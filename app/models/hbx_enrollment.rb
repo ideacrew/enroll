@@ -848,7 +848,7 @@ class HbxEnrollment
     end
 
     if employee_role.can_enroll_as_new_hire?
-      employee_role.new_coverage_effective_on
+      employee_role.coverage_effective_on
     elsif qle
       hbx_enrollment.family.earliest_effective_shop_sep.effective_on
     else
@@ -1255,14 +1255,15 @@ class HbxEnrollment
 
   def can_select_coverage?
     return true if is_cobra_status?
+
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
-        coverage_effective_date = employee_role.new_coverage_effective_on
+        coverage_effective_date = employee_role.coverage_effective_on
       elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
         coverage_effective_date = special_enrollment_period.effective_on
       elsif benefit_group.is_open_enrollment?
-        open_enrollment_effective_date = employee_role.employer_profile.show_plan_year.start_on
-        return false if open_enrollment_effective_date < employee_role.coverage_effective_on
+        open_enrollment_effective_date = benefit_group.start_on
+        return false if open_enrollment_effective_date < employee_role.coverage_effective_on(benefit_group)
         coverage_effective_date = open_enrollment_effective_date
       end
 

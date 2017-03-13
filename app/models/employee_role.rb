@@ -103,20 +103,8 @@ class EmployeeRole
     end
   end
 
-  def coverage_effective_on
-    if benefit_group.present?
-      effective_on_date = benefit_group.effective_on_for(census_employee.hired_on)
-
-      if census_employee.newly_designated_eligible? || census_employee.newly_designated_linked?
-        effective_on_date = [effective_on_date, census_employee.newly_eligible_earlist_eligible_date].max
-      end
-    end
-    
-    effective_on_date
-  end
-
-  def new_coverage_effective_on
-    census_employee.new_coverage_effective_on
+  def coverage_effective_on(current_benefit_group = nil)
+    census_employee.coverage_effective_on(current_benefit_group)
   end
 
   def can_enroll_as_new_hire?    
@@ -132,7 +120,7 @@ class EmployeeRole
   end
 
   def is_dental_offered?
-    plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on)
+    plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on(benefit_group))
 
     benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
     benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}
