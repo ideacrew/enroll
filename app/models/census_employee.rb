@@ -6,7 +6,7 @@ class CensusEmployee < CensusMember
   include Autocomplete
   include Acapi::Notifiers
   include ::Eligibility::CensusEmployee
-  include ::Eligibility::BenefitGroupAssignmentHelper
+  include ::Eligibility::EmployeeBenefitPackages
 
   require 'roo'
 
@@ -448,7 +448,6 @@ class CensusEmployee < CensusMember
         return 0
       end
     end
-
 
     def advance_day(new_date)
       CensusEmployee.terminate_scheduled_census_employees
