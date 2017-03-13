@@ -48,6 +48,8 @@ namespace :reports do
         begin
 
           primary_fm = family.primary_family_member
+          next if primary_fm.user.blank?
+          next if family.active_household.hbx_enrollments.individual_market.where(:"effective_on" => {"$lt" => Date.new(2016,1,1)} ).present?
           versioned_person = primary_fm.person.versions.detect { |ver| submitted_application(ver, start_date, end_date) }
           submitted_app_primary = versioned_person || (primary_fm.person if submitted_application(primary_fm.person, start_date, end_date))
           
