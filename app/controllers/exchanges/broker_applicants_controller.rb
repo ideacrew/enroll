@@ -62,7 +62,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.reload
 
       if broker_role.is_primary_broker?
-        broker_role.broker_agency_profile.approve!
+        broker_role.broker_agency_profile.approve! if broker_role.broker_agency_profile.aasm_state !=  "is_approved"
         staff_role = broker_role.person.broker_agency_staff_roles[0]
         staff_role.broker_agency_accept! if staff_role
       end

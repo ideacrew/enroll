@@ -103,6 +103,10 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to('/exchanges/hbx_profiles')
         end
+
+        it "should have training as true in broker role attributes" do
+          expect(broker_role.training).to eq true
+        end
       end
 
       context 'when application is pending' do
@@ -117,6 +121,10 @@ RSpec.describe Exchanges::BrokerApplicantsController do
           expect(broker_role.aasm_state).to eq 'broker_agency_pending'
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to('/exchanges/hbx_profiles')
+        end
+
+        it "should have training as true in broker role attributes" do
+          expect(broker_role.training).to eq true
         end
       end
 
