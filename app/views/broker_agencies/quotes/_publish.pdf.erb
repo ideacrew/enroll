@@ -30,7 +30,6 @@
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Relationship</th>
-                    <th>DOB</th>
                   </tr>
                 </thead>
                 <% @q.quote_households.each do |quote_household| %>
@@ -40,7 +39,6 @@
                         <td><%= member.first_name%></td>
                         <td><%= member.last_name%></td>
                         <td><%= member.employee_relationship.humanize%></td>
-                        <td><%= member.dob%></td>
                       </tr>
                     <% end %>
                   <% end %>
@@ -64,7 +62,7 @@
                       <% if benefit_group.plan %>
                       <tr>
                         <td><%= benefit_group.plan.name %></td>
-                        <td><%= benefit_group.plan.carrier_profile.abbrev.upcase %></td>
+                        <td><%= benefit_group.plan.carrier_profile.legal_name %></td>
                         <td><%= benefit_group.plan.plan_type.upcase%></td>
                         <td><%= benefit_group.plan.metal_level.capitalize%></td>
                         <td><%= benefit_group.plan_option_kind.titleize%></td>
@@ -73,7 +71,7 @@
                       <% if benefit_group.dental_plan %>
                       <tr>
                         <td><%= benefit_group.dental_plan.name %></td>
-                        <td><%= benefit_group.dental_plan.carrier_profile.abbrev.upcase %></td>
+                        <td><%= benefit_group.dental_plan.carrier_profile.legal_name %></td>
                         <td><%= benefit_group.dental_plan.plan_type.upcase%></td>
                         <td><%= benefit_group.dental_plan.metal_level.capitalize%></td>
                         <td><%= benefit_group.dental_plan_option_kind.titleize%></td>
