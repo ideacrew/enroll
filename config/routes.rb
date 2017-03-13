@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   
   get 'dashboard/home', to: 'dashboards#home'
   get 'ivl/home', to: 'ivls#home'
+  get 'policie/home', to: 'policies#home'
   
   namespace :exchanges do
 
