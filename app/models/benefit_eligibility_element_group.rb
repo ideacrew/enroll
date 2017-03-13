@@ -12,10 +12,11 @@ class BenefitEligibilityElementGroup
       child
       parent
       sibling
-      ward
-      guardian
       unrelated
-      other_tax_dependent
+      aunt_or_uncle
+      nephew_or_niece
+      grandchild
+      grandparent
     )
 
   SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
