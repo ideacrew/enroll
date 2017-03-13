@@ -10,7 +10,7 @@ class ChangeIncorrectTerminationDateInEnrollment < MongoidMigrationTask
         puts "The enrollment is not in terminated state"
       else
         enrollment.update_attributes(terminated_on: new_termination_date)
-        puts "Changed Enrollment effective on date to #{new_termination_date}" unless Rails.env.test?
+        puts "Changed Enrollment termination date to #{new_termination_date}" unless Rails.env.test?
       end
     rescue Exception => e
       puts e.message
