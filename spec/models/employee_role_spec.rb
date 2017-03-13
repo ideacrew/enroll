@@ -44,30 +44,57 @@ describe EmployeeRole, "given a person" do
 
 end
 
-# describe "coverage_effective_on" do
-#   let(:employee_role) { FactoryGirl.create(:employee_role) }
-#   let(:effective_on) { Date.new(2009, 2, 5) }
 
-#   context "when benefit group present" do
-#     it "should return coverage_effective_on" do
-#       allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(employee_role.hired_on)
-#       allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
-#       allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
-#       allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(effective_on)
-#       expect(employee_role.new_coverage_effective_on(employee_role.benefit_group)).to eq effective_on
-#     end
-#   end
+describe ".coverage_effective_on" do
 
-#   context "when benefit group doesn't exists" do
-#     it "coverage_effective_on should be nil" do
-#       allow(employee_role).to receive_message_chain(:census_employee, :hired_on).and_return(effective_on)
-#       allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_eligible?).and_return(false)
-#       allow(employee_role).to receive_message_chain(:census_employee, :newly_designated_linked?).and_return(false)
-#       allow(employee_role).to receive_message_chain(:benefit_group, :effective_on_for).and_return(nil)
-#       expect(employee_role.coverage_effective_on).to eq nil
-#     end
-#   end
-# end
+  context 'when both active and renewal benefit groups present' do 
+
+    let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
+
+    let!(:employer_profile) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
+      employer = FactoryGirl.create :employer_profile, organization: org
+      plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :active
+      FactoryGirl.create :benefit_group, plan_year: plan_year
+      renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
+      FactoryGirl.create :benefit_group, plan_year: renewal_plan_year
+      employer
+    }
+
+    let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
+    let(:end_on) { start_on + 1.year - 1.day }
+    let(:open_enrollment_start_on) { start_on - 2.months }
+    let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 9.days }
+
+    let!(:census_employees){
+      FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+      FactoryGirl.create :census_employee, employer_profile: employer_profile, hired_on: hired_on
+    }
+
+    let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+    let(:employee_role) {
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    }
+
+
+    context 'when called with benefit group' do
+      let(:renewal_benefit_group) {employer_profile.renewing_plan_year.benefit_groups.first}
+
+      it 'should calculate effective date from renewal benefit group' do
+        expect(employee_role.coverage_effective_on(renewal_benefit_group)).to eq renewal_benefit_group.start_on
+      end
+    end
+
+    context 'when called without benefit group' do
+
+      it 'should calculate effective date based on active benefit group' do
+        expect(employee_role.coverage_effective_on).to eq hired_on
+      end 
+    end
+  end
+end
 
 describe EmployeeRole, dbclean: :after_each do
   let(:ssn) {"987654321"}
