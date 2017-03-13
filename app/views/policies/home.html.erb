@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IVL Dashboard</title>
+<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+<!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+<!-- <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
+
+<script type="text/javascript">
+$(function () {
+    Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+    $('#barYr1').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            height: 185, 
+            width: 1200
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+                'Jan',
+                'Feb'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            <%@policy_totalaccounts.each do |policy_chart|%>
+            name: 'Account',
+            data: [<%=policy_chart.account_one%>,<%=policy_chart.account_two%>, <%=policy_chart.account_three%>, <%=policy_chart.account_four%>, <%=policy_chart.account_five%>, <%=policy_chart.account_six%>, <%=policy_chart.account_seven%>, <%=policy_chart.account_eight%>, <%=policy_chart.account_nine%>, <%=policy_chart.account_ten%>, <%=policy_chart.account_eleven%>, <%=policy_chart.account_twelve%>]
+
+        }, {
+            name: 'Enrolled',
+            data: [<%=policy_chart.enrolled_one%>, <%=policy_chart.enrolled_two%>, <%=policy_chart.enrolled_three%>, <%=policy_chart.enrolled_four%>, <%=policy_chart.enrolled_five%>, <%=policy_chart.enrolled_six%>, <%=policy_chart.enrolled_seven%>, <%=policy_chart.enrolled_eight%>, <%=policy_chart.enrolled_nine%>, <%=policy_chart.enrolled_ten%>, <%=policy_chart.enrolled_eleven%>, <%=policy_chart.enrolled_twelve%>]
+            <%end%>
+
+        }]
+    });
+});
+        </script>
+<script type="text/javascript">
+$(function () {
+    $('#web1').highcharts({
+        chart: {
+            type: 'heatmap',
+            marginTop: 3,
+            marginBottom: 3,
+            plotBorderWidth: 1
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        },
+        yAxis: {
+            categories: ['Page Views'],
+            title: null
+        },
+        colorAxis: {
+            min: 6,
+            minColor: '#FFFFFF',
+            maxColor: Highcharts.getOptions().colors[0]
+        },
+         legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br><b>' +
+                    this.point.value + '</b> thousand <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
+            }
+        },
+        series: [{
+            name: 'Web Activity',
+            borderWidth: 1,
+            data: [[0, 0, 9.1], [1, 0, 6.9], [2, 0, 8], [3, 0, 8.1], [4, 0, 7.4], [5, 0, 8.1], [6, 0, 7.3]],
+            dataLabels: {
+                enabled: true,
+                color: '#000000'
+            }
+        }]
+    });
+});
+        </script>
+
+<script type="text/javascript">
+$(function () {
+    $('#lineT1').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'line',
+            height: 190, 
+            width: 1200
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+        },
+        yAxis: {
+            title: {
+                text: ''
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+        series: [{
+            <%@policy_covered_lives.each do |policy_covered|%>
+            name: 'Cancel',
+            data: [<%=policy_covered.cancel_one%>, <%=policy_covered.cancel_two%>, <%=policy_covered.cancel_three%>, <%=policy_covered.cancel_four%>, <%=policy_covered.cancel_five%>, <%=policy_covered.cancel_six%>, <%=policy_covered.cancel_seven%>, <%=policy_covered.cancel_eight%>, <%=policy_covered.cancel_nine%>, <%=policy_covered.cancel_ten%>, <%=policy_covered.cancel_eleven%>, <%=policy_covered.cancel_twelve%>]
+        }, {
+            name: 'Term',
+            data: [<%=policy_covered.terminations_one%>, <%=policy_covered.terminations_two%>, <%=policy_covered.terminations_three%>, <%=policy_covered.terminations_four%>, <%=policy_covered.terminations_five%>, <%=policy_covered.terminations_six%>, <%=policy_covered.terminations_seven%>, <%=policy_covered.terminations_eight%>, <%=policy_covered.terminations_nine%>, <%=policy_covered.terminations_ten%>, <%=policy_covered.terminations_eleven%>, <%=policy_covered.terminations_twelve%>]
+        }, {
+            name: 'Reinstate',
+            data: [<%=policy_covered.reinstatements_one%>, <%=policy_covered.reinstatements_two%>, <%=policy_covered.reinstatements_three%>, <%=policy_covered.reinstatements_four%>, <%=policy_covered.reinstatements_five%>, <%=policy_covered.reinstatements_six%>, <%=policy_covered.reinstatements_seven%>, <%=policy_covered.reinstatements_eight%>, <%=policy_covered.reinstatements_nine%>, <%=policy_covered.reinstatements_ten%>, <%=policy_covered.reinstatements_eleven%>, <%=policy_covered.reinstatements_twelve%>]
+        }]
+        <%end%>
+    });
+});
+        </script>
+
+</head>
+
+<body>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <!-- <header class="jumbotron jumbotron"> -->
+
+        <!-- Main component for a primary marketing message or call to action -->
+
+    <!-- <div class="container-fluid"> -->
+            <!-- <div class="row row-header"> -->
+                <!-- <h2>CIO Dashboard</h2> -->
+            <!-- </div> -->
+    <!-- </div> -->
+    <!-- </header> -->
+
+<div class="container-fluid" style="margin: 5px;"> 
+<ul class="nav nav-pills">
+ <li class="active"><a href="ivl_index.htm" data-toggle="tab">IVL Covered Lives</a></li>
+ <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+ <li><a href="shop_lives.htm">SHOP Covered Lives</a></li>
+ <li><a href="shop_policy.htm">SHOP Policies</a></li>
+</ul>
+
+<div class="row row-content">
+<%@policy_overall.each do |overall|%>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+ <div class="panel-body"><b>Total Coverage - <%=overall.covered_lives_total%> <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_total_change.to_f * 100).to_i%>% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+ <div class="panel-body"><b>New Coverage YTD - <%=overall.covered_lives_new%> <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_new_change.to_f * 100).to_i%>% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+ <div class="panel-body"><b>Terminations YTD - <%=overall.covered_lives_terminations%> <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_terminations_change.to_f * 100).to_i%>% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+ <div class="panel-body"><b>Cancellations YTD - <%=overall.covered_lives_cancellations%> <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_cancellations_change.to_f * 100).to_i%>% YoY</div>
+</div>
+</div>
+<%end%>
+</div>
+
+    <div class="row row-content">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
+
+    <h4>Individual Market Covered Lives</h4>
+    <table class="table table-hover table-condensed">
+    <thead>
+      <tr>
+        <th class="texLef">Enrollment Type</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+    </thead>
+    <tbody>
+    <%@policy_annual_enrollments.each do |annual_policy|%>
+      <tr>
+        <td class="texLef">Auto Renewals</td>
+        <td><%=annual_policy.auto_renewals_count%></td>
+        <td><%=(annual_policy.auto_renewals_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual_policy.auto_renewals_yoy.to_f * 100).to_i%>%</td>     
+      </tr>
+      <tr>
+        <td class="texLef">Active Renewals</td>
+        <td><%=annual_policy.active_renewals_count%></td>
+        <td><%=(annual_policy.active_renewals_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual_policy.active_renewals_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">New Customers</td>
+        <td><%=annual_policy.new_customers_count%></td>
+        <td><%=(annual_policy.new_customers_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual_policy.new_customers_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">SEP</td>
+        <td><%=annual_policy.sep_count%></td>
+        <td><%=(annual_policy.sep_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual_policy.sep_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <%end%>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      
+      <tr>
+      <%@policy_annual_carriers.each do |carrier_annual|%>
+        <th class="texLef">Carrier</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier_annual.carrier_first_name%></td>
+        <td><%=carrier_annual.carrier_first_count%></td>
+        <td><%=(carrier_annual.carrier_first_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier_annual.carrier_first_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier_annual.carrier_secondName%></td>
+        <td><%=carrier_annual.carrier_second_count%></td>
+        <td><%=(carrier_annual.carrier_second_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier_annual.carrier_second_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <%end%>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%=@metal_types.each do |policy_metals|%>
+        <th class="texLef">Metal</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">Platinum</td>
+        <td><%=policy_metals.platinum_count%></td>
+        <td><%=(policy_metals.platinum_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_metals.platinum_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Gold</td>
+        <td><%=policy_metals.gold_count%></td>
+        <td><%=(policy_metals.gold_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_metals.gold_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Silver</td>
+        <td><%=policy_metals.silver_count%></td>
+        <td><%=(policy_metals.silver_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_metals.silver_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Bronze</td>
+        <td><%=policy_metals.bronze_count%></td>
+        <td><%=(policy_metals.bronze_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_metals.bronze_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Catastrophic</td>
+        <td><%=policy_metals.catastrophic_count%></td>
+        <td><%=(policy_metals.catastrophic_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_metals.catastrophic_yoy.to_f * 100).to_i%>%</td>
+        <%end%>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+ 
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@policy_family.each do |family|%>
+       <th class="texLef">Family Size</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">1-Member</td>
+       <td><%=family.one_count%></td>
+       <td><%=(family.one_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.one_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">2-Members</td>
+       <td><%=family.two_count%></td>
+       <td><%=(family.two_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.two_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">3-Members</td>
+       <td><%=family.three_count%></td>
+       <td><%=(family.three_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.three_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">4-Members</td>
+       <td><%=family.four_count%></td>
+       <td><%=(family.four_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.four_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">5-Members</td>
+       <td><%=family.five_count%></td>
+       <td><%=(family.five_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.five_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">6-Members</td>
+       <td><%=family.six_count%></td>
+       <td><%=(family.six_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.six_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">7+ Members</td>
+       <td><%=family.seven_count%></td>
+       <td><%=(family.seven_share.to_f * 100).to_i%>%</td>
+       <td><%=(family.seven_yoy.to_f * 100).to_i%>%</td>
+       <%end%>
+     </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@policy_annual_aptc.each do |policy_aptc|%>
+        <th class="texLef">APTC</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">Yes</td>
+        <td><%=policy_aptc.yes_count%></td>
+        <td><%=(policy_aptc.yes_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_aptc.yes_yoy.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">No</td>
+        <td><%=policy_aptc.no_count%></td>
+        <td><%=(policy_aptc.no_share.to_f * 100).to_i%>%</td>
+        <td><%=(policy_aptc.no_yoy.to_f * 100).to_i%>%</td>
+        <%end%>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@policy_csr.each do |policy_csr|%>
+       <th class="texLef">CSR</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">Yes</td>
+       <td><%=policy_csr.yes_count%></td>
+       <td><%=(policy_csr.yes_share.to_f * 100).to_i%>%</td>
+       <td><%=(policy_csr.yes_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <tr>
+       <td class="texLef">No</td>
+       <td><%=policy_csr.no_count%></td>
+       <td><%=(policy_csr.no_share.to_f * 100).to_i%>%</td>
+       <td><%=(policy_csr.no_yoy.to_f * 100).to_i%>%</td>
+     </tr>
+     <%end%>
+    </tbody>
+    </table>
+
+    </div>
+
+<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
+
+<h4>New DC Health Link Accounts and Covered Lives by Start Month</h4>
+<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h4>Enrollments by Type - 3/1/2016 to 2/28/2017</h4>
+    <table class="table table-hover table-condensed">
+    <%@policy_enrollments.each do |policy_enroll|%>
+    <thead>
+      <tr>
+        <th class="texLef">Enrollment</th>
+        <th><%=policy_enroll.month_one%></th>
+        <th><%=policy_enroll.month_two%></th>
+        <th><%=policy_enroll.month_three%></th>
+        <th><%=policy_enroll.month_four%></th>
+        <th><%=policy_enroll.month_five%></th>
+        <th><%=policy_enroll.month_six%></th>
+        <th><%=policy_enroll.month_seven%></th>
+        <th><%=policy_enroll.month_eight%></th>
+        <th><%=policy_enroll.month_nine%></th>
+        <th><%=policy_enroll.month_ten%></th>
+        <th><%=policy_enroll.month_eleven%></th>
+        <th><%=policy_enroll.month_twelve%></th>
+        <th>Total</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Auto Renew</td>
+        <td><%=policy_enroll.auto_renew_one%></td>
+        <td><%=policy_enroll.auto_renew_two%></td>
+        <td><%=policy_enroll.auto_renew_three%></td>
+        <td><%=policy_enroll.auto_renew_four%></td>
+        <td><%=policy_enroll.auto_renew_five%></td>
+        <td><%=policy_enroll.auto_renew_six%></td>
+        <td><%=policy_enroll.auto_renew_seven%></td>
+        <td><%=policy_enroll.auto_renew_eight%></td>
+        <td><%=policy_enroll.auto_renew_nine%></td>
+        <td><%=policy_enroll.auto_renew_ten%></td>
+        <td><%=policy_enroll.auto_renew_eleven%></td>
+        <td><%=policy_enroll.auto_renew_twelve%></td>
+        <td><%=policy_enroll.auto_renew_total%></td>
+        <td><%=(policy_enroll.auto_renew_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Active Renew</td> 
+        <td><%=policy_enroll.active_renew_one%></td>
+        <td><%=policy_enroll.active_renew_two%></td>
+        <td><%=policy_enroll.active_renew_three%></td>
+        <td><%=policy_enroll.active_renew_four%></td>
+        <td><%=policy_enroll.active_renew_five%></td>
+        <td><%=policy_enroll.active_renew_six%></td>
+        <td><%=policy_enroll.active_renew_seven%></td>
+        <td><%=policy_enroll.active_renew_eight%></td>
+        <td><%=policy_enroll.active_renew_nine%></td>
+        <td><%=policy_enroll.active_renew_ten%></td>
+        <td><%=policy_enroll.active_renew_eleven%></td>
+        <td><%=policy_enroll.active_renew_twelve%></td>
+        <td><%=policy_enroll.active_renew_total%></td>
+        <td><%=(policy_enroll.active_renew_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">New Customer</td>
+        <td><%=policy_enroll.newCustomer_one%></td>
+        <td><%=policy_enroll.newCustomer_two%></td>
+        <td><%=policy_enroll.newCustomer_three%></td>
+        <td><%=policy_enroll.newCustomer_four%></td>
+        <td><%=policy_enroll.newCustomer_five%></td>
+        <td><%=policy_enroll.newCustomer_six%></td>
+        <td><%=policy_enroll.newCustomer_seven%></td>
+        <td><%=policy_enroll.newCustomer_eight%></td>
+        <td><%=policy_enroll.newCustomer_nine%></td>
+        <td><%=policy_enroll.newCustomer_ten%></td>
+        <td><%=policy_enroll.newCustomer_eleven%></td>
+        <td><%=policy_enroll.newCustomer_twelve%></td>
+        <td><%=policy_enroll.newCustomer_total%></td>
+        <td><%=(policy_enroll.newCustomer_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">SEP</td>
+        <td><%=policy_enroll.sep_one%></td>
+        <td><%=policy_enroll.sep_two%></td>
+        <td><%=policy_enroll.sep_three%></td>
+        <td><%=policy_enroll.sep_four%></td>
+        <td><%=policy_enroll.sep_five%></td>
+        <td><%=policy_enroll.sep_six%></td>
+        <td><%=policy_enroll.sep_seven%></td>
+        <td><%=policy_enroll.sep_eight%></td>
+        <td><%=policy_enroll.sep_nine%></td>
+        <td><%=policy_enroll.sep_ten%></td>
+        <td><%=policy_enroll.sep_eleven%></td>
+        <td><%=policy_enroll.sep_twelve%></td>
+        <td><%=policy_enroll.sep_total%></td>
+        <td><%=(policy_enroll.sep_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td><%=policy_enroll.total_one%></td>
+        <td><%=policy_enroll.total_two%></td>
+        <td><%=policy_enroll.total_three%></td>
+        <td><%=policy_enroll.total_four%></td>
+        <td><%=policy_enroll.total_five%></td>
+        <td><%=policy_enroll.total_six%></td>
+        <td><%=policy_enroll.total_seven%></td>
+        <td><%=policy_enroll.total_eight%></td>
+        <td><%=policy_enroll.total_nine%></td>
+        <td><%=policy_enroll.total_ten%></td>
+        <td><%=policy_enroll.total_eleven%></td>
+        <td><%=policy_enroll.total_twelve%></td>
+        <td><%=policy_enroll.total_total%></td>
+        <td><%=(policy_enroll.total_share.to_f * 100).to_i%>%</td>
+      </tr>
+    </tbody>
+    <%end%>
+    </table>
+
+<h4>SEPs by Type - 3/1/2016 to 2/28/2017</h4>
+    <table class="table table-hover table-condensed">
+    <%@policy_seps.each do |policy_seps|%>
+    <thead>
+      <tr>
+        <th class="texLef">SEP</th>
+        <th><%=policy_seps.month_one.to_i%></th>
+        <th><%=policy_seps.month_two%></th>
+        <th><%=policy_seps.month_three%></th>
+        <th><%=policy_seps.month_four%></th>
+        <th><%=policy_seps.month_five%></th>
+        <th><%=policy_seps.month_six%></th>
+        <th><%=policy_seps.month_seven%></th>
+        <th><%=policy_seps.month_eight%></th>
+        <th><%=policy_seps.month_nine%></th>
+        <th><%=policy_seps.month_ten%></th>
+        <th><%=policy_seps.month_eleven%></th>
+        <th><%=policy_seps.month_twelve%></th>
+        <th>Total</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Lost Coverage</td>
+        <td><%=policy_seps.lost_coverage_one.to_i%></td>
+        <td><%=policy_seps.lost_coverage_two%></td>
+        <td><%=policy_seps.lost_coverage_three%></td>
+        <td><%=policy_seps.lost_coverage_four%></td>
+        <td><%=policy_seps.lost_coverage_five%></td>
+        <td><%=policy_seps.lost_coverage_six%></td>
+        <td><%=policy_seps.lost_coverage_seven%></td>
+        <td><%=policy_seps.lost_coverage_eight%></td>
+        <td><%=policy_seps.lost_coverage_nine%></td>
+        <td><%=policy_seps.lost_coverage_ten%></td>
+        <td><%=policy_seps.lost_coverage_eleven%></td>
+        <td><%=policy_seps.lost_coverage_twelve%></td>
+        <td><%=policy_seps.lost_coverage_total%></td>
+        <td><%=(policy_seps.lost_coverage_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Birth</td>
+        <td><%=policy_seps.birth_one%></td>
+        <td><%=policy_seps.birth_two%></td>
+        <td><%=policy_seps.birth_three%></td>
+        <td><%=policy_seps.birth_four%></td>
+        <td><%=policy_seps.birth_five%></td>
+        <td><%=policy_seps.birth_six%></td>
+        <td><%=policy_seps.birth_seven%></td>
+        <td><%=policy_seps.birth_eight%></td>
+        <td><%=policy_seps.birth_nine%></td>
+        <td><%=policy_seps.birth_ten%></td>
+        <td><%=policy_seps.birth_eleven%></td>
+        <td><%=policy_seps.birth_twelve%></td>
+        <td><%=policy_seps.birth_total%></td>
+        <td><%=(policy_seps.birth_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Citizenship</td>
+        <td><%=policy_seps.citizenship_one%></td>
+        <td><%=policy_seps.citizenship_two%></td>
+        <td><%=policy_seps.citizenship_three%></td>
+        <td><%=policy_seps.citizenship_four%></td>
+        <td><%=policy_seps.citizenship_five%></td>
+        <td><%=policy_seps.citizenship_six%></td>
+        <td><%=policy_seps.citizenship_seven%></td>
+        <td><%=policy_seps.citizenship_eight%></td>
+        <td><%=policy_seps.citizenship_nine%></td>
+        <td><%=policy_seps.citizenship_ten%></td>
+        <td><%=policy_seps.citizenship_eleven%></td>
+        <td><%=policy_seps.citizenship_twelve%></td>
+        <td><%=policy_seps.citizenship_total%></td>
+        <td><%=(policy_seps.citizenship_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Relocation</td>
+        <td><%=policy_seps.relocation_one%></td>
+        <td><%=policy_seps.relocation_two%></td>
+        <td><%=policy_seps.relocation_three%></td>
+        <td><%=policy_seps.relocation_four%></td>
+        <td><%=policy_seps.relocation_five%></td>
+        <td><%=policy_seps.relocation_six%></td>
+        <td><%=policy_seps.relocation_seven%></td>
+        <td><%=policy_seps.relocation_eight%></td>
+        <td><%=policy_seps.relocation_nine%></td>
+        <td><%=policy_seps.relocation_ten%></td>
+        <td><%=policy_seps.relocation_eleven%></td>
+        <td><%=policy_seps.relocation_twelve%></td>
+        <td><%=policy_seps.relocation_total%></td>
+        <td><%=(policy_seps.relocation_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Other</td>
+        <td><%=policy_seps.other_one%></td>
+        <td><%=policy_seps.other_two%></td>
+        <td><%=policy_seps.other_three%></td>
+        <td><%=policy_seps.other_four%></td>
+        <td><%=policy_seps.other_five%></td>
+        <td><%=policy_seps.other_six%></td>
+        <td><%=policy_seps.other_seven%></td>
+        <td><%=policy_seps.other_eight%></td>
+        <td><%=policy_seps.other_nine%></td>
+        <td><%=policy_seps.other_ten%></td>
+        <td><%=policy_seps.other_eleven%></td>
+        <td><%=policy_seps.other_twelve%></td>
+        <td><%=policy_seps.other_total%></td>
+        <td><%=(policy_seps.other_share.to_f * 100).to_i%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td><%=policy_seps.total_one%></td>
+        <td><%=policy_seps.total_two%></td>
+        <td><%=policy_seps.total_three%></td>
+        <td><%=policy_seps.total_four%></td>
+        <td><%=policy_seps.total_five%></td>
+        <td><%=policy_seps.total_six%></td>
+        <td><%=policy_seps.total_seven%></td>
+        <td><%=policy_seps.total_eight%></td>
+        <td><%=policy_seps.total_nine%></td>
+        <td><%=policy_seps.total_ten%></td>
+        <td><%=policy_seps.total_eleven%></td>
+        <td><%=policy_seps.total_twelve%></td>
+        <td><%=policy_seps.total_total%></td>
+        <td><%=(policy_seps.total_share.to_f * 100).to_i%>%</td>
+      </tr>
+    </tbody>
+    <%end%>
+    </table>
+
+ <h4>Discontinued or Reinstated Covered Lives - 3/1/2016 to 2/28/2017</h4>
+ <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
+
+    </div>
+    </div>
+
+
+    </body>
+</html>
