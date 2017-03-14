@@ -541,11 +541,6 @@ And /^employer clicks on non-linked employee without address$/ do
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
 
-And /^employer clicks on back button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
-end
-
 Then /^employer should see employee roaster$/ do
   expect(page).to have_content "Employee Roster"
 end
@@ -559,11 +554,6 @@ And /^employer clicks on all employees$/ do
   wait_for_ajax
   page.execute_script("$('.filter-options').show();")
   find("#family_all").trigger('click')
-end
-
-And /^employer clicks on cancel button$/ do
-  expect(page).to have_content "Details"
-  find('.interaction-click-control-cancel').click
 end
 
 Then /^employer should not see termination date column$/ do
