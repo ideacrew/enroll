@@ -17,9 +17,8 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-  Kinds               = %w(individual employer_sponsored coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid
-                              emergency_medicaid hcr_chip
-                            )
+
+  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
 
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
@@ -150,8 +149,8 @@ class HbxEnrollment
   scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected","renewing_coverage_selected","coverage_enrolled","auto_renewing"] )}
   scope :changing,            ->{ where(changing: true) }
   scope :with_in,             ->(time_limit){ where(:created_at.gte => time_limit) }
-  scope :shop_market,         ->{ where(:kind => "employer_sponsored") }
-  scope :individual_market,   ->{ where(:kind.ne => "employer_sponsored") }
+  scope :shop_market,         ->{ where(:kind.in => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:aasm_state => "enrolled_contingent").or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}).order(created_at: :desc) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
@@ -160,10 +159,11 @@ class HbxEnrollment
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
+  scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
-
+  scope :non_expired_and_non_terminated,            -> { any_of([enrolled.selector, renewing.selector, waived.selector]).order(created_at: :desc) }
   embeds_many :workflow_state_transitions, as: :transitional
 
   embeds_many :hbx_enrollment_members
@@ -308,7 +308,7 @@ class HbxEnrollment
         family.enrollments.renewing.each do |hbx_enrollment|
           if hbx_enrollment.effective_on <= new_date
             if census_employee = hbx_enrollment.census_employee
-              if census_employee.renewal_benefit_group_assignment.may_select_coverage?
+              if census_employee.renewal_benefit_group_assignment.try(:may_select_coverage?)
                 census_employee.renewal_benefit_group_assignment.select_coverage!
               end
             end
@@ -336,14 +336,21 @@ class HbxEnrollment
 
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable?
-      self.send(eligibility_ruleset.determine_next_state)
-      self.save!
+    if eligibility_ruleset.applicable? 
+      if eligibility_ruleset.determine_next_state != :do_nothing
+        self.send(eligibility_ruleset.determine_next_state)
+      end
     end
   end
 
   def coverage_kind
     read_attribute(:coverage_kind) || self.plan.coverage_kind
+  end
+
+  def benefit_package_name
+    if is_shop? && benefit_group
+      benefit_group.title
+    end
   end
 
   def census_employee
@@ -354,6 +361,23 @@ class HbxEnrollment
     else
       nil
     end
+  end
+
+  def market_name
+    if is_shop?
+      'Employer Sponsored'
+    else
+      'Individual'
+    end
+  end
+
+  def is_cobra_status?
+    kind == 'employer_sponsored_cobra'
+  end
+
+  def future_enrollment_termination_date
+    return "" unless coverage_termination_pending?
+    employee_role && employee_role.census_employee && employee_role.census_employee.coverage_terminated_on
   end
 
   def benefit_sponsored?
@@ -384,6 +408,10 @@ class HbxEnrollment
     terminated_on >= effective_on
   end
 
+  def cobra_future_active?
+    is_cobra_status? && future_active?
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -410,7 +438,7 @@ class HbxEnrollment
   end
 
   def propogate_waiver
-    return false if kind != 'employer_sponsored' # there is no concept of waiver in ivl case
+    return false unless is_shop? # there is no concept of waiver in ivl case
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
@@ -434,12 +462,12 @@ class HbxEnrollment
 
       previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
 
-      if (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on)
+      if (previous_enrollment.enrollment_signature == self.enrollment_signature && !previous_enrollment.is_shop? && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.is_shop? && TimeKeeper.date_of_record < previous_enrollment.effective_on)
 
         if previous_enrollment.may_cancel_coverage?
           previous_enrollment.cancel_coverage!(previous_enrollment.effective_on)
         end
-      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
+      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && !previous_enrollment.is_shop? && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.is_shop? && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
         if previous_enrollment.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           term_date = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum if (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum) > term_date && self.effective_on > (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum)
@@ -478,7 +506,7 @@ class HbxEnrollment
   end
 
   def propogate_selection
-    if self.kind == "employer_sponsored"
+    if is_shop?
       update_existing_shop_coverage
     else
       cancel_previous(self.plan.active_year)
@@ -503,7 +531,7 @@ class HbxEnrollment
   end
 
   def is_shop?
-    kind == "employer_sponsored"
+    ['employer_sponsored', 'employer_sponsored_cobra'].include?(kind)
   end
 
   def is_coverall?
@@ -707,7 +735,7 @@ class HbxEnrollment
   end
 
   def update_current(updates)
-    household.hbx_enrollments.where(id: id).update_all(updates)
+    household && household.hbx_enrollments.where(id: id).update_all(updates)
   end
 
   def update_hbx_enrollment_members_premium(decorated_plan)
@@ -862,7 +890,7 @@ class HbxEnrollment
     end
   end
 
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil)
+  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil)
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
 
@@ -880,7 +908,11 @@ class HbxEnrollment
         enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
         enrollment.enrollment_kind = "special_enrollment"
       else
-        enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+        if external_enrollment && coverage_start.present?
+          enrollment.effective_on = coverage_start
+        else
+          enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+        end
         enrollment.enrollment_kind = "open_enrollment"
       end
 
@@ -1165,45 +1197,25 @@ class HbxEnrollment
                     to:  :void
     end
 
-    event :move_to_enrolled!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_enrolled, :after => :record_transition do
       transitions from: :unverified, to: :coverage_selected
       transitions from: :enrolled_contingent, to: :coverage_selected
-      transitions from: :coverage_selected, to: :coverage_selected
-      transitions from: :auto_renewing, to: :auto_renewing
-      transitions from: :coverage_expired, to: :coverage_expired
-      transitions from: :shopping, to: :shopping
     end
 
-    event :move_to_contingent!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_contingent, :after => :record_transition do
       transitions from: :shopping, to: :enrolled_contingent
       transitions from: :coverage_selected, to: :enrolled_contingent
       transitions from: :unverified, to: :enrolled_contingent
-      transitions from: :enrolled_contingent, to: :enrolled_contingent
       transitions from: :coverage_enrolled, to: :enrolled_contingent
       transitions from: :auto_renewing, to: :enrolled_contingent
-      transitions from: :coverage_expired, to: :coverage_expired
     end
 
-    event :move_to_pending!, :after => :record_transition do
-      transitions from: :inactive, to: :inactive
-      transitions from: :coverage_terminated, to: :coverage_terminated
-      transitions from: :void, to: :void
-      transitions from: :coverage_canceled, to: :coverage_canceled
+    event :move_to_pending, :after => :record_transition do
       transitions from: :shopping, to: :unverified
-      transitions from: :unverified, to: :unverified
       transitions from: :coverage_selected, to: :unverified
       transitions from: :enrolled_contingent, to: :unverified
       transitions from: :coverage_enrolled, to: :unverified
       transitions from: :auto_renewing, to: :unverified
-      transitions from: :coverage_expired, to: :coverage_expired
     end
 
     event :force_select_coverage, :after => :record_transition do
@@ -1224,6 +1236,7 @@ class HbxEnrollment
 
   def can_select_coverage?
     return true unless is_shop?
+    return true if is_cobra_status?
 
     if employee_role.can_enroll_as_new_hire?
       coverage_effective_date = employee_role.coverage_effective_on

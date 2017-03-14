@@ -30,8 +30,8 @@ class ChangePlanYearEffectiveDate < MongoidMigrationTask
       else
         puts "#{plan_year.errors.full_messages}" unless Rails.env.test?
       end
-    rescue
-      puts "Incorrect environment variables"
+    rescue Exception => e
+      puts e.message
     end
   end
 end
