@@ -872,7 +872,7 @@ class Person
     end
   end
 
-  def check_for_ridp(session_var)
+  def check_for_paper_application(session_var)
     if user && session_var == 'paper'
       user.ridp_by_paper_application
     end
