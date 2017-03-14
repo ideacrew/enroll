@@ -5,7 +5,6 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     #find two person accounts and all the hbx_enrollments
     gp = Person.where(hbx_id:ENV['new_account_hbx_id']).first
     bp = Person.where(hbx_id:ENV['old_account_hbx_id']).first
-    puts "bp family>>>>>>>>>>>>> #{bp.primary_family}" 
     hbx_enrollments= bp.primary_family.active_household.hbx_enrollments
     #rebuild the family
     #add the family members of the old enrollments to the new enrollment
@@ -27,7 +26,7 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
                  consumer_role: hbx_enrollment.consumer_role,
                  coverage_household:gp.primary_family.active_household.immediate_family_coverage_household,
                  benefit_group: hbx_enrollment.benefit_group,
-                 benefit_group_assignment:hbx_enrollment.benefit_group_assignments
+                 benefit_group_assignment:hbx_enrollment.benefit_group_assignment
              )
              bp.primary_family.active_household.delete_hbx_enrollment(hbx_enrollment.id)
            else
