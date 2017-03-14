@@ -66,13 +66,18 @@ describe PersonRelationship, dbclean: :after_each do
 
     context "consumer relationship dropdown list(family member page)" do
       let(:params){ valid_params.deep_merge!({kind: "other_tax_dependent"}) }
+      let(:params2){ valid_params.deep_merge!({kind: "spouse"}) }
 
       it "consumer relationships should be matched" do
         expect(BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS).to eq consumer_relationship_kinds
       end
 
-      it "should be valid if kind is present" do
+      it "should not be valid if kind is not present in person_relationship" do
         expect(PersonRelationship.new(**params).valid?).to be_falsey
+      end
+
+      it "should be valid if kind is present" do
+        expect(PersonRelationship.new(**params2).valid?).to be_truthy
       end
 
     end
