@@ -35,7 +35,7 @@ describe UpdateInvalidBenefitGroupAssignmentsForEmployer do
 
       it "should update the invalid benefit group assignments" do
         allow(benefit_group_assignment).to receive(:valid?).and_return(false)
-        allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes).with(benefit_group_id: benefit_group.id)
+        allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes!).with(benefit_group_id: benefit_group.id)
         allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group_id ).and_return(true)
 
         subject.migrate
