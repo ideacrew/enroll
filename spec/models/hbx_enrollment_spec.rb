@@ -740,6 +740,44 @@ describe HbxProfile, "class methods", type: :model do
     end
   end
 
+  context "is reporting a qle before the employer plan start_date and having a expired plan year" do
+    let(:coverage_household) { double}
+    let(:coverage_household_members) {double}
+    let(:household) {FactoryGirl.create(:household, family: family)}
+    let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+    let(:census_employee) { FactoryGirl.create :census_employee, employer_profile: organization.employer_profile, dob: TimeKeeper.date_of_record - 30.years, first_name: person.first_name, last_name: person.last_name }
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:sep){
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'date_of_event'
+      sep.qualifying_life_event_kind= qle_kind
+      sep.qle_on= TimeKeeper.date_of_record - 7.days
+      sep.start_on = sep.qle_on
+      sep.end_on = sep.qle_on + 30.days
+      sep.save
+      sep
+    }
+
+    before do
+      allow(coverage_household).to receive(:household).and_return family.active_household
+      allow(coverage_household).to receive(:coverage_household_members).and_return []
+      allow(sep).to receive(:is_active?).and_return true
+      allow(family).to receive(:is_under_special_enrollment_period?).and_return true
+      expired_py = organization.employer_profile.plan_years.where(aasm_state: 'expired').first
+      census_employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: expired_py.benefit_groups[0], start_on: expired_py.benefit_groups[0].start_on)
+      census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id, hired_on: TimeKeeper.date_of_record - 2.months)
+      census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
+    end
+
+    it "should return a sep with an effective date that equals to sep date" do
+       enrollment = HbxEnrollment.new_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_package: nil, benefit_group_assignment: nil, qle: true)
+       expect(enrollment.effective_on).to eq sep.qle_on
+    end
+  end
+
   context "coverage_year" do
     let(:date){ TimeKeeper.date_of_record }
     let(:plan_year){ PlanYear.new(start_on: date) }
@@ -972,6 +1010,7 @@ describe HbxEnrollment, dbclean: :after_each do
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
     allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
     allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+    allow(shop_enrollment).to receive(:plan_year_check).with(employee_role).and_return false
   end
 
   after :all do
@@ -1127,6 +1166,7 @@ describe HbxEnrollment, dbclean: :after_each do
       allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+      allow(shop_enrollment).to receive(:plan_year_check).with(employee_role).and_return false
     end
 
     context 'under open enrollment' do
@@ -1246,6 +1286,9 @@ describe HbxEnrollment, dbclean: :after_each do
                                                    )
                                 }
 
+      before do
+        allow(shop_enrollment).to receive(:plan_year_check).with(employee_role).and_return false
+      end
       context 'under special enrollment period' do
         before do
           TimeKeeper.set_date_of_record_unprotected!( special_enrollment_period.end_on - 5.days )
@@ -2126,6 +2169,9 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
                          aasm_state: 'shopping'
                          )
     }
+    before do
+      allow(new_enrolllment).to receive(:plan_year_check).with(ce.employee_role).and_return false
+    end
 
     it 'should terminate their existing coverage' do
       expect(enrollment.coverage_selected?).to be_truthy
@@ -2175,6 +2221,10 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
                          )
     }
 
+    before do
+      allow(new_enrollment).to receive(:plan_year_check).with(ce.employee_role).and_return false
+    end
+
     context 'with same effective date as passive renewal' do
       it 'should cancel their passive renewal' do
         passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
@@ -2193,6 +2243,7 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
       before do
         new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month)
+        allow(new_enrollment).to receive(:plan_year_check).with(ce.employee_role).and_return false
       end
 
       it 'should terminate the passive renewal' do

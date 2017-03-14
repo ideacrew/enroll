@@ -46,9 +46,13 @@ And(/Employee has future hired on date/) do
   CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record + 15.days)
 end
 
-def expected_effective_on
-  employee = Person.where(:first_name => /Soren/i, :last_name => /White/i).first
-  employee.active_employee_roles.first.coverage_effective_on
+def expected_effective_on(qle: false)
+  person = Person.where(:first_name => /Soren/i, :last_name => /White/i).first
+  if qle
+    person.primary_family.current_sep.effective_on
+  else
+    person.active_employee_roles.first.coverage_effective_on
+  end
 end
 
 Then(/Employee tries to complete purchase of another plan/) do
@@ -88,8 +92,11 @@ end
 
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep 1 #wait for e-mail nonsense
+  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
+  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
   enrollment = first('.hbx-enrollment-panel')
-  enrollment.find('.enrollment-effective', text: expected_effective_on.strftime("%m/%d/%Y"))
+  qle  = sep_enr ? true : false
+  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   # Timekeeper is probably UTC in this case, as we are in a test environment
   # this will cause arbitrary problems with the specs late at night.
 #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
