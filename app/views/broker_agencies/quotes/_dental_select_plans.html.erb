@@ -6,7 +6,7 @@
             <%- @dental_selectors[:carriers].each do |carrier| %>
               <div style='width: 200px'>
                  <%- if carrier[0] == 'any' %>
-                 <input type='checkbox'  id="<%=carrier[1] %>" data-carrier='<%= carrier[2] %>' class="dental_carrier" checked> <%=carrier[0].rstrip %> </input>
+                 <input type='checkbox'  id="<%=carrier[1] %>" data-carrier='<%= carrier[2] %>' class="dental_carrier interaction-choice-control-value-any active1" checked> <%=carrier[0].rstrip %> </input>
                  <%- else %>
                  <input type='checkbox'  id="<%=carrier[1] %>" data-carrier='<%= carrier[2] %>' class="dental_carrier"> <%=carrier[0].rstrip %> </input>
                  <%- end %>
@@ -19,7 +19,7 @@
             <%- @dental_selectors[:dental_levels].each do |dental_level| %>
                 <div>
                 <%- if dental_level == 'any' %>
-                <input type='checkbox'  id="<%=dental_level%>" class="dental_metal" checked> <%= dental_level %> </input>
+                <input type='checkbox'  id="<%=dental_level%>" class="dental_metal interaction-choice-control-value-any active1" checked> <%= dental_level %> </input>
                 <%- else %>
                 <input type='checkbox'  id="<%=dental_level%>" class="dental_metal"> <%= dental_level %> </input>
                 <%- end %>
@@ -67,3 +67,49 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+  $(document).on("click", ".dental_plan_selectors input[type=checkbox]", function (event) {
+    selected=this;
+          sibs = $(selected.parentNode).siblings();
+          alert(selected.classList);
+
+          var valid_classLists = ["dental_carrier interaction-choice-control-value-any active1",
+          "dental_metal interaction-choice-control-value-any active1",
+          "dental_plan_type interaction-choice-control-value-any active1",
+          "dc_network interaction-choice-control-value-any active1",
+          "nationwide interaction-choice-control-value-any active1"];
+
+
+
+           valid_classLists.forEach(function(valid_classList){
+          if(valid_classList == selected.classList){
+            $.each(sibs, function(){
+              var cousins = $(this).children()
+              if(typeof(cousins[0]) != 'undefined' && ($(cousins[0]).prop('checked') == true)) {
+                  $(cousins[0]).removeClass('active')
+                  $(cousins[0]).prop('checked', false)
+             };
+            });
+          }else{
+            $.each(sibs, function(){
+              var cousins = $(this).children()
+              if(typeof(cousins[0]) != 'undefined' && ($(cousins[0]).prop('checked') == true) && cousins[0].id == 'any') {
+                $(cousins[0]).removeClass('active')
+                $(cousins[0]).prop('checked', false)
+             };
+            });
+          };
+          });
+          if (selected.checked){
+              this.classList.add('active');
+          }else{
+              $(this).removeClass('active')
+          }
+          disable_nationwide_if_dc_selected(selected);
+          toggle_plans([])
+          reset_selected_plans()
+  });
+
+</script>
