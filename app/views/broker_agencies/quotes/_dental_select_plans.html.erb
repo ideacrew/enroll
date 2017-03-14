@@ -73,15 +73,12 @@
   $(document).on("click", ".dental_plan_selectors input[type=checkbox]", function (event) {
     selected=this;
           sibs = $(selected.parentNode).siblings();
-          alert(selected.classList);
 
           var valid_classLists = ["dental_carrier interaction-choice-control-value-any active1",
           "dental_metal interaction-choice-control-value-any active1",
           "dental_plan_type interaction-choice-control-value-any active1",
           "dc_network interaction-choice-control-value-any active1",
           "nationwide interaction-choice-control-value-any active1"];
-
-
 
            valid_classLists.forEach(function(valid_classList){
           if(valid_classList == selected.classList){
