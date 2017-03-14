@@ -105,8 +105,8 @@ var Quote = ( function() {
     })    
   }
   var load_publish_listeners= function() {
-    $('.publish td').on('click', function(){
-        td = $(this)
+    $('.publish td .btn').on('click', function(){
+        td = $(this).parent('td')
         quote_id=$('#quote_id').val()
         plan_id=td.parent().attr('id')
         benefit_group_id = $('#benefit_group_select').val()
@@ -115,12 +115,18 @@ var Quote = ( function() {
         elected_plans_list = selected_plans(coverage_kind)
         inject_plan_into_quote(quote_id, benefit_group_id, plan_id, elected, coverage_kind, elected_plans_list)
         _open_quote()
+
         if(coverage_kind == 'health'){
-          alert('You can now select dental offerings.This is optional; employers are not required to offer dental coverage.');
+          $('.container-fluid .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
+          alert('You can now select dental offerings. This is optional; employers are not required to offer dental coverage');
+        }else{
+          $('.dental-panel .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
         }
+        td.children('div').addClass('btn darker_btn')
         $('#dental-feature-mgmt-header a').trigger('click')
     })
   }
+
   var show_benefit_group=function(quote_id, benefit_group_id){
     QuoteSliders.slider_listeners()
     QuotePageLoad.configure_benefit_group(quote_id, $('#broker_role_id').val(),benefit_group_id)

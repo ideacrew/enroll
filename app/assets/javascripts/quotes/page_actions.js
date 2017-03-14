@@ -245,20 +245,25 @@ QuotePageLoad = (function() {
 
   var page_load_listeners = function() {
       $('.plan_selectors .criteria').on('click',function(){
-          console.log(this)
           selected=this;
           sibs = $(selected.parentNode).siblings();
-          $.each(sibs, function(){
-            var cousins = $(this).children()
-            if(typeof(cousins[0]) != 'undefined') {
-              classList = cousins[0].classList
-                if(classList.length > 0 && ($(cousins[0]).prop('checked') == false)) {
-                this.checked = false
+          if(selected.classList == "criteria interaction-choice-control-value-any") {
+            $.each(sibs, function(){
+              var cousins = $(this).children()
+              if(typeof(cousins[0]) != 'undefined' && ($(cousins[0]).prop('checked') == true)) {
+                  $(cousins[0]).removeClass('active')
+                  $(cousins[0]).prop('checked', false)
+             };
+            });
+          }else{
+            $.each(sibs, function(){
+              var cousins = $(this).children()
+              if(typeof(cousins[0]) != 'undefined' && ($(cousins[0]).prop('checked') == true) && cousins[0].id == 'any') {
                 $(cousins[0]).removeClass('active')
                 $(cousins[0]).prop('checked', false)
-              };
-            };
-          });
+             };
+            });
+          };
           if (selected.checked){
               this.classList.add('active');
           }else{

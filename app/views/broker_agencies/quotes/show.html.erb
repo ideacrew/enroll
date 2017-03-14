@@ -1,12 +1,11 @@
 <div class="module container broker_quote_tool" style="border: 1; solid">
   <br> <br>
   <h2>Quote Calculator</h2>
-  <div  role="tab" id="feature-mgmt-header">
+  <div  role="tab" id="feature-mgmt-header" style="margin-left: 10px;">
     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group-mgmt">
     <b>Quote Benefit Group Selection</b>
     </a>
   </div>
-  <br>
   <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true)%>">
     <% @benefit_groups.each_with_index do |benefit_group, index| %>
     <% if index == 0 %>
