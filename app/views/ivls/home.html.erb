@@ -260,26 +260,26 @@ $(function () {
       
         <td class="texLef">Auto Renewals</td>
         <td><%=annual.auto_renewals_count%></td>
-        <td><%=annual.auto_renewals_share%>%</td>
-        <td><%=annual.auto_renewals_yoy%>%</td>     
+        <td><%=(annual.auto_renewals_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual.auto_renewals_yoy.to_f * 100).to_i%>%</td>     
       </tr>
       <tr>
         <td class="texLef">Active Renewals</td>
         <td><%=annual.active_renewals_count%></td>
-        <td><%=annual.active_renewals_share%>%</td>
-        <td><%=annual.active_renewals_yoy%>%</td>
+        <td><%=(annual.active_renewals_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual.active_renewals_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">New Customers</td>
         <td><%=annual.new_customers_count%></td>
-        <td><%=annual.new_customers_share%>%</td>
-        <td><%=annual.new_customers_yoy%>%</td>
+        <td><%=(annual.new_customers_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual.new_customers_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
         <td><%=annual.sep_count%></td>
-        <td><%=annual.sep_share%>%</td>
-        <td><%=annual.sep_yoy%>%</td>
+        <td><%=(annual.sep_share.to_f * 100).to_i%>%</td>
+        <td><%=(annual.sep_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <%end%>
 
@@ -300,14 +300,14 @@ $(function () {
       <tr>
         <td class="texLef"><%=carrier.carrier_first_name%></td>
         <td><%=carrier.carrier_first_count%></td>
-        <td><%=carrier.carrier_first_share%>%</td>
-        <td><%=carrier.carrier_first_yoy%>%</td>
+        <td><%=(carrier.carrier_first_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_first_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_secondName%></td>
         <td><%=carrier.carrier_second_count%></td>
-        <td><%=carrier.carrier_second_share%>%</td>
-        <td><%=carrier.carrier_second_yoy%>%</td>
+        <td><%=(carrier.carrier_second_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_second_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <%end%>
 
@@ -319,6 +319,7 @@ $(function () {
       </tr>
 
       <tr>
+      <%@metal_types.each do |metals|%>
         <th class="texLef">Metal</th>
         <th>#</th>
         <th>%</th>
@@ -326,33 +327,34 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Platinum</td>
-        <td>3,337</td>
-        <td>16%</td>
-        <td>1%</td>
+        <td><%=metals.platinum_count%></td>
+        <td><%=(metals.platinum_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.platinum_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td>4,277</td>
-        <td>20%</td>
-        <td>-15%</td>
+        <td><%=metals.gold_count%></td>
+        <td><%=(metals.gold_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.gold_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td>6,333</td>
-        <td>30%</td>
-        <td>-7%</td>
+        <td><%=metals.silver_count%></td>
+        <td><%=(metals.silver_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.silver_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td>5,854</td>
-        <td>28%</td>
-        <td>8%</td>
+        <td><%=metals.bronze_count%></td>
+        <td><%=(metals.bronze_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.bronze_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Catastrophic</td>
-        <td>1,465</td>
-        <td>7%</td>
-        <td>9%</td>
+        <td><%=metals.catastrophic_count%></td>
+        <td><%=(metals.catastrophic_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.catastrophic_yoy.to_f * 100).to_i%>%</td>
+        <%end%>
       </tr>
 
       <tr>
@@ -372,14 +374,14 @@ $(function () {
       <tr>
         <td class="texLef">Primary</td>
         <td><%=status.primary_count%></td>
-        <td><%=status.primary_share%>%</td>
-        <td><%=status.primary_yoy%>%</td>
+        <td><%=(status.primary_share.to_f * 100).to_i%>%</td>
+        <td><%=(status.primary_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
         <td><%=status.dependent_count%></td>
-        <td><%=status.dependent_share%>%</td>
-        <td><%=status.dependent_yoy%>%</td>
+        <td><%=(status.dependent_share.to_f * 100).to_i%>%</td>
+        <td><%=(status.dependent_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
  
@@ -400,50 +402,50 @@ $(function () {
       <tr>
         <td class="texLef">< 1</td>
         <td><%=age.zero_count%></td>
-        <td><%=age.zero_share%>%</td>
-        <td><%=age.zero_yoy%>%</td>
+        <td><%=(age.zero_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.zero_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
         <td><%=age.one_count%></td>
-        <td><%=age.one_share%>%</td>
-        <td><%=age.one_yoy%>%</td>
+        <td><%=(age.one_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.one_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
         <td><%=age.eighteen_count%></td>
-        <td><%=age.eighteen_share%>%</td>
-        <td><%=age.eighteen_yoy%>%</td>
+        <td><%=(age.eighteen_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.eighteen_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
         <td><%=age.twentysix_count%></td>
-        <td><%=age.twentysix_share%>%</td>
-        <td><%=age.twentysix_yoy%>%</td>
+        <td><%=(age.twentysix_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.twentysix_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
         <td><%=age.thirtyfive_count%></td>
-        <td><%=age.thirtyfive_share%>%</td>
-        <td><%=age.thirtyfive_yoy%>%</td>
+        <td><%=(age.thirtyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.thirtyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
         <td><%=age.fortyfive_count%></td>
-        <td><%=age.fortyfive_share%>%</td>
-        <td><%=age.fortyfive_yoy%>%</td>
+        <td><%=(age.fortyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.fortyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
         <td><%=age.fiftyfive_count%></td>
-        <td><%=age.fiftyfive_share%>%</td>
-        <td><%=age.fiftyfive_yoy%>%</td>
+        <td><%=(age.fiftyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.fiftyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
         <td><%=age.sixtyfive_count%></td>
-        <td><%=age.sixtyfive_share%>%</td>
-        <td><%=age.sixtyfive_yoy%>%</td>
+        <td><%=(age.sixtyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.sixtyfive_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
 
@@ -464,14 +466,14 @@ $(function () {
       <tr>
         <td class="texLef">Yes</td>
         <td><%=aptc.yes_count%></td>
-        <td><%=aptc.yes_share%>%</td>
-        <td><%=aptc.yes_yoy%>%</td>
+        <td><%=(aptc.yes_share.to_f * 100).to_i%>%</td>
+        <td><%=(aptc.yes_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">No</td>
         <td><%=aptc.no_count%></td>
-        <td><%=aptc.no_share%>%</td>
-        <td><%=aptc.no_yoy%>%</td>
+        <td><%=(aptc.no_share.to_f * 100).to_i%>%</td>
+        <td><%=(aptc.no_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
 
@@ -492,14 +494,14 @@ $(function () {
       <tr>
         <td class="texLef">Male</td>
         <td><%=gender.male_count%></td>
-        <td><%=gender.male_share%>%</td>
-        <td><%=gender.male_yoy%>%</td>
+        <td><%=(gender.male_share.to_f * 100).to_i%>%</td>
+        <td><%=(gender.male_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
         <td><%=gender.female_count%></td>
-        <td><%=gender.female_share%>%</td>
-        <td><%=gender.female_yoy%>%</td>
+        <td><%=(gender.female_share.to_f * 100).to_i%>%</td>
+        <td><%=(gender.female_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <%end%>
     </tbody>
