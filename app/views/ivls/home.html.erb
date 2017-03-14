@@ -550,7 +550,7 @@ $(function () {
         <td><%=enroll.auto_renew_eleven%></td>
         <td><%=enroll.auto_renew_twelve%></td>
         <td><%=enroll.auto_renew_total%></td>
-        <td><%=enroll.auto_renew_share%>%</td>
+        <td><%=(enroll.auto_renew_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Active Renew</td> 
@@ -567,7 +567,7 @@ $(function () {
         <td><%=enroll.active_renew_eleven%></td>
         <td><%=enroll.active_renew_twelve%></td>
         <td><%=enroll.active_renew_total%></td>
-        <td><%=enroll.active_renew_share%>%</td>
+        <td><%=(enroll.active_renew_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">New Customer</td>
@@ -584,7 +584,7 @@ $(function () {
         <td><%=enroll.newCustomer_eleven%></td>
         <td><%=enroll.newCustomer_twelve%></td>
         <td><%=enroll.newCustomer_total%></td>
-        <td><%=enroll.newCustomer_share%>%</td>
+        <td><%=(enroll.newCustomer_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
@@ -601,7 +601,7 @@ $(function () {
         <td><%=enroll.sep_eleven%></td>
         <td><%=enroll.sep_twelve%></td>
         <td><%=enroll.sep_total%></td>
-        <td><%=enroll.sep_share%>%</td>
+        <td><%=(enroll.sep_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Total</td>
@@ -618,7 +618,7 @@ $(function () {
         <td><%=enroll.total_eleven%></td>
         <td><%=enroll.total_twelve%></td>
         <td><%=enroll.total_total%></td>
-        <td><%=enroll.total_share%>%</td>
+        <td><%=(enroll.total_share.to_f * 100).to_i%>%</td>
       </tr>
     </tbody>
     <%end%>
@@ -662,7 +662,7 @@ $(function () {
         <td><%=s.lost_coverage_eleven%></td>
         <td><%=s.lost_coverage_twelve%></td>
         <td><%=s.lost_coverage_total%></td>
-        <td><%=s.lost_coverage_share%></td>
+        <td><%=(s.lost_coverage_share.to_f * 100).to_i%></td>
       </tr>
       <tr>
         <td class="texLef">Birth</td>
@@ -679,7 +679,7 @@ $(function () {
         <td><%=s.birth_eleven%></td>
         <td><%=s.birth_twelve%></td>
         <td><%=s.birth_total%></td>
-        <td><%=s.birth_share%>%</td>
+        <td><%=(s.birth_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Citizenship</td>
@@ -696,7 +696,7 @@ $(function () {
         <td><%=s.citizenship_eleven%></td>
         <td><%=s.citizenship_twelve%></td>
         <td><%=s.citizenship_total%></td>
-        <td><%=s.citizenship_share%>%</td>
+        <td><%=(s.citizenship_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Relocation</td>
@@ -713,7 +713,7 @@ $(function () {
         <td><%=s.relocation_eleven%></td>
         <td><%=s.relocation_twelve%></td>
         <td><%=s.relocation_total%></td>
-        <td><%=s.relocation_share%>%</td>
+        <td><%=(s.relocation_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Other</td>
@@ -730,7 +730,7 @@ $(function () {
         <td><%=s.other_eleven%></td>
         <td><%=s.other_twelve%></td>
         <td><%=s.other_total%></td>
-        <td><%=s.other_share%>%</td>
+        <td><%=(s.other_share.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Total</td>
@@ -747,7 +747,7 @@ $(function () {
         <td><%=s.total_eleven%></td>
         <td><%=s.total_twelve%></td>
         <td><%=s.total_total%></td>
-        <td><%=s.total_share%>%</td>
+        <td><%=(s.total_share.to_f * 100).to_i%>%</td>
       </tr>
     </tbody>
     <%end%>
