@@ -84,7 +84,7 @@ namespace :reports do
                 fm.person.full_name,
                 fm.person.dob,
                 fm.primary_relationship,
-                fm.person.addresses[0].created_at,
+                fm.person.addresses[0].try(:created_at),
                 health_enrollment,
                 dental_enrollment,
                 fm.person.gender,
