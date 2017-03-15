@@ -246,11 +246,17 @@ $(function () {
     <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
-    <h4>Individual Market Covered Lives</h4>
     <table class="table table-hover table-condensed">
     <thead>
+
+      <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Enrollment <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
       <tr>
-        <th class="texLef">Enrollment Type</th>
+        <th class="texLef">Enrollment </th>
         <th>#</th>
         <th>%</th>
         <th>YoY</th>
@@ -291,7 +297,13 @@ $(function () {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-      
+
+      <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Coverage <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
       <tr>
       <%@annual_carriers.each do |carrier|%>
         <th class="texLef">Carrier</th>
@@ -366,6 +378,12 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
 
+      <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Demographic <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
       <tr>
       <%@annual_status.each do |status|%>
         <th class="texLef">Status</th>
@@ -513,10 +531,10 @@ $(function () {
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h4>New DC Health Link Accounts and Covered Lives by Start Month</h4>
+<h4>Covered Lives by Start Month</h4>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h4>Enrollments by Type - 3/1/2016 to 2/28/2017</h4>
+<h4>Covered Lives Enrollment Type</h4>
     <table class="table table-hover table-condensed">
     <%@enrollments.each do |enroll|%>
     <thead>
@@ -628,7 +646,7 @@ $(function () {
     <%end%>
     </table>
 
-<h4>SEPs by Type - 3/1/2016 to 2/28/2017</h4>
+<h4>Covered Lives SEPs by Type</h4>
     <table class="table table-hover table-condensed">
     <%@seps.each do |s|%>
     <thead>
@@ -757,7 +775,7 @@ $(function () {
     <%end%>
     </table>
 
- <h4>Discontinued or Reinstated Covered Lives - 3/1/2016 to 2/28/2017</h4>
+ <h4>Discontinued or Reinstated Covered Lives </h4>
  <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
 
     </div>
