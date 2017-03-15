@@ -332,24 +332,24 @@
 
   &.verification-process {
     .family-member, .person {
-      padding: 10px;
-      padding-left: 0;
-      padding-right: 0;
-      margin-bottom: 10px;
+      padding: 0;
+      margin-bottom: 15px;
+      background-color: $primary-white;
+      color: $primary-dark-gray;
       .person {
-        border-bottom: 3px solid $primary-gray;
+        padding: 5px 0;
         font-weight: bold;
+        border-bottom: $new-style-gray-border;
+        padding-left: 30px;
       }
       .selectric {
-        border: solid 1px $primary-gray;
-        border-radius: 5px;
-        -webkit-border-radius:5px;
-        -moz-border-radius:5px;
+        border: $new-style-gray-border;
         width: 200px;
         height: 30px;
         p {
           font-size:0.9em;
           margin-top: -7px;
+          color: #7b7b7b;
         }
         .button {
           margin-top: -7px;
@@ -372,25 +372,26 @@
     }
     .verification-update-reason {
       margin-top: 10px;
-      margin-bottom: 20px;
       padding-bottom: 10px;
-      border-bottom: 1px solid $primary-gray;
       display: none;
     }
     .verification-document {
-      border: 1px solid $primary-gray;
+      border: $new-style-gray-border;
     }
     .v-doc-list {
-      border: 1px solid $primary-gray;
-      margin-top:20px;
+      border-top: $new-style-gray-border;
+      margin: 20px 0;
       padding: 5px;
       background-color: $primary-white;
-      -webkit-border-radius:5px;
-      -moz-border-radius:5px;
-      border-radius:5px;
       .v-doc-elem {
         margin: 5px;
       }
+    }
+    .family-member {
+      border: $new-style-gray-border;
+    }
+    .verification-types {
+      border: none;
     }
   }
 
