@@ -13,6 +13,7 @@ class IvlsController < ApplicationController
     @age_groups=IvlCovered::OverallAgeGroups.all
     @over_all_aptc=IvlCovered::OverallAptc.all
     @overall_genders=IvlCovered::OverallGenderTypes.all
+    @annual_covered_lives=IvlCovered::AnnualCoveredLives.all
   end
 
 end

@@ -222,22 +222,22 @@ $(function () {
 <%@policy_overall.each do |overall|%>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=overall.covered_lives_total%> Total Coverage <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_total_change.to_f * 100).to_i%>% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(overall.covered_lives_total)%> Total Coverage <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_total_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=overall.covered_lives_new%> New Coverage YTD <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_new_change.to_f * 100).to_i%>% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(overall.covered_lives_new)%> New Coverage YTD <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(overall.covered_lives_new_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=overall.covered_lives_terminations%> Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_terminations_change.to_f * 100).to_i%>% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(overall.covered_lives_terminations)%> Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_terminations_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=overall.covered_lives_cancellations%> Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_cancellations_change.to_f * 100).to_i%>% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(overall.covered_lives_cancellations)%> Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> <%=(overall.covered_lives_cancellations_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <%end%>

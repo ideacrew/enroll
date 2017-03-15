@@ -219,26 +219,28 @@ $(function () {
 </ul>
 
 <div class="row row-content">
+<%@annual_covered_lives.each do |covered|%>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b>Total Coverage - 25,224 <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
- <div class="panel-body"><b>New Coverage YTD - 7,834 <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_total)%> Total Coverage <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b>Terminations YTD - 1,980 <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -12% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_new)%> New Coverage YTD<span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b>Cancellations YTD - 1,350 <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -10% YoY</div>
+ <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_terminations)%> Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -12% YoY</div>
 </div>
 </div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+ <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_cancellations)%> Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -10% YoY</div>
+</div>
+</div>
+<%end%>
 </div>
 
     <div class="row row-content">
