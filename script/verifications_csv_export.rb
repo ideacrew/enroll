@@ -2,8 +2,7 @@ families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1)},
-      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+      "effective_on" => { "$gte" => Date.new(2017,1,1)},
   } }
 }).to_a
 
@@ -12,7 +11,7 @@ coverage_not_found = []
 pending_ssa_validation = []
 docs_uploaded = []
 
-CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
+CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
     'Primary HbxId',
@@ -34,7 +33,7 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
   families.each do |family|
     counter += 1
 
-    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lte => Date.new(2017,03,20)).present?
 
     begin
 
