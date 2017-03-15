@@ -29,8 +29,8 @@ describe MoveEnrollmentBetweenTwoAccount do
     before do
       coverage_household_member = family1.households.first.coverage_households.first.coverage_household_members.first
       h = HbxEnrollmentMember.new_from(coverage_household_member: coverage_household_member)
-      h.eligibility_date = TimeKeeper.date_of_record
-      h.coverage_start_on = TimeKeeper.date_of_record
+      h.eligibility_date = TimeKeeper.date_of_record-2
+      h.coverage_start_on = TimeKeeper.date_of_record-2
       hbx_enrollment.hbx_enrollment_members << h
       hbx_enrollment.save
 
