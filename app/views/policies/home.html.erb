@@ -194,7 +194,7 @@ $(function () {
 
 </head>
 
-<body>
+<body class="ivl_dashboard_body">
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/heatmap.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
@@ -209,8 +209,8 @@ $(function () {
             <!-- </div> -->
     <!-- </div> -->
     <!-- </header> -->
-
-<div class="container-fluid" style="margin: 5px;"> 
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 <ul class="nav nav-pills">
  <li class="active"><a href="ivl_index.htm" data-toggle="tab">IVL Covered Lives</a></li>
  <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
@@ -257,7 +257,7 @@ $(function () {
       </tr>
     </thead>
     <tbody>
-    <%@policy_annual_enrollments.each do |annual_policy|%>
+    <%@policy_annual_enrollments.each do |annual_policy| %>
       <tr>
         <td class="texLef">Auto Renewals</td>
         <td><%=annual_policy.auto_renewals_count%></td>
@@ -320,7 +320,7 @@ $(function () {
       </tr>
 
       <tr>
-      <%=@metal_types.each do |policy_metals|%>
+      <%@metal_types.each do |policy_metals|%>
         <th class="texLef">Metal</th>
         <th>#</th>
         <th>%</th>
@@ -735,6 +735,6 @@ $(function () {
     </div>
     </div>
 
-
+    </div>
     </body>
 </html>
