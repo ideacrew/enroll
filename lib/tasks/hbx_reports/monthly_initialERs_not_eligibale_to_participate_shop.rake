@@ -48,7 +48,7 @@ namespace :reports do
                     employer.legal_name,
                     employer.fein,
                     employer.hbx_id,
-                    employer.employer_profile.census_employees.size,
+                    employer.employer_profile.census_employees.active.size,
                     (plan_year.blank? ? '' : plan_year.employee_participation_percent),
                     employer.employer_profile.census_employees.size==1 ? 'yes' : 'no',
                     employer.employer_profile.is_primary_office_local? ? 'yes' : 'no'
