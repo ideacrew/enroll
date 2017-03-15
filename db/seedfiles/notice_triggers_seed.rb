@@ -85,6 +85,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP2B',
+    title: 'Employer Denial Notice',
+    description: 'Application to Offer Group Health Coverage in DC Health Link',
+    resource_name: 'employer',
+    event_name: 'initial_employer_denial',
+    notice_triggers: [
+      {
+        name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
+        notice_template: 'notices/shop_notices/2_initial_employer_denial_notice',
+        notice_builder: 'ShopNotices::InitialEmployerDenialNotice',
+        mpi_indicator: 'MPI_SHOP2B',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP3A',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
