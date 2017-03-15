@@ -164,7 +164,6 @@ class CensusEmployeeImport
     if record[:employee_relationship].downcase == "self"
       member = CensusEmployee.find_by_employer_profile(@employer_profile).by_ssn(record[:ssn]).active.first || CensusEmployee.new
       member = assign_census_employee_attributes(member, record)
-      member.terminate_employment(member.employment_terminated_on) if member.employment_terminated_on.present?
       @last_ee_member = member
       @last_ee_member_record = record
     else
