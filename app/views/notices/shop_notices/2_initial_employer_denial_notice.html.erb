@@ -1,5 +1,5 @@
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -45,11 +45,11 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Attn: Employer Eligibility Review<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        #{notice.hbe.address.street_1}<br>
+        1225 Eye St NW<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        #{notice.hbe.address.street_2}<br>
+        Suite 4<br>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        #{notice.hbe.address.city}, #{notice.hbe.address.state} #{notice.hbe.address.zip}"] } %>
+        Washington, D.C. 20005"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "At the end of the 30-day period, if you are not able to provide documentation supporting your eligibility to offer health coverage through #{Settings.site.short_name}, we will notify you that you have been determined to be ineligible for #{Settings.site.short_name} and explain your right to appeal that determination."} %>
