@@ -43,12 +43,13 @@ namespace :reports do
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
 
-      families = Family.by_enrollment_effective_date_range(Date.new(2016,1,1), Date.new(2016,12,31)).where(:"created_at" => { "$gte" => start_date, "$lte" => end_date}, :"e_case_id" => nil, :"households.hbx_enrollments.kind" => "individual", :"households.hbx_enrollments.aasm_state".in => (HbxEnrollment::CANCELED_STATUSES || (HbxEnrollment::TERMINATED_STATUSES - ["unverified", "void"])))
+      families = Family.where(:"created_at" => { "$gte" => start_date, "$lte" => end_date}, :"e_case_id" => nil, :"households.hbx_enrollments" => { :$elemMatch => { :effective_on => { "$gte" => Date.new(2016,1,1), "$lte" => Date.new(2016,9,30)}, :kind => "individual", :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES || HbxEnrollment::CANCELED_STATUSES || (HbxEnrollment::TERMINATED_STATUSES - ["unverified", "void"])) }})
       families.each do |family|
         begin
           primary_fm = family.primary_family_member
           next if primary_fm.person.user.blank?
           next if family.households.flat_map(&:hbx_enrollments).any? {|enr| enr.effective_on < Date.new(2016,1,1)}
+          next if (primary_fm.consumer_role.blank? || primary_fm.consumer_role.vlp_authority == "curam")
           family.family_members.each do |fm|
             begin
               enrollments = primary_fm.family.active_household.try(:hbx_enrollments)
