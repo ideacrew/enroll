@@ -19,7 +19,7 @@ class Family
   increments :hbx_assigned_id, seed: 9999
 
   field :e_case_id, type: String # Eligibility system foreign key
-  field :fin_app_id, type: String # Financial Application ID
+  #field :fin_app_id, type: String # Financial Application ID, Use Family ID instead
   field :e_status_code, type: String
   field :application_type, type: String
   field :renewal_consent_through_year, type: Integer # Authorize auto-renewal elibility check through this year (CCYY format)
