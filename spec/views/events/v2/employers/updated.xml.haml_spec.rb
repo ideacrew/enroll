@@ -29,7 +29,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     {
         organization: organization,
         entity_kind: entity_kind,
-        profile_source: 'conversion',
+        profile_source: 'self_serve',
         created_at: Date.today
     }
   end
@@ -66,8 +66,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
     end
 
-    it "should have shop_transfer" do
-      expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq employer.created_at.strftime("%Y-%m-%d")
+    it "should not have shop_transfer" do
+      expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq ""
     end
 
 
