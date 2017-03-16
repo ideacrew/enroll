@@ -70,8 +70,8 @@ namespace :reports do
             begin
               mailing_address = versioned_person.addresses.detect { |adr| adr.kind == "mailing" }
               citizen_status = versioned_person.citizen_status.try(:humanize) || "No Info"
-              naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(versioned_person.citizen_status)
-              tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(versioned_person.citizen_status)
+              naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
+              tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
 
               csv << [
                 fm.family.hbx_assigned_id,
