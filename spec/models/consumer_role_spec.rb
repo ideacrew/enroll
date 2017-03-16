@@ -303,14 +303,36 @@ context "Verification process and notices" do
     end
   end
 
+  describe "update_verification_type private" do
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "update verification type for consumer" do |verification_type|
+      before do
+        consumer.update_attributes(:ssn_validation => "invalid")
+        consumer.lawful_presence_determination.deny!(verification_attr)
+        consumer.update_verification_type(verification_type, "Curam")
+      end
+      it "updates #{verification_type}" do
+        expect(consumer.is_type_verified?(verification_type)).to eq true
+      end
+    end
+
+    it_behaves_like "update verification type for consumer", "Social Security Number"
+    it_behaves_like "update verification type for consumer", "Citizenship"
+  end
+
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     context "import" do
+      before do
+        person.consumer_role.update_attributes(:ssn_validation => "invalid")
+      end
       all_states.each do |state|
         it "changes #{state} to fully_verified" do
           expect(consumer).to transition_from(state).to(:fully_verified).on_event(:import)
+          expect(consumer.all_types_verified?).to eq true
         end
       end
     end
