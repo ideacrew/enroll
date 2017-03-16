@@ -31,6 +31,7 @@ class PlanSelection
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
+
     qle = hbx_enrollment.is_special_enrollment?
     if qle
       sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
@@ -78,6 +79,7 @@ class PlanSelection
         end
       end
     end
+
     hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
       hbx_id = hbx_em.person.hbx_id
       unless previous_enrollment_members[hbx_id].blank?
@@ -85,6 +87,7 @@ class PlanSelection
         hbx_em.save!
       end
     end
+
     hbx_enrollment.save!
   end
 
@@ -92,5 +95,59 @@ class PlanSelection
     plan = Plan.find(plan_id)
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     self.new(hbx_enrollment, plan)
+  end
+
+  def enrollment_for_same_plan_premiums
+    new_enrollment = hbx_enrollment.clone
+    new_enrollment.hbx_enrollment_members = set_enrollment_member_eligibility_dates(new_enrollment)
+    new_enrollment
+  end
+
+  def set_enrollment_member_eligibility_dates(new_enrollment)
+    previous_enrollment = get_previous_coverage
+
+    if previous_enrollment.blank?
+      new_enrollment.hbx_enrollment_members
+    else
+      previous_enrollment_members = previous_enrollment.hbx_enrollment_members
+
+      new_enrollment.hbx_enrollment_members.collect do |member|
+        matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
+        if matched
+          member.eligibility_date = matched.eligibility_date || previous_enrollment.effective_on
+        else
+          member.eligibility_date = new_enrollment.effective_on
+        end
+        member
+      end
+    end
+  end
+
+  def existing_enrollment_for_covered_individuals
+    previous_active_coverages.detect{|en| 
+      (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present?
+    }
+  end
+
+  def previous_active_coverages
+    if hbx_enrollment.is_shop?
+      coverage_year_start = hbx_enrollment.benefit_group.start_on
+    else
+      coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
+    end
+
+    family.active_household.hbx_enrollments.where({
+      :_id.ne => hbx_enrollment.id,
+      :kind => hbx_enrollment.kind,
+      :coverage_kind => hbx_enrollment.coverage_kind,
+      :effective_on.gte => coverage_year_start,
+      }).or( 
+        {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}, 
+        {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
+      ).order("effective_on DESC")
+  end
+
+  def family
+    hbx_enrollment.family
   end
 end
