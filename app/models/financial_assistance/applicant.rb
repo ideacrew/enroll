@@ -62,7 +62,7 @@ class FinancialAssistance::Applicant
   field :has_daily_living_help, type: Boolean, default: false
   field :need_help_paying_bills, type: Boolean, default: false
   field :is_resident_post_092296, type: Boolean, default: false
-  field :is_vet_spouse_or_child, type: Boolean, default: false
+  field :is_vets_spouse_or_child, type: Boolean, default: false
 
   embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
