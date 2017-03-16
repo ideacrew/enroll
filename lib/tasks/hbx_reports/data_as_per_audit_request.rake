@@ -49,7 +49,7 @@ namespace :reports do
           primary_fm = family.primary_family_member
           next if primary_fm.person.user.blank?
           next if family.households.flat_map(&:hbx_enrollments).any? {|enr| enr.effective_on < Date.new(2016,1,1)}
-          next if (primary_fm.consumer_role.blank? || primary_fm.consumer_role.vlp_authority == "curam")
+          next if (primary_fm.person.consumer_role.blank? || primary_fm.person.consumer_role.vlp_authority == "curam")
           family.family_members.each do |fm|
             begin
               enrollments = primary_fm.family.active_household.try(:hbx_enrollments)
@@ -85,7 +85,7 @@ namespace :reports do
                 fm.person.full_name,
                 fm.person.dob,
                 fm.primary_relationship,
-                fm.person.addresses[0].try(:created_at),
+                fm.family.created_at,
                 health_enrollment,
                 dental_enrollment,
                 fm.person.gender,
