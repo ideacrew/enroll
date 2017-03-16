@@ -393,6 +393,14 @@ class User
     self.save!
   end
 
+  def ridp_by_paper_application
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_description_text = "admin bypass ridp"
+    self.identity_verified_date = TimeKeeper.date_of_record
+    self.save
+  end
+
   def get_announcements_by_roles_and_portal(portal_path="")
     announcements = []
 
