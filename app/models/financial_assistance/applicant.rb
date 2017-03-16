@@ -39,6 +39,7 @@ class FinancialAssistance::Applicant
   field :had_medicaid_during_foster_care, type: Boolean, default: false
 
   field :is_pregnant, type: Boolean, default: false
+  field :is_enrolled_on_medicaid, type: Boolean, default: false
   field :is_post_partum_period, type: Boolean, default: false
   field :children_expected_count, type: Integer, default: 0
   field :pregnancy_due_on, type: Date
@@ -56,6 +57,12 @@ class FinancialAssistance::Applicant
   field :is_veteran_or_active_military, type: Boolean
   field :is_spouse_or_dep_child_of_veteran_or_active_military, type: Boolean
   field :is_currently_enrolled_in_health_plan, type: Boolean
+
+  # Other QNs.
+  field :has_daily_living_help, type: Boolean, default: false
+  field :need_help_paying_bills, type: Boolean, default: false
+  field :is_resident_post_092296, type: Boolean, default: false
+  field :is_vet_spouse_or_child, type: Boolean, default: false
 
   embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"

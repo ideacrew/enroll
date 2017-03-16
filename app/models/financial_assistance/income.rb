@@ -51,8 +51,9 @@ class FinancialAssistance::Income
   field :tax_form, type: String
   field :employer_name, type: String
   field :employer_id, type: Integer
-  field :income_from_native_american, type: Boolean
-  field :has_education_scholarship_income, type: Boolean
+  #field :income_from_native_american, type: Boolean #infer from income kinds
+  field :has_property_usage_rights, type: Boolean
+  #field :has_education_scholarship_income, type: Boolean #infer from income kinds
   field :submitted_at, type: DateTime
 
   validates_length_of :title, 
