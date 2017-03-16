@@ -59,13 +59,6 @@ Then(/^the consumer can expand the table by clicking on caret sign$/) do
   find('.fa-caret-down').click
 end
 
-Then(/^Consumer does not see FedHub details table$/) do
-  expect(page).to have_content('Verification')
-  expect(page).to_not have_content('FedHub')
-  expect(page).to have_content('Verification Type')
-  expect(page).to have_content('Status')
-end
-
 When(/^the consumer is completely verified$/) do
   user.person.consumer_role.import!(OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record, :vlp_authority => "hbx"}))
 end

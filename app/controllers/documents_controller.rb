@@ -67,14 +67,13 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.count_hub_calls
-    @person.consumer_role.invoke_verification!
+    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
     respond_to do |format|
       format.html {
         flash[:success] = "Request was sent to FedHub."
         redirect_to :back
       }
-      format.js { }
+      format.js
     end
   end
 
