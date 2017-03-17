@@ -1,4 +1,4 @@
-class ShopNotice < Notice
+class ShopEmployerNotice < Notice
 
   Required= Notice::Required + []
 
