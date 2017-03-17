@@ -104,7 +104,7 @@ class PlanSelection
   end
 
   def set_enrollment_member_eligibility_dates(new_enrollment)
-    previous_enrollment = get_previous_coverage
+    previous_enrollment = existing_enrollment_for_covered_individuals
 
     if previous_enrollment.blank?
       new_enrollment.hbx_enrollment_members
