@@ -33,6 +33,7 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
   families.each do |family|
     counter += 1
 
+    next if ["5619ca3e54726532e5f7f800", "58a47aae082e7654050000fe", "5845a2fff1244e5da300003d", "58365eab082e76791a000023", "5619c9e954726532e51f6500", "58815e10faca1438a00000ac"].include?(family.id.to_s)
     next if family.active_household.hbx_enrollments.where(:"special_verification_period".lte => Date.new(2017,03,20)).present?
 
     begin
