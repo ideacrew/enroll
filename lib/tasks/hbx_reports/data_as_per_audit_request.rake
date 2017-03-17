@@ -59,7 +59,7 @@ namespace :reports do
           primary_fm = family.primary_family_member
           next if primary_fm.person.user.blank?
           next if family.households.flat_map(&:hbx_enrollments).any? {|enr| enr.effective_on < Date.new(2016,1,1)}
-          next if (primary_fm.person.consumer_role.blank? || primary_fm.person.consumer_role.vlp_authority == "curam" || ([primary_fm.person.consumer_role.bookmark_url].include? "edit") || primary_fm.person.addresses.blank? )
+          next if (primary_fm.person.consumer_role.blank? || primary_fm.person.consumer_role.vlp_authority == "curam" || (primary_fm.person.consumer_role.bookmark_url.to_s.include? "edit") || primary_fm.person.addresses.blank? )
           
           versioned_primary = primary_fm.person.versions.detect { |ver| select_versioned_person(ver, start_date, end_date) }
           versioned_primary = versioned_primary || primary_fm.person
