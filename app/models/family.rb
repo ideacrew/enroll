@@ -175,12 +175,11 @@ class Family
                                                     }
 
   scope :by_datetime_range,                     ->(start_at, end_at){ where(:created_at.gte => start_at).and(:created_at.lte => end_at) }
-
   scope :all_enrollments,                       ->{  where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES) }
   scope :all_enrollments_by_writing_agent_id,   ->(broker_id){ where(:"households.hbx_enrollments.writing_agent_id" => broker_id) }
   scope :all_enrollments_by_benefit_group_id,   ->(benefit_group_id){where(:"households.hbx_enrollments.benefit_group_id" => benefit_group_id) }
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
-  scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind" => "employer_sponsored") }
+  scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
@@ -275,8 +274,14 @@ class Family
     family_members.detect { |family_member| family_member.person_id.to_s == person._id.to_s }
   end
 
-  def is_eligible_to_enroll?
-    current_enrollment_eligibility_reasons.length > 0
+  def is_eligible_to_enroll?(options = {})
+    current_enrollment_eligibility_reasons(qle: options[:qle]).length > 0
+  end
+
+  def current_enrollment_eligibility_reasons(options = {})
+    current_special_enrollment_periods.collect do |sep|
+      EnrollmentEligibilityReason.new(sep)
+    end + current_eligible_open_enrollments(qle: options[:qle])
   end
 
   # Determine if this family has enrollment eligibility under SHOP or Individual market open enrollment
@@ -318,12 +323,6 @@ class Family
     current_shop_eligible_open_enrollments.length > 0
   end
 
-  def current_enrollment_eligibility_reasons
-    current_special_enrollment_periods.collect do |sep|
-      EnrollmentEligibilityReason.new(sep)
-    end + current_eligible_open_enrollments
-  end
-
   # Get list of Individual and SHOP market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
   #
   # @example Get the list of {EnrollmentEligibilityReason EnrollmentEligibilityReasons}
@@ -333,8 +332,8 @@ class Family
   # @see current_shop_eligible_open_enrollments
   #
   # @return [ Array<EnrollmentEligibilityReason> ] The SHOP and Individual Market {EnrollmentEligibilityReasons} active for this family on today's date
-  def current_eligible_open_enrollments
-    current_shop_eligible_open_enrollments + current_ivl_eligible_open_enrollments
+  def current_eligible_open_enrollments(options = {})
+    current_shop_eligible_open_enrollments(qle: options[:qle]) + current_ivl_eligible_open_enrollments
   end
 
   # Get list of Individual market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
@@ -362,12 +361,12 @@ class Family
   #   model.current_shop_eligible_open_enrollments
   #
   # @return [ Array<EnrollmentEligibilityReason> ] The SHOP market {EnrollmentEligibilityReasons} active for this family on today's date
-  def current_shop_eligible_open_enrollments
+  def current_shop_eligible_open_enrollments(options = {})
     eligible_open_enrollments = []
 
     if employee_roles = primary_applicant.try(:person).try(:employee_roles) # TODO only active employee roles
       employee_roles.each do |employee_role|
-        if (benefit_group = employee_role.try(:benefit_group)) &&
+        if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
           (employer_profile = employee_role.try(:employer_profile))
           employer_profile.try(:published_plan_year).try(:enrolling?) &&
           benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
@@ -840,31 +839,8 @@ class Family
     enrollments.any? {|enrollment| enrollment.applied_aptc_amount > 0}
   end
 
-  def update_aptc_block_status
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    eligibility_determinations = latest_household.latest_active_tax_household.eligibility_determinations rescue nil
-
-    if eligibility_determinations.present? && has_aptc_hbx_enrollment?
-      self.set(status: "aptc_block")
-    end
-  end
-
-  def aptc_blocked?
-    status == "aptc_block"
-  end
-
-  def is_blocked_by_qle_and_assistance?(qle=nil, assistance=nil)
-    return false if qle.present?
-    return false if assistance.blank? #or qle.blank?
-    return false if status == "aptc_unblock"
-    return true if status == "aptc_block"
-
-    #max_aptc = latest_household.latest_active_tax_household.latest_eligibility_determination.max_aptc rescue 0
-    #if max_aptc > 0 && qle.individual? && qle.family_structure_changed?
-    #  true
-    #else
-    #  false
-    #end
+  def self.by_special_enrollment_period_id(special_enrollment_period_id)
+    Family.where("special_enrollment_periods._id" => special_enrollment_period_id)
   end
 
   # Get all {HbxEnrollment HbxEnrollments} under this family's active household.  Includes active and inactive enrollments.

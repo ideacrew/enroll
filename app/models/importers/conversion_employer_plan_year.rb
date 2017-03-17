@@ -143,6 +143,7 @@ module Importers
     def map_employees_to_benefit_groups(employer, plan_year)
       bg = plan_year.benefit_groups.first
       employer.census_employees.non_terminated.each do |ce|
+        next unless ce.valid?
         begin
         ce.add_benefit_group_assignment(bg)
         ce.save!
