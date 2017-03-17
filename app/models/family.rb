@@ -182,7 +182,6 @@ class Family
   scope :by_enrollment_individual_market,       ->{ where(:"households.hbx_enrollments.kind".in => ["individual", "unassisted_qhp", "insurance_assisted_qhp", "streamlined_medicaid", "emergency_medicaid", "hcr_chip"]) }
   scope :by_enrollment_shop_market,             ->{ where(:"households.hbx_enrollments.kind".in => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_enrollment_renewing,                ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::RENEWAL_STATUSES) }
-
   scope :by_enrollment_created_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.created_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_updated_datetime_range,  ->(start_at, end_at){ where(:"households.hbx_enrollments.updated_at" => { "$gte" => start_at, "$lte" => end_at} )}
   scope :by_enrollment_effective_date_range,    ->(start_on, end_on){ where(:"households.hbx_enrollments.effective_on" => { "$gte" => start_on, "$lte" => end_on} )}
@@ -280,6 +279,12 @@ class Family
     current_enrollment_eligibility_reasons(qle: options[:qle]).length > 0
   end
 
+  def current_enrollment_eligibility_reasons(options = {})
+    current_special_enrollment_periods.collect do |sep|
+      EnrollmentEligibilityReason.new(sep)
+    end + current_eligible_open_enrollments(qle: options[:qle])
+  end
+
   # Determine if this family has enrollment eligibility under SHOP or Individual market open enrollment
   #
   # @example Is this family under SHOP or Individual market open enrollment?
@@ -318,14 +323,6 @@ class Family
   def is_under_shop_open_enrollment?
     current_shop_eligible_open_enrollments.length > 0
   end
-
-
-  def current_enrollment_eligibility_reasons(options = {})
-    current_special_enrollment_periods.collect do |sep|
-      EnrollmentEligibilityReason.new(sep)
-    end + current_eligible_open_enrollments(qle: options[:qle])
-  end
-
 
   # Get list of Individual and SHOP market {EnrollmentEligibilityReason EnrollmentEligibilityReasons} currently available to this family
   #
