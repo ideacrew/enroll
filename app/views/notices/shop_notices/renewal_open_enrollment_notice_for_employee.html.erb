@@ -1,6 +1,4 @@
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -19,7 +17,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Good News! <Employer Name> has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. For a walkthrough of your options, you can follow this Open Enrollment Guide."} %>
+  { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. For a walkthrough of your options, you can follow this <a href='https://dchealthlink.com/sites/default/files/v2/forms/employee_renewal_open_enrollment_guide.pdf'>Open Enrollment Guide</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>Your Current Plan Election Will Automatically Renew.</strong>"} %>
@@ -31,7 +29,7 @@
   { content: "You Are Able to Change Your Plan Selection during Open Enrollment"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "In order to make a change to your employer-sponsored coverage through DC Health Link, you must complete your plan selection for enrollment by <OE End Date>, for coverage effective <Coverage Start Date >. If you no longer wish to receive coverage through <Employer Name> you will want to go into your DC Health Link account and “waive” coverage for the upcoming plan year. Please log-in to your existing DC Health Link account at DCHealthLink.com to view your plan options and complete the enrollment process."} %>
+  { content: "In order to make a change to your employer-sponsored coverage through DC Health Link, you must complete your plan selection for enrollment by <OE End Date>, for coverage effective <Coverage Start Date >. If you no longer wish to receive coverage through #{notice.employer_name} you will want to go into your DC Health Link account and “waive” coverage for the upcoming plan year. Please log-in to your existing DC Health Link account at DCHealthLink.com to view your plan options and complete the enrollment process."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you would like to change the dependents you cover on your plan, if available from your employer, you can simply check or uncheck what dependents you cover on the “Choose Coverage for your Household” page. If you need to add dependents to your accounts you can do so under the “Manage Family” tab."} %>
@@ -51,10 +49,11 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:"} %>
-  <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling #{notice.hbe.phone}."] } %>
 <% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{notice.hbe.phone}."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>

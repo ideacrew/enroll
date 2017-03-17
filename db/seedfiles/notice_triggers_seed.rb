@@ -170,6 +170,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP8',
+    title: 'Your Health Plan Open Enrollment Period has Begun',
+    description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
+    resource_name: 'employee_role',
+    event_name: 'active_employee_auto_renewal',
+    notice_triggers: [
+      {
+        name: 'Renewal Open Enrollment available for Employee',
+        notice_template: 'notices/shop_notices/renewal_open_enrollment_notice_for_employee',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOP8',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
