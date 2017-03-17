@@ -9,8 +9,7 @@ families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
       "aasm_state" => { "$in" => ["enrolled_contingent"] },
-      "effective_on" => { "$gte" => Date.new(2016,1,1)},
-      "submitted_at" => { "$gt" => Date.new(2016,7,22)},
+      "effective_on" => { "$gte" => Date.new(2017,1,1)},
   } }
 }).to_a
 
@@ -35,7 +34,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
 
   families.each do |family|
 
-    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lt => Date.new(2016,10,26)).present?
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lte => Date.new(2017,3,20)).present?
     counter += 1
     begin
       person = family.primary_applicant.person
