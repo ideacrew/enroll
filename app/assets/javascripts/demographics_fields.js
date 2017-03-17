@@ -280,13 +280,13 @@ var PersonValidations = (function(window, undefined) {
 
           } else {}
         }
-        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
-          if ($(this).val().length != 10) {
-            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-            PersonValidations.restoreRequiredAttributes(e);
-
-          } else {}
-        }
+//        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
+//          if ($(this).val().length != 10) {
+//            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+//            PersonValidations.restoreRequiredAttributes(e);
+//
+//          } else {}
+//        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
 
         } else {
