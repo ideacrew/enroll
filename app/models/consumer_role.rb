@@ -61,6 +61,7 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
+  field :is_applying_coverage, type: Boolean, default: true
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
@@ -75,6 +76,7 @@ class ConsumerRole
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
+  field :is_applying_coverage, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true

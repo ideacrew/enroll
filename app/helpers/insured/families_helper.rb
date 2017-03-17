@@ -222,7 +222,7 @@ module Insured::FamiliesHelper
       false
     elsif @person.consumer_role.blank?
       false
-    elsif @person.consumer_role.present? 
+    elsif @person.consumer_role.present?
       true
     end
   end
@@ -237,5 +237,15 @@ module Insured::FamiliesHelper
     elsif @person.consumer_role.present?
       true
     end
+  end
+
+  def is_applying_coverage_value_personal(person)
+    first_checked = true
+    second_checked = false
+    if person.consumer_role.present?
+      first_checked = person.consumer_role.is_applying_coverage
+      second_checked = !person.consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
   end
 end
