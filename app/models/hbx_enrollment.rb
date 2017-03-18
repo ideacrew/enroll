@@ -783,6 +783,10 @@ class HbxEnrollment
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
+  def calculate_costs_for_plans(elected_plans)
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+  end
+
   # FIXME: not sure what this is or if it should be removed - Sean
   def inactive_related_hbxs
     hbxs = if employee_role.present?

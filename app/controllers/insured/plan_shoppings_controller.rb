@@ -33,8 +33,10 @@ class Insured::PlanShoppingsController < ApplicationController
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
+
     plan_selection.set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
+
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
@@ -245,32 +247,40 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
-    if @person.nil?
+    Caches::MongoidCache.allocate(CarrierProfile)
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+
+    if @person.nil? || @hbx_enrollment.blank?
       @enrolled_hbx_enrollment_plan_ids = []
     else
-      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
-      if covered_plan_year.present?
-        id_list = covered_plan_year.benefit_groups.map(&:id)
-        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+      if @hbx_enrollment.is_shop?
+        covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
+        if covered_plan_year.present?
+          id_list = covered_plan_year.benefit_groups.map(&:id)
+          @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+        end
       else
         @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
       end
     end
 
-    Caches::MongoidCache.allocate(CarrierProfile)
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @hbx_enrollment.blank?
       @plans = []
     else
-      if @market_kind == 'shop'
+      if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @market_kind == 'individual'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
-      elsif @market_kind == 'coverall'
+      elsif @hbx_enrollment.is_coverall?
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
+      else
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end
     end
+
+    current_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
+    plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
+    plan_selection = plan_selection.same_plan_enrollment.calculate_costs_for_plans(current_plans)
+
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
     @carrier_names_map = Organization.valid_carrier_names_filters.select{|k, v| carrier_profile_ids.include?(k)}
