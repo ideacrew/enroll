@@ -460,11 +460,11 @@ class HbxEnrollment
     previous_enrollments(year).each do |previous_enrollment|
       next if is_shop? && benefit_group_assignment_id != previous_enrollment.benefit_group_assignment_id
       generate_signature(previous_enrollment)
-      if same_sign_future_ivl(previous_enrollment) || future_shop(previous_enrollment)
+      if same_sign_future_ivl(previous_enrollment)
         if previous_enrollment.may_schedule_coverage_termination?
           previous_enrollment.schedule_coverage_termination!(previous_enrollment.effective_on)
         end
-      elsif same_sign_past_ivl(previous_enrollment) || past_shop(previous_enrollment)
+      elsif same_sign_past_ivl(previous_enrollment)
         if previous_enrollment.may_terminate_coverage?
           term_date = self.effective_on - 1.day
           if date_term_min > term_date && self.effective_on > date_term_min

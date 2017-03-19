@@ -455,8 +455,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment7.cancel_previous(TimeKeeper.date_of_record.year)
       end
 
-      it "should cancel an auto renewing enrollment" do
-        expect(@enrollment6.aasm_state).to eq "coverage_termination_pending"
+      it "doesn't move enrollment for shop market" do
+        expect(@enrollment6.aasm_state).to eq "auto_renewing"
       end
 
       it "should not cancel current shopping enrollment" do
