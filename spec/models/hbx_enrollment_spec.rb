@@ -434,7 +434,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
-    context "should cancel previous auto renewing enrollment" do
+    context "should shedule termination previous auto renewing enrollment" do
       before :all do
         @enrollment6 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
@@ -456,7 +456,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
 
       it "should cancel an auto renewing enrollment" do
-        expect(@enrollment6.aasm_state).to eq "coverage_canceled"
+        expect(@enrollment6.aasm_state).to eq "coverage_termination_pending"
       end
 
       it "should not cancel current shopping enrollment" do
@@ -865,7 +865,7 @@ describe HbxProfile, "class methods", type: :model do
       TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1
     end
 
-    it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
+    it "should terminate hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
       hbx_enrollment1.effective_on = date + 1.day
       hbx_enrollment2.effective_on = date
       # This gets processed on 31st Dec
@@ -874,7 +874,7 @@ describe HbxProfile, "class methods", type: :model do
         hbx_enrollment2.effective_on = date + 1.day
       end
       hbx_enrollment2.select_coverage!
-      expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+      expect(hbx_enrollment1.coverage_termination_pending?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
