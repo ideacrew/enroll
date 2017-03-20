@@ -105,11 +105,11 @@ class PlanSelection
     return @same_plan_enrollment if defined? @same_plan_enrollment
 
     @same_plan_enrollment = family.active_household.hbx_enrollments.new(hbx_enrollment.dup.attributes)
-    @same_plan_enrollment.hbx_enrollment_members = set_enrollment_member_eligibility_dates
+    @same_plan_enrollment.hbx_enrollment_members = set_enrollment_member_coverage_start_dates
     @same_plan_enrollment
   end
 
-  def set_enrollment_member_eligibility_dates
+  def set_enrollment_member_coverage_start_dates
     previous_enrollment = existing_enrollment_for_covered_individuals
 
     if previous_enrollment.blank?
@@ -120,9 +120,9 @@ class PlanSelection
       hbx_enrollment.hbx_enrollment_members.collect do |member|
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
         if matched
-          member.eligibility_date = matched.eligibility_date || previous_enrollment.effective_on
+          member.coverage_start_on = matched.coverage_start_on || previous_enrollment.effective_on
         else
-          member.eligibility_date = hbx_enrollment.effective_on
+          member.coverage_start_on = hbx_enrollment.effective_on
         end
         member
       end
