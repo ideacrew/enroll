@@ -86,7 +86,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
-
+  field :parent_enrollment_id, type: String
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -351,6 +351,11 @@ class HbxEnrollment
     if is_shop? && benefit_group
       benefit_group.title
     end
+  end
+
+  def parent_enrollment
+    return nil if parent_enrollment_id.blank?
+    HbxEnrollment.by_hbx_id(parent_enrollment_id).first
   end
 
   def census_employee
