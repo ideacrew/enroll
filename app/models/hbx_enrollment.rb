@@ -458,20 +458,13 @@ class HbxEnrollment
   def cancel_previous(year)
     #Perform cancel/terms of previous enrollments for the same plan year
     previous_enrollments(year).each do |previous_enrollment|
-      next if is_shop? && benefit_group_assignment_id != previous_enrollment.benefit_group_assignment_id
       generate_signature(previous_enrollment)
-      if same_sign_future_ivl(previous_enrollment)
-        if previous_enrollment.may_schedule_coverage_termination?
-          previous_enrollment.schedule_coverage_termination!(previous_enrollment.effective_on)
-        end
-      elsif same_sign_past_ivl(previous_enrollment)
-        if previous_enrollment.may_terminate_coverage?
-          term_date = self.effective_on - 1.day
-          if date_term_min > term_date && self.effective_on > date_term_min
-            term_date = date_term_min
-          end
-          previous_enrollment.terminate_coverage
-          previous_enrollment.update_current(terminated_on: term_date)
+      if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
+        if self.effective_on > previous_enrollment.effective_on
+          previous_enrollment.terminate_coverage! if previous_enrollment.may_terminate_coverage?
+          previous_enrollment.update_current(terminated_on: termination_date)
+        else
+          previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
       end
     end
@@ -503,7 +496,7 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
-  def propogate_selection
+  def propagate_selection
     if is_shop?
       update_existing_shop_coverage
     else
@@ -1113,9 +1106,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                    to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                    to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                     to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1223,7 +1216,7 @@ class HbxEnrollment
     end
 
     event :force_select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
+      transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
 
   end
@@ -1348,11 +1341,6 @@ class HbxEnrollment
     employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
  end
 
-  def date_term_min
-    TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
-
-  end
-
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
@@ -1364,20 +1352,8 @@ class HbxEnrollment
     household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind)
   end
 
-  def same_sign_future_ivl(previous_enrollment)
-    same_signatures(previous_enrollment) && !previous_enrollment.is_shop? && future_effective_on(previous_enrollment)
-  end
-
-  def same_sign_past_ivl(previous_enrollment)
-    same_signatures(previous_enrollment) && !previous_enrollment.is_shop? && past_effective_on(previous_enrollment)
-  end
-
-  def future_shop(previous_enrollment)
-    previous_enrollment.is_shop? && future_effective_on(previous_enrollment)
-  end
-
-  def past_shop(previous_enrollment)
-    previous_enrollment.is_shop? && TimeKeeper.date_of_record >= previous_enrollment.effective_on
+  def date_term_min
+    TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
   end
 
   def generate_signature(previous_enrollment)
@@ -1388,12 +1364,9 @@ class HbxEnrollment
     previous_enrollment.enrollment_signature == self.enrollment_signature
   end
 
-  def future_effective_on(previous_enrollment)
-    TimeKeeper.date_of_record < previous_enrollment.effective_on
-  end
-
-  def past_effective_on(previous_enrollment)
-    TimeKeeper.date_of_record >= previous_enrollment.effective_on
+  def termination_date
+    day_before = effective_on - 1.day
+    (date_term_min > day_before && effective_on > date_term_min) ? date_term_min : day_before
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
