@@ -34,7 +34,7 @@ class Insured::PlanShoppingsController < ApplicationController
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
-    plan_selection.set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
+    plan_selection.verify_and_set_member_coverage_start_dates
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
 
     session.delete(:pre_hbx_enrollment_id)
@@ -292,8 +292,10 @@ class Insured::PlanShoppingsController < ApplicationController
   def build_same_plan_premiums
     enrolled_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
     if enrolled_plans.present?
+      enrolled_plans = enrolled_plans.collect{|p| Plan.find(p)}
       plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
       @enrolled_plans = plan_selection.same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
+
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan
