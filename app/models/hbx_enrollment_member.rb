@@ -69,17 +69,6 @@ class HbxEnrollmentMember
     @age_on_effective_date = age
   end
 
-  def age_on_eligibility_date
-    return @age_on_eligibility_date unless @age_on_eligibility_date.blank?
-    dob = person.dob
-    if eligibility_date.present?
-      age = calculate_age(eligibility_date,dob)
-      @age_on_eligibility_date = age
-    else
-      age_on_effective_date
-    end
-  end
-
   def calculate_age(calculation_date,dob)
     age = calculation_date.year - dob.year
 
