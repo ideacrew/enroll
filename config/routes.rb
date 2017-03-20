@@ -25,8 +25,15 @@ Rails.application.routes.draw do
 
   
   get 'dashboard/home', to: 'dashboards#home'
-  get 'ivl/home', to: 'ivls#home'
-  get 'policie/home', to: 'policies#home'
+  get 'policy/home', to: 'policies#home'
+  get 'covered/home', to: 'widget#home'
+
+  resources :ivl, only: [] do
+    collection do
+      get 'home', to: 'ivls#home' 
+      get 'ivl_enroll', to:'ivls#enrollment'
+    end
+  end
   
   namespace :exchanges do
 

@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>IVL Enrollments</title>
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="dashStyle.css">
+
+    <script type="text/javascript">
+$(function () {
+    Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+    $('#barYr1').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            height: 185
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            name: '2015',
+            data: [10042, 1040, 976, 78, 26, 234, 288, 92, 154, 111, 82, 10]
+        }, {
+            name: '2016',
+            data: [13042, 1940, 1476, 48, 36, 434, 488, 162, 254, 311, 182, 16]
+        }, {
+            name: '2017',
+            data: [14161, 5496, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        }]
+    });
+});
+        </script>
+ 
+
+</head>
+<body>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+
+
+<div class="container" style="margin: 5px;"> 
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+  <h4>Individual Market Covered Lives Enrollment by Start Month</h4>
+  <div id="barYr1" style="min-width: 310px; height: 250px; margin: 0 auto"></div>
+
+  <table class="table table-hover table-condensed">
+    <thead>
+      <tr>
+        <th class="texLef">Enrollment</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">2015</td>
+        <td>10,042</td>
+        <td>1,040</td>
+        <td>976</td>
+        <td>78</td>
+        <td>26</td>
+        <td>234</td>
+        <td>288</td>
+        <td>92</td>
+        <td>154</td>
+        <td>111</td>
+        <td>82</td>
+        <td>10</td>
+        <td>13,133</td>
+      </tr>
+      <tr>
+        <td class="texLef">2016</td> 
+        <td>13,042</td>
+        <td>1,940</td>
+        <td>1,476</td>
+        <td>48</td>
+        <td>36</td>
+        <td>434</td>
+        <td>488</td>
+        <td>162</td>
+        <td>254</td>
+        <td>311</td>
+        <td>182</td>
+        <td>16</td>
+        <td>18,389</td>
+      </tr>
+      <tr>
+        <td class="texLef">2017</td>
+        <td>14,161</td>
+        <td>5,496</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>19,657</td>
+      </tr>
+    </tbody>
+    </table>
+
+</div>
+</div>
+
+
+  </body>
+</html>

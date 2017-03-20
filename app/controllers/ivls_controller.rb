@@ -16,4 +16,8 @@ class IvlsController < ApplicationController
     @annual_covered_lives=IvlCovered::AnnualCoveredLives.all
   end
 
+  def enrollment
+
+  end
+  
 end
