@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IVL Dashboard</title>
+<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+<!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+<!-- <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
+
+<script type="text/javascript">
+    $(function () {
+        Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+        $('#barYr1').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+                'Jan',
+                'Feb'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            <%@enrollments.each do |enrollment|%>
+            name: 'Census',
+            data: [<%=enrollment.census_one%>, <%=enrollment.census_two%>, <%=enrollment.census_three%>, <%=enrollment.census_four%>, <%=enrollment.census_five%>, <%=enrollment.census_six%>, <%=enrollment.census_seven%>, <%=enrollment.census_eight%>, <%=enrollment.census_nine%>, <%=enrollment.census_ten%>, <%=enrollment.census_eleven%>, <%=enrollment.census_twelve%>]
+        }, {
+            name: 'Covered Lives',
+            data: [<%=enrollment.covered_one%>, <%=enrollment.covered_two%>,  <%=enrollment.covered_three%>, <%=enrollment.covered_four%>, <%=enrollment.covered_five%>, <%=enrollment.covered_six%>, <%=enrollment.covered_seven%>, <%=enrollment.covered_eight%>, <%=enrollment.covered_nine%>, <%=enrollment.covered_ten%>, <%=enrollment.covered_eleven%>, <%=enrollment.covered_twelve%>]
+            }]
+            <%end%>
+        });
+    });
+</script>
+        
+<script type="text/javascript">
+    $(function () {
+        Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+        $('#barYr2').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+                'Jan',
+                'Feb'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            <%@enrollments_monthly.each do |monthly_enrollments|%>
+            name: 'Month 13-24',
+            data: [<%=monthly_enrollments.covered_thirteen_one%>, <%=monthly_enrollments.covered_thirteen_two%>, <%=monthly_enrollments.covered_thirteen_three%>, <%=monthly_enrollments.covered_thirteen_four%>, <%=monthly_enrollments.covered_thirteen_five%>, <%=monthly_enrollments.covered_thirteen_six%>, <%=monthly_enrollments.covered_thirteen_seven%>, <%=monthly_enrollments.covered_thirteen_eight%>, <%=monthly_enrollments.covered_thirteen_nine%>, <%=monthly_enrollments.covered_thirteen_ten%>, <%=monthly_enrollments.covered_thirteen_eleven%>, <%=monthly_enrollments.covered_thirteen_twelve%>]
+            }, {
+            name: 'Month 1-12',
+            data: [<%=monthly_enrollments.covered_one_one%>, <%=monthly_enrollments.covered_one_two%>, <%=monthly_enrollments.covered_one_three%>, <%=monthly_enrollments.covered_one_four%>, <%=monthly_enrollments.covered_one_five%>, <%=monthly_enrollments.covered_one_six%>, <%=monthly_enrollments.covered_one_seven%>, <%=monthly_enrollments.covered_one_eight%>, <%=monthly_enrollments.covered_one_nine%>, <%=monthly_enrollments.covered_one_ten%>, <%=monthly_enrollments.covered_one_eleven%>, <%=monthly_enrollments.covered_one_twelve%>]
+            }]
+            <%end%>
+        });
+    });
+</script>
+
+</head>
+
+<body>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <!-- <header class="jumbotron jumbotron"> -->
+
+        <!-- Main component for a primary marketing message or call to action -->
+
+    <!-- <div class="container-fluid"> -->
+            <!-- <div class="row row-header"> -->
+                <!-- <h2>CIO Dashboard</h2> -->
+            <!-- </div> -->
+    <!-- </div> -->
+    <!-- </header> -->
+    <!-- TODO: This should move to Layout -->
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+<ul class="nav nav-pills">
+ <li><a href="/covered/home" data-toggle="tab">IVL Covered Lives</a></li>
+ <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+ <li class="active"><a href="/covered/home">SHOP Covered Lives</a></li>
+ <li><a href="shop_policy.htm">SHOP Policies</a></li>
+</ul>
+
+<div class="row row-content">
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>3,724 Active Employers <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>92% Employees Enrolled <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 12% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>51,213 Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>4,866 February Start <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 10% YoY</div>
+</div>
+</div>
+</div>
+
+    <div class="row row-content">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
+
+    <table class="table table-hover table-condensed">
+    <thead>
+
+      <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Coverage <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+      <tr>
+      <%@carriers.each do |carrier|%>s
+        <th class="texLef">Carrier</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier.carrier_first_name%></td>
+        <td><%=carrier.carrier_first_count%></td>
+        <td><%=carrier.carrier_first_share%>%</td>
+        <td><%=carrier.carrier_first_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier.carrier_second_name%></td>
+        <td><%=carrier.carrier_second_count%></td>
+        <td><%=carrier.carrier_second_share%>%</td>
+        <td><%=carrier.carrier_second_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier.carrier_third_name%></td>
+        <td><%=carrier.carrier_third_count%></td>
+        <td><%=carrier.carrier_third_share%>%</td>
+        <td><%=carrier.carrier_third_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef"><%=carrier.carrier_fourth_name%></td>
+        <td><%=carrier.carrier_fourth_count%></td>
+        <td><%=carrier.carrier_fourth_share%>%</td>
+        <td><%=carrier.carrier_fourth_yoy%>%</td>
+        <%end%>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@metal_types.each do |metals|%>
+        <th class="texLef">Metal</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">Platinum</td>
+        <td><%=metals.platinum_count%></td>
+        <td><%=metals.platinum_share%>%</td>
+        <td><%=metals.platinum_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Gold</td>
+        <td><%=metals.gold_count%></td>
+        <td><%=metals.gold_share%>%</td>
+        <td><%=metals.gold_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Silver</td>
+        <td><%=metals.silver_count%></td>
+        <td><%=metals.silver_share%>%</td>
+        <td><%=metals.silver_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Bronze</td>
+        <td><%=metals.bronze_count%></td>
+        <td><%=metals.bronze_share%>%</td>
+        <td><%=metals.bronze_yoy%>%</td>
+        <%end%>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Demographic <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+      <tr>
+      <%@total_status.each do |status|%>
+        <th class="texLef">Status</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">Employee</td>
+        <td><%=status.employee_count%></td>
+        <td><%=status.employee_share%>%</td>
+        <td><%=status.employee_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Dependent</td>
+        <td><%=status.dependent_count%></td>
+        <td><%=status.dependent_share%>%</td>
+        <td><%=status.dependent_yoy%>%</td>
+        <%end%>
+      </tr>
+ 
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@overall_ages.each do |age|%>
+        <th class="texLef">Age Group</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">< 1</td>
+        <td><%=age.zero_count%></td>
+        <td><%=age.zero_share%>%</td>
+        <td><%=age.zero_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">1-17</td>
+        <td><%=age.one_count%></td>
+        <td><%=age.one_share%>%</td>
+        <td><%=age.one_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">18-25</td>
+        <td><%=age.eighteen_count%></td>
+        <td><%=age.eighteen_share%>%</td>
+        <td><%=age.eighteen_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">26-34</td>
+        <td><%=age.twentysix_count%></td>
+        <td><%=age.twentysix_share%>%</td>
+        <td><%=age.twentysix_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">35-44</td>
+        <td><%=age.thirtyfive_count%></td>
+        <td><%=age.thirtyfive_share%>%</td>
+        <td><%=age.thirtyfive_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">45-54</td>
+        <td><%=age.fortyfive_count%></td>
+        <td><%=age.fortyfive_share%>%</td>
+        <td><%=age.fortyfive_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">55-64</td>
+        <td><%=age.fiftyfive_count%></td>
+        <td><%=age.fiftyfive_share%>%</td>
+        <td><%=age.fiftyfive_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">65+</td>
+        <td><%=age.sixtyfive_count%></td>
+        <td><%=age.sixtyfive_share%>%</td>
+        <td><%=age.sixtyfive_yoy%>%</td>
+        <%end%>
+      </tr>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+      <%@gender_types.each do |genders|%>
+        <th class="texLef">Gender</th>
+        <th>#</th>
+        <th>%</th>
+        <th>YoY</th>
+      </tr>
+      <tr>
+        <td class="texLef">Male</td>
+        <td><%=genders.male_count%></td>
+        <td><%=genders.male_share%>%</td>
+        <td><%=genders.male_yoy%>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Female</td>
+        <td><%=genders.female_count%></td>
+        <td><%=genders.female_share%>%</td>
+        <td><%=genders.female_yoy%>%</td>
+        <%end%>
+      </tr>
+    </tbody>
+    </table>
+
+    </div>
+
+<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
+
+
+<h5>Employee Census and Total Covered Lives</h5>
+<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h5>Covered Lives by Start Month</h5>
+<div id="barYr2" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h5>Employer Conversion Project</h5>
+    <table class="table table-hover table-condensed">   
+    <thead>
+      <tr>
+      <%@conversion_employees.each do |conversion|%>
+        <th class="texLef">Start</th>
+        <th><%=conversion.month_one%></th>
+        <th><%=conversion.month_two%></th>
+        <th><%=conversion.month_three%></th>
+        <th><%=conversion.month_four%></th>
+        <th><%=conversion.month_five%></th>
+        <th><%=conversion.month_six%></th>
+        <th><%=conversion.month_seven%></th>
+        <th><%=conversion.month_eight%></th>
+        <th><%=conversion.month_nine%></th>
+        <th><%=conversion.month_ten%></th>
+        <th><%=conversion.month_eleven%></th>
+        <th><%=conversion.month_twelve%></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Employees Projected</td>
+        <td><%=conversion.projected_one%></td>
+        <td><%=conversion.projected_two%></td>
+        <td><%=conversion.projected_three%></td>
+        <td><%=conversion.projected_four%></td>
+        <td><%=conversion.projected_five%></td>
+        <td><%=conversion.projected_six%></td>
+        <td><%=conversion.projected_seven%></td>
+        <td><%=conversion.projected_eight%></td>
+        <td><%=conversion.projected_nine%></td>
+        <td><%=conversion.projected_ten%></td>
+        <td><%=conversion.projected_eleven%></td>
+        <td><%=conversion.projected_twelve%></td>
+      </tr>
+      <tr>
+        <td class="texLef">Covered Lives Actual</td>
+        <td><%=conversion.actual_one%></td>
+        <td><%=conversion.actual_two%></td>
+        <td><%=conversion.actual_three%></td>
+        <td><%=conversion.actual_four%></td>
+        <td><%=conversion.actual_five%></td>
+        <td><%=conversion.actual_six%></td>
+        <td><%=conversion.actual_seven%></td>
+        <td><%=conversion.actual_eight%></td>
+        <td><%=conversion.actual_nine%></td>
+        <td><%=conversion.actual_ten%></td>
+        <td><%=conversion.actual_eleven%></td>
+        <td><%=conversion.actual_twelve%></td>
+        <%end%>
+      </tr>
+    </tbody>
+    </table>
+
+    </div>
+    </div>
+
+    </div>
+    </div>
+
+    </div>
+    </body>
+</html>
