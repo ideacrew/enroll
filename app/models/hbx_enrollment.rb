@@ -481,9 +481,10 @@ class HbxEnrollment
 
   def update_existing_shop_coverage
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
-    shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
+    shop_enrollments = household.hbx_enrollments.ne(id: id).shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
     shop_enrollments.each do |enrollment|
+
 
       if enrollment.effective_on >= self.effective_on
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
