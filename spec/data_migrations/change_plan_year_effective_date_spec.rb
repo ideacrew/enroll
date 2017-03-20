@@ -27,6 +27,7 @@ describe ChangePlanYearEffectiveDate do
       allow(ENV).to receive(:[]).with("referenece_plan_hios_id").and_return(plan.hios_id)
       allow(ENV).to receive(:[]).with("ref_plan_active_year").and_return(plan.active_year)
       allow(ENV).to receive(:[]).with("action_on_enrollments").and_return("")
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("")
       allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
     end
 
@@ -44,10 +45,35 @@ describe ChangePlanYearEffectiveDate do
       expect(plan_year.benefit_groups.first.reference_plan.hios_id).to eq plan.hios_id
     end
 
+    it "should not publish the plan year" do
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "draft"
+    end
+
     it "should publish the plan year" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).not_to eq "draft"
+    end
+
+    it "should revert the renewal py if received args as revert renewal" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_draft"
+    end
+
+    it "should revert the inital py if received args as revert application" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_application")
+      plan_year.update_attributes(aasm_state: "active")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "draft"
     end
 
     it "should set the enrollment effective on date as py start on date if enrollment has an effective date prior to py" do
