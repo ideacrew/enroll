@@ -16,7 +16,6 @@ describe 'employee with inactive benefit group assignment' do
     it "should now be active" do
       renew_benefit.update(is_active:true)
       expect(renew_benefit.first.is_active).to eq true
-      binding.pry
     end
   end
 end
