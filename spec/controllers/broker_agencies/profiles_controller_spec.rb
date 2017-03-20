@@ -437,7 +437,6 @@ RSpec.describe BrokerAgencies::ProfilesController do
   end
 
   describe "GET employer_profile datatable" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_agency_staff_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker_agency_staff']) }
