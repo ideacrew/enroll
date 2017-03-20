@@ -64,3 +64,4 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
   }).to be_truthy
   expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
 end
+

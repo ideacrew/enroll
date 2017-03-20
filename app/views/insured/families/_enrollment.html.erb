@@ -187,7 +187,7 @@
     </div>
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
-        <i class="fa fa-phone fa-2x pull-left"></i>
+        <i class="fa fa-phone fa-2x pull-right"></i>
         <span>Plan Contact Info</span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
