@@ -49,7 +49,7 @@ module Queries
       # if @order_by
       #   return Family.unscoped.where(criteria).order_by(@order_by)
       # end
-       Family.unscoped.where(hbx_idss).order_by("families.households.hbx_enrollments.employee_roles.persons.last_name" => "ASC")
+       Family.unscoped.where(hbx_idss).order_by(:'households.hbx_enrollments._id'.asc)
     end
 
   end
