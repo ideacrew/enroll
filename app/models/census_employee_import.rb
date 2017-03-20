@@ -396,7 +396,7 @@ class CensusEmployeeImport
 
   def is_employee_terminable?(employee, record)
     #return false
-    if employee.present? && record[:termination_date] < TimeKeeper.date_of_record
+    if record[:termination_date] < TimeKeeper.date_of_record
       employee.may_terminate_employee_role?
     else
       false
