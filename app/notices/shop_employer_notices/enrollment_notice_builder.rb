@@ -1,4 +1,4 @@
-class ShopNotices::EnrollmentNoticeBuilder < ShopNotice
+class ShopEmployerNotices::EnrollmentNoticeBuilder < ShopEmployerNotice
 
   attr_reader :notice, :to
   
