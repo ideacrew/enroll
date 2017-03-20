@@ -83,6 +83,14 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:broker_agency_profile/x:brokers", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
     end
 
+    it "should have one office_location" do
+      expect(@doc.xpath("//x:office_locations", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+    end
+
+    it "should have office location with address kind work" do
+      expect(@doc.xpath("//x:office_locations/x:office_location/x:address/x:type","x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#work"
+    end
+
     it "should have contact email" do
       expect(@doc.xpath("//x:contacts/x:contact//x:emails//x:email//x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
     end
