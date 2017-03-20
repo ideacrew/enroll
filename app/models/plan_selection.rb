@@ -29,67 +29,70 @@ class PlanSelection
 
   def select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
     hbx_enrollment.update_current(plan_id: plan.id)
-    hbx_enrollment.inactive_related_hbxs
-    hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
+    # hbx_enrollment.inactive_related_hbxs
+    # hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
 
     qle = hbx_enrollment.is_special_enrollment?
     if qle
-      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
+      sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id 
+      : hbx_enrollment.family.earliest_effective_ivl_sep.id
+
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
     hbx_enrollment.select_coverage!(qle: qle)
   end
 
-  def set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
-    if previous_enrollment_id.present?
-      previous_enrollment = HbxEnrollment.find(previous_enrollment_id)
-      return if hbx_enrollment.plan.active_year != previous_enrollment.plan.active_year
-      previous_enrollment_members = {}
-      previous_enrollment.hbx_enrollment_members.each do |hbx_em|
-        hbx_id = hbx_em.person.hbx_id
-        unless hbx_em.eligibility_date.blank?
-          previous_enrollment_members[hbx_id] = hbx_em.eligibility_date
-        else
-          previous_enrollment_members[hbx_id] = hbx_em.coverage_start_on
-        end
-      end
-    else
-      current_year = hbx_enrollment.coverage_year
-      current_year_enrollments = hbx_enrollment.household.hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_year == current_year}
-      return if current_year_enrollments.blank?
-      current_year_enrollments.sort_by!{|cye| cye.effective_on}
-      previous_enrollment_members = {}
-      current_year_enrollments.each do |hbx_enrollment|
-        next if hbx_enrollment.aasm_state == 'coverage_canceled'
-        hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
-          hbx_id = hbx_em.person.hbx_id
-          unless hbx_em.eligibility_date.blank?
-            potential_eligibility_date = hbx_em.eligibility_date
-          else
-            potential_eligibility_date = hbx_em.coverage_start_on
-          end
-          if previous_enrollment_members[hbx_id].blank?
-            previous_enrollment_members[hbx_id] = potential_eligibility_date
-          else
-            current_date = previous_enrollment_members[hbx_id]
-            if current_date > potential_eligibility_date
-              previous_enrollment_members[hbx_id] = potential_eligibility_date
-            end
-          end
-        end
-      end
-    end
+  # def set_eligibility_and_effective_dates_to_previous_eligibility_dates(previous_enrollment_id)
+  #   if previous_enrollment_id.present?
+  #     previous_enrollment = HbxEnrollment.find(previous_enrollment_id)
+  #     return if hbx_enrollment.plan.active_year != existing_coverage.plan.active_year
+  #     previous_enrollment_members = {}
+  #     existing_coverage.hbx_enrollment_members.each do |hbx_em|
+  #       hbx_id = hbx_em.person.hbx_id
+  #       unless hbx_em.eligibility_date.blank?
+  #         previous_enrollment_members[hbx_id] = hbx_em.eligibility_date
+  #       else
+  #         previous_enrollment_members[hbx_id] = hbx_em.coverage_start_on
+  #       end
+  #     end
+  #   else
+  #     current_year = hbx_enrollment.coverage_year
+  #     current_year_enrollments = hbx_enrollment.household.hbx_enrollments.select{|hbx_enrollment| hbx_enrollment.coverage_year == current_year}
+  #     return if current_year_enrollments.blank?
+  #     current_year_enrollments.sort_by!{|cye| cye.effective_on}
+  #     previous_enrollment_members = {}
+  #     current_year_enrollments.each do |hbx_enrollment|
+  #       next if hbx_enrollment.aasm_state == 'coverage_canceled'
+  #       hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
+  #         hbx_id = hbx_em.person.hbx_id
+  #         unless hbx_em.eligibility_date.blank?
+  #           potential_eligibility_date = hbx_em.eligibility_date
+  #         else
+  #           potential_eligibility_date = hbx_em.coverage_start_on
+  #         end
+  #         if previous_enrollment_members[hbx_id].blank?
+  #           previous_enrollment_members[hbx_id] = potential_eligibility_date
+  #         else
+  #           current_date = previous_enrollment_members[hbx_id]
+  #           if current_date > potential_eligibility_date
+  #             previous_enrollment_members[hbx_id] = potential_eligibility_date
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
 
-    hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
-      hbx_id = hbx_em.person.hbx_id
-      unless previous_enrollment_members[hbx_id].blank?
-        hbx_em.eligibility_date = previous_enrollment_members[hbx_id]
-        hbx_em.save!
-      end
-    end
+  #   hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
+  #     hbx_id = hbx_em.person.hbx_id
+  #     unless previous_enrollment_members[hbx_id].blank?
+  #       hbx_em.eligibility_date = previous_enrollment_members[hbx_id]
+  #       hbx_em.save!
+  #     end
+  #   end
 
-    hbx_enrollment.save!
-  end
+  #   hbx_enrollment.save!
+  # end
+
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)
     plan = Plan.find(plan_id)
@@ -101,6 +104,13 @@ class PlanSelection
     hbx_enrollment.family
   end
 
+  def verify_and_set_member_coverage_start_dates
+    if existing_coverage.present?
+      hbx_enrollment.hbx_enrollment_members = set_enrollment_member_coverage_start_dates
+      hbx_enrollment.parent_enrollment_id = existing_coverage.hbx_id
+    end
+  end
+
   def same_plan_enrollment
     return @same_plan_enrollment if defined? @same_plan_enrollment
 
@@ -109,18 +119,20 @@ class PlanSelection
     @same_plan_enrollment
   end
 
-  def set_enrollment_member_coverage_start_dates
-    previous_enrollment = existing_enrollment_for_covered_individuals
+  def existing_coverage
+    existing_enrollment_for_covered_individuals
+  end
 
-    if previous_enrollment.blank?
+  def set_enrollment_member_coverage_start_dates
+    if existing_coverage.blank?
       hbx_enrollment.hbx_enrollment_members
     else
-      previous_enrollment_members = previous_enrollment.hbx_enrollment_members
+      previous_enrollment_members = existing_coverage.hbx_enrollment_members
 
       hbx_enrollment.hbx_enrollment_members.collect do |member|
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
         if matched
-          member.coverage_start_on = matched.coverage_start_on || previous_enrollment.effective_on
+          member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on
         else
           member.coverage_start_on = hbx_enrollment.effective_on
         end
