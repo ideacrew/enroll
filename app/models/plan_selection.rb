@@ -97,26 +97,32 @@ class PlanSelection
     self.new(hbx_enrollment, plan)
   end
 
-  def enrollment_for_same_plan_premiums
-    new_enrollment = hbx_enrollment.clone
-    new_enrollment.hbx_enrollment_members = set_enrollment_member_eligibility_dates(new_enrollment)
-    new_enrollment
+  def family
+    hbx_enrollment.family
   end
 
-  def set_enrollment_member_eligibility_dates(new_enrollment)
+  def same_plan_enrollment
+    return @same_plan_enrollment if defined? @same_plan_enrollment
+
+    @same_plan_enrollment = family.active_household.hbx_enrollments.new(hbx_enrollment.dup.attributes)
+    @same_plan_enrollment.hbx_enrollment_members = set_enrollment_member_eligibility_dates
+    @same_plan_enrollment
+  end
+
+  def set_enrollment_member_eligibility_dates
     previous_enrollment = existing_enrollment_for_covered_individuals
 
     if previous_enrollment.blank?
-      new_enrollment.hbx_enrollment_members
+      hbx_enrollment.hbx_enrollment_members
     else
       previous_enrollment_members = previous_enrollment.hbx_enrollment_members
 
-      new_enrollment.hbx_enrollment_members.collect do |member|
+      hbx_enrollment.hbx_enrollment_members.collect do |member|
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
         if matched
           member.eligibility_date = matched.eligibility_date || previous_enrollment.effective_on
         else
-          member.eligibility_date = new_enrollment.effective_on
+          member.eligibility_date = hbx_enrollment.effective_on
         end
         member
       end

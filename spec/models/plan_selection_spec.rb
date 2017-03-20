@@ -97,7 +97,7 @@ describe PlanSelection do
         hbx_enrollment_member.person.hbx_id
       end
       it 'should set eligibility dates to that of the previous enrollment' do
-        subject.set_enrollment_member_eligibility_dates(hbx_enrollment)
+        subject.set_enrollment_member_eligibility_dates
         previous_eligibility_dates = Hash[previous_coverage.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.eligibility_date]} ]
         new_eligibility_dates = Hash[hbx_enrollment.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.eligibility_date]} ]
         new_eligibility_dates.each do |hbx_id,date|

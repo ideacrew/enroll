@@ -250,11 +250,16 @@ class Insured::PlanShoppingsController < ApplicationController
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
 
-    if @person.nil? || @hbx_enrollment.blank?
-      @enrolled_hbx_enrollment_plan_ids = []
-    else
+    @enrolled_hbx_enrollment_plan_ids = []
+
+    if @person.present? && @hbx_enrollment.present?
       if @hbx_enrollment.is_shop?
-        covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
+        if @person.active_employee_roles.present?
+          employer = @person.active_employee_roles.first.employer_profile
+          sep_effective_date = @person.primary_family.current_sep.try(:effective_on)
+          covered_plan_year = employer.plan_years.detect{|py| (py.start_on..py.end_on).cover?(sep_effective_date)}
+        end
+
         if covered_plan_year.present?
           id_list = covered_plan_year.benefit_groups.map(&:id)
           @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
@@ -277,13 +282,24 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
 
-    current_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
-    plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
-    plan_selection = plan_selection.same_plan_enrollment.calculate_costs_for_plans(current_plans)
+    build_same_plan_premiums
 
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
     @carrier_names_map = Organization.valid_carrier_names_filters.select{|k, v| carrier_profile_ids.include?(k)}
+  end
+
+  def build_same_plan_premiums
+    enrolled_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
+    if enrolled_plans.present?
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
+      @enrolled_plans = plan_selection.same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
+      @enrolled_plans.each do |enrolled_plan|
+        if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
+          @plans[plan_index] = enrolled_plan
+        end
+      end
+    end
   end
 
   def thousand_ceil(num)

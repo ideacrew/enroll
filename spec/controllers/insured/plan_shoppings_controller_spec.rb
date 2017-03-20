@@ -399,6 +399,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
       allow(user).to receive(:person).and_return(person)
