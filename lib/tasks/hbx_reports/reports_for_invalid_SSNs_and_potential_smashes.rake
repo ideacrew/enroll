@@ -1,4 +1,4 @@
-# Run the following rake task: RAILS_ENV=production bundle exec rake reports:non_ridp_users_with_enrollments
+# Run the following rake task: RAILS_ENV=production bundle exec rake reports:people_with_invalid_SSN_and_multiple_families
 require 'csv'
 namespace :reports do
   desc "Users with Invalid SSN's & people having more than 1 family"
