@@ -25,7 +25,7 @@ class ShopEmployeeNotice < Notice
   end
 
   def build
-    notice.primary_fullname = census_employee.full_name
+    notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
