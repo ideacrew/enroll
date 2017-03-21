@@ -27,11 +27,28 @@ class ShopEmployeeNotice < Notice
   def build
     notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
+    append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
   def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+  end
+
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+      url: "www.dhs.dc.gov",
+      phone: "(855) 532-5465",
+      fax: "(855) 532-5465",
+      email: "#{Settings.contact_center.email_address}",
+      address: PdfTemplates::NoticeAddress.new({
+        street_1: "100 K ST NE",
+        street_2: "Suite 100",
+        city: "Washington DC",
+        state: "DC",
+        zip: "20005"
+      })
+    })
   end
 
   def append_broker(broker)
