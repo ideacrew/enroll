@@ -237,26 +237,26 @@
       <tr>
         <td class="texLef"><%=carrier.carrier_first_name%></td>
         <td><%=carrier.carrier_first_count%></td>
-        <td><%=carrier.carrier_first_share%>%</td>
-        <td><%=carrier.carrier_first_yoy%>%</td>
+        <td><%=(carrier.carrier_first_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_first_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_second_name%></td>
         <td><%=carrier.carrier_second_count%></td>
-        <td><%=carrier.carrier_second_share%>%</td>
-        <td><%=carrier.carrier_second_yoy%>%</td>
+        <td><%=(carrier.carrier_second_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_second_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_third_name%></td>
         <td><%=carrier.carrier_third_count%></td>
-        <td><%=carrier.carrier_third_share%>%</td>
-        <td><%=carrier.carrier_third_yoy%>%</td>
+        <td><%=(carrier.carrier_third_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_third_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_fourth_name%></td>
         <td><%=carrier.carrier_fourth_count%></td>
-        <td><%=carrier.carrier_fourth_share%>%</td>
-        <td><%=carrier.carrier_fourth_yoy%>%</td>
+        <td><%=(carrier.carrier_fourth_share.to_f * 100).to_i%>%</td>
+        <td><%=(carrier.carrier_fourth_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
 
@@ -277,26 +277,26 @@
       <tr>
         <td class="texLef">Platinum</td>
         <td><%=metals.platinum_count%></td>
-        <td><%=metals.platinum_share%>%</td>
-        <td><%=metals.platinum_yoy%>%</td>
+        <td><%=(metals.platinum_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.platinum_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
         <td><%=metals.gold_count%></td>
-        <td><%=metals.gold_share%>%</td>
-        <td><%=metals.gold_yoy%>%</td>
+        <td><%=(metals.gold_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.gold_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
         <td><%=metals.silver_count%></td>
-        <td><%=metals.silver_share%>%</td>
-        <td><%=metals.silver_yoy%>%</td>
+        <td><%=(metals.silver_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.silver_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
         <td><%=metals.bronze_count%></td>
-        <td><%=metals.bronze_share%>%</td>
-        <td><%=metals.bronze_yoy%>%</td>
+        <td><%=(metals.bronze_share.to_f * 100).to_i%>%</td>
+        <td><%=(metals.bronze_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
 
@@ -323,14 +323,14 @@
       <tr>
         <td class="texLef">Employee</td>
         <td><%=status.employee_count%></td>
-        <td><%=status.employee_share%>%</td>
-        <td><%=status.employee_yoy%>%</td>
+        <td><%=(status.employee_share.to_f * 100).to_i%>%</td>
+        <td><%=(status.employee_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
         <td><%=status.dependent_count%></td>
-        <td><%=status.dependent_share%>%</td>
-        <td><%=status.dependent_yoy%>%</td>
+        <td><%=(status.dependent_share.to_f * 100).to_i%>%</td>
+        <td><%=(status.dependent_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
  
@@ -351,50 +351,50 @@
       <tr>
         <td class="texLef">< 1</td>
         <td><%=age.zero_count%></td>
-        <td><%=age.zero_share%>%</td>
-        <td><%=age.zero_yoy%>%</td>
+        <td><%=(age.zero_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.zero_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
         <td><%=age.one_count%></td>
-        <td><%=age.one_share%>%</td>
-        <td><%=age.one_yoy%>%</td>
+        <td><%=(age.one_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.one_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
         <td><%=age.eighteen_count%></td>
-        <td><%=age.eighteen_share%>%</td>
-        <td><%=age.eighteen_yoy%>%</td>
+        <td><%=(age.eighteen_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.eighteen_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
         <td><%=age.twentysix_count%></td>
-        <td><%=age.twentysix_share%>%</td>
-        <td><%=age.twentysix_yoy%>%</td>
+        <td><%=(age.twentysix_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.twentysix_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
         <td><%=age.thirtyfive_count%></td>
-        <td><%=age.thirtyfive_share%>%</td>
-        <td><%=age.thirtyfive_yoy%>%</td>
+        <td><%=(age.thirtyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.thirtyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
         <td><%=age.fortyfive_count%></td>
-        <td><%=age.fortyfive_share%>%</td>
-        <td><%=age.fortyfive_yoy%>%</td>
+        <td><%=(age.fortyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.fortyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
         <td><%=age.fiftyfive_count%></td>
-        <td><%=age.fiftyfive_share%>%</td>
-        <td><%=age.fiftyfive_yoy%>%</td>
+        <td><%=(age.fiftyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.fiftyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
         <td><%=age.sixtyfive_count%></td>
-        <td><%=age.sixtyfive_share%>%</td>
-        <td><%=age.sixtyfive_yoy%>%</td>
+        <td><%=(age.sixtyfive_share.to_f * 100).to_i%>%</td>
+        <td><%=(age.sixtyfive_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
 
@@ -415,14 +415,14 @@
       <tr>
         <td class="texLef">Male</td>
         <td><%=genders.male_count%></td>
-        <td><%=genders.male_share%>%</td>
-        <td><%=genders.male_yoy%>%</td>
+        <td><%=(genders.male_share.to_f * 100).to_i%>%</td>
+        <td><%=(genders.male_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
         <td><%=genders.female_count%></td>
-        <td><%=genders.female_share%>%</td>
-        <td><%=genders.female_yoy%>%</td>
+        <td><%=(genders.female_share.to_f * 100).to_i%>%</td>
+        <td><%=(genders.female_yoy.to_f * 100).to_i%>%</td>
         <%end%>
       </tr>
     </tbody>
