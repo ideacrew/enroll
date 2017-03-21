@@ -9,11 +9,7 @@ class WidgetController < ApplicationController
     @total_status=ShopCovered::ShopStatusWidget.all
     @metal_types=ShopCovered::ShopMetalWidget.all
     @carriers=ShopCovered::ShopCarriersWidget.all
-    # @annual_status=IvlCovered::AnnualStatusType.all
-    # @age_groups=IvlCovered::OverallAgeGroups.all
-    # @over_all_aptc=IvlCovered::OverallAptc.all
-    # @overall_genders=IvlCovered::OverallGenderTypes.all
-    # @annual_covered_lives=IvlCovered::AnnualCoveredLives.all
+    @total_widgets=ShopCovered::ShopTotalEnrollments.all
   end
 
 

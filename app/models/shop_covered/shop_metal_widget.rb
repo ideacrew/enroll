@@ -7,13 +7,13 @@ module ShopCovered
     field :platinum_count, type: Integer
     field :platinum_share, type: String
     field :platinum_yoy, type: String
-    field :gold_count, type: String
+    field :gold_count, type: Integer
     field :gold_share, type: String
     field :gold_yoy, type: String
-    field :silver_count, type: String
+    field :silver_count, type: Integer
     field :silver_share, type: String
     field :silver_yoy, type: String
-    field :bronze_count, type: String
+    field :bronze_count, type: Integer
     field :bronze_share, type: String
     field :bronze_yoy, type: String
 

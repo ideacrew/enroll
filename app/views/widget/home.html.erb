@@ -193,26 +193,28 @@
 </ul>
 
 <div class="row row-content">
+<%@total_widgets.each do |widgets|%>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>3,724 Active Employers <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>92% Employees Enrolled <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 12% YoY</div>
+  <div class="panel-body"><b><%=number_with_delimiter(widgets.active_employers_count)%> Active Employers <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(widgets.active_employers_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>51,213 Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+  <div class="panel-body"><b><%=(widgets.employees_enrolled_percentage_count.to_f * 100).to_i%>% Employees Enrolled <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(widgets.employees_enrolled_percentage_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>4,866 February Start <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 10% YoY</div>
+  <div class="panel-body"><b><%=number_with_delimiter(widgets.total_covered_count)%> Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(widgets.total_covered_change.to_f * 100).to_i%>% YoY</div>
 </div>
 </div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b><%=number_with_delimiter(widgets.month_start_count)%> February Start <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> <%=(widgets.month_start_change.to_f * 100).to_i%>% YoY</div>
+</div>
+</div>
+<%end%>
 </div>
 
     <div class="row row-content">
@@ -236,25 +238,25 @@
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_first_name%></td>
-        <td><%=carrier.carrier_first_count%></td>
+        <td><%=number_with_delimiter(carrier.carrier_first_count)%></td>
         <td><%=(carrier.carrier_first_share.to_f * 100).to_i%>%</td>
         <td><%=(carrier.carrier_first_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_second_name%></td>
-        <td><%=carrier.carrier_second_count%></td>
+        <td><%=number_with_delimiter(carrier.carrier_second_count)%></td>
         <td><%=(carrier.carrier_second_share.to_f * 100).to_i%>%</td>
         <td><%=(carrier.carrier_second_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_third_name%></td>
-        <td><%=carrier.carrier_third_count%></td>
+        <td><%=number_with_delimiter(carrier.carrier_third_count)%></td>
         <td><%=(carrier.carrier_third_share.to_f * 100).to_i%>%</td>
         <td><%=(carrier.carrier_third_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef"><%=carrier.carrier_fourth_name%></td>
-        <td><%=carrier.carrier_fourth_count%></td>
+        <td><%=number_with_delimiter(carrier.carrier_fourth_count)%></td>
         <td><%=(carrier.carrier_fourth_share.to_f * 100).to_i%>%</td>
         <td><%=(carrier.carrier_fourth_yoy.to_f * 100).to_i%>%</td>
         <%end%>
@@ -276,25 +278,25 @@
       </tr>
       <tr>
         <td class="texLef">Platinum</td>
-        <td><%=metals.platinum_count%></td>
+        <td><%=number_with_delimiter(metals.platinum_count)%></td>
         <td><%=(metals.platinum_share.to_f * 100).to_i%>%</td>
         <td><%=(metals.platinum_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td><%=metals.gold_count%></td>
+        <td><%=number_with_delimiter(metals.gold_count)%></td>
         <td><%=(metals.gold_share.to_f * 100).to_i%>%</td>
         <td><%=(metals.gold_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td><%=metals.silver_count%></td>
+        <td><%=number_with_delimiter(metals.silver_count)%></td>
         <td><%=(metals.silver_share.to_f * 100).to_i%>%</td>
         <td><%=(metals.silver_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td><%=metals.bronze_count%></td>
+        <td><%=number_with_delimiter(metals.bronze_count)%></td>
         <td><%=(metals.bronze_share.to_f * 100).to_i%>%</td>
         <td><%=(metals.bronze_yoy.to_f * 100).to_i%>%</td>
         <%end%>
@@ -322,13 +324,13 @@
       </tr>
       <tr>
         <td class="texLef">Employee</td>
-        <td><%=status.employee_count%></td>
+        <td><%=number_with_delimiter(status.employee_count)%></td>
         <td><%=(status.employee_share.to_f * 100).to_i%>%</td>
         <td><%=(status.employee_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td><%=status.dependent_count%></td>
+        <td><%=number_with_delimiter(status.dependent_count)%></td>
         <td><%=(status.dependent_share.to_f * 100).to_i%>%</td>
         <td><%=(status.dependent_yoy.to_f * 100).to_i%>%</td>
         <%end%>
@@ -350,49 +352,49 @@
       </tr>
       <tr>
         <td class="texLef">< 1</td>
-        <td><%=age.zero_count%></td>
+        <td><%=number_with_delimiter(age.zero_count)%></td>
         <td><%=(age.zero_share.to_f * 100).to_i%>%</td>
         <td><%=(age.zero_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-        <td><%=age.one_count%></td>
+        <td><%=number_with_delimiter(age.one_count)%></td>
         <td><%=(age.one_share.to_f * 100).to_i%>%</td>
         <td><%=(age.one_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-        <td><%=age.eighteen_count%></td>
+        <td><%=number_with_delimiter(age.eighteen_count)%></td>
         <td><%=(age.eighteen_share.to_f * 100).to_i%>%</td>
         <td><%=(age.eighteen_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-        <td><%=age.twentysix_count%></td>
+        <td><%=number_with_delimiter(age.twentysix_count)%></td>
         <td><%=(age.twentysix_share.to_f * 100).to_i%>%</td>
         <td><%=(age.twentysix_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-        <td><%=age.thirtyfive_count%></td>
+        <td><%=number_with_delimiter(age.thirtyfive_count)%></td>
         <td><%=(age.thirtyfive_share.to_f * 100).to_i%>%</td>
         <td><%=(age.thirtyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-        <td><%=age.fortyfive_count%></td>
+        <td><%=number_with_delimiter(age.fortyfive_count)%></td>
         <td><%=(age.fortyfive_share.to_f * 100).to_i%>%</td>
         <td><%=(age.fortyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td><%=age.fiftyfive_count%></td>
+        <td><%=number_with_delimiter(age.fiftyfive_count)%></td>
         <td><%=(age.fiftyfive_share.to_f * 100).to_i%>%</td>
         <td><%=(age.fiftyfive_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-        <td><%=age.sixtyfive_count%></td>
+        <td><%=number_with_delimiter(age.sixtyfive_count)%></td>
         <td><%=(age.sixtyfive_share.to_f * 100).to_i%>%</td>
         <td><%=(age.sixtyfive_yoy.to_f * 100).to_i%>%</td>
         <%end%>
@@ -414,13 +416,13 @@
       </tr>
       <tr>
         <td class="texLef">Male</td>
-        <td><%=genders.male_count%></td>
+        <td><%=number_with_delimiter(genders.male_count)%></td>
         <td><%=(genders.male_share.to_f * 100).to_i%>%</td>
         <td><%=(genders.male_yoy.to_f * 100).to_i%>%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td><%=genders.female_count%></td>
+        <td><%=number_with_delimiter(genders.female_count)%></td>
         <td><%=(genders.female_share.to_f * 100).to_i%>%</td>
         <td><%=(genders.female_yoy.to_f * 100).to_i%>%</td>
         <%end%>
@@ -462,33 +464,33 @@
     <tbody>
       <tr>
         <td class="texLef">Employees Projected</td>
-        <td><%=conversion.projected_one%></td>
-        <td><%=conversion.projected_two%></td>
-        <td><%=conversion.projected_three%></td>
-        <td><%=conversion.projected_four%></td>
-        <td><%=conversion.projected_five%></td>
-        <td><%=conversion.projected_six%></td>
-        <td><%=conversion.projected_seven%></td>
-        <td><%=conversion.projected_eight%></td>
-        <td><%=conversion.projected_nine%></td>
-        <td><%=conversion.projected_ten%></td>
-        <td><%=conversion.projected_eleven%></td>
-        <td><%=conversion.projected_twelve%></td>
+        <td><%=number_with_delimiter(conversion.projected_one)%></td>
+        <td><%=number_with_delimiter(conversion.projected_two)%></td>
+        <td><%=number_with_delimiter(conversion.projected_three)%></td>
+        <td><%=number_with_delimiter(conversion.projected_four)%></td>
+        <td><%=number_with_delimiter(conversion.projected_five)%></td>
+        <td><%=number_with_delimiter(conversion.projected_six)%></td>
+        <td><%=number_with_delimiter(conversion.projected_seven)%></td>
+        <td><%=number_with_delimiter(conversion.projected_eight)%></td>
+        <td><%=number_with_delimiter(conversion.projected_nine)%></td>
+        <td><%=number_with_delimiter(conversion.projected_ten)%></td>
+        <td><%=number_with_delimiter(conversion.projected_eleven)%></td>
+        <td><%=number_with_delimiter(conversion.projected_twelve)%></td>
       </tr>
       <tr>
         <td class="texLef">Covered Lives Actual</td>
-        <td><%=conversion.actual_one%></td>
-        <td><%=conversion.actual_two%></td>
-        <td><%=conversion.actual_three%></td>
-        <td><%=conversion.actual_four%></td>
-        <td><%=conversion.actual_five%></td>
-        <td><%=conversion.actual_six%></td>
-        <td><%=conversion.actual_seven%></td>
-        <td><%=conversion.actual_eight%></td>
-        <td><%=conversion.actual_nine%></td>
-        <td><%=conversion.actual_ten%></td>
-        <td><%=conversion.actual_eleven%></td>
-        <td><%=conversion.actual_twelve%></td>
+        <td><%=number_with_delimiter(conversion.actual_one)%></td>
+        <td><%=number_with_delimiter(conversion.actual_two)%></td>
+        <td><%=number_with_delimiter(conversion.actual_three)%></td>
+        <td><%=number_with_delimiter(conversion.actual_four)%></td>
+        <td><%=number_with_delimiter(conversion.actual_five)%></td>
+        <td><%=number_with_delimiter(conversion.actual_six)%></td>
+        <td><%=number_with_delimiter(conversion.actual_seven)%></td>
+        <td><%=number_with_delimiter(conversion.actual_eight)%></td>
+        <td><%=number_with_delimiter(conversion.actual_nine)%></td>
+        <td><%=number_with_delimiter(conversion.actual_ten)%></td>
+        <td><%=number_with_delimiter(conversion.actual_eleven)%></td>
+        <td><%=number_with_delimiter(conversion.actual_twelve)%></td>
         <%end%>
       </tr>
     </tbody>
