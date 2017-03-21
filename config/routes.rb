@@ -25,13 +25,19 @@ Rails.application.routes.draw do
 
   
   get 'dashboard/home', to: 'dashboards#home'
-  get 'policy/home', to: 'policies#home'
-  get 'covered/home', to: 'widget#home'
+
+  resources :shop, only: [] do
+    collection do
+      get 'covered', to: 'widget#home'
+      get 'policy', to: 'shop_widget#home'
+    end
+  end
 
   resources :ivl, only: [] do
     collection do
-      get 'home', to: 'ivls#home' 
+      get 'covered', to: 'ivls#home' 
       get 'ivl_enroll', to:'ivls#enrollment'
+      get 'policy', to: 'policies#home'
     end
   end
   

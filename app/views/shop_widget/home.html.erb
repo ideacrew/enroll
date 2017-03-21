@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IVL Dashboard</title>
+<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+<!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+<!-- <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
+
+<script type="text/javascript">
+    $(function () {
+        Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+        $('#barYr1').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+                'Jan',
+                'Feb'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            name: 'Census',
+            data: [786, 1624, 2393, 3126, 3792, 6529, 9147, 13281, 19433, 22020, 30112, 34118]
+        }, {
+            name: 'Covered Lives',
+            data: [705, 1451, 2165, 2814, 3446, 5927, 8352, 11076, 13833, 16590, 26912, 30798]
+            }]
+        });
+    });
+</script>
+        
+<script type="text/javascript">
+    $(function () {
+        Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+        $('#barYr2').highcharts({
+        chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+                'Jan',
+                'Feb'
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Enrollment'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            name: 'Month 13-24',
+            data: [37, 26, 247, 347, 334, 412, 350, 116, 11, 1550, 851, 983]
+            }, {
+            name: 'Month 1-12',
+            data: [57, 46, 547, 647, 634, 712, 650, 216, 21, 3050, 1551, 1683]
+            }]
+        });
+    });
+</script>
+
+</head>
+
+<body>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <!-- <header class="jumbotron jumbotron"> -->
+
+        <!-- Main component for a primary marketing message or call to action -->
+
+    <!-- <div class="container-fluid"> -->
+            <!-- <div class="row row-header"> -->
+                <!-- <h2>CIO Dashboard</h2> -->
+            <!-- </div> -->
+    <!-- </div> -->
+    <!-- </header> -->
+    <!-- TODO: This should move to Layout -->
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+<ul class="nav nav-pills">
+ <li><a href="/covered/home" data-toggle="tab">IVL Covered Lives</a></li>
+ <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+ <li class="active"><a href="/covered/home">SHOP Covered Lives</a></li>
+ <li><a href="shop_policy.htm">SHOP Policies</a></li>
+</ul>
+
+<div class="row row-content">
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>3,724 Active Employers <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>92% Employees Enrolled <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 12% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>51,213 Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>4,866 February Start <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 10% YoY</div>
+</div>
+</div>
+</div>
+
+    <div class="row row-content">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
+
+    <table class="table table-hover table-condensed">
+    <thead>
+    
+    <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Employer <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">Broker</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">Yes</td>
+       <td>3,366</td>
+       <td>90%</td>
+       <td>-5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">No</td>
+       <td>358</td>
+       <td>2%</td>
+       <td>7%</td>
+     </tr>
+
+     <tr>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">Choice</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">1-Plan</td>
+       <td>1,670</td>
+       <td>45%</td>
+       <td>5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">1-Carrier</td>
+       <td>1,790</td>
+       <td>48%</td>
+       <td>7%</td>
+     </tr>
+     <tr>
+       <td class="texLef">1-Metal</td>
+       <td>264</td>
+       <td>7%</td>
+       <td>-3%</td>
+     </tr>
+
+     <tr>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">Employer Contribution</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">100%</td>
+       <td>1,778</td>
+       <td>48%</td>
+       <td>-12%</td>
+     </tr>
+     <tr>
+       <td class="texLef">51-99%</td>
+       <td>996</td>
+       <td>27%</td>
+       <td>7%</td>
+     </tr>
+     <tr>
+       <td class="texLef">50%</td>
+       <td>950</td>
+       <td>26%</td>
+       <td>5%</td>
+     </tr>
+
+     <tr>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">New Hire Benefits</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">Date of Hire</td>
+       <td>1,778</td>
+       <td>48%</td>
+       <td>-12%</td>
+     </tr>
+     <tr>
+       <td class="texLef">1st of Month</td>
+       <td>996</td>
+       <td>27%</td>
+       <td>7%</td>
+     </tr>
+     <tr>
+       <td class="texLef">1st After 30 Days</td>
+       <td>950</td>
+       <td>26%</td>
+       <td>5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">1st After 60 Days</td>
+       <td>950</td>
+       <td>26%</td>
+       <td>5%</td>
+     </tr>
+
+    <tr>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr class="tabSpc1">
+       <td class="texLef" colspan="4">Employee <a href="ivl_enroll.htm">More Information</a></td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">Census</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">Enrolled</td>
+       <td>30,798</td>
+       <td>62%</td>
+       <td>3%</td>
+     </tr>
+     <tr>
+       <td class="texLef">Not-Enrolled</td>
+       <td>20,445</td>
+       <td>38%</td>
+       <td>5%</td>
+     </tr>
+
+     <tr>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+       <td>&nbsp;</td>
+     </tr>
+     <tr>
+       <th class="texLef">Family Size</th>
+       <th>#</th>
+       <th>%</th>
+       <th>YoY</th>
+     </tr>
+     <tr>
+       <td class="texLef">1-Member</td>
+       <td>19,850</td>
+       <td>82%</td>
+       <td>5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">2-Members</td>
+       <td>2,445</td>
+       <td>18%</td>
+       <td>-10%</td>
+     </tr>
+     <tr>
+       <td class="texLef">3-Members</td>
+       <td>19,850</td>
+       <td>82%</td>
+       <td>5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">4-Members</td>
+       <td>2,445</td>
+       <td>18%</td>
+       <td>-10%</td>
+     </tr>
+     <tr>
+       <td class="texLef">5-Members</td>
+       <td>19,850</td>
+       <td>82%</td>
+       <td>5%</td>
+     </tr>
+     <tr>
+       <td class="texLef">6-Members</td>
+       <td>2,445</td>
+       <td>18%</td>
+       <td>-10%</td>
+     </tr>
+     <tr>
+       <td class="texLef">7+ Members</td>
+       <td>2,445</td>
+       <td>18%</td>
+       <td>-10%</td>
+     </tr>
+    
+    
+    </tbody>
+    </table>
+
+    </div>
+
+<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
+
+
+<h5>Employee Census and Total Covered Lives</h5>
+<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h5>Covered Lives by Start Month</h5>
+<div id="barYr2" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h5>Employer Conversion Project</h5>
+   <table class="table table-hover table-condensed">  
+   <thead>
+     <tr>
+       <th class="texLef">Start</th>
+       <th>Jul 16</th>
+       <th>Aug 16</th>
+       <th>Sep 16</th>
+       <th>Oct 16</th>
+       <th>Nov 16</th>
+       <th>Dec 16</th>
+       <th>Jan 17</th>
+       <th>Feb 17</th>
+       <th>Mar 17</th>
+       <th>Apr 17</th>
+       <th>May 17</th>
+       <th>Jun 17</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <td class="texLef">Employers Projected</td>
+       <td>275</td>
+       <td>260</td>
+       <td>292</td>
+       <td>265</td>
+       <td>317</td>
+       <td>1,223</td>
+       <td>195</td>
+       <td>132</td>
+       <td>172</td>
+       <td>128</td>
+       <td>157</td>
+       <td>195</td>
+     </tr>
+     <tr>
+       <td class="texLef">Employers Actual</td>
+       <td>330</td>
+       <td>272</td>
+       <td>262</td>
+       <td>256</td>
+       <td>296</td>
+       <td>1,135</td>
+       <td>172</td>
+       <td>127</td>
+       <td>171</td>
+       <td>128</td>
+       <td>158</td>
+       <td></td>
+     </tr>
+   </tbody>
+   </table>
+
+    </div>
+    </div>
+
+    </div>
+    </div>
+
+    </div>
+    </body>
+</html>
