@@ -86,9 +86,6 @@ end
 
 And(/(.*) matches all employee roles to employers and is logged in/) do |named_person|
   person = people[named_person]
-  Person.all.select { |stored_person| stored_person["ssn"] == person.ssn &&
-                                      stored_person["dob"] == person.dob
-                    }
   organizations = Organization.in(fein: [person[:fein], person[:mfein]])
   employer_profiles = organizations.map(&:employer_profile)
   counter = 0
@@ -129,6 +126,12 @@ end
 Then(/Employee should see \"employer-sponsored benefits not found\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
   find('.alert', text: "Unable to find employer-sponsored benefits for enrollment year")
+  visit '/families/home'
+end
+
+Then(/Employee should see \"You are attempting to purchase coverage through qle proir to your eligibility date\" error message/) do
+  screenshot("new_hire_not_yet_eligible_exception")
+  find('.alert', text: "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date")
   visit '/families/home'
 end
 
@@ -205,9 +208,31 @@ Then(/(.*) should get plan year start date as coverage effective date/) do |name
   find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end
 
+Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
+  person = people[named_person]
+  effective_on = Person.where(:first_name=> person[:first_name]).first.primary_family.current_sep.effective_on
+  find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"))
+end
+
 When(/(.+) should see coverage summary page with renewing plan year start date as effective date/) do |named_person|
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
+end
+
+Then(/(.+) should see coverage summary page with qle effective date/) do |named_person|
+  step "#{named_person} should get qle effective date as coverage effective date"
+  find('.interaction-click-control-confirm').click
+end
+
+Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
+  expect(page).to have_content('Enrollment Submitted')
+  step "#{named_person} should get qle effective date as coverage effective date"
+
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
 end
 
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
@@ -229,6 +254,14 @@ When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    click_link "CONTINUE"
+  end
+end
+
+When(/Employee select a qle date based on expired plan year/) do
+  screenshot("past_qle_date")
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end

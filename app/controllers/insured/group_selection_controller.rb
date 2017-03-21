@@ -46,12 +46,13 @@ class Insured::GroupSelectionController < ApplicationController
     insure_hbx_enrollment_for_shop_qle_flow
 
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
+    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
-      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      qle: qle,
       family: @family,
       employee_role: @employee_role,
-      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_group: @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
 
     generate_coverage_family_members_for_cobra
@@ -162,7 +163,7 @@ class Insured::GroupSelectionController < ApplicationController
           benefit_group = @hbx_enrollment.benefit_group
           benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         else
-          benefit_group = @employee_role.benefit_group
+          benefit_group = @employee_role.benefit_group(qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
           benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
         end
       end
@@ -216,7 +217,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def insure_hbx_enrollment_for_shop_qle_flow
     if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      @hbx_enrollment = Insured::GroupSelectionHelper.selected_enrollment(@family, @employee_role)
     end
   end
 
