@@ -14,7 +14,7 @@ class ShopEmployeeNotices::OpenEnrollmentNotice < ShopEmployeeNotice
   def append_data
     renewing_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
     notice.plan_year = PdfTemplates::PlanYear.new({
-      :open_enrollment_start_on => renewing_plan_year.open_enrollment_start_on,
+      :start_on => renewing_plan_year.start_on,
       :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on
       })
   end
