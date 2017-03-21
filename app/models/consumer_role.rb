@@ -461,9 +461,9 @@ class ConsumerRole
 
   def verify_ivl_by_admin(*args)
     if person.ssn || is_native?
-      self.ssn_valid_citizenship_valid! verification_attr
+      self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
-      self.pass_dhs! verification_attr
+      self.pass_dhs! verification_attr(args.first)
     end
   end
 
@@ -676,19 +676,21 @@ class ConsumerRole
   end
 
   def update_all_verification_types(*args)
-    person.verification_types.each{|v_type| update_verification_type(v_type, "person is fully verified") }
+    person.verification_types.each do |v_type|
+      update_verification_type(v_type, "person is fully verified", lawful_presence_determination.try(:vlp_authority))
+    end
   end
 
-  def update_verification_type(v_type, update_reason)
+  def update_verification_type(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
     elsif v_type == "American Indian Status"
       update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
     else
-      lawful_presence_determination.authorize!(verification_attr)
+      lawful_presence_determination.authorize!(verification_attr(authority.first))
       update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
     end
-    all_types_verified? ? verify_ivl_by_admin : "#{v_type} successfully verified."
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type} successfully verified."
   end
 
   def is_type_verified?(type)
@@ -744,9 +746,10 @@ class ConsumerRole
     )
   end
 
-  def verification_attr
-    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
-                    :vlp_authority => "hbx"
+  def verification_attr(*authority)
+    authority = authority.first == "curam" ? "curam" : "hbx"
+    OpenStruct.new({:determined_at => TimeKeeper.date_of_record,
+                    :vlp_authority => authority
                    })
   end
 end
