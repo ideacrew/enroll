@@ -429,23 +429,24 @@ def employer_poc
    def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @health_enrollments, @dental_enrollments = @person.primary_family.terminated_enrollments.partition{|e| e.is_health_enrollment? }
+    @enrollments = @person.primary_family.terminated_enrollments
   end
 
   def reinstate_hbx_enrollments
-    @terminated_enrollments=[]
-    params[:enrollment_ids].each do |id|
+    @terminated_enrollments = []
+    params[:enrollment_ids].each do |enrollment_id|
       begin
-        enrollment =HbxEnrollment.find id
+        enrollment = HbxEnrollment.find(enrollment_id)
         if enrollment.kind == "individual"
           Enrollments::Replicator::Individual.new(enrollment, TimeKeeper.date_of_record + 1.day).build
         end
         # enrollment.reinstate
       rescue Exception => e
-        @terminated_enrollments << id
+        @terminated_enrollments << enrollment_id
         next
       end
     end
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   def verify_dob_change
