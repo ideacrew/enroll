@@ -5,7 +5,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',
-                            :notice_template => 'notices/shop_notices/3a_3b_employer_plan_year_renewal',
+                            :notice_template => 'notices/shop_employer_notices/3a_3b_employer_plan_year_renewal',
                             :notice_builder => 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
                             :mpi_indicator => 'MPI_SHOPRA',
                             :title => "Plan Offerings Finalized"})

@@ -10,7 +10,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalNotice do
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Conversion, Group Renewal Available',
-                            :notice_template => 'notices/shop_notices/6_conversion_group_renewal_notice',
+                            :notice_template => 'notices/shop_employer_notices/6_conversion_group_renewal_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerRenewalNotice',
                             :mpi_indicator => 'MPI_SHOP6',
                             :title => "Welcome to DC Health Link, Group Renewal Available"})

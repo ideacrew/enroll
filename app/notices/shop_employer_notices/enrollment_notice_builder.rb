@@ -6,7 +6,7 @@ class ShopEmployerNotices::EnrollmentNoticeBuilder < ShopEmployerNotice
     super(args)
     @employer = employer
     @to = @employer.try(:person).try(:home_email).try(:address)
-    @template = args[:template] || "notices/shop_notices/shop_5c_notice.html.erb"
+    @template = args[:template] || "notices/shop_employer_notices/shop_5c_notice.html.erb"
     @email_notice = args[:email_notice] || true
     @paper_notice = args[:paper_notice] || true
     build

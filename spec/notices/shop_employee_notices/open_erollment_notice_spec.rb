@@ -12,9 +12,9 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
   let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Open Enrollment available for Employee',
-                            :notice_template => 'notices/shop_notices/renewal_open_enrollment_notice_for_employee',
+                            :notice_template => 'notices/shop_employee_notices/renewal_open_enrollment_notice_for_employee',
                             :notice_builder => 'ShopEmployeeNotices::OpenEnrollmentNotice',
-                            :mpi_indicator => 'MPI_SHOP8',
+                            :mpi_indicator => 'MPI_SHOP8A',
                             :title => "Your Health Plan Open Enrollment Period has Begun"})
                           }
     let(:valid_parmas) {{

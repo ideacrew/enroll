@@ -8,7 +8,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employer SHOP Approval Notice',
-                            :notice_template => 'notices/shop_notices/2_initial_employer_approval_notice',
+                            :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
                             :mpi_indicator => 'MPI_SHOP2A',
                             :title => "Employer Approval Notice"})

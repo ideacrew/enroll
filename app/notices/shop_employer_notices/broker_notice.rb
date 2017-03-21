@@ -4,7 +4,7 @@ class ShopEmployerNotices::BrokerNotice < ShopEmployerNotice
     super(args)
     @broker = broker
     @to = @broker.try(:person).try(:home_email).try(:address)
-    @template = args[:template] || "notices/shop_notices/1b_broker_notice.html.erb"
+    @template = args[:template] || "notices/shop_employer_notices/1b_broker_notice.html.erb"
     build
   end
 
