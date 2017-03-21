@@ -1349,7 +1349,7 @@ class HbxEnrollment
   end
 
   def previous_enrollments(year)
-    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind)
+    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
   end
 
   def generate_signature(previous_enrollment)
