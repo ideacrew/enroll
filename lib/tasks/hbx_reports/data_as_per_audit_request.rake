@@ -53,7 +53,7 @@ namespace :reports do
 
     def has_ivl_enrollment?(person, family)
       @has_enrollment = false
-      if family.households.flat_map(&:hbx_enrollments).select { |enr| enr.kind == "individual" }.each do |enrollment|
+      family.households.flat_map(&:hbx_enrollments).select { |enr| enr.kind == "individual" }.each do |enrollment|
         enrollment.hbx_enrollment_members.each do |hem|
           if hem.family_member.person.id == person.id
             @has_enrollment = true
