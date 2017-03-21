@@ -462,7 +462,7 @@ class HbxEnrollment
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
         if self.effective_on > previous_enrollment.effective_on
           previous_enrollment.terminate_coverage! if previous_enrollment.may_terminate_coverage?
-          previous_enrollment.update_current(terminated_on: termination_date)
+          previous_enrollment.update_current(terminated_on: effective_on - 1.day)
         else
           previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
@@ -1352,21 +1352,12 @@ class HbxEnrollment
     household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind)
   end
 
-  def date_term_min
-    TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
-  end
-
   def generate_signature(previous_enrollment)
     previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
   end
 
   def same_signatures(previous_enrollment)
     previous_enrollment.enrollment_signature == self.enrollment_signature
-  end
-
-  def termination_date
-    day_before = effective_on - 1.day
-    (date_term_min > day_before && effective_on > date_term_min) ? date_term_min : day_before
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
