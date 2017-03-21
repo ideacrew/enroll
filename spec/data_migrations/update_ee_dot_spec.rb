@@ -14,7 +14,6 @@ describe UpdateEeDot do
 
   describe "updating termination date for an Employee" do
     
-    let(:person) { FactoryGirl.create(:person) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile)}
     let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile)}
 
@@ -26,7 +25,7 @@ describe UpdateEeDot do
     it "should update date of termination" do
       subject.migrate
       census_employee.reload
-      expect(census_employee.employment_terminated_on.to_s).to eq "02/28/2017"
+      expect(census_employee.employment_terminated_on).to eq (TimeKeeper.date_of_record - 20.days)
     end
   end
 end
