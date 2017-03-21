@@ -3,7 +3,7 @@
 
 require 'csv'
  
- namespace :reports do
+namespace :reports do
   namespace :ivl do
 
     desc "Monthly report of IVL cases with non-DC addresses"
@@ -20,9 +20,10 @@ require 'csv'
         employee_role
       )
       processed_count = 0
+      family_member_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/ivl_non_dc_address.csv"
-      CSV.open(file_name, "w", force_quotes: true) do |csv|
+      file_path = "#{Rails.root}/hbx_report/ivl_non_dc_address.csv"
+      CSV.open(file_path, "w", force_quotes: true) do |csv|
         csv << field_names
 
         Person.where(no_dc_address: true).each do |person|
@@ -37,13 +38,14 @@ require 'csv'
                       person.consumer_role.present?, 
                       person.employee_roles.present?
                      ]
+              processed_count +=1
             end
           rescue Exception => e
             puts e.message
           end
-          processed_count +=1
+          family_member_count +=1
         end
-        puts "File path: #{file_name}, Total count of IVL cases with non DC address: #{processed_count}"
+        puts "File path: %s. Total count of IVL cases with non DC address: %d. Total count including dependents: %d" %[file_path, processed_count, family_member_count]
       end
     end
   end
