@@ -34,6 +34,7 @@ namespace :reports do
         Naturalized_Citizen
         Incarceration_Status
         American_Indian_Or_Alaska_Native
+        IvlEnrollmentInstance
       )
      count = 0
      file_name = "#{Rails.root}/public/audit_request_data_report.csv"
@@ -48,6 +49,21 @@ namespace :reports do
 
     def versioned_dependent(person)
       person.versions.detect { |ver| ver.citizen_status.present? } || person
+    end
+
+    def has_ivl_enrollment?(person, family)
+      @has_enrollment = false
+      if family.households.flat_map(&:hbx_enrollments).select { |enr| enr.kind == "individual" }.each do |enrollment|
+        enrollment.hbx_enrollment_members.each do |hem|
+          if hem.family_member.person.id == person.id
+            @has_enrollment = true
+            break
+          end
+          break if @has_enrollment == true
+        end
+      end
+
+      @has_enrollment
     end
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
@@ -71,6 +87,8 @@ namespace :reports do
               citizen_status = versioned_person.citizen_status.try(:humanize) || "No Info"
               naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
               tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
+
+              has_ivl_enrollment_instance = has_ivl_enrollment?(fm.person, family)
 
               csv << [
                 fm.family.hbx_assigned_id,
@@ -96,7 +114,8 @@ namespace :reports do
                 citizen_status,
                 naturalized_citizen,
                 versioned_person.is_incarcerated,
-                tribe_member
+                tribe_member,
+                has_ivl_enrollment_instance
               ]
               count += 1
             rescue => e
