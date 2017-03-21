@@ -429,9 +429,7 @@ def employer_poc
    def view_terminated_hbx_enrollments
     @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
-    @health_enrollments = @person.primary_family.terminated_enrollments.select{|e| e.coverage_kind == 'health'}
-    # byebug
-    @dental_enrollments = @person.primary_family.terminated_enrollments.select{|e| e.coverage_kind == 'dental'}
+    @health_enrollments, @dental_enrollments = @person.primary_family.terminated_enrollments.partition{|e| e.is_health_enrollment? }
   end
 
   def reinstate_hbx_enrollments
@@ -439,10 +437,13 @@ def employer_poc
     params[:enrollment_ids].each do |id|
       begin
         enrollment =HbxEnrollment.find id
-        enrollment.reinstate
+        if enrollment.kind == "individual"
+          Enrollments::Replicator::Individual.new(enrollment, TimeKeeper.date_of_record + 1.day).build
+        end
+        # enrollment.reinstate
       rescue Exception => e
         @terminated_enrollments << id
-        next 
+        next
       end
     end
   end

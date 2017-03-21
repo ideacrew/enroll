@@ -44,7 +44,9 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
+
       collection do
+        get :reinstate_hbx_enrollments
         get :family_index
         get :family_index_dt
         post :families_index_datatable

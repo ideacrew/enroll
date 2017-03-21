@@ -1369,6 +1369,14 @@ class HbxEnrollment
    end
  end
 
+ def is_health_enrollment?
+  coverage_kind == "health"
+ end
+
+ def is_dental_enrollment?
+  coverage_kind == "dental"
+ end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
