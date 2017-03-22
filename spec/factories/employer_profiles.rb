@@ -33,7 +33,7 @@ FactoryGirl.define do
 
     transient do
       start_on TimeKeeper.date_of_record.beginning_of_month
-      plan_year_state 'draft'
+      plan_year_state 'active'
       renewal_plan_year_state 'renewing_draft'
       reference_plan_id { FactoryGirl.build(:plan).id }
       elected_plan_ids { FactoryGirl.build(:plan).to_a.map(&:id) }
@@ -46,7 +46,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :employer_with_renewing_planyear do 
+    factory :employer_with_renewing_planyear do
       after(:create) do |employer, evaluator|
         create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on - 1.year, aasm_state: 'active')
         create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on, aasm_state: evaluator.renewal_plan_year_state, renewing: true, with_dental: evaluator.with_dental)
