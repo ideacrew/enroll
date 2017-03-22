@@ -457,18 +457,14 @@ class HbxEnrollment
 
   def cancel_previous(year)
     #Perform cancel/terms of previous enrollments for the same plan year
-    self.household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).cancel_eligible.by_kind(self.kind).each do |previous_enrollment|
-      next if is_shop? && benefit_group_assignment_id != previous_enrollment.benefit_group_assignment_id
-
-      previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) if !previous_enrollment.enrollment_signature.present?
-
-      if (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record < previous_enrollment.effective_on)
-        execute_cancel_coverage(previous_enrollment)
-      elsif (previous_enrollment.enrollment_signature == self.enrollment_signature && previous_enrollment.kind != "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on) || (previous_enrollment.kind == "employer_sponsored" && TimeKeeper.date_of_record >= previous_enrollment.effective_on)
-        if previous_enrollment.effective_on == self.effective_on
-          execute_cancel_coverage(previous_enrollment)
+    previous_enrollments(year).each do |previous_enrollment|
+      generate_signature(previous_enrollment)
+      if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
+        if self.effective_on > previous_enrollment.effective_on
+          previous_enrollment.terminate_coverage! if previous_enrollment.may_terminate_coverage?
+          previous_enrollment.update_current(terminated_on: effective_on - 1.day)
         else
-          execute_terminate_coverage(previous_enrollment)
+          previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
       end
     end
@@ -513,7 +509,7 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
-  def propogate_selection
+  def propagate_selection
     if is_shop?
       update_existing_shop_coverage
     else
@@ -1123,9 +1119,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                    to: :coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                    to: :renewing_coverage_selected, after: :propogate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                     to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1233,7 +1229,7 @@ class HbxEnrollment
     end
 
     event :force_select_coverage, :after => :record_transition do
-      transitions from: :shopping, to: :coverage_selected, after: :propogate_selection
+      transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
 
   end
@@ -1344,7 +1340,7 @@ class HbxEnrollment
     end
   end
 
- def set_submitted_at
+  def set_submitted_at
    if submitted_at.blank?
       write_attribute(:submitted_at, TimeKeeper.date_of_record)
    end
@@ -1368,6 +1364,18 @@ class HbxEnrollment
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
      self.update_attribute(:created_at, TimeKeeper.datetime_of_record) unless self.created_at.present?
+  end
+
+  def previous_enrollments(year)
+    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
+  end
+
+  def generate_signature(previous_enrollment)
+    previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
+  end
+
+  def same_signatures(previous_enrollment)
+    previous_enrollment.enrollment_signature == self.enrollment_signature
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
