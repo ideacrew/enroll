@@ -9,7 +9,9 @@ class Employers::PremiumStatementsController < ApplicationController
     authorize @employer_profile, :list_enrollments?
     set_billing_date
     query = Queries::EmployerPremiumStatement.new(@employer_profile, @billing_date)
-    @hbx_enrollments = query.execute.hbx_enrollments
+    @hbx_enrollments =  query.execute.nil? ? [] : query.execute.hbx_enrollments
+    scopes={ id: params.require(:id), billing_date: @billing_date}
+    @datatable = Effective::Datatables::PremiumBillingReportDataTable.new(scopes)
 
     respond_to do |format|
       format.html
