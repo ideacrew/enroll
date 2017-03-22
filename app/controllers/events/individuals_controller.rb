@@ -7,24 +7,16 @@ module Events
       headers = properties.headers || {}
       individual_id = headers.stringify_keys["individual_id"]
       individual = Person.by_hbx_id(individual_id).first
-      if !individual.nil?
-        begin
+      begin
+        if !individual.nil?
           response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
           reply_with(connection, reply_to, "200", response_payload, individual_id)
-        rescue Exception => e
-          reply_with(
-            connection,
-            reply_to,
-            "500",
-            JSON.dump({
-              exception: e.inspect,
-              backtrace: e.backtrace.inspect
-            }),
-            individual_id
-          )
+        else
+          reply_with(connection, reply_to, "404", "", individual_id)
         end
-      else
-        reply_with(connection, reply_to, "404", "", individual_id)
+      rescue Exception => e
+        json_dump = JSON.dump({ exception: e.inspect, backtrace: e.backtrace.inspect })
+        reply_with(connection, reply_to, "500", json_dump, individual_id)
       end
     end
 
