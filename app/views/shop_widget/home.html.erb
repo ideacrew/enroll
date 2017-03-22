@@ -379,6 +379,7 @@
        <td>&nbsp;</td>
      </tr>
      <tr>
+     <% @family_members.each do |family| %>
        <th class="texLef">Family Size</th>
        <th>#</th>
        <th>%</th>
@@ -386,48 +387,47 @@
      </tr>
      <tr>
        <td class="texLef">1-Member</td>
-       <td>19,850</td>
-       <td>82%</td>
-       <td>5%</td>
+       <td><%= number_with_delimiter(family.one_count) %></td>
+       <td><%= (family.one_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.one_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">2-Members</td>
-       <td>2,445</td>
-       <td>18%</td>
-       <td>-10%</td>
+       <td><%= number_with_delimiter(family.two_count) %></td>
+       <td><%= (family.two_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.two_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">3-Members</td>
-       <td>19,850</td>
-       <td>82%</td>
-       <td>5%</td>
+       <td><%= number_with_delimiter(family.three_count) %></td>
+       <td><%= (family.three_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.three_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">4-Members</td>
-       <td>2,445</td>
-       <td>18%</td>
-       <td>-10%</td>
+       <td><%= number_with_delimiter(family.four_count) %></td>
+       <td><%= (family.four_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.four_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">5-Members</td>
-       <td>19,850</td>
-       <td>82%</td>
-       <td>5%</td>
+       <td><%= number_with_delimiter(family.five_count) %></td>
+       <td><%= (family.five_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.five_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">6-Members</td>
-       <td>2,445</td>
-       <td>18%</td>
-       <td>-10%</td>
+       <td><%= number_with_delimiter(family.six_count) %></td>
+       <td><%= (family.six_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.six_yoy.to_f * 100).to_i %>%</td>
      </tr>
      <tr>
        <td class="texLef">7+ Members</td>
-       <td>2,445</td>
-       <td>18%</td>
-       <td>-10%</td>
+       <td><%= number_with_delimiter(family.seven_count) %></td>
+       <td><%= (family.seven_share.to_f * 100).to_i %>%</td>
+       <td><%= (family.seven_yoy.to_f * 100).to_i %>%</td>
      </tr>
-
-    
+     <% end %>
     </tbody>
     </table>
 
