@@ -175,13 +175,55 @@ shop_notice_triggers = [
     title: 'Your Health Plan Open Enrollment Period has Begun',
     description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
     resource_name: 'employee_role',
-    event_name: 'active_employee_auto_renewal',
+    event_name: 'employee_open_enrollment_auto_renewal',
     notice_triggers: [
       {
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
         notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
         mpi_indicator: 'MPI_SHOP8A',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP8B',
+    title: 'Your Health Plan Open Enrollment Period has Begun',
+    description: 'All employees that enrolled the previous year and do not have an auto-renewal plan option available.',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_no_auto_renewal',
+    notice_triggers: [
+      {
+        name: 'Renewal Open Enrollment available for Employee',
+        notice_template: 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOP8B',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP8C',
+    title: 'Your Health Plan Open Enrollment Period has Begun',
+    description: 'All employees that are not currently enrolled in a plan',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_unenrolled',
+    notice_triggers: [
+      {
+        name: 'Renewal Open Enrollment available for Employee',
+        notice_template: 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOP8C',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
