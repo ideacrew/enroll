@@ -426,7 +426,7 @@
        <td>18%</td>
        <td>-10%</td>
      </tr>
-    
+
     
     </tbody>
     </table>
@@ -443,56 +443,58 @@
 <div id="barYr2" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
 <h5>Employer Conversion Project</h5>
-   <table class="table table-hover table-condensed">  
+   <table class="table table-hover table-condensed"> 
+   <% @conversion_widgets.each do |conversion| %> 
    <thead>
      <tr>
        <th class="texLef">Start</th>
-       <th>Jul 16</th>
-       <th>Aug 16</th>
-       <th>Sep 16</th>
-       <th>Oct 16</th>
-       <th>Nov 16</th>
-       <th>Dec 16</th>
-       <th>Jan 17</th>
-       <th>Feb 17</th>
-       <th>Mar 17</th>
-       <th>Apr 17</th>
-       <th>May 17</th>
-       <th>Jun 17</th>
+       <th><%= conversion.month_one %></th>
+       <th><%= conversion.month_two %></th>
+       <th><%= conversion.month_three %></th>
+       <th><%= conversion.month_four %></th>
+       <th><%= conversion.month_five %></th>
+       <th><%= conversion.month_six %></th>
+       <th><%= conversion.month_seven %></th>
+       <th><%= conversion.month_eight %></th>
+       <th><%= conversion.month_nine %></th>
+       <th><%= conversion.month_ten %></th>
+       <th><%= conversion.month_eleven %></th>
+       <th><%= conversion.month_twelve %></th>
      </tr>
    </thead>
    <tbody>
      <tr>
        <td class="texLef">Employers Projected</td>
-       <td>275</td>
-       <td>260</td>
-       <td>292</td>
-       <td>265</td>
-       <td>317</td>
-       <td>1,223</td>
-       <td>195</td>
-       <td>132</td>
-       <td>172</td>
-       <td>128</td>
-       <td>157</td>
-       <td>195</td>
+       <td><%= conversion.projected_one %></td>
+       <td><%= conversion.projected_two %></td>
+       <td><%= conversion.projected_three %></td>
+       <td><%= conversion.projected_four %></td>
+       <td><%= conversion.projected_five %></td>
+       <td><%= number_with_delimiter(conversion.projected_six) %></td>
+       <td><%= conversion.projected_seven %></td>
+       <td><%= conversion.projected_eight %></td>
+       <td><%= conversion.projected_nine %></td>
+       <td><%= conversion.projected_ten %></td>
+       <td><%= conversion.projected_eleven %></td>
+       <td><%= conversion.projected_twelve %></td>
      </tr>
      <tr>
        <td class="texLef">Employers Actual</td>
-       <td>330</td>
-       <td>272</td>
-       <td>262</td>
-       <td>256</td>
-       <td>296</td>
-       <td>1,135</td>
-       <td>172</td>
-       <td>127</td>
-       <td>171</td>
-       <td>128</td>
-       <td>158</td>
-       <td></td>
+       <td><%= conversion.actual_one %></td>
+       <td><%= conversion.actual_two %></td>
+       <td><%= conversion.actual_three %></td>
+       <td><%= conversion.actual_four %></td>
+       <td><%= conversion.actual_five %></td>
+       <td><%= number_with_delimiter(conversion.actual_six) %></td>
+       <td><%= conversion.actual_seven %></td>
+       <td><%= conversion.actual_eight %></td>
+       <td><%= conversion.actual_nine %></td>
+       <td><%= conversion.actual_ten %></td>
+       <td><%= conversion.actual_eleven %></td>
+       <td><%= conversion.actual_twelve %></td>
      </tr>
    </tbody>
+   <%end%>
    </table>
 
     </div>

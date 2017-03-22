@@ -1,7 +1,7 @@
 class ShopWidgetController < ApplicationController
 
   def home
-    # @enrollments=ShopCovered::ShopEnrollmentsWidget.all
+    @conversion_widgets=ShopWidget::ShopConversionWidget.all
     # @enrollments_monthly=ShopCovered::ShopEnrollmentsMonth.all
     # @conversion_employees=ShopCovered::ShopConversionEmployees.all
     # @gender_types=ShopCovered::ShopGenderTypes.all
