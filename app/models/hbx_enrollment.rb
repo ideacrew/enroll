@@ -1350,14 +1350,10 @@ class HbxEnrollment
    end
  end
 
-  def is_active_renewal_purchase?
-    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
-    !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
-  end
-
-  def assign_cost_decorator(decorator)
-    @cost_decorator = decorator
-  end
+ def is_active_renewal_purchase?
+   enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
+   !is_shop? && is_open_enrollment? && enrollment.present? && ['auto_renewing', 'renewing_coverage_selected'].include?(enrollment.aasm_state)
+ end
 
   def plan_year_check(employee_role)
     covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
