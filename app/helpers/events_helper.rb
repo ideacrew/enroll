@@ -23,6 +23,19 @@ module EventsHelper
     end
   end
 
+  def is_office_location_address_valid?(office_location)
+    office_location.present? && office_location.address.present? && (['mailing', 'work', 'primary'].include? office_location.address.kind)
+  end
+
+  def is_office_location_phone_valid?(office_location)
+    office_location.present? && office_location.phone.present? && ((['work', 'home', 'main'].include? office_location.phone.kind) || (office_location.phone.kind == 'phone main'))
+    #Adding phone kind 'phone main' temporary, revert once phone.kind in office location fixed.
+  end
+
+  def employer_has_office_location?(office_location)
+    is_office_location_address_valid?(office_location) && is_office_location_phone_valid?(office_location)
+  end
+
   def transaction_id
     @transaction_id ||= begin
       ran = Random.new
