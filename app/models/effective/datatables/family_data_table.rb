@@ -56,16 +56,8 @@ module Effective
       end
 
       def aptc_csr_link_type(family, allow)
-        return "disabled" # DISABLING APTC FEATURE FOR NOW.
-
-        link_type = "disabled"
-        family.active_household.tax_households.each do |th|
-          th.eligibility_determinations.each do |ed|
-            link_type = "ajax" if ed.max_aptc > 0 && th.effective_ending_on.nil? && allow
-            #link_type = "ajax" if ed.max_aptc > 0 && allow
-          end
-        end
-        return link_type
+        return "disabled" # DISABLING APTC FEATURE.
+        family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
       end
 
       def add_sep_link_type(allow)

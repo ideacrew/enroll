@@ -11,7 +11,6 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :set_kind_for_market_and_coverage, only: [:thankyou, :show, :plans, :checkout, :receipt]
 
   def checkout
-
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
     if plan_selection.employee_is_shopping_before_hire?
@@ -21,7 +20,9 @@ class Insured::PlanShoppingsController < ApplicationController
       return
     end
 
-    if !plan_selection.may_select_coverage?
+    qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
+
+    if !plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
       if plan_selection.hbx_enrollment.errors.present?
         flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
       end
@@ -94,11 +95,11 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     @family = @person.primary_family
     #FIXME need to implement can_complete_shopping? for individual
-    @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?
+    @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?
+    flash.now[:error] = qualify_qle_notice unless @enrollment.can_select_coverage?(qle: @enrollment.is_special_enrollment?)
 
     respond_to do |format|
       format.html { render 'thankyou.html.erb' }
@@ -116,6 +117,7 @@ class Insured::PlanShoppingsController < ApplicationController
       coverage_household = @person.primary_family.active_household.immediate_family_coverage_household
       waived_enrollment =  coverage_household.household.new_hbx_enrollment_from(employee_role: employee_role, coverage_household: coverage_household, benefit_group: nil, benefit_group_assignment: nil, qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
       waived_enrollment.coverage_kind= hbx_enrollment.coverage_kind
+      waived_enrollment.kind = 'employer_sponsored_cobra' if employee_role.present? && employee_role.is_cobra_status?
       waived_enrollment.generate_hbx_signature
 
       if waived_enrollment.save!
@@ -156,6 +158,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def show
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop'
+    set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -244,7 +247,13 @@ class Insured::PlanShoppingsController < ApplicationController
     if @person.nil?
       @enrolled_hbx_enrollment_plan_ids = []
     else
-      @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
+      if covered_plan_year.present?
+        id_list = covered_plan_year.benefit_groups.map(&:id)
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+      else
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      end
     end
 
     Caches::MongoidCache.allocate(CarrierProfile)
@@ -257,6 +266,8 @@ class Insured::PlanShoppingsController < ApplicationController
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      elsif @market_kind == 'coverall'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       end
     end
     # for carrier search options

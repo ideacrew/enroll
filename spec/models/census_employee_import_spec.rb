@@ -41,8 +41,9 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.load_imported_census_employees.last).to be_a CensusDependent
     end
 
-    it "should save the employee with address" do
+    it "should save the employee with address_kind_even_without_input_address_kind" do
       expect(subject.save).to be_truthy
+      expect(subject.load_imported_census_employees.first.address.kind).to eq 'home'
       expect(subject.load_imported_census_employees.first.address.present?).to be_truthy
       expect(subject.load_imported_census_employees.first.address.address_2.present?).to be_truthy
     end
@@ -57,7 +58,9 @@ RSpec.describe CensusEmployeeImport, :type => :model do
       expect(subject.load_imported_census_employees.first.census_dependents.first.employee_relationship).to eq "spouse"
       expect(subject.load_imported_census_employees.first.census_dependents.first.gender).to eq "female"
     end
+
   end
+
 
   context "relationship field is empty" do
 

@@ -43,10 +43,21 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
 end
 
-Then(/Employee (.*) should see renewing plan year start date as earliest effective date/) do |named_person|
+Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  find('label', text: "Enroll as an employee of #{employer_profile.legal_name} with coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}.")
+  census_employee = employer_profile.census_employees.where(first_name: person[:first_name], last_name: person[:last_name]).first
+  bg = plan_year == "renewing" ? census_employee.renewal_benefit_group_assignment.benefit_group : census_employee.active_benefit_group_assignment.benefit_group
+  if bg.effective_on_for(census_employee.hired_on) == employer_profile.renewing_plan_year.start_on
+  else
+    expect(page).to have_content "Raising this failure, b'coz this else block should never be executed"
+  end
+end
+
+Then(/Employee (.*) should not see earliest effective date on the page/) do |named_person|
+  person = people[named_person]
+  employer_profile = EmployerProfile.find_by_fein(person[:fein])
+  expect(page).not_to have_content "coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}."
 end
 
 And(/(.*) already matched and logged into employee portal/) do |named_person|
@@ -72,9 +83,6 @@ end
 
 And(/(.*) matches all employee roles to employers and is logged in/) do |named_person|
   person = people[named_person]
-  Person.all.select { |stored_person| stored_person["ssn"] == person.ssn &&
-                                      stored_person["dob"] == person.dob
-                    }
   organizations = Organization.in(fein: [person[:fein], person[:mfein]])
   employer_profiles = organizations.map(&:employer_profile)
   counter = 0
@@ -115,6 +123,12 @@ end
 Then(/Employee should see \"employer-sponsored benefits not found\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
   find('.alert', text: "Unable to find employer-sponsored benefits for enrollment year")
+  visit '/families/home'
+end
+
+Then(/Employee should see \"You are attempting to purchase coverage through qle proir to your eligibility date\" error message/) do
+  screenshot("new_hire_not_yet_eligible_exception")
+  find('.alert', text: "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date")
   visit '/families/home'
 end
 
@@ -196,9 +210,31 @@ Then(/(.*) should get plan year start date as coverage effective date/) do |name
   find('.coverage_effective_date', text: employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y"))
 end
 
+Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
+  person = people[named_person]
+  effective_on = Person.where(:first_name=> person[:first_name]).first.primary_family.current_sep.effective_on
+  find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"))
+end
+
 When(/(.+) should see coverage summary page with renewing plan year start date as effective date/) do |named_person|
   step "#{named_person} should get plan year start date as coverage effective date"
   find('.interaction-click-control-confirm').click
+end
+
+Then(/(.+) should see coverage summary page with qle effective date/) do |named_person|
+  step "#{named_person} should get qle effective date as coverage effective date"
+  find('.interaction-click-control-confirm').click
+end
+
+Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
+  expect(page).to have_content('Enrollment Submitted')
+  step "#{named_person} should get qle effective date as coverage effective date"
+
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
 end
 
 Then(/(.*) should see the receipt page with renewing plan year start date as effective date/) do |named_person|
@@ -220,6 +256,14 @@ When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    click_link "CONTINUE"
+  end
+end
+
+When(/Employee select a qle date based on expired plan year/) do
+  screenshot("past_qle_date")
+  fill_in "qle_date", :with => (TimeKeeper.date_of_record - 30.days).strftime("%m/%d/%Y")
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
