@@ -280,33 +280,6 @@ describe EventsHelper, "given an address_kind" do
 
   end
 
-  describe "employer_has_office_location?" do
-
-    let(:phone) { FactoryGirl.build(:phone) }
-    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
-    let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
-
-    context "office address & phone valid" do
-
-      it "should return true" do
-        allow(subject).to receive(:is_office_location_address_valid?).with(office_location).and_return true
-        allow(subject).to receive(:is_office_location_phone_valid?).with(office_location).and_return true
-        expect(subject.employer_has_office_location?(office_location)).to eq true
-      end
-
-    end
-
-    context "office address & phone not valid" do
-
-      it "should return false " do
-        allow(subject).to receive(:is_office_location_address_valid?).with(office_location).and_return true
-        allow(subject).to receive(:is_office_location_phone_valid?).with(office_location).and_return false
-        expect(subject.employer_has_office_location?(office_location)).to eq false
-      end
-    end
-
-  end
-
   describe "is_office_location_address_valid?" do
 
     let(:phone) { FactoryGirl.build(:phone) }
