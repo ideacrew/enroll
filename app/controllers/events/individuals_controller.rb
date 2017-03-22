@@ -10,48 +10,28 @@ module Events
       begin
         if !individual.nil?
           response_payload = render_to_string "created", :formats => ["xml"], :locals => { :individual => individual }
-          with_response_exchange(connection) do |ex|
-            ex.publish(
-              response_payload,
-              {
-                :routing_key => reply_to,
-                :headers => {
-                  :return_status => "200",
-                  :individual_id => individual_id
-                }
-              }
-            )
-          end
+          reply_with(connection, reply_to, "200", response_payload, individual_id)
         else
-          with_response_exchange(connection) do |ex|
-            ex.publish(
-              "",
-              {
-                :routing_key => reply_to,
-                :headers => {
-                  :return_status => "404",
-                  :individual_id => individual_id
-                }
-              }
-            )
-          end
+          reply_with(connection, reply_to, "404", "", individual_id)
         end
       rescue Exception => e
-        with_response_exchange(connection) do |ex|
-          ex.publish(
-            JSON.dump({
-              exception: e.inspect,
-              backtrace: e.backtrace.inspect
-              }),
-            {
-              :routing_key => reply_to,
-              :headers => {
-                :return_status => "500",
-                :individual_id => individual_id
-              }
+        json_dump = JSON.dump({ exception: e.inspect, backtrace: e.backtrace.inspect })
+        reply_with(connection, reply_to, "500", json_dump, individual_id)
+      end
+    end
+
+    def reply_with(connection, reply_to, return_status, body, individual_id)
+      with_response_exchange(connection) do |ex|
+        ex.publish(
+          body,
+          {
+            :routing_key => reply_to,
+            :headers => {
+              :return_status => return_status,
+              :individual_id => individual_id
             }
-          )
-        end
+          }
+        )
       end
     end
   end
