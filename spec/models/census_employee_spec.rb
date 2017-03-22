@@ -1634,7 +1634,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       )
     }
 
-
     shared_examples_for "enrollments for display" do |state, status, result|
 
       let!(:health_enrollment)   { FactoryGirl.create(:hbx_enrollment,
