@@ -3,13 +3,13 @@ class ShopWidgetController < ApplicationController
   def home
     @conversion_widgets=ShopWidget::ShopConversionWidget.all
     @family_members=ShopWidget::ShopFamilyMembers.all
-    # @conversion_employees=ShopCovered::ShopConversionEmployees.all
-    # @gender_types=ShopCovered::ShopGenderTypes.all
-    # @overall_ages=ShopCovered::ShopOverallAges.all
-    # @total_status=ShopCovered::ShopStatusWidget.all
-    # @metal_types=ShopCovered::ShopMetalWidget.all
-    # @carriers=ShopCovered::ShopCarriersWidget.all
-    # @total_widgets=ShopCovered::ShopTotalEnrollments.all
+    @census_members=ShopWidget::ShopCensusMembers.all
+    @employer_benefits=ShopWidget::ShopBenefits.all
+    @employer_contribution=ShopWidget::EmployerContributions.all
+    @plans=ShopWidget::Plans.all
+    @brokers=ShopWidget::Brokers.all
+    @total_policies=ShopWidget::ShopTotalPolicies.all
+    @policies_by_month=ShopWidget::ShopPoliciesMonth.all
   end
 
 
