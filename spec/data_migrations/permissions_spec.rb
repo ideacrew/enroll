@@ -46,12 +46,10 @@ describe DefinePermissions do
       person = FactoryGirl.create(:person)
       permission = FactoryGirl.create(:permission, :hbx_staff)
       role = FactoryGirl.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)
-      #subject.initial_hbx
       subject.hbx_admin_can_complete_resident_application
     end
     it "updates can_complete_resident_application to true" do
     expect(Person.all.count).to eq(1)
-    binding.pry
     expect(Person.first.hbx_staff_role.permission.can_complete_resident_application).to be true
     end
   end
