@@ -28,7 +28,7 @@
   { content: "Since you already enrolled in employer-sponsored coverage through DC Health Link, your current plan selection will automatically be renewed for the upcoming plan year beginning on #{notice.plan_year.start_on} unless you change your plan prior to #{notice.plan_year.open_enrollment_end_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You Are Able to Change Your Plan Selection during Open Enrollment"} %>
+  { content: "<strong>You Are Able to Change Your Plan Selection during Open Enrollment</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "In order to make a change to your employer-sponsored coverage through DC Health Link, you must complete your plan selection for enrollment by #{notice.plan_year.open_enrollment_end_on}, for coverage effective #{notice.plan_year.start_on}. If you no longer wish to receive coverage through #{notice.employer_name} you will want to go into your DC Health Link account and “waive” coverage for the upcoming plan year. Please log-in to your existing DC Health Link account at <a href='www.DCHealthLink.com'>DCHealthLink.com</a> to view your plan options and complete the enrollment process."} %>
@@ -37,7 +37,7 @@
   { content: "If you would like to change the dependents you cover on your plan, if available from your employer, you can simply check or uncheck what dependents you cover on the “Choose Coverage for your Household” page. If you need to add dependents to your accounts you can do so under the “Manage Family” tab."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "What is Open Enrollment?"} %>
+  { content: "<strong>What is Open Enrollment?</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Open enrollment is your annual opportunity to enroll in health plans offered by your employer or make changes to your current plan selection. Outside of this annual open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain life events such as marriage, birth, or adoption."} %>

@@ -1,4 +1,4 @@
-<!-- This notice goes to all the employees enrolled in the previous year and do not have an auto-renewal plan option available -->
+<!-- This notice goes to all the employees that are currently active in coverage and have an auto-renewal plan option available. -->
 
 <%= render partial: 'notices/shared/logo' %>
 
@@ -13,7 +13,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>,</td>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
     </tr>
   </tbody>
 </table>
@@ -22,19 +22,10 @@
   { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. For a walkthrough of your options, you can follow this <a href='https://dchealthlink.com/sites/default/files/v2/forms/employee_renewal_open_enrollment_guide.pdf'>Open Enrollment Guide</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Your Current Plan is No Longer Available.</strong>"} %>
+  { content: "<strong>Your DO NOT Currently Have a Plan.</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "The plan in which you are currently enrolled will no longer be available to you beginning #{notice.plan_year.start_on}. You must select another plan by #{notice.plan_year.open_enrollment_end_on} in order to continue coverage effective #{notice.plan_year.start_on}."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>IMPORTANT: You MUST Select a New Plan to Continue Coverage into Upcoming Plan Year</strong>"} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you do not make a new plan selection by #{notice.plan_year.open_enrollment_end_on}, your current coverage will be terminated on #{(notice.plan_year.start_on - 1.day).strftime("%m/%d/%Y")} and you will not have coverage for the upcoming plan year beginning on #{notice.plan_year.start_on}."} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you would like to change the dependents you cover on your plan, if available from your employer, you can simply check or uncheck what dependents you cover on the “Choose Coverage for your Household” page. If you need to add dependents to your accounts you can do so under the “Manage Family” tab."} %>
+  { content: "You chose to waive coverage last year or did not take any action. If you would like to enroll in coverage for this year you must select a plan by #{notice.plan_year.open_enrollment_end_on} in order to continue coverage effective #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>What is Open Enrollment?</strong>"} %>
