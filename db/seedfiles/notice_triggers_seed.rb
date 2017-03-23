@@ -93,8 +93,8 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
-        notice_template: 'notices/shop_notices/2_initial_employer_denial_notice',
-        notice_builder: 'ShopNotices::InitialEmployerDenialNotice',
+        notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
         mpi_indicator: 'MPI_SHOP2B',
         notice_trigger_element_group: {
           market_places: ['shop'],
