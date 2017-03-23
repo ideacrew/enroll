@@ -563,4 +563,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       end
     end
   end
+
+  describe "enrollment premiums should stay the same if a person is being retained between enrollments" do 
+    let (:person) { FactoryGirl.create(:person, :with_family) }
+    let (:family) { person.primary_family }
+    let (:household) { family.active_household }
+    let (:plan) { FactoryGirl.create(:plan, :individual_health) }
+    let (:previous_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_apr1, household: household, plan: plan) }
+    let (:new_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_may1, household: household, plan: plan) }
+    it "should have existing variables" do
+      binding.pry
+    end
+  end
 end
