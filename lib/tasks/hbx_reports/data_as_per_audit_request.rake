@@ -44,11 +44,11 @@ namespace :reports do
     end
 
     def select_versioned_person(person, start_date, end_date)
-      person.citizen_status.present? && submitted_application(person, start_date, end_date)
+      person.citizen_status.present? && submitted_application(person, start_date, end_date) && person.is_incarcerated != nil
     end
 
     def versioned_dependent(person)
-      person.versions.detect { |ver| ver.citizen_status.present? } || person
+      person.versions.detect { |ver| ver.citizen_status.present? && ver.is_incarcerated != nil } || person
     end
 
     def has_ivl_enrollment?(person, family)
@@ -85,9 +85,6 @@ namespace :reports do
             begin
               mailing_address = versioned_person.addresses.detect { |adr| adr.kind == "mailing" }
               citizen_status = versioned_person.citizen_status.try(:humanize) || "No Info"
-              naturalized_citizen = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
-              tribe_member = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(versioned_person.citizen_status) if fm.person.citizen_status.present?
-
               has_ivl_enrollment_instance = has_ivl_enrollment?(fm.person, family)
 
               csv << [
@@ -112,9 +109,9 @@ namespace :reports do
                 mailing_address.try(:state),
                 mailing_address.try(:zip),
                 citizen_status,
-                naturalized_citizen,
+                versioned_person.naturalized_citizen,
                 versioned_person.is_incarcerated,
-                tribe_member,
+                versioned_person.indian_tribe_member,
                 has_ivl_enrollment_instance
               ]
               count += 1
