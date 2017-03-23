@@ -44,15 +44,20 @@ module Factories
           active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
           if active_enrollment.present? && active_enrollment.inactive?
             renew_waived_enrollment(active_enrollment)
+            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
           elsif renewal_plan_offered_by_er?(active_enrollment)
             renewal_enrollment = renewal_builder(active_enrollment)
             renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
             renewal_enrollment.decorated_hbx_enrollment
             save_renewal_enrollment(renewal_enrollment, active_enrollment)
+            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal")
+          else
+            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal")
           end
         end
       elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
         renew_waived_enrollment
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
       end
 
       return family

@@ -1,4 +1,4 @@
-class ShopNotices::EmployerRenewalNotice < ShopNotice
+class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
 
   def deliver
     build
