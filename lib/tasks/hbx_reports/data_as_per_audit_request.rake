@@ -53,7 +53,7 @@ namespace :reports do
 
     def has_ivl_enrollment?(person, family)
       @has_enrollment = false
-      family.households.flat_map(&:hbx_enrollments).select { |enr| enr.kind == "individual" }.each do |enrollment|
+      family.households.flat_map(&:hbx_enrollments).select { |enr| enr.kind == "individual" && enr.effective_on <= end_date && enr.effective_on >= start_date }.each do |enrollment|
         enrollment.hbx_enrollment_members.each do |hem|
           if hem.family_member.person.id == person.id
             @has_enrollment = true
@@ -86,6 +86,8 @@ namespace :reports do
               mailing_address = versioned_person.addresses.detect { |adr| adr.kind == "mailing" }
               citizen_status = versioned_person.citizen_status.try(:humanize) || "No Info"
               has_ivl_enrollment_instance = has_ivl_enrollment?(fm.person, family)
+
+              next if ((citizen_status == "No Info" || versioned_person.is_incarcerated == nil) && !(has_ivl_enrollment_instance))
 
               csv << [
                 fm.family.hbx_assigned_id,
