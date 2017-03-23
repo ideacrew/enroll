@@ -10,6 +10,7 @@ class ShopWidgetController < ApplicationController
     @brokers=ShopWidget::Brokers.all
     @total_policies=ShopWidget::ShopTotalPolicies.all
     @policies_by_month=ShopWidget::ShopPoliciesMonth.all
+    @total_employers=ShopWidget::ShopOverallEmployers.all
   end
 
 
