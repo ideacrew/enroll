@@ -61,7 +61,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
     it "should append data" do
       renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.open_enrollment_start_on).to eq renewing_plan_year.open_enrollment_start_on
+      expect(@employee_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
       expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq renewing_plan_year.open_enrollment_end_on
     end
   end
