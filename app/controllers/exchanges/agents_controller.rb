@@ -42,7 +42,7 @@ class Exchanges::AgentsController < ApplicationController
     consumer_role = person.consumer_role
     employee_role = person.employee_roles.last
     person.set_consumer_role_url
-    person.check_for_ridp(session[:original_application_type]) if session[:original_application_type]
+    person.check_for_paper_application(session[:original_application_type]) if session[:original_application_type]
     resident_role = person.resident_role
 
     if resident_role && resident_role.bookmark_url

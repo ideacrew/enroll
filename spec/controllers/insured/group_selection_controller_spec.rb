@@ -9,8 +9,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
   let(:coverage_household) {double}
   let(:family) {Family.new}
   let(:hbx_enrollment) {HbxEnrollment.create}
-  let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment])}
+  let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
+  let(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
   let(:hbx_profile) {FactoryGirl.create(:hbx_profile)}
+  let(:benefit_group) { FactoryGirl.create(:benefit_group)}
   let(:benefit_package) { FactoryGirl.build(:benefit_package,
       benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,
       title: "individual_health_benefits_2015",
@@ -35,6 +37,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(person).to receive(:active_employee_roles).and_return [employee_role]
+    allow(person).to receive(:has_active_employee_role?).and_return true
+    allow(employee_role).to receive(:benefit_group).and_return benefit_group
   end
 
   context "GET new" do
@@ -78,12 +83,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should get hbx_enrollment when has active hbx_enrollments and in qle flow" do
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop'
@@ -109,13 +110,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should get hbx_enrollment when has enrolled hbx_enrollments and in shop qle flow but user has both employee_role and consumer_role" do
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
+      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
       expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
@@ -128,12 +124,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should disable individual market kind if selected market kind is shop in dual role SEP" do
-      allow(household).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:shop_market).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:enrolled_and_renewing).and_return(hbx_enrollments)
-      allow(hbx_enrollments).to receive(:effective_desc).and_return([hbx_enrollment])
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id

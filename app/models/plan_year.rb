@@ -798,8 +798,8 @@ class PlanYear
     # Submit plan year application
     event :publish, :after => :record_transition do
       transitions from: :draft, to: :draft,     :guard => :is_application_unpublishable?
-      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
-      transitions from: :draft, to: :published, :guard => :is_application_eligible?
+      transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :initial_employer_approval_notice]
+      transitions from: :draft, to: :published, :guard => :is_application_eligible?, :after => :initial_employer_approval_notice
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
@@ -846,7 +846,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:published, :enrolling, :enrolled, :active], to: :canceled
+      transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled
     end
 
     # Coverage disabled due to non-payment
@@ -1010,6 +1010,11 @@ private
     elsif event_name == "force_publish"
       self.employer_profile.trigger_notices("planyear_renewal_3b")
     end
+  end
+
+  def initial_employer_approval_notice
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
+    self.employer_profile.trigger_notices("initial_employer_approval")
   end
 
   def renewal_group_notice
