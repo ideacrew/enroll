@@ -193,7 +193,16 @@ class HbxEnrollment
     }
 
   before_save :generate_hbx_id, :set_submitted_at
-  after_save :check_created_at
+  after_save :check_created_at, :check_for_subscriber
+
+  # This method checks to see if there is at least one subscriber in the hbx_enrollment_members nested document.
+  # If not, it assigns it to the oldest person.
+  def check_for_subscriber
+    return hbx_enrollment_members.map { |x| x.is_subscriber ? 1 : 0 }.max == 1
+    new_is_subscriber_true = hbx_enrollment_members.min_by { |hbx_member| hbx_member.person.dob }
+    new_is_subscriber_true.is_subscriber = true
+    return new_is_subscriber_true.save!
+  end
 
   def generate_hbx_signature
     if self.subscriber
@@ -336,7 +345,7 @@ class HbxEnrollment
 
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::HbxEnrollment::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable? 
+    if eligibility_ruleset.applicable?
       if eligibility_ruleset.determine_next_state != :do_nothing
         self.send(eligibility_ruleset.determine_next_state)
       end
