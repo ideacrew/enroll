@@ -47,9 +47,9 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
 
     next if person.inbox.blank?
     next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
+    # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+    #   next if secure_message.created_at > 35.days.ago
+    # end
 
     if person.consumer_role.blank?
       count += 1
