@@ -1,4 +1,4 @@
-class ShopNotices::OutOfPocketNotice < ShopNotice
+class ShopNotices::OutOfPocketNotice < ShopEmployerNotice
 
   # def initialize(employer_profile, args = {})
   #   self.employer_profile = employer_profile
