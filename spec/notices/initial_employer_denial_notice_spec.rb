@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopNotices::InitialEmployerDenialNotice do
+RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
@@ -8,8 +8,8 @@ RSpec.describe ShopNotices::InitialEmployerDenialNotice do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Denial of Initial Employer Application/Request for Clarifying Documentation',
-                            :notice_template => 'notices/shop_notices/2_initial_employer_denial_notice',
-                            :notice_builder => 'ShopNotices::InitialEmployerDenialNotice',
+                            :notice_template => 'notices/shop_employer_notices/2_initial_employer_denial_notice',
+                            :notice_builder => 'ShopEmployerNotices::InitialEmployerDenialNotice',
                             :mpi_indicator => 'MPI_SHOP2B',
                             :title => "Employer Denial Notice"})
                           }
@@ -25,7 +25,7 @@ RSpec.describe ShopNotices::InitialEmployerDenialNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -33,7 +33,7 @@ RSpec.describe ShopNotices::InitialEmployerDenialNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe ShopNotices::InitialEmployerDenialNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -55,7 +55,7 @@ RSpec.describe ShopNotices::InitialEmployerDenialNotice do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
       # plan_year.publish
       plan_year.force_publish
     end
