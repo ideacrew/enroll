@@ -44,6 +44,7 @@ module Factories
           active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
           if active_enrollment.present? && active_enrollment.inactive?
             renew_waived_enrollment(active_enrollment)
+            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
           elsif renewal_plan_offered_by_er?(active_enrollment)
             renewal_enrollment = renewal_builder(active_enrollment)
             renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
