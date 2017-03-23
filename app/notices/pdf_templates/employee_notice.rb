@@ -10,6 +10,7 @@ module PdfTemplates
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
     attribute :email, String
+    attribute :plan_year, PdfTemplates::PlanYear
 
     def shop?
       return true
