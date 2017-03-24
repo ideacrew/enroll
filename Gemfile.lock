@@ -19,6 +19,15 @@ GIT
       bunny (~> 1.7.0)
 
 GIT
+  remote: https://github.com/dchbx/openhbx_cv2.git
+  revision: 86a115f5e8e12f506057413ff1fa6c6bfaee9013
+  branch: master
+  specs:
+    openhbx_cv2 (0.0.1)
+      activesupport (>= 3.2)
+      nokogiri-happymapper (~> 0.5)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -30,7 +39,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: ./project_gems/effective_datatables-2.6.14
+  remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
       coffee-rails
@@ -231,7 +240,9 @@ GEM
     factory_girl_rails (4.6.0)
       factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
-    ffi (1.9.14)
+    fakeredis (0.6.0)
+      redis (~> 3.2)
+    ffi (1.9.10)
     font-awesome-rails (4.5.0.1)
       railties (>= 3.2, < 5.1)
     forgery (0.6.0)
@@ -604,6 +615,7 @@ DEPENDENCIES
   email_spec (= 2.0.0)
   eye
   factory_girl_rails (= 4.6.0)
+  fakeredis
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
@@ -633,6 +645,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri (= 1.6.7.2)
   nokogiri-happymapper
+  openhbx_cv2!
   parallel_tests
   poltergeist
   prawn!
@@ -670,4 +683,4 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 BUNDLED WITH
-   1.12.5
+   1.14.3

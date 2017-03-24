@@ -26,6 +26,7 @@ module PdfTemplates
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
+    attribute :plan_year, PdfTemplates::PlanYear
 
     def shop?
       return true

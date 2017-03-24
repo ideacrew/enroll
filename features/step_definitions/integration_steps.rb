@@ -94,7 +94,22 @@ def people
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
       password: 'aA1!aA1!aA1!'
-
+    },
+    "Jack Cobra" => {
+      first_name: "Jack",
+      last_name: "Cobra",
+      dob: "08/10/1960",
+      ssn: "196008107",
+      email: "jack@cobra.com",
+      password: 'aA1!aA1!aA1!'
+    },
+    "Jack Employee" => {
+      first_name: "Jack",
+      last_name: "Employee",
+      dob: "08/10/1960",
+      ssn: "196008111",
+      email: "jack@employee.com",
+      password: 'aA1!aA1!aA1!'
     },
     "Tim Wood" => {
       first_name: "Tim",
@@ -118,6 +133,16 @@ def people
     },
     "CSR" => {
       email: "sherry.buckner@dc.gov",
+      password: 'aA1!aA1!aA1!'
+    },
+    "Hbx AdminEnrollments" => {
+      first_name: "Hbx Admin",
+      last_name: "Enrollments#{rand(1000)}",
+      dob: defined?(@u) ?  @u.adult_dob : "08/13/1979",
+      legal_name: "Tronics",
+      dba: "Tronics",
+      fein: defined?(@u) ? @u.fein : '123123123',
+      email: defined?(@u) ? @u.email : 'hxadmin_enroll@example.com',
       password: 'aA1!aA1!aA1!'
     }
   }
@@ -192,6 +217,21 @@ Given(/^Hbx Admin exists$/) do
   year = (Date.today + 2.months).year
   plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
   plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
+end
+
+Given(/^a Hbx admin with read and write permissions and broker agencies$/) do
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true)
+  person = people['Hbx AdminEnrollments']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
+  org1 = FactoryGirl.create(:organization, legal_name: 'ACME Agency')
+  broker_agency_profile1 = FactoryGirl.create(:broker_agency_profile, organization: org1)
+        org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc')
+        broker_agency_profile2 = FactoryGirl.create(:broker_agency_profile, organization: org2)
 end
 
 Given(/^a Hbx admin with read and write permissions exists$/) do
@@ -280,7 +320,53 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment benefit_group
 
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kind, named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date],
+    hired_on: TimeKeeper.date_of_record - 15.months
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+  expired_bg = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+  employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group_id: expired_bg.id, start_on: expired_bg.start_on)
+
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
+  Caches::PlanDetails.load_record_cache!
+end
+
+Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
+  person = people[named_person]
+  organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
+  organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
+  owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
+  employee = FactoryGirl.create :census_employee, employer_profile: organization.employer_profile,
+    first_name: person[:first_name],
+    last_name: person[:last_name],
+    ssn: person[:ssn],
+    dob: person[:dob_date],
+    hired_on: TimeKeeper.date_of_record - 15.months
+  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
+  employee.update_attributes(employee_role_id: employee_role.id)
+  renewing_bg = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+  employee.benefit_group_assignments << BenefitGroupAssignment.new(benefit_group_id: renewing_bg.id, start_on: renewing_bg.start_on)
+
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+  FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
 end
 
@@ -384,7 +470,7 @@ Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
 end
 
-When(/^I visit the Employer portal$/) do
+When(/^.* visit the Employer portal$/) do
   visit "/"
   page.click_link 'Employer Portal'
   screenshot("employer_start")
@@ -616,6 +702,11 @@ end
 Then(/^.+ should see the list of plans$/) do
   expect(page).to have_link('Select')
   screenshot("plan_shopping")
+end
+
+And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
+  employer_profile = CensusEmployee.where(first_name: people[named_person][:first_name]).first.employee_role.employer_profile
+  expect(page).to have_content "#{employer_profile.plan_years.where(aasm_state: plan_year_state ).first.benefit_groups.first.reference_plan.name}"
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do

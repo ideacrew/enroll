@@ -47,6 +47,14 @@ class HbxEnrollmentMember
     @primary_relationship = family_member.primary_relationship
   end
 
+  def hbx_id
+    person.hbx_id
+  end
+
+  def <=>(other)
+    [hbx_id, is_subscriber, coverage_start_on] <=> [other.hbx_id, other.is_subscriber, other.coverage_start_on]
+  end
+
   def person
     return @person unless @person.blank?
     @person = family_member.person
