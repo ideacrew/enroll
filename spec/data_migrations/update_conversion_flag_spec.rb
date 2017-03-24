@@ -15,7 +15,7 @@ describe UpdateConversionFlag do
   describe "updating conversion flag of employer" do
     
     let(:organization) { FactoryGirl.create(:organization, employer_profile: employer_profile)}
-    let(:employer_profile) { FactoryGirl.create(:employer_profile)}
+    let(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: "conversion")}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
@@ -25,7 +25,7 @@ describe UpdateConversionFlag do
     it "should update conversion flag" do
       subject.migrate
       organization.reload
-      expect(employer_profile.profile_source).to eq ("self_serve")
+      expect(organization.employer_profile.profile_source).to eq ("self_serve")
     end
   end
 end
