@@ -5,29 +5,17 @@ module Queries
       @feins = feins
     end
 
-    def valid_enrollment_statuses
-      HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES
-    end
-
-    def group_query
-      {
-        "$group" => {
-          "_id" => {
-            "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
-            "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
-          },
-          "hbx_enrollment_id" => { "$last" => "$households.hbx_enrollments.hbx_id" }
-        }
-      }
-    end
-
-    def project_query
-      {
-        "$project" => {
-         "_id" => 0,
-         "enrollment_hbx_id" => "$hbx_enrollment_id"
-        }
-      }
+    def find
+      @feins.inject({}) do |enrollments_under_employers, fein|
+        employer_profile = EmployerProfile.find_by_fein(fein)
+        if employer_profile.present?
+          plan_year = employer_profile.plan_years.published_or_renewing_published.order_by("start_on DESC").first
+          if plan_year.present?
+            enrollments_under_employers[fein] = enrollment_hbx_ids(plan_year)
+          end
+        end
+        enrollments_under_employers
+      end
     end
 
     def enrollment_hbx_ids(plan_year)
@@ -55,17 +43,29 @@ module Queries
       ]).collect{|record| record['enrollment_hbx_id']}
     end
 
-    def find
-      @feins.inject({}) do |enrollments_under_employers, fein|
-        employer_profile = EmployerProfile.find_by_fein(fein)
-        if employer_profile.present?
-          plan_year = employer_profile.plan_years.published_or_renewing_published.order_by("start_on DESC").first
-          if plan_year.present?
-            enrollments_under_employers[fein] = enrollment_hbx_ids(plan_year)
-          end
-        end
-        enrollments_under_employers
-      end
+    def group_query
+      {
+        "$group" => {
+          "_id" => {
+            "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
+            "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
+          },
+          "hbx_enrollment_id" => { "$last" => "$households.hbx_enrollments.hbx_id" }
+        }
+      }
+    end
+
+    def project_query
+      {
+        "$project" => {
+         "_id" => 0,
+         "enrollment_hbx_id" => "$hbx_enrollment_id"
+        }
+      }
+    end
+    
+    def valid_enrollment_statuses
+      HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES
     end
   end
 end
