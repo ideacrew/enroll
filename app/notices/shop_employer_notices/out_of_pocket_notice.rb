@@ -1,8 +1,8 @@
-class ShopNotices::OutOfPocketNotice < ShopNotice
+class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
 
   # def initialize(employer_profile, args = {})
   #   self.employer_profile = employer_profile
-  #   args[:template] =  "notices/shop_notices/out_of_pocket_notice.html.erb"
+  #   args[:template] =  "notices/shop_employer_notices/out_of_pocket_notice.html.erb"
   #   args[:market_kind] = 'shop'
   #   args[:notice] = PdfTemplates::EmployerNotice.new
   #   args[:recipient] = employer_profile
@@ -30,7 +30,7 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
       bg_ids = @recipient.active_and_published_plan_year.benefit_groups.map(&:id)
       @notice.benefit_group_assignments.delete_if{|bg_id, assignments| !bg_ids.include?(bg_id)}
       @notice.legal_name= @recipient.organization.legal_name
-      @notice.data = {:url => url} 
+      @notice.data = {:url => url}
   end
 
   def url
@@ -40,8 +40,8 @@ class ShopNotices::OutOfPocketNotice < ShopNotice
 def create_secure_inbox_message(notice)
     body = "<p><br><strong>Plan Match:  Help your employees find the right health plan based on their needs and budget!</strong></p>" +
             "<p><br>To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions.  Click here to download a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them:</p>" +
-            # "<br><p><u>Employee Plan Match – Instructions for Your Eligible Employees</u></p>" + 
-            "<br><a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+            # "<br><p><u>Employee Plan Match – Instructions for Your Eligible Employees</u></p>" +
+            "<br><a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + "Employee Plan Match – Instructions for Your Eligible Employees"  + "</a>" +
             "<br></p><strong>What is Plan Match? </strong> " +
             "<br>Plan Match, DC Health Link's health plan comparison tool powered by Consumers' CHECKBOOK takes your employees through a few simple steps to find the best health plan for them.</p>" +
@@ -62,4 +62,4 @@ def create_secure_inbox_message(notice)
     attachments={"#{subject}": notice_path}
     UserMailer.generic_notice_alert(@notice.primary_fullname,subject,to,attachments).deliver_now
   end
-end 
+end
