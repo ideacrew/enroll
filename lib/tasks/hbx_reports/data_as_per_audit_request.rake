@@ -35,6 +35,9 @@ namespace :reports do
         Incarceration_Status
         American_Indian_Or_Alaska_Native
         IvlEnrollmentInstance
+        Eligibility
+        Person_Created_At
+        Person_Updated_At
       )
      count = 0
      file_name = "#{Rails.root}/public/audit_request_data_report.csv"
@@ -70,12 +73,14 @@ namespace :reports do
       csv << field_names
 
       families = Family.where(:"created_at" => { "$gte" => start_date, "$lte" => end_date}, :"e_case_id" => nil)
+      hbx = HbxProfile.current_hbx
+      bcps = hbx.benefit_sponsorship.benefit_coverage_periods
       families.each do |family|
         begin
           primary_fm = family.primary_family_member
           next if primary_fm.person.user.blank?
           next if family.households.flat_map(&:hbx_enrollments).any? {|enr| enr.effective_on < Date.new(2016,1,1)}
-          next if (primary_fm.person.consumer_role.blank? || (primary_fm.person.consumer_role.created_at > end_date) || primary_fm.person.consumer_role.vlp_authority == "curam" || (primary_fm.person.consumer_role.bookmark_url.to_s.include? "edit") || primary_fm.person.addresses.blank? )
+          next if (primary_fm.person.consumer_role.blank? || (primary_fm.person.consumer_role.created_at > end_date) || (primary_fm.person.consumer_role.created_at < start_date) || primary_fm.person.consumer_role.vlp_authority == "curam" || (primary_fm.person.consumer_role.bookmark_url.to_s.include? "edit") || primary_fm.person.addresses.blank? )
           versioned_primary = primary_fm.person.versions.detect { |ver| select_versioned_person(ver, start_date, end_date) }
           versioned_primary = versioned_primary || primary_fm.person
           family.family_members.each do |fm|
@@ -88,6 +93,19 @@ namespace :reports do
               has_ivl_enrollment_instance = has_ivl_enrollment?(fm.person, family, start_date, end_date)
 
               next if ((citizen_status == "No Info" || versioned_person.is_incarcerated == nil) && !(has_ivl_enrollment_instance))
+
+              @eligibility = false
+              consumer_role = versioned_person.consumer_role
+              bcp = bcps.detect { |bcp| bcp.start_on.year == fm.family.created_at.year }
+              health_benefit_packages = bcp.benefit_packages.select { |bp| bp.title.include? "health_benefits" }
+              health_benefit_packages.each do |bp|
+                rule = InsuredEligibleForBenefitRule.new(consumer_role, bp, family: family)
+                result = rule.satisfied?
+                if result[0] && result[1].blank?
+                  @eligibility = true
+                  break
+                end
+              end
 
               csv << [
                 fm.family.hbx_assigned_id,
@@ -114,7 +132,10 @@ namespace :reports do
                 versioned_person.naturalized_citizen,
                 versioned_person.is_incarcerated,
                 versioned_person.indian_tribe_member,
-                has_ivl_enrollment_instance
+                has_ivl_enrollment_instance,
+                @eligibility,
+                versioned_person.created_at,
+                versioned_person.updated_at
               ]
               count += 1
             rescue => e
