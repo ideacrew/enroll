@@ -96,7 +96,7 @@ namespace :reports do
 
               @eligibility = false
               consumer_role = versioned_person.consumer_role
-              bcp = bcps.detect { |bcp| bcp.start_on.year == fm.family.created_at.year }
+              bcp = bcps.detect { |bcp| bcp.start_on.year == fm.created_at.year }
               health_benefit_packages = bcp.benefit_packages.select { |bp| bp.title.include? "health_benefits" }
               health_benefit_packages.each do |bp|
                 rule = InsuredEligibleForBenefitRule.new(consumer_role, bp, family: family)
