@@ -127,10 +127,33 @@ describe Person do
       end
 
       context 'duplicated key issue' do
-        before do
-          Person.remove_indexes
-          Person.create_indexes
+
+        def drop_encrypted_ssn_index_in_db
+          Person.collection.indexes.each do |spec|
+            if spec["key"].keys.include?("encrypted_ssn")
+              if spec["unique"] && spec["sparse"]
+                Person.collection.indexes.drop_one(spec["key"])
+              end
+            end
+          end
         end
+
+        def create_encrypted_ssn_uniqueness_index
+          Person.index_specifications.each do |spec|
+            if spec.options[:unique] && spec.options[:sparse]
+              if spec.key.keys.include?(:encrypted_ssn)
+                key, options = spec.key, spec.options
+                Person.collection.indexes.create_one(key, options)
+              end
+            end
+          end
+        end
+
+        before :each do
+          drop_encrypted_ssn_index_in_db
+          create_encrypted_ssn_uniqueness_index
+        end
+
         context "with blank ssn" do
 
           let(:params) {valid_params.deep_merge({ssn: ""})}
