@@ -62,9 +62,6 @@ gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
 
-#For Background jobs
-gem 'resque'
-
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
 # gem 'bh'
