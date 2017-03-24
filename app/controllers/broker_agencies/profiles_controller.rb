@@ -363,7 +363,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def broker_profile_params
     params.require(:organization).permit(
-      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :legal_name,
+      :dba,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension],
