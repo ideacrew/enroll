@@ -2,7 +2,7 @@ module Queries
   class ShopMonthlyEnrollments
 
     def initialize(feins = [])
-      @feins = feins
+      @feins = feins.collect{|e| prepend_zeros(e.to_s, 9) }
     end
 
     def find
@@ -63,9 +63,14 @@ module Queries
         }
       }
     end
-    
+
     def valid_enrollment_statuses
       HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times { number.prepend('0') }
+      number
     end
   end
 end
