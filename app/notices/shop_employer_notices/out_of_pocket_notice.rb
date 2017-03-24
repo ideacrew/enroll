@@ -1,8 +1,8 @@
-class ShopNotices::OutOfPocketNotice < ShopEmployerNotice
+class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
 
   # def initialize(employer_profile, args = {})
   #   self.employer_profile = employer_profile
-  #   args[:template] =  "notices/shop_notices/out_of_pocket_notice.html.erb"
+  #   args[:template] =  "notices/shop_employer_notices/out_of_pocket_notice.html.erb"
   #   args[:market_kind] = 'shop'
   #   args[:notice] = PdfTemplates::EmployerNotice.new
   #   args[:recipient] = employer_profile

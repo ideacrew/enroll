@@ -156,8 +156,8 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Out of pocket Notice',
-        notice_template: "notices/shop_notices/out_of_pocket_notice.html.erb",
-        notice_builder: 'ShopNotices::OutOfPocketNotice',
+        notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
         mpi_indicator: 'MPI',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -168,7 +168,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
   {
     hbx_id: 'SHOP5',
     title: 'Group Renewal Available',

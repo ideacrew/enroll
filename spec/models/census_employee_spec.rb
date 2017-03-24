@@ -901,7 +901,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:hbx_enrollment) { HbxEnrollment.new(coverage_kind: 'health') }
     let(:plan){FactoryGirl.create(:plan)}
-    let(:builder){instance_double("ShopNotices::OutOfPocketNotice",:deliver => true)}
+    let(:builder){instance_double("ShopEmployerNotices::OutOfPocketNotice",:deliver => true)}
     let(:notice_triggers){double("notice_triggers")}
     let(:notice_trigger){instance_double("NoticeTrigger",:notice_template => "template",:mpi_indicator => "mpi_indicator")}
 

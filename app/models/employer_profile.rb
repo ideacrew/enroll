@@ -856,7 +856,7 @@ class EmployerProfile
   end
 
   def generate_checkbook_notices
-    OutofpocketNotifierJob.perform_later(self.id.to_s)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
   end
 
   def trigger_notices(event)

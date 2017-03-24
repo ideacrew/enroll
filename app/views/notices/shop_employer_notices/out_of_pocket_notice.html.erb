@@ -39,13 +39,13 @@
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "1.Your employer's plan year start date  : #{notice.start_on}"} %>
-  
+
 
   <% plan_offering = if benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_carrier"
       'All Plans From A Single Carrier'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind  == "metal_level" 
+    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind  == "metal_level"
      'All Plans From A Given Metal Level'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_plan" 
+    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_plan"
       'A Single Plan'
     end %>
 
