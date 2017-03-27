@@ -8,15 +8,17 @@
 <!-- <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
 
 <script type="text/javascript">
-$(function () {
+    $(function () {
     Highcharts.setOptions({ lang: { thousandsSep: ',' }});
-    $('#barYr1').highcharts({
-        chart: {
+        $('#barYr1').highcharts({
+            chart: {
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
-            height: 185, 
-            width: 1200
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
         },
         title: {
             text: ''
@@ -27,6 +29,8 @@ $(function () {
         },
         xAxis: {
             categories: [
+                'Jan',
+                'Feb',
                 'Mar',
                 'Apr',
                 'May',
@@ -37,8 +41,6 @@ $(function () {
                 'Oct',
                 'Nov',
                 'Dec',
-                'Jan',
-                'Feb'
             ],
             crosshair: true
         },
@@ -72,19 +74,17 @@ $(function () {
             }
         },
         series: [{
-            <%@totalaccounts.each do |chart|%>
-            name: 'Account',
-            data: [<%=chart.account_one%>,<%=chart.account_two%>, <%=chart.account_three%>, <%=chart.account_four%>, <%=chart.account_five%>, <%=chart.account_six%>, <%=chart.account_seven%>, <%=chart.account_eight%>, <%=chart.account_nine%>, <%=chart.account_ten%>, <%=chart.account_eleven%>, <%=chart.account_twelve%>]
+            name: '2016',
+            data: [17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000]
 
         }, {
-            name: 'Enrolled',
-            data: [<%=chart.enrolled_one%>, <%=chart.enrolled_two%>, <%=chart.enrolled_three%>, <%=chart.enrolled_four%>, <%=chart.enrolled_five%>, <%=chart.enrolled_six%>, <%=chart.enrolled_seven%>, <%=chart.enrolled_eight%>, <%=chart.enrolled_nine%>, <%=chart.enrolled_ten%>, <%=chart.enrolled_eleven%>, <%=chart.enrolled_twelve%>]
-            <%end%>
+            name: '2017',
+            data: [22000, 22000, 22000, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-        }]
+            }]
+        });
     });
-});
-        </script>
+</script>
 <script type="text/javascript">
 $(function () {
     $('#web1').highcharts({
@@ -138,14 +138,16 @@ $(function () {
         </script>
 
 <script type="text/javascript">
-$(function () {
+    $(function () {
     $('#lineT1').highcharts({
         chart: {
             borderColor: '#000000',
             borderWidth: 0,
             type: 'line',
-            height: 190, 
-            width: 1200
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
         },
         title: {
             text: ''
@@ -155,7 +157,7 @@ $(function () {
         verticalAlign: 'center'
         },
         xAxis: {
-            categories: ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb']
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         },
         yAxis: {
             title: {
@@ -177,20 +179,18 @@ $(function () {
             }
         },
         series: [{
-            <%@covered_lives.each do |covered|%>
             name: 'Cancel',
-            data: [<%=covered.cancel_one%>, <%=covered.cancel_two%>, <%=covered.cancel_three%>, <%=covered.cancel_four%>, <%=covered.cancel_five%>, <%=covered.cancel_six%>, <%=covered.cancel_seven%>, <%=covered.cancel_eight%>, <%=covered.cancel_nine%>, <%=covered.cancel_ten%>, <%=covered.cancel_eleven%>, <%=covered.cancel_twelve%>]
+            data: [750, 855, 402, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }, {
             name: 'Term',
-            data: [<%=covered.terminations_one%>, <%=covered.terminations_two%>, <%=covered.terminations_three%>, <%=covered.terminations_four%>, <%=covered.terminations_five%>, <%=covered.terminations_six%>, <%=covered.terminations_seven%>, <%=covered.terminations_eight%>, <%=covered.terminations_nine%>, <%=covered.terminations_ten%>, <%=covered.terminations_eleven%>, <%=covered.terminations_twelve%>]
+            data: [981, 1042, 699, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         }, {
             name: 'Reinstate',
-            data: [<%=covered.reinstatements_one%>, <%=covered.reinstatements_two%>, <%=covered.reinstatements_three%>, <%=covered.reinstatements_four%>, <%=covered.reinstatements_five%>, <%=covered.reinstatements_six%>, <%=covered.reinstatements_seven%>, <%=covered.reinstatements_eight%>, <%=covered.reinstatements_nine%>, <%=covered.reinstatements_ten%>, <%=covered.reinstatements_eleven%>, <%=covered.reinstatements_twelve%>]
-        }]
-        <%end%>
+            data: [24, 13, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            }]
+        });
     });
-});
-        </script>
+</script>
 
 </head>
 
@@ -210,86 +210,86 @@ $(function () {
     <!-- </div> -->
     <!-- </header> -->
 
-<div class="container-fluid" style="margin: 5px;"> 
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+
 <ul class="nav nav-pills">
- <li class="active"><a href="ivl_index.htm" data-toggle="tab">IVL Covered Lives</a></li>
- <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
- <li><a href="shop_lives.htm">SHOP Covered Lives</a></li>
- <li><a href="shop_policy.htm">SHOP Policies</a></li>
+  <li class="active"><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
+  <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+  <li><a href="shop_main.htm">SHOP</a></li>
+  <li><a href="cong_main.htm">Congress</a></li>
 </ul>
 
 <div class="row row-content">
-<%@annual_covered_lives.each do |covered|%>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_total)%> Total Coverage <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
- <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_new)%> New Coverage YTD<span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% YoY</div>
+  <div class="panel-body"><b>25,224 Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% MoM</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_terminations)%> Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -12% YoY</div>
+  <div class="panel-body"><b>7,834 New Coverage YTD <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% MoM</div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
- <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_cancellations)%> Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -10% YoY</div>
+  <div class="panel-body"><b>1,980 Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -12% MoM</div>
 </div>
 </div>
-<%end%>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>1,350 Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -10% MoM</div>
+</div>
+</div>
+        
 </div>
 
     <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
     <table class="table table-hover table-condensed">
-    <thead>
-
-      <tr class="tabSpc1">
-       <td class="texLef" colspan="4">Enrollment <%= link_to "More Information", "ivl_enroll" %></a></td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-     </tr>
-      <tr>
-        <th class="texLef">Enrollment </th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
-      </tr>
-    </thead>
     <tbody>
-    <%@annual_enrollments.each do |annual|%>
+    <tr class="tabSpc1">
+        <td class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm">More Information</a></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
       <tr>
-      
+        <th class="texLef">Enrollment</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
+      </tr>
+      <tr>
         <td class="texLef">Auto Renewals</td>
-        <td><%=annual.auto_renewals_count%></td>
-        <td><%=(annual.auto_renewals_share.to_f * 100).to_i%>%</td>
-        <td><%=(annual.auto_renewals_yoy.to_f * 100).to_i%>%</td>     
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>25%</td>
       </tr>
       <tr>
         <td class="texLef">Active Renewals</td>
-        <td><%=annual.active_renewals_count%></td>
-        <td><%=(annual.active_renewals_share.to_f * 100).to_i%>%</td>
-        <td><%=(annual.active_renewals_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>25%</td>
       </tr>
       <tr>
         <td class="texLef">New Customers</td>
-        <td><%=annual.new_customers_count%></td>
-        <td><%=(annual.new_customers_share.to_f * 100).to_i%>%</td>
-        <td><%=(annual.new_customers_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>25%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
-        <td><%=annual.sep_count%></td>
-        <td><%=(annual.sep_share.to_f * 100).to_i%>%</td>
-        <td><%=(annual.sep_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>25%</td>
       </tr>
-      <%end%>
 
       <tr>
         <td>&nbsp;</td>
@@ -299,76 +299,82 @@ $(function () {
       </tr>
 
       <tr class="tabSpc1">
-       <td class="texLef" colspan="4">Coverage <a href="ivl_enroll.htm">More Information</a></td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-     </tr>
+        <td class="texLef" colspan="4">Coverage <a href="ivl_dd_live2.htm">More Information</a></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      
       <tr>
-      <%@annual_carriers.each do |carrier|%>
         <th class="texLef">Carrier</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
       <tr>
-        <td class="texLef"><%=carrier.carrier_first_name%></td>
-        <td><%=carrier.carrier_first_count%></td>
-        <td><%=(carrier.carrier_first_share.to_f * 100).to_i%>%</td>
-        <td><%=(carrier.carrier_first_yoy.to_f * 100).to_i%>%</td>
+        <td class="texLef">CareFirst</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
       <tr>
-        <td class="texLef"><%=carrier.carrier_secondName%></td>
-        <td><%=carrier.carrier_second_count%></td>
-        <td><%=(carrier.carrier_second_share.to_f * 100).to_i%>%</td>
-        <td><%=(carrier.carrier_second_yoy.to_f * 100).to_i%>%</td>
-      </tr>
-      <%end%>
-
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <td class="texLef">Kaiser</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
 
       <tr>
-      <%@metal_types.each do |metals|%>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
         <th class="texLef">Metal</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
       <tr>
         <td class="texLef">Platinum</td>
-        <td><%=metals.platinum_count%></td>
-        <td><%=(metals.platinum_share.to_f * 100).to_i%>%</td>
-        <td><%=(metals.platinum_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>20%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td><%=metals.gold_count%></td>
-        <td><%=(metals.gold_share.to_f * 100).to_i%>%</td>
-        <td><%=(metals.gold_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>20%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td><%=metals.silver_count%></td>
-        <td><%=(metals.silver_share.to_f * 100).to_i%>%</td>
-        <td><%=(metals.silver_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>20%</td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td><%=metals.bronze_count%></td>
-        <td><%=(metals.bronze_share.to_f * 100).to_i%>%</td>
-        <td><%=(metals.bronze_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>20%</td>
       </tr>
       <tr>
         <td class="texLef">Catastrophic</td>
-        <td><%=metals.catastrophic_count%></td>
-        <td><%=(metals.catastrophic_share.to_f * 100).to_i%>%</td>
-        <td><%=(metals.catastrophic_yoy.to_f * 100).to_i%>%</td>
-        <%end%>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>20%</td>
       </tr>
 
       <tr>
@@ -379,94 +385,101 @@ $(function () {
       </tr>
 
       <tr class="tabSpc1">
-       <td class="texLef" colspan="4">Demographic <a href="ivl_enroll.htm">More Information</a></td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-       <td>&nbsp;</td>
-     </tr>
+        <td class="texLef" colspan="4">Demographic <a href="ivl_dd_live3.htm">More Information</a></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
       <tr>
-      <%@annual_status.each do |status|%>
         <th class="texLef">Status</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
       <tr>
         <td class="texLef">Primary</td>
-        <td><%=status.primary_count%></td>
-        <td><%=(status.primary_share.to_f * 100).to_i%>%</td>
-        <td><%=(status.primary_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td><%=status.dependent_count%></td>
-        <td><%=(status.dependent_share.to_f * 100).to_i%>%</td>
-        <td><%=(status.dependent_yoy.to_f * 100).to_i%>%</td>
-        <%end%>
-      </tr>
- 
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
 
       <tr>
-      <%@age_groups.each do |age|%>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
         <th class="texLef">Age Group</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
       <tr>
         <td class="texLef">< 1</td>
-        <td><%=age.zero_count%></td>
-        <td><%=(age.zero_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.zero_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-        <td><%=age.one_count%></td>
-        <td><%=(age.one_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.one_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-        <td><%=age.eighteen_count%></td>
-        <td><%=(age.eighteen_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.eighteen_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-        <td><%=age.twentysix_count%></td>
-        <td><%=(age.twentysix_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.twentysix_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-        <td><%=age.thirtyfive_count%></td>
-        <td><%=(age.thirtyfive_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.thirtyfive_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-        <td><%=age.fortyfive_count%></td>
-        <td><%=(age.fortyfive_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.fortyfive_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td><%=age.fiftyfive_count%></td>
-        <td><%=(age.fiftyfive_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.fiftyfive_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-        <td><%=age.sixtyfive_count%></td>
-        <td><%=(age.sixtyfive_share.to_f * 100).to_i%>%</td>
-        <td><%=(age.sixtyfive_yoy.to_f * 100).to_i%>%</td>
-        <%end%>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0%</td>
       </tr>
 
       <tr>
@@ -475,55 +488,27 @@ $(function () {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-
       <tr>
-      <%@over_all_aptc.each do |aptc|%>
-        <th class="texLef">APTC</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
-      </tr>
-      <tr>
-        <td class="texLef">Yes</td>
-        <td><%=aptc.yes_count%></td>
-        <td><%=(aptc.yes_share.to_f * 100).to_i%>%</td>
-        <td><%=(aptc.yes_yoy.to_f * 100).to_i%>%</td>
-      </tr>
-      <tr>
-        <td class="texLef">No</td>
-        <td><%=aptc.no_count%></td>
-        <td><%=(aptc.no_share.to_f * 100).to_i%>%</td>
-        <td><%=(aptc.no_yoy.to_f * 100).to_i%>%</td>
-        <%end%>
-      </tr>
-
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-      </tr>
-
-      <tr>
-      <%@overall_genders.each do |gender|%>
         <th class="texLef">Gender</th>
-        <th>#</th>
-        <th>%</th>
-        <th>YoY</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
       <tr>
         <td class="texLef">Male</td>
-        <td><%=gender.male_count%></td>
-        <td><%=(gender.male_share.to_f * 100).to_i%>%</td>
-        <td><%=(gender.male_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td><%=gender.female_count%></td>
-        <td><%=(gender.female_share.to_f * 100).to_i%>%</td>
-        <td><%=(gender.female_yoy.to_f * 100).to_i%>%</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>50%</td>
       </tr>
-      <%end%>
     </tbody>
     </table>
 
@@ -531,256 +516,134 @@ $(function () {
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h4>Covered Lives by Start Month</h4>
+<h5>Active Covered Lives</h5>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h4>Covered Lives Enrollment Type</h4>
+<h5>Covered Lives by Effective Month</h5>
     <table class="table table-hover table-condensed">
-    <%@enrollments.each do |enroll|%>
     <thead>
       <tr>
         <th class="texLef">Enrollment</th>
-        <th><%=enroll.month_one%></th>
-        <th><%=enroll.month_two%></th>
-        <th><%=enroll.month_three%></th>
-        <th><%=enroll.month_four%></th>
-        <th><%=enroll.month_five%></th>
-        <th><%=enroll.month_six%></th>
-        <th><%=enroll.month_seven%></th>
-        <th><%=enroll.month_eight%></th>
-        <th><%=enroll.month_nine%></th>
-        <th><%=enroll.month_ten%></th>
-        <th><%=enroll.month_eleven%></th>
-        <th><%=enroll.month_twelve%></th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
         <th>Total</th>
-        <th>%</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="texLef">Auto Renew</td>
-        <td><%=enroll.auto_renew_one%></td>
-        <td><%=enroll.auto_renew_two%></td>
-        <td><%=enroll.auto_renew_three%></td>
-        <td><%=enroll.auto_renew_four%></td>
-        <td><%=enroll.auto_renew_five%></td>
-        <td><%=enroll.auto_renew_six%></td>
-        <td><%=enroll.auto_renew_seven%></td>
-        <td><%=enroll.auto_renew_eight%></td>
-        <td><%=enroll.auto_renew_nine%></td>
-        <td><%=enroll.auto_renew_ten%></td>
-        <td><%=enroll.auto_renew_eleven%></td>
-        <td><%=enroll.auto_renew_twelve%></td>
-        <td><%=enroll.auto_renew_total%></td>
-        <td><%=(enroll.auto_renew_share.to_f * 100).to_i%>%</td>
+        <td class="texLef">Selected</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
       </tr>
       <tr>
-        <td class="texLef">Active Renew</td> 
-        <td><%=enroll.active_renew_one%></td>
-        <td><%=enroll.active_renew_two%></td>
-        <td><%=enroll.active_renew_three%></td>
-        <td><%=enroll.active_renew_four%></td>
-        <td><%=enroll.active_renew_five%></td>
-        <td><%=enroll.active_renew_six%></td>
-        <td><%=enroll.active_renew_seven%></td>
-        <td><%=enroll.active_renew_eight%></td>
-        <td><%=enroll.active_renew_nine%></td>
-        <td><%=enroll.active_renew_ten%></td>
-        <td><%=enroll.active_renew_eleven%></td>
-        <td><%=enroll.active_renew_twelve%></td>
-        <td><%=enroll.active_renew_total%></td>
-        <td><%=(enroll.active_renew_share.to_f * 100).to_i%>%</td>
+        <td class="texLef">Effectuated</td> 
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
       </tr>
       <tr>
-        <td class="texLef">New Customer</td>
-        <td><%=enroll.newCustomer_one%></td>
-        <td><%=enroll.newCustomer_two%></td>
-        <td><%=enroll.newCustomer_three%></td>
-        <td><%=enroll.newCustomer_four%></td>
-        <td><%=enroll.newCustomer_five%></td>
-        <td><%=enroll.newCustomer_six%></td>
-        <td><%=enroll.newCustomer_seven%></td>
-        <td><%=enroll.newCustomer_eight%></td>
-        <td><%=enroll.newCustomer_nine%></td>
-        <td><%=enroll.newCustomer_ten%></td>
-        <td><%=enroll.newCustomer_eleven%></td>
-        <td><%=enroll.newCustomer_twelve%></td>
-        <td><%=enroll.newCustomer_total%></td>
-        <td><%=(enroll.newCustomer_share.to_f * 100).to_i%>%</td>
+        <td class="texLef">Effectuation %</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
       </tr>
       <tr>
-        <td class="texLef">SEP</td>
-        <td><%=enroll.sep_one%></td>
-        <td><%=enroll.sep_two%></td>
-        <td><%=enroll.sep_three%></td>
-        <td><%=enroll.sep_four%></td>
-        <td><%=enroll.sep_five%></td>
-        <td><%=enroll.sep_six%></td>
-        <td><%=enroll.sep_seven%></td>
-        <td><%=enroll.sep_eight%></td>
-        <td><%=enroll.sep_nine%></td>
-        <td><%=enroll.sep_ten%></td>
-        <td><%=enroll.sep_eleven%></td>
-        <td><%=enroll.sep_twelve%></td>
-        <td><%=enroll.sep_total%></td>
-        <td><%=(enroll.sep_share.to_f * 100).to_i%>%</td>
+        <td class="texLef">Paying</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
       </tr>
       <tr>
-        <td class="texLef">Total</td>
-        <td><%=enroll.total_one%></td>
-        <td><%=enroll.total_two%></td>
-        <td><%=enroll.total_three%></td>
-        <td><%=enroll.total_four%></td>
-        <td><%=enroll.total_five%></td>
-        <td><%=enroll.total_six%></td>
-        <td><%=enroll.total_seven%></td>
-        <td><%=enroll.total_eight%></td>
-        <td><%=enroll.total_nine%></td>
-        <td><%=enroll.total_ten%></td>
-        <td><%=enroll.total_eleven%></td>
-        <td><%=enroll.total_twelve%></td>
-        <td><%=enroll.total_total%></td>
-        <td><%=(enroll.total_share.to_f * 100).to_i%>%</td>
+        <td class="texLef">Terminated</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td class="texLef">Canceled</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
       </tr>
     </tbody>
-    <%end%>
     </table>
 
-<h4>Covered Lives SEPs by Type</h4>
-    <table class="table table-hover table-condensed">
-    <%@seps.each do |s|%>
-    <thead>
-      <tr>
-        <th class="texLef">SEP</th>
-        <th><%=s.month_one.to_i%></th>
-        <th><%=s.month_two%></th>
-        <th><%=s.month_three%></th>
-        <th><%=s.month_four%></th>
-        <th><%=s.month_five%></th>
-        <th><%=s.month_six%></th>
-        <th><%=s.month_seven%></th>
-        <th><%=s.month_eight%></th>
-        <th><%=s.month_nine%></th>
-        <th><%=s.month_ten%></th>
-        <th><%=s.month_eleven%></th>
-        <th><%=s.month_twelve%></th>
-        <th>Total</th>
-        <th>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="texLef">Lost Coverage</td>
-        <td><%=s.lost_coverage_one.to_i%></td>
-        <td><%=s.lost_coverage_two%></td>
-        <td><%=s.lost_coverage_three%></td>
-        <td><%=s.lost_coverage_four%></td>
-        <td><%=s.lost_coverage_five%></td>
-        <td><%=s.lost_coverage_six%></td>
-        <td><%=s.lost_coverage_seven%></td>
-        <td><%=s.lost_coverage_eight%></td>
-        <td><%=s.lost_coverage_nine%></td>
-        <td><%=s.lost_coverage_ten%></td>
-        <td><%=s.lost_coverage_eleven%></td>
-        <td><%=s.lost_coverage_twelve%></td>
-        <td><%=s.lost_coverage_total%></td>
-        <td><%=(s.lost_coverage_share.to_f * 100).to_i%></td>
-      </tr>
-      <tr>
-        <td class="texLef">Birth</td>
-        <td><%=s.birth_one%></td>
-        <td><%=s.birth_two%></td>
-        <td><%=s.birth_three%></td>
-        <td><%=s.birth_four%></td>
-        <td><%=s.birth_five%></td>
-        <td><%=s.birth_six%></td>
-        <td><%=s.birth_seven%></td>
-        <td><%=s.birth_eight%></td>
-        <td><%=s.birth_nine%></td>
-        <td><%=s.birth_ten%></td>
-        <td><%=s.birth_eleven%></td>
-        <td><%=s.birth_twelve%></td>
-        <td><%=s.birth_total%></td>
-        <td><%=(s.birth_share.to_f * 100).to_i%>%</td>
-      </tr>
-      <tr>
-        <td class="texLef">Citizenship</td>
-        <td><%=s.citizenship_one%></td>
-        <td><%=s.citizenship_two%></td>
-        <td><%=s.citizenship_three%></td>
-        <td><%=s.citizenship_four%></td>
-        <td><%=s.citizenship_five%></td>
-        <td><%=s.citizenship_six%></td>
-        <td><%=s.citizenship_seven%></td>
-        <td><%=s.citizenship_eight%></td>
-        <td><%=s.citizenship_nine%></td>
-        <td><%=s.citizenship_ten%></td>
-        <td><%=s.citizenship_eleven%></td>
-        <td><%=s.citizenship_twelve%></td>
-        <td><%=s.citizenship_total%></td>
-        <td><%=(s.citizenship_share.to_f * 100).to_i%>%</td>
-      </tr>
-      <tr>
-        <td class="texLef">Relocation</td>
-        <td><%=s.relocation_one%></td>
-        <td><%=s.relocation_two%></td>
-        <td><%=s.relocation_three%></td>
-        <td><%=s.relocation_four%></td>
-        <td><%=s.relocation_five%></td>
-        <td><%=s.relocation_six%></td>
-        <td><%=s.relocation_seven%></td>
-        <td><%=s.relocation_eight%></td>
-        <td><%=s.relocation_nine%></td>
-        <td><%=s.relocation_ten%></td>
-        <td><%=s.relocation_eleven%></td>
-        <td><%=s.relocation_twelve%></td>
-        <td><%=s.relocation_total%></td>
-        <td><%=(s.relocation_share.to_f * 100).to_i%>%</td>
-      </tr>
-      <tr>
-        <td class="texLef">Other</td>
-        <td><%=s.other_one%></td>
-        <td><%=s.other_two%></td>
-        <td><%=s.other_three%></td>
-        <td><%=s.other_four%></td>
-        <td><%=s.other_five%></td>
-        <td><%=s.other_six%></td>
-        <td><%=s.other_seven%></td>
-        <td><%=s.other_eight%></td>
-        <td><%=s.other_nine%></td>
-        <td><%=s.other_ten%></td>
-        <td><%=s.other_eleven%></td>
-        <td><%=s.other_twelve%></td>
-        <td><%=s.other_total%></td>
-        <td><%=(s.other_share.to_f * 100).to_i%>%</td>
-      </tr>
-      <tr>
-        <td class="texLef">Total</td>
-        <td><%=s.total_one%></td>
-        <td><%=s.total_two%></td>
-        <td><%=s.total_three%></td>
-        <td><%=s.total_four%></td>
-        <td><%=s.total_five%></td>
-        <td><%=s.total_six%></td>
-        <td><%=s.total_seven%></td>
-        <td><%=s.total_eight%></td>
-        <td><%=s.total_nine%></td>
-        <td><%=s.total_ten%></td>
-        <td><%=s.total_eleven%></td>
-        <td><%=s.total_twelve%></td>
-        <td><%=s.total_total%></td>
-        <td><%=(s.total_share.to_f * 100).to_i%>%</td>
-      </tr>
-    </tbody>
-    <%end%>
-    </table>
-
- <h4>Discontinued or Reinstated Covered Lives </h4>
+ <h5>Discontinued or Reinstated Covered Lives by Transaction Month</h5>
  <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
 
     </div>
     </div>
-
 
     </body>
 </html>
