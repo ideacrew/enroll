@@ -65,7 +65,6 @@ class Insured::GroupSelectionController < ApplicationController
     family_member_ids = params.require(:family_member_ids).collect() do |index, family_member_id|
       BSON::ObjectId.from_string(family_member_id)
     end
-
     hbx_enrollment = build_hbx_enrollment
     if (keep_existing_plan && @hbx_enrollment.present?)
       sep_id = @hbx_enrollment.is_shop? ? @hbx_enrollment.family.earliest_effective_shop_sep.id : @hbx_enrollment.family.earliest_effective_ivl_sep.id
@@ -93,9 +92,6 @@ class Insured::GroupSelectionController < ApplicationController
         raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
       end
     end
-
-    # Set effective_on if this is a case of QLE with date options available.
-    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
 
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
@@ -170,7 +166,8 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        opt_effective_on: @optional_effective_on)
     when 'coverall'
       @coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
@@ -204,6 +201,7 @@ class Insured::GroupSelectionController < ApplicationController
     @coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @shop_for_plans = params[:shop_for_plans].present? ? params{:shop_for_plans} : ''
+    @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
   end
 
   def insure_hbx_enrollment_for_shop_qle_flow

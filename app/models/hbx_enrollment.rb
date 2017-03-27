@@ -880,7 +880,7 @@ class HbxEnrollment
     end
   end
 
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil)
+  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
 
@@ -920,9 +920,8 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.benefit_package_id = benefit_package.try(:id)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
@@ -937,7 +936,7 @@ class HbxEnrollment
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
