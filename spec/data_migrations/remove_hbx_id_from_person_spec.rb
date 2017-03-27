@@ -2,6 +2,9 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_hbx_id_from_person")
 
 describe RemoveHbxIdFromPerson do
+  let(:given_task_name) { "remove_hbx_id_from_person" }
+  subject { RemoveHbxIdFromPerson.new(given_task_name, double(:current_scope => nil)) }
+  
   let(:person_1) { FactoryGirl.create(:person, hbx_id:"911911911") }
   let(:person_2) { FactoryGirl.create(:person) }
   
