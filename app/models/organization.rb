@@ -20,7 +20,7 @@ class Organization
     "foreign_embassy_or_consulate"
   ]
 
-  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_changed"}
+  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
   field :hbx_id, type: String
 
