@@ -958,14 +958,6 @@ describe HbxEnrollment, dbclean: :after_each do
   let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
   let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
-  let(:employee_role) {
-    person.employee_roles.create(
-      employer_profile: employer_profile,
-      hired_on: census_employee.hired_on,
-      census_employee_id: census_employee.id
-    )
-  }
-
   let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
   let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
@@ -991,13 +983,13 @@ describe HbxEnrollment, dbclean: :after_each do
                                                    }
 
 
-  let(:benefit_group_assignment) {
-    BenefitGroupAssignment.create({
-                                    census_employee: census_employee,
-                                    benefit_group: plan_year.benefit_groups.first,
-                                    start_on: plan_year_start_on
-    })
-  }
+  let(:hired_on) { middle_of_prev_year }
+  let(:created_at) { middle_of_prev_year }
+  let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: created_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+
+  let(:employee_role) {
+      FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
+    }
 
   let(:shop_enrollment)   { FactoryGirl.build(:hbx_enrollment,
                                               household: shop_family.latest_household,
@@ -1008,7 +1000,7 @@ describe HbxEnrollment, dbclean: :after_each do
                                               submitted_at: effective_date - 10.days,
                                               benefit_group_id: plan_year.benefit_groups.first.id,
                                               employee_role_id: employee_role.id,
-                                              benefit_group_assignment_id: benefit_group_assignment.id
+                                              benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
                                               )}
 
 
@@ -1016,8 +1008,7 @@ describe HbxEnrollment, dbclean: :after_each do
     TimeKeeper.set_date_of_record_unprotected!(plan_year_start_on + 45.days)
 
     allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
-    allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-    allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
+    # allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
     allow(shop_enrollment).to receive(:plan_year_check).with(employee_role).and_return false
   end
 
@@ -1027,8 +1018,8 @@ describe HbxEnrollment, dbclean: :after_each do
 
   context ".effective_date_for_enrollment" do
     context 'when new hire' do
-
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record, created_at: TimeKeeper.date_of_record ) }
+      let(:hired_on) { TimeKeeper.date_of_record.beginning_of_month }
+      let(:created_at) { TimeKeeper.date_of_record }
 
       it 'should return new hire effective date' do
         expect(employee_role.can_enroll_as_new_hire?).to be_truthy
@@ -1095,11 +1086,10 @@ describe HbxEnrollment, dbclean: :after_each do
     context 'when under open enrollment' do
       before do
         TimeKeeper.set_date_of_record_unprotected!(open_enrollment_start_on)
-        allow(employee_role.census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
       end
 
       it "should return benefit group and assignment" do
-        expect(HbxEnrollment.employee_current_benefit_group(employee_role, shop_enrollment, false)).to eq [plan_year.benefit_groups.first, benefit_group_assignment]
+        expect(HbxEnrollment.employee_current_benefit_group(employee_role, shop_enrollment, false)).to eq [plan_year.benefit_groups.first, census_employee.active_benefit_group_assignment]
       end
     end
   end
@@ -1114,16 +1104,7 @@ describe HbxEnrollment, dbclean: :after_each do
     let(:calender_year) { TimeKeeper.date_of_record.year }
 
     let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
-    let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
-
-    let(:employee_role) {
-      person.employee_roles.create(
-        employer_profile: employer_profile,
-        hired_on: census_employee.hired_on,
-        census_employee_id: census_employee.id
-      )
-    }
 
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
@@ -1149,13 +1130,14 @@ describe HbxEnrollment, dbclean: :after_each do
                                                      py
                                                      }
 
+    let(:hired_on) { middle_of_prev_year }
+    let(:created_at) { middle_of_prev_year }
+    let(:updated_at) { middle_of_prev_year }
 
-    let(:benefit_group_assignment) {
-      BenefitGroupAssignment.create({
-                                      census_employee: census_employee,
-                                      benefit_group: plan_year.benefit_groups.first,
-                                      start_on: plan_year_start_on
-      })
+    let(:census_employee) { FactoryGirl.create(:census_employee_with_active_assignment, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: created_at, updated_at: updated_at, hired_on: hired_on, benefit_group: plan_year.benefit_groups.first) }
+
+    let(:employee_role) {
+      FactoryGirl.create(:employee_role, employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id)
     }
 
     let(:shop_enrollment)   { FactoryGirl.create(:hbx_enrollment,
@@ -1167,14 +1149,12 @@ describe HbxEnrollment, dbclean: :after_each do
                                                  submitted_at: effective_date - 10.days,
                                                  benefit_group_id: plan_year.benefit_groups.first.id,
                                                  employee_role_id: employee_role.id,
-                                                 benefit_group_assignment_id: benefit_group_assignment.id
+                                                 benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id
                                                  )
                               }
 
     before do
       allow(employee_role).to receive(:benefit_group).and_return(plan_year.benefit_groups.first)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-      allow(shop_enrollment).to receive(:employee_role).and_return(employee_role)
       allow(shop_enrollment).to receive(:plan_year_check).with(employee_role).and_return false
     end
 
@@ -1199,7 +1179,9 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when its a new hire' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: Date.new(calender_year, 3, 1), created_at: Date.new(calender_year, 2, 1), updated_at: Date.new(calender_year, 2, 1)) }
+      let(:hired_on) { Date.new(calender_year, 3, 1) }
+      let(:created_at) { Date.new(calender_year, 2, 1) }
+      let(:updated_at) { Date.new(calender_year, 2, 1) }
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
@@ -1227,7 +1209,9 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when roster create present' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
+      let(:hired_on) { middle_of_prev_year }
+      let(:created_at) { Date.new(calender_year, 5, 10) }
+      let(:updated_at) { Date.new(calender_year, 5, 10) }
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
@@ -1239,7 +1223,9 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when roster update not present' do
-      let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: middle_of_prev_year, updated_at: Date.new(calender_year, 5, 10)) }
+      let(:hired_on) { middle_of_prev_year }
+      let(:created_at) { middle_of_prev_year }
+      let(:updated_at) { Date.new(calender_year, 5, 10) }
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
@@ -1290,7 +1276,7 @@ describe HbxEnrollment, dbclean: :after_each do
                                                    submitted_at: effective_date - 10.days,
                                                    benefit_group_id: plan_year.benefit_groups.first.id,
                                                    employee_role_id: employee_role.id,
-                                                   benefit_group_assignment_id: benefit_group_assignment.id,
+                                                   benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id,
                                                    special_enrollment_period_id: special_enrollment_period.id
                                                    )
                                 }
@@ -2110,8 +2096,8 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
 
   let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month - 1.year }
   let(:end_on) { start_on + 1.year - 1.day }
-  let(:open_enrollment_start_on) { start_on - 1.month }
-  let(:open_enrollment_end_on) { open_enrollment_start_on + 9.days }
+  let(:open_enrollment_start_on) { start_on - 2.months }
+  let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 9.days }
 
   let!(:renewal_plan) {
     FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01")
@@ -2220,16 +2206,18 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
   context 'When family has passive renewal and selected a coverage' do
 
     let!(:renewing_plan_year) {
-      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_published
+      FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
     }
 
     let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }
-    let!(:renewal_benefit_group_assignment) { ce.add_renew_benefit_group_assignment renewal_benefit_group }
+    let!(:renewal_benefit_group_assignment) { employer_profile.census_employees.each{|ce| ce.add_renew_benefit_group_assignment renewal_benefit_group; ce.save!;} }
 
     let!(:generate_passive_renewal) {
+      ce.update!(created_at: 2.months.ago)
+
       factory = Factories::FamilyEnrollmentRenewalFactory.new
       factory.family = family
-      factory.census_employee = ce
+      factory.census_employee = ce.reload
       factory.employer = employer_profile
       factory.renewing_plan_year = employer_profile.renewing_plan_year
       factory.renew

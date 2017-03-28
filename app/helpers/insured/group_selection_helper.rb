@@ -30,6 +30,41 @@ module Insured
       end
     end
 
+    def calculate_effective_on(market_kind:, employee_role:, benefit_group:, effective_on_option_selected:)
+      HbxEnrollment.calculate_effective_on_from(
+        market_kind: market_kind,
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        family: @family,
+        employee_role: employee_role,
+        benefit_group: benefit_group,
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship),
+        effective_on_option_selected: effective_on_option_selected)
+    end
+
+    def insure_hbx_enrollment_for_shop_qle_flow
+      if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+        if @hbx_enrollment.blank? # && @employee_role.present?
+          # plan_year = @employee_role.employer_profile.find_plan_year_by_effective_date(@new_effective_on)
+          # id_list = plan_year.benefit_groups.collect(&:_id).uniq
+          # enrollments = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.where(:"benefit_group_id".in => id_list).effective_desc
+          # @hbx_enrollment = enrollments.first
+
+          @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+        end
+      end
+    end
+
+    def select_market(person, params)
+      return params[:market_kind] if params[:market_kind].present?
+      if @person.try(:has_active_employee_role?)
+        'shop'
+      elsif @person.try(:has_active_consumer_role?)
+        'individual'
+      else
+        nil
+      end
+    end
+
     def self.selected_enrollment(family, employee_role)
       py = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.effective_on)}
       id_list = py.benefit_groups.map(&:id) if py.present?
