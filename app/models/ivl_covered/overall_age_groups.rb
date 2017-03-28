@@ -4,31 +4,41 @@ module IvlCovered
     store_in collection: "ivlCovered"
 
     field :tile , type: String
-    field :zero_count, type: Integer
-    field :zero_share, type: String
-    field :zero_yoy, type: String
-    field :one_count, type: Integer
-    field :one_share, type: String
-    field :one_yoy, type: String
-    field :eighteen_count, type: Integer
-    field :eighteen_share, type: String
-    field :eighteen_yoy, type: String
-    field :twentysix_count, type: Integer
-    field :twentysix_share, type: String
-    field :twentysix_yoy, type: String
-    field :thirtyfive_count, type: Integer
-    field :thirtyfive_share, type: String
-    field :thirtyfive_yoy, type: String
-    field :fortyfive_count, type: Integer
-    field :fortyfive_share, type: String
-    field :fortyfive_yoy, type: String
-    field :fiftyfive_count, type: Integer
-    field :fiftyfive_share, type: String
-    field :fiftyfive_yoy, type: String
-    field :sixtyfive_count, type: Integer
-    field :sixtyfive_share, type: String
-    field :sixtyfive_yoy, type: String
-
+    field :zero_select, type: Integer
+    field :zero_effectuate, type: Integer
+    field :zero_paying, type: Integer
+    field :zero_pay_share, type: String
+    field :one_select, type: Integer
+    field :one_effectuate, type: Integer
+    field :one_paying, type: Integer
+    field :one_pay_share, type: String
+    field :eighteen_select, type: Integer
+    field :eighteen_effectuate, type: Integer
+    field :eighteen_paying, type: Integer
+    field :eighteen_pay_share, type: String
+    field :twentysix_select, type: Integer
+    field :twentysix_effectuate, type: Integer
+    field :twentysix_paying, type: Integer
+    field :twentysix_pay_share, type: String
+    field :thirtyfive_select, type: Integer
+    field :thirtyfive_effectuate, type: Integer
+    field :thirtyfive_paying, type: Integer
+    field :thirtyfive_pay_share, type: Integer
+    field :fiftyfive_select, type: Integer
+    field :fiftyfive_effectuate, type: Integer
+    field :fiftyfive_paying, type: Integer
+    field :fortyfive_select, type: Integer
+    field :fortyfive_effectuate, type: Integer
+    field :fortyfive_paying, type: Integer
+    field :fortyfive_pay_share, type: String
+    field :fiftyfive_pay_share, type: String
+    field :sixtyfive_select, type: Integer
+    field :sixtyfive_effectuate, type: Integer
+    field :sixtyfive_paying, type: Integer
+    field :sixtyfive_pay_share, type: String
+    
     default_scope ->{where(tile: "left_age_group" )}
   end
 end
+
+   

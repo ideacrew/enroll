@@ -339,6 +339,7 @@ $(function () {
       </tr>
 
       <tr>
+      <% @metal_types.each do |metal| %>
         <th class="texLef">Metal</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -347,38 +348,40 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Platinum</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>20%</td>
+        <td><%= metal.platinum_select %></td>
+        <td><%= metal.platinum_effectuate %></td>
+        <td><%= metal.platinum_paying %></td>
+        <td><%= (metal.platinum_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>20%</td>
+        <td><%= metal.gold_select %></td>
+        <td><%= metal.gold_effectuate %></td>
+        <td><%= metal.gold_paying %></td>
+        <td><%= (metal.gold_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>20%</td>
+        <td><%= metal.silver_select %></td>
+        <td><%= metal.silver_effectuate %></td>
+        <td><%= metal.silver_paying %></td>
+        <td><%= (metal.silver_pay_share.to_f * 100).to_i  %>%</td>
+      </tr>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>20%</td>
+        <td><%= metal.bronze_select %></td>
+        <td><%= metal.bronze_effectuate %></td>
+        <td><%= metal.bronze_paying %></td>
+        <td><%= (metal.bronze_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
       <tr>
         <td class="texLef">Catastrophic</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>20%</td>
+       <td><%= metal.catastrophic_select %></td>
+        <td><%= metal.catastrophic_effectuate %></td>
+        <td><%= metal.catastrophic_paying %></td>
+        <td><%= (metal.catastrophic_pay_share.to_f * 100).to_i  %>%</td>
+        <% end %>
       </tr>
 
       <tr>
@@ -395,6 +398,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <% @annual_status.each do |status| %>
         <th class="texLef">Status</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -403,17 +407,18 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Primary</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td><%= status.primary_select %></td>
+        <td><%= status.primary_effectuate %></td>
+        <td><%= status.primary_paying %></td>
+        <td><%= (status.primary_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td><%= status.dependent_select %></td>
+        <td><%= status.dependent_effectuate %></td>
+        <td><%= status.dependent_paying %></td>
+        <td><%= (status.dependent_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
 
       <tr>
@@ -423,6 +428,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <% @age_groups.each do |age| %>
         <th class="texLef">Age Group</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -431,59 +437,60 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">< 1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.zero_select %></td>
+        <td><%= age.zero_effectuate %></td>
+        <td><%= age.zero_paying %></td>
+        <td><%= (age.zero_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.one_select %></td>
+        <td><%= age.one_effectuate %></td>
+        <td><%= age.one_paying %></td>
+        <td><%= (age.one_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.eighteen_select %></td>
+        <td><%= age.eighteen_effectuate %></td>
+        <td><%= age.eighteen_paying %></td>
+        <td><%= (age.eighteen_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.twentysix_select %></td>
+        <td><%= age.twentysix_effectuate %></td>
+        <td><%= age.twentysix_paying %></td>
+        <td><%= (age.twentysix_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.thirtyfive_select %></td>
+        <td><%= age.thirtyfive_effectuate %></td>
+        <td><%= age.thirtyfive_paying %></td>
+        <td><%= (age.thirtyfive_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.fortyfive_select %></td>
+        <td><%= age.fortyfive_effectuate %></td>
+        <td><%= age.fortyfive_paying %></td>
+        <td><%= (age.fortyfive_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.fiftyfive_select %></td>
+        <td><%= age.fiftyfive_effectuate %></td>
+        <td><%= age.fiftyfive_paying %></td>
+        <td><%= (age.fiftyfive_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0%</td>
+        <td><%= age.sixtyfive_select %></td>
+        <td><%= age.sixtyfive_effectuate %></td>
+        <td><%= age.sixtyfive_paying %></td>
+        <td><%= (age.sixtyfive_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
 
       <tr>
@@ -493,6 +500,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <% @overall_genders.each do |genders| %>
         <th class="texLef">Gender</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -501,17 +509,18 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Male</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td><%= genders.male_select %></td>
+        <td><%= genders.male_effectuate %></td>
+        <td><%= genders.male_paying %></td>
+        <td><%= (genders.male_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td><%= genders.female_select %></td>
+        <td><%= genders.female_effectuate %></td>
+        <td><%= genders.female_paying %></td>
+        <td><%= (genders.female_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
     </tbody>
     </table>
