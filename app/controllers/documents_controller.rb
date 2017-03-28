@@ -163,7 +163,7 @@ class DocumentsController < ApplicationController
   end
 
   def verification_attr
-    OpenStruct.new({:determined_at => Time.now,
+    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
                     :authority => "hbx"
                    })
   end

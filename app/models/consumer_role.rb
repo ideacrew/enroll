@@ -563,12 +563,12 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = false
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = true
   end
 
@@ -712,7 +712,7 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > TimeKeeper.datetime_of_record
   end
 
   def record_transition(*args)
@@ -724,7 +724,7 @@ class ConsumerRole
 
   def verification_attr(*authority)
     authority = authority.first == "curam" ? "curam" : "hbx"
-    OpenStruct.new({:determined_at => Time.now,
+    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
                     :vlp_authority => authority
                    })
   end
