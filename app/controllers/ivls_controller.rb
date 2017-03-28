@@ -5,7 +5,7 @@ class IvlsController < ApplicationController
     @seps=IvlCovered::SepType.all
     @discontinuedreinstatedlives=IvlCovered::SepType.all
     @totalaccounts=IvlCovered::TotalAccounts.all
-    @annual_enrollments=IvlCovered::AnnualEnrollmentType.all
+    @annual_enrollments=IvlCovered::AnnualEnrollment.all
     @annual_carriers=IvlCovered::AnnualCarrierType.all
     @covered_lives=IvlCovered::DiscontinuedReinstatedCoveredLives.all
     @metal_types=IvlCovered::TotalMetalTypes.all

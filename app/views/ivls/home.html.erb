@@ -256,6 +256,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <% @annual_enrollments.each do |enrollment| %>
         <th class="texLef">Enrollment</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -264,31 +265,32 @@ $(function () {
       </tr>
       <tr>
         <td class="texLef">Auto Renewals</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>25%</td>
+        <td><%= enrollment.auto_renewals_select %></td>
+        <td><%= enrollment.auto_renewals_effectuate %></td>
+        <td><%= enrollment.auto_renewals_paying %></td>
+        <td><%= (enrollment.auto_renewals_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">Active Renewals</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>25%</td>
+        <td><%= enrollment.active_renewals_select %></td>
+        <td><%= enrollment.active_renewals_effectuate %></td>
+        <td><%= enrollment.active_renewals_paying %></td>
+        <td><%= (enrollment.active_renewals_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">New Customers</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>25%</td>
+        <td><%= enrollment.new_customers_select %></td>
+        <td><%= enrollment.new_customers_effectuate %></td>
+        <td><%= enrollment.new_customers_paying %></td>
+        <td><%= (enrollment.new_customers_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">SEP</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>25%</td>
+        <td><%= enrollment.sep_select %></td>
+        <td><%= enrollment.sep_effectuate %></td>
+        <td><%= enrollment.sep_paying %></td>
+        <td><%= (enrollment.sep_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
 
       <tr>
@@ -306,6 +308,7 @@ $(function () {
       </tr>
       
       <tr>
+      <% @annual_carriers.each do |carrier| %>
         <th class="texLef">Carrier</th>
         <th>Select</th>
         <th>Effectuate</th>
@@ -313,18 +316,19 @@ $(function () {
         <th>Pay %</th>
       </tr>
       <tr>
-        <td class="texLef">CareFirst</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td class="texLef"><%= carrier.carrier_first_name %></td>
+        <td><%= carrier.carrier_first_select %></td>
+        <td><%= carrier.carrier_first_effectuate %></td>
+        <td><%= carrier.carrier_first_paying %></td>
+        <td><%= (carrier.carrier_first_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
-        <td class="texLef">Kaiser</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>50%</td>
+        <td class="texLef"><%= carrier.carrier_second_name %></td>
+        <td><%= carrier.carrier_second_select %></td>
+        <td><%= carrier.carrier_second_effectuate %></td>
+        <td><%= carrier.carrier_second_paying %></td>
+        <td><%= (carrier.carrier_second_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
 
       <tr>
