@@ -36,28 +36,17 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       expect(rendered).to match /shop_for_plan/
     end
 
-    it "should have link with change_plan" do
-      expect(rendered).to have_selector("input[type=submit][value='Shop for Plans']")
-      expect(rendered).to have_selector('strong', text: 'Shop for health and dental plans')
-      expect(rendered).to have_selector("a[href='/insured/group_selections/new?change_plan=change_plan&employee_role_id=#{employee_role.id}&person_id=#{person.id}&shop_for_plan=shop_for_plan']")
+    it "should have form with action" do
+      expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
     end
 
-  end
-
-  context "without hbx_enrollments" do
-    before :each do
-      assign :person, person
-      assign :employee_role, employee_role
-      assign :hbx_enrollments, []
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      sign_in(current_user)
-
-      render "insured/families/shop_for_plans_widget"
+    it "should have form with hidden parameters" do
+      expect(rendered).to have_css("input#change_plan[value='change_plan']", :visible => false)
+      expect(rendered).to have_css("input#employee_role_id[value='#{employee_role.id}']", :visible => false)
+      expect(rendered).to have_css("input#person_id[value='#{person.id}']", :visible => false)
+      expect(rendered).to have_css("input#shop_for_plans[value='shop_for_plans']", :visible => false)
     end
 
-    it "should have link without change_plan" do
-      expect(rendered).to have_selector("a[href='/insured/consumer_role/build']")
-    end
   end
 
   context "action path" do
@@ -77,13 +66,6 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       sign_in(current_user)
     end
 
-    it "should have the updated description with link to 'enroll today' text" do
-      render "insured/families/shop_for_plans_widget"
-      expect(rendered).to have_content 'coverage will begin'
-      expect(rendered).to have_link('enroll today')
-      expect(rendered).not_to have_content 'for Open Enrollment Period.'
-    end
-
     it "should action to new insured group selection path" do
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
@@ -99,19 +81,5 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       expect(rendered).to have_selector("form[action='/insured/families/find_sep']")
     end
   end
-
-  context "without employee or consumer role" do
-    before :each do
-      assign :person, person
-      sign_in(current_user)
-      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      render "insured/families/shop_for_plans_widget"
-    end
-
-    it "should have text about enrolling in Individual Market" do
-      expect(rendered).to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
-    end
-  end
-
 
 end

@@ -201,6 +201,10 @@ Then(/I should land on home page$/) do
   expect(page).to have_content 'My DC Health Link'
 end
 
+Then(/I should land on special enrollment period page$/) do
+  expect(page).to have_content 'Special Enrollment Period'
+end
+
 And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
@@ -564,5 +568,37 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
-
 end
+
+
+Given 'that open enrollment has ended for individual market' do
+  step "I use unique values"
+end
+
+When 'user clicks on continue button to save personal information' do
+  find('.btn', text: 'CONTINUE').click
+end
+
+When 'the person has an active consumer' do
+  @user = User.last
+  @user.person.consumer_role.present?
+end
+
+And 'does not have an active employee role' do
+  @user = User.last
+  @user.person.active_employee_roles.blank?
+end
+
+And 'the user click the shop for plans' do
+  click_button 'Shop for Plans'
+end
+
+Given 'that open enrollment has ended for deactivate employee market' do
+  step "I use unique values"
+end
+
+When 'the person is a terminated employee' do
+  @user = User.last
+  !@user.person.is_active?
+end
+
