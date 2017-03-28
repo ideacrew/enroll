@@ -571,8 +571,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let (:plan) { FactoryGirl.create(:plan, :individual_health) }
     let (:previous_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_apr1, household: household, plan: plan) }
     let (:new_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_may1, household: household, plan: plan) }
-    it "should have existing variables" do
-      binding.pry
+    it "should have have different effective dates by enrollment member" do
+      previous_hbx_enrollment.hbx_enrollment_members << 
+      expect(previous_hbx_enrollment.subscriber.coverage_start_on).to be == new_hbx_enrollment.subscriber.coverage_start_on
     end
   end
 end
