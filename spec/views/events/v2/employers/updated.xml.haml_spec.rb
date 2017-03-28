@@ -8,6 +8,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
   let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+  let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
   let(:office_location) { OfficeLocation.new(
@@ -17,11 +18,17 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   )
   }
 
+  let(:office_location2) { OfficeLocation.new(
+      is_primary: false,
+      address: mailing_address
+  )
+  }
+
   let(:organization) { Organization.create(
       legal_name: "Sail Adventures, Inc",
       dba: "Sail Away",
       fein: "001223333",
-      office_locations: [office_location]
+      office_locations: [office_location,office_location2]
   )
   }
 
@@ -60,6 +67,22 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     it "should have one plan year" do
       expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+    end
+
+    it "should have two office_location" do
+      expect(@doc.xpath("//x:office_location", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
+    end
+
+    it "should have office location with address kind work" do
+      expect(@doc.xpath("//x:office_locations/x:office_location[1]/x:address/x:type","x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#work"
+    end
+
+    it "should have office location with address kind mailing" do
+      expect(@doc.xpath("//x:office_locations/x:office_location[2]/x:address/x:type","x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#mailing"
+    end
+
+    it "should not have phone for mailing office location " do
+      expect(@doc.xpath("//x:office_location[2]/x:phone", "x"=>"http://openhbx.org/api/terms/1.0").to_a).to eq []
     end
 
     it "should have contact email" do

@@ -687,8 +687,8 @@ class HbxEnrollment
     broker_agency_profile_id.present?
   end
 
-  def can_complete_shopping?
-    household.family.is_eligible_to_enroll?
+  def can_complete_shopping?(options = {})
+    household.family.is_eligible_to_enroll?(qle: options[:qle])
   end
 
   def humanized_dependent_summary
@@ -845,7 +845,7 @@ class HbxEnrollment
 
   def self.effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
     if employee_role.can_enroll_as_new_hire?
-      return employee_role.coverage_effective_on
+      return employee_role.coverage_effective_on(qle: qle)
     end
 
     if employee_role.census_employee.new_hire_enrollment_period.min > TimeKeeper.date_of_record
@@ -878,9 +878,8 @@ class HbxEnrollment
 
       census_employee = employee_role.census_employee
       benefit_group_assignment = plan_year.is_renewing? ?
-      census_employee.renewal_benefit_group_assignment : census_employee.active_benefit_group_assignment
-
-      if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+      census_employee.renewal_benefit_group_assignment : (plan_year.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
+      if benefit_group_assignment.blank? || benefit_group_assignment.try(:plan_year) != plan_year
         raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
       end
 
@@ -900,12 +899,19 @@ class HbxEnrollment
       if benefit_group.blank? || benefit_group_assignment.blank?
         benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
       end
+      if qle && employee_role.coverage_effective_on(qle: qle) > employee_role.person.primary_family.current_sep.effective_on
+        raise "You are attempting to purchase coverage through Qualifying Life Event prior to your eligibility date. Please contact your Employer for assistance. You are eligible for employer benefits from #{employee_role.coverage_effective_on(qle: qle)} "
+      end
 
       enrollment.kind = "employer_sponsored"
       enrollment.employee_role = employee_role
 
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
+        if enrollment.plan_year_check(employee_role)
+          enrollment.effective_on =  enrollment.family.current_sep.effective_on
+        else
+          enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
+        end
         enrollment.enrollment_kind = "special_enrollment"
       else
         if external_enrollment && coverage_start.present?
@@ -1233,13 +1239,12 @@ class HbxEnrollment
     benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
   end
 
-
-  def can_select_coverage?
+  def can_select_coverage?(qle: false)
     return true unless is_shop?
     return true if is_cobra_status?
 
     if employee_role.can_enroll_as_new_hire?
-      coverage_effective_date = employee_role.coverage_effective_on
+      coverage_effective_date = employee_role.coverage_effective_on(qle: qle)
     elsif special_enrollment_period.present? && special_enrollment_period.contains?(TimeKeeper.date_of_record)
       coverage_effective_date = special_enrollment_period.effective_on
     elsif benefit_group.is_open_enrollment?
@@ -1335,6 +1340,14 @@ class HbxEnrollment
    if submitted_at.blank?
       write_attribute(:submitted_at, TimeKeeper.date_of_record)
    end
+ end
+
+ def plan_year_check(employee_role)
+  covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
+ end
+
+ def covered_plan_year(employee_role)
+    employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
  end
 
   private
