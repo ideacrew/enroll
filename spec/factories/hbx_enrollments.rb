@@ -53,6 +53,11 @@ FactoryGirl.define do
       aasm_state "coverage_selected"
     end
 
+    trait :cobra_shop do
+      kind "employer_sponsored_cobra"
+      aasm_state "coverage_selected"
+    end
+
     trait :health_plan do
       active_individual_health_plan
     end
@@ -87,7 +92,7 @@ FactoryGirl.define do
 
     trait :terminated do
       aasm_state "coverage_terminated"
-      terminated_on Time.now.last_month.end_of_month
+      terminated_on TimeKeeper.datetime_of_record.last_month.end_of_month
     end
 
     factory :individual_qhp_enrollment,          traits: [:individual_unassisted, :health_plan]

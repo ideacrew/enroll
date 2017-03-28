@@ -18,7 +18,7 @@ class Insured::GroupSelectionController < ApplicationController
   def new
     set_bookmark_url
     initialize_common_vars
-    
+
     @employee_role = @person.active_employee_roles.first if @employee_role.blank? and @person.has_active_employee_role?
     @market_kind = select_market(@person, params)
     @resident = Person.find(params[:person_id]) if Person.find(params[:person_id]).resident_role?
@@ -36,20 +36,22 @@ class Insured::GroupSelectionController < ApplicationController
         benefit_group: nil,
         benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
-      @aptc_blocked = @person.primary_family.is_blocked_by_qle_and_assistance?(nil, session["individual_assistance_path"])
     end
     if (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
       @disable_market_kind = @market_kind == "shop" ? "individual" : "shop"
     end
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
+    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
     @new_effective_on = HbxEnrollment.calculate_effective_on_from(
       market_kind:@market_kind,
-      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      qle: qle,
       family: @family,
       employee_role: @employee_role,
-      benefit_group: @employee_role.present? ? @employee_role.benefit_group : nil,
+      benefit_group: @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil,
       benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+
+    generate_coverage_family_members_for_cobra
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
     @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
@@ -82,8 +84,15 @@ class Insured::GroupSelectionController < ApplicationController
     broker_role = current_user.person.broker_role
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
-
     hbx_enrollment.coverage_kind = @coverage_kind
+
+    if @employee_role.present? && @employee_role.is_cobra_status?
+      hbx_enrollment.kind = 'employer_sponsored_cobra'
+      hbx_enrollment.effective_on = @employee_role.census_employee.coverage_terminated_on.end_of_month + 1.days if @employee_role.census_employee.need_update_hbx_enrollment_effective_on?
+      if @employee_role.census_employee.coverage_terminated_on.present? && !@employee_role.census_employee.have_valid_date_for_cobra?
+        raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+      end
+    end
 
     # Set effective_on if this is a case of QLE with date options available.
     hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
@@ -145,7 +154,7 @@ class Insured::GroupSelectionController < ApplicationController
           benefit_group = @hbx_enrollment.benefit_group
           benefit_group_assignment = @hbx_enrollment.benefit_group_assignment
         else
-          benefit_group = @employee_role.benefit_group
+          benefit_group = @employee_role.benefit_group(qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
           benefit_group_assignment = @employee_role.census_employee.active_benefit_group_assignment
         end
       end
@@ -199,11 +208,20 @@ class Insured::GroupSelectionController < ApplicationController
 
   def insure_hbx_enrollment_for_shop_qle_flow
     if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      @hbx_enrollment = Insured::GroupSelectionHelper.selected_enrollment(@family, @employee_role)
     end
   end
 
   private
+  def generate_coverage_family_members_for_cobra
+    if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?
+      hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
+      if hbx_enrollment.present?
+        @coverage_family_members_for_cobra = hbx_enrollment.hbx_enrollment_members.map(&:family_member)
+      end
+    end
+  end
+
 
   # def is_under_open_enrollment
   #   if @employee_role.present? && !@employee_role.is_under_open_enrollment?

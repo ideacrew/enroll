@@ -77,11 +77,11 @@ FactoryGirl.define do
     end
 
     trait :this_year do
-      active_year Time.now.year
+      active_year TimeKeeper.datetime_of_record.year
     end
 
     trait :next_year do
-      active_year Time.now.year
+      active_year TimeKeeper.datetime_of_record.year
     end
 
     trait :premiums_for_2015 do
@@ -93,6 +93,7 @@ FactoryGirl.define do
         create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: Date.new(2015,1,1))
       end
     end
+
 
     trait :with_next_year_premium_tables do
       transient do
@@ -114,11 +115,11 @@ FactoryGirl.define do
 
     factory :renewal_individual_health_plan,      traits: [:individual_health, :next_year, :with_premium_tables]
     factory :renewal_shop_health_plan,            traits: [:shop_health, :next_year, :with_premium_tables]
+
     factory :renewal_individual_dental_plan,      traits: [:individual_dental, :next_year, :with_premium_tables]
     factory :renewal_individual_catastophic_plan, traits: [:catastrophic, :next_year, :with_premium_tables]
     factory :renewal_csr_87_plan,                 traits: [:csr_87, :next_year, :with_premium_tables]
     factory :renewal_csr_00_plan,                 traits: [:csr_00, :next_year, :with_premium_tables]
-
   end
 
   factory :premium_table do

@@ -361,7 +361,7 @@ class ConsumerRole
 
     before_all_events :ensure_validation_states
 
-    event :import, :after => [:record_transition, :notify_of_eligibility_change] do
+    event :import, :after => [:record_transition, :notify_of_eligibility_change, :update_all_verification_types] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
       transitions from: :dhs_pending, to: :fully_verified
@@ -400,6 +400,7 @@ class ConsumerRole
       transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
@@ -457,9 +458,9 @@ class ConsumerRole
 
   def verify_ivl_by_admin(*args)
     if person.ssn || is_native?
-      self.ssn_valid_citizenship_valid! verification_attr
+      self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
-      self.pass_dhs! verification_attr
+      self.pass_dhs! verification_attr(args.first)
     end
   end
 
@@ -562,12 +563,12 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = false
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = Time.now
+    self.residency_determined_at = TimeKeeper.datetime_of_record
     self.is_state_resident = true
   end
 
@@ -661,6 +662,24 @@ class ConsumerRole
     person.verification_types.all?{ |type| is_type_verified?(type) }
   end
 
+  def update_all_verification_types(*args)
+    person.verification_types.each do |v_type|
+      update_verification_type(v_type, "person is fully verified", lawful_presence_determination.try(:vlp_authority))
+    end
+  end
+
+  def update_verification_type(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.authorize!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type} successfully verified."
+  end
+
   def is_type_verified?(type)
     case type
       when 'Social Security Number'
@@ -693,7 +712,7 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > TimeKeeper.datetime_of_record
   end
 
   def record_transition(*args)
@@ -703,9 +722,10 @@ class ConsumerRole
     )
   end
 
-  def verification_attr
-    OpenStruct.new({:determined_at => Time.now,
-                    :vlp_authority => "hbx"
+  def verification_attr(*authority)
+    authority = authority.first == "curam" ? "curam" : "hbx"
+    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
+                    :vlp_authority => authority
                    })
   end
 end
