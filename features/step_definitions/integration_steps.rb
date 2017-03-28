@@ -569,19 +569,10 @@ When(/^.+ accepts? the matched employer$/) do
   find_by_id('btn-continue').click
 end
 
-
-Then(/Employee (.*) should see \"my account\" page with enrollment/) do |named_person|
-  census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
-
-  sleep 1 #wait for e-mail nonsense
-  enrollment = first('.hbx-enrollment-panel')
-  enrollment.find('.enrollment-effective', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
-end
-
 Then(/^Employee (.+) should see coverage effective date/) do |named_person|
   employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
   census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
-  
+
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
 end
