@@ -179,15 +179,17 @@ $(function () {
             }
         },
         series: [{
+            <% @covered_lives.each do |covered_lives| %>
             name: 'Cancel',
-            data: [750, 855, 402, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.cancel_jan%>, <%= covered_lives.cancel_feb%>, <%= covered_lives.cancel_mar%>, <%= covered_lives.cancel_apr%>, <%= covered_lives.cancel_may%>, <%= covered_lives.cancel_jun%>, <%= covered_lives.cancel_jul%>, <%= covered_lives.cancel_aug%>, <%= covered_lives.cancel_sep%>, <%= covered_lives.cancel_oct%>, <%= covered_lives.cancel_nov%>, <%= covered_lives.cancel_dec%>]
         }, {
             name: 'Term',
-            data: [981, 1042, 699, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.term_jan%>, <%= covered_lives.term_feb%>, <%= covered_lives.term_mar%>, <%= covered_lives.term_apr%>, <%= covered_lives.term_may%>, <%= covered_lives.term_jun%>, <%= covered_lives.term_jul%>, <%= covered_lives.term_aug%>, <%= covered_lives.term_sep%>, <%= covered_lives.term_oct%>, <%= covered_lives.term_nov%>, <%= covered_lives.term_dec%>]
         }, {
             name: 'Reinstate',
-            data: [24, 13, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.reinstate_jan%>, <%= covered_lives.reinstate_feb%>, <%= covered_lives.reinstate_mar%>, <%= covered_lives.reinstate_apr%>, <%= covered_lives.reinstate_may%>, <%= covered_lives.reinstate_jun%>, <%= covered_lives.reinstate_jul%>, <%= covered_lives.reinstate_aug%>, <%= covered_lives.reinstate_sep%>, <%= covered_lives.reinstate_oct%>, <%= covered_lives.reinstate_nov%>, <%= covered_lives.reinstate_dec%>]
             }]
+            <% end %>
         });
     });
 </script>
@@ -535,6 +537,7 @@ $(function () {
 <h5>Covered Lives by Effective Month</h5>
     <table class="table table-hover table-condensed">
     <thead>
+    <% @enrollments.each do |enrollment| %>
       <tr>
         <th class="texLef">Enrollment</th>
         <th>Jan</th>
@@ -555,99 +558,97 @@ $(function () {
     <tbody>
       <tr>
         <td class="texLef">Selected</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= enrollment.selected_jan %></td>
+        <td><%= enrollment.selected_feb %></td>
+        <td><%= enrollment.selected_mar %></td>
+        <td><%= enrollment.selected_apr %></td>
+        <td><%= enrollment.selected_may %></td>
+        <td><%= enrollment.selected_jun %></td>
+        <td><%= enrollment.selected_jul %></td>
+        <td><%= enrollment.selected_aug %></td>
+        <td><%= enrollment.selected_sep %></td>
+        <td><%= enrollment.selected_oct %></td>
+        <td><%= enrollment.selected_nov %></td>
+        <td><%= enrollment.selected_dec %></td>
+        
       </tr>
       <tr>
         <td class="texLef">Effectuated</td> 
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= enrollment.effectuated_jan %></td>
+        <td><%= enrollment.effectuated_feb %></td>
+        <td><%= enrollment.effectuated_mar %></td>
+        <td><%= enrollment.effectuated_apr %></td>
+        <td><%= enrollment.effectuated_may %></td>
+        <td><%= enrollment.effectuated_jun %></td>
+        <td><%= enrollment.effectuated_jul %></td>
+        <td><%= enrollment.effectuated_aug %></td>
+        <td><%= enrollment.effectuated_sep %></td>
+        <td><%= enrollment.effectuated_oct %></td>
+        <td><%= enrollment.effectuated_nov %></td>
+        <td><%= enrollment.effectuated_dec %></td>
+
       </tr>
       <tr>
         <td class="texLef">Effectuation %</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <!-- <td class="texLef">Effectuated</td>  -->
+        <td><%= enrollment.effectuation_share_jan %></td>
+        <td><%= enrollment.effectuation_share_feb %></td>
+        <td><%= enrollment.effectuation_share_mar %></td>
+        <td><%= enrollment.effectuation_share_apr %></td>
+        <td><%= enrollment.effectuation_share_may %></td>
+        <td><%= enrollment.effectuation_share_jun %></td>
+        <td><%= enrollment.effectuation_share_jul %></td>
+        <td><%= enrollment.effectuation_share_aug %></td>
+        <td><%= enrollment.effectuation_share_sep %></td>
+        <td><%= enrollment.effectuation_share_oct %></td>
+        <td><%= enrollment.effectuation_share_nov %></td>
+        <td><%= enrollment.effectuation_share_dec %></td>
       </tr>
       <tr>
         <td class="texLef">Paying</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= enrollment.paying_jan %></td>
+        <td><%= enrollment.paying_feb %></td>
+        <td><%= enrollment.paying_mar %></td>
+        <td><%= enrollment.paying_apr %></td>
+        <td><%= enrollment.paying_may %></td>
+        <td><%= enrollment.paying_jun %></td>
+        <td><%= enrollment.paying_jul %></td>
+        <td><%= enrollment.paying_aug %></td>
+        <td><%= enrollment.paying_sep %></td>
+        <td><%= enrollment.paying_oct %></td>
+        <td><%= enrollment.paying_nov %></td>
+        <td><%= enrollment.paying_dec %></td>
       </tr>
       <tr>
         <td class="texLef">Terminated</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= enrollment.terminated_jan %></td>
+        <td><%= enrollment.terminated_feb %></td>
+        <td><%= enrollment.terminated_mar %></td>
+        <td><%= enrollment.terminated_apr %></td>
+        <td><%= enrollment.terminated_may %></td>
+        <td><%= enrollment.terminated_jun %></td>
+        <td><%= enrollment.terminated_jul %></td>
+        <td><%= enrollment.terminated_aug %></td>
+        <td><%= enrollment.terminated_sep %></td>
+        <td><%= enrollment.terminated_oct %></td>
+        <td><%= enrollment.terminated_nov %></td>
+        <td><%= enrollment.terminated_dec %></td>
       </tr>
       <tr>
         <td class="texLef">Canceled</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= enrollment.canceled_jan %></td>
+        <td><%= enrollment.canceled_feb %></td>
+        <td><%= enrollment.canceled_mar %></td>
+        <td><%= enrollment.canceled_apr %></td>
+        <td><%= enrollment.canceled_may %></td>
+        <td><%= enrollment.canceled_jun %></td>
+        <td><%= enrollment.canceled_jul %></td>
+        <td><%= enrollment.canceled_aug %></td>
+        <td><%= enrollment.canceled_sep %></td>
+        <td><%= enrollment.canceled_oct %></td>
+        <td><%= enrollment.canceled_nov %></td>
+        <td><%= enrollment.canceled_dec %></td>
+        <% end %>
       </tr>
     </tbody>
     </table>

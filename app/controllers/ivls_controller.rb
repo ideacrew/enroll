@@ -1,7 +1,7 @@
 class IvlsController < ApplicationController
 
   def home
-    @enrollments=IvlCovered::EnrollmentType.all
+    @enrollments=IvlCovered::CoveredLivesMonth.all
     @seps=IvlCovered::SepType.all
     @discontinuedreinstatedlives=IvlCovered::SepType.all
     @totalaccounts=IvlCovered::TotalAccounts.all
@@ -14,6 +14,8 @@ class IvlsController < ApplicationController
     @over_all_aptc=IvlCovered::OverallAptc.all
     @overall_genders=IvlCovered::OverallGenderTypes.all
     @annual_covered_lives=IvlCovered::AnnualCoveredLives.all
+
+    # @annual_covered=IvlCovered::ActiveCoveredLives.all
   end
 
   def enrollment

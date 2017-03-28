@@ -3,65 +3,50 @@ module IvlCovered
     include Mongoid::Document
     store_in collection: "ivlCovered"
     field :tile , type: String
-    field :month_one, type: String
-    field :month_two, type: String
-    field :month_three, type: String
-    field :month_four, type: String
+    field :cancel_jan, type: String
+    field :cancel_feb, type: String
+    field :cancel_mar, type: String
+    field :cancel_apr, type: String
 
-    field :month_five, type: String
-    field :month_six, type: String
-    field :month_seven, type: String
-    field :month_eight, type: String
+    field :cancel_may, type: String
+    field :cancel_jun, type: String
+    field :cancel_jul, type: String
+    field :cancel_aug, type: String
 
-    field :month_nine, type: String
-    field :month_ten, type: String
-    field :month_eleven, type: String
-    field :month_twelve, type: String
+    field :cancel_sep, type: String
+    field :cancel_oct, type: String
+    field :cancel_nov, type: String
+    field :cancel_dec, type: String
     
-    field :cancel_one, type: String
-    field :cancel_two, type: String
-    field :cancel_three, type: String
-    field :cancel_four, type: String
+    field :term_jan, type: String
+    field :term_feb, type: String
+    field :term_mar, type: String
+    field :term_apr, type: String
 
-    field :cancel_five, type: String
-    field :cancel_six, type: String
-    field :cancel_seven, type: String
-    field :cancel_eight, type: String
+    field :term_may, type: String
+    field :term_jun, type: String
+    field :term_jul, type: String
+    field :term_aug, type: String
 
-    field :cancel_nine, type: String
-    field :cancel_ten, type: String
-    field :cancel_eleven, type: String
-    field :cancel_twelve, type: String
+    field :term_sep, type: String
+    field :term_oct, type: String
+    field :term_nov, type: String
+    field :term_dec, type: String
 
-    field :terminations_one, type: String
-    field :terminations_two, type: String
-    field :terminations_three, type: String
-    field :terminations_four, type: String
+    field :reinstate_jan, type: String
+    field :reinstate_feb, type: String
+    field :reinstate_mar, type: String
+    field :reinstate_apr, type: String
 
-    field :terminations_five, type: String
-    field :terminations_six, type: String
-    field :terminations_seven, type: String
-    field :terminations_eight, type: String
+    field :reinstate_may, type: String
+    field :reinstate_jun, type: String
+    field :reinstate_jul, type: String
+    field :reinstate_aug, type: String
 
-    field :terminations_nine, type: String
-    field :terminations_ten, type: String
-    field :terminations_eleven, type: String
-    field :terminations_twelve, type: String
-
-    field :reinstatements_one, type: String
-    field :reinstatements_two, type: String
-    field :reinstatements_three, type: String
-    field :reinstatements_four, type: String
-
-    field :reinstatements_five, type: String
-    field :reinstatements_six, type: String
-    field :reinstatements_seven, type: String
-    field :reinstatements_eight, type: String
-
-    field :reinstatements_nine, type: String
-    field :reinstatements_ten, type: String
-    field :reinstatements_eleven, type: String
-    field :reinstatements_twelve, type: String
+    field :reinstate_sep, type: String
+    field :reinstate_oct, type: String
+    field :reinstate_nov, type: String
+    field :reinstate_dec, type: String
 
     default_scope ->{where(tile: "right_discontinued" )}
   end
