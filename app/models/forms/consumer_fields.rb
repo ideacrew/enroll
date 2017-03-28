@@ -32,13 +32,15 @@ module Forms
 
         def naturalized_citizen
           return @naturalized_citizen if !@naturalized_citizen.nil?
-          return nil if @citizen_status.blank?
+          # return nil if @citizen_status.blank?
+          return nil if @naturalized_citizen.nil?
           @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == @citizen_status)
         end
 
         def indian_tribe_member
           return @indian_tribe_member if !@indian_tribe_member.nil?
-          return nil if @citizen_status.blank?
+          # return nil if @citizen_status.blank?
+          return nil if @indian_tribe_member.nil?
           @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == @citizen_status)
         end
 
