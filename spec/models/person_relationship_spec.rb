@@ -37,31 +37,15 @@ describe PersonRelationship, dbclean: :after_each do
 
     let(:kinds) {  [
       "spouse",
-      "life_partner",
+      "domestic_partner", # no inverse
       "child",
-      "adopted_child",
-      "annuitant",
-      "aunt_or_uncle",
-      "brother_or_sister_in_law",
-      "collateral_dependent",
-      "court_appointed_guardian",
-      "daughter_or_son_in_law",
-      "dependent_of_a_minor_dependent",
-      "father_or_mother_in_law",
-      "foster_child",
-      "grandchild",
-      "grandparent",
-      "great_grandchild",
-      "great_grandparent",
-      "nephew_or_niece",
-      "other_relationship",
       "parent",
       "sibling",
-      "sponsored_dependent",
-      "stepchild",
-      "stepparent",
-      "trustee",
-      "unrelated"
+      "unrelated",
+      "aunt_or_uncle",
+      "nephew_or_niece",
+      "grandchild",
+      "grandparent"
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
