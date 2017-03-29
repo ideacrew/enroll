@@ -24,16 +24,17 @@ namespace :reports do
       families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
       families.each do |family|
         enrollments=family.active_household.hbx_enrollments
-        family.active_household.hbx_enrollments.where(aasm_state:"coverage_canceled").each do |canceled_enrollment|
+        canceled_enrollments=enrollments.where(aasm_state:"coverage_canceled")
+        canceled_enrollments.each do |canceled_enrollment|
           enrollments.each do |enrollment|
             if canceled_enrollment.kind == enrollment.kind
-              cancel_member=canceled_enrollment.hbx_enrollment_members.where(is_subscriber:true).first
-              reference_member=enrollment.hbx_enrollment_members.where(is_subscriber:true).first
-              if cancel_member.id == reference_member.id
+              cancel_member=canceled_enrollment.subscriber
+              reference_member=enrollment.subscriber
+              if cancel_member && reference_member && cancel_member.person.id == reference_member.person.id
                 cancel_effective=canceled_enrollment.effective_on
                 reference_effective=enrollment.effective_on
                 reference_submitted=enrollment.submitted_at
-                if cancel_effective > reference_submitted && cancel_effective < reference_effective
+                if reference_submitted && cancel_effective && reference_effective && cancel_effective > reference_submitted && cancel_effective < reference_effective
                   if canceled_enrollment.kind == "individual"
                     if canceled_enrollment.effective_on.year == enrollment.effective_on.year
                       csv << [cancel_member.person.hbx_id,
