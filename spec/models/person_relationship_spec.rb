@@ -37,7 +37,7 @@ describe PersonRelationship, dbclean: :after_each do
 
     let(:kinds) {  [
       "spouse",
-      "domestic_partner", # no inverse
+      "domestic_partner",
       "child",
       "parent",
       "sibling",

@@ -16,7 +16,7 @@ class PersonRelationship
 
   Relationships = [
     "spouse",
-    "domestic_partner", # no inverse
+    "domestic_partner",
     "child",
     "parent",
     "sibling",
