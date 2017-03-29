@@ -108,7 +108,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the plan start" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -154,13 +154,13 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     it "should display the Plan Start" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match /effective date/i
+      expect(rendered).to match /plan start/i
     end
 
     it "should display market" do
