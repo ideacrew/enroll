@@ -296,6 +296,7 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
 end
 
 describe "checking validations on family member object" do
+  let(:family_id) { double }
   let(:family) { double("family", :family_members => []) }
   let(:member_attributes) {
     { "first_name"=>"test",
@@ -314,12 +315,11 @@ describe "checking validations on family member object" do
       "addresses"=>
       { "0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
         "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}
-      },
-      "family_id"=>"581c9b9dc5231b8df7000010"
+      }
     }
   }
 
-  subject { Forms::FamilyMember.new(member_attributes) }
+  subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
 
   before do
     allow(subject).to receive(:family).and_return family
@@ -337,7 +337,7 @@ describe "checking validations on family member object" do
 
   context "user answered for citizen status question" do
     context "when user answered us citizen as true" do
-      subject { Forms::FamilyMember.new(member_attributes.merge({"us_citizen"=>"true"})) }
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true"})) }
       it "should return errors with naturalization, native american / alaskan native and incarceration status" do
         subject.save
         expect(subject.errors.full_messages).to eq ["Naturalized citizen is required", "native american / alaskan native status is required", "Incarceration status is required"]
@@ -345,7 +345,7 @@ describe "checking validations on family member object" do
     end
 
     context "when user answered us citizen as false" do
-      subject { Forms::FamilyMember.new(member_attributes.merge({"us_citizen"=>"false"})) }
+      subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
       it "should return errors with Eligible immigration, native american / alaskan native and incarceration status" do
         subject.save
         expect(subject.errors.full_messages).to eq ["Eligible immigration status is required", "native american / alaskan native status is required", "Incarceration status is required"]
@@ -354,7 +354,7 @@ describe "checking validations on family member object" do
   end
 
   context "when user answered for citizen & naturalization" do
-    subject { Forms::FamilyMember.new(member_attributes.merge({"us_citizen"=>"true", "naturalized_citizen"=>"false"})) }
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false"})) }
     it "should return errors with native american / alaskan native and incarceration status" do
       subject.save
       expect(subject.errors.full_messages).to eq ["native american / alaskan native status is required", "Incarceration status is required"]
@@ -362,7 +362,7 @@ describe "checking validations on family member object" do
   end
 
   context "when user not answered for incarceration status" do
-    subject { Forms::FamilyMember.new(member_attributes.merge({"us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false"})) }
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false"})) }
     it "should return errors with incarceration status" do
       subject.save
       expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
@@ -370,7 +370,7 @@ describe "checking validations on family member object" do
   end
 
   context "when satisfied with all the validations" do
-    subject { Forms::FamilyMember.new(member_attributes.merge({"us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false"})) }
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"true", "naturalized_citizen"=>"false", "indian_tribe_member"=>"false", "is_incarcerated"=>"false"})) }
     it "should return true" do
       expect(subject.valid?).to eq true
     end
