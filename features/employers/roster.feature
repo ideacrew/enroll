@@ -58,3 +58,4 @@ Feature: Employer can view their employees
     And clicks on the Add New Employee button
     Then fill the form with hired date as future date
     Then employer should see the message Your employee was successfully added to your roster on page
+    And employer logs out
