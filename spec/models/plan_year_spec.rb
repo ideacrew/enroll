@@ -710,7 +710,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it "should record state transition and timestamp" do
           expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.from_state).to eq "draft"
           expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.to_state).to eq "publish_pending"
-          expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.transition_at.utc).to be_within(1.second).of(DateTime.now)
+          expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.transition_at.utc).to be_within(1.second).of(TimeKeeper.datetime_of_record)
         end
 
         context "and the applicant chooses to cancel application submission" do
