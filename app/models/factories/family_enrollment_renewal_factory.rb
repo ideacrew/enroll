@@ -32,32 +32,35 @@ module Factories
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| !enrollment.currently_active? && !enrollment.cobra_future_active? }
+      begin
+        if shop_enrollments.present?
+          passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
 
-      if shop_enrollments.present?
-        passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
-
-        passive_renewals.reject! do |renewal|
-          renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
-        end
-        
-        if passive_renewals.blank?
-          active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
-          if active_enrollment.present? && active_enrollment.inactive?
-            renew_waived_enrollment(active_enrollment)
-            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
-          elsif renewal_plan_offered_by_er?(active_enrollment)
-            renewal_enrollment = renewal_builder(active_enrollment)
-            renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
-            renewal_enrollment.decorated_hbx_enrollment
-            save_renewal_enrollment(renewal_enrollment, active_enrollment)
-            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal")
-          else
-            ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal")
+          passive_renewals.reject! do |renewal|
+            renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
           end
+
+          if passive_renewals.blank?
+            active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
+            if active_enrollment.present? && active_enrollment.inactive?
+              renew_waived_enrollment(active_enrollment)
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
+            elsif renewal_plan_offered_by_er?(active_enrollment)
+              renewal_enrollment = renewal_builder(active_enrollment)
+              renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
+              renewal_enrollment.decorated_hbx_enrollment
+              save_renewal_enrollment(renewal_enrollment, active_enrollment)
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal")
+            else
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal")
+            end
+          end
+        elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
+          renew_waived_enrollment
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
         end
-      elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
-        renew_waived_enrollment
-        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled")
+      rescue Exception => e
+        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
      
       return family
