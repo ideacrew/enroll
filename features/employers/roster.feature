@@ -68,3 +68,12 @@ Feature: Employer can view their employees
     And ER enters terminated EE name on search bar
     Then ER should see the terminated searched EE on the roster page
     And employer logs out
+
+  Scenario: Employer adds employee with future hire date
+    Given an employer exists
+    And the employer has employees
+    And the employer is logged in
+    When they visit the Employee Roster
+    And clicks on the Add New Employee button
+    Then fill the form with hired date as future date
+    Then employer should see the message Your employee was successfully added to your roster on page
