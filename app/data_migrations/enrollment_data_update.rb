@@ -13,15 +13,18 @@ class EnrollmentDataUpdate < MongoidMigrationTask
     #IVL Enrollments should be transitioned from the Canceled state to the Terminated state.
     #SHOP Enrollments should be transitioned from the Canceled state to the Termination_Pending if coverage end date is in the future,
     #otherwise they should be transitioned to Terminated state.                                                                                                                                                                                                                                                                                  require 'csv'
-    namespace :reports do
+
       families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
       families.each do |family|
         enrollments=family.active_household.hbx_enrollments
         family.active_household.hbx_enrollments.where(aasm_state:"coverage_canceled").each do |canceled_enrollment|
         enrollments.each do |enrollment|
           if canceled_enrollment.kind == enrollment.kind
+            puts canceled_enrollment.inspect
+            puts enrollment.inspect
             cancel_member=canceled_enrollment.hbx_enrollment_members.where(is_subscriber:true).first
             reference_member=enrollment.hbx_enrollment_members.where(is_subscriber:true).first
+
             if cancel_member.id == reference_member.id
               cancel_effective=canceled_enrollment.effective_on
               reference_effective=enrollment.effective_on
@@ -46,6 +49,6 @@ class EnrollmentDataUpdate < MongoidMigrationTask
         end
         end
        end
-    end
+
   end
 end
