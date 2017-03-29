@@ -35,7 +35,7 @@ RSpec.describe PortalHeaderHelper, :type => :helper do
     end
 
     context "has_consumer_role?" do
-      let(:current_user) { FactoryGirl.build(:user, :identity_verified_date => Time.now)}
+      let(:current_user) { FactoryGirl.build(:user, :identity_verified_date => TimeKeeper.datetime_of_record)}
       before(:each) do
         allow(current_user).to receive(:has_consumer_role?).and_return(true)
         allow(controller).to receive(:controller_path).and_return("insured")

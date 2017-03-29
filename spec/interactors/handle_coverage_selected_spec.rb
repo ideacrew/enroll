@@ -7,7 +7,7 @@ describe HandleCoverageSelected do
   end
 
   let(:the_hbx_id) { "ALKJFKLJEIJFDLF" }
-  let(:the_update_time) { Time.now }
+  let(:the_update_time) { TimeKeeper.datetime_of_record }
 
 
   describe "given an IVL policy with multiple members" do
@@ -21,7 +21,7 @@ describe HandleCoverageSelected do
     before(:each) do
       allow(enrollment_member_1).to receive(:ivl_coverage_selected)
       allow(enrollment_member_2).to receive(:ivl_coverage_selected)
-      allow(Time).to receive(:now).and_return(the_update_time)
+      allow(TimeKeeper).to receive(:datetime_of_record).and_return(the_update_time)
       allow(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
     end
 
@@ -90,7 +90,7 @@ describe HandleCoverageSelected do
       let(:purchased_in_sep) { true }
 
       before(:each) do
-        allow(Time).to receive(:now).and_return(the_update_time)
+        allow(TimeKeeper).to receive(:datetime_of_record).and_return(the_update_time)
         allow(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
       end
 

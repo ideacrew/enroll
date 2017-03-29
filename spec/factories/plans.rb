@@ -77,11 +77,11 @@ FactoryGirl.define do
     end
 
     trait :this_year do
-      active_year Time.now.year
+      active_year TimeKeeper.datetime_of_record.year
     end
 
     trait :next_year do
-      active_year Time.now.year
+      active_year TimeKeeper.datetime_of_record.year
     end
 
     trait :premiums_for_2015 do
