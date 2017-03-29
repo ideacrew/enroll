@@ -333,7 +333,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#admin_user" do
+  describe "#admin_user?" do
     let(:person_id) { double }
     let(:admin_user) { FactoryGirl.create(:user, :hbx_staff)}
     let(:user) { FactoryGirl.create(:user, :consumer)}
@@ -343,16 +343,16 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should return true when current user is admin & accessing other's account" do
-      expect(helper.admin_user(admin_user, person.consumer_role)).to eq true
+      expect(helper.admin_user?(admin_user, person.consumer_role)).to eq true
     end
 
     it "should return false when the current user is not an admin" do
-      expect(helper.admin_user(user, person.consumer_role)).to eq false
+      expect(helper.admin_user?(user, person.consumer_role)).to eq false
     end
 
     it "should return false when admin user has hbx staff role & accessing his/her own account" do
       allow(person).to receive(:user).and_return admin_user
-      expect(helper.admin_user(admin_user, person.consumer_role)).to eq false
+      expect(helper.admin_user?(admin_user, person.consumer_role)).to eq false
     end
   end
 end

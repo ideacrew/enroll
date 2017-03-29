@@ -226,7 +226,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
 
     it "should redirect to family members path when current user is admin" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
-      allow(controller).to receive(:admin_user).and_return true
+      allow(controller).to receive(:admin_user?).and_return true
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
@@ -338,7 +338,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       before :each do
         allow(user).to receive(:person).and_return(person)
         allow(person).to receive(:completed_identity_verification?).and_return(false)
-        allow(controller).to receive(:admin_user).and_return false
+        allow(controller).to receive(:admin_user?).and_return false
         allow(person).to receive(:consumer_role).and_return consumer_role
       end
 
@@ -348,7 +348,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
 
       it "should redirect to family members path if current user is an admin user" do
-        allow(controller).to receive(:admin_user).and_return true
+        allow(controller).to receive(:admin_user?).and_return true
         get "ridp_agreement"
         expect(response).to redirect_to insured_family_members_path(consumer_role_id: consumer_role.id)
       end
