@@ -74,10 +74,6 @@
             }
         },
         series: [{
-            name: '2016',
-            data: [17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000, 17000]
-
-        }, {
             name: '2017',
             data: [22000, 22000, 22000, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -225,22 +221,22 @@ $(function () {
 <div class="row row-content">
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>25,224 Total Covered <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% MoM</div>
+  <div class="panel-body"><b>25,224 Total Covered</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>7,834 New Coverage YTD <span class="glyphicon glyphicon-arrow-up" style="color: green"></span></b> 62% MoM</div>
+  <div class="panel-body"><b>7,834 New Coverage YTD</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>1,980 Terminations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -12% MoM</div>
+  <div class="panel-body"><b>1,980 Terminations YTD</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>1,350 Cancellations YTD <span class="glyphicon glyphicon-arrow-down" style="color: green"></span></b> -10% MoM</div>
+  <div class="panel-body"><b>1,350 Cancellations YTD</b></div>
 </div>
 </div>
         
@@ -250,12 +246,12 @@ $(function () {
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
     <table class="table table-hover table-condensed">
-    <tbody>
+    <thead>
     <tr class="tabSpc1">
-        <td class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm">More Information</a></td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <th class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm">More Information</a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
       </tr>
       <tr>
       <% @annual_enrollments.each do |enrollment| %>
@@ -265,6 +261,9 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+
+      <tbody>
       <tr>
         <td class="texLef">Auto Renewals</td>
         <td><%= enrollment.auto_renewals_select %></td>
@@ -294,21 +293,21 @@ $(function () {
         <td><%= (enrollment.sep_pay_share.to_f * 100).to_i %>%</td>
         <% end %>
       </tr>
-
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
+      </tbody>
 
+      <thead>
       <tr class="tabSpc1">
-        <td class="texLef" colspan="4">Coverage <a href="ivl_dd_live2.htm">More Information</a></td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <th class="texLef" colspan="4">Coverage <a href="ivl_dd_live2.htm">More Information</a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
       </tr>
-      
       <tr>
       <% @annual_carriers.each do |carrier| %>
         <th class="texLef">Carrier</th>
@@ -317,6 +316,8 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+      <tbody>
       <tr>
         <td class="texLef"><%= carrier.carrier_first_name %></td>
         <td><%= carrier.carrier_first_select %></td>
@@ -332,14 +333,15 @@ $(function () {
         <td><%= (carrier.carrier_second_pay_share.to_f * 100).to_i %>%</td>
         <% end %>
       </tr>
-
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
+      </tbody>
 
+      <thead>
       <tr>
       <% @metal_types.each do |metal| %>
         <th class="texLef">Metal</th>
@@ -348,6 +350,8 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+      <tbody>
       <tr>
         <td class="texLef">Platinum</td>
         <td><%= metal.platinum_select %></td>
@@ -385,6 +389,7 @@ $(function () {
         <td><%= (metal.catastrophic_pay_share.to_f * 100).to_i  %>%</td>
         <% end %>
       </tr>
+      </tbody>
 
       <tr>
         <td>&nbsp;</td>
@@ -392,7 +397,8 @@ $(function () {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-
+        
+      <thead> 
       <tr class="tabSpc1">
         <td class="texLef" colspan="4">Demographic <a href="ivl_dd_live3.htm">More Information</a></td>
         <td>&nbsp;</td>
@@ -407,6 +413,9 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+
+      <tbody>
       <tr>
         <td class="texLef">Primary</td>
         <td><%= status.primary_select %></td>
@@ -422,6 +431,7 @@ $(function () {
         <td><%= (status.dependent_pay_share.to_f * 100).to_i %>%</td>
         <% end %>
       </tr>
+      </tbody>
 
       <tr>
         <td>&nbsp;</td>
@@ -430,6 +440,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <thead>
       <% @age_groups.each do |age| %>
         <th class="texLef">Age Group</th>
         <th>Select</th>
@@ -437,6 +448,9 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+
+      <tbody>
       <tr>
         <td class="texLef">< 1</td>
         <td><%= age.zero_select %></td>
@@ -494,6 +508,7 @@ $(function () {
         <td><%= (age.sixtyfive_pay_share.to_f * 100).to_i %>%</td>
         <% end %>
       </tr>
+      </tbody>
 
       <tr>
         <td>&nbsp;</td>
@@ -502,6 +517,7 @@ $(function () {
         <td>&nbsp;</td>
       </tr>
       <tr>
+      <thead>
       <% @overall_genders.each do |genders| %>
         <th class="texLef">Gender</th>
         <th>Select</th>
@@ -509,6 +525,9 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
+      </thead>
+
+      <tbody>
       <tr>
         <td class="texLef">Male</td>
         <td><%= genders.male_select %></td>
@@ -524,6 +543,7 @@ $(function () {
         <td><%= (genders.female_pay_share.to_f * 100).to_i %>%</td>
         <% end %>
       </tr>
+      </tbody>
     </tbody>
     </table>
 
@@ -531,10 +551,10 @@ $(function () {
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h5>Active Covered Lives</h5>
+<h5><b>Active Covered Lives</b></h5>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h5>Covered Lives by Effective Month</h5>
+<h5><b>Covered Lives by Effective Month</b></h5>
     <table class="table table-hover table-condensed">
     <thead>
     <% @enrollments.each do |enrollment| %>
@@ -653,7 +673,7 @@ $(function () {
     </tbody>
     </table>
 
- <h5>Discontinued or Reinstated Covered Lives by Transaction Month</h5>
+ <h5><b>Discontinued or Reinstated Covered Lives by Transaction Month</b></h5>
  <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
 
     </div>
