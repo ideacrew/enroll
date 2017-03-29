@@ -9,5 +9,20 @@ module Queries
       end
       enroll_pol_ids
     end
+
+    def self.shop_monthly_enrollments(feins, effective_on)
+      qs = ::Queries::ShopMonthlyEnrollments.new
+
+      qs.filter_families_by_employers(feins, effective_on)
+        .unwind_enrollments
+        .filter_enrollments_by_employer(feins, effective_on)
+        .filter_enrollments_by_status
+        .filter_by_open_enrollment
+        .sort_enrollments
+        .group_them_by_kind
+        .project_enrollment_ids
+
+      qs.evaluate.collect{|record| record['enrollment_hbx_id']}
+    end
   end
 end
