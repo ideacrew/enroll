@@ -18,8 +18,8 @@ module Queries
         .filter_enrollments_by_employer(feins, effective_on)
         .filter_enrollments_by_status
         .filter_by_open_enrollment
-        .sort_enrollments
-        .group_them_by_kind
+        .sort_by_submitted_at
+        .group_by_coverage_kind_and_assignment
         .project_enrollment_ids
 
       qs.evaluate.collect{|record| record['enrollment_hbx_id']}
