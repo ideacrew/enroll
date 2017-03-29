@@ -748,7 +748,7 @@ class ConsumerRole
 
   def verification_attr(*authority)
     authority = authority.first == "curam" ? "curam" : "hbx"
-    OpenStruct.new({:determined_at => TimeKeeper.date_of_record,
+    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
                     :vlp_authority => authority
                    })
   end
