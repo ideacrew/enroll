@@ -64,14 +64,14 @@ module Queries
       self
     end
 
-    def sort_enrollments
+    def sort_by_submitted_at
       add({
        "$sort" => {"households.hbx_enrollments.submitted_at" => 1}
        })
       self
     end
 
-    def group_them_by_kind
+    def group_by_coverage_kind_and_assignment
       add({
         "$group" => {
           "_id" => {
@@ -97,8 +97,9 @@ module Queries
 
     def find_benefit_group_ids(feins, effective_on)
       return @bg_ids_list if defined? @bg_ids_list
+      formatted_feins = feins.collect{|e| prepend_zeros(e.to_s, 9) }
 
-      employers = feins.collect{|e| prepend_zeros(e.to_s, 9) }.collect{|fein| EmployerProfile.find_by_fein(fein)}.compact
+      employers = formatted_feins.collect{|fein| EmployerProfile.find_by_fein(fein)}.compact
       @bg_ids_list = employers.inject([]) do |id_list, employer|
         plan_year = employer.plan_years.published_or_renewing_published.where(:start_on => effective_on).first
         if plan_year.present?
