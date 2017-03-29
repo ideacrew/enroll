@@ -1,50 +1,78 @@
 module Queries
   class ShopMonthlyEnrollments
+    include QueryHelpers
 
-    def initialize(feins = [])
-      @feins = feins.collect{|e| prepend_zeros(e.to_s, 9) }
+    def initialize
+      @pipeline = []
     end
 
-    def find
-      @feins.inject({}) do |enrollments_under_employers, fein|
-        employer_profile = EmployerProfile.find_by_fein(fein)
-        if employer_profile.present?
-          plan_year = employer_profile.plan_years.published_or_renewing_published.order_by("start_on DESC").first
-          if plan_year.present?
-            enrollments_under_employers[fein] = enrollment_hbx_ids(plan_year)
-          end
-        end
-        enrollments_under_employers
-      end
+    def add(step)
+      @pipeline << step.to_hash
     end
 
-    def enrollment_hbx_ids(plan_year)
-      id_list = plan_year.benefit_groups.map(&:id)
+    def evaluate
+      Family.collection.aggregate(@pipeline)
+    end
 
-      Family.collection.aggregate([
-        {"$match" => { 
-          "households.hbx_enrollments" => { "$elemMatch" => {
-            "benefit_group_id" => {"$in" => id_list},
-            "aasm_state" => {"$in" => valid_enrollment_statuses},
-            "effective_on" => plan_year.start_on,
-            "enrollment_kind" => "open_enrollment"
-        }}}},
-        {"$unwind" => "$households"},
-        {"$unwind" => "$households.hbx_enrollments"},
-        {"$match" => {
-          "households.hbx_enrollments.benefit_group_id" => {"$in" => id_list},
-          "households.hbx_enrollments.aasm_state" => {"$in" => valid_enrollment_statuses},
-          "households.hbx_enrollments.effective_on" => plan_year.start_on,
+    def filter_families_by_employers(feins, effective_on)
+      find_benefit_group_ids(feins, effective_on)
+    
+      add({
+        "$match" => { 
+          "households.hbx_enrollments.benefit_group_id" => {"$in" => @bg_ids_list}
+        }
+      })
+
+      self
+    end
+
+    def unwind_enrollments
+      add({"$unwind" => "$households"})
+      add({"$unwind" => "$households.hbx_enrollments"})
+      self
+    end
+
+    def filter_enrollments_by_status
+      add({
+        "$match" => {
+          "households.hbx_enrollments.aasm_state" => {
+            "$in" => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+          }
+        }
+      })
+      self
+    end
+
+    def filter_enrollments_by_employer(feins, effective_on)
+      find_benefit_group_ids(feins, effective_on)
+
+      add({
+        "$match" => {
+          "households.hbx_enrollments.benefit_group_id" => {"$in" => @bg_ids_list},
+          "households.hbx_enrollments.effective_on" => effective_on          
+        }
+      })
+      self
+    end
+
+    def filter_by_open_enrollment
+      add({
+        "$match" => {
           "households.hbx_enrollments.enrollment_kind" => "open_enrollment"
-        }},
-        {"$sort" => {"households.hbx_enrollments.submitted_at" => 1}},
-        group_query,
-        project_query
-      ]).collect{|record| record['enrollment_hbx_id']}
+        }
+      })
+      self
     end
 
-    def group_query
-      {
+    def sort_enrollments
+      add({
+       "$sort" => {"households.hbx_enrollments.submitted_at" => 1}
+       })
+      self
+    end
+
+    def group_them_by_kind
+      add({
         "$group" => {
           "_id" => {
             "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
@@ -52,20 +80,33 @@ module Queries
           },
           "hbx_enrollment_id" => { "$last" => "$households.hbx_enrollments.hbx_id" }
         }
-      }
+      })
+
+      self
     end
 
-    def project_query
-      {
+    def project_enrollment_ids
+      add({
         "$project" => {
          "_id" => 0,
          "enrollment_hbx_id" => "$hbx_enrollment_id"
         }
-      }
+      })
+      self
     end
 
-    def valid_enrollment_statuses
-      HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+    def find_benefit_group_ids(feins, effective_on)
+      return @bg_ids_list if defined? @bg_ids_list
+
+      employers = feins.collect{|e| prepend_zeros(e.to_s, 9) }.collect{|fein| EmployerProfile.find_by_fein(fein)}.compact
+      @bg_ids_list = employers.inject([]) do |id_list, employer|
+        plan_year = employer.plan_years.published_or_renewing_published.where(:start_on => effective_on).first
+        if plan_year.present?
+          id_list += plan_year.benefit_groups.map(&:id)
+        else
+          id_list
+        end
+      end
     end
 
     def prepend_zeros(number, n)
