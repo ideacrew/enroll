@@ -593,19 +593,18 @@ def employer_poc
   def cancel_initial_plan_year
     begin
       employer_profile = EmployerProfile.find(params[:id])
-      hbx_enrollments = employer_profile.active_plan_year.hbx_enrollments
+      hbx_enrollments = employer_profile.published_plan_year.hbx_enrollments
 
       if is_initial_or_conversion_employer?(employer_profile) && can_cancel_employer_plan_year?(employer_profile)
         process_cancel_initial_plan_year(hbx_enrollments, employer_profile)
-        post_cancel_conditions(hbx_enrollments, employer_profile)
+        post_cancel_conditions(employer_profile)
         flash["notice"] = "Initial plan year cancelled for employer: #{employer_profile.legal_name}"
-        return_status = 200
       else
         raise("Internal error.")
       end
     rescue Exception => e
-      return_status = 501
-      flash["error"] = "Could not cancel/terminate initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
+      return_status = 500
+      flash["error"] = "Could not cancel initial plan year for employer: #{employer_profile.legal_name}. #{e.message}"
     end
 
     render :js => "window.location = '#{exchanges_hbx_profiles_root_path}'", status: return_status
@@ -706,10 +705,10 @@ private
     hbx_enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
-    employer_profile.active_plan_year.cancel!
+    employer_profile.published_plan_year.cancel!
   end
 
-  def post_cancel_conditions(hbx_enrollments, employer_profile)
+  def post_cancel_conditions(employer_profile)
     employer_profile.aasm_state = 'applicant' unless employer_profile.applicant?
     employer_profile.save!
   end
