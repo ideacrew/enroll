@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
-  context ".shop_monthly_enrollments" do
+  context "Shop Monthly Queries" do 
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
 
@@ -74,53 +74,73 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
           aasm_state: status
         )
     end
- 
-    context 'When passed employer FEINs and plan year effective date' do
 
-      it 'should return coverages under given employers' do
-        enrollment_hbx_ids = (initial_employee_enrollments + renewing_employee_passives).map(&:hbx_id)
-        result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+    context ".shop_monthly_enrollments" do
 
-        expect(result.sort).to eq enrollment_hbx_ids.sort
-      end
+      context 'When passed employer FEINs and plan year effective date' do
 
-      context 'When enrollments purchased with QLE' do
-
-        let!(:qle_coverages) {
-          renewing_employees[0..4].inject([]) do |enrollments, ce|
-            family = ce.employee_role.person.primary_family
-            enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, enrollment_kind: 'special_enrollment')
-          end
-        }
-
-        it 'should not return QLE enrollments' do
+        it 'should return coverages under given employers' do
+          enrollment_hbx_ids = (initial_employee_enrollments + renewing_employee_passives).map(&:hbx_id)
           result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-          
-          expect(result & qle_coverages.map(&:hbx_id)).to eq []
+
+          expect(result.sort).to eq enrollment_hbx_ids.sort
         end
-      end
 
-      context 'When both active and passive renewal present' do
+        context 'When enrollments purchased with QLE' do
 
-        let!(:actively_renewed_coverages) {
-          renewing_employees[0..4].inject([]) do |enrollments, ce|
-            enrollments << create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days)
+          let!(:qle_coverages) {
+            renewing_employees[0..4].inject([]) do |enrollments, ce|
+              family = ce.employee_role.person.primary_family
+              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, enrollment_kind: 'special_enrollment')
+            end
+          }
+
+          it 'should not return QLE enrollments' do
+            result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+
+            expect(result & qle_coverages.map(&:hbx_id)).to eq []
           end
-        }
+        end
 
-        it 'should return active renewal' do
-          passive_renewal_hbx_ids = actively_renewed_coverages.collect{|e| e.family.active_household.hbx_enrollments.renewing.first.hbx_id }
-          active_renewal_hbx_ids = actively_renewed_coverages.map(&:hbx_id).sort
+        context 'When both active and passive renewal present' do
 
-          result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
-          
-          expect(result & passive_renewal_hbx_ids).to eq []
-          expect(result.sort & active_renewal_hbx_ids).to eq active_renewal_hbx_ids
+          let!(:actively_renewed_coverages) {
+            renewing_employees[0..4].inject([]) do |enrollments, ce|
+              enrollment = create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
+              enrollment.select_coverage!
+              enrollments << enrollment
+            end
+          }
+
+          it 'should return active renewal' do
+            active_renewal_hbx_ids = actively_renewed_coverages.map(&:hbx_id).sort
+            result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+            expect(result.sort & active_renewal_hbx_ids).to eq active_renewal_hbx_ids
+          end
         end
       end
     end
-  end
 
-  context '.shop_monthly_terminations' do 
+    context '.shop_monthly_terminations' do
+      context 'When passed employer FEINs and plan year effective date' do
+
+        context 'When EE created waivers' do
+
+          let!(:active_waivers) {
+            renewing_employees[0..4].inject([]) do |enrollments, ce|
+              enrollment= create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
+              enrollment.waive_coverage!
+              enrollments << enrollment
+            end
+          }
+
+          it 'should return their previous enrollments as terminations' do
+            termed_enrollments = active_waivers.collect{|en| en.family.active_household.hbx_enrollments.where(:effective_on => effective_on.prev_year).first}
+            result = Queries::NamedPolicyQueries.shop_monthly_terminations(feins, effective_on)
+            expect(result.sort).to eq termed_enrollments.map(&:hbx_id).sort
+          end
+        end
+      end
+    end
   end
 end
