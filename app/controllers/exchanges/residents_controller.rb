@@ -5,6 +5,7 @@ class Exchanges::ResidentsController < ApplicationController
   include ErrorBubble
 
   before_action :find_resident_role, only: [:edit, :update]
+  before_action :authorize_user
 
   def index
     @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
@@ -59,7 +60,6 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def match
-
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
     @resident_candidate = Forms::ResidentCandidate.new(@person_params)
@@ -116,8 +116,6 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def update
-    # need to add @resident_role to pundit?
-    # authorize @resident_role, :update?
     save_and_exit =  params['exit_after_method'] == 'true'
     if save_and_exit
       respond_to do |format|
@@ -155,6 +153,22 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   private
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+
+    flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
+      respond_to do |format|
+      format.json { redirect_to destroy_user_session_path }
+      format.html { redirect_to destroy_user_session_path }
+      format.js   { redirect_to destroy_user_session_path }
+    end
+  end
+
+  def authorize_user
+    authorize ResidentRole 
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
