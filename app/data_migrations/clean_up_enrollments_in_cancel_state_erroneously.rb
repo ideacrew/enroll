@@ -5,7 +5,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 # 3. Provide an output identifying the following: Primary Subscriber HBX ID, E1 HBX ID, E1 effective date, E1 Market type, E2 HBX ID
 class CleanUpEnrollmentsInCancelStateErroneously < MongoidMigrationTask
   def migrate
-    puts "#{Subscriber HBX ID}, #{Cancel_enrollment_hbx_id}, #{Cancel_enrollment_effective_date}, #{Cancel_enrollment_market_type}, #{Reference_enrollment_hbx_id}"
+    puts "Primary Subscriber HBX ID, Enrollment HBX ID, Effective Date, Market Type, Enrollment 2 HBX ID"
     
     families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::TERMINATED_STATUSES)
 
