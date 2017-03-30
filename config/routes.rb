@@ -26,10 +26,9 @@ Rails.application.routes.draw do
   
   get 'dashboard/home', to: 'dashboards#home'
 
-  resources :shop, only: [] do
+  resources :host, only: [] do
     collection do
-      get 'covered', to: 'widget#home'
-      get 'policy', to: 'shop_widget#home'
+      get 'shop', to: 'shop_widget#home'
     end
   end
 
