@@ -32,8 +32,7 @@ module Forms
 
         def naturalized_citizen
           return @naturalized_citizen if !@naturalized_citizen.nil?
-          return nil if @us_citizen.nil?
-          return nil if @us_citizen
+          return nil if (@us_citizen.nil? || @us_citizen)
           @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == @citizen_status)
         end
 
@@ -45,8 +44,7 @@ module Forms
 
         def eligible_immigration_status
           return @eligible_immigration_status if !@eligible_immigration_status.nil?
-          return nil if @us_citizen.nil?
-          return nil unless @us_citizen
+          return nil if (@us_citizen.nil? || !@us_citizen)
           @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == @citizen_status)
         end
 
