@@ -109,12 +109,20 @@ RSpec.describe Insured::FamiliesController do
         allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
         allow(family).to receive(:check_for_consumer_role).and_return true
         allow(family).to receive(:active_family_members).and_return(family_members)
+        allow(controller).to receive(:admin_user?).and_return false
         sign_in user
       end
 
-      it "should redirect to ridp page if user has not verified identity" do
+      it "should redirect to ridp page if user has not verified identity & if current user is not an admin" do
         get :home
-        expect(response).to redirect_to("/insured/consumer_role/ridp_agreement")
+        expect(response).to redirect_to ridp_agreement_insured_consumer_role_index_path
+      end
+
+      it "should not redirect to ridp page if current user is an admin irrespective of identity verification" do
+        allow(controller).to receive(:admin_user?).and_return true
+        get :home
+        expect(response).not_to redirect_to ridp_agreement_insured_consumer_role_index_path
+        expect(response).to have_http_status(:success)
       end
 
       it "should redirect to edit page if user do not have addresses" do
@@ -215,6 +223,7 @@ RSpec.describe Insured::FamiliesController do
           allow(person).to receive(:has_active_employee_role?).and_return(false)
           allow(person).to receive(:has_active_consumer_role?).and_return(true)
           allow(person).to receive(:active_employee_roles).and_return([])
+          allow(controller).to receive(:admin_user?).and_return false
           sign_in user
           get :home
         end
