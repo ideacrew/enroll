@@ -25,7 +25,7 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
   end
 
   def build
-      @notice.start_on= @recipient.try(:active_and_published_plan_year).start_on
+      @notice.start_on= @recipient.try(:active_or_published_plan_year).start_on
       @notice.benefit_group_assignments =  @recipient.census_employees.map(&:active_benefit_group_assignment).compact.group_by(&:benefit_group_id)
       bg_ids = @recipient.active_and_published_plan_year.benefit_groups.map(&:id)
       @notice.benefit_group_assignments.delete_if{|bg_id, assignments| !bg_ids.include?(bg_id)}
@@ -49,7 +49,7 @@ def create_secure_inbox_message(notice)
             "<br><p><strong>Who can I share my custom Plan Match instructions with? </strong>" +
             "<br>Plan Match is a tool for your employees who are eligible for the health plan(s) you offer through DC Health Link.  Plan Match can be used anonymously by your eligible employees and their family members to compare health plan options and find the right health plan for their needs and budget.  Employees can also use Plan Match during the year when they experience a life event, such as marriage, birth, or loss of other coverage, to help determine the right health plan for them under their new circumstances.  Because Plan Match is truly anonymous, you could even share it with prospective employees who want to see what health plan options are available as part of your benefits offerings. </p>" +
             "<br><p><strong>Can employees enroll directly using Plan Match? </strong>" +
-            "<br>Since Plan Match is an anonymous health plan comparison tool, eligible employees will still need to log into their DCHealthLink.com employee account to quickly complete their plan selection.</p>"
+            "<br>Since Plan Match is an anonymous health plan comparison tool, eligible employees will need to log into their DCHealthLink.com account to complete their plan selection.</p>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
