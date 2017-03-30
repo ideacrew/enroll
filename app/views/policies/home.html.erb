@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
 <head>
-<meta charset="utf-8">
-<title>IVL Dashboard</title>
-<!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
-<!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
-<!-- <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
+    <meta charset="utf-8">
+    <title>IVL Dashboard</title>
 
+    <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="dashStyle.css"> -->
+    
 <script type="text/javascript">
     $(function () {
     Highcharts.setOptions({ lang: { thousandsSep: ',' }});
@@ -82,58 +84,7 @@
         });
     });
 </script>
-<script type="text/javascript">
-$(function () {
-    $('#web1').highcharts({
-        chart: {
-            type: 'heatmap',
-            marginTop: 3,
-            marginBottom: 3,
-            plotBorderWidth: 1
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        },
-        yAxis: {
-            categories: ['Page Views'],
-            title: null
-        },
-        colorAxis: {
-            min: 6,
-            minColor: '#FFFFFF',
-            maxColor: Highcharts.getOptions().colors[0]
-        },
-         legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        exporting: {
-            enabled: false
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br><b>' +
-                    this.point.value + '</b> thousand <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
-            }
-        },
-        series: [{
-            name: 'Web Activity',
-            borderWidth: 1,
-            data: [[0, 0, 9.1], [1, 0, 6.9], [2, 0, 8], [3, 0, 8.1], [4, 0, 7.4], [5, 0, 8.1], [6, 0, 7.3]],
-            dataLabels: {
-                enabled: true,
-                color: '#000000'
-            }
-        }]
-    });
-});
-        </script>
-
+ 
 <script type="text/javascript">
     $(function () {
     $('#lineT1').highcharts({
@@ -187,59 +138,47 @@ $(function () {
 </script>
 
 </head>
-
 <body>
+
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/heatmap.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
 
-    <!-- <header class="jumbotron jumbotron"> -->
+    <div class="module">
+    <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
-        <!-- Main component for a primary marketing message or call to action -->
+    <ul class="nav nav-pills">
+      <li><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
+      <li class="active"><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+      <li><a href="shop_main.htm">SHOP</a></li>
+      <li><a href="cong_main.htm">Congress</a></li>
+    </ul>
 
-    <!-- <div class="container-fluid"> -->
-            <!-- <div class="row row-header"> -->
-                <!-- <h2>CIO Dashboard</h2> -->
-            <!-- </div> -->
-    <!-- </div> -->
-    <!-- </header> -->
+   <div class="row row-content">
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <div class="panel panel-default">
+                <div class="panel-body"><b>25,224 Total Policies </b></div>
+            </div>
+         </div>
+     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-body"><b>7,834 New Policies YTD </b></div>
+         </div>
+     </div>
 
-<div class="module">
-<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-body"><b>1,980 Terminations YTD </b></div>
+         </div>
+     </div>
 
-<ul class="nav nav-pills">
-  <li><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
-  <li class="active"><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
-  <li><a href="shop_main.htm">SHOP</a></li>
-  <li><a href="cong_main.htm">Congress</a></li>
-</ul>
+     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-body"><b>1,350 Cancellations YTD </b></div>
+        </div>
+     </div>
 
-<div class="row row-content">
+   </div>
 
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>25,224 Total Policies </b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>7,834 New Policies YTD </b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>1,980 Terminations YTD </b> </div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>1,350 Cancellations YTD </b></div>
-</div>
-</div>
-
-</div>
-
-     <div class="row row-content">
+    <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
     <table class="table table-hover table-condensed">
@@ -375,8 +314,6 @@ $(function () {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-
-      <thead>
       <tr class="tabSpc1">
         <td class="texLef" colspan="4">Demographic <a href="ivl_enroll.htm">More Information</a></td>
         <td>&nbsp;</td>
@@ -391,9 +328,6 @@ $(function () {
         <th>Paying</th>
         <th>Pay %</th>
       </tr>
-      </thead>
-
-      <tbody>
       <tr>
         <td class="texLef">Yes</td>
         <td>0</td>
@@ -464,8 +398,6 @@ $(function () {
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-      </tbody>
-      <thead>
       <tr>
         <th class="texLef">Family Size</th>
         <th>Select</th>
@@ -522,7 +454,6 @@ $(function () {
         <td>0</td>
         <td>0%</td>
       </tr>
-      </thead>
  
     </tbody>
     </table>
@@ -664,3 +595,4 @@ $(function () {
 
     </body>
 </html>
+
