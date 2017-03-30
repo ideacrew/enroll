@@ -170,6 +170,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
     end
+    
+    it "should not show a Plan End if cobra" do
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      expect(rendered).not_to match /plan ending/i 
+    end
   end
 
   context "with consumer_role", dbclean: :before_each do
