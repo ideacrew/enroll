@@ -59,7 +59,8 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
     def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil)
        benefit_group = benefit_group_assignment.benefit_group
-       FactoryGirl.create(:hbx_enrollment,
+       FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,
+          enrollment_members: [family.primary_applicant],
           household: family.active_household,
           coverage_kind: "health",
           effective_on: effective_date || benefit_group.start_on,
@@ -118,5 +119,8 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
         end
       end
     end
+  end
+
+  context '.shop_monthly_terminations' do 
   end
 end
