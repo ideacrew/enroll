@@ -15,7 +15,7 @@ class IvlsController < ApplicationController
     @overall_genders=IvlCovered::OverallGenderTypes.all
     @annual_covered_lives=IvlCovered::AnnualCoveredLives.all
 
-    # @annual_covered=IvlCovered::ActiveCoveredLives.all
+    @annual_covered=IvlCovered::ActiveCoveredLives.all
   end
 
   def enrollment

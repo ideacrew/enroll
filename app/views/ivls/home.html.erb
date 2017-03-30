@@ -74,10 +74,13 @@
             }
         },
         series: [{
+          
+          <% @annual_covered.each do |annual| %>
             name: '2017',
-            data: [22000, 22000, 22000, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= annual.count_jan_current%>, <%= annual.count_feb_current%>, <%= annual.count_mar_current%>, <%= annual.count_apr_current%>, <%= annual.count_may_current%>, <%= annual.count_jun_current%>, <%= annual.count_jul_current%>, <%= annual.count_aug_current%>, <%= annual.count_sep_current%>, <%= annual.count_oct_current%>, <%= annual.count_nov_current%>, <%= annual.count_dec_current%>]
 
             }]
+            <% end %>
         });
     });
 </script>
@@ -219,26 +222,28 @@ $(function () {
 </ul>
 
 <div class="row row-content">
+<% @annual_covered_lives.each do |coverd_lives| %>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>25,224 Total Covered</b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b>7,834 New Coverage YTD</b></div>
+  <div class="panel-body"><b><%= coverd_lives.covered_lives_total%> Total Covered</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>1,980 Terminations YTD</b></div>
+  <div class="panel-body"><b><%= coverd_lives.covered_lives_new%> New Coverage YTD</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b>1,350 Cancellations YTD</b></div>
+  <div class="panel-body"><b><%= coverd_lives.covered_lives_terminations%> Terminations YTD</b></div>
 </div>
 </div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b><%= coverd_lives.covered_lives_cancellations%> Cancellations YTD</b></div>
+</div>
+</div>
+<% end %>
         
 </div>
 
