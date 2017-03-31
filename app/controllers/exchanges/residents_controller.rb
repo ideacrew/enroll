@@ -101,12 +101,11 @@ class Exchanges::ResidentsController < ApplicationController
       redirect_to search_exchanges_residents_path
       return
     end
-    create_sso_account(current_user, @person, 15, "resident") do
-      respond_to do |format|
-        format.html {
-          redirect_to :action => "edit", :id => @resident_role.id
-        }
-      end
+    
+    respond_to do |format|
+      format.html {
+        redirect_to :action => "edit", :id => @resident_role.id
+      }
     end
   end
 

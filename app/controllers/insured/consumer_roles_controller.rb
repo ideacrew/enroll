@@ -84,7 +84,7 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-
+          #binding.pry
           @resident_candidate = Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
@@ -101,7 +101,7 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               rescue Exception => e
                 flash[:error] = set_error_message(e.message)
-                redirect_to search_exchanges_consumers_path
+                redirect_to search_exchanges_residents_path
                 return
               end
               create_sso_account(current_user, @person, 15, "resident") do
