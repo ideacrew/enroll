@@ -62,7 +62,8 @@
   <%family_benefits = benefit_assignment_groups.first.benefit_group.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
 
   <% premium_benefit_contributions = "" ; family_benefits.each do |relationship_benefit| %>
-		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{number_to_percentage relationship_benefit.premium_pct.to_i} <br></br>" %>
+  
+		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{(relationship_benefit.premium_pct)} %<br></br>" %>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
   <div class="page-break-before"/>
