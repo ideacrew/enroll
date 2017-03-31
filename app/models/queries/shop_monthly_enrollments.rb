@@ -16,6 +16,30 @@ module Queries
       Family.collection.aggregate(@pipeline)
     end
 
+    def query_families_with_active_enrollments
+       add({
+        "$match" => {
+          "households.hbx_enrollments.benefit_group_id" => {
+            "$in" => collect_benefit_group_ids
+          }
+        }
+      })
+
+      self
+    end
+
+     def query_active_enrollments
+      add({
+        "$match" => {
+          "$or" => [
+            new_coverage_expression
+          ]
+        }
+      })
+
+      self
+    end
+
     def query_families
       add({
         "$match" => {
@@ -32,11 +56,6 @@ module Queries
       add({"$unwind" => "$households"})
       add({"$unwind" => "$households.hbx_enrollments"})
       self
-    end
-
-    def unwind_enrollment_members
-     add({"$unwind" => "$households.hbx_enrollments.hbx_enrollment_members"})
-     self
     end
 
     def new_enrollment_statuses
@@ -77,27 +96,10 @@ module Queries
       self
     end
 
-    def project_enrollments_with_subscriber
-     add({
-      "$project" => {"households.hbx_enrollments" => 1, "family_member" => {"$cond" => [{"$eq" => ["$households.hbx_enrollments.hbx_enrollment_members.is_subscriber", true]}, "$households.hbx_enrollments.hbx_enrollment_members.applicant_id", nil]}}
-     })
-
-     self
-    end
-
-    def filter_missing_subscribers
-      add({
-        "$match" => {"family_member" => {"$ne" => nil}}
-      })
-
-      self
-    end
-
     def group_enrollments
       add({
         "$group" => {
           "_id" => {
-            "subscriber" => "$family_member",
             "effective_on" => "$households.hbx_enrollments.effective_on",
             "employee_role_id" => "$households.hbx_enrollments.employee_role_id",
             "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
@@ -110,10 +112,10 @@ module Queries
       self
     end
 
-    def sort(attribute = nil)
+    def sort_enrollments
       add({
-       "$sort" => {"households.hbx_enrollments.#{attribute}" => 1}
-       })
+       "$sort" => {"households.hbx_enrollments.submitted_at" => 1}
+      })
 
       self
     end
