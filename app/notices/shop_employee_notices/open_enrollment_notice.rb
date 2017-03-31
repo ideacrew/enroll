@@ -17,14 +17,20 @@ class ShopEmployeeNotices::OpenEnrollmentNotice < ShopEmployeeNotice
       :start_on => renewing_plan_year.start_on,
       :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on
       })
-    enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
+
     if census_employee.renewal_benefit_group_assignment.present? && census_employee.renewal_benefit_group_assignment.hbx_enrollments.present?
+      enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
       notice.plan = PdfTemplates::Plan.new({
         :plan_name => enrollment.plan.name
         })
       notice.enrollment = PdfTemplates::Enrollment.new({
         :enrollees => enrollment.hbx_enrollment_members.map(&:person).map(&:full_name),
         :employee_cost => enrollment.total_employee_cost
+        })
+    elsif census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollments.present?
+      enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
+      notice.plan = PdfTemplates::Plan.new({
+        :plan_name => enrollment.plan.name
         })
     end
   end
