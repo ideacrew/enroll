@@ -230,6 +230,10 @@ class PlanYear
     "#{(enrolled_summary / eligible_to_enroll_count.to_f * 100).round(2)}%"
   end
 
+  def external_plan_year?
+    employer_profile.is_conversion? && coverage_period_contains?(employer_profile.registered_on)
+  end
+
   def editable?
     !benefit_groups.any?(&:assigned?)
   end
