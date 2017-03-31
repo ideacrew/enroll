@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
+RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -13,7 +13,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Renewal Open Enrollment available for Employee',
                             :notice_template => 'notices/shop_employee_notices/renewal_open_enrollment_notice_for_employee',
-                            :notice_builder => 'ShopEmployeeNotices::OpenEnrollmentNotice',
+                            :notice_builder => 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
                             :mpi_indicator => 'MPI_SHOP8A',
                             :title => "Your Health Plan Open Enrollment Period has Begun"})
                           }
@@ -25,11 +25,11 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
 
   describe "New" do
     before do
-      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNotice.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal.new(census_employee, valid_parmas)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::OpenEnrollmentNotice.new(census_employee, valid_parmas)}.not_to raise_error
+        expect{ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal.new(census_employee, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -37,7 +37,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployeeNotices::OpenEnrollmentNotice.new(census_employee, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal.new(census_employee, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
 
   describe "Build" do
     before do
-      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNotice.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal.new(census_employee, valid_parmas)
     end
     it "should build notice with all necessory info" do
       @employee_notice.build
@@ -56,7 +56,7 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNotice do
 
   describe "append data" do
     before do
-      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNotice.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal.new(census_employee, valid_parmas)
     end
     it "should append data" do
       renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first
