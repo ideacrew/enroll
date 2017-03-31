@@ -18,7 +18,7 @@ class ShopEmployeeNotices::OpenEnrollmentNotice < ShopEmployeeNotice
       :open_enrollment_end_on => renewing_plan_year.open_enrollment_end_on
       })
     enrollment = census_employee.renewal_benefit_group_assignment.hbx_enrollments.first
-    if census_employee.renewal_benefit_group_assignment && census_employee.renewal_benefit_group_assignment.hbx_enrollments
+    if census_employee.renewal_benefit_group_assignment.present? && census_employee.renewal_benefit_group_assignment.hbx_enrollments.present?
       notice.plan = PdfTemplates::Plan.new({
         :plan_name => enrollment.plan.name
         })
