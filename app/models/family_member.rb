@@ -129,14 +129,6 @@ class FamilyMember
     family.save!
   end
 
-  def primary_applicant
-    if is_primary_applicant?
-      self.person
-    else
-      family.try(:primary_applicant_person)
-    end
-  end
-
   def self.find(family_member_id)
     Family.find_family_member(family_member_id)
   end
