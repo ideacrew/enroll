@@ -1,0 +1,512 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>IVL Dashboard</title>
+
+  <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="dashStyle.css"> -->
+    
+<script type="text/javascript">
+    $(function () {
+    Highcharts.setOptions({ lang: { thousandsSep: ',' }});
+        $('#barYr1').highcharts({
+            chart: {
+            borderColor: '#000000',
+            borderWidth: 0,
+            type: 'column',
+            spacingBottom: 10,
+            spacingTop: 10,
+            spacingLeft: 10,
+            spacingRight: 10
+        },
+        title: {
+            text: ''
+        },
+        legend: {
+        align: 'center',
+        verticalAlign: 'center'
+        },
+        xAxis: {
+            categories: [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Covered Lives'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:,.0f}</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                enabled: true
+            }
+            }
+        },
+        series: [{
+            showInLegend: false,
+            name: '2017',
+            data: [10481, 11138, 11205, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+            }]
+        });
+    });
+</script>
+
+</head>
+<body>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+
+<ul class="nav nav-pills">
+  <li><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
+  <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
+  <li><a href="shop_main.htm">SHOP</a></li>
+  <li class="active"><a href="cong_main.htm">Congress</a></li>
+</ul>
+
+<div class="row row-content">
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>11,205 Total Covered</b></div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>724 New Coverage YTD</b></div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>180 Terminations YTD</b></div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b>50 Cancellations YTD</b></div>
+</div>
+</div>
+    
+</div>
+
+    <div class="row row-content">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
+
+    <table class="table table-hover table-condensed">
+    <thead>
+    <tr class="tabSpc1">
+        <th class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm">More Information</a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+      <tr>
+        <th class="texLef">Enrollment</th>
+        <th>#</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Auto Renewals</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Active Renewals</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">New Customers</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">SEP</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    <thead>
+      <tr class="tabSpc1">
+        <th class="texLef" colspan="4">Coverage <a href="ivl_dd_live2.htm">More Information</a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+      <tr>
+        <th class="texLef">Carrier</th>
+        <th>#</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Aetna</td>
+        <td>525</td>
+        <td>5%</td>
+      </tr>
+      <tr>
+        <td class="texLef">CareFirst</td>
+        <td>8,611</td>
+        <td>77%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Kaiser</td>
+        <td>1,024</td>
+        <td>10%</td>
+      </tr>
+      <tr>
+        <td class="texLef">United</td>
+        <td>995</td>
+        <td>9%</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    <thead>
+      <tr>
+        <th class="texLef">Metal</th>
+        <th>Select</th>
+        <th>Pay %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Platinum</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Gold</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Silver</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Bronze</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    <thead>
+      <tr class="tabSpc1">
+        <th class="texLef" colspan="4">Demographic <a href="ivl_dd_live3.htm">More Information</a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+      <tr>
+        <th class="texLef">Age Group</th>
+        <th>Select</th>
+        <th>Pay %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">< 1</td>
+        <td>81</td>
+        <td>1%</td>
+      </tr>
+      <tr>
+        <td class="texLef">1-17</td>
+        <td>2000</td>
+        <td>18%</td>
+      </tr>
+      <tr>
+        <td class="texLef">18-25</td>
+        <td>1,292</td>
+        <td>12%</td>
+      </tr>
+      <tr>
+        <td class="texLef">26-34</td>
+        <td>3,785</td>
+        <td>38%</td>
+      </tr>
+      <tr>
+        <td class="texLef">35-44</td>
+        <td>1,761</td>
+        <td>16%</td>
+      </tr>
+      <tr>
+        <td class="texLef">45-54</td>
+        <td>1,129</td>
+        <td>10%</td>
+      </tr>
+      <tr>
+        <td class="texLef">55-64</td>
+        <td>835</td>
+        <td>7%</td>
+      </tr>
+      <tr>
+        <td class="texLef">65+</td>
+        <td>322</td>
+        <td>3%</td>
+      </tr>
+
+
+
+      
+    </tbody>
+    </table>
+
+    </div>
+
+<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
+
+<h6>Active Covered Lives</h6>
+<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+
+<h6>Covered Lives by Effective Month</h6>
+    <table class="table table-hover table-condensed">
+    <thead>
+      <tr>
+        <th class="texLef">Enrollment</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">House Members</td>
+        <td>722</td>
+        <td>85</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td class="texLef">House Staff</td> 
+        <td>5,088</td>
+        <td>327</td>
+        <td>38</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td class="texLef">Senate</td>
+        <td>4,651</td>
+        <td>265</td>
+        <td>29</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td>10,461</td>
+        <td>677</td>
+        <td>67</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+
+    </tbody>
+    </table>
+
+
+<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="box-shadow: 0px 0px 5px gray;">   
+
+    <table class="table table-hover table-condensed">
+    <thead>
+      <tr>
+        <th class="texLef">Status</th>
+        <th>Select</th>
+        <th>Pay %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Primary</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Dependent</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    <thead>
+      <tr>
+        <th class="texLef">Gender</th>
+        <th>Select</th>
+        <th>Pay %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Male</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Female</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+    </table>
+    </div>
+
+<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="box-shadow: 0px 0px 5px gray;">   
+
+    <table class="table table-hover table-condensed">
+    <thead>
+      <tr>
+        <th class="texLef">Family Size</th>
+        <th>#</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">1-Member</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">2-Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">3-Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">4-Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">5-Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">6-Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+      <tr>
+        <td class="texLef">7+ Members</td>
+        <td>0</td>
+        <td>0%</td>
+      </tr>
+    </tbody>
+    </table>
+    </div>
+    </div>
+    </div>
+
+  </body>
+</html>
+
