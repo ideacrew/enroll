@@ -50,7 +50,7 @@ module Factories
               renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
               renewal_enrollment.decorated_hbx_enrollment
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renew_enrollment.coverage_kind == "health"
+              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renew_enrollment.coverage_kind == "dental"
             else
               ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal")
             end

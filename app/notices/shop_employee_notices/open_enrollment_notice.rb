@@ -23,7 +23,7 @@ class ShopEmployeeNotices::OpenEnrollmentNotice < ShopEmployeeNotice
         :plan_name => enrollment.plan.name
         })
       notice.enrollment = PdfTemplates::Enrollment.new({
-        :enrollees => enrollment.hbx_enrollment_members.map(&:person).map(&:full_name)
+        :enrollees => enrollment.hbx_enrollment_members.map(&:person).map(&:full_name),
         :employee_cost => enrollment.total_employee_cost
         })
     end
