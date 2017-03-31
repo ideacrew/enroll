@@ -126,10 +126,8 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   end
 
-
-
   it "ImmediateFamily should have stepchild" do
-    expect(Household::ImmediateFamily.include?('stepchild')).to eq true
+    expect(Family::IMMEDIATE_FAMILY.include?('stepchild')).to eq true
   end
 
   context "eligibility determinations for a household" do
