@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   resources :host, only: [] do
     collection do
       get 'shop', to: 'shop_widget#home'
+      get 'congress' , to: 'congress#index'
     end
   end
 
