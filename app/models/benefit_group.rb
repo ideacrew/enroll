@@ -40,7 +40,6 @@ class BenefitGroup
   field :lowest_cost_plan_id, type: BSON::ObjectId
   field :highest_cost_plan_id, type: BSON::ObjectId
 
-
   # Employer contribution amount as percentage of reference plan premium
   field :employer_max_amt_in_cents, type: Integer, default: 0
 
@@ -54,6 +53,9 @@ class BenefitGroup
   field :is_congress, type: Boolean, default: false
   field :_type, type: String, default: self.name
 
+  field :is_active, type: Boolean, default: true
+
+  default_scope ->{ where(is_active: true) }
 
   delegate :start_on, :end_on, to: :plan_year
   # accepts_nested_attributes_for :plan_year
@@ -102,7 +104,6 @@ class BenefitGroup
   validate :check_offered_for_employee
 
   before_save :set_congress_defaults
-  before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
   #   super new_plan_option_kind.to_s
@@ -341,13 +342,14 @@ class BenefitGroup
 
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
-      organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
-      organizations.map(&:employer_profile).lazy.flat_map(&:plan_years).flat_map(&:benefit_groups).select do |bg|
-        bg.id == id
-      end.first
+      if organization = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id }).first
+        plan_year = organization.employer_profile.plan_years.where({"benefit_groups._id" => id }).first
+        plan_year.benefit_groups.unscoped.detect{|bg| bg.id == id }
+      else
+        nil
+      end
     end
   end
-
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100
@@ -471,20 +473,29 @@ class BenefitGroup
     [valid_plan_year.start_on, eligible_on(date_of_hire)].max
   end
 
-  def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
+  def disable_benefits
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
 
       if benefit_group_assignments.present?
         benefit_group_assignments.each do |bga|
-          bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-          bga.destroy
+          bga.hbx_enrollments.each do |enrollment|
+            enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+          end
+          bga.update(is_active: false) unless self.plan_year.is_renewing?
         end
 
-        benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
-        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+        other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
+
+        if self.plan_year.is_renewing?
+          ce.add_renew_benefit_group_assignment(other_benefit_group)
+        else
+          ce.find_or_build_benefit_group_assignment(other_benefit_group)
+        end
       end
     end
+
+    self.is_active = false
   end
 
   private
