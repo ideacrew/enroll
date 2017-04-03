@@ -203,6 +203,11 @@ class HbxEnrollment
     end
   end
 
+  def benefit_group
+    return @benefit_group if defined? @benefit_group
+    return nil if benefit_group_id.blank?
+    @benefit_group = BenefitGroup.find(self.benefit_group_id)
+  end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
