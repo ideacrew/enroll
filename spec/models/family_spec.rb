@@ -665,21 +665,21 @@ describe Family, "large family with multiple employees - The Brady Bunch", :dbcl
   let(:family_member_id) {mikes_family.primary_applicant.id}
 
   it "should be possible to find the family_member from a family_member_id" do
-    expect(Family.find_family_member(family_member_id).id.to_s).to eq family_member_id.to_s
+    expect(FamilyMember.find(family_member_id).id.to_s).to eq family_member_id.to_s
   end
 
   context "Family.find_by_primary_applicant" do
     context "on Mike" do
       let(:find) {Family.find_by_primary_applicant(mike)}
       it "should find Mike's family" do
-        expect(find.id.to_s).to eq mikes_family.id.to_s
+        expect(find).to include mikes_family
       end
     end
 
     context "on Carol" do
       let(:find) {Family.find_by_primary_applicant(carol)}
       it "should find Carol's family" do
-        expect(find.id.to_s).to eq carols_family.id.to_s
+        expect(find).to include carols_family
       end
     end
   end
@@ -1082,87 +1082,6 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 end
 
-describe Family, "is_blocked_by_qle_and_assistance" do
-  let(:qle) {FactoryGirl.build(:qualifying_life_event_kind)}
-  let(:family) {Family.new}
-  let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-
-  it "return false without parameters" do
-    expect(family.is_blocked_by_qle_and_assistance?()).to eq false
-    expect(family.is_blocked_by_qle_and_assistance?(qle)).to eq false
-  end
-
-  it "return true when status is aptc_block" do
-    family.status = "aptc_block"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq true
-  end
-
-  it "return false when status is aptc_block" do
-    family.status = "aptc_unblock"
-    expect(family.is_blocked_by_qle_and_assistance?(nil, "abc")).to eq false
-  end
-
-  #context "when max_aptc greater than 0" do
-  #  before :each do
-  #    allow(family).to receive(:latest_household).and_return household
-  #    allow(eligibility_determination).to receive(:max_aptc).and_return 100
-  #  end
-
-  #  it "return false when qle is not individual" do
-  #    allow(qle).to receive(:individual?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return false when qle is not family_structure_changed" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return false
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #  end
-
-  #  it "return true" do
-  #    allow(qle).to receive(:individual?).and_return true
-  #    allow(qle).to receive(:family_structure_changed?).and_return true
-  #    expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq true
-  #  end
-  #end
-
-  #it "return false when max_aptc is 0" do
-  #  allow(family).to receive(:latest_household).and_return household
-  #  allow(eligibility_determination).to receive(:max_aptc).and_return 0
-  #  expect(family.is_blocked_by_qle_and_assistance?(qle, "abc")).to eq false
-  #end
-end
-
-describe Family, "aptc_blocked?" do
-  let(:family) {Family.new}
-
-  it "return false" do
-    expect(family.aptc_blocked?).to eq false
-  end
-
-  it "return true" do
-    family.status = "aptc_block"
-    expect(family.aptc_blocked?).to eq true
-  end
-end
-
-describe Family, "update_aptc_block_status" do
-  let(:family) {Family.new}
-  let(:eligibility_determination) {double(max_aptc: 0)}
-  #let(:household) {double(latest_active_tax_household: double(latest_eligibility_determination: eligibility_determination))}
-  let(:household) { double(latest_active_tax_household: double(eligibility_determinations: [eligibility_determination])) }
-
-  it "set aptc_block" do
-    allow(family).to receive(:latest_household).and_return household
-    #allow(eligibility_determination).to receive(:max_aptc).and_return 100
-    #allow(family).to receive(:is_under_special_enrollment_period?).and_return true
-    allow(family).to receive(:has_aptc_hbx_enrollment?).and_return true
-    family.update_aptc_block_status
-    expect(family.status).to eq "aptc_block"
-  end
-end
-
 describe Family, 'coverage_waived?' do
   let(:family) {Family.new}
   let(:household) {double}
@@ -1264,5 +1183,127 @@ describe Family, "given a primary applicant and a dependent", dbclean: :after_ea
     expect(family_member_dependent.person.consumer_role).to eq cr
     family_member_dependent.family.check_for_consumer_role
     expect(family_member_dependent.person.consumer_role).to eq cr
+  end
+end
+
+
+describe Family, ".expire_individual_market_enrollments", dbclean: :after_each do
+  let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+  let(:sep_effective_date) { Date.new(current_effective_date.year - 1, 11, 1) }
+  let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+  let!(:prev_year_plan) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year - 1)}
+  let!(:two_years_old_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year - 2, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let!(:enrollments) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date - 1.year,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: prev_year_plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: sep_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: dental_plan.id
+    )
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: current_effective_date - 2.years,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: two_years_old_plan.id
+    )
+  }
+  context 'when family exists with current & previous year coverages' do
+    before do
+      Family.expire_individual_market_enrollments
+      family.reload
+    end
+    it "should expire previous year coverages" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 1.year).first
+      expect(enrollment.coverage_expired?).to be_truthy
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date - 2.years).first
+      expect(enrollment.coverage_expired?).to be_truthy
+    end
+    it "should expire coverage with begin date less than 60 days" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => sep_effective_date).first
+      expect(enrollment.coverage_expired?).to be_truthy
+    end
+    it "should not expire coverage for current year" do
+      enrollment = family.active_household.hbx_enrollments.where(:effective_on => current_effective_date).first
+      expect(enrollment.coverage_expired?).to be_falsey
+    end
+  end
+end
+
+describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+
+  let!(:person) { FactoryGirl.create(:person, last_name: 'John', first_name: 'Doe') }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+  let!(:dental_plan) { FactoryGirl.create(:plan, :with_dental_coverage, market: 'individual', active_year: TimeKeeper.date_of_record.year)}
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+
+  let!(:enrollments) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: plan.id,
+                       aasm_state: 'auto_renewing'
+    )
+
+    FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "dental",
+                       effective_on: current_effective_date,
+                       enrollment_kind: "open_enrollment",
+                       kind: "individual",
+                       submitted_at: TimeKeeper.date_of_record.prev_month,
+                       plan_id: dental_plan.id,
+                       aasm_state: 'auto_renewing'
+    )
+
+  }
+  context 'when family exists with passive renewals ' do
+    before do
+      Family.begin_coverage_for_ivl_enrollments
+      family.reload
+    end
+
+    it "should begin coverage on health passive renewal" do
+      enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'health').first
+      expect(enrollment.coverage_selected?).to be_truthy
+    end
+
+    it "should begin coverage on dental passive renewal" do
+      enrollment = family.active_household.hbx_enrollments.where(:coverage_kind => 'dental').first
+      expect(enrollment.coverage_selected?).to be_truthy
+    end
   end
 end

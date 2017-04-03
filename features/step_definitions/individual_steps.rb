@@ -447,7 +447,7 @@ Given(/^Company Tronics is created with benefits$/) do
   step "Tronics creates an HBX account"
   step "Tronics should see a successful sign up message"
   step "I should click on employer portal"
-  step "Tronics creates a new employer profile"
+  step "Tronics creates a new employer profile with default_office_location"
   step "Tronics creates and publishes a plan year"
   step "Tronics should see a published success message without employee"
 end
@@ -528,7 +528,7 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
     household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
     fm_id = person.primary_family.family_members.last.id
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
-    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
+    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: TimeKeeper.datetime_of_record, csr_percent_as_integer: 40)
   end
 
   screenshot("aptc_householdinfo")
@@ -564,5 +564,4 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
-
 end

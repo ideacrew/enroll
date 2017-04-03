@@ -136,6 +136,7 @@ class User
   field :last_sign_in_at,    type: Time
   field :current_sign_in_ip, type: String
   field :last_sign_in_ip,    type: String
+  field :idp_uuid, type: String
 
   field :authentication_token
   field :roles, :type => Array, :default => []
@@ -246,6 +247,10 @@ class User
 
   def has_consumer_role?
     person && person.consumer_role
+  end
+
+  def has_resident_role?
+    person && person.resident_role
   end
 
   def has_employer_staff_role?
@@ -386,6 +391,14 @@ class User
       self.oim_id = self.email
     end
     self.save!
+  end
+
+  def ridp_by_paper_application
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_description_text = "admin bypass ridp"
+    self.identity_verified_date = TimeKeeper.date_of_record
+    self.save
   end
 
   def get_announcements_by_roles_and_portal(portal_path="")

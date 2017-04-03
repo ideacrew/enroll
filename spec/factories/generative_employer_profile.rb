@@ -106,8 +106,8 @@ FactoryGirl.define do
   end
 
   factory(:generative_broker_agency_account, {class: BrokerAgencyAccount}) {
-    start_on { DateTime.now }
-    end_on { DateTime.now }
+    start_on { TimeKeeper.datetime_of_record }
+    end_on { TimeKeeper.datetime_of_record }
     broker_agency_profile {
       FactoryGirl.build_stubbed :generative_broker_agency_profile
     }
