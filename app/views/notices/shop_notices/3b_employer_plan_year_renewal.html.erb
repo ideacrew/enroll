@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Application to Offer Group Health Coverage in DC Health Link</h3></td>
+      <td><h3>RE: Application to Offer Group Health Coverage in #{Settings.site.short_name}</h3></td>
     </tr>
   </tbody>
 </table>
@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "DC Health Link finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
+    content: "#{Settings.site.short_name} finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
     
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
@@ -57,7 +57,7 @@
   </tbody>
 </table>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-  contents: ["Please contact your broker for further assistance.  You can also contact DC Health Link with any questions:"],
+  contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <table class="total_table" border="0">
   <tbody>
