@@ -112,7 +112,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
-    @role.citizen_status == "not_lawfully_present_in_us" ? false : true
+    !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
 
   def is_ethnicity_satisfied?

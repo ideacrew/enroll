@@ -293,6 +293,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns true if insured_eligible_for_benefit_rule satisfies all criteria" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
+        allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         expect(rule.satisfied?).to eq [true, []]
       end
@@ -335,6 +336,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       it "returns false if insured_eligible_for_benefit_rule fails" do
         allow(benefit_package).to receive(:benefit_categories).and_return(['health'])
         allow(rule).to receive(:is_family_relationships_satisfied?).and_return(true)
+        allow(rule).to receive(:is_citizenship_status_satisfied?).and_return(true)
         role.person.created_at = TimeKeeper.date_of_record - ( Settings.aca.individual_market.verification_outstanding_window.days + 10.days)
         role.lawful_presence_determination.aasm_state = "verification_outstanding"
         error_msg = (Settings.aca.individual_market.verification_outstanding_window.days == 0) ? [] : [["eligibility failed on lawful_presence_status"]]
@@ -342,16 +344,17 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       end
     end
 
-    context "is citizenship status satisfied" do
-      it "returns false if person is not lawfully present" do
-        role.citizen_status = "not_lawfully_present_in_us"
-        expect(rule.is_citizenship_status_satisfied?).to eq false
+    context "is citizenship status satisfied?" do
+      shared_examples_for "citizenship status satisfied" do |citizen_status, result|
+        it "returns #{result} if citizen status is #{citizen_status}" do
+          role.citizen_status = citizen_status
+          expect(rule.is_citizenship_status_satisfied?).to eq result
+        end
       end
-
-      it "returns true if person is lawfully present" do
-        role.citizen_status = "alien_lawfully_present"
-        expect(rule.is_citizenship_status_satisfied?).to eq true
-      end
+      it_behaves_like "citizenship status satisfied", "not_lawfully_present_in_us", false
+      it_behaves_like "citizenship status satisfied", "non_native_not_lawfully_present_in_us", false
+      it_behaves_like "citizenship status satisfied", nil, false
+      it_behaves_like "citizenship status satisfied", "alien_lawfully_present", true
     end
 
     context "#primary applicant" do
