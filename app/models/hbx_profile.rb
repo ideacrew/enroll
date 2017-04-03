@@ -123,11 +123,11 @@ class HbxProfile
   ## Application-level caching
 
   ## HBX general settings
-  StateName = "District of Columbia"
-  StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
-  CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  StateName = Settings.aca.state_name
+  StateAbbreviation = Settings.aca.state_abbreviation
+  CallCenterName = Settings.contact_center.name
+  CallCenterPhoneNumber = Settings.contact_center.phone_number
+  ShortName = Settings.site.short_name
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
