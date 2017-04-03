@@ -86,7 +86,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
-  field :parent_enrollment_id, type: String
+  field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -354,8 +354,8 @@ class HbxEnrollment
   end
 
   def parent_enrollment
-    return nil if parent_enrollment_id.blank?
-    HbxEnrollment.by_hbx_id(parent_enrollment_id).first
+    return nil if predecessor_enrollment_id.blank?
+    HbxEnrollment.find(predecessor_enrollment_id).first
   end
 
   def census_employee
