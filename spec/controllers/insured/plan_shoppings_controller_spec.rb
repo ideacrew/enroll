@@ -573,7 +573,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let (:new_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_may1, household: household, plan: plan) }
     let (:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
     it "should have have different effective dates by enrollment member" do
-      binding.pry
       # previous_hbx_enrollment.hbx_enrollment_members << 
       # expect(previous_hbx_enrollment.subscriber.coverage_start_on).to be == new_hbx_enrollment.subscriber.coverage_start_on
     end
