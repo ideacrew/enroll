@@ -9,7 +9,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   let(:plan) do
     double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
-      nationwide: "true", total_employee_cost: 100, deductible: 500,
+      nationwide: "true", total_employee_cost: 100, deductible: 500, family_deductible: 1000,
       name: "My Plan", id: "991283912392", carrier_profile: nil,
       carrier_profile_id: carrier_profile.id,
       active_year: TimeKeeper.date_of_record.year, total_premium: 300,
@@ -61,7 +61,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to match(/#{plan.name}/)
       expect(rendered).to match(/#{plan.carrier_profile}/)
       expect(rendered).to match(/#{plan.active_year}/)
-      expect(rendered).to match(/#{plan.deductible}/)
+      expect(rendered).to match(/#{plan.family_deductible}/)
       expect(rendered).to match(/#{plan.is_standard_plan}/)
       expect(rendered).to match(/#{plan.nationwide}/)
       expect(rendered).to match(/#{plan.total_employee_cost}/)
@@ -86,6 +86,15 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_selector('a', text:'Summary of Benefits and Coverage')
       expect(rendered).to match(/#{file_param}/)
     end
+
+    it "should have the see details selector" do
+      expect(rendered).to have_selector('a', text: /See Details/)
+    end
+
+    it "should have title text for standard plan " do
+      expect(rendered).to match /Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them./i
+    end
+
   end
 
   context "with aptc" do

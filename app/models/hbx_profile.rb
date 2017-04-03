@@ -101,9 +101,22 @@ class HbxProfile
       employer_profile_ids.each do |empr_id|
         empr = EmployerProfile.find(empr_id)
         hbx_ids << empr.hbx_id
-        empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
+        empr.update_attribute(:xml_transmitted_timestamp, TimeKeeper.datetime_of_record.utc)
       end
       notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
+    end
+
+    def search_random(search_param)
+      if search_param.present?
+        organizations = Organization.where(legal_name: /#{search_param}/i)
+        broker_agency_profiles = []
+        organizations.each do |org|
+          broker_agency_profiles << org.broker_agency_profile if org.broker_agency_profile.present?
+        end
+      else
+        broker_agency_profiles = BrokerAgencyProfile.all
+      end
+      broker_agency_profiles
     end
   end
 
@@ -221,6 +234,4 @@ class HbxProfile
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end
-
-
 end

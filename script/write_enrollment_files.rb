@@ -35,7 +35,7 @@ count = 0
 
 hbx_ids.each do |pid|
   count += 1
-  puts "#{Time.now} - #{count}/#{total_count}" if count % 100 == 0
+  puts "#{TimeKeeper.datetime_of_record} - #{count}/#{total_count}" if count % 100 == 0
   pol = HbxEnrollment.by_hbx_id(pid).first
   if pol.nil?
     raise "NO SUCH POLICY #{pid}"

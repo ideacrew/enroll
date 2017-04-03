@@ -27,7 +27,9 @@ module Effective
            ['Send Secure Message', new_insured_inbox_path(id: row.primary_applicant.person.id, profile_id: current_user.person.hbx_staff_role.hbx_profile.id, to: row.primary_applicant.person.last_name + ', ' + row.primary_applicant.person.first_name, family_actions_id: "family_actions_#{row.id.to_s}"), secure_message_link_type(row, current_user)],
            ['Edit APTC / CSR', edit_aptc_csr_path(family_id: row.id, person_id: row.primary_applicant.person.id),
             aptc_csr_link_type(row, pundit_allow(Family, :can_update_ssn?))],
-           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax']
+           ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id.to_s}"),'ajax'],
+           ['Paper', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'paper'), 'static'],
+           ['Phone', resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id, original_application_type: 'phone'), 'static'],
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -54,16 +56,8 @@ module Effective
       end
 
       def aptc_csr_link_type(family, allow)
-        return "disabled" # DISABLING APTC FEATURE FOR NOW.
-
-        link_type = "disabled"
-        family.active_household.tax_households.each do |th|
-          th.eligibility_determinations.each do |ed|
-            link_type = "ajax" if ed.max_aptc > 0 && th.effective_ending_on.nil? && allow
-            #link_type = "ajax" if ed.max_aptc > 0 && allow
-          end
-        end
-        return link_type
+        return "disabled" # DISABLING APTC FEATURE.
+        family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
       end
 
       def add_sep_link_type(allow)
