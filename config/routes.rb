@@ -81,6 +81,8 @@ Rails.application.routes.draw do
         get :hide_form
         get :show_sep_history
         get :enable_or_disable_link
+        post :cancel_initial_plan_year
+        post :cancel_initial_plan_year_form
       end
 
       member do
