@@ -785,6 +785,10 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan){ Plan.new(active_year: date.year) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
 
+    before do 
+      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+    end
+
     it "should return plan year start on year when shop" do
       expect(hbx_enrollment.coverage_year).to eq date.year
     end
@@ -1724,12 +1728,16 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end
-                                                 })
+
+      benefit_group =  BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
     it "should have an eligibility event date" do
       expect(subject.eligibility_event_has_date?).to eq true
@@ -1764,13 +1772,17 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
                                                                                                                :hired_on => hired_on
                                                                       })
       })
-      subject.benefit_group = BenefitGroup.new({
-                                                 :plan_year => PlanYear.new({
-                                                                              :open_enrollment_start_on => open_enrollment_start,
-                                                                              :open_enrollment_end_on => open_enrollment_end,
-                                                                              :start_on => coverage_start
-                                                 })
+
+      benefit_group = BenefitGroup.new({
+       :plan_year => PlanYear.new({
+        :open_enrollment_start_on => open_enrollment_start,
+        :open_enrollment_end_on => open_enrollment_end,
+        :start_on => coverage_start
+        })
       })
+
+      subject.benefit_group = benefit_group
+      allow(subject).to receive(:benefit_group).and_return(benefit_group)
     end
 
     describe "when coverage start is the same as the plan year" do

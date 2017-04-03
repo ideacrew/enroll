@@ -8,6 +8,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb"  do
   let(:hbx_enrollment) { HbxEnrollment.new(plan: plan, benefit_group: benefit_group) }
   let(:family) { Family.new }
   before :each do
+    allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
     allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
     allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
     allow(hbx_enrollment).to receive(:is_shop?).and_return true
