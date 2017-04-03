@@ -7,7 +7,7 @@ class UpdateEeDependentSSN < MongoidMigrationTask
       dep = census_employee.census_dependents.where(_id: ENV['dep_id']).first
       if dep.present?
         dep.update_attributes!(ssn: ENV['dep_ssn'])
-        puts "SSN of census_employee's #{ENV['ce_id']} dependent of id: #{ENV['dep_id']} updated to '#{ENV['dep_ssn']}' " unless Rails.env.test?
+        puts "SSN of census_employee: #{census_employee.full_name}'s dependent: #{dep.full_name} updated to '#{ENV['dep_ssn']}' " unless Rails.env.test?
       else
         puts "dependent id not found"
       end
