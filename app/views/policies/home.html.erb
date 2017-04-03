@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>IVL Dashboard</title>
+    <title>IVL Policies Dashboard</title>
 
     <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
     <!-- <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -17,7 +17,9 @@
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
-            height: 185
+            marginLeft: 70,
+            height: 185,
+            width: 1000
         },
         title: {
             text: ''
@@ -46,6 +48,7 @@
         yAxis: {
             min: 0,
             title: {
+                offset: 50,
                 text: 'Enrollment'
             }
         },
@@ -73,10 +76,7 @@
             }
         },
         series: [{
-            name: '2016',
-            data: [14000, 14000, 14000, 14000, 14000, 14000, 14000, 14000, 14000, 14000, 14000, 14000]
-
-        }, {
+            showInLegend: false,
             name: '2017',
             data: [17000, 17000, 17000, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -92,7 +92,8 @@
             borderColor: '#000000',
             borderWidth: 0,
             type: 'line',
-            height: 190
+            height: 195,
+            width: 1000
         },
         title: {
             text: ''
@@ -146,10 +147,10 @@
     <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
     <ul class="nav nav-pills">
-      <li><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
-      <li class="active"><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
-      <li><a href="shop_main.htm">SHOP</a></li>
-      <li><a href="cong_main.htm">Congress</a></li>
+      <li><a href="https://enroll-dashboard.dchbx.org/ivl/covered"data-toggle="tab">IVL Covered Lives</a></li>
+      <li class="active"><a href="https://enroll-dashboard.dchbx.org/ivl/policy" data-toggle="tab">IVL Policies</a></li>
+      <li><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+      <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
     </ul>
 
    <div class="row row-content">
@@ -181,7 +182,7 @@
     <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
-    <table class="table table-hover table-condensed">
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
     <tbody>
     <tr class="tabSpc1">
         <td class="texLef" colspan="4">Policies <a href="ivl_enroll.htm">More Information</a></td>
@@ -462,10 +463,10 @@
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h5><b>Active Policies</b></h5>
+<h6><b>Active Policies</b></h6>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h5><b>Policies by Effective Month</b></h5>
+<h6><b>Policies by Effective Month</b></h6>
     <table class="table table-hover table-condensed">
     <thead>
       <tr>
@@ -586,7 +587,7 @@
     </tbody>
     </table>
 
- <h5><b>Discontinued or Reinstated Policies by Transaction Date</b></h5>
+ <h6><b>Discontinued or Reinstated Policies by Transaction Date</b></h6>
  <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
 
     </div>

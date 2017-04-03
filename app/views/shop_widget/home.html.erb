@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>IVL Dashboard</title>
+  <title>SHOP Dashboard</title>
 
   <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -17,10 +17,9 @@
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
-            spacingBottom: 10,
-            spacingTop: 10,
-            spacingLeft: 10,
-            spacingRight: 10
+            marginLeft: 70,
+            height: 200,
+            width: 1000
         },
         title: {
             text: ''
@@ -49,6 +48,7 @@
         yAxis: {
             min: 0,
             title: {
+                offset: 50,
                 text: 'Covered Lives'
             }
         },
@@ -95,10 +95,10 @@
 <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
 <ul class="nav nav-pills">
-  <li><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
-  <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
-  <li class="active"><a href="shop_main.htm">SHOP</a></li>
-  <li><a href="cong_main.htm">Congress</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" data-toggle="tab">IVL Covered Lives</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" data-toggle="tab">IVL Policies</a></li>
+  <li class="active"><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
 </ul>
 
 <div class="row row-content">
@@ -129,7 +129,7 @@
     <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="box-shadow: 0px 0px 5px gray;">
 
-    <table class="table table-hover table-condensed">
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
     
     <thead>
       <tr class="tabSpc1">
@@ -333,9 +333,9 @@
 
 <h6>SHOP Active Covered Lives by Start Month</h6>
 
-<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
+<div id="barYr1" style="min-width: 310px; height: 200px; margin: 0 auto"></div>
 
-  <table class="table table-hover table-condensed">   
+  <table class="table table-hover table-condensed" style="margin-top: 10px;">   
     <thead>
       <tr>
         <th class="texLef"></th>
