@@ -18,11 +18,11 @@ contact_center:
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
-  email_address: "info@example.com"
+  email_address: "info@mhc.hbxshop.org"
 
 aca:
-  state_name: ""
-  state_abbreviation: ""
+  state_name: "Massachusetts"
+  state_abbreviation: "MA"
 
 #
   qle:
