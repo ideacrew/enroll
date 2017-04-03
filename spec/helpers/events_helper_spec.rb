@@ -279,4 +279,52 @@ describe EventsHelper, "given an address_kind" do
     end
 
   end
+
+  describe "is_office_location_address_valid?" do
+
+    let(:phone) { FactoryGirl.build(:phone) }
+    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
+    let(:office_location1) { OfficeLocation.new(is_primary: true, address: address1, phone: phone)}
+
+    context "office location with valid address kind" do
+
+      it "should return true" do
+        expect(subject.is_office_location_address_valid?(office_location)).to eq true
+      end
+    end
+
+    context "office location with invalid address kind" do
+
+      it "should return false " do
+        expect(subject.is_office_location_address_valid?(office_location1)).to eq false
+      end
+    end
+  end
+
+  describe "is_office_location_phone_valid?" do
+
+    let(:phone) { FactoryGirl.build(:phone, kind:'home') }
+    let(:phone1) { FactoryGirl.build(:phone, kind:'phone main main') }
+    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
+    let(:office_location1) { OfficeLocation.new(is_primary: true, address: address1, phone: phone1)}
+
+    context "office location with valid phone kind" do
+
+      it "should return true" do
+        expect(subject.is_office_location_phone_valid?(office_location)).to eq true
+      end
+    end
+
+    context "office location with invalid phone kind" do
+
+      it "should return false " do
+        expect(subject.is_office_location_phone_valid?(office_location1)).to eq false
+      end
+    end
+  end
+
 end

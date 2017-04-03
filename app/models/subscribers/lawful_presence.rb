@@ -21,10 +21,10 @@ module Subscribers
         return if person.nil? || person.consumer_role.nil?
 
         consumer_role = person.consumer_role
-        consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: Time.now, body: xml})
+        consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
         if "503" == return_status
           args = OpenStruct.new
-          args.determined_at = Time.now
+          args.determined_at = TimeKeeper.datetime_of_record
           args.vlp_authority = 'dhs'
           consumer_role.fail_dhs!(args)
           consumer_role.save      
@@ -47,18 +47,18 @@ module Subscribers
     def update_consumer_role(consumer_role, xml_hash)
       args = OpenStruct.new
       if xml_hash[:lawful_presence_indeterminate].present?
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'dhs'
         consumer_role.fail_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("lawfully_present")
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'dhs'
-        args.citizen_status = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
+        args.citizenship_result = get_citizen_status(xml_hash[:lawful_presence_determination][:legal_status])
         consumer_role.pass_dhs!(args)
       elsif xml_hash[:lawful_presence_determination].present? && xml_hash[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
-        args.determined_at = Time.now
+        args.determined_at = TimeKeeper.datetime_of_record
         args.vlp_authority = 'dhs'
-        args.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+        args.citizenship_result = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
         consumer_role.fail_dhs!(args)
       end
       consumer_role.save
