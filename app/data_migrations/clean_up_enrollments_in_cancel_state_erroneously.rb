@@ -5,13 +5,13 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 # 3. Provide an output identifying the following: Primary Subscriber HBX ID, E1 HBX ID, E1 effective date, E1 Market type, E2 HBX ID
 class CleanUpEnrollmentsInCancelStateErroneously < MongoidMigrationTask
   def migrate
-    puts "Primary Subscriber HBX ID, Enrollment HBX ID, Effective Date, Market Type, Enrollment 2 HBX ID"
-    
+    puts "Primary Subscriber HBX ID, Enrollment HBX ID, Effective Date, Market Type, Enrollment 2 HBX ID" unless Rails.env.test?
+
     families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::TERMINATED_STATUSES)
 
       families.each do |family|
         enrollments = family.active_household.hbx_enrollments
-  
+
         family.active_household.hbx_enrollments.where(aasm_state:"coverage_terminated").each do |terminated_enrollment|
           enrollments.each do |enrollment|
             if terminated_enrollment.kind == enrollment.kind
@@ -35,7 +35,7 @@ class CleanUpEnrollmentsInCancelStateErroneously < MongoidMigrationTask
                         # 2. Coverage end date for affected enrollments should be equal to the enrollment effective date.
                          terminated_enrollment.update(terminated_on:active_effective)
                         # 3. Provide an output identifying the following: Primary Subscriber HBX ID, E1 HBX ID, E1 effective date, E1 Market type, E2 HBX ID
-                        puts "#{active_member.person.hbx_id}, #{terminated_enrollment.hbx_id}, #{terminate_effective}, #{terminated_enrollment.kind}, #{enrollment.hbx_id}"
+                        puts "#{active_member.person.hbx_id}, #{terminated_enrollment.hbx_id}, #{terminate_effective}, #{terminated_enrollment.kind}, #{enrollment.hbx_id}" unless Rails.env.test?
                       end
                     end
                   end
