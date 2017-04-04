@@ -2198,6 +2198,7 @@ describe PlanYear, "which has the concept of export eligibility" do
           employer_profile: employer_profile,
           start_on: valid_plan_year_start_on,
           end_on: valid_plan_year_end_on,
+          fte_count: 3,
           open_enrollment_start_on: valid_open_enrollment_start_on,
           open_enrollment_end_on: valid_open_enrollment_end_on
           })
