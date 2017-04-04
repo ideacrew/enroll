@@ -20,7 +20,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     }
 
     let(:renewing_employees) {
-      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 10, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
+      FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: renewing_employer, 
         benefit_group: renewing_employer.active_plan_year.benefit_groups.first, 
         renewal_benefit_group: renewing_employer.renewing_plan_year.benefit_groups.first)
     }
@@ -28,17 +28,15 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     let!(:initial_employee_enrollments) {
       initial_employees.inject([]) do |enrollments, ce|
         employee_role = create_person(ce, initial_employer)
-        family = Family.find_or_build_from_employee_role(employee_role)
-        enrollments << create_enrollment(family: family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
+        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
       end
     }
 
     let!(:renewing_employee_enrollments) {
       renewing_employees.inject([]) do |enrollments, ce|
         employee_role = create_person(ce, renewing_employer)
-        family = Family.find_or_build_from_employee_role(employee_role)
-        enrollments << create_enrollment(family: family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
-        enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: employee_role, status: 'auto_renewing', submitted_at: effective_on - 20.days)
+        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
+        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: employee_role, status: 'auto_renewing', submitted_at: effective_on - 20.days)
       end
     }
 
@@ -54,6 +52,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
       ce.update_attributes({employee_role: employee_role})
+      Family.find_or_build_from_employee_role(employee_role)
       employee_role
     end
 
