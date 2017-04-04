@@ -333,7 +333,10 @@ class CensusEmployee < CensusMember
   end
 
   def active_and_renewing_benefit_group_assignments
-    active_benefit_group_assignment.present? ? active_benefit_group_assignment + renewal_benefit_group_assignment : renewal_benefit_group_assignment
+    result = []
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 
+    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
+    result
   end
 
   def add_default_benefit_group_assignment
