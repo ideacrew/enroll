@@ -332,6 +332,10 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def active_and_renewing_benefit_group_assignments
+    active_benefit_group_assignment.present? ? active_benefit_group_assignment + renewal_benefit_group_assignment : renewal_benefit_group_assignment
+  end
+
   def add_default_benefit_group_assignment
     if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
       add_benefit_group_assignment(plan_year.benefit_groups.first)
