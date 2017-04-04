@@ -17,10 +17,95 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
       end
     end
     #move the hbx_enrollments
+
     hbx_enrollments.each do |hbx_enrollment|
+      #check whether the enrollment member of the hbx_enrollment match with each other
+      enrollment_person=hbx_enrollment_members.map{|a|a.person}
+
       if hbx_enrollment.is_shop?
         unless hbx_enrollment.census_employee.nil?
            if hbx_enrollment.census_employee.id == gp.employee_roles.first.census_employee.id
+
+
+           #   enrollment = HbxEnrollment.new
+           #   enrollment.household = coverage_household.household
+           #
+           #   enrollment.submitted_at = submitted_at
+           #   case
+           #     when employee_role.present?
+           #       if benefit_group.blank? || benefit_group_assignment.blank?
+           #         benefit_group, benefit_group_assignment = employee_current_benefit_group(employee_role, enrollment, qle)
+           #       end
+           #
+           #       enrollment.kind = "employer_sponsored"
+           #       enrollment.employee_role = employee_role
+           #
+           #       if qle && enrollment.family.is_under_special_enrollment_period?
+           #         enrollment.effective_on = [enrollment.family.current_sep.effective_on, benefit_group.start_on].max
+           #         enrollment.enrollment_kind = "special_enrollment"
+           #       else
+           #         if external_enrollment && coverage_start.present?
+           #           enrollment.effective_on = coverage_start
+           #         else
+           #           enrollment.effective_on = calculate_start_date_from(employee_role, coverage_household, benefit_group)
+           #         end
+           #         enrollment.enrollment_kind = "open_enrollment"
+           #       end
+           #
+           #       enrollment.benefit_group_id = benefit_group.id
+           #       enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+           #     when consumer_role.present?
+           #       enrollment.consumer_role = consumer_role
+           #       enrollment.kind = "individual"
+           #       enrollment.benefit_package_id = benefit_package.try(:id)
+           #       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+           #
+           #       if qle && enrollment.family.is_under_special_enrollment_period?
+           #         enrollment.effective_on = enrollment.family.current_sep.effective_on
+           #         enrollment.enrollment_kind = "special_enrollment"
+           #       elsif enrollment.family.is_under_ivl_open_enrollment?
+           #         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
+           #         enrollment.enrollment_kind = "open_enrollment"
+           #       else
+           #         raise "You may not enroll until you're eligible under an enrollment period"
+           #       end
+           #     when resident_role.present?
+           #       enrollment.kind = "coverall"
+           #       enrollment.resident_role = resident_role
+           #       enrollment.benefit_package_id = benefit_package.try(:id)
+           #       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+           #
+           #       if qle && enrollment.family.is_under_special_enrollment_period?
+           #         enrollment.effective_on = enrollment.family.current_sep.effective_on
+           #         enrollment.enrollment_kind = "special_enrollment"
+           #       elsif enrollment.family.is_under_ivl_open_enrollment?
+           #         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
+           #         enrollment.enrollment_kind = "open_enrollment"
+           #       else
+           #         raise "You may not enroll until you're eligible under an enrollment period"
+           #       end
+           #     else
+           #       raise "either employee_role or consumer_role is required" unless resident_role.present?
+           #   end
+           #   coverage_household.coverage_household_members.each do |coverage_member|
+           #     enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
+           #     enrollment_member.eligibility_date = enrollment.effective_on
+           #     enrollment_member.coverage_start_on = enrollment.effective_on
+           #     enrollment.hbx_enrollment_members << enrollment_member
+           #   end
+           #   enrollment
+           # end
+           #
+           #
+
+
+
+
+
+
+
+
+
              gp.primary_family.active_household.create_hbx_enrollment_from(
                  employee_role: hbx_enrollment.employee_role,
                  consumer_role: hbx_enrollment.consumer_role,
@@ -52,45 +137,3 @@ end
 
 
 
-
-
-
-
-#
-#
-#
-#     enroll_hbx_id=ENV['enrollment_hbx_id']
-#     if  bp.primary_family.active_household.hbx_enrollments.where(hbx_id:enroll_hbx_id).first
-#       hbx1 = bp.primary_family.active_household.hbx_enrollments.where(hbx_id:enroll_hbx_id).first
-#     else
-#       raise "No enrollment found"
-#     end
-#     move_index=moveable(gp.primary_family,hbx1)
-#     unless move_index
-#       gp.primary_family.latest_household.update_attributes!(:hbx_enrollments => gp.primary_family.latest_household.hbx_enrollments.append(hbx1))
-#       fm= gp.primary_family.latest_household.hbx_enrollments[0].hbx_enrollment_members.first.family_member
-#       hbx_total=gp.primary_family.latest_household.hbx_enrollments.size
-#       gp.primary_family.latest_household.hbx_enrollments[hbx_total-1].hbx_enrollment_members.each do |m|
-#         m.update_attributes!(:family_member => fm)
-#       end
-#       gp.primary_family.latest_household.hbx_enrollments[hbx_total-1].update_attributes!(:consumer_role_id => gp.consumer_role.id)
-#       bp.primary_family.latest_household.hbx_enrollments.delete_at(index)
-#       hbx = bp.primary_family.latest_household.hbx_enrollments
-#       hh = bp.primary_family.latest_household
-#       hh.hbx_enrollments = hbx
-#       hh.save!
-#     end
-#   end
-#
-#
-#   def moveable (family, enrollment)
-#     enrollment_ppl_hbx_ids=enrollment.try(:hbx_enrollment_members).map{|a| a.person.hbx_id}
-#     family_ppl_hbx_ids=family.family_members.map{|a| a.person.hbx_id}
-#     if enrollment_ppl_hbx_ids.to_set.subset?(family_ppl_hbx_ids.to_set)
-#       return true
-#     else
-#       return false
-#     end
-#
-#   end
-# end
