@@ -15,10 +15,9 @@
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
-            spacingBottom: 10,
-            spacingTop: 10,
-            spacingLeft: 10,
-            spacingRight: 10
+            marginLeft: 70,
+            height: 190,
+            width: 1000
         },
         title: {
             text: ''
@@ -47,7 +46,8 @@
         yAxis: {
             min: 0,
             title: {
-                text: 'Enrollment'
+              offset: 50,
+                text: 'Covered Lives'
             }
         },
         credits: {
@@ -84,57 +84,6 @@
         });
     });
 </script>
-<script type="text/javascript">
-$(function () {
-    $('#web1').highcharts({
-        chart: {
-            type: 'heatmap',
-            marginTop: 3,
-            marginBottom: 3,
-            plotBorderWidth: 1
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-            categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-        },
-        yAxis: {
-            categories: ['Page Views'],
-            title: null
-        },
-        colorAxis: {
-            min: 6,
-            minColor: '#FFFFFF',
-            maxColor: Highcharts.getOptions().colors[0]
-        },
-         legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        exporting: {
-            enabled: false
-        },
-        tooltip: {
-            formatter: function () {
-                return '<b>' + this.series.xAxis.categories[this.point.x] + '</b> <br><b>' +
-                    this.point.value + '</b> thousand <br><b>' + this.series.yAxis.categories[this.point.y] + '</b>';
-            }
-        },
-        series: [{
-            name: 'Web Activity',
-            borderWidth: 1,
-            data: [[0, 0, 9.1], [1, 0, 6.9], [2, 0, 8], [3, 0, 8.1], [4, 0, 7.4], [5, 0, 8.1], [6, 0, 7.3]],
-            dataLabels: {
-                enabled: true,
-                color: '#000000'
-            }
-        }]
-    });
-});
-        </script>
 
 <script type="text/javascript">
     $(function () {
@@ -143,10 +92,8 @@ $(function () {
             borderColor: '#000000',
             borderWidth: 0,
             type: 'line',
-            spacingBottom: 10,
-            spacingTop: 10,
-            spacingLeft: 10,
-            spacingRight: 10
+            height: 195,
+            width: 1000 
         },
         title: {
             text: ''
@@ -215,10 +162,10 @@ $(function () {
 <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
 <ul class="nav nav-pills">
-  <li class="active"><a href="ivl_lives.htm" data-toggle="tab">IVL Covered Lives</a></li>
-  <li><a href="ivl_policy.htm" data-toggle="tab">IVL Policies</a></li>
-  <li><a href="shop_main.htm">SHOP</a></li>
-  <li><a href="cong_main.htm">Congress</a></li>
+  <li class="active"><a href="https://enroll-dashboard.dchbx.org/ivl/policy" data-toggle="tab">IVL Covered Lives</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" data-toggle="tab">IVL Policies</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
 </ul>
 
 <div class="row row-content">
@@ -250,7 +197,7 @@ $(function () {
     <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
-    <table class="table table-hover table-condensed">
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
     <thead>
     <tr class="tabSpc1">
         <th class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm">More Information</a></th>
@@ -556,11 +503,11 @@ $(function () {
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h5><b>Active Covered Lives</b></h5>
+<h6><b>Active Covered Lives</b></h6>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h5><b>Covered Lives by Effective Month</b></h5>
-    <table class="table table-hover table-condensed">
+<h6><b>Covered Lives by Effective Month</b></h6>
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
     <thead>
     <% @enrollments.each do |enrollment| %>
       <tr>
@@ -678,7 +625,7 @@ $(function () {
     </tbody>
     </table>
 
- <h5><b>Discontinued or Reinstated Covered Lives by Transaction Month</b></h5>
+ <h6><b>Discontinued or Reinstated Covered Lives by Transaction Month</b></h6>
  <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
 
     </div>
