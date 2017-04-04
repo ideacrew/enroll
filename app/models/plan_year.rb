@@ -112,7 +112,11 @@ class PlanYear
           "$in" => id_list
         },
         "households.hbx_enrollments.aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::WAIVED_STATUSES)},
-        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on}
+        "households.hbx_enrollments.effective_on" =>  {"$lte" => date.end_of_month, "$gte" => self.start_on},
+        "$or" => [
+         {"households.hbx_enrollments.terminated_on" => {"$eq" => nil} },
+         {"households.hbx_enrollments.terminated_on" => {"$gte" => date.end_of_month}}
+        ]
       }},
       {"$sort" => {
         "households.hbx_enrollments.submitted_at" => 1
