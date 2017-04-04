@@ -821,7 +821,7 @@ class PlanYear
       transitions from: :draft, to: :draft,     :guard => :is_application_invalid?
       transitions from: :draft, to: :enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => :accept_application
       transitions from: :draft, to: :published, :guard => :is_application_eligible?
-      transitions from: :draft, to: :publish_pending
+      transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice]
@@ -1024,6 +1024,13 @@ private
       self.employer_profile.trigger_notices("conversion_group_renewal")
     else
       self.employer_profile.trigger_notices("group_renewal_5")
+    end
+  end
+
+  def initial_employer_denial_notice
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
+      self.employer_profile.trigger_notices("initial_employer_denial")
     end
   end
 
