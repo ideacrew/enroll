@@ -449,7 +449,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
   find('label[for=census_employee_gender_male]').click
-  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (TimeKeeper.datetime_of_record - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
   fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
@@ -714,7 +714,12 @@ end
 
 And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, plan_year_state|
   employer_profile = CensusEmployee.where(first_name: people[named_person][:first_name]).first.employee_role.employer_profile
-  expect(page).to have_content "#{employer_profile.plan_years.where(aasm_state: plan_year_state ).first.benefit_groups.first.reference_plan.name}"
+  # cannot select a SEP date from expired plan year on 31st.
+  if TimeKeeper.date_of_record.day != 31 || plan_year_state != "expired"
+    expect(page).to have_content "#{employer_profile.plan_years.where(aasm_state: plan_year_state ).first.benefit_groups.first.reference_plan.name}"
+  else
+    expect(page).to have_content "#{employer_profile.plan_years.where(:aasm_state.ne => plan_year_state ).first.benefit_groups.first.reference_plan.name}"
+  end
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do

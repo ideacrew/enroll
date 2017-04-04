@@ -32,14 +32,10 @@ module EventsHelper
     #Adding phone kind 'phone main' temporary, revert once phone.kind in office location fixed.
   end
 
-  def employer_has_office_location?(office_location)
-    is_office_location_address_valid?(office_location) && is_office_location_phone_valid?(office_location)
-  end
-
   def transaction_id
     @transaction_id ||= begin
       ran = Random.new
-      current_time = Time.now.utc
+      current_time = TimeKeeper.datetime_of_record.utc
       reference_number_base = current_time.strftime("%Y%m%d%H%M%S") + current_time.usec.to_s[0..2]
       reference_number_base + sprintf("%05i",ran.rand(65535))
     end

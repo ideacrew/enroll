@@ -40,12 +40,18 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
     begin
       person = family.primary_applicant.person
 
+      next if person.inbox.blank?
+      next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+      # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+      #   next if secure_message.created_at > 35.days.ago
+      # end
+
       if person.consumer_role.blank?
         count += 1
         next
       end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
 
       notice_trigger = event_kind.notice_triggers.first 
 

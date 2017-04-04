@@ -48,7 +48,7 @@ module LegacyImporters
           :is_applicant => true,
           :lawful_presence_determination => LawfulPresenceDetermination.new(
              :vlp_authority => "curam",
-             :vlp_verified_at => Time.now,
+             :vlp_verified_at => TimeKeeper.datetime_of_record,
              :aasm_state => "verification_successful"
           ),
           :aasm_state => "fully_verified",
