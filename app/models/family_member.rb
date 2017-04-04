@@ -5,6 +5,7 @@ class FamilyMember
   include MongoidSupport::AssociationProxies
 
   embedded_in :family
+  embeds_many :person_relationships, cascade_callbacks: true, validate: true
 
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
@@ -122,16 +123,52 @@ class FamilyMember
     family.add_family_member(person)
   end
 
-  def update_relationship(relationship)
-    return if (primary_relationship == relationship)
-    family.remove_family_member(person)
-    self.reactivate!(relationship)
-    family.save!
-  end
+  # def update_relationship(relationship)
+  #   return if (primary_relationship == relationship)
+  #   family.remove_family_member(person)
+  #   self.reactivate!(relationship)
+  #   family.save!
+  # end
 
   def self.find(family_member_id)
     return [] if family_member_id.nil?
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
+  end
+
+  # Related to Relationship Matrix
+  def add_relationship(successor, relationship_kind)
+    if same_successor_exists?(successor)
+      direct_relationship = family.person_relationships.where(predecessor_id: self.id, successor_id: successor.id).first # Direct Relationship
+      inverse_relationship = family.person_relationships.where(predecessor_id: successor.id, successor_id: self.id).first # Inverse Relationship
+
+      # Destroying the Row and Column relationships of the Family Member when updating the Existing VALID Relationship which is not "NIL".
+      # if direct_relationship != nil
+      #   family.person_relationships.where(predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+      #   family.person_relationships.where(successor_id: self.id, :id.nin =>[inverse_relationship.id]).each(&:destroy)
+      # end
+
+      direct_relationship.update(kind: relationship_kind)
+      inverse_relationship.update(kind: inverse_relationship_kind(relationship_kind))
+    else
+      if self.id != successor.id
+        primary_person = self.family.primary_applicant.person
+        family.person_relationships.create(family_id: self.family.id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+        family.person_relationships.create(family_id: self.family.id, predecessor_id: successor.id, successor_id: self.id, kind: inverse_relationship_kind(relationship_kind)) # Inverse Relationship
+      end
+    end
+  end
+
+  def remove_relationship
+    family.person_relationships.where(predecessor_id: self.id).each(&:destroy)
+    family.person_relationships.where(successor_id: self.id).each(&:destroy)
+  end
+
+  def same_successor_exists?(successor)
+    family.person_relationships.where(predecessor_id: self.id, successor_id: successor.id).first.present?
+  end
+
+  def inverse_relationship_kind(relationship_kind)
+    PersonRelationship::InverseMap[relationship_kind]
   end
 end

@@ -48,6 +48,7 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
+  embeds_many :person_relationships
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -540,7 +541,7 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    primary_applicant_person.ensure_relationship_with(person, relationship)
+    #primary_applicant_person.ensure_relationship_with(person, relationship)
     add_family_member(person)
   end
 
@@ -911,6 +912,120 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+
+  #Used for RelationshipMatrix
+  def build_relationship_matrix
+    family_members_id = family_members.map(&:id)
+    matrix_size = family_members.count
+    matrix = Array.new(matrix_size){Array.new(matrix_size)} #[n*n] square matrix.
+    id_map = {}
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        matrix[xi][yi] = find_existing_relationship(id_map[xi], id_map[yi])
+        matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi]) # Populate Inverse
+      end
+    end
+    matrix = apply_rules_and_update_relationships(matrix)
+    return matrix
+  end
+
+  def find_existing_relationship(member_a_id, member_b_id)
+    return "self" if member_a_id == member_b_id
+    rel = person_relationships.where(predecessor_id: member_a_id, successor_id: member_b_id).first
+    return rel.kind if rel.present?
+  end
+
+  def find_missing_relationships(matrix)
+    id_map = {}
+    family_members_id = family_members.map(&:id)
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    missing_relationships = []
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        if (xi > yi) && matrix[xi][yi].blank?
+          missing_relationships << {id_map[xi] => id_map[yi]}
+        end
+      end
+    end
+    missing_relationships
+  end
+
+  def apply_rules_and_update_relationships(matrix)
+    missing_relationship = find_missing_relationships(matrix)
+
+    # Sibling rule
+    missing_relationship.each do |rel|
+      relation = person_relationships.where(:predecessor_id.in => rel.to_a.flatten, kind: "child")
+      s_ids = relation.collect(&:successor_id)
+
+      if s_ids.count > s_ids.uniq.count
+        members = family_members.where(:id.in => rel.to_a.flatten)
+        members.second.add_relationship(members.first, "sibling")
+      end
+    end
+
+    # #GrandParent-GrandChild Rule(OLD RULE)
+    # missing_relationship.each do |rel|
+    #   relation = person_relationships.where(:successor_id.in => rel.to_a.flatten, :kind.in => ['parent', 'child'])
+    #   r_types = relation.collect(&:kind)
+    #   s_ids = relation.collect(&:predecessor_id)
+
+    #   if r_types.uniq.count >= 2 && s_ids.count != s_ids.uniq.count
+    #     grandchild = family_members.where(id: relation.where(kind: 'parent').first.successor_id).first
+    #     grandparent = family_members.where(id: relation.where(kind: 'child').first.successor_id).first
+    #     grandparent.add_relationship(grandchild, "grandparent")
+    #   end
+    # end
+
+    # GrandParent-GrandChild Rule
+    missing_relationship.each do |rel|
+      first_rel = rel.to_a.flatten.first
+      second_rel = rel.to_a.flatten.second
+      relation = person_relationships.where(:successor_id.in => rel.to_a.flatten, :kind.in => ['parent', 'child'])
+      r_types = relation.collect(&:kind)
+      s_ids = relation.collect(&:predecessor_id)
+      s_ids.each do |p_id|
+        parent_rel1 = person_relationships.where(successor_id: p_id, predecessor_id: first_rel, kind: 'parent').present?
+        child_rel1 = person_relationships.where(successor_id: p_id, predecessor_id: second_rel, kind: 'child').present?
+        parent_rel2 = person_relationships.where(successor_id: first_rel, predecessor_id: p_id, kind: 'parent').present?
+        child_rel2 = person_relationships.where(successor_id: second_rel, predecessor_id: p_id, kind: 'child').present?
+        if parent_rel1 && child_rel1
+          grandchild = family_members.where(id: second_rel).first
+          grandparent = family_members.where(id: first_rel).first
+          grandparent.add_relationship(grandchild, "grandparent")
+          break
+        elsif parent_rel2 && child_rel2
+          grandchild = family_members.where(id: first_rel).first
+          grandparent = family_members.where(id: second_rel).first
+          grandparent.add_relationship(grandchild, "grandparent")
+          break
+        else
+        end
+      end
+    end
+
+    # Spouse Rule
+    missing_relationship.each do |rel|
+      first_rel = rel.to_a.flatten.first
+      second_rel = rel.to_a.flatten.second
+      relation = person_relationships.where(kind: 'spouse')
+      relation.each do |r|
+        child_rel1 = person_relationships.where(successor_id: r.predecessor_id, predecessor_id: first_rel, kind: 'child').present?
+        child_rel2 = person_relationships.where(successor_id: r.successor_id, predecessor_id: second_rel, kind: 'child').present?
+        parent_rel1 = person_relationships.where(successor_id: first_rel, predecessor_id: r.successor_id, kind: 'parent').present?
+        parent_rel2 = person_relationships.where(successor_id: second_rel, predecessor_id: r.predecessor_id, kind: 'parent').present?
+        if ((child_rel1 && child_rel2) || (parent_rel1 && parent_rel2))
+          members = family_members.where(:id.in => rel.to_a.flatten)
+          members.first.add_relationship(members.last, "sibling")
+          break
+        end
+      end
+    end
+
+    return matrix
+  end
+
 private
   def build_household
     if households.size == 0
@@ -922,7 +1037,7 @@ private
   def family_integrity
     only_one_active_primary_family
     single_primary_family_member
-    all_family_member_relations_defined
+    # all_family_member_relations_defined
     single_active_household
     no_duplicate_family_members
   end
@@ -955,12 +1070,26 @@ private
   end
 
   def all_family_member_relations_defined
+    # binding.pry
     return unless primary_family_member.present? && primary_family_member.person.present?
-    primary_member_id = primary_family_member.id
-    primary_person = primary_family_member.person
-    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
-    undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
+    primary_member = primary_family_member
+    other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member.id.to_s) }
+    undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member, fm).blank? }
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
+  end
+
+  # def all_family_member_relations_defined
+  #   return unless primary_family_member.present? && primary_family_member.person.present?
+  #   primary_member_id = primary_family_member.id
+  #   primary_person = primary_family_member.person
+  #   other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member_id.to_s) && fm.person.present? }
+  #   undefined_relations = other_family_members.any? { |fm| primary_person.find_relationship_with(fm.person).blank? }
+  #   errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
+  # end
+
+  def find_relationship_between(successor, predecessor)
+    binding.pry
+    person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id).first
   end
 
   def single_active_household

@@ -164,7 +164,7 @@ class Person
   index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
-  index({"person_relationship.relative_id" =>  1})
+  # index({"person_relationship.relative_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 

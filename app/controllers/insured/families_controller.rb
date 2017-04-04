@@ -49,6 +49,19 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def family_relationships_matrix
+    set_bookmark_url
+    @family_members = @family.active_family_members
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
+    @relationship_kinds = PersonRelationship::Relationships
+    @tab = params['tab']
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def brokers
     @tab = params['tab']
 

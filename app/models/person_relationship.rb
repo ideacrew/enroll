@@ -3,6 +3,8 @@ class PersonRelationship
   include Mongoid::Timestamps
 
   embedded_in :person
+  embedded_in :family
+  embedded_in :family_member
 
   MaleRelationships   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
                               foster\ child son-in-law brother-in-law father-in-law brother ward
@@ -83,17 +85,29 @@ class PersonRelationship
 
   field :relative_id, type: BSON::ObjectId
   field :kind, type: String
+  field :predecessor_id, type: BSON::ObjectId
+  field :successor_id, type: BSON::ObjectId
+  field :family_id, type: BSON::ObjectId
 
-	validates_presence_of :relative_id, message: "Choose a relative"
+	# validates_presence_of :relative_id, message: "Choose a relative"
+  validates_presence_of :predecessor_id, :successor_id
   validates :kind,
             presence: true,
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
-  def parent
-    raise "undefined parent class: Person" unless person?
-    self.person
+  # def parent
+  #   raise "undefined parent class: Person" unless person?
+  #   self.person
+  # end
+
+  def predecessor
+    family.family_member.find(predecessor_id)
+  end
+
+  def successor
+    family.family_member.find(successor_id)
   end
 
   def relative=(new_person)

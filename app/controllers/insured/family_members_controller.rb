@@ -48,6 +48,9 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_consumer_role_id = false
     end
 
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
+
   end
 
   def new
@@ -60,6 +63,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
+    @matrix = @dependent.family.build_relationship_matrix
+    @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
+    @relationship_kinds = PersonRelationship::Relationships
 
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.save
@@ -100,7 +106,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def show
     @dependent = Forms::FamilyMember.find(params.require(:id))
-
+    @matrix = @dependent.family.build_relationship_matrix
+    @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
+    @relationship_kinds = PersonRelationship::Relationships
     respond_to do |format|
       format.html
       format.js

@@ -174,17 +174,14 @@ end
 
 describe FamilyMember, "given a relationship to update" do
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:primary_person) {family.primary_applicant}
   let(:relationship) { "spouse" }
   let(:person) { FactoryGirl.build(:person) }
   subject { FactoryGirl.build(:family_member, person: person, family: family) }
 
-  it "should do nothing if the relationship is the same" do
-    subject.update_relationship(subject.primary_relationship)
-  end
-
-  it "should update the relationship if different" do
-    expect(subject.primary_relationship).not_to eq relationship
-    subject.update_relationship(relationship)
-    expect(subject.primary_relationship).to eq relationship
+  it "should update the relationship" do
+    subject.add_relationship(primary_person, relationship)
+    rel = family.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
+    expect(rel).to eq relationship
   end
 end
