@@ -261,6 +261,10 @@ class EmployerProfile
      published_plan_year || active_plan_year
   end
 
+  def active_and_renewing_published
+    active_plan_year.present? ? (active_plan_year + renewing_published_plan_year) : renewing_published_plan_year
+  end
+
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
