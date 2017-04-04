@@ -29,9 +29,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_A) {
         ce = initial_employees[0]
-        employee_role = create_person(ce, initial_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, initial_employer)
       }
 
       let!(:enrollment_1) {
@@ -40,9 +38,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_B) {
         ce = initial_employees[1]
-        employee_role = create_person(ce, initial_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, initial_employer)
       }
 
       let!(:enrollment_2) {
@@ -55,9 +51,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_C) {
         ce = initial_employees[2]
-        employee_role = create_person(ce, initial_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, initial_employer)
       }
 
       let!(:enrollment_4) {
@@ -146,9 +140,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_A) {
         ce = renewing_employees[0]
-        employee_role = create_person(ce, renewing_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, renewing_employer)
       }
 
       let!(:enrollment_1) {      
@@ -161,9 +153,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_B) {
         ce = renewing_employees[1]
-        employee_role = create_person(ce, renewing_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, renewing_employer)
       }
 
       let!(:enrollment_3) {
@@ -176,9 +166,7 @@ describe "a monthly shop enrollment query" do
 
       let(:employee_C) {
         ce = renewing_employees[2]
-        employee_role = create_person(ce, renewing_employer)
-        Family.find_or_build_from_employee_role(employee_role)
-        employee_role
+        create_person(ce, renewing_employer)
       }
 
 
@@ -250,6 +238,7 @@ describe "a monthly shop enrollment query" do
     person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
     employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
     ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
     employee_role
   end
 
