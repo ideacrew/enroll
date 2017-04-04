@@ -1,4 +1,3 @@
-<script>
 $(document).on('ready page:load', function () {
   $('#person_ssn').blur(function(){
     var user_input = $(this).val();
@@ -51,4 +50,3 @@ $(document).on('ready page:load', function () {
     }
   });
 });
-</script>
