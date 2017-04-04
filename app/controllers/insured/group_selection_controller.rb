@@ -47,10 +47,9 @@ class Insured::GroupSelectionController < ApplicationController
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
     qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    session[:effective_on_option_selected] = effective_on_option_selected
+    session[:effective_on_option_selected] = effective_on_option_selected # This will be used later in the PlanShoppingController#set_plans_by method.
     benefit_group = (@employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil)
     @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: benefit_group, effective_on_option_selected: effective_on_option_selected)
-
     generate_coverage_family_members_for_cobra
   end
 

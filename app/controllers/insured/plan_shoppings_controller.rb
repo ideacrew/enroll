@@ -278,7 +278,7 @@ class Insured::PlanShoppingsController < ApplicationController
       elsif @market_kind == 'individual'
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
       elsif @market_kind == 'coverall'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, nil, @market_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected, @market_kind)
       end
     end
     # for carrier search options
