@@ -6,7 +6,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do
@@ -17,7 +17,6 @@ RSpec.describe "insured/thankyou.html.erb" do
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
       allow(@enrollment).to receive(:is_shop?).and_return(true)
-      allow(@enrollment).to receive(:benefit_package_name).and_return('benefit_package')
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
@@ -41,13 +40,6 @@ RSpec.describe "insured/thankyou.html.erb" do
       expect(rendered).to match('Employer Sponsored')
     end
 
-    it "should have benefit_package" do
-      allow(@enrollment).to receive(:is_cobra_status?).and_return(false)
-      render :template => "insured/plan_shoppings/thankyou.html.erb"
-      expect(rendered).to match('Benefit Package:')
-      expect(rendered).to match('benefit_package')
-    end
-
     it "should have cobra msg" do
       allow(@enrollment).to receive(:is_cobra_status?).and_return(true)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
@@ -59,7 +51,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do

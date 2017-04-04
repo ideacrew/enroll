@@ -9,6 +9,7 @@ class PlanCostDecorator < SimpleDelegator
     @benefit_group = benefit_group
     @reference_plan = reference_plan
     @max_contribution_cache = max_cont_cache
+    @plan = plan
   end
 
   def plan_year_start_on

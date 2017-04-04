@@ -353,6 +353,30 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
   end
 
+  describe '#ridp_by_paper_application', dbclean: :after_each do
+    subject { User.new }
+
+    before do
+      subject.ridp_by_paper_application
+    end
+
+    it "should set the identity_final_decision_code as success code" do
+      expect(subject.identity_final_decision_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    end
+
+    it "should set the identity_response_code as success code" do
+      expect(subject.identity_response_code).to eq User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    end
+
+    it "should set the identity_response_description_text as admin bypassed ridp" do
+      expect(subject.identity_response_description_text).to eq "admin bypass ridp"
+    end
+
+    it "should set the identity_verified_date as the it was done" do
+      expect(subject.identity_verified_date).to eq TimeKeeper.date_of_record
+    end
+  end
+
   describe "can_change_broker?", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, person: person) }

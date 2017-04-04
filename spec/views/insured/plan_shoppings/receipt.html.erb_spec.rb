@@ -21,7 +21,6 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       is_cobra_status?: false,
       coverage_kind: 'health',
       is_shop?: true,
-      benefit_package_name: 'benefit_package',
       employee_role: double("EmployeeRole")
     )
   end
@@ -77,7 +76,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
     enrollment.hbx_enrollment_members.each do |enr_member|
       expect(rendered).to match(/#{enr_member.person.full_name}/m)
       expect(rendered).to match(/#{enr_member.primary_relationship}/m)
-      expect(rendered).to match(/#{dob_in_words(enr_member.person.age_on(Time.now.utc.to_date),enr_member.person.dob)}/m)
+      expect(rendered).to match(/#{dob_in_words(enr_member.person.age_on(TimeKeeper.datetime_of_record.utc.to_date),enr_member.person.dob)}/m)
       expect(rendered).to match(/#{@plan.premium_for(enr_member)}/m)
       expect(rendered).to match(/#{@plan.employer_contribution_for(enr_member)}/m)
       expect(rendered).to match(/#{@plan.employee_cost_for(enr_member)}/m)
@@ -95,11 +94,6 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should have market" do
     expect(rendered).to match('Market')
     expect(rendered).to match('Employer Sponsored')
-  end
-
-  it "should have benefit_package" do
-    expect(rendered).to match('Benefit Package:')
-    expect(rendered).to match('benefit_package')
   end
 
   it "should not have cobra msg" do
