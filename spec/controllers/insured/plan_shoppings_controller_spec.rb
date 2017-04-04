@@ -564,14 +564,38 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
   end
 
-  describe "enrollment premiums should stay the same if a person is being retained between enrollments" do 
-    let (:person) { FactoryGirl.create(:person, :with_family) }
+  describe "enrollment premiums should stay the same if a person is being retained between enrollments" do
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) } 
+    let (:dob) { Date.new(1985, 4, 10) }
+    let (:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
     let (:family) { person.primary_family }
     let (:household) { family.active_household }
-    let (:plan) { FactoryGirl.create(:plan, :individual_health) }
-    let (:previous_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_apr1, household: household, plan: plan) }
-    let (:new_hbx_enrollment) { FactoryGirl.create(:individual_qhp_enrollment_may1, household: household, plan: plan) }
-    let (:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let!(:plan) { individual_plans.first }
+    let!(:previous_hbx_enrollment) { 
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
+    }
+    let!(:new_hbx_enrollment) { 
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual') 
+    }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 4, 10))
+      allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile)
+      allow(benefit_coverage_period).to receive(:elected_plans_by_enrollment_members).and_return(individual_plans)
+    end
+
+    context "GET plans" do
+      before :each do
+        sign_in user
+      end
+
+      it "returns http success" do
+        xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
+        # expect(response).to have_http_status(:success)
+      end
+    end
+
     it "should have have different effective dates by enrollment member" do
       # previous_hbx_enrollment.hbx_enrollment_members << 
       # expect(previous_hbx_enrollment.subscriber.coverage_start_on).to be == new_hbx_enrollment.subscriber.coverage_start_on
