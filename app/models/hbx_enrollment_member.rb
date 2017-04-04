@@ -76,7 +76,7 @@ class HbxEnrollmentMember
     if calculation_date.month == dob.month
       age -= 1 if calculation_date.day < dob.day
     else
-      age -= 1 if calculation_date.day < dob.month
+      age -= 1 if calculation_date.month < dob.month
     end
     return age
   end
