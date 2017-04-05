@@ -82,14 +82,6 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:contacts//x:contact//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
     end
 
-    it "should have one broker_agency_profile" do
-      expect(@doc.xpath("//x:broker_agency_profile", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
-    end
-
-    it "should have brokers in broker_agency_profile" do
-      expect(@doc.xpath("//x:broker_agency_profile/x:brokers", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
-    end
-
     it "should have two office_location" do
       expect(@doc.xpath("//x:office_location", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
     end
@@ -104,6 +96,14 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     it "should not have phone for mailing office location " do
       expect(@doc.xpath("//x:office_location[2]/x:phone", "x"=>"http://openhbx.org/api/terms/1.0").to_a).to eq []
+    end
+
+    it "should have one broker_agency_profile" do
+      expect(@doc.xpath("//x:broker_agency_profile", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+    end
+
+    it "should have brokers in broker_agency_profile" do
+      expect(@doc.xpath("//x:broker_agency_profile/x:brokers", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
     end
 
     it "should have contact email" do
