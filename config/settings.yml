@@ -1,11 +1,11 @@
 site:
-  short_name: "Health Connector"
-  byline: "The Right Place for the Right Plan"
+  short_name: "DC Health Link"
+  byline: "DC's Online Health Insurance Marketplace"
   long_name: ""
-  copyright_period_start: "2017"
-  header_message: "The Right Place for the Right Plan"
+  copyright_period_start: "2013"
+  header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
-  home_url: "https://qa.enroll.mhc.hbxshop.org/"
+  home_url: "https://www.dchealthlink.com/"
 
   social_media:
     facebook_url: ""
@@ -13,16 +13,16 @@ site:
   aca_market_kinds: ["individual", "shop"]
 
 contact_center:
-  name: "Health Connector's Customer Care Center"
-  alt_name: "Health Connector Customer Service"
+  name: "DC Health Link's Customer Care Center"
+  alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
-  email_address: "info@mhc.hbxshop.org"
+  email_address: "info@dchealthlink.com"
 
 aca:
-  state_name: "Massachusetts"
-  state_abbreviation: "MA"
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
 
 #
   qle:
@@ -114,3 +114,4 @@ aptc_errors:
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
+ga_enable: false
