@@ -22,5 +22,7 @@ Feature: Employee hired during renewal period
       Then Employee Soren White should see coverage effective date
       When Employee clicks on Confirm button on the coverage summary page
       Then Employee should see the receipt page
-      Then Employee Soren White should see "my account" page with enrollment
+      Then Employee clicks on Continue button on receipt page
+      Then Soren White should see "my account" page with active enrollment
+      And Soren White should see passive renewal
 

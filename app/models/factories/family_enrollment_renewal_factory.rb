@@ -35,7 +35,6 @@ module Factories
       prev_plan_year_end   = @plan_year_start_on - 1.day
 
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| !enrollment.currently_active? && !enrollment.cobra_future_active? }
       shop_enrollments.reject!{|enrollment| enrollment.coverage_termination_pending? }
 
       if shop_enrollments.present?

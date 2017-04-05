@@ -113,6 +113,24 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
 #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
 end
 
+
+Then(/(.*) should see \"my account\" page with active enrollment/) do |named_person|
+  sleep 1 #wait for e-mail nonsense
+  enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
+  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
+
+  enrollment = page.all('.hbx-enrollment-panel').last
+  qle  = sep_enr ? true : false
+  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+  enrollment.find('.panel-heading', text: 'Coverage Selected')
+end
+
+Then (/(.*) should see passive renewal/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').first
+  enrollment.find('.panel-heading', text: 'Auto Renewing')
+end
+
+
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")
   wait_for_ajax(2,2)
