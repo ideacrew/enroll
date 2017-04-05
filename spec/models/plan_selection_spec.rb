@@ -96,17 +96,10 @@ describe PlanSelection do
       def hash_key_creator(hbx_enrollment_member)
         hbx_enrollment_member.person.hbx_id
       end
-<<<<<<< HEAD
-      it 'should set eligibility dates to that of the previous enrollment' do # This will need to be redone based on the input regarding effective dates.
-        subject.set_enrollment_member_eligibility_dates(hbx_enrollment)
-        previous_eligibility_dates = Hash[previous_coverage.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.eligibility_date]} ]
-        new_eligibility_dates = Hash[hbx_enrollment.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.eligibility_date]} ]
-=======
       it 'should set eligibility dates to that of the previous enrollment' do
         subject.set_enrollment_member_coverage_start_dates
         previous_eligibility_dates = Hash[previous_coverage.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.coverage_start_on]} ]
         new_eligibility_dates = Hash[hbx_enrollment.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.coverage_start_on]} ]
->>>>>>> a19f71b... Refs #6715 Fixed coverage start date logic
         new_eligibility_dates.each do |hbx_id,date|
           expect(previous_eligibility_dates[hbx_id]).to eq(date)
         end
