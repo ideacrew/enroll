@@ -19,8 +19,12 @@ namespace :reports do
       file_name = "#{Rails.root}/public/family_list_with_antiquated_relationships.csv"
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        Person.all.each do |person|
-          unless  person.person_relationships.size <= 1
+        people_id=Person.collection.aggregate([{"$match"=>{"person_relationship.kind"=>{"$in"=>["ward","guardian","other_tax_dependent"]}}},
+                                             {"$group"=>{"_id"=>"$_id"}}]).to_a
+
+        people_id.each do |person_id|
+          person=Person.find(person_id[:_id])
+          unless person.person_relationships.size <= 1
             person.person_relationships.each do |relationship|
             if ["guardian", "ward" ,"other_tax_dependent"].include? relationship.kind
               csv << [
