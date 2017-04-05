@@ -143,10 +143,10 @@ class FamilyMember
       inverse_relationship = family.person_relationships.where(predecessor_id: successor.id, successor_id: self.id).first # Inverse Relationship
 
       # Destroying the Row and Column relationships of the Family Member when updating the Existing VALID Relationship which is not "NIL".
-      # if direct_relationship != nil
-      #   family.person_relationships.where(predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
-      #   family.person_relationships.where(successor_id: self.id, :id.nin =>[inverse_relationship.id]).each(&:destroy)
-      # end
+      if direct_relationship != nil
+        family.person_relationships.where(predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+        family.person_relationships.where(successor_id: self.id, :id.nin =>[inverse_relationship.id]).each(&:destroy)
+      end
 
       direct_relationship.update(kind: relationship_kind)
       inverse_relationship.update(kind: inverse_relationship_kind(relationship_kind))
@@ -157,6 +157,11 @@ class FamilyMember
         family.person_relationships.create(family_id: self.family.id, predecessor_id: successor.id, successor_id: self.id, kind: inverse_relationship_kind(relationship_kind)) # Inverse Relationship
       end
     end
+  end
+
+  def build_relationship(successor, relationship_kind)
+    family.person_relationships.build(family_id: self.family.id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+    family.person_relationships.build(family_id: self.family.id, predecessor_id: successor.id, successor_id: self.id, kind: inverse_relationship_kind(relationship_kind)) # Inverse Relationship
   end
 
   def remove_relationship
