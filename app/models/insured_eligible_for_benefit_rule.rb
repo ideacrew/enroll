@@ -13,7 +13,7 @@ class InsuredEligibleForBenefitRule
 
   def initialize(role, benefit_package, options = {})
     @role = role
-    @family = options[:family]
+    @family = options[:family] || @role.person.families.first
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
     @new_effective_on = options[:new_effective_on]
@@ -112,6 +112,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
+    return false if @role.citizen_status.blank?
     !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
 
@@ -143,7 +144,6 @@ class InsuredEligibleForBenefitRule
 
   def is_age_range_satisfied?
     return true if @benefit_package.age_range == (0..0)
-
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)
   end

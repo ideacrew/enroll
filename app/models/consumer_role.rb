@@ -17,7 +17,7 @@ class ConsumerRole
   US_CITIZEN_STATUS = "us_citizen"
   NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
-  INELIGIBLE_CITIZEN_VERIFICATION = ["not_lawfully_present_in_us", "non_native_not_lawfully_present_in_us", nil]
+  INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
