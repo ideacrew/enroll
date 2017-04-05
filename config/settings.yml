@@ -11,17 +11,11 @@ site:
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
-  mailing_address:
-    address_1: 
-    address_2: 
-    city: 
-    state: "MA"
-    zip: 
 
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["shop"]
+  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
 
 contact_center:
   name: "Health Connector's Customer Care Center"
@@ -39,9 +33,18 @@ contact_center:
     state: "DC"
     zip: "20026"
 
+notices:
+  mailing_address:
+    address_1: 
+    address_2: 
+    city: 
+    state: "MA"
+    zip:   
+
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
+  market_kinds: ["shop"]
 
 #
   qle:
