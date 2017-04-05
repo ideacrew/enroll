@@ -1,6 +1,6 @@
-<%notice.benefit_group_assignments.each do |benefit_group_id,benefit_assignment_groups| %>
+<%notice.benefit_group_assignments.each do |benefit_group_id,benefit_group| %>
   <%= render partial: 'notices/shared/logo' %>
-
+  
   <table class="total_table" border="0">
     <tbody>
       <tr>
@@ -17,7 +17,7 @@
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Benefit Package:    #{benefit_assignment_groups.first.benefit_group.title.capitalize.titleize}"} %>
+  content: "Benefit Package:    #{benefit_group.first.title.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?</strong>"} %>
@@ -41,11 +41,11 @@
   content: "1.Your employer's plan year start date: #{notice.start_on}"} %>
 
 
-  <% plan_offering = if benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_carrier"
+  <% plan_offering = if benefit_group.first.plan_option_kind == "single_carrier"
       'All Plans From A Single Carrier'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind  == "metal_level"
+    elsif benefit_group.first.plan_option_kind  == "metal_level"
      'All Plans From A Given Metal Level'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_plan"
+    elsif benefit_group.first.plan_option_kind == "single_plan"
       'A Single Plan'
     end %>
 
@@ -54,12 +54,12 @@
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums:#{benefit_assignment_groups.first.benefit_group.reference_plan.name} "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums:#{benefit_group.first.reference_plan.name} "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
-  <%family_benefits = benefit_assignment_groups.first.benefit_group.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
+  <%family_benefits = benefit_group.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
 
   <% premium_benefit_contributions = "" ; family_benefits.each do |relationship_benefit| %>
   

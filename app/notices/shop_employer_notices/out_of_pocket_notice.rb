@@ -26,7 +26,8 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
 
   def build
       @notice.start_on= @recipient.try(:active_or_published_plan_year).start_on
-      @notice.benefit_group_assignments =  @recipient.census_employees.map(&:active_and_renewing_benefit_group_assignments).flatten.group_by(&:benefit_group_id)
+      published_plan_years = @recipient.plan_years.published_or_renewing_published      
+      @notice.benefit_group_assignments = published_plan_years.collect{|py| py.benefit_groups}.flatten.group_by(&:id)
       bg_ids = @recipient.active_or_published_plan_year.benefit_groups.map(&:id)
       @notice.benefit_group_assignments.delete_if{|bg_id, assignments| !bg_ids.include?(bg_id)}
       @notice.legal_name= @recipient.organization.legal_name

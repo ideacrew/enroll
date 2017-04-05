@@ -258,7 +258,7 @@ class EmployerProfile
   end
 
   def active_or_published_plan_year
-     published_plan_year || active_plan_year
+     published_plan_year
   end
 
   def active_and_renewing_published
