@@ -105,7 +105,7 @@ RSpec.describe CensusEmployeeImport, :type => :model do
     context "employee exists" do
       before do
         allow(subject).to receive(:find_employee).and_return(census_employee)
-        allow(subject).to receive(:is_employee_terminable?).and_return(true)
+        allow(subject).to receive(:is_employee_terminable?).with(census_employee).and_return(true)
       end
 
       it "should save successfully" do
