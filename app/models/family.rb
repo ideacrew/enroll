@@ -965,19 +965,6 @@ class Family
       end
     end
 
-    # #GrandParent-GrandChild Rule(OLD RULE)
-    # missing_relationship.each do |rel|
-    #   relation = person_relationships.where(:successor_id.in => rel.to_a.flatten, :kind.in => ['parent', 'child'])
-    #   r_types = relation.collect(&:kind)
-    #   s_ids = relation.collect(&:predecessor_id)
-
-    #   if r_types.uniq.count >= 2 && s_ids.count != s_ids.uniq.count
-    #     grandchild = family_members.where(id: relation.where(kind: 'parent').first.successor_id).first
-    #     grandparent = family_members.where(id: relation.where(kind: 'child').first.successor_id).first
-    #     grandparent.add_relationship(grandchild, "grandparent")
-    #   end
-    # end
-
     # GrandParent-GrandChild Rule
     missing_relationship.each do |rel|
       first_rel = rel.to_a.flatten.first
@@ -1070,7 +1057,6 @@ private
   end
 
   def all_family_member_relations_defined
-    # binding.pry
     return unless primary_family_member.present? && primary_family_member.person.present?
     primary_member = primary_family_member
     other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member.id.to_s) }
@@ -1088,7 +1074,6 @@ private
   # end
 
   def find_relationship_between(successor, predecessor)
-    binding.pry
     person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id).first
   end
 
