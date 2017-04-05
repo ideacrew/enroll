@@ -422,7 +422,6 @@ class HbxEnrollment
       benefit_group_assignment.end_benefit(terminated_on)
       benefit_group_assignment.save
     end
-
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
@@ -520,6 +519,33 @@ class HbxEnrollment
 
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
+  end
+
+  def update_renewal_coverage
+    if is_shop?
+      if self.benefit_group.plan_year.is_published?
+
+        renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
+
+        if renewal_plan_year.present?
+          renewal_enrollments = self.family.active_household.hbx_enrollments.where({ 
+            :coverage_kind => self.coverage_kind,
+            :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
+          }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
+
+          renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
+           
+          begin
+            factory = Factories::FamilyEnrollmentRenewalFactory.new
+            factory.enrollment = self
+            factory.disable_notifications = true
+            factory.renew
+          rescue Exception => e 
+            Rails.logger.error { e }
+          end
+        end
+      end
+    end
   end
 
   def should_transmit_update?
@@ -1077,7 +1103,7 @@ class HbxEnrollment
 
   aasm do
     state :shopping, initial: true
-    state :coverage_selected
+    state :coverage_selected, :after_enter => :update_renewal_coverage
     state :transmitted_to_carrier
     state :coverage_enrolled
 
@@ -1086,7 +1112,7 @@ class HbxEnrollment
     state :coverage_terminated    # coverage ended
 
     state :coverage_expired
-    state :inactive   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
+    state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
 
     # Verified Lawful Presence (VLP) flags
     state :unverified
@@ -1176,20 +1202,11 @@ class HbxEnrollment
     end
 
     event :terminate_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected],
+      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing, 
+                         :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
+                         :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
+                         :enrolled_contingent, :unverified],
                     to: :coverage_terminated, after: :propogate_terminate
-
-      transitions from: [:auto_renewing, :renewing_coverage_selected],
-                    to: :coverage_terminated, after: :propogate_terminate
-
-      transitions from: [:auto_renewing_contingent, :renewing_contingent_selected,
-                         :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled],
-                    to: :coverage_terminated, after: :propogate_terminate
-
-      transitions from: [:enrolled_contingent, :unverified],
-                    to: :coverage_terminated, after: :propogate_terminate
-
-      transitions from: :coverage_enrolled, to: :coverage_terminated, after: :propogate_terminate
     end
 
     event :invalidate_enrollment, :after => :record_transition do
