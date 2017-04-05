@@ -286,6 +286,25 @@ And(/^.+ should see a button to create new plan year$/) do
   find('a.interaction-click-control-add-plan-year').click
 end
 
+When(/^Employer enters plan year start date$/) do
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+end
+
+Then(/^Employer should see disabled button with text continue$/) do
+  expect(page).to have_css('a.btn-primary[disabled]', visible: false)
+end
+
+When(/^Employer enters total number of employees$/) do
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+  fill_in "plan_year[fte_count]", :with => "3"
+end
+
+Then(/^Employer should see benefits page$/) do
+  expect(page).to have_content('Benefit Package - Set Up')
+end
+
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click

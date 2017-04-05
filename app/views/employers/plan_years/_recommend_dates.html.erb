@@ -48,7 +48,7 @@
 </div>
 <div class="col-xs-3 pull-right">
   <div class="row <%= pundit_class EmployerProfile,:updateable? %>">
-    <a class="btn btn-primary btn-lg btn-block  pull-right interaction-click-control-continue plan-year-primary" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
+    <a class="btn btn-primary btn-lg btn-block  pull-right interaction-click-control-continue" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
   </div>
   <br/><br/><br/>
 </div>
@@ -80,7 +80,6 @@
 
 
 <script type="text/javascript">
-  $(".interaction-click-control-continue").prop('title', 'Please enter the total number of employees in your workforce');
   $(".interaction-click-control-continue").attr('disabled', true)
 
   $("#plan_year_fte_count").keyup(function() {
@@ -99,12 +98,9 @@
     var msp_count_val = $(plan_year_msp_count).val();
     if (fte_count_val.trim().length == 0 || pte_count_val.trim().length == 0 || msp_count_val.trim().length == 0) {
       $(".interaction-click-control-continue").attr('disabled', true);
-      $(".interaction-click-control-continue").prop('title', 'Please enter the total number of employees in your workforce');
-
     }
     else {
       $(".interaction-click-control-continue").attr('disabled', false)
-      $(".interaction-click-control-continue").prop('title', '');
     }
   }
 
