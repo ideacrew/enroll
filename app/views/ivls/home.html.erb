@@ -330,8 +330,8 @@
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td><%= (metal.bronze_select) %></td>
-        <td><%= (metal.bronze_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.bronze_select) %></td>
+        <td><%= number_with_delimiter(metal.bronze_effectuate) %></td>
         <td><%= number_with_delimiter(metal.bronze_paying) %></td>
         <td><%= (metal.bronze_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
@@ -407,9 +407,9 @@
       <tbody>
       <tr>
         <td class="texLef">< 1</td>
-        <td><%= age.zero_select %></td>
-        <td><%= age.zero_effectuate %></td>
-        <td><%= age.zero_paying %></td>
+        <td><%= number_with_delimiter(age.zero_select) %></td>
+        <td><%= number_with_delimiter(age.zero_effectuate) %></td>
+        <td><%= number_with_delimiter(age.zero_paying) %></td>
         <td><%= (age.zero_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
@@ -449,9 +449,9 @@
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td><%= age.fiftyfive_select %></td>
-        <td><%= age.fiftyfive_effectuate %></td>
-        <td><%= age.fiftyfive_paying %></td>
+        <td><%= number_with_delimiter(age.fiftyfive_select) %></td>
+        <td><%= number_with_delimiter(age.fiftyfive_effectuate) %></td>
+        <td><%= number_with_delimiter(age.fiftyfive_paying) %></td>
         <td><%= (age.fiftyfive_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
@@ -484,9 +484,9 @@
       <tbody>
       <tr>
         <td class="texLef">Male</td>
-        <td><%= genders.male_select %></td>
-        <td><%= genders.male_effectuate %></td>
-        <td><%= genders.male_paying %></td>
+        <td><%= number_with_delimiter(genders.male_select) %></td>
+        <td><%= number_with_delimiter(genders.male_effectuate) %></td>
+        <td><%= number_with_delimiter(genders.male_paying) %></td>
         <td><%= (genders.male_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
