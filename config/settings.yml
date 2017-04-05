@@ -11,10 +11,15 @@ site:
     facebook_url: ""
 
   aca_market_kinds: ["shop"]
+  general_agency_enabled: false
 
 contact_center:
   name: "Health Connector's Customer Care Center"
   alt_name: "Health Connector Customer Service"
+  address_one: "PO Box 44018"
+  city: "Washington"
+  state: "DC"
+  postal_code: "20026"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
