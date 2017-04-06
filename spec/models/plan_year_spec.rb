@@ -2251,13 +2251,15 @@ describe PlanYear, "plan year schedule changes" do
     let(:open_enrollment_start_on)  { plan_year_start_on.prev_month }
     let(:open_enrollment_end_on)    { open_enrollment_start_on + 12.days }
 
+    let(:renewal_py_state) { 'renewing_draft' }
+
     let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
                                                       open_enrollment_end_on: open_enrollment_end_on,
                                                       employer_profile: employer_profile,
-                                                      aasm_state: 'renewing_draft'
+                                                      aasm_state: renewal_py_state
                                                     )
 
                                                     py.benefit_groups = [FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)]
@@ -2308,6 +2310,52 @@ describe PlanYear, "plan year schedule changes" do
         renewing_plan_year.reload
         expect(renewing_plan_year.renewing_enrolling?).to be_truthy
         expect(renewing_plan_year.valid?).to be_truthy
+      end
+    end
+
+    context 'when plan year reverted' do
+
+      context 'employee has enrollment under renewing plan year'  do 
+
+        let(:renewal_py_state) { 'renewing_enrolling' }
+
+        let(:census_employee){
+          employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+          employee.add_renew_benefit_group_assignment renewing_plan_year.benefit_groups.first
+          employee
+        }
+
+        let(:family) {
+          person = FactoryGirl.create(:person, last_name: census_employee.last_name, first_name: census_employee.first_name)
+          employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: employer_profile)
+          census_employee.update_attributes({employee_role: employee_role})
+          Family.find_or_build_from_employee_role(employee_role)
+        }
+
+        let!(:plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: renewing_plan_year.start_on.year, hios_id: "11111111122301-01", csr_variant_id: "01")
+        }
+
+        let(:person) { family.family_members.first.person }
+        let(:passive_renewal) { FactoryGirl.create(:hbx_enrollment,
+                       household: family.active_household,
+                       coverage_kind: "health",
+                       effective_on: renewing_plan_year.start_on,
+                       enrollment_kind: "open_enrollment",
+                       kind: "employer_sponsored",
+                       benefit_group_id: renewing_plan_year.benefit_groups.first.id,
+                       employee_role_id: person.active_employee_roles.first.id,
+                       benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+                       plan_id: plan.id,
+                       aasm_state: 'auto_renewing'
+                       ) }
+
+        it 'should cancel enrollments under reverted plan year' do 
+          expect(passive_renewal.auto_renewing?).to be_truthy
+          renewing_plan_year.revert_renewal!
+          passive_renewal.reload
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+        end
       end
     end
   end
