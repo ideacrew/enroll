@@ -24,6 +24,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def send_census_employee_invitation_email(email, census_employee, invitation)
+    if email.present?
+      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
+    format.html { render "send_census_employee_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+      end
+    end
+  end
+
   def renewal_invitation_email(email, census_employee, invitation)
     mail({to: email, subject: "Enroll Now: Your Health Plan Open Enrollment Period has Begun"}) do |format|
       format.html { render "renewal_invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}

@@ -487,6 +487,22 @@ class CensusEmployee < CensusMember
     false
   end
 
+  def plan_year_start_on
+    if employer_profile.is_renewing_employer? && renewal_benefit_group_assignment.present?
+      renewal_benefit_group_assignment.plan_year.start_on
+    elsif employer_profile.is_new_employer? && active_benefit_group_assignment.present?
+      earliest_eligible_date
+    end
+  end
+
+  def enrollment_end_date
+    if employer_profile.is_renewing_employer? && renewal_benefit_group_assignment.present?
+      renewal_benefit_group_assignment.plan_year.open_enrollment_end_on
+    elsif employer_profile.is_new_employer? && active_benefit_group_assignment.present?
+      new_hire_enrollment_period.last.to_date
+    end
+  end
+
   def construct_employee_role_for_match_person
     employee_relationship = Forms::EmployeeCandidate.new({first_name: first_name,
                                                           last_name: last_name,
