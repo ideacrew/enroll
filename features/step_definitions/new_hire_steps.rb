@@ -97,6 +97,10 @@ Then(/(.*) should see (.*) page with employer name and plan details/) do |named_
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
 end
 
+When(/(.*) clicks back to my account button/) do |named_person|
+  find('.interaction-click-control-go-to-my-account').click
+end
+
 When(/(.*) clicks on Continue button on receipt page/) do |named_person|
   find('.interaction-click-control-continue').click
 end
@@ -119,9 +123,8 @@ Then(/(.*) should see \"my account\" page with active enrollment/) do |named_per
   enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
   sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
 
-  enrollment = page.all('.hbx-enrollment-panel').last
+  enrollment = page.all('.hbx-enrollment-panel')[1]
   qle  = sep_enr ? true : false
-  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   enrollment.find('.panel-heading', text: 'Coverage Selected')
 end
 
@@ -130,6 +133,60 @@ Then (/(.*) should see passive renewal/) do |named_person|
   enrollment.find('.panel-heading', text: 'Auto Renewing')
 end
 
+
+Then(/(.*) should see active enrollment with his daughter/) do |named_person|
+  sleep 1 #wait for e-mail nonsense
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+  expect(enrollment.find('.family-members')).to have_content 'Soren'
+  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+end
+
+Then(/(.*) should see updated passive renewal with his daughter/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Auto Renewing' }
+  expect(enrollment.find('.family-members')).to have_content 'Soren'
+  expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+end
+
+Then(/(.*) selects make changes on active enrollment/) do |named_person|
+  enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
+  enrollment.find('.interaction-click-control-make-changes').click
+end
+
+Then(/(.*) should see page with SelectPlanToTerminate button/) do |named_person|
+  sleep(1)
+  expect(page).to have_content('Choose Coverage for your Household')
+  expect(page.find('.interaction-click-control-select-plan-to-terminate')).to be_truthy
+end
+
+When(/(.*) clicks SelectPlanToTerminate button/) do |named_person| 
+  page.find('.interaction-click-control-select-plan-to-terminate').click
+end
+
+Then(/(.*) selects active enrollment for termination/) do |named_person|
+  sleep(1)
+  page.find('.interaction-click-control-terminate-plan').click
+end
+
+When(/(.*) enters termination reason/) do |named_person|
+  wait_for_ajax
+
+  waiver_modal = find('.terminate_confirm')
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select terminate reason')]]").click
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
+  waiver_modal.find('.terminate_reason_submit').click
+end
+
+Then(/(.*) should see termination confirmation/) do |named_person|
+  sleep(1)
+  expect(page).to have_content('Confirm Your Plan Selection')
+  page.find('.interaction-click-control-terminate-plan').click
+end
+
+Then(/(.*) should see a waiver instead of passive renewal/) do |named_person|
+  sleep(1)
+  waiver = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Waived' }
+  expect(waiver.present?).to be_truthy
+end
 
 Then(/Employee should see \"not yet eligible\" error message/) do
   screenshot("new_hire_not_yet_eligible_exception")

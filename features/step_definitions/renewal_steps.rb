@@ -28,7 +28,6 @@ end
 
 Then(/(.*) should see active and renewing enrollments/) do |named_person|
   visit "/families/home"
-
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
@@ -44,6 +43,8 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
 end
 
 When(/(.*) proceed with continue on the group selection page/) do |named_person|
+  sleep(1)
+  
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue').click
   else
@@ -99,5 +100,9 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
   expect(statuses).to include('Waived')
   expect(statuses).to include('Coverage Selected')
   expect(statuses).not_to include('Auto Renewing')
+end
+
+When(/^.+ clicks continue on family members page/) do
+  page.find('#dependent_buttons').find('.interaction-click-control-continue').click 
 end
 
