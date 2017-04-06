@@ -23,6 +23,15 @@ class FinancialAssistance::Benefit
       health_care_for_peace_corp_volunteers
       state_supplementary_payment
       department_of_defense_non_appropriated_health_benefits
+      private_individual_and_family_coverage
+      employer_sponsored_insurance
+      self_funded_student_health_coverage
+      foreign_government_health_coverage
+      private_health_insurance_plan
+      coverage_obtained_through_another_exchange
+      coverage_under_the_state_health_benefits_risk_pool
+      veterans_administration_health_benefits
+      peace_corps_health_benefits
     )
 
   field :title, type: String

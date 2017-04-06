@@ -5,8 +5,43 @@ class FinancialAssistance::Applicant
   embedded_in :application
 
   TAX_FILER_KINDS = %W(tax_filer single joint separate dependent non_filer)
-  STUDENT_KINDS = %w()
-  STUDENT_SCHOOL_KINDS = %w()
+  STUDENT_KINDS = %w(
+    dropped_out
+    elementary
+    english_linguist
+    full_time
+    ged
+    graduated
+    graduate_school
+    half_time
+    junior_school
+    not_in_school
+    open_university
+    part_time
+    preschool
+    primary
+    secondary
+    technical
+    undergraduate
+    vocational
+    vocational_tech
+  )
+
+  STUDENT_SCHOOL_KINDS = %w(
+    english_language_institute
+    elementary
+    equivalent_vocational_tech
+    graduate_school
+    ged
+    high_school
+    junior_school
+    open_university
+    pre_school
+    primary
+    technical
+    undergraduate
+    vocational
+  )
 
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
