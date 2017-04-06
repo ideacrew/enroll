@@ -8,11 +8,12 @@ class GeneralAgencyProfile
 
   # for market_kind
   MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
-  MARKET_KINDS_OPTIONS = {
+  ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
 
 
   field :entity_kind, type: String

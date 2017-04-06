@@ -3,23 +3,17 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
+  include IndividualMarketBehaviors
 
   embedded_in :organization
 
-  MARKET_KINDS = %W[individual shop both]
-
-if Settings.aca.individual_market.is_active
-  MARKET_KINDS_OPTIONS = {
+  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
+    "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
-
-else
-    MARKET_KINDS_OPTIONS = {
-      "Small Business Marketplace ONLY" => "shop",
-    }
-end
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
 
   field :entity_kind, type: String
   field :market_kind, type: String
