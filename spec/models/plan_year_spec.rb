@@ -668,6 +668,26 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+      context "and the number of employees count is zero" do
+        before do
+          workflow_plan_year_with_benefit_group.fte_count = 0
+          workflow_plan_year_with_benefit_group.publish
+        end
+
+        it "application should not be valid" do
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_pending"
+        end
+      end
+
       context "and plan year is published after the publish due date" do
 
         before do
