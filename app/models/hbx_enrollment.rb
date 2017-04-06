@@ -533,8 +533,9 @@ class HbxEnrollment
             :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
           }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
 
+          renewal_enrollments.reject!{|e| e.inactive?}
           renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
-           
+          
           begin
             factory = Factories::FamilyEnrollmentRenewalFactory.new
             factory.enrollment = self
