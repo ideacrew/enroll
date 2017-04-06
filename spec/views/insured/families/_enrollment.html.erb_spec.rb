@@ -39,7 +39,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "without consumer_role" do
+  context "without consumer_role", dbclean: :before_each do
     let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
     let(:plan) { double("Plan",
