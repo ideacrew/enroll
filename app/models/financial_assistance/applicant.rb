@@ -8,7 +8,7 @@ class FinancialAssistance::Applicant
   STUDENT_KINDS = %w(
     dropped_out
     elementary
-    english_linguist
+    english_language_institute
     full_time
     ged
     graduated
