@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>RE: Application to Offer Group Health Coverage in #{Settings.site.short_name}</h3></td>
+      <td><h3>RE: Application to Offer Group Health Coverage in <%= Settings.site.short_name %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -21,7 +21,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "#{Settings.site.short_name} finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
-    
+
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
 <br>
