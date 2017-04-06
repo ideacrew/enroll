@@ -84,7 +84,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
-
+  field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -351,6 +351,11 @@ class HbxEnrollment
     if is_shop? && benefit_group
       benefit_group.title
     end
+  end
+
+  def parent_enrollment
+    return nil if predecessor_enrollment_id.blank?
+    HbxEnrollment.find(predecessor_enrollment_id).first
   end
 
   def census_employee
@@ -784,6 +789,10 @@ class HbxEnrollment
 
     tax_household = household.latest_active_tax_household_with_year(effective_on.year)
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+  end
+
+  def calculate_costs_for_plans(elected_plans)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 

@@ -33,7 +33,10 @@ class Insured::PlanShoppingsController < ApplicationController
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
+
+    plan_selection.verify_and_set_member_coverage_start_dates
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id)
+
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
@@ -255,35 +258,62 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def set_plans_by(hbx_enrollment_id:)
     effective_on_option_selected = session[:effective_on_option_selected].present? ? session[:effective_on_option_selected] : nil
-    if @person.nil?
-      @enrolled_hbx_enrollment_plan_ids = []
-    else
-      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
-      if covered_plan_year.present?
-        id_list = covered_plan_year.benefit_groups.map(&:id)
-        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+
+    Caches::MongoidCache.allocate(CarrierProfile)
+    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
+
+    @enrolled_hbx_enrollment_plan_ids = []
+
+    if @person.present? && @hbx_enrollment.present?
+      if @hbx_enrollment.is_shop?
+        if @person.active_employee_roles.present?
+          employer = @person.active_employee_roles.first.employer_profile
+          sep_effective_date = @person.primary_family.current_sep.try(:effective_on)
+          covered_plan_year = employer.plan_years.detect{|py| (py.start_on..py.end_on).cover?(sep_effective_date)}
+        end
+
+        if covered_plan_year.present?
+          id_list = covered_plan_year.benefit_groups.map(&:id)
+          @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+        end
       else
         @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
       end
     end
 
-    Caches::MongoidCache.allocate(CarrierProfile)
-    @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @hbx_enrollment.blank?
       @plans = []
     else
-      if @market_kind == 'shop'
+      if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @market_kind == 'individual'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
-      elsif @market_kind == 'coverall'
+      elsif @hbx_enrollment.is_coverall?
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected, @market_kind)
+      else
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
       end
     end
+
+    build_same_plan_premiums
+
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
     @carrier_names_map = Organization.valid_carrier_names_filters.select{|k, v| carrier_profile_ids.include?(k)}
+  end
+
+  def build_same_plan_premiums
+    enrolled_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
+    if enrolled_plans.present?
+      enrolled_plans = enrolled_plans.collect{|p| Plan.find(p)}
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
+      @enrolled_plans = plan_selection.same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
+
+      @enrolled_plans.each do |enrolled_plan|
+        if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
+          @plans[plan_index] = enrolled_plan
+        end
+      end
+    end
   end
 
   def thousand_ceil(num)

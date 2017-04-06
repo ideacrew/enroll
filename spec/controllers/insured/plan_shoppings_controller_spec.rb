@@ -424,6 +424,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       allow(hbx_enrollment).to receive(:household).and_return(household)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
       allow(user).to receive(:person).and_return(person)
@@ -584,6 +585,67 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         it "should get default selected_aptc_pct" do
           expect(session[:elected_aptc]).to eq 0
         end
+      end
+    end
+  end
+
+  describe ".build_same_plan_premiums" do
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) } 
+    let(:dob) { Date.new(1985, 4, 10) }
+    let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
+    let(:family) { person.primary_family }
+    let(:household) { family.active_household }
+    let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
+    let(:plan) { individual_plans.first }
+    let!(:previous_hbx_enrollment) { 
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
+    }
+
+    let!(:new_hbx_enrollment) { 
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual') 
+    }
+
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
+
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 4, 10))
+      allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile)
+      allow(benefit_coverage_period).to receive(:elected_plans_by_enrollment_members).and_return(individual_plans)
+
+      sign_in user
+    end
+
+    context "when plan is same as existing coverage plan" do
+
+      let(:previous_age) {
+        person.age_on(previous_hbx_enrollment.effective_on)
+      }
+
+      it "should calculate premium from previous enrollment effective date" do
+        Caches::PlanDetails.load_record_cache!
+        xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
+
+        matching_plan = assigns(:plans).detect{|e| e.id == new_hbx_enrollment.plan_id }
+        premium = plan.premium_tables.where(:age => previous_age).first.cost
+
+        expect(matching_plan.total_premium).to eq premium
+      end
+    end
+      
+    context "When plan is different from existing coverage plan" do 
+
+      let(:current_age) {
+        person.age_on(new_hbx_enrollment.effective_on)
+      }
+
+      it "should calculate premium from new enrollment effective date" do
+
+        Caches::PlanDetails.load_record_cache!
+        xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
+
+        non_matching_plans = assigns(:plans).select{|e| e.id != new_hbx_enrollment.plan_id }
+        premiums = non_matching_plans.collect{|plan| plan.premium_tables.where(:age => current_age).first.cost }
+        expect(non_matching_plans.collect{|p| p.total_premium}).to eq premiums
       end
     end
   end
