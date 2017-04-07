@@ -35,6 +35,10 @@ class ExpireConversionEmployers < MongoidMigrationTask
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
       end
 
+      if plan_year.active?
+        plan_year.update(aasm_state: 'renewing_enrolled')
+      end
+
       plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
       plan_year.cancel! if plan_year.may_cancel?
       data += [plan_year.aasm_state.camelcase]
