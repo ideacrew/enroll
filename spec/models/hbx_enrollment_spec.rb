@@ -784,7 +784,7 @@ describe HbxProfile, "class methods", type: :model do
     let(:plan){ Plan.new(active_year: date.year) }
     let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, effective_on: date.end_of_year + 1.day, kind: "employer_sponsored", plan: plan) }
 
-    before do 
+    before do
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
     end
 
@@ -2099,7 +2099,8 @@ context '.process_verification_reminders' do
   end
 end
 
-describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
+# describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage selected', type: :model, dbclean: :after_all do
+describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :after_all do
 
   let!(:employer_profile) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
@@ -2221,7 +2222,7 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
       FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, end_on: end_on + 1.year, open_enrollment_start_on: open_enrollment_start_on + 1.year, open_enrollment_end_on: open_enrollment_end_on + 1.year + 3.days, fte_count: 2, aasm_state: :renewing_enrolling
     }
 
-    let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id }
+    let!(:renewal_benefit_group){ FactoryGirl.create :benefit_group, plan_year: renewing_plan_year, reference_plan_id: renewal_plan.id, elected_plan_ids: elected_plans }
     let!(:renewal_benefit_group_assignment) { employer_profile.census_employees.each{|ce| ce.add_renew_benefit_group_assignment renewal_benefit_group; ce.save!;} }
 
     let!(:generate_passive_renewal) {
@@ -2239,58 +2240,124 @@ describe HbxEnrollment, 'Terminate/Cancel current enrollment when new coverage s
       FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year + 1, hios_id: "11111111122301-01", csr_variant_id: "01")
     }
 
-    let(:new_enrollment) {
-      FactoryGirl.create(:hbx_enrollment,
-                         household: family.active_household,
-                         coverage_kind: "health",
-                         effective_on: renewing_plan_year.start_on,
-                         enrollment_kind: "open_enrollment",
-                         kind: "employer_sponsored",
-                         submitted_at: TimeKeeper.date_of_record,
-                         benefit_group_id: renewal_benefit_group.id,
-                         employee_role_id: person.active_employee_roles.first.id,
-                         benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
-                         plan_id: new_plan.id,
-                         aasm_state: 'shopping'
-                         )
-    }
+    let(:elected_plans) { [renewal_plan.id] }
 
-    before do
-      allow(new_enrollment).to receive(:plan_year_check).with(ce.employee_role).and_return false
-    end
+    context 'When Actively Renewed' do
 
-    context 'with same effective date as passive renewal' do
-      it 'should cancel their passive renewal' do
-        passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
-        expect(passive_renewal).not_to be_nil
+      let(:new_enrollment) {
+        FactoryGirl.create(:hbx_enrollment,
+         household: family.active_household,
+         coverage_kind: "health",
+         effective_on: renewing_plan_year.start_on,
+         enrollment_kind: "open_enrollment",
+         kind: "employer_sponsored",
+         submitted_at: TimeKeeper.date_of_record,
+         benefit_group_id: renewal_benefit_group.id,
+         employee_role_id: person.active_employee_roles.first.id,
+         benefit_group_assignment_id: ce.renewal_benefit_group_assignment.id,
+         plan_id: new_plan.id,
+         aasm_state: 'shopping'
+         )
+      }
 
-        new_enrollment.select_coverage!
-        passive_renewal.reload
-        new_enrollment.reload
 
-        expect(passive_renewal.coverage_canceled?).to be_truthy
-        expect(new_enrollment.coverage_selected?).to be_truthy
+      context 'with same effective date as passive renewal' do
+        it 'should cancel their passive renewal' do
+          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          expect(passive_renewal).not_to be_nil
+
+          new_enrollment.select_coverage!
+          passive_renewal.reload
+          new_enrollment.reload
+
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+          expect(new_enrollment.coverage_selected?).to be_truthy
+        end
+      end
+
+      context 'with effective date later to the passive renewal' do
+
+        before do
+          new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month)
+          allow(new_enrollment).to receive(:plan_year_check).with(ce.employee_role).and_return false
+        end
+
+        it 'should terminate the passive renewal' do
+          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          expect(passive_renewal).not_to be_nil
+
+          new_enrollment.select_coverage!
+          passive_renewal.reload
+          new_enrollment.reload
+
+          expect(new_enrollment.coverage_selected?).to be_truthy
+          expect(passive_renewal.coverage_termination_pending?).to be_truthy
+          expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+        end
       end
     end
 
-    context 'with effective date later to the passive renewal' do
+    context '.update_renewal_coverage' do
+      context 'when EE enters SEP and picks new plan' do
 
-      before do
-        new_enrollment.update_attributes(:effective_on => renewing_plan_year.start_on + 1.month)
-        allow(new_enrollment).to receive(:plan_year_check).with(ce.employee_role).and_return false
+        let(:new_renewal_plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01")
+        }
+
+        let(:new_plan) {
+          FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: new_renewal_plan.id)
+        }
+
+        let(:elected_plans) { [renewal_plan.id, new_renewal_plan.id] }
+
+        let(:new_enrollment) {
+          FactoryGirl.create(:hbx_enrollment,
+           household: family.active_household,
+           coverage_kind: "health",
+           effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+           enrollment_kind: "special_enrollment",
+           kind: "employer_sponsored",
+           submitted_at: TimeKeeper.date_of_record,
+           benefit_group_id: current_benefit_group.id,
+           employee_role_id: person.active_employee_roles.first.id,
+           benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+           special_enrollment_period_id: sep.id,
+           plan_id: new_plan.id,
+           aasm_state: 'shopping'
+           )
+        }
+
+        let(:sep){
+          FactoryGirl.create(:special_enrollment_period, family: family)
+        }
+
+        it 'should cancel passive renewal and create new passive' do
+          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          expect(passive_renewal).not_to be_nil
+
+          new_enrollment.select_coverage!
+          family.reload
+          passive_renewal.reload
+
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+          new_passive = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          expect(new_passive.plan).to eq new_renewal_plan
+        end
       end
 
-      it 'should terminate the passive renewal' do
-        passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
-        expect(passive_renewal).not_to be_nil
+      context 'when EE terminates current coverage' do
 
-        new_enrollment.select_coverage!
-        passive_renewal.reload
-        new_enrollment.reload
+        it 'should cancel passive renewal and generate a waiver' do
+          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          expect(passive_renewal).not_to be_nil
 
-        expect(new_enrollment.coverage_selected?).to be_truthy
-        expect(passive_renewal.coverage_termination_pending?).to be_truthy
-        expect(passive_renewal.terminated_on).to eq(new_enrollment.effective_on - 1.day)
+          enrollment.terminate_coverage!
+          enrollment.update_renewal_coverage
+
+          expect(passive_renewal.coverage_canceled?).to be_truthy
+          passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
+          expect(passive_waiver.present?).to be_truthy
+        end
       end
     end
   end
