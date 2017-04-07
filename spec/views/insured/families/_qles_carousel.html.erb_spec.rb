@@ -53,8 +53,13 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
   end
 
   context "QLE buttons for person with both roles" do
+    let(:person) { FactoryGirl.build(:person)}
+    let(:employee_role) { double }
+
     before :each do
       assign(:multiroles, true)
+      assign(:person, person)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
       render "insured/families/qles_carousel"
     end
 
@@ -62,12 +67,12 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
       expect(rendered).to have_selector('div.market-selection')
     end
 
-    it "should have Employee button for person with multiple roles" do
+    it "should have Employee  button for person with multiple roles" do
       expect(rendered).to match(/Employee/)
     end
 
-    it "should have Individual button for person with multiple roles" do
-      expect(rendered).to match(/Individual/)
+     it "should not have Individual button for person with multiple roles" do
+       expect(rendered).not_to match(/Individual/)
     end
   end
 
