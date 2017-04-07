@@ -52,7 +52,7 @@ class BrokerAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid practice area" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid practice area" },
     allow_blank: false
 
   validates :entity_kind,
@@ -63,7 +63,6 @@ class BrokerAgencyProfile
 
   scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
   scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
-
 
   # has_many employers
   def employer_clients

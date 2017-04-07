@@ -2,7 +2,9 @@ require 'rails_helper'
 Settings.reload_from_files(
   Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
 )
-Settings.reload!
+Object.send(:remove_const, 'BrokerAgencyProfile')
+load 'broker_agency_profile.rb'
+
 RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
 #  it { should validate_presence_of :primary_broker_role_id }
@@ -22,9 +24,31 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
 
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid practice area"}
 
-  it "assigns MARKET_KINDS and MARKET_KINDS_OPTIONS correctly" do
-    expect(subject.class::MARKET_KINDS).to match_array(%W(shop individual both))
-    expect(subject.class::MARKET_KINDS_OPTIONS.count).to eq(3)
+  describe "individual market can be toggled..." do
+    context "when it is enabled" do
+      it "assigns MARKET_KINDS and MARKET_KINDS_OPTIONS correctly" do
+        expect(BrokerAgencyProfile::MARKET_KINDS).to match_array(%W(shop individual both))
+        expect(BrokerAgencyProfile::MARKET_KINDS_OPTIONS.count).to eq(3)
+      end
+
+    end
+
+    context "when it is disabled" do
+      let(:bad_market_kind) { "individual" }
+      let(:invalid_params) do
+        {
+          organization: organization,
+          market_kind: bad_market_kind,
+          entity_kind: "s_corporation",
+          primary_broker_role: primary_broker_role
+        }
+      end
+
+      it "should fail validation for individual" do
+        stub_const("BrokerAgencyProfile::MARKET_KINDS", ['shop'])
+        expect(BrokerAgencyProfile.create(**invalid_params).errors[:market_kind]).to eq [market_kind_error_message]
+      end
+    end
   end
 
   describe ".new" do
