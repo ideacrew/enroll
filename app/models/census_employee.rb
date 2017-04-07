@@ -476,6 +476,17 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def coverage_effective_on(benefit_group = nil)
+    benefit_group = (active_benefit_group_assignment || renewal_benefit_group_assignment).benefit_group if benefit_group.blank?
+    if benefit_group.present?
+      effective_on_date = benefit_group.effective_on_for(hired_on)
+      if newly_designated_eligible? || newly_designated_linked?
+        effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max
+      end
+      effective_on_date
+    end
+  end
+
   def send_invite!
     if has_benefit_group_assignment?
       plan_year = active_benefit_group_assignment.benefit_group.plan_year
@@ -485,22 +496,6 @@ class CensusEmployee < CensusMember
       end
     end
     false
-  end
-
-  def plan_year_start_on
-    if employer_profile.is_renewing_employer? && renewal_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.plan_year.start_on
-    elsif employer_profile.is_new_employer? && active_benefit_group_assignment.present?
-      earliest_eligible_date
-    end
-  end
-
-  def enrollment_end_date
-    if employer_profile.is_renewing_employer? && renewal_benefit_group_assignment.present?
-      renewal_benefit_group_assignment.plan_year.open_enrollment_end_on
-    elsif employer_profile.is_new_employer? && active_benefit_group_assignment.present?
-      new_hire_enrollment_period.last.to_date
-    end
   end
 
   def construct_employee_role_for_match_person
