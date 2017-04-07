@@ -7,7 +7,7 @@
 <%= raw render_datatable(@datatable) %>
 
 <div class="container">
-  <% if is_individual_market_is_enabled? %>
+  <% if individual_market_is_enabled? %>
     <div class="col-sm-12 col-md-12">
     <%=pundit_span Family, :updateable? %>
       <div class="row">
