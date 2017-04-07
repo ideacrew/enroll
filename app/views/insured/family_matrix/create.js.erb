@@ -1,5 +1,0 @@
-<%if @missing_relationships.present?%>
-$("#family-matrix").html("<%= escape_javascript(render '/insured/family_matrix/form', form_remote: true, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: '') %>");
-<% else %>
-$('#family-matrix').html("You have sucessfully added missing_relationships");
-<%end%>

@@ -1,4 +1,4 @@
-class Insured::FamilyMatrixController < ApplicationController
+class Insured::FamilyRelationshipsController < ApplicationController
 	
 
 	before_action :set_current_person, :set_family

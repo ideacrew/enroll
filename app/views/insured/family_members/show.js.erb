@@ -6,8 +6,6 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
   window.location.reload();
 }
 <% if @created %>
-// $("#family-matrix").append("<%= escape_javascript(render '/insured/family_matrix/form', form_remote: true, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: '') %>");
-// $('#family-matrix').removeClass('hidden');
 $('#qle_flow_info').removeClass('hidden');
 <% end %>
 $("#dependent_buttons").removeClass('hidden');

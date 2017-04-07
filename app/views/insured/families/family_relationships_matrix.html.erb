@@ -9,7 +9,7 @@
     <%= render "profile_submenu", :active_subtab => "family-matrix-tab" %>
     <div id="profile-content">
 <div id="family-matrix">
-<%= render partial: '/insured/family_matrix/form', locals: {form_remote: true, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: ''}%>
+<%= render partial: '/insured/family_relationships/form', locals: {form_remote: true, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: ''}%>
 </div>
 </div>
 </div>
