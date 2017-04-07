@@ -108,7 +108,6 @@ class HbxEnrollment
   # Checkbook url
   field :checkbook_url , type: String
 
-
   # An external enrollment is one which we keep for recording purposes,
   # but did not originate with the exchange.  'External' enrollments
   # should not be transmitted to carriers nor reported in metrics.
@@ -203,6 +202,11 @@ class HbxEnrollment
     end
   end
 
+  def benefit_group
+    return @benefit_group if defined? @benefit_group
+    return nil if benefit_group_id.blank?
+    @benefit_group = BenefitGroup.find(self.benefit_group_id)
+  end
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
@@ -1051,7 +1055,7 @@ class HbxEnrollment
 
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled.to_a
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled_and_renewing.to_a
     end
   end
 
