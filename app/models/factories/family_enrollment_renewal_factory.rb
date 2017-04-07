@@ -6,6 +6,10 @@ module Factories
 
     attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications
 
+    def initialize
+      @disable_notifications = false
+    end
+
     def renew
 
       if enrollment.present?
