@@ -262,7 +262,10 @@ class EmployerProfile
   end
 
   def active_and_renewing_published
-    active_plan_year.present? ? (active_plan_year + renewing_published_plan_year) : renewing_published_plan_year
+    result = []
+    result <<active_plan_year  if active_plan_year.present? 
+    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result
   end
 
   def plan_year_drafts
