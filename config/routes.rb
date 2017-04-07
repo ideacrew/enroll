@@ -55,7 +55,7 @@ Rails.application.routes.draw do
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
-        get :general_agency_index
+        get :general_agency_index if Settings.site.general_agency_enabled
         get :issuer_index
         get :product_index
         get :configuration
@@ -294,6 +294,7 @@ Rails.application.routes.draw do
   end
 
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
+
   match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
 
   namespace :carriers do
@@ -318,10 +319,10 @@ Rails.application.routes.draw do
         get :assign_history
       end
       member do
-        get :general_agency_index
+        get :general_agency_index if Settings.site.general_agency_enabled
         get :manage_employers
         post :clear_assign_for_employer
-        get :assign
+        get :assign if Settings.site.general_agency_enabled
         post :update_assign
         post :employer_datatable
         post :family_datatable
