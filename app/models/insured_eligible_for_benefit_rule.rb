@@ -49,7 +49,7 @@ class InsuredEligibleForBenefitRule
         end
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
-      status = set_status_and_error_if_not_applying_coverage if is_applying_coverage_status_satisfied? == false
+      status = set_status_and_error_if_not_applying_coverage if @role.class.name == "ConsumerRole" && is_applying_coverage_status_satisfied? == false
       return status, @errors
     end
     [false]
