@@ -49,7 +49,7 @@ describe ExpireConversionEmployers do
 
     it 'should cancel renewal plan year' do
       subject.update_employer_plan_years(employer_profile, benefit_group.start_on)
-      expect(employer_profile.plan_years.where(:start_on => benefit_group.start_on).first.canceled?).to be_truthy
+      expect(employer_profile.plan_years.where(:start_on => benefit_group.start_on).first.renewing_canceled?).to be_truthy
     end
 
     it 'should conversion expire external plan year' do
