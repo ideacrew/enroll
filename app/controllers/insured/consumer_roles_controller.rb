@@ -101,7 +101,6 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               rescue Exception => e
                 flash[:error] = set_error_message(e.message)
-                puts e.message
                 redirect_to search_exchanges_residents_path
                 return
               end
