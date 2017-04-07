@@ -10,4 +10,6 @@ module IndividualMarketBehaviors
       Settings.aca.market_kinds.include? "individual"
     end
   end
+
+  # delegate :individual_market_is_enabled?, to: :class
 end
