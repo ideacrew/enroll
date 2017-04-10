@@ -418,3 +418,19 @@ end
 When /^the broker click the link of clear default ga$/ do
   click_link "Clear Default GA"
 end
+
+Then(/^he should be able to see the Assign link under his profile$/) do
+ expect(page).to have_selector('#assign-tab')
+end
+
+When(/^the general agency is enabled through settings$/) do
+ Settings.site.general_agency_enabled = true
+end
+
+When(/^the general agency is disabled through settings$/) do
+ Settings.site.general_agency_enabled = false
+end
+
+Then(/^he should not be able to see the Assign link under his profile$/) do
+expect(page).not_to have_selector('#assign-tab')
+end

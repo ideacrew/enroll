@@ -9,6 +9,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
+  before_action :check_if_general_agency_enabled, only: [:assign, :update_assign]
 
   layout 'single_column'
 
@@ -462,5 +463,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
+  end
+
+  def check_if_general_agency_enabled
+    unless Settings.site.general_agency_enabled
+      redirect_to broker_agencies_profile_path(@broker_agency_profile)
+    end
   end
 end

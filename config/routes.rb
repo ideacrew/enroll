@@ -321,8 +321,10 @@ Rails.application.routes.draw do
         get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
-        get :assign
-        post :update_assign
+        if Settings.site.general_agency_enabled
+          get :assign
+          post :update_assign
+        end
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
