@@ -648,7 +648,7 @@ module ApplicationHelper
     end
   end
 
-  def admin_user?(current_user, consumer_role)
-    current_user != consumer_role.person.user && current_user.has_hbx_staff_role?
+  def is_new_paper_application?(current_user, consumer_role, app_type)
+    current_user.has_hbx_staff_role? && app_type == "paper"
   end
 end

@@ -202,7 +202,7 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if admin_user?(current_user, @consumer_role)
+        if is_new_paper_application?(current_user, @consumer_role, session[:original_application_type])
           redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -226,7 +226,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def ridp_agreement
     set_current_person
-    if @person.completed_identity_verification? || admin_user?(current_user, @person.consumer_role)
+    if @person.completed_identity_verification?
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     else
       set_consumer_bookmark_url
