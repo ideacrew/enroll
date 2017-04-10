@@ -577,7 +577,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     }
 
     let!(:new_hbx_enrollment) { 
-      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual') 
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual', aasm_state: 'shopping') 
     }
 
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
@@ -614,12 +614,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       }
 
       it "should calculate premium from new enrollment effective date" do
-
         Caches::PlanDetails.load_record_cache!
         xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
 
         non_matching_plans = assigns(:plans).select{|e| e.id != new_hbx_enrollment.plan_id }
         premiums = non_matching_plans.collect{|plan| plan.premium_tables.where(:age => current_age).first.cost }
+
         expect(non_matching_plans.collect{|p| p.total_premium}).to eq premiums
       end
     end
