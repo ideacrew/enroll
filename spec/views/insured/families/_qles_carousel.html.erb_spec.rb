@@ -60,6 +60,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
       assign(:multiroles, true)
       assign(:person, person)
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      allow(view).to receive(:individual_market_is_enabled?).and_return(false)
       render "insured/families/qles_carousel"
     end
 
