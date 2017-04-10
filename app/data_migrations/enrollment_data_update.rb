@@ -20,26 +20,23 @@ class EnrollmentDataUpdate < MongoidMigrationTask
         family.active_household.hbx_enrollments.where(aasm_state:"coverage_canceled").each do |canceled_enrollment|
         enrollments.each do |enrollment|
           if canceled_enrollment.kind == enrollment.kind
-            puts canceled_enrollment.inspect
-            puts enrollment.inspect
             cancel_member=canceled_enrollment.hbx_enrollment_members.where(is_subscriber:true).first
             reference_member=enrollment.hbx_enrollment_members.where(is_subscriber:true).first
-
-            if cancel_member.id == reference_member.id
+            if cancel_member.applicant_id == reference_member.applicant_id
               cancel_effective=canceled_enrollment.effective_on
               reference_effective=enrollment.effective_on
               reference_submitted=enrollment.submitted_at
               if cancel_effective > reference_submitted && cancel_effective < reference_effective
                 if canceled_enrollment.kind == "individual"
                   if canceled_enrollment.effective_on.year == enrollment.effective_on.year
-                     enrollment.update_attributes(aasm_state:"coverage_terminated")
+                    canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
                   end
                 elsif canceled_enrollment.kind == "employer_sponsored"
                   if canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
-                    if enrollment.terminated_on > TimeKeeper.datetime_of_record
-                      enrollment.update_attributes(aasm_state:"coverage_termination_pending")
+                    if canceled_enrollment.terminated_on > TimeKeeper.datetime_of_record
+                      canceled_enrollment.update_attributes(aasm_state:"coverage_termination_pending")
                     else
-                      enrollment.update_attributes(aasm_state:"coverage_terminated")
+                      canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
                     end
                   end
                 end
