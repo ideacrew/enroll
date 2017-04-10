@@ -118,6 +118,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+      when 'accounts'
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
