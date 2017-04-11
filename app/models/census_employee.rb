@@ -221,6 +221,13 @@ class CensusEmployee < CensusMember
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
 
+  def active_and_renewing_benefit_group_assignments
+    result = []
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
+    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
+    result
+  end
+
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
     return nil unless self.employment_terminated?

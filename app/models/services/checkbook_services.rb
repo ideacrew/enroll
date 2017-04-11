@@ -3,7 +3,7 @@ require 'nokogiri'
 module CheckbookServices
   class PlanComparision
     attr_accessor :census_employee
-    BASE_URL =  Settings.checkbook_services.base_url
+    # BASE_URL =  Settings.checkbook_services.base_url
     def initialize(census_employee)
       @census_employee= census_employee
       @url = BASE_URL+"/shop/dc/api/"

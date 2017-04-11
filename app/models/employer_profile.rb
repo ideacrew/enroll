@@ -258,8 +258,15 @@ class EmployerProfile
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
-  def active_and_published_plan_year
-    active_plan_year || published_plan_year
+  def active_or_published_plan_year
+     published_plan_year
+  end
+
+  def active_and_renewing_published
+    result = []
+    result <<active_plan_year  if active_plan_year.present? 
+    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result
   end
 
   def plan_year_drafts

@@ -1,6 +1,6 @@
-<%notice.benefit_group_assignments.each do |benefit_group_id,benefit_assignment_groups| %>
+<%notice.benefit_group_assignments.each do |benefit_group_id,benefit_group| %>
   <%= render partial: 'notices/shared/logo' %>
-
+  
   <table class="total_table" border="0">
     <tbody>
       <tr>
@@ -10,14 +10,14 @@
   </table>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "For eligible employees office:   #{notice.legal_name.capitalize.titleize}"} %>
+  content: "For eligible employees of:   #{notice.legal_name.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Plan year  :    #{notice.start_on} "} %>
+  content: "Plan year  :    #{benefit_group.first.start_on} "} %>
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Benefit Package:    #{benefit_assignment_groups.first.benefit_group.title.capitalize.titleize}"} %>
+  content: "Benefit Package:    #{benefit_group.first.title.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?</strong>"} %>
@@ -32,37 +32,37 @@
   content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Either use this personalized link to have this information pre-completed on your behalf: <br> <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
+  content: "Either use this personalized link to have this information pre-completed on your behalf: <br> <a target='_blank' href= '#{notice.data[:url]}'> Click this link to access the Plan Match Tool and enter your employer’s information using the details below</a>"}%>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Or you can enter your employer's plan year information yourself using the details below:" } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "1.Your employer's plan year start date  : #{notice.start_on}"} %>
+  content: "1.Your employer's plan year start date: #{benefit_group.first.start_on}"} %>
 
 
-  <% plan_offering = if benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_carrier"
+  <% plan_offering = if benefit_group.first.plan_option_kind == "single_carrier"
       'All Plans From A Single Carrier'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind  == "metal_level"
+    elsif benefit_group.first.plan_option_kind  == "metal_level"
      'All Plans From A Given Metal Level'
-    elsif benefit_assignment_groups.first.benefit_group.plan_option_kind == "single_plan"
+    elsif benefit_group.first.plan_option_kind == "single_plan"
       'A Single Plan'
     end %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "2.Your employer's plan offerings  : #{plan_offering.capitalize.titleize}"} %>
+  content: "2.Your employer's plan offerings: #{plan_offering.capitalize.titleize}"} %>
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums  :#{benefit_assignment_groups.first.benefit_group.reference_plan.name} "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums:#{benefit_group.first.reference_plan.name} "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
-  <%family_benefits = benefit_assignment_groups.first.benefit_group.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
+  <%family_benefits = benefit_group.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
 
   <% premium_benefit_contributions = "" ; family_benefits.each do |relationship_benefit| %>
-		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{relationship_benefit.premium_pct} <br></br>" %>
+		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{(relationship_benefit.premium_pct)} %<br></br>" %>
   <%end%>
   <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
   <div class="page-break-before"/>
