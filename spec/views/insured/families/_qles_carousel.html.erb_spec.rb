@@ -69,7 +69,7 @@ RSpec.describe "insured/families/_qles_carousel.html.erb" do
       expect(rendered).to have_link('Individual')
     end
 
-    it "should have Individual button for person with multiple roles" do
+    it "should not display Individual button if Individual market is disabled" do
       allow(view).to receive(:individual_market_is_enabled?).and_return(false)
       render "insured/families/qles_carousel"
       expect(rendered).not_to match(/Individual/)
