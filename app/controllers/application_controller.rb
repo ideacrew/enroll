@@ -48,9 +48,9 @@ class ApplicationController < ActionController::Base
   end
 
   def individual_market_is_active
-    if !(Settings.aca.individual_market.is_active)
-      flash[:error] = "unauthorized"
-      redirect_to root_path
+     unless Settings.aca.individual_market.is_active
+       flash[:error] = "unauthorized"
+       redirect_to root_path
     end
   end
 
