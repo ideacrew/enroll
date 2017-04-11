@@ -1,7 +1,8 @@
-#8354, updating the aasm_state of this employer(Anytime Canine) because this employer was created manually.
+# Rake taks used to update the aasm_state of the employer to enrolled.
+# To run rake task: RAILS_ENV=production bundle exec rake update:employer_status_to_enrolled fein=987654321
 namespace :update do
-  task :employer_status_to_enrolled, [:name] => :environment do |task, args|
-    organization = Organization.where(legal_name: /#{args["name"]}/)
+  task :employer_status_to_enrolled => :environment do
+    organization = Organization.where(fein:ENV['fein'])
     empr = organization.last.employer_profile
     puts "*"*80
     puts "found employer : #{empr.legal_name} "
