@@ -13,12 +13,15 @@ describe Forms::FamilyMember do
     expect(subject).to have_errors_on(:relationship)
   end
 
+  
   it "should require tribal_id when citizen_status=indian_tribe_member" do
-    subject.is_consumer_role = "true"
-    subject.citizen_status = "indian_tribe_member"
-    subject.valid?
-    expect(subject).to have_errors_on(:tribal_id)
-    expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
+    if Settings.aca.market_kinds.include?("individual")
+      subject.is_consumer_role = "true"
+      subject.citizen_status = "indian_tribe_member"
+      subject.valid?
+      expect(subject).to have_errors_on(:tribal_id)
+      expect(subject.errors[:tribal_id]).not_to eq ["is required when native american / alaskan native is selected"]
+    end
   end
 
   it "should require a gender" do
