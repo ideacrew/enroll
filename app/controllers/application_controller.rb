@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
   include Pundit
-  include SiteConfig
-  include AcaConfig
-  include ContactCenterConfig
+  include Config::SiteConcern
+  include Config::AcaConcern
+  include Config::ContactCenterConcern
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?

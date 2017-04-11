@@ -3,6 +3,10 @@ module Config::SiteHelper
     Settings.site.byline
   end
 
+  def site_domain_name
+    Settings.site.domain_name
+  end
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
