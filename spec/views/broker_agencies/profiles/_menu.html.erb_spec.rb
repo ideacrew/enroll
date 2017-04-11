@@ -19,6 +19,16 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
       expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
     end
+
+    context "with general agency disabled" do
+      before :each do
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+      end
+      it "does not show general agency related links" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+        expect(rendered).not_to match /General Agencies/
+      end
+    end
   end
 
   context "with broker role" do
@@ -29,6 +39,15 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
       expect(view.content_for(:horizontal_menu)).to include('multi-line')
     end
-  end
 
+    context "with general agency disabled" do
+      before :each do
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+      end
+      it "does not show general agency related links" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+        expect(rendered).not_to match /General Agencies/
+      end
+    end
+  end
 end
