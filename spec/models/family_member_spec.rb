@@ -178,10 +178,53 @@ describe FamilyMember, "given a relationship to update" do
   let(:relationship) { "spouse" }
   let(:person) { FactoryGirl.build(:person) }
   subject { FactoryGirl.build(:family_member, person: person, family: family) }
+  let(:family_member2) {FactoryGirl.create(:family_member, :family => family)}
+  let(:family_member3) {FactoryGirl.create(:family_member, :family => family)}
 
-  it "should update the relationship" do
+  it "should update the direct relationship" do
     subject.add_relationship(primary_person, relationship)
     rel = family.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
     expect(rel).to eq relationship
+  end
+
+  it "should create inverse realtionship too" do
+    subject.add_relationship(primary_person, relationship)
+    rel = family.person_relationships.where(successor_id: subject.id, predecessor_id: primary_person.id).first.kind
+    expect(rel).to eq relationship
+    expect(family.person_relationships.count).to eq 2
+  end
+
+  it "should create the relationships" do
+    family_member2.add_relationship(primary_person, "parent")
+    family_member3.add_relationship(primary_person, "child")
+    family.build_relationship_matrix
+    expect(family.person_relationships.count).to eq 6
+    family_member2.add_relationship(primary_person, "unrelated") #Test for updating the exisiting relationship
+    expect(family.person_relationships.count).to eq 4
+    unr_relationship = family.person_relationships.where(successor_id: primary_person.id, predecessor_id: family_member2.id).first.kind
+    expect(unr_relationship).to eq "unrelated"
+  end
+
+  it "should build relationship" do
+    family_member2.build_relationship(primary_person, "spouse")
+    family.save
+    expect(family.person_relationships.count).to eq 2
+  end
+
+  it "should destroy relationships associated to removed family member" do
+    family_member2.add_relationship(primary_person, "parent")
+    expect(family.person_relationships.count).to eq 2
+    family_member2.remove_relationship
+    expect(family.person_relationships.count).to eq 0
+  end
+
+  it "should return true if same successor exists" do
+    family_member2.add_relationship(primary_person, "parent")
+    expect(family_member2.same_successor_exists?(primary_person)).to eq true
+  end
+
+  it "should not return true if same successor does not exists" do
+    family_member2.add_relationship(primary_person, "parent")
+    expect(family_member2.same_successor_exists?(primary_person)).not_to eq false
   end
 end
