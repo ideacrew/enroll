@@ -44,8 +44,10 @@ $(document).on('ready page:load', function () {
       })();
     }
 
-    if ( is_invalid || is_sequential || is_same_number) {
-      alert('The SSN you entered is Invalid.')
+    if ( user_input.length != 0 && (is_invalid || is_sequential || is_same_number)) {
+      $( function() {
+        $( "#dialog" ).dialog();
+      });
       $(this).val("");
     }
   });
