@@ -293,17 +293,28 @@ class Insured::FamiliesController < FamiliesController
     else
       if @person.active_employee_roles.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+          @qualifying_life_events += fetch_Only_SHOP_QLE
         else
           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
         end
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += fetch_Only_SHOP_QLE
         else
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         end
       end
+    end
+  end
+
+  # This method returns shop market QLE when dependent house hold adding or removing
+  #
+  # @return [Array<BSON_FIELDS>]
+  def fetch_Only_SHOP_QLE
+    unless individual_market_is_enabled?
+      QualifyingLifeEventKind.shop_market_events_admin
+    else
+      QualifyingLifeEventKind.individual_market_events_admin
     end
   end
 
