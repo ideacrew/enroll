@@ -51,7 +51,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         next
       end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
 
       notice_trigger = event_kind.notice_triggers.first
 
