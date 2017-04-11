@@ -1,4 +1,4 @@
-class ShopNotices::RenewalEmployerEligibilityNotice < ShopNotice
+class ShopEmployerNotices::RenewalEmployerEligibilityNotice < ShopEmployerNotice
 
   attr_accessor :employer_profile
 
