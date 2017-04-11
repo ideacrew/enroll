@@ -16,6 +16,37 @@ class PersonRelationship
 
   Relationships = [
     "spouse",
+    "life_partner",
+    "child",
+    "adopted_child",
+    "annuitant", # no inverse
+    "aunt_or_uncle",
+    "brother_or_sister_in_law",
+    "collateral_dependent",
+    "court_appointed_guardian",
+    "daughter_or_son_in_law",
+    "dependent_of_a_minor_dependent",
+    "father_or_mother_in_law",
+    "foster_child",
+    "grandchild",
+    "grandparent",
+    "great_grandchild",
+    "great_grandparent",
+    "guardian",
+    "nephew_or_niece",
+    "other_relationship",
+    "parent",
+    "sibling",
+    "sponsored_dependent",
+    "stepchild",
+    "stepparent",
+    "trustee", # no inverse
+    "unrelated",
+    "ward"
+  ]
+
+  Relationships_UI = [
+    "spouse",
     "domestic_partner",
     "child",
     "parent",
@@ -32,15 +63,31 @@ class PersonRelationship
     "parent" => "child",
     "grandparent" => "grandchild",
     "grandchild" => "grandparent",
+    "great_grandparent" => "great_grandchild",
+    "great_grandchild" => "great_grandparent",
+    "stepparent" => "stepchild",
+    "stepchild" => "stepparent",
     "aunt_or_uncle" => "nephew_or_niece",
     "nephew_or_niece" => "aunt_or_uncle",
+    "father_or_mother_in_law" => "daughter_or_son_in_law",
+    "daughter_or_son_in_law" => "father_or_mother_in_law",
+    "guardian" => "ward",
+    "ward" => "guardian",
 
     # bi directional
     "self" => "self",
+    "brother_or_sister_in_law" => "brother_or_sister_in_law",
     "sibling" => "sibling",
-    "domestic_partner" => "domestic_partner",
+    "life_partner" => "life_partner",
     "spouse" => "spouse",
-    "unrelated" => "unrelated"
+    "other_relationship" => "other_relationship",
+    "cousin" => "cousin",
+    "unrelated" => "unrelated",
+
+    #one directional
+    "foster_child" => "guardian",
+    "court_appointed_guardian" => "ward",
+    "adopted_child" => "parent"
   }
 
   SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]

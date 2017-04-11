@@ -39,7 +39,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4715271575815847936</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-4976474822285459456</ns0:id>
                   </ns0:object_individual>
@@ -48,7 +48,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4715271575815847936</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#life_partner</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6886001064290549760</ns0:id>
                   </ns0:object_individual>
@@ -84,7 +84,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6886001064290549760</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:object_individual>
@@ -102,7 +102,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-4976474822285459456</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4181595019972444160</ns0:id>
                   </ns0:object_individual>
@@ -111,7 +111,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-4976474822285459456</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:object_individual>
@@ -120,7 +120,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4181595019972444160</ns0:id>
                   </ns0:object_individual>
@@ -221,7 +221,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6886001064290549760</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:object_individual>
@@ -313,7 +313,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-4976474822285459456</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4181595019972444160</ns0:id>
                   </ns0:object_individual>
@@ -322,7 +322,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-4976474822285459456</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:object_individual>
@@ -395,7 +395,7 @@
                   <ns0:subject_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#-6122640927451250688</ns0:id>
                   </ns0:subject_individual>
-                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#unrelated</ns0:relationship_uri>
+                  <ns0:relationship_uri>urn:openhbx:terms:v1:individual_relationship#other_relationship</ns0:relationship_uri>
                   <ns0:object_individual>
                      <ns0:id>urn:openhbx:hbx:dc0:resources:v1:curam:concern_role#4181595019972444160</ns0:id>
                   </ns0:object_individual>
