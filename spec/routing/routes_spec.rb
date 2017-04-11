@@ -7,40 +7,7 @@ RSpec.describe "routing", :type => :routing do
       :action => "immigration_document_options"
     )
   end
-
-  describe "general agency can be enabled or disabled via settings" do
-    context "when enabled" do
-      it "routes to general_agency_registration by default" do
-        expect(get: "/general_agency_registration").to route_to(
-          controller: 'general_agencies/profiles',
-          action: 'new_agency'
-        )
-      end
-
-      it "routes to general_agencies profiles" do
-        expect(get: '/general_agencies').to route_to(
-          controller: 'general_agencies/profiles',
-          action: 'new'
-        )
-      end
-    end
-
-    context "when disabled" do
-      before do
-        Settings.site.general_agency_enabled = false
-        Enroll::Application.reload_routes!
-      end
-
-      it "routes to general_agency_registration by default" do
-        expect(get: "/general_agency_registration").not_to be_routable
-      end
-
-      it "routes to general_agencies profiles" do
-        expect(get: '/general_agencies').not_to be_routable
-      end
-    end
-  end
-
+  
   describe "broker agency assign can be enabled or disabled via settings" do
     context "when enabled" do
       before do
