@@ -20,10 +20,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Congratulations! Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{Settings.site.short_name}. Your group health plan coverage will take effect as of <Coverage Start Date>."} %>
+  content: "Congratulations! Your employees have completed open enrollment and have satisfied the requirements to participate in group health coverage through #{Settings.site.short_name}. Your group health plan coverage will take effect as of #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your first month’s premium payment must be received and cleared by 5:00 p.m. on <binder payment deadline>, or your group’s coverage will be delayed. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:"} %>
+  content: "Your first month’s premium payment must be received and cleared by 5:00 p.m. on #{notice.plan_year.binder_payment_due_date}, or your group’s coverage will be delayed. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Make a Secure Online Payment"} %>
