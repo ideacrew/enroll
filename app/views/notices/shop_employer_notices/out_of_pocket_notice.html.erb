@@ -13,7 +13,7 @@
   content: "For eligible employees of:   #{notice.legal_name.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Plan year  :    #{notice.start_on} "} %>
+  content: "Plan year  :    #{benefit_group.first.start_on} "} %>
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -38,7 +38,7 @@
   content: "Or you can enter your employer's plan year information yourself using the details below:" } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "1.Your employer's plan year start date: #{notice.start_on}"} %>
+  content: "1.Your employer's plan year start date: #{benefit_group.first.start_on}"} %>
 
 
   <% plan_offering = if benefit_group.first.plan_option_kind == "single_carrier"
