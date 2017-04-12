@@ -710,7 +710,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it "should record state transition and timestamp" do
           expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.from_state).to eq "draft"
           expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.to_state).to eq "publish_pending"
-          expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.transition_at.utc).to be_within(1.second).of(DateTime.now)
+          expect(workflow_plan_year_with_benefit_group.latest_workflow_state_transition.transition_at.utc).to be_within(1.second).of(TimeKeeper.datetime_of_record)
         end
 
         context "and the applicant chooses to cancel application submission" do
@@ -1556,12 +1556,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     it "in interval of map" do
       binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2015,9,1))
       expect(binder_payment_due_date).to eq Date.new(2015,8,12)
+      binder_payment_due_date_1 = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
+      expect(binder_payment_due_date_1).to eq Date.new(2017,8,14)
     end
 
     it "out of map" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2019,9,1))
 
-      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(Date.new(2017,9,1))[:binder_payment_due_date]
+      expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(Date.new(2019,9,1))[:binder_payment_due_date]
     end
   end
 
@@ -2187,6 +2189,23 @@ describe PlanYear, "filter_active_enrollments_by_date" do
   it 'should return both health & dental plan ids' do
     result = plan_year.filter_active_enrollments_by_date(plan_year.start_on)
     expect(result.map(&:plan_id)).to eq [dental_enrollment.plan.id, health_enrollment.plan.id]
+  end
+
+  context "termination date of enrollment is prior to the billing date" do
+
+    before do
+      health_enrollment.update_attributes(terminated_on: plan_year.end_on - 3.months)
+    end
+
+    it 'should not return health enrollment' do
+      result = plan_year.filter_active_enrollments_by_date(plan_year.end_on - 1.months)
+      expect(result.map(&:plan_id).include?(health_enrollment.plan.id)).to eq false
+    end
+
+    it 'should return only dental_enrollment' do
+      result = plan_year.filter_active_enrollments_by_date(plan_year.end_on - 1.months)
+      expect(result.map(&:plan_id)).to eq [dental_enrollment.plan.id]
+    end
   end
 end
 

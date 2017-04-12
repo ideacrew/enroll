@@ -127,10 +127,33 @@ describe Person do
       end
 
       context 'duplicated key issue' do
-        before do
-          Person.remove_indexes
-          Person.create_indexes
+
+        def drop_encrypted_ssn_index_in_db
+          Person.collection.indexes.each do |spec|
+            if spec["key"].keys.include?("encrypted_ssn")
+              if spec["unique"] && spec["sparse"]
+                Person.collection.indexes.drop_one(spec["key"])
+              end
+            end
+          end
         end
+
+        def create_encrypted_ssn_uniqueness_index
+          Person.index_specifications.each do |spec|
+            if spec.options[:unique] && spec.options[:sparse]
+              if spec.key.keys.include?(:encrypted_ssn)
+                key, options = spec.key, spec.options
+                Person.collection.indexes.create_one(key, options)
+              end
+            end
+          end
+        end
+
+        before :each do
+          drop_encrypted_ssn_index_in_db
+          create_encrypted_ssn_uniqueness_index
+        end
+
         context "with blank ssn" do
 
           let(:params) {valid_params.deep_merge({ssn: ""})}
@@ -461,7 +484,7 @@ describe Person do
     end
 
     it 'matches by ssn' do
-      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq [@p1]
+      expect(Person.match_by_id_info(ssn: @p1.ssn)).to eq []
     end
 
     it 'matches by ssn, last_name and dob' do
@@ -478,6 +501,14 @@ describe Person do
 
     it 'not match last_name and dob if ssn provided (match is already done if ssn ok)' do
       expect(Person.match_by_id_info(last_name: @p0.last_name, dob: @p0.dob, ssn: '999884321').size).to eq 0
+    end
+
+    it 'ssn, dob present, then should return person object' do
+      expect(Person.match_by_id_info(dob: @p0.dob, ssn: '999884321').size).to eq 0
+    end
+
+    it 'ssn present, dob not present then should return empty array' do
+      expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
   end
 
@@ -1296,39 +1327,64 @@ describe Person do
     end
   end
 
+  describe "#check_for_paper_application", dbclean: :after_each do
+    let(:person) { FactoryGirl.create(:person, user: user) }
+    let(:user) { FactoryGirl.create(:user)}
+
+    before do
+      user.unset(:identity_final_decision_code)
+    end
+
+    it "should return true if user present & got paper in session variable" do
+      expect(person.check_for_paper_application('paper')).to eq true
+    end
+
+    it "should return nil if no user present" do
+      allow(person).to receive(:user).and_return nil
+      expect(person.check_for_paper_application('paper')).to eq nil
+    end
+
+    it "should return nil if session variable is not paper" do
+      expect(person.check_for_paper_application('something')).to eq nil
+    end
+
+    it "should return nil if session variable is nil" do
+      expect(person.check_for_paper_application(nil)).to eq nil
+    end
+
+    it "should return nil if no user present & if session var is not paper" do
+      person.user.destroy!
+      expect(person.check_for_paper_application('something')).to eq nil
+    end
+  end
+
   describe "changing the bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family) }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, user: user) }
     let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
+    let(:user) { FactoryGirl.create(:user)}
     before(:each) do
       allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
+      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
     end
 
     it "should not change the bookmark_url if they not passed RIDP" do
-      person.user = FactoryGirl.create(:user, :consumer)
       person.user.update_attributes(:idp_verified => false)
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
     it "should not change the bookmark_url if they don't have addresses" do
-      person.user = FactoryGirl.create(:user, :consumer)
-      person.user.update_attributes(:idp_verified => true)
-      person.user.ridp_by_payload!
+      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
       person.addresses.to_a.each do |add|
         add.delete
       end
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
     it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
-      person.user = FactoryGirl.create(:user, :consumer)
-      person.user.update_attribute(:idp_verified, true)
-      person.user.ridp_by_payload!
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
+      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
       person.set_consumer_role_url
       expect(person.consumer_role.bookmark_url).to eq "/families/home"
     end

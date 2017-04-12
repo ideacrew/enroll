@@ -9,10 +9,10 @@ class HandleCoverageSelected
         hem.ivl_coverage_selected
       end
       notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id})
-      enrollment.update_attributes!(:published_to_bus_at => Time.now)
+      enrollment.update_attributes!(:published_to_bus_at => TimeKeeper.datetime_of_record)
     elsif enrollment.is_shop_sep?
       notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id})
-      enrollment.update_attributes!(:published_to_bus_at => Time.now)
+      enrollment.update_attributes!(:published_to_bus_at => TimeKeeper.datetime_of_record)
     end
   end
 end

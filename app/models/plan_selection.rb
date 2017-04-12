@@ -31,11 +31,12 @@ class PlanSelection
     hbx_enrollment.update_current(plan_id: plan.id)
     hbx_enrollment.inactive_related_hbxs
     hbx_enrollment.inactive_pre_hbx(previous_enrollment_id)
-    if hbx_enrollment.is_special_enrollment?
+    qle = hbx_enrollment.is_special_enrollment?
+    if qle
       sep_id = hbx_enrollment.is_shop? ? hbx_enrollment.family.earliest_effective_shop_sep.id : hbx_enrollment.family.earliest_effective_ivl_sep.id
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
-    hbx_enrollment.select_coverage!
+    hbx_enrollment.select_coverage!(qle: qle)
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)

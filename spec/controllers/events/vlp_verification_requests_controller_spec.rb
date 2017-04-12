@@ -7,7 +7,7 @@ describe Events::VlpVerificationRequestsController do
     let(:rendered_template) { double }
     let(:coverage_start_date) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
-    let(:mock_now) { Time.mktime(2015,5,21,12,29,39) }
+    let(:mock_now) { TimeKeeper.datetime_of_record }
 
     it "should send out a message to the bus with the request to validate ssa" do
       @event_name = ""

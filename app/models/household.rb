@@ -4,8 +4,6 @@ class Household
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild}
-
   embedded_in :family
 
   # field :e_pdc_id, type: String  # Eligibility system PDC foreign key
@@ -55,7 +53,7 @@ class Household
   end
 
   def add_household_coverage_member(family_member)
-    if ImmediateFamily.include?(family_member.primary_relationship)
+    if Family::IMMEDIATE_FAMILY.include?(family_member.primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
       extended_family_coverage_household.remove_family_member(family_member)
     else
@@ -252,17 +250,20 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil,enrollment_kind:nil,external_enrollment: false)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
+      resident_role: resident_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: Time.now
+      submitted_at: TimeKeeper.datetime_of_record,
+      external_enrollment: external_enrollment,
+      coverage_start: coverage_start
     )
   end
 
@@ -274,7 +275,7 @@ class Household
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
-      submitted_at: Time.now
+      submitted_at: TimeKeeper.datetime_of_record
     )
     enrollment.save
     enrollment

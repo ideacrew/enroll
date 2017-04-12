@@ -94,7 +94,7 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150
     @pdf.move_down 12    
 
-    @pdf.text_box "#{DateTime.now.next_month.strftime("%m/%Y")} Group Coverage Bill", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
+    @pdf.text_box "#{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")} Group Coverage Bill", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
 
     @pdf.move_down 48
 
@@ -109,7 +109,7 @@ module InvoiceHelper
 
     enrollment_summary.each do |name, summary| 
       carrier_plan_services_data = [ 
-        ["Last 4 SSN", "Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
+        ["Last Name","First Name", "No. of Enrolled (1=EE only)", "Coverage Month", "Employer Cost", "Employee Cost", "Premium"]
       ]
       @pdf.start_new_page
 
@@ -130,15 +130,15 @@ module InvoiceHelper
 
        @pdf.move_down 24
 
-       @pdf.text_box "Subscriber(s) and Adjustment(s) for Coverage Period: #{DateTime.now.next_month.strftime("%m/%Y")}", :style => :bold, :at => [0, @pdf.cursor]
+       @pdf.text_box "Subscriber(s) and Adjustment(s) for Coverage Period: #{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")}", :style => :bold, :at => [0, @pdf.cursor]
 
        @pdf.move_down 24
 
       summary["enrollments"].each do |enrollment|
         subscriber = enrollment.subscriber.person.employee_roles.try(:first).try(:census_employee)
-        carrier_plan_services_data << ["#{subscriber.ssn.split(//).last(4).join}", "#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{DateTime.now.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
+        carrier_plan_services_data << ["#{subscriber.last_name}", "#{subscriber.first_name}","#{enrollment.humanized_members_summary}", "#{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")}","$#{currency_format(enrollment.total_employer_contribution)}" ,"$#{currency_format(enrollment.total_employee_cost)}"  ,"$#{currency_format(enrollment.total_premium)}"]
       end
-      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
+      carrier_plan_services_data << ["PLAN TOTAL", "", "", "", "", "", "$#{currency_format(summary['total_premium'])}"]
       dchbx_table_by_plan(carrier_plan_services_data)
     end
 
@@ -223,10 +223,10 @@ module InvoiceHelper
       style(column(1..-1), :align => :center)
       style(columns(-1), :align => :right)
       style(columns(0).row(-1), :width => 80)
+      style(columns(2), :width => 60)
       style(columns(3), :width => 60)
       style(columns(4), :width => 60)
-      style(columns(5), :width => 60)
-      style(columns(6), :width => 70)
+      style(columns(5), :width => 70)
     end
   end
 
@@ -254,11 +254,11 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
-        ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
-        ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{TimeKeeper.datetime_of_record.next_month.strftime("%m%Y")}"],
+        ["INVOICE DATE:", "#{TimeKeeper.datetime_of_record.strftime("%m/%d/%Y")}"],
+        ["COVERAGE MONTH:", "#{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
+        ["DATE DUE:", "#{TimeKeeper.datetime_of_record.strftime("%m/14/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
@@ -345,11 +345,11 @@ module InvoiceHelper
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
       invoice_header_data = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
-        ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
-        ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{TimeKeeper.datetime_of_record.next_month.strftime("%m%Y")}"],
+        ["INVOICE DATE:", "#{TimeKeeper.datetime_of_record.strftime("%m/%d/%Y")}"],
+        ["COVERAGE MONTH:", "#{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        ["DATE DUE:", "#{DateTime.now.end_of_month.strftime("%m/%d/%Y")}"]
+        ["DATE DUE:", "#{TimeKeeper.datetime_of_record.end_of_month.strftime("%m/%d/%Y")}"]
       ]
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
@@ -431,15 +431,16 @@ module InvoiceHelper
     @pdf.move_down 36
 
     @pdf.image logopath, :width => 150, :at => [address_x,  @pdf.cursor]
-      invoice_header_data = [
+    arrayof_arrayof_string = [
         ["ACCOUNT NUMBER:", "#{@employer_profile.organization.hbx_id}"],
-        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{DateTime.now.next_month.strftime("%m%Y")}"],
-        ["INVOICE DATE:", "#{DateTime.now.strftime("%m/%d/%Y")}"],
-        ["COVERAGE MONTH:", "#{DateTime.now.next_month.strftime("%m/%Y")}"],
+        ["INVOICE NUMBER:", "#{@employer_profile.organization.hbx_id}#{TimeKeeper.datetime_of_record.next_month.strftime("%m%Y")}"],
+        ["INVOICE DATE:", "#{TimeKeeper.datetime_of_record.strftime("%m/%d/%Y")}"],
+        ["COVERAGE MONTH:", "#{TimeKeeper.datetime_of_record.next_month.strftime("%m/%Y")}"],
         ["TOTAL AMOUNT DUE:", "$#{currency_format(@hbx_enrollments.map(&:total_premium).sum)}"],
-        # ["DATE DUE:", "#{DateTime.now.strftime("%m/14/%Y")}"]
+        # ["DATE DUE:", "#{TimeKeeper.datetime_of_record.strftime("%m/14/%Y")}"]
         ["DATE DUE:", "#{PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")}"]
-      ]
+    ]
+    invoice_header_data = arrayof_arrayof_string
     dchbx_table_light_blue(invoice_header_data,invoice_header_x)
 
     address = mailing_or_primary_address(@organization)
