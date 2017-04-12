@@ -90,7 +90,7 @@ class Insured::GroupSelectionController < ApplicationController
       hbx_enrollment.kind = 'employer_sponsored_cobra'
       hbx_enrollment.effective_on = @employee_role.census_employee.coverage_terminated_on.end_of_month + 1.days if @employee_role.census_employee.need_update_hbx_enrollment_effective_on?
       if @employee_role.census_employee.coverage_terminated_on.present? && !@employee_role.census_employee.have_valid_date_for_cobra?
-        raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        raise "You may not enroll for cobra after #{aca_shop_market_cobra_enrollment_period_in_months} months later of coverage terminated."
       end
     end
 

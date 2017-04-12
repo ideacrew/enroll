@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :general_agency_profile do
-    market_kind "both"
+    market_kind IvlHelper.individual_market_is_enabled? ? "both" : "shop"
     entity_kind "s_corporation"
     organization
     sequence(:corporate_npn) {|n| "2002345#{n}" }
@@ -12,3 +12,4 @@ FactoryGirl.define do
     end
   end
 end
+

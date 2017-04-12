@@ -331,7 +331,20 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return nil given an invalid enrollment ID" do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
-
   end
+end
 
+  describe "Enabled/Disabled IVL market" do
+    shared_examples_for "IVL market status" do |value|
+       if value == true
+        it "should return true if IVL market is enabled" do
+          expect(helper.individual_market_is_enabled?).to eq  true
+        end
+       else
+        it "should return false if IVL market is disabled" do
+          expect(helper.individual_market_is_enabled?).to eq  false
+        end
+       end
+    it_behaves_like "IVL market status", Settings.aca.market_kinds.include?("individual")
+  end
 end

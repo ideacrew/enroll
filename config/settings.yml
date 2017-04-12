@@ -1,17 +1,22 @@
 site:
-  short_name: "DC Health Link"
-  byline: "DC's Online Health Insurance Marketplace"
-  long_name: ""
-  copyright_period_start: "2013"
-  header_message: "Welcome to the District's Health Insurance Marketplace"
+  subdomain: "mhc"
+  domain_name: "hbxshop.org"
+  home_url: "https://enroll.mhc.hbxshop.org"
+  help_url: "https://mhc.hbxshop.org/help"
+  faqs_url: "https://mhc.hbxshop.org/faqs"
+
+  short_name: "Health Connector"
+  byline: "The Right Place for the Right Plan"
+  long_name: "Massachusetts Health Connector"
+  copyright_period_start: "2017"
+  header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
-  home_url: "https://www.dchealthlink.com/"
 
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["individual", "shop"]
-  general_agency_enabled: false
+  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
+
 contact_center:
   name: "DC Health Link's Customer Care Center"
   alt_name: "DC Health Link Customer Service"
@@ -20,10 +25,27 @@ contact_center:
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
-aca:
-  state_name: "District of Columbia"
-  state_abbreviation: "DC"
+  mailing_address:
+    name: "Massachusetts Health Connector"
+    address_1: "PO Box 44018"
+    address_2:
+    city: "Washington"
+    state: "DC"
+    zip: "20026"
 
+notices:
+  mailing_address:
+    address_1:
+    address_2:
+    city:
+    state: "MA"
+    zip:
+
+aca:
+  state_name: "Massachusetts"
+  state_abbreviation: "MA"
+  market_kinds: ["shop"]
+  general_agency_enabled: false
 #
   qle:
     with_in_sixty_days: 60
