@@ -7,7 +7,10 @@ module Config::AcaConcern
     Settings.aca.shop_market.cobra_enrollment_period.months
   end
 
-  def aca_state_abbreviation
-    Settings.aca.state_abbreviation
+  def individual_market_is_enabled?
+    unless Settings.aca.market_kinds.include? 'individual'
+     flash[:error] = "This Exchange does not support an individual marketplace"
+     redirect_to root_path
+    end
   end
 end

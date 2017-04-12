@@ -652,6 +652,4 @@ module ApplicationHelper
       "2. You have 0 non-owner employees on your roster"
     end
   end
-
-
 end
