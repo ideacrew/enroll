@@ -12,16 +12,20 @@ namespace :role do
         person = Person.where(hbx_id:hbx).first
         if role == "assister" && person.assister_role.present?
           person.assister_role.destroy
+          person.update(is_disabled:true)
         elsif role == "cac" && person.csr_role.present?
           person.csr_role.destroy
+          person.update(is_disabled:true)
         end
       elsif email.present?
         user = User.where(email:email).first
         if user.person.present?
           if role == "assister" && user.person.assister_role.present?
             user.person.assister_role.destroy
+            user.person.update(is_disabled:true)
           elsif role == "cac" && user.person.csr_role.present?
             user.person.csr_role.destroy
+            user.person.update(is_disabled:true)
           end
         end
       end
