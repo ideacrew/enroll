@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pundit
+  include Config::AcaConcern
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
@@ -45,13 +46,6 @@ class ApplicationController < ActionController::Base
 
   def access_denied
     render file: 'public/403.html', status: 403
-  end
-
-  def individual_market_is_active
-     unless Settings.aca.individual_market.is_active
-       flash[:error] = "unauthorized"
-       redirect_to root_path
-    end
   end
 
   def user_not_authorized(exception)

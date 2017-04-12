@@ -647,8 +647,4 @@ module ApplicationHelper
       "2. You have 0 non-owner employees on your roster"
     end
   end
-
-  def individual_market_is_enabled?
-    Settings.aca.market_kinds.include?("individual")
-  end
 end
