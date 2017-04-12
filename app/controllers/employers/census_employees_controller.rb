@@ -98,7 +98,7 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully updated."
       else
-        flash[:notice] = "Note: new employee cannot enroll on #{Settings.site.short_name} until they are assigned a benefit group. "
+        flash[:notice] = "Note: new employee cannot enroll on #{site_short_name} until they are assigned a benefit group. "
         flash[:notice] += "Census Employee is successfully updated."
       end
       redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
@@ -197,7 +197,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date, current_user)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."
