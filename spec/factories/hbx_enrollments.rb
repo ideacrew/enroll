@@ -92,7 +92,7 @@ FactoryGirl.define do
 
     trait :terminated do
       aasm_state "coverage_terminated"
-      terminated_on TimeKeeper.datetime_of_record.last_month.end_of_month
+      terminated_on Time.now.last_month.end_of_month
     end
 
     trait :older_effective_date do 

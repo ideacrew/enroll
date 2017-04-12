@@ -20,7 +20,7 @@ module Subscribers
         person = find_person(person_hbx_id)
         return if person.nil? || person.consumer_role.nil?
         consumer_role = person.consumer_role
-        consumer_role.local_residency_responses << EventResponse.new({received_at: TimeKeeper.datetime_of_record, body: xml})
+        consumer_role.local_residency_responses << EventResponse.new({received_at: Time.now, body: xml})
 
         if "503" == return_status.to_s
           consumer_role.deny_residency!

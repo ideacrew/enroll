@@ -44,7 +44,6 @@ module Factories
         if shop_enrollments.present?
           passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
 
-
           passive_renewals.reject! do |renewal|
             renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
           end
