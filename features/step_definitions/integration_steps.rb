@@ -449,7 +449,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
   find('label[for=census_employee_gender_male]').click
-  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (TimeKeeper.datetime_of_record - 1.week).strftime('%m/%d/%Y')
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
   fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'

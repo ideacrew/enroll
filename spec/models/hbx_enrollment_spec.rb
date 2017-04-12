@@ -1700,7 +1700,7 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
     let(:reference_date) { Date.today }
     let(:open_enrollment_start) { reference_date - 15.days }
     let(:open_enrollment_end) { reference_date - 5.days }
-    let(:purchase_time) { TimeKeeper.datetime_of_record - 20.days }
+    let(:purchase_time) { Time.now - 20.days }
     let(:hired_on) { reference_date - 21.days }
 
     before :each do
@@ -1736,7 +1736,7 @@ describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
   end
 
   describe "in the SHOP market, purchased during open enrollment" do
-    let(:reference_date) { TimeKeeper.datetime_of_record }
+    let(:reference_date) { Time.now }
     let(:coverage_start) { (reference_date + 15.days).to_date }
     let(:open_enrollment_start) { (reference_date - 15.days).to_date }
     let(:open_enrollment_end) { (reference_date - 5.days).to_date }
