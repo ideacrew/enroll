@@ -800,9 +800,9 @@ class CensusEmployee < CensusMember
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
     cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months) &&
+      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months) &&
       coverage_terminated_on <= cobra_begin_date &&
-      cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months)
+      cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 
   def has_employee_role_linked?
