@@ -1,51 +1,30 @@
 site:
-  subdomain: "mhc"
-  domain_name: "hbxshop.org"
-  home_url: "https://enroll.mhc.hbxshop.org"
-  help_url: "https://mhc.hbxshop.org/help"
-  faqs_url: "https://mhc.hbxshop.org/faqs"
-
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
-  long_name: "Massachusetts Health Connector"
+  long_name: ""
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
+  home_url: "https://qa.enroll.mhc.hbxshop.org/"
 
   social_media:
     facebook_url: ""
 
-  aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
-
+  aca_market_kinds: ["individual", "shop"]
+  general_agency_enabled: true
+  
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "Health Connector's Customer Care Center"
+  alt_name: "Health Connector Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
-  email_address: "info@dchealthlink.com"
-
-  mailing_address:
-    name: "Massachusetts Health Connector"
-    address_1: "PO Box 44018"
-    address_2:
-    city: "Washington"
-    state: "DC"
-    zip: "20026"
-
-notices:
-  mailing_address:
-    address_1:
-    address_2:
-    city:
-    state: "MA"
-    zip:
+  email_address: "info@mhc.hbxshop.org"
 
 aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
-  market_kinds: ["shop"]
-  general_agency_enabled: false
+
 #
   qle:
     with_in_sixty_days: 60
