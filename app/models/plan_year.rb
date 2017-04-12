@@ -1040,7 +1040,7 @@ private
 
   def initial_employer_open_enrollment_completed
     #also check if minimum participation and non owner conditions are met by ER.
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum || non_business_owner_enrolled.count < 1)
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
