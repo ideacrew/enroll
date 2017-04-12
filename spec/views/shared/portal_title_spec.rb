@@ -55,7 +55,7 @@ RSpec.describe "layouts/_header.html.erb" do
 
   it 'identifies default controller' do
     render :template => 'layouts/_header.html.erb'
-    expect(rendered).to match(/Welcome to the District/)
+    expect(rendered).to match(/#{Settings.site.header_message}/)
   end
 
 end

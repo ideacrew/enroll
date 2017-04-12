@@ -1,4 +1,5 @@
 class EmployerProfile
+  include Config::AcaModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -351,9 +352,9 @@ class EmployerProfile
   end
 
   def is_primary_office_local?
-    organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
+    organization.primary_office_location.address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -833,7 +834,7 @@ class EmployerProfile
   def conversion_employer?
     !self.converted_from_carrier_at.blank?
   end
-  
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
@@ -903,6 +904,6 @@ private
   end
 
   def plan_year_publishable?
-    !published_plan_year.is_application_unpublishable? 
+    !published_plan_year.is_application_unpublishable?
   end
 end
