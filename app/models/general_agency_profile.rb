@@ -4,7 +4,7 @@ class GeneralAgencyProfile
   include Mongoid::Timestamps
   include AASM
   include AgencyProfile
-  include AcaModelConcern
+  include Config::AcaModelConcern
 
   # for market_kind
   MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]

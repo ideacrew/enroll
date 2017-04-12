@@ -1,6 +1,7 @@
 module IvlHelper
-	delegate :individual_market_is_enabled?, to: :class
-	
+	def individual_market_is_enabled?
+		Settings.aca.market_kinds.include?("individual")
+	end
 	def self.individual_market_is_enabled?
 		Settings.aca.market_kinds.include?("individual")
 	end

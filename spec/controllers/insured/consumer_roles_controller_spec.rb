@@ -35,7 +35,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
     end
   end
-  
+
   describe "Get search" do
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", ssn: "333224444", dob: "08/15/1975") }
 
@@ -49,7 +49,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(person).to receive(:has_active_consumer_role?).and_return(false)
       allow(consumer_role).to receive(:save!).and_return(true)
     end
-    
+
     it "should render search template" do
       get :search
       if individual_market_is_enabled?
@@ -158,7 +158,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
           post :match, :person => person_parameters
         end
-        it "render employee role match template" do 
+        it "render employee role match template" do
           if individual_market_is_enabled?
             expect(response).to have_http_status(:success)
             expect(response).to render_template('insured/employee_roles/match')
@@ -195,7 +195,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:person).and_return(person)
       sign_in user
     end
-    
+
     it "should create new person/consumer role object" do
       post :create, person: person_params
       if individual_market_is_enabled?
@@ -211,7 +211,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(Factories::EnrollmentFactory).to receive(:construct_consumer_role).and_return(nil)
       sign_in user
     end
-  
+
     it "should throw a 500 error" do
       post :create, person: person_params
       if individual_market_is_enabled?
@@ -233,14 +233,14 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:bookmark_url=).and_return(true)
       sign_in user
     end
-    
+
     it "should render new template" do
       get :edit, id: "test"
-      if individual_market_is_enabled?  
+      if individual_market_is_enabled?
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit)
       else
-        expect(response).to redirect_to(root_path) 
+        expect(response).to redirect_to(root_path)
       end
     end
   end
@@ -257,7 +257,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(person).to receive(:consumer_role).and_return consumer_role
       sign_in user
     end
-    
+
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
@@ -266,8 +266,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         expect(response).to have_http_status(:redirect)
         expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
       else
-        expect(response).to redirect_to(root_path) 
-      end  
+        expect(response).to redirect_to(root_path)
+      end
     end
 
     it "should not update the person" do
@@ -276,7 +276,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       put :update, person: person_params, id: "test"
       if individual_market_is_enabled?
         expect(response).to have_http_status(:success)
-        expect(response).to render_template(:edit)  
+        expect(response).to render_template(:edit)
       else
         expect(response).to redirect_to(root_path)
       end
@@ -310,13 +310,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       if individual_market_is_enabled?
         expect(controller).to receive(:bubble_address_errors_by_person)
-        put :update, person: person_params, id: "test"  
+        put :update, person: person_params, id: "test"
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit)
       else
         put :update, person: person_params, id: "test"
         expect(response).to redirect_to(root_path)
-      end 
+      end
     end
   end
 
@@ -326,8 +326,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before :each do
       sign_in user
     end
-  end  
-  
+  end
+
   context "target type is Person" do
     before :each do
       allow(Person).to receive(:find).and_return person
@@ -338,14 +338,14 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       if individual_market_is_enabled?
         expect(response).to have_http_status(:success)
         expect(assigns(:target)).to eq person
-      end 
+      end
     end
 
     it "assign vlp_doc_target from params" do
       if individual_market_is_enabled?
         expect(assigns(:vlp_doc_target)).to eq "vlp doc"
       end
-   end 
+   end
 
     it "assign country of citizenship based on vlp document" do
       if individual_market_is_enabled?
@@ -364,17 +364,17 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
           expect(assigns(:vlp_doc_target)).to eq "vlp doc"
         else
           expect(assigns(:country)).to eq "Ukraine"
-        end 
+        end
       end
     end
 
     it "render javascript template" do
       if individual_market_is_enabled?
         allow(Person).to receive(:find).and_return person
-        xhr :get, 'immigration_document_options', params, format: :js       
+        xhr :get, 'immigration_document_options', params, format: :js
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:immigration_document_options)
-      end  
+      end
     end
 
   context "GET ridp_agreement" do
@@ -406,13 +406,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         allow(person).to receive(:completed_identity_verification?).and_return(false)
         get "ridp_agreement"
       end
-     
+
       it "should render the agreement page" do
         if individual_market_is_enabled?
           expect(response).to render_template("ridp_agreement")
         else
           expect(response).to redirect_to(root_path)
-        end  
+        end
       end
     end
   end

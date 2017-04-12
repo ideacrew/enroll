@@ -3,7 +3,7 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
-  include AcaModelConcern
+  include Config::AcaModelConcern
 
   embedded_in :organization
 
