@@ -354,26 +354,25 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#admin_user?" do
+  describe "#is_new_paper_application?" do
     let(:person_id) { double }
     let(:admin_user) { FactoryGirl.create(:user, :hbx_staff)}
-    let(:user) { FactoryGirl.create(:user, :consumer)}
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, user: user)}
+    let(:user) { FactoryGirl.create(:user)}
+    let(:person) { FactoryGirl.create(:person, user: user)}
     before do
       allow(admin_user).to receive(:person_id).and_return person_id
     end
 
-    it "should return true when current user is admin & accessing other's account" do
-      expect(helper.admin_user?(admin_user, person.consumer_role)).to eq true
+    it "should return true when current user is admin & doing new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "paper")).to eq true
     end
 
-    it "should return false when the current user is not an admin" do
-      expect(helper.admin_user?(user, person.consumer_role)).to eq false
+    it "should return false when the current user is not an admin & working on new paper application" do
+      expect(helper.is_new_paper_application?(user, "paper")).to eq nil
     end
 
-    it "should return false when admin user has hbx staff role & accessing his/her own account" do
-      allow(person).to receive(:user).and_return admin_user
-      expect(helper.admin_user?(admin_user, person.consumer_role)).to eq false
+    it "should return false when the current user is an admin & not working on new paper application" do
+      expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
 end
