@@ -1,5 +1,6 @@
 Feature: Consumer verification process
 
+  @individual
   Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
     * Individual visits the Insured portal during open enrollment
@@ -22,20 +23,31 @@ Feature: Consumer verification process
     * I select a plan on plan shopping page
     * I click on purchase button on confirmation page
     * I click on continue button to go to the individual home page
-     
+    * I should see Documents link
+    * I click on verification link
+    * I should see page for documents verification
+    * I upload the file as vlp document
+    * I click the upload file button
 
-
+  @individual
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
     And the consumer is logged in
     And consumer has outstanding verification and unverified enrollments
-     
+    When the consumer visits verification page
+    Then consumer should see Verification Due date label
+    And consumer should see Documents FAQ link
+    And the consumer should see documents verification page
+    Then the consumer can expand the table by clicking on caret sign
 
-
+  @individual
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
     And the consumer is logged in
-     
+    When the consumer is completely verified
+    Then the consumer visits verification page
+    And the consumer should see documents verification page
+    Then verification types have to be visible
 
 
 
