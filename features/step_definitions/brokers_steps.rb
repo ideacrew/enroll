@@ -19,7 +19,28 @@ When(/^.+ enters personal information$/) do
   fill_in 'organization[npn]', with: '109109109'
 end
 
-And(/^.+ enters broker agency information$/) do
+And(/^.+ enters broker agency information for individual markets$/) do
+  fill_in 'organization[legal_name]', with: "Logistics Inc"
+  fill_in 'organization[dba]', with: "Logistics Inc"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890890891"
+
+  # this field was hidden 4/13/2016
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
+  # find(:xpath, "//li[contains(., 'C Corporation')]").click
+
+  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  find(:xpath, "//li[contains(., 'Both - Individual & Family AND Small Business Marketplaces')]").click
+
+  find('button.multiselect').click
+  find(:xpath, '//label[input[@value="bn"]]').click
+  find(:xpath, '//label[input[@value="fr"]]').click
+
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
+end
+
+And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
   # Auto-Generates FEIN
@@ -67,7 +88,7 @@ Then(/^.+ should see the broker successfully approved message$/) do
 end
 
 And(/^.+ should receive an invitation email$/) do
-  open_email("ricky.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
+  open_email("ricky.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name}")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
   #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
