@@ -18,18 +18,18 @@ namespace :reports do
 
         Person.all.each do |pr|
           begin
-          if pr.employee_roles.all.count >= 2
+          if pr.employee_roles.count >= 2
             if (pr.employee_roles[-1].census_employee.employer_profile.id ==  pr.employee_roles[0].census_employee.employer_profile.id)
               legal_name = pr.employee_roles[-1].census_employee.employer_profile.organization.legal_name
               fein = pr.employee_roles[-1].census_employee.employer_profile.organization.fein
-              if ((pr.employee_roles[-1].census_employee.aasm_state == 'eligible') && (pr.employee_roles[-1].census_employee.employee_role_id == nil) && (pr.employee_roles[0].census_employee.aasm_state == 'rehired'))
+              if (( ["eligible","employee_role_linked"].include?(pr.employee_roles[-1].census_employee.aasm_state) ) && (pr.employee_roles[-1].census_employee.employee_role_id == nil) && (pr.employee_roles[0].census_employee.aasm_state == 'rehired'))
                 csv << [pr.hbx_id, pr.full_name, legal_name, fein]
                 total_count += 1
               end
             end
           end
           rescue
-            puts "***bad record*** #{pr.hbx_id}, #{pr.full_name} #{legal_name} #{fein}" 
+            puts "***bad record*** #{pr.hbx_id}, #{pr.full_name}, #{legal_name}, #{fein}" 
           end
         end
         puts "File path: %s. Total count of rehired EE's with inactive employee_roles: %d." %[file_path, total_count]
