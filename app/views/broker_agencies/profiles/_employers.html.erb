@@ -17,7 +17,9 @@
             <th>ER State</th>
             <th>Effective Date</th>
             <th>Broker</th>
+            <% if general_agency_enabled? %>
             <th>General Agency</th>
+            <%end%>
           </tr>
           </thead>
           <tbody>
@@ -52,7 +54,9 @@
               { data: 'er_state'},
               { data: 'effective_date'},
               { data: 'broker'},
+              <% if general_agency_enabled? %>
               { data: 'general_agency'},
+              <%end%>
 	      ],
   'dom': "<'row'" +
             "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +

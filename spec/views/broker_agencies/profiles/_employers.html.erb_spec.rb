@@ -54,5 +54,8 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
       it "should not have general agency" do
         expect(rendered).not_to match(/General Agencies/)
       end
+      it "should not have general agency in table" do
+        expect(rendered).not_to match(/General Agency/)
+      end
   end
 end  
