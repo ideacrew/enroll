@@ -84,7 +84,6 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-
           @resident_candidate = Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
@@ -105,10 +104,14 @@ class Insured::ConsumerRolesController < ApplicationController
                 return
               end
               create_sso_account(current_user, @person, 15, "resident") do
-                format.html { redirect_to family_account_path }
-                return
+                respond_to do |format|
+                  format.html {
+                    redirect_to family_account_path
+                  }
+                end
               end
             end
+            return
           end
 
           found_person = @consumer_candidate.match_person
