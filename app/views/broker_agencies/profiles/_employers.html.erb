@@ -17,7 +17,9 @@
             <th>ER State</th>
             <th>Effective Date</th>
             <th>Broker</th>
+            <% if general_agency_enabled? %>
             <th>General Agency</th>
+            <%end%>
           </tr>
           </thead>
           <tbody>
@@ -52,7 +54,9 @@
               { data: 'er_state'},
               { data: 'effective_date'},
               { data: 'broker'},
+              <% if general_agency_enabled? %>
               { data: 'general_agency'},
+              <%end%>
 	      ],
   'dom': "<'row'" +
             "<'col-sm-7 col-md-7'B><'col-sm-5 col-md-5'f>" +
@@ -83,7 +87,7 @@
 
       </script>
 
-
+<% if general_agency_enabled? %>
         <div class="col-md-4">
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
@@ -91,6 +95,7 @@
           <%= submit_tag "Assign", class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
           <%= submit_tag "Clear Assignment", class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
         </div>
+        <% end %>
       <% end %>
     </div>
   </div>
