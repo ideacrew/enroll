@@ -281,21 +281,48 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    before :each do
-      sign_in user
-      xhr :get, :assign, id: broker_agency_profile.id, format: :js
+    context "when general agency is enabled via settings" do
+      before :each do
+        Settings.aca.general_agency_enabled = true
+        sign_in user
+        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+      end
+
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agency_profiles" do
+        expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
+      end
+
+      it "should get employers" do
+        expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+      end
     end
 
-    it "should return http success" do
-      expect(response).to have_http_status(:success)
-    end
+    context "when general agency is disabled via settings" do
+      before :each do
+        Settings.aca.general_agency_enabled = false
+        sign_in user
+        xhr :get, :assign, id: broker_agency_profile.id, format: :js
+      end
 
-    it "should get general_agency_profiles" do
-      expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
-    end
+      it "should return http redirect" do
+        expect(response).to have_http_status(:redirect)
+      end
 
-    it "should get employers" do
-      expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+      it "should redirect to broker_agency_profile" do
+        expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+      end
+
+      it "general_agency_profiles should be nil" do
+        expect(assigns(:general_agency_profiles)).to be_nil
+      end
+
+      it "employers should be nil" do
+        expect(assigns(:employers)).to be_nil
+      end
     end
   end
 
@@ -363,36 +390,113 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
-    context "when we Assign agency" do
-      before :each do
-        sign_in user
-        xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+    context "when general agency is enabled via settings" do
+      before do
+        Settings.site.general_agency_enabled = true
       end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
 
-      it "should render" do
-        expect(response).to render_template(:update_assign)
+        it "should render" do
+          expect(response).to render_template(:update_assign)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Assign successful.'
+        end
       end
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
 
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Assign successful.'
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Unassign successful.'
+        end
+        it "should update aasm_state" do
+          employer_profile.reload
+          expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+        end
       end
     end
-    context "when we Unassign agency" do
-      before :each do
-        sign_in user
-        post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
-      end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
+    context "when general agency is enabled via settings" do
+      before do
+        Settings.site.general_agency_enabled = true
       end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
 
-      it "should get notice" do
-        expect(flash[:notice]).to eq 'Unassign successful.'
+        it "should render" do
+          expect(response).to render_template(:update_assign)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Assign successful.'
+        end
       end
-      it "should update aasm_state" do
-        employer_profile.reload
-        expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
+
+        it "should redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should get notice" do
+          expect(flash[:notice]).to eq 'Unassign successful.'
+        end
+        it "should update aasm_state" do
+          employer_profile.reload
+          expect(employer_profile.general_agency_accounts.first.aasm_state).to eq "inactive"
+        end
+      end
+    end
+
+    context "when general agency is disabled via settings" do
+      before do
+        Settings.site.general_agency_enabled = false
+      end
+      context "when we Assign agency" do
+        before :each do
+          sign_in user
+          xhr :post, :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], general_agency_id: general_agency_profile.id, type: 'Hire'
+        end
+
+        it "should return http redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should redirect to broker_agency_profile" do
+          expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+        end
+      end
+      context "when we Unassign agency" do
+        before :each do
+          sign_in user
+          post :update_assign, id: broker_agency_profile.id, employer_ids: [employer_profile.id], commit: "Clear Assignment"
+        end
+
+        it "should return http redirect" do
+          expect(response).to have_http_status(:redirect)
+        end
+
+        it "should redirect to broker_agency_profile" do
+          expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+        end
       end
     end
   end

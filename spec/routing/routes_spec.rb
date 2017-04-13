@@ -6,51 +6,58 @@ RSpec.describe "routing", :type => :routing do
       :controller => "insured/consumer_roles",
       :action => "immigration_document_options"
     )
-  end
-
-  describe "general agency can be enabled or disabled via settings" do
+  end  
+  describe "broker agency assign can be enabled or disabled via settings" do
     context "when enabled" do
-      it "routes to general_agency_registration by default" do
-        expect(get: "/general_agency_registration").to route_to(
-          controller: 'general_agencies/profiles',
-          action: 'new_agency'
+      before do
+        Settings.site.general_agency_enabled = true
+        Enroll::Application.reload_routes!
+      end
+      it "routes to broker_agencies/profiles#assign by default" do
+        expect(get: "/broker_agencies/profiles/1/assign").to route_to(
+          controller: 'broker_agencies/profiles',
+          action: 'assign',
+          id: '1'
         )
       end
-
-      it "routes to general_agencies profiles" do
-        expect(get: '/general_agencies').to route_to(
-          controller: 'general_agencies/profiles',
-          action: 'new'
-        )
-      end
-
-      it "routes to general_agencies index path in admin dashboard" do
-        expect(get: '/exchanges/hbx_profiles/general_agency_index').to route_to(
-          controller: 'exchanges/hbx_profiles',
-          action: 'general_agency_index'
-        )
-      end
-
     end
 
-    pending "when disabled" do
-      let(:site) { double(general_agency_enabled: false) }
+    context "when disabled" do
       before do
-        Settings.site = site
+        Settings.site.general_agency_enabled = false
+        Enroll::Application.reload_routes!
       end
 
-      it "routes to general_agency_registration by default" do
-        expect(get: "/general_agency_registration").not_to be_routable
+      it "assign becomes unroutable" do
+        expect(get: "/broker_agencies/profiles/1/assign").not_to be_routable
+      end
+    end
+  end
+
+  describe "broker agency update_assign can be enabled or disabled via settings" do
+    context "when enabled" do
+      before do
+        Settings.site.general_agency_enabled = true
+        Enroll::Application.reload_routes!
+      end
+      it "routes to broker_agencies/profiles#update_assign by default" do
+        expect(post: "/broker_agencies/profiles/1/update_assign").to route_to(
+          controller: 'broker_agencies/profiles',
+          action: 'update_assign',
+          id: '1'
+        )
+      end
+    end
+
+    context "when disabled" do
+      before do
+        Settings.site.general_agency_enabled = false
+        Enroll::Application.reload_routes!
       end
 
-      it "routes to general_agencies profiles" do
-        expect(get: '/general_agencies').not_to be_routable
+      it "update_assign becomes unroutable" do
+        expect(post: "/broker_agencies/profiles/1/update_assign").not_to be_routable
       end
-
-      it "routes to general_agencies index path in admin dashboard" do
-        expect(get: '/exchanges/hbx_profiles/general_agency_index').not_to be_routable        
-      end
-
     end
   end
 end
