@@ -239,7 +239,7 @@ When /^the broker login in$/ do
   fill_in "user[password]", with: "1qaz@WSX"
   fill_in "user[login]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "broker1@dc.gov"
   find('.interaction-click-control-sign-in').click
-  Settings.site.general_agency_enabled = true
+  Settings.aca.general_agency_enabled = true
 end
 
 When /^the broker login in with disabling general agency settings$/ do
@@ -252,7 +252,7 @@ When /^the broker login in with disabling general agency settings$/ do
   fill_in "user[password]", with: "1qaz@WSX"
   fill_in "user[login]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "broker1@dc.gov"
   find('.interaction-click-control-sign-in').click
-  Settings.site.general_agency_enabled = false
+  Settings.aca.general_agency_enabled = false
 end
 
 Then /^the broker should see the home of broker$/ do
