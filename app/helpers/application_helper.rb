@@ -647,12 +647,4 @@ module ApplicationHelper
       "2. You have 0 non-owner employees on your roster"
     end
   end
-
-  # Allows us to conditionally display General Agency related links and information
-  # This can be enabled or disabled in config/settings.yml
-  # @return { True } if Settings.site.general_agency_enabled
-  # @return { False } otherwise
-  def general_agency_enabled?
-   Settings.site.general_agency_enabled
-  end
 end
