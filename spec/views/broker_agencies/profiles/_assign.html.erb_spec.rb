@@ -5,6 +5,8 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
 
   before :each do
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
     assign :employers, Kaminari.paginate_array(EmployerProfile.all).page(0)
     assign :broker_agency_profile, broker_agency_profile
     assign :general_agency_profiles, [general_agency_profile]
