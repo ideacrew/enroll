@@ -442,11 +442,11 @@ Then(/^he should be able to see the Assign link under his profile$/) do
 end
 
 When(/^the general agency is enabled through settings$/) do
- Settings.site.general_agency_enabled = true
+ Settings.aca.general_agency_enabled = true
 end
 
 When(/^the general agency is disabled through settings$/) do
- Settings.site.general_agency_enabled = false
+ Settings.aca.general_agency_enabled = false
 end
 
 Then(/^he should not be able to see the Assign link under his profile$/) do

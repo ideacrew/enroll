@@ -392,7 +392,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
     context "when general agency is enabled via settings" do
       before do
-        Settings.site.general_agency_enabled = true
+        Settings.aca.general_agency_enabled = true
       end
       context "when we Assign agency" do
         before :each do
@@ -430,7 +430,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     context "when general agency is enabled via settings" do
       before do
-        Settings.site.general_agency_enabled = true
+        Settings.aca.general_agency_enabled = true
       end
       context "when we Assign agency" do
         before :each do
@@ -468,7 +468,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     context "when general agency is disabled via settings" do
       before do
-        Settings.site.general_agency_enabled = false
+        Settings.aca.general_agency_enabled = false
       end
       context "when we Assign agency" do
         before :each do

@@ -55,7 +55,7 @@ Rails.application.routes.draw do
         post :employer_invoice_datatable
         post :generate_invoice
         get :broker_agency_index
-        get :general_agency_index if Settings.site.general_agency_enabled
+        get :general_agency_index if Settings.aca.general_agency_enabled
         get :issuer_index
         get :product_index
         get :configuration
@@ -319,7 +319,7 @@ Rails.application.routes.draw do
         get :assign_history
       end
       member do
-        get :general_agency_index 
+        get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
         if Settings.aca.general_agency_enabled
@@ -391,7 +391,7 @@ Rails.application.routes.draw do
     end
   end
 
-  if Settings.site.general_agency_enabled
+  if Settings.aca.general_agency_enabled
     match 'general_agency_registration', to: 'general_agencies/profiles#new_agency', via: [:get]
     namespace :general_agencies do
       root 'profiles#new'

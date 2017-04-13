@@ -46,7 +46,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb" do
   end 
   describe "when disabled" do
     before :each do
-      Settings.site.general_agency_enabled = false
+      Settings.aca.general_agency_enabled = false
       allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", list_enrollments?: false, updateable?: false))
       render template: "broker_agencies/profiles/_employers.html.erb"
     end

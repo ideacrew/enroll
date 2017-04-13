@@ -10,7 +10,7 @@ RSpec.describe "routing", :type => :routing do
   describe "broker agency assign can be enabled or disabled via settings" do
     context "when enabled" do
       before do
-        Settings.site.general_agency_enabled = true
+        Settings.aca.general_agency_enabled = true
         Enroll::Application.reload_routes!
       end
       it "routes to broker_agencies/profiles#assign by default" do
@@ -24,7 +24,7 @@ RSpec.describe "routing", :type => :routing do
 
     context "when disabled" do
       before do
-        Settings.site.general_agency_enabled = false
+        Settings.aca.general_agency_enabled = false
         Enroll::Application.reload_routes!
       end
 
@@ -37,7 +37,7 @@ RSpec.describe "routing", :type => :routing do
   describe "broker agency update_assign can be enabled or disabled via settings" do
     context "when enabled" do
       before do
-        Settings.site.general_agency_enabled = true
+        Settings.aca.general_agency_enabled = true
         Enroll::Application.reload_routes!
       end
       it "routes to broker_agencies/profiles#update_assign by default" do
@@ -51,7 +51,7 @@ RSpec.describe "routing", :type => :routing do
 
     context "when disabled" do
       before do
-        Settings.site.general_agency_enabled = false
+        Settings.aca.general_agency_enabled = false
         Enroll::Application.reload_routes!
       end
 
