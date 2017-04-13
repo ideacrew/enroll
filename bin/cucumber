@@ -9,11 +9,17 @@
 require 'yaml'
 settings = YAML.load_file(File.expand_path("config/settings.yml"))
 
+cucumber_settings_string = ""
 if (settings['aca']['market_kinds'].include? 'individual')
-  system "cucumber --tags ~@individual_disabled"
+  cucumber_settings_string << " --tags ~@individual_disabled"
 else
-  system "cucumber --tags ~@individual_enabled"
+  cucumber_settings_string << " --tags ~@individual_enabled"
 end
 
+if (settings['aca']['general_agency_enabled'])
+  cucumber_settings_string << " --tags ~@general_agency_disabled"
+else
+  cucumber_settings_string << " --tags ~@general_agency_enabled"
+end
 
-load Gem.bin_path("cucumber", "cucumber")
+system "cucumber#{cucumber_settings_string}"
