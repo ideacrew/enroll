@@ -62,10 +62,30 @@ describe ChangePlanYearEffectiveDate do
     it "should revert the renewal py if received args as revert renewal" do
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
       plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "auto_renewing")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should cancel the enrollments under renewal plan year if received args as revert renewal" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_draft"
+    end
+
+    it "should cancel the enrollments under inital py if received args as revert application" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_application")
+      plan_year.update_attributes(aasm_state: "active")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "coverage_enrolled")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
     end
 
     it "should revert the inital py if received args as revert application" do
