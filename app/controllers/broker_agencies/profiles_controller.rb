@@ -111,7 +111,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
-    @total_records = query.total_count    
+    @total_records = query.total_count
     @records_filtered = query.filtered_count
 
     @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
