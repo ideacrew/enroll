@@ -151,3 +151,9 @@ Feature: Broker Assigns a General Agency to an Employer
     Given call change default ga subscriber for ga1 with pre default ga id
     When the broker visits their Employers page
     Then the employer will not be assigned that general agency
+
+  Scenario: A Broker can not visits the general agency page if the general agency Settings disabled
+    When the broker login in with disabling general agency settings
+    Then the broker should see the home of broker
+    Then the broker should not see the link General Agencies
+    Then the broker logs out
