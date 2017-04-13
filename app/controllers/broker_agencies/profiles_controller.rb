@@ -9,7 +9,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
-  before_action :check_if_general_agency_enabled, only: [:assign, :update_assign]
+  before_action :general_agency_is_enabled?, only: [:assign, :update_assign]
 
   layout 'single_column'
 
