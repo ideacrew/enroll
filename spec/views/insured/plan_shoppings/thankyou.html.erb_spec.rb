@@ -6,7 +6,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record  ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do
@@ -51,7 +51,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     let(:employee_role){FactoryGirl.create(:employee_role)}
     let(:plan){FactoryGirl.create(:plan)}
     let(:benefit_group){ FactoryGirl.build(:benefit_group) }
-    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: TimeKeeper.datetime_of_record ) }
+    let(:hbx_enrollment){ HbxEnrollment.new(benefit_group: benefit_group, employee_role: employee_role, effective_on: 1.month.ago.to_date, updated_at: DateTime.now  ) }
     let(:carrier_profile) { double(legal_name: "carefirst")}
 
     before :each do
