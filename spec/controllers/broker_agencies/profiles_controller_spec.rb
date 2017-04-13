@@ -283,7 +283,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
     context "when general agency is enabled via settings" do
       before :each do
-        Settings.site.general_agency_enabled = true
+        Settings.aca.general_agency_enabled = true
         sign_in user
         xhr :get, :assign, id: broker_agency_profile.id, format: :js
       end
@@ -303,7 +303,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
 
     context "when general agency is disabled via settings" do
       before :each do
-        Settings.site.general_agency_enabled = false
+        Settings.aca.general_agency_enabled = false
         sign_in user
         xhr :get, :assign, id: broker_agency_profile.id, format: :js
       end
