@@ -1,5 +1,7 @@
 require 'rails_helper'
-
+Settings.reload_from_files(
+  Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
+)
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
@@ -12,6 +14,11 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   let(:market_kind) {"both"}
   let(:bad_market_kind) {"commodities"}
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+
+  it "assigns MARKET_KINDS and MARKET_KINDS_OPTIONS correctly" do
+    expect(subject.class::MARKET_KINDS).to match_array(%W(shop individual both))
+    expect(subject.class::MARKET_KINDS_OPTIONS.count).to eq(3)
+  end
 
   describe ".new" do
     let(:valid_params) do

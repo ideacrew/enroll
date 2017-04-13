@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Consumer verification process
 
   Scenario: Outstanding verification
@@ -47,7 +48,3 @@ Feature: Consumer verification process
     Then the consumer visits verification page
     And the consumer should see documents verification page
     Then verification types have to be visible
-
-
-
-

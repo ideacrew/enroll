@@ -375,7 +375,7 @@ When(/^.+ clicks? on publish plan year$/) do
 end
 
 Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
-  expect(find('.modal-body')).to have_content('Primary office must be located in District of Columbia')
+  expect(find('.modal-body')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
@@ -388,7 +388,7 @@ end
 
 Then(/^.+ should be on the business info page with warnings$/) do
   expect(page).to have_content 'Primary Office Location'
-  expect(find('.alert-error')).to have_content('Primary office must be located in District of Columbia')
+  expect(find('.alert-error')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
