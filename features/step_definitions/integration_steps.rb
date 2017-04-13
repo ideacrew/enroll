@@ -182,8 +182,8 @@ def default_office_location
   {
   address1: "623a Spalding Ct",
   address2: "Suite 200",
-  city: "Washington",
-  state: "DC",
+  city: "AnyCity",
+  state: Settings.aca.state_abbreviation,
   zip: "20001",
   phone_area_code: "202",
   phone_number: "1110000",

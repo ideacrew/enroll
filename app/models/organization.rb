@@ -5,6 +5,7 @@ class Organization
   include Mongoid::Versioning
   include Acapi::Notifiers
   extend Acapi::Notifiers
+  include Config::AcaModelConcern
 
   extend Mongorder
 
@@ -47,12 +48,14 @@ class Organization
 
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
   embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
-  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
-
-  accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
+  if general_agency_enabled?
+    embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
+    accepts_nested_attributes_for :general_agency_profile
+  end
+  accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by
 
@@ -104,7 +107,7 @@ class Organization
          { name: "active_broker_accounts_writing_agent" })
 
 
-  index({"employer_profile.general_agency_accounts._id" => 1})
+  index({"employer_profile.general_agency_accounts._id" => 1}) if general_agency_enabled?
   index({"employer_profile.broker_agency_accounts.is_active" => 1,
          "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1,
          "fein" => 1, "legal_name" => 1, "dba" => 1},
@@ -121,10 +124,10 @@ class Organization
   scope :broker_agencies_by_market_kind,      ->( market_kind ) { any_in("broker_agency_profile.market_kind" => market_kind) }
   scope :all_employers_by_plan_year_start_on, ->( start_on ){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on)  if start_on.present? }
   scope :plan_year_start_on_or_after,         ->( start_on ){ where(:"employer_profile.plan_years.start_on".gte => start_on) if start_on.present? }
-  scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
+  scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) } if general_agency_enabled?
   scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
   scope :has_broker_agency_profile,           ->{ exists(broker_agency_profile: true) }
-  scope :has_general_agency_profile,          ->{ exists(general_agency_profile: true) }
+  scope :has_general_agency_profile,          ->{ exists(general_agency_profile: true) } if general_agency_enabled?
   scope :all_employers_renewing,              ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
   scope :all_employers_renewing_published,    ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING_PUBLISHED_STATE) }
   scope :all_employers_non_renewing,          ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::PUBLISHED) }
@@ -202,8 +205,10 @@ class Organization
     office_locations.detect(&:is_primary?)
   end
 
-  def self.search_by_general_agency(search_content)
-    Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
+  if general_agency_enabled?
+    def self.search_by_general_agency(search_content)
+      Organization.has_general_agency_profile.or({legal_name: /#{search_content}/i}, {"fein" => /#{search_content}/i})
+    end
   end
 
   def self.default_search_order
