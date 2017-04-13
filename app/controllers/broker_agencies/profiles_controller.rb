@@ -464,10 +464,4 @@ class BrokerAgencies::ProfilesController < ApplicationController
     policy = ::AccessPolicies::GeneralAgencyProfile.new(current_user)
     policy.authorize_set_default_ga(self, @broker_agency_profile)
   end
-
-  def check_if_general_agency_enabled
-    unless Settings.site.general_agency_enabled
-      redirect_to broker_agencies_profile_path(@broker_agency_profile)
-    end
-  end
 end
