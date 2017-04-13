@@ -17,10 +17,15 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
   end
 
   describe "not signed in user" do
+    # before :each do
+    #   sign_in user
+    # end
     it "shows registration if not signed in" do
-      render
-      expect(rendered).to match /Broker Registration/
-      expect(rendered).to match /General Agency Registration/
+      if individual_market_is_enabled?
+        render
+        expect(rendered).to match /Broker Registration/
+        expect(rendered).to match /General Agency Registration/
+      end
     end
 
     context "with general agency disabled" do
