@@ -321,7 +321,7 @@ Rails.application.routes.draw do
         get :general_agency_index
         get :manage_employers
         post :clear_assign_for_employer
-        if Settings.site.general_agency_enabled
+        if Settings.aca.general_agency_enabled
           get :assign
           post :update_assign
         end
