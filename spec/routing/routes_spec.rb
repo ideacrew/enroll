@@ -23,6 +23,14 @@ RSpec.describe "routing", :type => :routing do
           action: 'new'
         )
       end
+
+      it "routes to general_agencies index path in admin dashboard" do
+        expect(get: '/exchanges/hbx_profiles/general_agency_index').to route_to(
+          controller: 'exchanges/hbx_profiles',
+          action: 'general_agency_index'
+        )
+      end
+
     end
 
     pending "when disabled" do
@@ -38,6 +46,11 @@ RSpec.describe "routing", :type => :routing do
       it "routes to general_agencies profiles" do
         expect(get: '/general_agencies').not_to be_routable
       end
+
+      it "routes to general_agencies index path in admin dashboard" do
+        expect(get: '/exchanges/hbx_profiles/general_agency_index').not_to be_routable        
+      end
+
     end
   end
 end
