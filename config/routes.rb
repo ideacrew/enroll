@@ -319,13 +319,13 @@ Rails.application.routes.draw do
         get :assign_history
       end
       member do
-        get :general_agency_index
+        if Settings.aca.general_agency_enabled
+          get :general_agency_index
+        end
         get :manage_employers
         post :clear_assign_for_employer
-        if Settings.aca.general_agency_enabled
-          get :assign
-          post :update_assign
-        end
+        get :assign
+        post :update_assign
         post :employer_datatable
         post :family_datatable
         post :set_default_ga
