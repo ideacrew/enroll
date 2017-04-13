@@ -1,26 +1,26 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddHbxEnrollmentMember < MongoidMigrationTask
   def migrate
-    enrollment = HbxEnrollment.by_hbx_id(ENV['hbx_id'])
-    family_member = FamilyMember.find(ENV['family_member_id'])
-    existing_record = enrollment.first.hbx_enrollment_members.detect {|hem| hem.applicant_id == family_member.id}
-    if existing_record.present?
-      puts "this person is already covered"
-      return
-    end
-    if enrollment.present?
-      if enrollment.count > 1
-        puts "found more than one enrollment with hbx_id #{ENV['hbx_id']}"
-      else
-        enrollment_member = HbxEnrollmentMember.new
-        enrollment.first.hbx_enrollment_members << enrollment_member
-        enrollment_member = enrollment.first.hbx_enrollment_members.last
-        enrollment_member.applicant_id = family_member.id
-        enrollment_member.is_subscriber = false
-        enrollment_member.eligibility_date = enrollment.first.hbx_enrollment_members.first.eligibility_date
-        enrollment_member.coverage_start_on = enrollment.first.hbx_enrollment_members.first.coverage_start_on
-        enrollment_member.save
+    begin
+      enrollments = HbxEnrollment.by_hbx_id(ENV['hbx_id'].to_s)
+      if enrollments.count != 1
+        puts "found more than one/no enrollment with hbx_id #{ENV['hbx_id']}" unless Rails.env.test?
+        return
       end
+      enrollment = enrollments.first
+      family_member = FamilyMember.find(ENV['family_member_id'].to_s)
+      existing_record = enrollment.hbx_enrollment_members.detect {|hem| hem.applicant_id == family_member.id}
+      if existing_record.present?
+        puts "this person is already covered" unless Rails.env.test?
+        return
+      end
+      primary_hem = enrollment.hbx_enrollment_members.where(is_subscriber: true).first
+      enrollment_member = HbxEnrollmentMember.new(applicant_id: family_member.id, is_subscriber: false, eligibility_date: primary_hem.eligibility_date, coverage_start_on: primary_hem.coverage_start_on)
+      enrollment.hbx_enrollment_members << enrollment_member
+      enrollment.save!
+      puts "Added coverage to the family member" unless Rails.env.test?
+    rescue => e
+      puts "#{e}"
     end
   end
 end

@@ -18,7 +18,7 @@ class Family
   include Sortable
   include Mongoid::Autoinc
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
+  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
