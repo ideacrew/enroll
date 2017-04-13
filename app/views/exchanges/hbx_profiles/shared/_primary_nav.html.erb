@@ -37,13 +37,14 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Brokers"></span>
          <% end %>
         </li>
-        <li role="presentation"<%= menu_tab_class(active_tab, "general-agencies-tab") %>>
-         <%= link_to(general_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "general_agencies", "role" => "tab" ) do  %>
-            <span class="hidden-xs">General Agencies</span>
-            <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
-         <% end %>
-        </li>
-
+        <%if general_agency_enabled?%>
+          <li role="presentation"<%= menu_tab_class(active_tab, "general-agencies-tab") %>>
+           <%= link_to(general_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "general_agencies", "role" => "tab" ) do  %>
+              <span class="hidden-xs">General Agencies</span>
+              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
+           <% end %>
+          </li>
+          <%end%>
         <li role="presentation"<%= menu_tab_class(active_tab, "issuers-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(issuer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "issuers", "role" => "tab" ) do  %>
             <span class="hidden-xs">Issuers</span>
