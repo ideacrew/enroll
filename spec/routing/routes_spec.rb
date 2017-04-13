@@ -6,8 +6,7 @@ RSpec.describe "routing", :type => :routing do
       :controller => "insured/consumer_roles",
       :action => "immigration_document_options"
     )
-  end
-  
+  end  
   describe "broker agency assign can be enabled or disabled via settings" do
     context "when enabled" do
       before do

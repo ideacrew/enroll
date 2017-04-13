@@ -3,14 +3,14 @@ Feature: Fake FEINs
   The Broker should not see Fake FEIN in his account
   The Hbx Admin should be able to see the Fake FEIN in broker's account
   Brokers with REAL Feins should Fein in their account
-  
+
 Scenario: Primary Broker should not see FAKE Fein in his account
   When Primary Broker visits the HBX Broker Registration form
 
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information
-  And Primary Broker enters broker agency information
+  And Primary Broker enters broker agency information for SHOP markets
   And Primary Broker enters office location for default_office_location
   And Primary Broker clicks on Create Broker Agency
   Then Primary Broker should see broker registration successful message
@@ -47,7 +47,7 @@ Scenario: Hbx Admin should see fake fein in broker's account
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information
-  And Primary Broker enters broker agency information
+  And Primary Broker enters broker agency information for SHOP markets
   And Primary Broker enters office location for default_office_location
   And Primary Broker clicks on Create Broker Agency
   Then Primary Broker should see broker registration successful message
