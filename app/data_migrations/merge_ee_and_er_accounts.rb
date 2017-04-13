@@ -4,9 +4,9 @@ class MergeEeAndErAccounts < MongoidMigrationTask
   def migrate
     employee_hbx_id= ENV['employee_hbx_id']
     employer_hbx_id= ENV['employer_hbx_id']
-    if Person.where(hbx_id: employee_hbx_id).nil?
+    if Person.where(hbx_id: employee_hbx_id).first.nil?
        puts "No employee found with given hbx_id"
-    elsif Person.where(hbx_id: employer_hbx_id).nil?
+    elsif Person.where(hbx_id: employer_hbx_id).first.nil?
        puts "No employer found with givin hbx_id"
     else
        employee=Person.where(hbx_id: employee_hbx_id).first
@@ -14,8 +14,6 @@ class MergeEeAndErAccounts < MongoidMigrationTask
        if employer.employer_staff_roles.nil?
          puts "No employer staff role attached to the employer"
        else
-         puts Person.where(hbx_id: employee_hbx_id)
-         puts employer.inspect
          employee.employer_staff_roles=employer.employer_staff_roles
          employee.save!
          employee.user_id = employer.user_id

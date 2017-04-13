@@ -82,10 +82,10 @@ describe MergeEeAndErAccounts do
 
   describe "merge ee and er roles" do
 
-    let(:user) { FactoryGirl.build(:user, person: employer_staff_role.person)}
-    let(:person)  {FactoryGirl.build(:person,:with_employee_role,hbx_id:"1234567")}
-    let(:employer_staff_role) {FactoryGirl.build(:employer_staff_role,employer_profile_id:employer_profile.id)}
-    let(:employer_profile){FactoryGirl.build(:employer_profile)}
+    let!(:user) { FactoryGirl.create(:user, person: employer_staff_role.person)}
+    let(:person)  {FactoryGirl.create(:person,:with_employee_role, hbx_id: "1234567")}
+    let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role,employer_profile_id:employer_profile.id)}
+    let(:employer_profile){FactoryGirl.create(:employer_profile)}
 
     before(:each) do
       allow(ENV).to receive(:[]).with("employee_hbx_id").and_return(person.hbx_id)
@@ -95,6 +95,8 @@ describe MergeEeAndErAccounts do
     context "giving a new state" do
       it "should assign user to the employee" do
         expect(person.user).to eq nil
+        expect(employer_staff_role.person.user).not_to eq nil
+        puts Person.all.map{|p| p.user.inspect}
         subject.migrate
         person.reload
         expect(person.user).not_to eq nil
