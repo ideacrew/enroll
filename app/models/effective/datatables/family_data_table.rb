@@ -2,7 +2,7 @@
 module Effective
   module Datatables
     class FamilyDataTable < Effective::MongoidDatatable
-      include IndividualMarketBehaviors
+      include Config::AcaModelConcern
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
         table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
