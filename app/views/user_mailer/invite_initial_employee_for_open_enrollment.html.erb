@@ -6,15 +6,11 @@ You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= Set
 <div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
 <br/><br/>
 <div>
-  Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.
-</div>
-
-<div>
-  Good News! <%= census_employee.employer_profile.legal_name %>, has invited you to sign up for employer-sponsored coverage through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable. 
+  Good News! <%= census_employee.employer_profile.legal_name %>, has invited you to sign up for employer-sponsored coverage through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>
 <br/>
 <div>
-  You are able to begin plan shopping on <%= census_employee.hired_on.to_formatted_s %> for coverage be effective on <%= census_employee.coverage_effective_on.to_formatted_s %>. In order to enroll into employer-sponsored coverage through <%= Settings.site.short_name %>, you must complete an application for enrollment by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year.
+  You are now able to begin plan shopping for coverage effective on <%= census_employee.coverage_effective_on.to_formatted_s %>. In order to enroll into employer-sponsored coverage through <%= Settings.site.short_name %>, you must complete an application for enrollment by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year.
   <br/>
   <br/>
   <b> What is New Hire Open Enrollment? </b>
