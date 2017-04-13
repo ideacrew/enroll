@@ -12,14 +12,14 @@
               <!-- <a href="#"><%= image_tag 'icons/phone.png' %> &nbsp;(855) 532-5465</a> -->
             </li>
             <li>
-              <a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
+              <a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
                 <span>
-                  <i class="fa fa-phone fa-lg"></i> &nbsp;<%= Settings.contact_center.phone_number %>
+                  <i class="fa fa-phone fa-lg"></i> &nbsp;<%= contact_center_phone_number %>
                 </span>
               </a>
             </li>
             <li>
-              <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> &nbsp;<%= mail_to Settings.contact_center.email_address %>
+              <i class="fa fa-envelope-o fa-lg" aria-hidden="true"></i> &nbsp;<%= mail_to contact_center_email_address %>
             </li>
             <li>
               <i class="fa fa-question fa-lg" aria-hidden="true"></i> &nbsp;FAQs

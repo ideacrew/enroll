@@ -279,7 +279,7 @@ describe Person do
           end
         end
       end
-      
+
       context "has_employer_benefits?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:benefit_group) { FactoryGirl.build(:benefit_group)}
@@ -364,7 +364,7 @@ describe Person do
           expect(person.active_census_employees).to eq [ce1]
         end
       end
-      
+
       context "has_active_employee_role?" do
         let(:person) {FactoryGirl.build(:person)}
         let(:employee_roles) {double(active: true)}
@@ -675,7 +675,7 @@ describe Person do
       expect(person.emails.first.address).to eq 'sam@example.com'
     end
   end
-  
+
   describe '#work_email_or_best' do
     it "expects to get a work email address or home address" do
       person = Person.new
@@ -967,10 +967,10 @@ describe Person do
         end
       end
 
-      context "when state is dc" do
-        let(:home_addr) {Address.new(kind: 'home', state: 'DC')}
-        let(:mailing_addr) {Address.new(kind: 'mailing', state: 'DC')}
-        let(:work_addr) { Address.new(kind: 'work', state: 'DC') }
+      context "when state is in settings state" do
+        let(:home_addr) {Address.new(kind: 'home', state: Settings.aca.state_abbreviation)}
+        let(:mailing_addr) {Address.new(kind: 'mailing', state: Settings.aca.state_abbreviation)}
+        let(:work_addr) { Address.new(kind: 'work', state: Settings.aca.state_abbreviation) }
         it "home" do
           allow(person).to receive(:addresses).and_return [home_addr]
           expect(person.is_dc_resident?).to eq true
@@ -1131,7 +1131,7 @@ describe Person do
   describe ".deactivate_employer_staff_role" do
     let(:person) {FactoryGirl.create(:person)}
     let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role, person: person)}
-    let(:employer_staff_roles) { FactoryGirl.create_list(:employer_staff_role, 3, person: person) } 
+    let(:employer_staff_roles) { FactoryGirl.create_list(:employer_staff_role, 3, person: person) }
     context 'does not find the person' do
       before {@status, @result = Person.deactivate_employer_staff_role(1, employer_staff_role.employer_profile_id)}
       it 'returns false' do
@@ -1168,7 +1168,7 @@ describe Person do
       end
 
       it 'has more than one employer_staff_role' do
-        employer_staff_roles 
+        employer_staff_roles
         expect(person.employer_staff_roles.count).to eq (employer_staff_roles << employer_staff_role).count
       end
 
@@ -1232,7 +1232,7 @@ describe Person do
 
     context "person has active employee roles" do
       before(:each) do
-        person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person, 
+        person.employee_roles.create!(FactoryGirl.create(:employee_role, person: person,
                                                                        census_employee_id: census_employee.id).attributes)
         person.employee_roles.pluck(:census_employee).each { |census_employee| census_employee.update_attribute(:aasm_state, 'eligible') }
       end
@@ -1257,9 +1257,9 @@ describe Person do
       expect(person.agent?).to be_truthy
     end
   end
-  
+
   describe "dob_change_implication_on_active_enrollments" do
-    
+
     let(:persons_dob) { TimeKeeper.date_of_record - 19.years }
     let(:person) { FactoryGirl.create(:person, dob: persons_dob) }
     let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -1271,9 +1271,9 @@ describe Person do
                                             )}
     let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
     let(:new_dob_without_premium_implication) { TimeKeeper.date_of_record - 17.years }
-    
+
     let(:premium_implication_hash) { {enrollment.id => true} }
-    let(:empty_hash) { {} } 
+    let(:empty_hash) { {} }
 
     before do
       allow(person).to receive(:primary_family).and_return(primary_family)
@@ -1287,27 +1287,27 @@ describe Person do
     it "should return an EMPTY hash if DOB change DOES NOT RESULT in premium change" do
       expect(Person.dob_change_implication_on_active_enrollments(person, new_dob_without_premium_implication)).to eq empty_hash
     end
-    
+
     context 'edge case when DOB change makes person 61' do
-      
+
       let(:age_older_than_sixty_one) { TimeKeeper.date_of_record - 75.years }
       let(:person_older_than_sixty_one) { FactoryGirl.create(:person, dob: age_older_than_sixty_one) }
       let(:primary_family) { FactoryGirl.create(:family, :with_primary_family_member) }
       let(:new_dob_with_premium_implication)    { TimeKeeper.date_of_record - 35.years }
       let(:enrollment)   { FactoryGirl.create( :hbx_enrollment, household: primary_family.latest_household, aasm_state: 'coverage_selected', effective_on: Date.new(2016,1,1), is_active: true)}
       let(:new_dob_to_make_person_sixty_one)    { Date.new(1955,1,1) }
-  
+
       before do
         allow(person_older_than_sixty_one).to receive(:primary_family).and_return(primary_family)
         allow(primary_family).to receive(:enrollments).and_return([enrollment])
       end
 
       it "should return an EMPTY hash if a person more than 61 year old changes their DOB so that they are 61 on the day the coverage starts" do
-        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash 
+        expect(Person.dob_change_implication_on_active_enrollments(person_older_than_sixty_one, new_dob_to_make_person_sixty_one)).to eq empty_hash
       end
 
     end
-  end 
+  end
 
   describe "given a consumer role" do
     let(:consumer_role) { ConsumerRole.new }

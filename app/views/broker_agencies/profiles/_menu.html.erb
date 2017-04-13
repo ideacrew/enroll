@@ -34,12 +34,14 @@
             <% end %>
           </li>
         <% end %>
-        <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
-          <%= link_to(general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
-            <span class="hidden-xs">General Agencies</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
-          <% end %>
-        </li>
+        <% if general_agency_enabled? %>
+          <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
+            <%= link_to(general_agency_index_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "general-agency", "role" => "tab" ) do  %>
+              <span class="hidden-xs">General Agencies</span>
+              <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="General Agencies"></span>
+            <% end %>
+          </li>
+        <% end %>
         <li role="presentation" id="assign-tab" <%= menu_tab_class(active_tab, "assign-tab") %>>
           <%= link_to(assign_broker_agencies_profile_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>
             <span class="hidden-xs">Assign</span>

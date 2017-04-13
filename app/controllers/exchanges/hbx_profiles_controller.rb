@@ -618,7 +618,7 @@ private
       body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
       body += "DOB #{params[:dob]} <br>" if params[:dob].present?
     end
-    hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
+    hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
       sender_id: hbx_profile.id,
       parent_message_id: hbx_profile.id,

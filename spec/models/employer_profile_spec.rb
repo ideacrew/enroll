@@ -6,7 +6,12 @@ describe EmployerProfile, dbclean: :after_each do
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:address)  { Address.new(
+                                kind: "primary",
+                                address_1: "609 H St",
+                                city: "Washington",
+                                state: Settings.aca.state_abbreviation,
+                                zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -332,7 +337,7 @@ describe EmployerProfile, dbclean: :after_each do
 
   context "has hired a broker" do
   end
-  
+
   context "has employees that have enrolled in coverage" do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
