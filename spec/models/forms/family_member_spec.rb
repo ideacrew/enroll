@@ -15,7 +15,7 @@ describe Forms::FamilyMember do
 
   
   it "should require tribal_id when citizen_status=indian_tribe_member" do
-    if Settings.aca.market_kinds.include?("individual")
+    if individual_market_is_enabled?
       subject.is_consumer_role = "true"
       subject.citizen_status = "indian_tribe_member"
       subject.valid?
