@@ -1,6 +1,6 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 
-<% if Settings.aca.individual_market.is_active %>
+<% if individual_market_is_enabled? %>
   <div id="consumer_fields" class="focus_effect">
     <div class="row row-form-wrapper no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
