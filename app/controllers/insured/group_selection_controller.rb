@@ -9,7 +9,7 @@ class Insured::GroupSelectionController < ApplicationController
     return params[:market_kind] if params[:market_kind].present?
     if @person.try(:has_active_employee_role?)
       'shop'
-    elsif @person.try(:has_active_consumer_role?)
+    elsif @person.try(:has_active_consumer_role?) && !(@person.try(:has_active_resident_role?))
       'individual'
     elsif @person.try(:has_active_resident_role?)
       'coverall'
