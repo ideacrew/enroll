@@ -2,6 +2,7 @@ module Forms
   class FamilyMember
     include ActiveModel::Model
     include ActiveModel::Validations
+    include Config::AcaModelConcern
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
@@ -27,7 +28,7 @@ module Forms
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
-    validate :consumer_fields_validation if Settings.aca.individual_market.is_active
+    validate :consumer_fields_validation if individual_market_is_enabled?
 
     attr_reader :dob
 
