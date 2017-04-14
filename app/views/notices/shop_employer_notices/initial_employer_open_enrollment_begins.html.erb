@@ -22,7 +22,7 @@
   content: "Congratulations on completing your application for employer-sponsored coverage with #{Settings.site.short_name}!"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your employees can begin to enroll in coverage on <EE OE start date>, employees must complete their enrollments no later than <EE OE end date>. You can monitor your employee enrollments during your open enrollment period through your employer account – see the <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>Employers Managing Your Employee Roster guide</a> for instructions."} %>
+  content: "Your employees can begin to enroll in coverage on #{notice.plan_year.open_enrollment_start_on}, employees must complete their enrollments no later than #{notice.plan_year.open_enrollment_end_on}. You can monitor your employee enrollments during your open enrollment period through your employer account – see the <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf'>Employers Managing Your Employee Roster guide</a> for instructions."} %>
 <br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
