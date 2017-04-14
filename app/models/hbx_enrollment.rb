@@ -572,7 +572,7 @@ class HbxEnrollment
     if !consumer_role.present?
       if !is_shop_sep?
         notify(ENROLLMENT_CREATED_EVENT_NAME, {policy_id: self.hbx_id})
-        self.published_to_bus_at = Time.now
+        self.published_to_bus_at = TimeKeeper.datetime_of_record
         self.save!
       end
     end

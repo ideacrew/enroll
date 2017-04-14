@@ -353,7 +353,7 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => TimeKeeper.datetime_of_record, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     context "import" do
       before do
@@ -404,10 +404,11 @@ context "Verification process and notices" do
         expect(consumer.ssn_validation).to eq("valid")
       end
       it "changes state to dhs_pending for non native citizen" do
-        consumer.citizen_status = "not_us"
+        consumer.citizen_status = "alien_lawfully_present"
         expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
-        expect(consumer.lawful_presence_determination.citizen_status).to eq("non_native_not_lawfully_present_in_us")
+        #check that user's input was not overwritten
+        expect(consumer.lawful_presence_determination.citizen_status).to eq("alien_lawfully_present")
         expect(consumer.lawful_presence_determination.citizenship_result).to eq("not_lawfully_present_in_us")
       end
     end
@@ -415,26 +416,35 @@ context "Verification process and notices" do
     context "ssn_valid_citizenship_valid" do
       before :each do
         consumer.lawful_presence_determination.deny! verification_attr
+        consumer.citizen_status = "alien_lawfully_present"
       end
       it "changes state to fully_verified from unverified for native citizen or non native with ssn" do
         expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+        #check that user's input was not overwritten
+        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
       it "changes state to fully_verified from ssa_pending" do
         expect(consumer).to transition_from(:ssa_pending).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+        #check that user's input was not overwritten
+        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
       it "changes state to fully_verified from verification_outstanding" do
         expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+        #check that user's input was not overwritten
+        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
       it "changes state to fully_verified from fully_verified" do
         expect(consumer).to transition_from(:fully_verified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
         expect(consumer.ssn_validation).to eq("valid")
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+        #check that user's input was not overwritten
+        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
       end
     end
 
