@@ -1404,6 +1404,10 @@ class HbxEnrollment
     employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
   end
 
+  def event_submission_date
+    submitted_at.blank? ? Time.now : submitted_at
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
