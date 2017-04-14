@@ -43,9 +43,9 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     context "with general agency disabled" do
       before :each do
         allow(view).to receive(:general_agency_enabled?).and_return(false)
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
       end
       it "does not show general agency related links" do
-        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
         expect(rendered).not_to match /General Agencies/
       end
     end
