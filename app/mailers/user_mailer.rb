@@ -24,14 +24,6 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def send_initial_employee_open_enrollment_email(email, census_employee, invitation)
-    if email.present?
-      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
-      end
-    end
-  end
-
   def send_future_employee_open_enrollment_email(email, census_employee, invitation)
     if email.present?
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
