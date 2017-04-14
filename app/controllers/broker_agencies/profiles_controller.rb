@@ -9,6 +9,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
+  before_action :general_agency_is_enabled?, only: [:assign, :update_assign]
 
   layout 'single_column'
 
@@ -110,7 +111,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
-    @total_records = query.total_count    
+    @total_records = query.total_count
     @records_filtered = query.filtered_count
 
     @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a

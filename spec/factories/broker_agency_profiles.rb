@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :broker_agency_profile do
+    market_kind "shop"
     entity_kind "s_corporation"
     market_kind "shop"
     association :primary_broker_role, factory: :broker_role
@@ -21,5 +22,3 @@ FactoryGirl.define do
     end
   end
 end
-
-

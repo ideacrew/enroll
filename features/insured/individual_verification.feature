@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Consumer verification process
 
   Scenario: Outstanding verification
@@ -28,7 +29,6 @@ Feature: Consumer verification process
     * I upload the file as vlp document
     * I click the upload file button
 
-
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
     And the consumer is logged in
@@ -39,7 +39,6 @@ Feature: Consumer verification process
     And the consumer should see documents verification page
     Then the consumer can expand the table by clicking on caret sign
 
-
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
     And the consumer is logged in
@@ -47,7 +46,3 @@ Feature: Consumer verification process
     Then the consumer visits verification page
     And the consumer should see documents verification page
     Then verification types have to be visible
-
-
-
-

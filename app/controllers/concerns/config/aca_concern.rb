@@ -13,4 +13,11 @@ module Config::AcaConcern
      redirect_to root_path
     end
   end
+
+  def general_agency_is_enabled?
+    unless Settings.aca.general_agency_enabled
+      flash[:error] = "General Agencies are not supported by this Exchange"
+      redirect_to broker_agencies_profile_path(@broker_agency_profile)
+    end
+  end
 end
