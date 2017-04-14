@@ -151,6 +151,7 @@ group :test do
   gem 'capybara', '2.6.2'
   gem 'warden'
   gem 'fakeredis', :require => 'fakeredis/rspec'
+  gem 'rspec-instafail'
 end
 
 group :production do
