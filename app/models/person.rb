@@ -369,8 +369,13 @@ class Person
     self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
+  # Get the {Family} where this {Person} is the primary family member
+  #
+  # family itegrity ensures only one active family can be the primary for a person
+  #
+  # @return [ Family ] the family member who matches this person
   def primary_family
-    @primary_family ||= Family.find_by_primary_applicant(self)
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
   end
 
   def families
@@ -876,9 +881,9 @@ class Person
     end
   end
 
-  def check_for_ridp(session_var)
+  def check_for_paper_application(session_var)
     if user && session_var == 'paper'
-      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+      user.ridp_by_paper_application
     end
   end
 

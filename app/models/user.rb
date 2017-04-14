@@ -354,6 +354,15 @@ class User
     where(authentication_token: token).first
   end
 
+  def handle_headless_records
+    headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
+    headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
+    headless_users = headless_with_email + headless_with_oim_id
+    headless_users.each do |headless|
+      headless.destroy if !headless.person.present?
+    end
+  end
+
   class << self
 
     def by_email(email)
@@ -391,6 +400,14 @@ class User
       self.oim_id = self.email
     end
     self.save!
+  end
+
+  def ridp_by_paper_application
+    self.identity_final_decision_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_code = INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
+    self.identity_response_description_text = "admin bypass ridp"
+    self.identity_verified_date = TimeKeeper.date_of_record
+    self.save
   end
 
   def get_announcements_by_roles_and_portal(portal_path="")
