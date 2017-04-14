@@ -5,6 +5,8 @@ You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= Set
 <br/>
 <div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
 <br/><br/>
+<div>Your employer has created a Health Benefits Program through <%= Settings.site.short_name %>.</div>
+<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.</div>
 <div>
   Good News! <%= census_employee.employer_profile.legal_name %>, has invited you to sign up for employer-sponsored coverage through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
 </div>

@@ -488,10 +488,10 @@ class CensusEmployee < CensusMember
   end
 
   def send_invite!
-    if has_benefit_group_assignment?
+    if (has_benefit_group_assignment? && (hired_on > TimeKeeper.date_of_record))
       plan_year = active_benefit_group_assignment.benefit_group.plan_year
       if plan_year.employees_are_matchable?
-        Invitation.invite_employee!(self)
+        Invitation.invite_future_employee_for_open_enrollment!(self)
         return true
       end
     end
