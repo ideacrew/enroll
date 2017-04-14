@@ -17,44 +17,63 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
   end
 
   describe "not signed in user" do
-    it "shows registration if not signed in" do
-      render
-      expect(rendered).to match /Broker Registration/
-      expect(rendered).to match /General Agency Registration/
+    # before :each do
+    #   sign_in user
+    # end
+    context "with general agency enabled" do
+      before :each do
+        Settings.aca.general_agency_enabled = true
+        Enroll::Application.reload_routes!
+        render
+      end
+      it "shows registration if not signed in" do
+        expect(rendered).to match /Broker Registration/
+        expect(rendered).to match /General Agency Registration/
+      end
     end
+
 
     context "with general agency disabled" do
       before :each do
         allow(view).to receive(:general_agency_enabled?).and_return(false)
+        render
       end
       it "does not show general agency related links" do
-        render
         expect(rendered).not_to match /General Agency Registration/
         expect(rendered).not_to match /General Agency Portal/
       end
     end
-  end
 
-  describe "Enabled/Disabled IVL market" do
-  	shared_examples_for "IVL market status" do |status, value|
-		  it "should #{status} Consumer/Family Portal registeration" do
-		  	if value == false
-					expect(rendered).not_to have_link('Consumer/Family Portal')
-				else
-					expect(rendered).to have_link('Consumer/Family Portal')
-				end
-		  end
+    context "with enabled IVL market" do
+      before do
+        Settings.aca.market_kinds = %w[individual shop]
+        Enroll::Application.reload_routes!
 
-		  it "should #{status} Assisted Consumer/Family Portal registeration" do
-		  	if value == false
-					expect(rendered).not_to have_link('Assisted Consumer/Family Portal')
-				else
-					expect(rendered).to have_link('Assisted Consumer/Family Portal')
-				end
-		  end
-		end
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+        render
+      end
 
-		# it_behaves_like "IVL market status", "Enable", Settings.aca.market_kinds.include? "individual" # use it when we enable IVL market
-		it_behaves_like "IVL market status", "Disabled", Settings.aca.market_kinds.include?("individual")
+      it "shows the Consumer portal link" do
+        expect(rendered).to have_link('Consumer/Family Portal')
+      end
+
+      it "shows the Assistest consumer portal link" do
+        expect(rendered).to have_link('Assisted Consumer/Family Portal')
+      end
+    end
+
+    context "with disabled IVL market" do
+      before do
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+        allow(view).to receive(:individual_market_is_enabled?).and_return(false)
+        render
+      end
+      it "does not show the Consumer portal links" do
+        expect(rendered).not_to have_link('Consumer/Family Portal')
+      end
+      it "does not show the Assisted consumer portal link" do
+        expect(rendered).not_to have_link('Assisted Consumer/Family Portal')
+      end
+    end
   end
 end
