@@ -383,6 +383,7 @@ Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
+  screenshot("havent clicked cancel yet")
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 

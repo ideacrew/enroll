@@ -22,4 +22,8 @@ else
   cucumber_settings_string << " --tags ~@general_agency_enabled"
 end
 
+ARGV.each do |a|
+  cucumber_settings_string << " #{a}"
+end
+
 system "cucumber#{cucumber_settings_string}"
