@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :broker_agency_profile do
     entity_kind "s_corporation"
+    market_kind "shop"
     association :primary_broker_role, factory: :broker_role
     organization
     corporate_npn do
