@@ -16,10 +16,8 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     let(:person) { FactoryGirl.create(:person, :with_hbx_staff_role)}
 
     it "should not have right navigation section" do
-      if individual_market_is_enabled?
-        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-        expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
-      end
+      render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+      expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
     end
 
     context "with general agency disabled" do
@@ -27,10 +25,8 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
         allow(view).to receive(:general_agency_enabled?).and_return(false)
       end
       it "does not show general agency related links" do
-        if individual_market_is_enabled?
-          render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-          expect(rendered).not_to match /General Agencies/
-        end
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+        expect(rendered).not_to match /General Agencies/
       end
     end
   end
@@ -40,21 +36,17 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     let(:person) { FactoryGirl.create(:person, :with_broker_role) }
 
     it "should have right navigation section" do
-      if individual_market_is_enabled?
-        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:horizontal_menu)).to include('multi-line')
-      end
+      render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+      expect(view.content_for(:horizontal_menu)).to include('multi-line')
     end
 
     context "with general agency disabled" do
       before :each do
-        if individual_market_is_enabled?
-          allow(view).to receive(:general_agency_enabled?).and_return(false)
-          end
-          it "does not show general agency related links" do
-          render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-          expect(rendered).not_to match /General Agencies/
-        end
+        allow(view).to receive(:general_agency_enabled?).and_return(false)
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
+      end
+      it "does not show general agency related links" do
+        expect(rendered).not_to match /General Agencies/
       end
     end
   end
