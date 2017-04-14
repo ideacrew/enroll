@@ -107,9 +107,7 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
           let!(:actively_renewed_coverages) {
             renewing_employees[0..4].inject([]) do |enrollments, ce|
-              enrollment = create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days, status: 'shopping')
-              enrollment.select_coverage!
-              enrollments << enrollment
+              enrollments << create_enrollment(family: ce.employee_role.person.primary_family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: effective_on - 10.days)
             end
           }
 
