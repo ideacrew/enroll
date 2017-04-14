@@ -1,0 +1,37 @@
+<html>
+<body>
+You Have Been Invited to Sign Up for Employer-Sponsored Coverage through <%= Settings.site.short_name %></div>
+<br/>
+<br/>
+<div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
+<br/><br/>
+<div>
+  Good News! <%= census_employee.employer_profile.legal_name %>, has invited you to sign up for employer-sponsored coverage through <%= Settings.site.short_name %> and will contribute to the monthly premium to make the cost of coverage more affordable.
+</div>
+<br/>
+<div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.</div>
+<br>
+<div>
+  You are now able to begin plan shopping for coverage effective on <%= census_employee.coverage_effective_on.to_formatted_s %>. In order to enroll into employer-sponsored coverage through <%= Settings.site.short_name %>, you must complete an application for enrollment by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year.
+  <br/>
+  <br/>
+  <b> What is New Hire Open Enrollment? </b>
+  <br/>
+  Open enrollment is your annual opportunity to enroll in health plans offered by your employer. Outside of this annual open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain life events such as marriage, birth, or adoption.
+  <br/>
+  <b>To See Plan Options and Enroll: </b>
+  <br/>
+  If you have an existing <%= Settings.site.short_name %> account, please log in at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a> to view the plan options chosen by your employer and complete the enrollment process. If you do not have an existing <%= Settings.site.short_name %> account, please visit <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a> to create an account and proceed with plan shopping and enrollment.
+  <br/>
+  <h2 style="color: #007bc4;">
+    For Questions or Assistance:
+  </h2>
+  You can contact <%= Settings.site.short_name %> with any questions:
+  <br/>
+  <ul style="list-style-type:circle">
+    <li>By calling <%= Settings.contact_center.phone_number %>;</li>
+    <li>Online at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a>.</li>
+  </ul>
+</div>
+</body>
+</html>
