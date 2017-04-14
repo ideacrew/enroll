@@ -277,8 +277,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "show_default_ga?", dbclean: :after_each do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :shop_agency) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, :shop_agency) }
 
     it "should return false without broker_agency_profile" do
       expect(helper.show_default_ga?(general_agency_profile, nil)).to eq false
