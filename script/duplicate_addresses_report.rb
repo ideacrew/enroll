@@ -21,7 +21,7 @@ end
 
 count = 0
 
-timestamp = TimeKeeper.datetime_of_record.strftime('%Y%m%d%H%M')
+timestamp = Time.now.strftime('%Y%m%d%H%M')
 
 CSV.open("2016_enrollments_with_multiple_addresses_#{timestamp}_enroll.csv", "w") do |csv|
 	csv << ["Enrollment Group ID", "Subscriber", "HBX ID", "Home Address","","","","", "Mailing Address"]

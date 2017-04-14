@@ -56,7 +56,7 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
       next
     end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'first_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {

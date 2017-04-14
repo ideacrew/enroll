@@ -19,13 +19,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. For a walkthrough of your options, you can follow this <a href='https://dchealthlink.com/sites/default/files/v2/forms/employee_renewal_open_enrollment_guide.pdf'>Open Enrollment Guide</a>."} %>
+  { content: "Good News! #{notice.employer_name} has chosen to renew the offer of health insurance coverage to its employees through #{Settings.site.short_name} and will contribute to your monthly premium to make the cost of coverage more affordable. <br>For a walkthrough of your options, you can follow this <a href='https://dchealthlink.com/sites/default/files/v2/forms/employee_renewal_open_enrollment_guide.pdf'>Open Enrollment Guide</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Your DO NOT Currently Have a Plan.</strong>"} %>
+  { content: "<strong>You DO NOT Currently Have a Plan</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You chose to waive coverage last year or did not take any action. If you would like to enroll in coverage for this year you must select a plan by #{notice.plan_year.open_enrollment_end_on} in order to continue coverage effective #{notice.plan_year.start_on}."} %>
+  { content: "You chose to waive coverage last year or did not take any action. If you would like to enroll in coverage for this year you must select a plan by #{notice.plan_year.open_enrollment_end_on} in order to have coverage start on #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>What is Open Enrollment?</strong>"} %>
@@ -49,7 +49,7 @@
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact DC Health Link with any questions:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                    ["By calling #{notice.hbe.phone}."] } %>
 
