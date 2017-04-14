@@ -4,8 +4,6 @@
     <div class="top-pd" id="inbox_provider_form">
       <span class="flash_message"></span>
       <%= form_tag(update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
-
-
       <div class="module">
         <table class="table table-striped" id="Broker-Employer-dataTable">
           <thead>
@@ -87,7 +85,7 @@
 
       </script>
 
-<% if general_agency_enabled? %>
+      <% if general_agency_enabled? %>
         <div class="col-md-4">
           <h3>General Agencies</h3>
           <%= select_tag "general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>

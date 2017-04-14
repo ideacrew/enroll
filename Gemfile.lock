@@ -476,6 +476,8 @@ GEM
     rspec-expectations (3.4.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
+    rspec-instafail (1.0.0)
+      rspec
     rspec-mocks (3.4.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
@@ -661,6 +663,7 @@ DEPENDENCIES
   redis-rails
   resque
   roo (~> 2.1.0)
+  rspec-instafail
   rspec-rails (~> 3.4.2)
   rspec_junit_formatter (= 0.2.3)
   ruby-progressbar (= 1.6.0)

@@ -2,6 +2,8 @@ require 'rails_helper'
 Settings.reload_from_files(
   Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
 )
+
+load 'general_agency_profile.rb'
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
