@@ -71,8 +71,6 @@ class Insured::PlanShoppingsController < ApplicationController
   def thankyou
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
-    plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
-    plan_selection.verify_and_set_member_coverage_start_dates
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
     if @enrollment.is_special_enrollment?
