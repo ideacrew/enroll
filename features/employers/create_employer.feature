@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Create Employer
   In order for Employers to create and manage an account on the HBX for their organization
   In order for Employees to purchase insurance
@@ -9,7 +10,7 @@ Feature: Create Employer
   Employee should be able to create an account, match to their employer and roster family
   Employee should be able to  purchase insurance
 
-    
+
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
       When I visit the Employer portal
