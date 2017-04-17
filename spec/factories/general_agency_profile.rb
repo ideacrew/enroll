@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :general_agency_profile do
     entity_kind "s_corporation"
+    market_kind "shop"
     organization
     sequence(:corporate_npn) {|n| "2002345#{n}" }
 
@@ -17,4 +18,3 @@ FactoryGirl.define do
     end
   end
 end
-
