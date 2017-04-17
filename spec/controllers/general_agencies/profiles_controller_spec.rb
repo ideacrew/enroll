@@ -6,9 +6,10 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
 
-  ## THIS TEST IS ONLY RELEVANT FOR EXCHANGES WITH GENERAL AGENCY SUPPORT
-  Settings.aca.general_agency_enabled = true
-  Enroll::Application.reload_routes!
+  before :each do
+    Settings.aca.general_agency_enabled = true
+    Enroll::Application.reload_routes!
+  end
 
   describe "GET new" do
     it "should redirect without login" do
