@@ -47,7 +47,7 @@ class GeneralAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
