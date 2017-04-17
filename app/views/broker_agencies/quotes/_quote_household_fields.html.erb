@@ -1,5 +1,5 @@
 	<%= fields_for :quote_households do |qhh| %>
-	<% index= "#{(TimeKeeper.datetime_of_record.to_f * 1000).to_i}" %>
+	<% index= "#{(Time.now.to_f * 1000).to_i}" %>
 		<div class="panel panel-default">
 			<div id="family-panel">
 				<div class="panel-heading" role="tab" id="headingOne">
