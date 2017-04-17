@@ -2,8 +2,10 @@ require 'rails_helper'
 Settings.reload_from_files(
   Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
 )
-Object.send(:remove_const, 'BrokerAgencyProfile')
-load 'broker_agency_profile.rb'
+if Object.const_defined?('BrokerAgencyProfile')
+  Object.send(:remove_const, 'BrokerAgencyProfile')
+  load 'broker_agency_profile.rb'
+end
 
 RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
