@@ -28,7 +28,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     legal_name: 'useragency',
     fein: "223232323",
     entity_kind: "c_corporation",
-    market_kind: "individual",
+    market_kind: Settings.aca.market_kinds.include?("individual") ? "individual" : "shop",
     working_hours: "0",
     accept_new_clients: "0",
     office_locations_attributes: office_locations
@@ -47,7 +47,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       kind: "primary",
       address_1: "99 N ST",
       city: "washignton",
-      state: "dc",
+      state: Settings.aca.state_abbreviation,
       zip: "20006"
     }
   }
