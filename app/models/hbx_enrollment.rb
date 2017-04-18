@@ -1349,7 +1349,7 @@ class HbxEnrollment
     return false if is_special_enrollment?
     return false unless is_shop?
     shopping_plan_year = benefit_group.plan_year
-    purchased_at = submitted_at.blank? ? created_at : submitted_at
+    purchased_at = [submitted_at, created_at].compact.max
     return true unless (shopping_plan_year.open_enrollment_start_on..shopping_plan_year.open_enrollment_end_on).include?(TimeKeeper.date_according_to_exchange_at(purchased_at))
     !(shopping_plan_year.start_on == effective_on)
   end
