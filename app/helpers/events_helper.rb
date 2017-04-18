@@ -59,10 +59,6 @@ module EventsHelper
     #Adding phone kind 'phone main' temporary, revert once phone.kind in office location fixed.
   end
 
-  def employer_has_office_location?(office_location)
-    is_office_location_address_valid?(office_location) && is_office_location_phone_valid?(office_location)
-  end
-
   def transaction_id
     @transaction_id ||= begin
                           ran = Random.new

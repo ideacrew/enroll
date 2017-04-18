@@ -45,8 +45,8 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
     #   next
     # end
 
-    # next if person.inbox.blank?
-    # next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+    next if person.inbox.blank?
+    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
     # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
     #   next if secure_message.created_at > 35.days.ago
     # end
@@ -56,7 +56,7 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
       next
     end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {

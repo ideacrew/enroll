@@ -642,8 +642,7 @@ class ConsumerRole
   end
 
   def record_partial_pass(*args)
-    lawful_presence_determination.citizen_status = "non_native_not_lawfully_present_in_us"
-    lawful_presence_determination.citizenship_result = "ssn_pass_citizenship_fails_with_SSA"
+    lawful_presence_determination.update_attributes!(:citizenship_result => "ssn_pass_citizenship_fails_with_SSA")
   end
 
   def fail_lawful_presence(*args)
