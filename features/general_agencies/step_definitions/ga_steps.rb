@@ -239,20 +239,6 @@ When /^the broker login in$/ do
   fill_in "user[password]", with: "1qaz@WSX"
   fill_in "user[login]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "broker1@dc.gov"
   find('.interaction-click-control-sign-in').click
-  Settings.aca.general_agency_enabled = true
-end
-
-When /^the broker login in with disabling general agency settings$/ do
-  visit '/'
-  click_link 'Broker Agency Portal'
-  find('.interaction-click-control-sign-in-existing-account', wait: 10).click
-
-  fill_in "user[login]", with: "broker1@dc.gov"
-  find('#user_login').set("broker1@dc.gov")
-  fill_in "user[password]", with: "1qaz@WSX"
-  fill_in "user[login]", :with => "broker1@dc.gov" unless find(:xpath, '//*[@id="user_login"]').value == "broker1@dc.gov"
-  find('.interaction-click-control-sign-in').click
-  Settings.aca.general_agency_enabled = false
 end
 
 Then /^the broker should see the home of broker$/ do
