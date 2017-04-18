@@ -288,7 +288,22 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def redirect_to_first_allowed
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
-
+  
+  def get_counties
+  #    if params[:id].present?
+  #      @organization = Organization.find('58eb1aa588dd7c03ca00000d')
+  #      @employer_profile = @organization.employer_profile
+  #    else
+  #      @organization = Forms::EmployerProfile.new
+  #    end
+    
+      @counties = RateReference.where(zip_code: params[:zip_code])
+      if @counties.present?
+        render partial: 'employers/employer_profiles/county_field'
+      else
+        render nothing: true
+      end
+  end
 
   private
 
@@ -421,7 +436,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     params.require(:organization).permit(
       :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
       :office_locations_attributes => [
-        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
+        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
         {:email_attributes => [:kind, :address]},
         :is_primary

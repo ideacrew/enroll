@@ -44,14 +44,17 @@
           </div>
 
           <div class="row row-form-wrapper no-buffer">
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", required: true, placeholder: 'CITY' %>
               </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                 <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"}, required: true) %>
               </div>
-              <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-                <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', oninvalid:"checkZip(this);", oninput:"checkZip(this);" %>
+              <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+                 <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP',oninvalid:"checkZip(this);", oninput:"checkZip(this);",onchange:"getCounties(this, "+child_index.to_s+")" %>
+              </div>
+              <div id="county<%= child_index %>" class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">   <% @counties = RateReference.where(zip_code: address.object.try(:zip)) %>
+                <%= address.select(:county, options_for_select(@counties.pluck(:county), selected: address.object.try(:county)), {include_blank: "SELECT COUNTY"}, required: true)%>
               </div>
           </div>
         <% end %>
