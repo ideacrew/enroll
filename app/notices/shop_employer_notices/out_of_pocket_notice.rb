@@ -34,7 +34,7 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
   end
 
   def url
-    "https://staging.checkbookhealth.org/shop/dc/"
+    "https://dc.checkbookhealth.org/shop/dc/"
   end
 
 def create_secure_inbox_message(notice)
