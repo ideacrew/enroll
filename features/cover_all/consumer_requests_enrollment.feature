@@ -5,7 +5,7 @@ Feature: Consumer requests enrollment in CoverAll
   process their application through the families index page.
 
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should see link New DC Resident Application
-    Given a Hbx admin with read and write permissions exists
+    Given a Hbx admin with super admin access exists
     When Hbx Admin logs on to the Hbx Portal
     Then Hbx Admin sees Families link
     When Hbx Admin clicks on Families link
