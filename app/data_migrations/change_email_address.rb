@@ -1,8 +1,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-person_hbx_id="123123123", old_email="123@gmail.com", new_email="321@gmail.com"
-
-class ChangeEmployerContributions < MongoidMigrationTask
+class ChangeEmailAddress < MongoidMigrationTask
   def migrate
     hbx_id = ENV['person_hbx_id']
     old_email = ENV['old_email']
