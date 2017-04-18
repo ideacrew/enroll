@@ -263,8 +263,8 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Initial Eligible Employer open enrollment begins',
-        notice_template: 'notices/shop_employee_notices/initial_employer_open_enrollment_begins',
-        notice_builder: 'ShopEmployeeNotices::InitialEmployerOpenEnrollmentBegin',
+        notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
         mpi_indicator: 'MPI_SHOP16',
         notice_trigger_element_group: {
           market_places: ['shop'],
