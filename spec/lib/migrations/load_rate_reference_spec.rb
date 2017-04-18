@@ -1,6 +1,4 @@
 require 'rails_helper'
-require 'rake'
-require 'roo'
 
 RSpec.shared_examples "a rate reference" do |attributes|
   attributes.each do |attribute, value|
@@ -13,8 +11,6 @@ end
 RSpec.describe 'Load Rating Regions Task', :type => :task do
 
   context "rate_reference:update_rating_regions" do
-    let(:file_path) { File.join(Rails.root,'lib', 'xls_templates', "SHOP_ZipCode_CY2017_FINAL.xlsx") }
-
     before :all do
       Rake.application.rake_require "tasks/migrations/load_rate_reference"
       Rake::Task.define_task(:environment)
