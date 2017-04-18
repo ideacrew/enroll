@@ -6,11 +6,11 @@ namespace :load_service_reference do
       xlsx = Roo::Spreadsheet.open(file_path)
       sheet = xlsx.sheet(0)
       (13..sheet.last_row).each do |i|
-          ServiceReference.create!(service_area_id: sheet.cell(i,1),
+          ServiceAreaReference.create!(service_area_id: sheet.cell(i,1),
             service_area_name: sheet.cell(i,2),
-            state: to_boolean(sheet.cell(i,3)),
+            serves_entire_state: to_boolean(sheet.cell(i,3)),
             county_name: sheet.cell(i,4),
-            partial_county: to_boolean(sheet.cell(i,5)),
+            serves_partial_county: to_boolean(sheet.cell(i,5)),
             service_area_zipcode: sheet.cell(i,6),
             partial_county_justification: sheet.cell(i,7))
       end
@@ -19,11 +19,11 @@ namespace :load_service_reference do
     end
   end
 
-  
+
   def to_boolean(value)
     return true   if value == true   || value =~ (/(true|t|yes|y|1)$/i)
     return false  if value == false  || value =~ (/(false|f|no|n|0)$/i)
     return nil
   end
-  
+
 end
