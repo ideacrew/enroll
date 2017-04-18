@@ -254,6 +254,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP16',
+    title: 'Application to Offer Group Health Coverage in DC Health Link',
+    description: 'When Employer application meets minimum participation and non-owner requirements',
+    resource_name: 'employer',
+    event_name: 'initial_eligibile_employer_open_enrollment_begins',
+    notice_triggers: [
+      {
+        name: 'Initial Eligible Employer open enrollment begins',
+        notice_template: 'notices/shop_employee_notices/initial_employer_open_enrollment_begins',
+        notice_builder: 'ShopEmployeeNotices::InitialEmployerOpenEnrollmentBegin',
+        mpi_indicator: 'MPI_SHOP16',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
