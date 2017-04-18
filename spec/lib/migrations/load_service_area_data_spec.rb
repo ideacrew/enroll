@@ -1,6 +1,4 @@
 require 'rails_helper'
-require 'rake'
-require 'roo'
 
 RSpec.shared_examples "a service area reference" do |attributes|
   attributes.each do |attribute, value|
@@ -13,7 +11,6 @@ end
 RSpec.describe 'Service Area Task', :type => :task do
 
   context "service_area:update_service_area" do
-    let(:file_path) { File.join(Rails.root,'lib', 'xls_templates', "ServiceArea_Example.xlsx") }
 
     before :all do
       Rake.application.rake_require "tasks/migrations/load_service_area_data"
@@ -24,16 +21,53 @@ RSpec.describe 'Service Area Task', :type => :task do
       invoke_task
     end
 
+    imported_areas = ServiceAreaReference.all
     context "it creates ServiceArea elements correctly" do
-      subject { ServiceReference.first }
-      it_should_behave_like "a service area reference", { service_area_id: "MAS001",
+      subject { imported_areas.first }
+      it_should_behave_like "a service area reference", {
+                                                  service_area_id: "MAS001",
                                                   service_area_name: "Service Area 1",
-                                                  state: true,
+                                                  serves_entire_state: true,
                                                   county_name: nil,
-                                                  partial_county: nil,
+                                                  serves_partial_county: nil,
                                                   service_area_zipcode: "",
-                                                  partial_county_justification: nil 
+                                                  partial_county_justification: nil
                                                 }
+    end
+
+    context "for elements that serve partial state" do
+      subject { imported_areas.second }
+      it_should_behave_like "a service area reference", {
+                                                  service_area_id: "MAS002",
+                                                  service_area_name: "Service Area 2",
+                                                  serves_entire_state: false,
+                                                  county_name: "Barnstable - 25001",
+                                                  serves_partial_county: false,
+                                                  service_area_zipcode: "",
+                                                  partial_county_justification: nil
+                                                }
+    end
+
+    context "for elements that serve partial state and partial county" do
+      subject { imported_areas.third }
+      it_should_behave_like "a service area reference", {
+                                                  service_area_id: "MAS002",
+                                                  service_area_name: "Service Area 2",
+                                                  serves_entire_state: false,
+                                                  county_name: "Franklin - 25011",
+                                                  serves_partial_county: true,
+                                                  service_area_zipcode: "19020",
+                                                  partial_county_justification: "XX"
+                                                }
+    end
+
+    context "if it runs again it doesn't create duplicates or throw errors" do
+      before do
+        invoke_task
+      end
+      it "does not create any more elements" do
+        expect(imported_areas.count).to eq(ServiceAreaReference.all.count)        
+      end
     end
 
     private
