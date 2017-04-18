@@ -3,17 +3,6 @@
 <% end %>
 <div class="container group-selection">
   <div class="row">
-    <% if @aptc_blocked.present? && @aptc_blocked %>
-      <br />
-      <div class="alert alert-danger" role="alert">
-        <p>
-          We need a bit of additional information to redetermine your eligibility. Please call us at <%= Settings.contact_center.phone_number %>.
-        </p>
-        <br>
-        <a data-method='delete' href='/users/sign_out' class='btn btn-primary'>Acknowledge</a>
-      </div>
-    <% else %>
-
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
@@ -155,6 +144,7 @@
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+
               <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
               class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
@@ -188,7 +178,6 @@
           <% end %>
         </div>
       </div>
-    <% end %>
     <% end %>
   </div>
   <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => {:enrollment => @hbx_enrollment } if (@hbx_enrollment.present? && (@hbx_enrollment.employee_role.present? || @hbx_enrollment.benefit_group.present?)) %>

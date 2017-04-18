@@ -127,10 +127,33 @@ describe Person do
       end
 
       context 'duplicated key issue' do
-        before do
-          Person.remove_indexes
-          Person.create_indexes
+
+        def drop_encrypted_ssn_index_in_db
+          Person.collection.indexes.each do |spec|
+            if spec["key"].keys.include?("encrypted_ssn")
+              if spec["unique"] && spec["sparse"]
+                Person.collection.indexes.drop_one(spec["key"])
+              end
+            end
+          end
         end
+
+        def create_encrypted_ssn_uniqueness_index
+          Person.index_specifications.each do |spec|
+            if spec.options[:unique] && spec.options[:sparse]
+              if spec.key.keys.include?(:encrypted_ssn)
+                key, options = spec.key, spec.options
+                Person.collection.indexes.create_one(key, options)
+              end
+            end
+          end
+        end
+
+        before :each do
+          drop_encrypted_ssn_index_in_db
+          create_encrypted_ssn_uniqueness_index
+        end
+
         context "with blank ssn" do
 
           let(:params) {valid_params.deep_merge({ssn: ""})}
@@ -1304,8 +1327,7 @@ describe Person do
     end
   end
 
-  describe "#check_for_ridp" do
-    let(:subject) { Person.new }
+  describe "#check_for_paper_application", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person, user: user) }
     let(:user) { FactoryGirl.create(:user)}
 
@@ -1313,19 +1335,26 @@ describe Person do
       user.unset(:identity_final_decision_code)
     end
 
-    it "should not set the ridp for non-paper applications" do
-      person.check_for_ridp('')
-      expect(user.identity_verified?).to eq false
+    it "should return true if user present & got paper in session variable" do
+      expect(person.check_for_paper_application('paper')).to eq true
     end
 
-    it "should set the ridp for paper applications" do
-      person.check_for_ridp('paper')
-      expect(user.identity_verified?).to eq true
+    it "should return nil if no user present" do
+      allow(person).to receive(:user).and_return nil
+      expect(person.check_for_paper_application('paper')).to eq nil
     end
 
-    it "should return nil if there is no user record" do
+    it "should return nil if session variable is not paper" do
+      expect(person.check_for_paper_application('something')).to eq nil
+    end
+
+    it "should return nil if session variable is nil" do
+      expect(person.check_for_paper_application(nil)).to eq nil
+    end
+
+    it "should return nil if no user present & if session var is not paper" do
       person.user.destroy!
-      expect(person.check_for_ridp(nil)).to eq nil
+      expect(person.check_for_paper_application('something')).to eq nil
     end
   end
 

@@ -16,6 +16,7 @@ class InsuredEligibleForBenefitRule
     @family = options[:family]
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
+    @new_effective_on = options[:new_effective_on]
   end
 
   def setup
@@ -115,7 +116,7 @@ class InsuredEligibleForBenefitRule
       return true if person.is_dc_resident?
 
       #TODO person can have more than one families
-      person.families.last.family_members.active.each do |family_member|
+      @family.family_members.active.each do |family_member|
         if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
           return true
         end
