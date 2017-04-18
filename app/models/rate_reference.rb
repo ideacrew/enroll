@@ -1,7 +1,7 @@
 class RateReference
   include Mongoid::Document
 
-  field :zip_code, type: Integer
+  field :zip_code, type: String
   field :county, type: String
   field :rating_region, type: String
   field :multiple_counties, type: Boolean, default: false
