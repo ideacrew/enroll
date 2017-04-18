@@ -580,6 +580,22 @@ function checkZip(textbox) {
   return true;
 }
 
+function getCounties(textbox, index) {
+     var phoneRegex = /^\d{5}$/;
+       if (phoneRegex.test(textbox.value)) {
+               $.ajax({
+                       type: 'get',
+                       datatype: 'js',
+                       url: '/employers/employer_profiles/get_counties',
+                       data: {zip_code: textbox.value},
+                       success: function (response) {
+                               $('#county' + index).show();
+                               $('#county' + index).html(response);
+                       }
+               });
+       }
+}
+
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
   if (textbox.value == '') {
