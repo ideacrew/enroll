@@ -88,7 +88,7 @@ class Insured::ConsumerRolesController < ApplicationController
           @resident_candidate = Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
-            if found_person.present?
+            if found_person.present? && found_person.resident_role.present?
               begin
                 @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
                 if @resident_role.present?
