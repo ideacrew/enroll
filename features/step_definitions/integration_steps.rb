@@ -316,9 +316,9 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: renewal_plan.id
-  employee.add_renew_benefit_group_assignment benefit_group
+  renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
+  renewal_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewal_plan_year, reference_plan_id: renewal_plan.id
+  employee.add_renew_benefit_group_assignment renewal_benefit_group
 
   employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
   employee.update_attributes(employee_role_id: employee_role.id)
@@ -449,7 +449,7 @@ Then(/^.+ creates (.+) as a roster employee$/) do |named_person|
   fill_in 'census_employee[ssn]', :with => person[:ssn]
 
   find('label[for=census_employee_gender_male]').click
-  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (TimeKeeper.datetime_of_record - 1.week).strftime('%m/%d/%Y')
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', with: (Time.now - 1.week).strftime('%m/%d/%Y')
   find(:xpath, '//label[input[@name="census_employee[is_business_owner]"]]').click
 
   fill_in 'census_employee[address_attributes][address_1]', :with => '1026 Potomac'
@@ -569,6 +569,14 @@ When(/^.+ accepts? the matched employer$/) do
   find_by_id('btn-continue').click
 end
 
+Then(/^Employee (.+) should see coverage effective date/) do |named_person|
+  employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
+  census_employee = CensusEmployee.where(:first_name => /#{people[named_person][:first_name]}/i, :last_name => /#{people[named_person][:last_name]}/i).first
+
+  find('p', text: employer_profile.legal_name)
+  find('.coverage_effective_date', text: census_employee.earliest_eligible_date.strftime("%m/%d/%Y"))
+end
+
 When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
 
   # Sometimes bombs due to overlapping modal
@@ -581,9 +589,9 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   screenshot("during modal")
   # find('.interaction-click-control-close').click
   screenshot("after modal")
-
   expect(page).to have_css('input.interaction-field-control-person-phones-attributes-0-full-phone-number')
   wait_for_ajax(3,2)
+
   #find("#person_addresses_attributes_0_address_1", :wait => 10).click
   # find("#person_addresses_attributes_0_address_1").trigger('click')
   # find("#person_addresses_attributes_0_address_2").trigger('click')
