@@ -8,9 +8,9 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employee Open Enrollment Successfully Completed',
-                            :notice_template => 'notices/shop_employer_notices/17_initial_ee_open_enrollment_completed',
+                            :notice_template => 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-                            :mpi_indicator => 'MPI_SHOP14',
+                            :mpi_indicator => 'MPI_SHOP17',
                             :title => "Open Enrollment Completed"})
                           }
     let(:valid_parmas) {{
