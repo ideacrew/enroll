@@ -714,8 +714,11 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
-      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+      self.where(:employer_staff_roles => {
+          '$elemMatch' => {
+              employer_profile_id: employer_profile.id,
+              aasm_state: :is_active}
+          }).to_a
     end
 
     def staff_for_employer_including_pending(employer_profile)
