@@ -23,6 +23,12 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :financial_assistance do
+    resources :applcations do
+      put :step, on: :member
+    end
+  end
+
   namespace :exchanges do
 
     resources :inboxes, only: [:show, :destroy]

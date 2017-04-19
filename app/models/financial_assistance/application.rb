@@ -6,7 +6,7 @@ class FinancialAssistance::Application
   embedded_in :household, class_name: "::Household"
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
-  
+
   APPLICANT_KINDS   = ["user and/or family", "call center rep or case worker", "authorized representative"]
   SOURCE_KINDS      = %w(paper source in-person)
   REQUEST_KINDS     = %w()
@@ -57,19 +57,19 @@ class FinancialAssistance::Application
   validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
 
   validates :renewal_base_year, allow_nil: true,
-                                numericality: { 
+                                numericality: {
                                   only_integer: true,
-                                  greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first, 
-                                  less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last, 
-                                  message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}" 
+                                  greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
+                                  less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
+                                  message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
                                 }
 
   validates :years_to_renew,    allow_nil: true,
-                                numericality: { 
+                                numericality: {
                                   only_integer: true,
-                                  greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first, 
-                                  less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last, 
-                                  message: "must fall within range: #{YEARS_TO_RENEW_RANGE}" 
+                                  greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
+                                  less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
+                                  message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                 }
 
 
@@ -95,29 +95,29 @@ class FinancialAssistance::Application
   end
 
   # Virtual attribute that indicates whether Primary Applicant accepts the Medicaid terms
-  # of service presented at the time of application submission 
-  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not  
+  # of service presented at the time of application submission
+  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not
   def has_accepted_medicaid_terms?
     SUBMITTED_STATUS.include?(aasm_state)
   end
 
   # Virtual attribute that indicates whether Primary Applicant accepts the Attest terms
-  # of service presented at the time of application submission 
-  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not  
+  # of service presented at the time of application submission
+  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not
   def has_accepted_attestation_terms?
     SUBMITTED_STATUS.include?(aasm_state)
   end
 
   # Virtual attribute that indicates whether Primary Applicant accepts the Submit terms
-  # of service presented at the time of application submission 
-  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not  
+  # of service presented at the time of application submission
+  # @return [ true, false ] true if application has reached workflow state of submitted (or later), false if not
   def has_accepted_submission_terms?
     SUBMITTED_STATUS.include?(aasm_state)
   end
 
-  # Whether {User} account for Primary Applicant has succussfully completed 
+  # Whether {User} account for Primary Applicant has succussfully completed
   # Remote Identity Proofing (RIDP) verification process
-  # @return [ true, false ] true if RIDP verification is complete, false if not 
+  # @return [ true, false ] true if RIDP verification is complete, false if not
   def is_ridp_verified?
     return @is_ridp_verified if defined?(@is_ridp_verified)
     if primary_applicant.person.user.present?
