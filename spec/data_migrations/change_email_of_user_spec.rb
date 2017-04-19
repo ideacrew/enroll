@@ -1,10 +1,5 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_email_of_user")
-
-# user_oimid = ENV['user_oimid']
-# new_email = ENV['new_email']
-
-
 describe ChangeEmailOfUser do
   let(:given_task_name) { "change_email_of_user" }
   subject { ChangeEmailOfUser.new(given_task_name, double(:current_scope => nil)) }
