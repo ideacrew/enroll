@@ -6,7 +6,7 @@ class ChangeIncorrectTerminationDateInEnrollment < MongoidMigrationTask
       new_termination_date = ENV['termination_date']
       if enrollment.nil?
         puts "No enrollment with given hbx_id was found" unless Rails.env.test?
-      elsif enrollment.aasm_state != "terminated"
+      elsif enrollment.aasm_state != "coverage_terminated"
         puts "The enrollment is not in terminated state" unless Rails.env.test?
       else
         enrollment.update_attributes(terminated_on: new_termination_date)
