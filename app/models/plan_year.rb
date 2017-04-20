@@ -92,7 +92,7 @@ class PlanYear
       ]
     )
   }
-  
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -956,7 +956,14 @@ class PlanYear
     TimeKeeper.date_of_record.end_of_day < start_on
   end
 
-private
+  # Checks for external plan year
+  def can_be_migrated?
+    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
+  end
+
+  alias_method :external_plan_year?, :can_be_migrated?
+
+  private
 
   def log_message(errors)
     msg = yield.first
@@ -977,11 +984,6 @@ private
     else
       false
     end
-  end
-
-  # Checks for external plan year
-  def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
   end
 
   def is_event_date_valid?

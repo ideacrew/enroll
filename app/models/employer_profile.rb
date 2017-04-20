@@ -261,6 +261,10 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
+  def coverting?
+    is_coversion_employer? && (published_plan_year.present? && published_plan_year.coverage_period_contains?(registered_on))
+  end
+
   def is_coversion_employer?
     profile_source.to_s == 'conversion'
   end
@@ -270,11 +274,7 @@ class EmployerProfile
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
-    if plan_year.present?
-      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.try(:first) : plan_year
-    else
-      plan_year
-    end
+    (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
   end
 
   def billing_plan_year(billing_date = nil)

@@ -79,7 +79,7 @@ module InvoiceHelper
 
     @pdf.start_new_page
 
-    if @employer_profile.is_conversion?
+    if @employer_profile.coverting?
       payment_page_for_conversion_employer
     elsif @employer_profile.published_plan_year && @employer_profile.published_plan_year.is_renewing?
       payment_page_for_renewing_employer
