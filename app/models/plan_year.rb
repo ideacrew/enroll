@@ -984,11 +984,6 @@ private
     end
   end
 
-  # Checks for external plan year
-  def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
-  end
-
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
