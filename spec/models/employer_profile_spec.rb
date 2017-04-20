@@ -985,6 +985,52 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, ".converting?", dbclean: :after_each do
+
+  let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:source) { 'conversion' }
+  let(:plan_year_status) { 'renewing_enrolling' }
+
+  let(:renewing_employer) {
+    FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status, profile_source: source, registered_on: start_date - 3.months)
+  }
+
+  describe "conversion employer" do  
+
+    context "when under converting period" do
+      it "should return true" do
+        expect(renewing_employer.converting?).to be_truthy
+      end
+    end
+
+    context "when under next renewal cycle" do
+      let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month.prev_year }
+      let(:plan_year_status) { 'active' }
+
+      before do 
+        plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
+        plan_year_renewal_factory.employer_profile = renewing_employer
+        plan_year_renewal_factory.is_congress = false
+        plan_year_renewal_factory.renew
+      end
+
+      it "should return false" do
+        expect(renewing_employer.converting?).to be_falsey
+      end
+    end
+  end
+
+  describe "non conversion employer" do 
+    let(:source) { 'self_serve' }
+
+    context "under renewal cycle" do
+      it "should always return false" do
+        expect(renewing_employer.converting?).to be_falsey
+      end
+    end
+  end
+end
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }
