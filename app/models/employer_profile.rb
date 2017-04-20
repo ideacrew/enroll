@@ -268,11 +268,13 @@ class EmployerProfile
   end
 
   def earliest_plan_year_start_on_date
-    plan_year = plan_years.order_by(:'start_on'.asc).limit(1).first
-    if !plan_year.blank?
-      plan_year.start_on
-    end
-  end
+   plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+   plan_years.reject!{|py| py.can_be_migrated? }
+   plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+   if !plan_year.blank?
+     plan_year.start_on
+   end
+ end
 
   def billing_plan_year(billing_date = nil)
     billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
