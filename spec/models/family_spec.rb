@@ -333,8 +333,7 @@ describe Family do
 
   describe "family has a past QLE, but Special Enrollment Period has expired" do
     before :each do
-      expired_sep = FactoryGirl.build(:special_enrollment_period, :expired)
-      family.special_enrollment_periods << expired_sep
+      expired_sep = FactoryGirl.build(:special_enrollment_period, :expired, family: family)
     end
 
     it "should have the SEP instance" do
@@ -356,8 +355,7 @@ describe Family do
 
   context "family has a QLE and is under a SEP" do
     before do
-      @current_sep = FactoryGirl.build(:special_enrollment_period)
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family)
     end
 
     it "should indicate SEP is active" do
@@ -372,10 +370,8 @@ describe Family do
 
   context "and the family is under more than one SEP" do
     before do
-      current_sep = FactoryGirl.build(:special_enrollment_period)
-      family.special_enrollment_periods << current_sep
-      another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date)
-      family.special_enrollment_periods << another_current_sep
+      current_sep = FactoryGirl.build(:special_enrollment_period, family: family)
+      another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: 4.days.ago.to_date, family: family)
     end
     it "should return multiple current_special_enrollment" do
       expect(family.current_special_enrollment_periods.size).to eq 2
@@ -385,11 +381,9 @@ describe Family do
   context "earliest_effective_sep" do
     before do
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1)
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1, family: family)
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2)
-      family.special_enrollment_periods << @another_current_sep
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2, family: family)
     end
 
     it "should return earliest sep when all active" do
@@ -400,8 +394,7 @@ describe Family do
 
     it "should return earliest active sep" do
       date3 = TimeKeeper.date_of_record - 200.days
-      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3)
-      family.special_enrollment_periods << sep
+      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3, family: family)
       expect(@current_sep.is_active?).to eq true
       expect(@another_current_sep.is_active?).to eq true
       expect(sep.is_active?).to eq false
@@ -414,18 +407,14 @@ describe Family do
     before do
       @qlek = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop', is_active: true)
       date1 = TimeKeeper.date_of_record - 20.days
-      @current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << @current_sep
+      @current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date1, effective_on: date1, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
       date2 = TimeKeeper.date_of_record - 10.days
-      @another_current_sep = FactoryGirl.build(:special_enrollment_period, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << @another_current_sep
+      @another_current_sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date2, effective_on: date2, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
     end
 
     it "should return latest active sep" do
       date3 = TimeKeeper.date_of_record - 200.days
-      sep = FactoryGirl.build(:special_enrollment_period, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
-      family.special_enrollment_periods << sep
-      family.save
+      sep = FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date3, effective_on: date3, qualifying_life_event_kind: @qlek, effective_on_kind: 'first_of_month')
       expect(@current_sep.is_active?).to eq true
       expect(@another_current_sep.is_active?).to eq true
       expect(sep.is_active?).to eq false
@@ -439,11 +428,19 @@ describe Family do
     end
 
     context "with latest_shop_sep" do
+
+      let(:person) { Person.new }
+      let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
+
       let(:qlek) { FactoryGirl.build(:qualifying_life_event_kind, reason: 'death') }
       let(:date) { TimeKeeper.date_of_record - 10.days }
-      let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date) }
-      let(:death_sep) { FactoryGirl.build(:special_enrollment_period, qle_on: date, qualifying_life_event_kind: qlek) }
+      let(:normal_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date) }
+      let(:death_sep) { FactoryGirl.build(:special_enrollment_period, family: family, qle_on: date, qualifying_life_event_kind: qlek) }
       let(:hbx) { HbxEnrollment.new }
+
+      before do
+        allow(family).to receive(:primary_applicant).and_return family_member_person
+      end
 
       it "normal sep" do
         allow(family).to receive(:latest_shop_sep).and_return normal_sep
@@ -451,7 +448,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep
+        allow(family).to receive(:latest_shop_sep).and_return death_sep 
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 

@@ -353,7 +353,7 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => TimeKeeper.datetime_of_record, :vlp_authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     context "import" do
       before do
