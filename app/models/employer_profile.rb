@@ -250,7 +250,7 @@ class EmployerProfile
   end
 
   def published_plan_year
-    plan_years.published.first
+    plan_years.published.last
   end
 
   def show_plan_year
