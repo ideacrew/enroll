@@ -76,6 +76,7 @@ class Employers::BrokerAgencyController < ApplicationController
       format.js {
         if params["termination_date"].present? && @fa
           flash[:notice] = "Broker terminated successfully."
+          UserMailer.broker_terminate_from_employer(@employer_profile,@employer_profile.active_broker_agency_account.writing_agent).deliver_now
           render text: true
         else
           render text: false

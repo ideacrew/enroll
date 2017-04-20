@@ -225,7 +225,9 @@ class Insured::FamiliesController < FamiliesController
 
   def delete_consumer_broker
     @family = Family.find(params[:id])
+    broker_role=@family.current_broker_agency.writing_agent
     if @family.current_broker_agency.destroy
+      UserMailer.broker_terminate_from_individual(@family.primary_applicant_person,broker_role).deliver_now
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
     end
   end
