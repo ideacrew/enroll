@@ -5,8 +5,8 @@ RSpec.describe "insured/family_relationships/_form.html.erb" do
   let(:current_user) {FactoryGirl.create(:user)}
   let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
   let(:relationship_kinds) {PersonRelationship::Relationships}
-  let(:child) {FactoryGirl.create(:family_member, :family => test_family)}
-  let(:unrelated_member) {FactoryGirl.create(:family_member, :family => test_family)}
+  let(:child) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:unrelated_member) {FactoryGirl.create(:family_member, :family => test_family).person}
   let(:missing_relationships){ [{child.id => unrelated_member.id}]}
   before :each do
     assign(:family, test_family)
@@ -26,8 +26,8 @@ RSpec.describe "insured/family_relationships/_form.html.erb" do
   end
 
   it "should display family member's name" do
-    child_name = child.person.full_name
-    unrelated_name = unrelated_member.person.full_name
+    child_name = child.full_name
+    unrelated_name = unrelated_member.full_name
     expect(rendered).to match child_name
     expect(rendered).to match unrelated_name
   end

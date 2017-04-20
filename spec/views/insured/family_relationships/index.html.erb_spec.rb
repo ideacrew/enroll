@@ -19,11 +19,6 @@ describe "insured/family_relationships/index.html.erb" do
     expect(rendered).to have_selector("h1", text: 'Household Relationships')
   end
 
-  it "should have memo to indicate required fields" do
-    render template: "insured/family_relationships/index.html.erb"
-    expect(rendered).to have_selector('li', text: 'Household Relationships')
-  end
-
   it "should render the form partial" do
     expect(render).to render_template(partial: '_form')
   end

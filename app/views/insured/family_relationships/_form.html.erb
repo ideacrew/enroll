@@ -1,10 +1,13 @@
 <%if missing_relationships.present?%>
   <h1 class="darkblue">Household Relationships</h1>
-  <h4>Answer the relationship question below:</h4>
+  <p>Enter this household member's relationship to other members of your household. Press Add Relationship to proceed.</p>
   <%= form_tag "/insured/family_relationships", remote: form_remote do %>
     <%= hidden_field_tag :family_id, family.id%>
     <%= hidden_field_tag :predecessor_id, missing_relationships.first.flatten.first%>
     <%= hidden_field_tag :successor_id, missing_relationships.first.flatten.second%>
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id]%>
+    <%= hidden_field_tag :resident_role_id, params[:resident_role_id]%>
+    <%= hidden_field_tag :employee_role_id, params[:employee_role_id]%>
     <%= hidden_field_tag :redirect_url, redirect_url%>
     <table width= 50% >
       <tr>

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Insured::FamilyRelationshipsController do
+RSpec.describe Insured::FamilyRelationshipsController, dbclean: :after_each do
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
   let(:person) { test_family.primary_family_member.person }
@@ -38,8 +38,8 @@ RSpec.describe Insured::FamilyRelationshipsController do
 
   describe "POST create" do
     let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:family_member1) {FactoryGirl.create(:family_member, family: test_family)}
-    let(:primary_member) {test_family.primary_applicant}
+    let(:family_member1) {FactoryGirl.create(:family_member, family: test_family).person}
+    let(:primary_member) {test_family.primary_applicant.person}
 
 
     before :each do
@@ -52,12 +52,16 @@ RSpec.describe Insured::FamilyRelationshipsController do
 
     describe "with valid inputs" do
       it "should create relation" do
-        expect(test_family.person_relationships.count).to eq 2
+        family_member1.add_relationship(primary_member, "spouse", test_family.id)
+        primary_member.add_relationship(family_member1, "spouse", test_family.id)
+        expect(primary_member.person_relationships.count).to eq 1
       end
 
-      it "should update the relationship to spouse" do
-        relationship = test_family.person_relationships.where(:successor_id => primary_member.id, :predecessor_id => family_member1.id).first
-        expect(relationship.kind).to eq "spouse"
+      it "should update the relationship to unrelated" do
+        family_member1.add_relationship(primary_member, "unrelated", test_family.id)
+        primary_member.add_relationship(family_member1, "unrelated", test_family.id)
+        relationship = family_member1.person_relationships.where(:successor_id => primary_member.id, :predecessor_id => family_member1.id).first
+        expect(relationship.kind).to eq "unrelated"
       end
 
       it "should have 2 family members" do
@@ -66,58 +70,83 @@ RSpec.describe Insured::FamilyRelationshipsController do
     end
 
     describe "with multiple family members" do
-      let(:child1) {FactoryGirl.create(:family_member, family: test_family)}
-      let(:child2) {FactoryGirl.create(:family_member, family: test_family)}
-      let(:parent1) {FactoryGirl.create(:family_member, family: test_family)}
-      let(:unrelated_member) {FactoryGirl.create(:family_member, family: test_family)}
+      let(:child1) {FactoryGirl.create(:family_member, family: test_family).person}
+      let(:child2) {FactoryGirl.create(:family_member, family: test_family).person}
+      let(:parent1) {FactoryGirl.create(:family_member, family: test_family).person}
+      let(:unrelated_member) {FactoryGirl.create(:family_member, family: test_family).person}
 
       it "should have relationships defined" do
-        child1.add_relationship(primary_member, "child")
-        child2.add_relationship(primary_member, "child")
-        unrelated_member.add_relationship(primary_member, "unrelated")
+        child1.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child1, "child", test_family.id)
+        child2.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child2, "child", test_family.id)
+        unrelated_member.add_relationship(primary_member, "unrelated", test_family.id)
+        primary_member.add_relationship(unrelated_member, "unrelated", test_family.id)
         test_family.build_relationship_matrix
-        expect(test_family.person_relationships.count).to eq 10
+        expect(primary_member.person_relationships.count).to eq 3
       end
 
       it "should have 2 missing relationships" do
-        child1.add_relationship(primary_member, "child")
-        child2.add_relationship(primary_member, "child")
-        unrelated_member.add_relationship(primary_member, "unrelated")
+        child1.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child1, "child", test_family.id)
+        child2.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child2, "child", test_family.id)
+        unrelated_member.add_relationship(primary_member, "unrelated", test_family.id)
+        primary_member.add_relationship(unrelated_member, "unrelated", test_family.id)
         matrix = test_family.build_relationship_matrix
         missing_rel = test_family.find_missing_relationships(matrix)
         expect(missing_rel.count).to eq 6
       end
 
       it "should not update any of the relationships unless in rules" do
-        relationship1 = test_family.person_relationships.where(:successor_id => unrelated_member.id, :predecessor_id => child1.id).first
-        relationship2 = test_family.person_relationships.where(:successor_id => unrelated_member.id, :predecessor_id => child2.id).first
+        relationship1 = child1.person_relationships.where(:successor_id => unrelated_member.id, :predecessor_id => child1.id).first
+        relationship2 = child2.person_relationships.where(:successor_id => unrelated_member.id, :predecessor_id => child2.id).first
         expect(relationship1).to eq nil
         expect(relationship2).to eq nil
       end
 
       it "should apply sibling relationship" do
-        child1.add_relationship(primary_member, "child")
-        child2.add_relationship(primary_member, "child")
+        child1.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child1, "child", test_family.id)
+        child2.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child2, "child", test_family.id)
         test_family.build_relationship_matrix
-        relationship = test_family.person_relationships.where(:successor_id => child2.id, :predecessor_id => child1.id).first
-        expect(relationship.kind).to eq "sibling"
+
+        relationship1 = test_family.find_existing_relationship(child1.id, child2.id, test_family.id)
+        relationship2 = test_family.find_existing_relationship(child2.id, child1.id, test_family.id)
+
+        expect(relationship1).to eq "sibling"
+        expect(relationship2).to eq "sibling"
       end
 
       it "should apply spouse rule which updates sibling relationship" do
-        child1.add_relationship(primary_member, "child")
-        child2.add_relationship(family_member1, "child")
+        child1.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child1, "parent", test_family.id)
+        child2.add_relationship(family_member1, "child", test_family.id)
+        family_member1.add_relationship(child2, "parent", test_family.id)
         test_family.build_relationship_matrix
-        relationship = test_family.person_relationships.where(:successor_id => child2.id, :predecessor_id => child1.id).first
-        expect(relationship.kind).to eq "sibling"
+
+        relationship1 = test_family.find_existing_relationship(child1.id, child2.id, test_family.id)
+        relationship2 = test_family.find_existing_relationship(child2.id, child1.id, test_family.id)
+
+        expect(relationship1).to eq "sibling"
+        expect(relationship2).to eq "sibling"
       end
 
       it "should apply grandparent-grandchild rule" do
-        child1.add_relationship(primary_member, "child")
-        parent1.add_relationship(primary_member, "parent")
+        child1.add_relationship(primary_member, "child", test_family.id)
+        primary_member.add_relationship(child1, "parent", test_family.id)
+        parent1.add_relationship(primary_member, "parent", test_family.id)
+        primary_member.add_relationship(parent1, "child", test_family.id)
         test_family.build_relationship_matrix
-        relationship = test_family.person_relationships.where(:successor_id => parent1.id, :predecessor_id => child1.id).first
-        expect(relationship.kind).to eq "grandchild"
+
+        relationship1 = test_family.find_existing_relationship(child1.id, parent1.id, test_family.id)
+        relationship2 = test_family.find_existing_relationship(parent1.id, child1.id, test_family.id)
+
+        expect(relationship1).to eq "grandchild"
+        expect(relationship2).to eq "grandparent"
       end
+
     end
   end
 end

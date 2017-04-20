@@ -6,6 +6,7 @@ describe PersonRelationship, dbclean: :after_each do
 
   let(:kind) {"spouse"}
   let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:person_2) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1975", ssn: "123456780" )}
 
   describe "class methods" do
     context "shop_display_relationship_kinds" do
@@ -17,7 +18,9 @@ describe PersonRelationship, dbclean: :after_each do
     let(:valid_params) do
       { kind: kind,
         relative: person,
-        person: person
+        person: person,
+        predecessor_id: person_2.id,
+        successor_id: person.id
       }
     end
 
@@ -120,6 +123,14 @@ describe PersonRelationship, dbclean: :after_each do
           params[:kind] = rkind
           expect(PersonRelationship.new(**params).save).to be_truthy
         end
+      end
+    end
+
+    context "test for validation, with same successor and predecessor" do
+      let(:params) {valid_params.except(:predecessor_id).deep_merge!({predecessor_id: person.id})}
+
+      it "should not save on failed validation" do
+        expect(PersonRelationship.new(**params).save).not_to be_truthy
       end
     end
   end

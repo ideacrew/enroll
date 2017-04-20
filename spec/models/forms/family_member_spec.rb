@@ -274,17 +274,25 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
     let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
+    let(:new_person2) { double(:save => true, :errors => double(:has_key? => false)) }
 
     before do
-      allow(new_family_member).to receive(:add_relationship).and_return nil
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(new_person).to receive(:add_relationship).and_return nil
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(primary_person).to receive(:person).and_return new_person2
+      allow(family.primary_applicant).to receive(:person).and_return new_person2
+      allow(subject).to receive(:assign_person_address).and_return true
+      allow(subject).to receive(:relationship).and_return relationship
     end
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
-      expect(new_family_member).to receive(:add_relationship).with(primary_person, relationship).and_return(true)
+      expect(new_person).to receive(:add_relationship).with(new_person2, relationship, family_id, true).and_return(true)
+      expect(new_person2).to receive(:add_relationship).with(new_person, PersonRelationship::InverseMap[relationship], family_id).and_return(true)
       expect(family).to receive(:build_relationship_matrix).and_return(true)
       subject.save
     end
@@ -292,6 +300,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     it "should create a new family member and call save_relevant_coverage_households" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(new_person).to receive(:add_relationship).with(new_person2, relationship, family_id, true).and_return(true)
+      expect(new_person2).to receive(:add_relationship).with(new_person, PersonRelationship::InverseMap[relationship], family_id).and_return(true)
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
@@ -339,7 +349,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     allow(subject).to receive(:valid?).and_return(true)
     allow(Family).to receive(:find).and_return family
     allow(family).to receive(:primary_applicant).and_return family_member
-    allow(family_member).to receive(:add_relationship).and_return nil
+    allow(person).to receive(:add_relationship).and_return nil
     allow(family).to receive(:build_relationship_matrix).and_return true
   end
 
@@ -365,11 +375,14 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     let(:primary_person) {family.primary_applicant}
+    let(:person1) { double(:save => true, :errors => double(:has_key? => false)) }
 
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(person1).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
-      expect(family_member).to receive(:add_relationship).with(primary_person, relationship)
+      allow(primary_person).to receive(:person).and_return person1
+      expect(person).to receive(:add_relationship).with(person1, relationship, family_id).and_return true
+      expect(person1).to receive(:add_relationship).with(person, PersonRelationship::InverseMap[relationship], family_id, true).and_return true
       subject.update_attributes(update_attributes)
     end
 

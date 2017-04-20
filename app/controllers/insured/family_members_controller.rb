@@ -180,6 +180,9 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
+
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
   end
 
   def new_resident_dependent
