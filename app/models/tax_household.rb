@@ -25,7 +25,7 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
-  before_save :generate_hbx_assigned_id
+  before_save :generate_family_id
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
@@ -182,8 +182,8 @@ class TaxHousehold
     end
   end
 
-  def generate_hbx_assigned_id
-    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_hbx_assigned_id) if hbx_assigned_id.blank?
+  def generate_family_id
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_family_id) if hbx_assigned_id.blank?
   end
 
   #primary applicant is the tax household member who is the subscriber
