@@ -261,7 +261,7 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  def coverting?
+  def converting?
     is_coversion_employer? && (published_plan_year.present? && published_plan_year.coverage_period_contains?(registered_on))
   end
 
