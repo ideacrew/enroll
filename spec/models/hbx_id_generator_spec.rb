@@ -13,6 +13,10 @@ describe HbxIdGenerator do
     it "generates organization ids" do
       expect(HbxIdGenerator.generate_organization_id).not_to eq nil
     end
+
+    it "generates hbx assigned id's" do
+      expect(HbxIdGenerator.generate_hbx_assigned_id).not_to eq nil
+    end
   end
 
   describe "with an amqp source" do
@@ -51,5 +55,15 @@ describe HbxIdGenerator do
         expect(generator.generate_organization_id).to eq sequence_number
       end
     end
+
+    describe "for hbx assigned id's" do
+      let(:sequence_name) { "hbx_assigned_id" }
+      let(:sequence_number) { "867433" }
+
+      it "returns the expected hbx_assigned_id" do
+        expect(generator.generate_hbx_assigned_id).to eq sequence_number
+      end
+    end
+
   end
 end

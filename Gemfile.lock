@@ -335,8 +335,6 @@ GEM
       mongo (~> 2.1)
       origin (~> 2.1)
       tzinfo (>= 0.3.37)
-    mongoid-autoinc (5.0.2)
-      mongoid (~> 5.0)
     mongoid-compatibility (0.4.0)
       activesupport
       mongoid (>= 2.0)
@@ -640,7 +638,6 @@ DEPENDENCIES
   mongo (= 2.1.2)
   mongo_session_store-rails4 (~> 6.0.0)
   mongoid (= 5.0.1)
-  mongoid-autoinc
   mongoid-enum
   mongoid-history!
   mongoid-rspec (= 3.0.0)

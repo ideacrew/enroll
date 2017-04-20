@@ -9,22 +9,19 @@
 # Family is a top level physical MongoDB Collection.
 
 class Family
-  require 'autoinc'
 
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   # include Mongoid::Versioning
   include Sortable
-  include Mongoid::Autoinc
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
 
-  field :hbx_assigned_id, type: Integer
-  increments :hbx_assigned_id, seed: 9999
+  field :hbx_assigned_id, type: String
 
   field :e_case_id, type: String # Eligibility system foreign key
   field :e_status_code, type: String
@@ -51,11 +48,12 @@ class Family
 
   after_initialize :build_household
   before_save :clear_blank_fields
+  before_save :generate_hbx_assigned_id
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
 
-  # index({hbx_assigned_id: 1}, {unique: true})
+  index({hbx_assigned_id: 1}, {unique: true})
   index({e_case_id: 1}, { sparse: true })
   index({submitted_at: 1})
   index({person_id: 1})
@@ -527,6 +525,10 @@ class Family
   # @return [ SpecialEnrollmentPeriod ] The SEP eligibility active on today's date with latest end on date
   def current_sep
     active_seps.max { |sep| sep.end_on }
+  end
+
+  def generate_hbx_assigned_id
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_hbx_assigned_id) if hbx_assigned_id.blank?
   end
 
   def build_from_employee_role(employee_role)
