@@ -20,8 +20,8 @@ class HbxIdGenerator
     provider.generate_organization_id
   end
 
-  def generate_hbx_assigned_id
-    provider.generate_hbx_assigned_id
+  def generate_family_id
+    provider.generate_family_id
   end
 
   def self.slug!
@@ -40,8 +40,8 @@ class HbxIdGenerator
     self.instance.generate_organization_id
   end
 
-  def self.generate_hbx_assigned_id
-    self.instance.generate_hbx_assigned_id
+  def self.generate_family_id
+    self.instance.generate_family_id
   end
 
   class AmqpSource
@@ -67,8 +67,8 @@ class HbxIdGenerator
       generate_id_from_sequence("organization_id")
     end
 
-    def self.generate_hbx_assigned_id
-      generate_id_from_sequence("hbx_assigned_id")
+    def self.generate_family_id
+      generate_id_from_sequence("family_id")
     end
   end
 
@@ -85,7 +85,7 @@ class HbxIdGenerator
       random_uuid
     end
 
-    def self.generate_hbx_assigned_id
+    def self.generate_family_id
       random_uuid
     end
 

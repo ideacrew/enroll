@@ -48,7 +48,7 @@ class Family
 
   after_initialize :build_household
   before_save :clear_blank_fields
-  before_save :generate_hbx_assigned_id
+  before_save :generate_family_id
 
   accepts_nested_attributes_for :special_enrollment_periods, :family_members, :irs_groups,
                                 :households, :broker_agency_accounts, :general_agency_accounts
@@ -527,8 +527,8 @@ class Family
     active_seps.max { |sep| sep.end_on }
   end
 
-  def generate_hbx_assigned_id
-    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_hbx_assigned_id) if hbx_assigned_id.blank?
+  def generate_family_id
+    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_family_id) if hbx_assigned_id.blank?
   end
 
   def build_from_employee_role(employee_role)
