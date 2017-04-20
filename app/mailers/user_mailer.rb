@@ -99,13 +99,13 @@ class UserMailer < ApplicationMailer
 
   def broker_terminate_from_employer(employer,broker_role)
     mail({to: broker_role.email_address , subject: "Termination Notification"}) do |format|
-      format.html { render "broker_termination_from_employer", :locals => { :employer => employer }}
+      format.html { render "broker_terminate_from_employer", :locals => { :employer => employer }}
     end
   end
 
   def broker_terminate_from_individual(person,broker_role)
     mail({to: broker_role.email_address , subject: "Termination Notification"}) do |format|
-      format.html { render "broker_termination_from_individual", :locals => { :person => person }}
+      format.html { render "broker_terminate_from_individual", :locals => { :person => person }}
     end
   end
 

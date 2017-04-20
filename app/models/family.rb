@@ -479,7 +479,13 @@ class Family
     return unless broker_role_id
     existing_agency = current_broker_agency
     broker_agency_profile_id = BrokerRole.find(broker_role_id).try(:broker_agency_profile_id)
-    fire_broker_agency(existing_agency) if existing_agency
+    if existing_agency
+      result=UserMailer.broker_terminate_from_individual(primary_applicant_person,current_broker_agency.writing_agent)
+      result.deliver_now
+      puts result.to_s if Rails.env.development?
+      send_broker_delete_msg(primary_applicant_person,current_broker_agency.broker_agency_profile)
+      fire_broker_agency(existing_agency)
+    end
     start_on = Time.now
     broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile_id, writing_agent_id: broker_role_id, start_on: start_on, is_active: true)
     broker_agency_accounts.push(broker_agency_account)
@@ -801,5 +807,34 @@ private
     else
       return false
     end
+  end
+
+  
+  def send_broker_delete_msg(person,broker_agency_profile)
+    broker_subject = "#{person.full_name} has deleted you as the broker on DC Health Link"
+    broker_body = "<br><p>You have been removed from  #{person.full_name} account on #{TimeKeeper.date_of_record} </p>"
+    secure_message_for_person(person, broker_agency_profile, broker_subject, broker_body)
+  end
+
+  def secure_message_for_person(from_provider, to_provider, subject, body)
+    message_params = {
+        sender_id: from_provider.id,
+        parent_message_id: to_provider.id,
+        from: from_provider.full_name,
+        to: to_provider.legal_name,
+        subject: subject,
+        body: body
+    }
+    create_secure_message(message_params, to_provider, :inbox)
+    create_secure_message(message_params, from_provider, :sent)
+  end
+
+
+  def create_secure_message(message_params, inbox_provider, folder)
+    message = Message.new(message_params)
+    message.folder =  Message::FOLDER_TYPES[folder]
+    msg_box = inbox_provider.inbox
+    msg_box.post_message(message)
+    msg_box.save
   end
 end

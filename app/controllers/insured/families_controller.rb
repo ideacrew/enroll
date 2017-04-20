@@ -227,12 +227,19 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     broker_role=@family.current_broker_agency.writing_agent
     if @family.current_broker_agency.destroy
-      UserMailer.broker_terminate_from_individual(@family.primary_applicant_person,broker_role).deliver_now
+      UserMailer.broker_terminate_from_individual(@family.primary_applicant.person,broker_role).deliver_now
+      send_broker_delete_msg(@family.primary_applicant.person,broker_role.broker_agency_profile)
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
     end
   end
 
   private
+
+  def send_broker_delete_msg(person,broker_agency_profile)
+    broker_subject = "#{person.full_name} has deleted you as the broker on DC Health Link"
+    broker_body = "<br><p>You have been removed from  #{person.full_name} account on #{TimeKeeper.date_of_record} </p>"
+    secure_message_for_person(person, broker_agency_profile, broker_subject, broker_body)
+  end
 
   def updateable?
     authorize Family, :updateable?
