@@ -53,7 +53,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
-  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
@@ -73,6 +73,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:plan=).with(plan).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:can_select_coverage?).and_return true
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return false
       allow(benefit_group).to receive(:reference_plan).and_return(:reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(hbx_enrollment).to receive(:may_select_coverage?).and_return(true)
@@ -118,7 +120,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before :each do
         request.env["HTTP_REFERER"] = "/home"
         allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record - 10.days)
-        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return false
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return false
         allow(hbx_enrollment).to receive(:errors).and_return(errors)
         allow(errors).to receive(:full_messages).and_return("You can not keep an existing plan which belongs to previous plan year")
       end
@@ -489,6 +491,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           get :show, id: "hbx_id"
         end
@@ -506,6 +509,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -522,6 +526,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
@@ -541,6 +546,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(hbx_enrollment).to receive(:kind).and_return 'shop'
           get :show, id: "hbx_id"
