@@ -9,6 +9,7 @@ class ChangeRenewingPlanYearAasmState< MongoidMigrationTask
         plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
         plan_year = organization.employer_profile.plan_years.where(:start_on => plan_year_start_on).first
         if plan_year.present?
+          plan_year.revert_renewal! if plan_year.renewing_application_ineligible?
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?
           plan_year.renew_publish! if plan_year.may_renew_publish?
           plan_year.advance_date! if plan_year.may_advance_date?
