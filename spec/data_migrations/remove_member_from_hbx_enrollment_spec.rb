@@ -25,7 +25,7 @@ describe RemoveMemberFromHbxEnrollment do
       let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
       before(:each) do
         allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("applicant_id").and_return(family_member1.id)
+        allow(ENV).to receive(:[]).with("hbx_enrollment_member_id").and_return(hbx_enrollment_member1.id)
       end
       it "should not remove the hbx_enrollment" do
         size=household.hbx_enrollments.size
@@ -40,7 +40,7 @@ describe RemoveMemberFromHbxEnrollment do
       let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
       before(:each) do
         allow(ENV).to receive(:[]).with("enrollment_hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("applicant_id").and_return(family_member1.id)
+        allow(ENV).to receive(:[]).with("hbx_enrollment_member_id").and_return(hbx_enrollment_member1.id)
       end
       it "should remove the related hbx_enrollment_member from the hbx_enrollment" do
         size=hbx_enrollment.hbx_enrollment_members.size
