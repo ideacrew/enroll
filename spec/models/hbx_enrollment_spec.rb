@@ -2325,6 +2325,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
 
     it "should return true if benefit group & published plan year present for shop enrollment" do
       allow(enrollment).to receive(:benefit_group).and_return benefit_group
+      expect(enrollment.is_applicable_for_renewal?).to eq true
     end
   end
 
