@@ -11,4 +11,17 @@ describe RemoveResidentRole do
       expect(subject.name).to eql given_task_name
     end
   end
+
+  describe "remove resident role" do
+    let!(:person1) { FactoryGirl.create(:person, :with_resident_role, hbx_id: "12345678")}
+    let!(:person2) { FactoryGirl.create(:person, :with_resident_role, hbx_id: "87654321")}
+
+    it "should delete the resident role for person1 and not for person2" do
+      person2.update_attributes(id:'58e3dc7d50526c33c5000187')
+      subject.migrate
+      person1.reload
+      expect(person1.resident_role).to be(nil)
+      expect(person2.resident_role).not_to be_nil
+    end
+  end
 end
