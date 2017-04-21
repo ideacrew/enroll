@@ -75,6 +75,7 @@ module Forms
     end
 
     def uniq_ssn_dob
+      return true if ssn.blank?
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob

@@ -70,6 +70,7 @@ class Person
                 index: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
+  embeds_one :resident_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
@@ -89,7 +90,8 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
 
-  accepts_nested_attributes_for :consumer_role, :broker_role, :hbx_staff_role,
+
+  accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
@@ -172,6 +174,7 @@ class Person
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
+  scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
   scope :all_employer_staff_roles,    -> { exists(employer_staff_roles: true) }
 
@@ -283,7 +286,7 @@ class Person
 
   #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
-  
+
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
     if !deleted_messages.blank?
@@ -362,8 +365,13 @@ class Person
     self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
+  # Get the {Family} where this {Person} is the primary family member
+  #
+  # family itegrity ensures only one active family can be the primary for a person
+  #
+  # @return [ Family ] the family member who matches this person
   def primary_family
-    @primary_family ||= Family.find_by_primary_applicant(self)
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
   end
 
   def families
@@ -506,6 +514,10 @@ class Person
 
   def has_active_consumer_role?
     consumer_role.present? and consumer_role.is_active?
+  end
+
+  def has_active_resident_role?
+    resident_role.present? and resident_role.is_active?
   end
 
   def can_report_shop_qle?
@@ -756,6 +768,7 @@ class Person
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
   attr_accessor :is_consumer_role
+  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 
@@ -864,9 +877,9 @@ class Person
     end
   end
 
-  def check_for_ridp(session_var)
+  def check_for_paper_application(session_var)
     if user && session_var == 'paper'
-      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+      user.ridp_by_paper_application
     end
   end
 

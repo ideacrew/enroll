@@ -469,6 +469,12 @@ module ApplicationHelper
     end
   end
 
+  def is_readonly(object)
+    return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
+    return true if object.try(:linked?)  # cannot edit, employer census roster
+    return !(object.new_record? or object.try(:eligible?)) # employer census roster
+  end
+
   def may_update_census_employee?(census_employee)
     if current_user.roles.include?("hbx_staff") || census_employee.new_record? || census_employee.is_eligible?
       true
@@ -544,8 +550,8 @@ module ApplicationHelper
     end
   end
 
-  def disable_purchase?(disabled, hbx_enrollment)
-    disabled || !hbx_enrollment.can_select_coverage?
+  def disable_purchase?(disabled, hbx_enrollment, options = {})
+    disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
 
   def get_key_and_bucket(uri)
