@@ -55,6 +55,9 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
+  delegate :indian_tribe_member, to: :person, allow_nil: true
+  delegate :naturalized_citizen, to: :person, allow_nil: true
+  delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
   delegate :is_applying_coverage, to: :person, allow_nil: true
