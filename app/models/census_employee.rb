@@ -34,6 +34,9 @@ class CensusEmployee < CensusMember
   field :employee_role_id, type: BSON::ObjectId
 
   field :cobra_begin_date, type: Date
+  field :cobra_end_date, type: Date
+
+  attr_accessor :cobra_max_months
 
   embeds_many :census_dependents,
     cascade_callbacks: true,
@@ -59,6 +62,8 @@ class CensusEmployee < CensusMember
 
   before_save :assign_default_benefit_package
   before_save :allow_nil_ssn_updates_dependents
+
+  before_create :update_cobra_end_date
 
   index({aasm_state: 1})
   index({last_name: 1})
@@ -145,6 +150,12 @@ class CensusEmployee < CensusMember
       if cd.ssn.blank?
         cd.unset(:encrypted_ssn)
       end
+    end
+  end
+
+  def update_cobra_end_date
+    if cobra_max_months.present? and cobra_begin_date.present?
+      self.cobra_end_date = cobra_begin_date + cobra_max_months.to_i.months
     end
   end
 
