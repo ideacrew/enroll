@@ -14,7 +14,7 @@ class ChangeEmailAddress < MongoidMigrationTask
         puts "No email was found with given hbx_id"
       else
         email.update_attributes(address:new_email)
-        puts "update the email of person #{hbx_id} from #{new_email} to #{old_email}"
+        puts "update the email of person #{hbx_id} from #{old_email} to #{new_email}"
       end
     end
   end
