@@ -143,7 +143,7 @@ class PeopleController < ApplicationController
         if member.save && @dependent.save
           @dependent.person.add_relationship(@family.primary_applicant.person, params[:family_member][:primary_relationship], true)
           @family.primary_applicant.person.add_relationship(@dependent.person, PersonRelationship::InverseMap[params[:family_member][:primary_relationship]])
-          # @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          # @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id) #old_code
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else

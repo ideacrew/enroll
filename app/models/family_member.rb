@@ -122,6 +122,7 @@ class FamilyMember
     family.add_family_member(person)
   end
 
+  #old_code
   # def update_relationship(relationship)
   #   return if (primary_relationship == relationship)
   #   family.remove_family_member(person)

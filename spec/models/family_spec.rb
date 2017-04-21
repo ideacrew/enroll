@@ -158,6 +158,11 @@ describe Family, type: :model, dbclean: :after_each do
             end
           end
 
+          #old_code
+          # it "should not be valid" do
+          #   expect(family.errors[:family_members].any?).to be_truthy
+          # end
+
           context "and one of the same family members is added again" do
             before do
               family.family_members << family_member_spouse.dup
@@ -528,6 +533,18 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryGirl.create(:person, last_name: "sheen", first_name: "sam") }
   let(:grandpa)       { FactoryGirl.create(:person, last_name: "sheen", first_name: "martin") }
+
+  #old_code
+  # let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
+  #                                PersonRelationship.new(relative: child, kind: "child")] }
+  # let(:family_relationships)  {  married_relationships <<
+  #                                PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+
+  # let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
+  # let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
+  #                                          person_relationships: married_relationships ) }
+  # let(:family_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "charles",
+  #                                          person_relationships: family_relationships ) }
 
   let(:single_dude)   { family1.primary_applicant.person }
   let(:married_dude)  { family2.primary_applicant.person }

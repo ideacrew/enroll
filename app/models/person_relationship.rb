@@ -100,6 +100,7 @@ class PersonRelationship
     errors.add(:successor, "can't be the same as predecessor") if successor_id == predecessor_id
   end
 
+  #old_code
   # def parent
   #   raise "undefined parent class: Person" unless person?
   #   self.person

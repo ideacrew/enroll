@@ -641,6 +641,19 @@ describe Person do
     end
   end
 
+  #old_code
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     # setup
+  #     person = FactoryGirl.build(:person)
+  #     relationship = person.person_relationships.build({kind: "self", relative: person})
+
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
+
   describe '#full_name' do
     it 'returns the concatenated name attributes' do
       expect(Person.new(first_name: "Ginger", last_name: "Baker").full_name).to eq 'Ginger Baker'

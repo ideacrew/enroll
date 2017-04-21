@@ -541,7 +541,7 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    #primary_applicant_person.ensure_relationship_with(person, relationship)
+    #primary_applicant_person.ensure_relationship_with(person, relationship) #old_code
     add_family_member(person)
   end
 
@@ -1044,7 +1044,7 @@ private
   def family_integrity
     only_one_active_primary_family
     single_primary_family_member
-    # all_family_member_relations_defined
+    # all_family_member_relations_defined #old_code
     single_active_household
     no_duplicate_family_members
   end
@@ -1076,7 +1076,7 @@ private
     self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
   end
 
-  def all_family_member_relations_defined
+  def all_family_member_relations_defined #new_code
     return unless primary_family_member.present? && primary_family_member.person.present?
     primary_member = primary_family_member
     other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member.id.to_s) }
@@ -1084,6 +1084,7 @@ private
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 
+  #old_code
   # def all_family_member_relations_defined
   #   return unless primary_family_member.present? && primary_family_member.person.present?
   #   primary_member_id = primary_family_member.id
