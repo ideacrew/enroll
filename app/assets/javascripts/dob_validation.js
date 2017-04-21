@@ -5,13 +5,13 @@ $(document).on('change', '#jq_datepicker_ignore_person_dob, #family_member_dob_,
   var entered_year =  entered_date.substring(entered_date.length -4);
   var todays_date = dchbx_enroll_date_of_record();
   if (entered_date.value == '') {
-    this.setCustomValidity('Please fill out this DOB field.');
+    this.setCustomValidity('Please fill out this date of birth field.');
   }
   else if(entered_dob > todays_date){
-    this.setCustomValidity('Please enter a DOB that does not take place in the future.');
+    this.setCustomValidity('Please enter a date of birth that does not take place in the future.');
   }
   else if(entered_year < (new Date().getFullYear() - 110)) {
-    this.setCustomValidity('Please enter a DOB not more than 110 years ago.');
+    this.setCustomValidity('Please enter a date of birth not more than 110 years ago.');
   }
   else {
     this.setCustomValidity('');
@@ -25,16 +25,16 @@ $(document).on('change', '#jq_datepicker_ignore_organization_dob', function() {
   var entered_year =  entered_date.substring(entered_date.length -4);
   var todays_date = dchbx_enroll_date_of_record();
   if (entered_date.value == '') {
-    this.setCustomValidity('Please fill out this DOB field.');
+    this.setCustomValidity('Please fill out this date of birth field.');
   }
   else if(entered_dob > todays_date){
-    this.setCustomValidity('Please enter a DOB that does not take place in the future.');
+    this.setCustomValidity('Please enter a date of birth that does not take place in the future.');
   }
   else if(entered_year == new Date().getFullYear()){
-    this.setCustomValidity('Please enter a DOB that is not in the current year.');
+    this.setCustomValidity('Please enter a date of birth that is not in the current year.');
   }
   else if(entered_year < (new Date().getFullYear() - 110)) {
-    this.setCustomValidity('Please enter a DOB not more than 110 years ago.');
+    this.setCustomValidity('Please enter a date of birth not more than 110 years ago.');
   }
   else {
     this.setCustomValidity('');
