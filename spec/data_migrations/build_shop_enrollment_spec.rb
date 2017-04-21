@@ -23,27 +23,51 @@ describe BuildShopEnrollment do
       allow(ENV).to receive(:[]).with("effective_on").and_return(TimeKeeper.date_of_record)
       allow(ENV).to receive(:[]).with("plan_year_state").and_return(plan_year.aasm_state)
       allow(ENV).to receive(:[]).with("new_hbx_id").and_return("1234567")
+      allow(ENV).to receive(:[]).with("fein").and_return plan_year.employer_profile.parent.fein
+      allow(ENV).to receive(:[]).with("hios_id").and_return nil
+      allow(ENV).to receive(:[]).with("active_year").and_return nil
       person.employee_roles[0].update_attributes(census_employee_id: census_employee.id)
       census_employee.update_attributes(employee_role_id: person.employee_roles[0].id)
-      subject.migrate
-      person.reload
     end
 
-    it "should create a new enrollment" do
-      enrollments = person.primary_family.active_household.hbx_enrollments
-      expect(enrollments.size).to eq 1
+    context "without providing plan details" do
+
+      before do
+        subject.migrate
+        person.reload
+      end
+
+      it "should create a new enrollment" do
+        enrollments = person.primary_family.active_household.hbx_enrollments
+        expect(enrollments.size).to eq 1
+      end
+
+      it "should have the given effective_on date" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.effective_on).to eq TimeKeeper.date_of_record
+      end
+
+      it "should have the updated hbx_id" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.hbx_id).to eq "1234567"
+      end
+
+      it "should be in enrolled statuses" do
+        expect(HbxEnrollment::ENROLLED_STATUSES.include?(person.primary_family.active_household.hbx_enrollments.first.aasm_state)).to eq true
+      end
+
+      it "should create enrollment with reference plan id" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.plan_id).to eq benefit_group.reference_plan.id
+      end
     end
 
-    it "should have the given effective_on date" do
-      expect(person.primary_family.active_household.hbx_enrollments.first.effective_on).to eq TimeKeeper.date_of_record
-    end
-
-    it "should have the updated hbx_id" do
-      expect(person.primary_family.active_household.hbx_enrollments.first.hbx_id).to eq "1234567"
-    end
-
-    it "should be in enrolled statuses" do
-      expect(HbxEnrollment::ENROLLED_STATUSES.include?(person.primary_family.active_household.hbx_enrollments.first.aasm_state)).to eq true
+    context "with plan details" do
+      it "should create enrollment with the given plan id" do
+        plan = Plan.first
+        allow(ENV).to receive(:[]).with("hios_id").and_return plan.hios_id
+        allow(ENV).to receive(:[]).with("active_year").and_return plan.active_year
+        subject.migrate
+        person.reload
+        expect(person.primary_family.active_household.hbx_enrollments.first.plan_id).to eq plan.id
+      end
     end
   end
 end

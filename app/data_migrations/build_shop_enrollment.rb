@@ -12,24 +12,37 @@ class BuildShopEnrollment < MongoidMigrationTask
       effective_on = Date.strptime(ENV['effective_on'].to_s, "%m/%d/%Y")
       plan_year_state = ENV['plan_year_state'].to_s
       new_hbx_id = ENV['new_hbx_id'].to_s
+      fein = ENV['fein'].to_s
+      hios_id = ENV['hios_id'].to_s
+      active_year = ENV['active_year']
+      if hios_id.present? && active_year.present?
+        plan = Plan.where(hios_id: hios_id, active_year: active_year).first
+        if plan.nil?
+          puts "This Plan details you entered are incorrect" unless Rails.env.test?
+          return
+        end
+      end
+      organizations = Organization.where(fein: fein)
+      if organizations.size != 1
+        puts "Found More than one (or) no organization with the given FEIN" unless Rails.env.test?
+        return
+      end
 
-      benefit_group = person.active_employee_roles.first.employer_profile.plan_years.where(aasm_state: plan_year_state).first.default_benefit_group
-      benefit_group ||= person.active_employee_roles.first.employer_profile.plan_years.where(aasm_state: plan_year_state).first.benefit_groups.first
-      benefit_group_assignment = person.active_employee_roles.first.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
+      employer_profile_id = organizations.first.employer_profile.id
+      employee_role = person.active_employee_roles.detect { |er| er.employer_profile_id == employer_profile_id}
+
+      benefit_group = organizations.first.employer_profile.plan_years.where(aasm_state: plan_year_state).first.default_benefit_group
+      benefit_group ||= organizations.first.employer_profile.plan_years.where(aasm_state: plan_year_state).first.benefit_groups.first
+      benefit_group_assignment = employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
       
       if benefit_group_assignment.nil?
         bga = BenefitGroupAssignment.new(benefit_group: benefit_group, start_on: benefit_group.start_on)
         bga.save!
       end
       
-      enrollment = HbxEnrollment.new
-      enrollment.kind = "employer_sponsored"
-      enrollment.employee_role_id = person.active_employee_roles.first.id
-      enrollment.enrollment_kind = "open_enrollment"
-      enrollment.benefit_group_id = benefit_group.id
-      enrollment.benefit_group_assignment_id = benefit_group_assignment.id
+      enrollment = HbxEnrollment.new(kind: "employer_sponsored", enrollment_kind: "open_enrollment", employee_role_id: employee_role.id, benefit_group_id: benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment.effective_on = effective_on
-      enrollment.plan_id = benefit_group.reference_plan.id
+      enrollment.plan_id = plan.present? ? plan.id : benefit_group.reference_plan.id
       person.primary_family.active_household.hbx_enrollments << enrollment
       person.primary_family.active_household.save!
       enrollment.update_attributes(aasm_state: "coverage_selected")
