@@ -600,6 +600,26 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
       end
 
+      context "and the number of employees count is zero" do
+        before do
+          workflow_plan_year_with_benefit_group.fte_count = 0
+          workflow_plan_year_with_benefit_group.publish
+        end
+
+        it "application should not be valid" do
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_pending"
+        end
+      end
+
       context "and plan year is published after the publish due date" do
 
         before do
@@ -2116,6 +2136,7 @@ describe PlanYear, "which has the concept of export eligibility" do
           employer_profile: employer_profile,
           start_on: valid_plan_year_start_on,
           end_on: valid_plan_year_end_on,
+          fte_count: 3,
           open_enrollment_start_on: valid_open_enrollment_start_on,
           open_enrollment_end_on: valid_open_enrollment_end_on
           })
@@ -2316,7 +2337,7 @@ describe PlanYear, "plan year schedule changes" do
 
     context 'when plan year reverted' do
 
-      context 'employee has enrollment under renewing plan year'  do 
+      context 'employee has enrollment under renewing plan year'  do
 
         let(:renewal_py_state) { 'renewing_enrolling' }
 
@@ -2351,7 +2372,7 @@ describe PlanYear, "plan year schedule changes" do
                        aasm_state: 'auto_renewing'
                        ) }
 
-        it 'should cancel enrollments under reverted plan year' do 
+        it 'should cancel enrollments under reverted plan year' do
           expect(passive_renewal.auto_renewing?).to be_truthy
           renewing_plan_year.revert_renewal!
           passive_renewal.reload

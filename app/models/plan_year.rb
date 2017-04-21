@@ -29,13 +29,13 @@ class PlanYear
   field :imported_plan_year, type: Boolean, default: false
 
   # Number of full-time employees
-  field :fte_count, type: Integer, default: 0
+  field :fte_count, type: Integer
 
   # Number of part-time employess
-  field :pte_count, type: Integer, default: 0
+  field :pte_count, type: Integer
 
   # Number of Medicare Second Payers
-  field :msp_count, type: Integer, default: 0
+  field :msp_count, type: Integer
 
   # Calculated Fields for DataTable
   field :enrolled_summary, type: Integer, default: 0
@@ -92,7 +92,7 @@ class PlanYear
       ]
     )
   }
-  
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -390,7 +390,7 @@ class PlanYear
     end
 
     # Maximum company size at time of initial registration on the HBX
-    if fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
+    if (fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
       warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
     end
 
