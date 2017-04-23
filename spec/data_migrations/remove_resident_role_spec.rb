@@ -14,12 +14,14 @@ describe RemoveResidentRole do
 
   describe "remove resident role" do
     let!(:person1) { FactoryGirl.create(:person, :with_resident_role, hbx_id: "12345678")}
-    let!(:person2) { FactoryGirl.create(:person, :with_resident_role, hbx_id: "87654321")}
+    let!(:person2) { FactoryGirl.create(:person, :with_resident_role, hbx_id: "87654321", id:'58e3dc7d50526c33c5000187')}
 
     it "should delete the resident role for person1 and not for person2" do
-      person2.update_attributes(id:'58e3dc7d50526c33c5000187')
       subject.migrate
+      #binding.pry
       person1.reload
+      person2.reload
+      binding.pry
       expect(person1.resident_role).to be(nil)
       expect(person2.resident_role).not_to be_nil
     end
