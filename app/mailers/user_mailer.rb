@@ -25,7 +25,8 @@ class UserMailer < ApplicationMailer
   end
 
   def send_employee_open_enrollment_invitation(email, census_employee, invitation)
-    if email.present?
+    plan_years = census_employee.employer_profile.plan_years.published_or_renewing_published.select{|py| py.coverage_period_contains?(census_employee.earliest_eligible_date)}
+    if email.present? && plan_years.any?{|py| py.employees_are_matchable?}
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
         if census_employee.hired_on > TimeKeeper.date_of_record
           format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}

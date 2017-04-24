@@ -457,15 +457,12 @@ class CensusEmployee < CensusMember
     end
 
     def initial_employee_open_enrollment_notice(date)
-      census_employees = CensusEmployee.where(:"hired_on" => date)
+      census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated
       census_employees.each do |ce|
         begin
-          if ce.has_benefit_group_assignment?
-            plan_year = ce.active_benefit_group_assignment.benefit_group.plan_year
-            Invitation.invite_employee_for_open_enrollment!(ce) if (ce.hired_on == date && plan_year.employees_are_matchable?)
-          end
+          Invitation.invite_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          puts "Unable to deliver to #{ce.full_name} due to --- #{e}" unless Rails.env.test?
+          puts "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" unless Rails.env.test?
         end
       end
     end
@@ -473,21 +470,33 @@ class CensusEmployee < CensusMember
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
       census_employees_for_termination = CensusEmployee.pending.where(:employment_terminated_on.lt => as_of_date)
       census_employees_for_termination.each do |census_employee|
-        census_employee.terminate_employment(census_employee.employment_terminated_on)
+        begin
+          census_employee.terminate_employment(census_employee.employment_terminated_on)
+        rescue Exception => e
+          puts "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" unless Rails.env.test?
+        end
       end
     end
 
     def rebase_newly_designated_employees
       return unless TimeKeeper.date_of_record.yday == 1
       CensusEmployee.where(:"aasm_state".in => NEWLY_DESIGNATED_STATES).each do |employee|
-        employee.rebase_new_designee! if employee.may_rebase_new_designee?
+        begin
+          employee.rebase_new_designee! if employee.may_rebase_new_designee?
+        rescue Exception => e
+          puts "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" unless Rails.env.test?
+        end
       end
     end
 
     def terminate_future_scheduled_census_employees(as_of_date)
       census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
-        census_employee.terminate_employee_role!
+        begin
+          census_employee.terminate_employee_role!
+        rescue Exception => e
+          puts "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+        end
       end
     end
 
