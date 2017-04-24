@@ -6,7 +6,7 @@ class PopulateConversionFlag< MongoidMigrationTask
     begin
       Organization.exists(:employer_profile => true).each do |org|
         employer_profile = org.employer_profile
-        employer_profile.plan_years.each{|py| py.update(is_conversion: false)}
+        employer_profile.plan_years.each{|py| py.set(is_conversion: false)}
 
         if employer_profile.is_coversion_employer?
           external_plan_years = employer_profile.plan_years.select{|py| py.coverage_period_contains?(employer_profile.registered_on)}
@@ -35,7 +35,7 @@ class PopulateConversionFlag< MongoidMigrationTask
                 } }).any?
           }
 
-          external_plan_years.each{|py| py.update(is_conversion: true)}
+          external_plan_years.each{|py| py.set(is_conversion: true)}
         end
       end
     rescue Exception => e
