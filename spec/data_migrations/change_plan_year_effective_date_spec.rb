@@ -54,6 +54,10 @@ describe ChangePlanYearEffectiveDate do
 
     it "should publish the plan year" do
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what")
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what")
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what")
+
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).not_to eq "draft"
