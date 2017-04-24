@@ -185,12 +185,8 @@ class Invitation
     UserMailer.invitation_email(invitation_email, invitee_name, self).deliver_now
   end
 
-  def send_future_employee_invitation_for_open_enrollment!(census_employee)
-    UserMailer.send_future_employee_open_enrollment_email(invitation_email, census_employee, self).deliver_now
-  end
-
-  def send_initial_employee_invitation_for_open_enrollment!(census_employee)
-    UserMailer.send_initial_employee_open_enrollment_email(invitation_email, census_employee, self).deliver_now
+  def send_employee_invitation_for_open_enrollment!(census_employee)
+    UserMailer.send_employee_open_enrollment_invitation(invitation_email, census_employee, self).deliver_now
   end
 
   def send_renewal_invitation!(census_employee)
@@ -222,7 +218,7 @@ class Invitation
     end
   end
 
-  def self.invite_initial_employee_for_open_enrollment!(census_employee)
+  def self.invite_employee_for_open_enrollment!(census_employee)
     if !census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
@@ -230,20 +226,7 @@ class Invitation
         :source_id => census_employee.id,
         :invitation_email => census_employee.email_address
       )
-      invitation.send_initial_employee_invitation_for_open_enrollment!(census_employee)
-      invitation
-    end
-  end
-
-  def self.invite_future_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
-      invitation = self.create(
-        :role => "employee_role",
-        :source_kind => "census_employee",
-        :source_id => census_employee.id,
-        :invitation_email => census_employee.email_address
-      )
-      invitation.send_future_employee_invitation_for_open_enrollment!(census_employee)
+      invitation.send_employee_invitation_for_open_enrollment!(census_employee)
       invitation
     end
   end

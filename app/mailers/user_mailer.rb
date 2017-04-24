@@ -24,18 +24,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def send_future_employee_open_enrollment_email(email, census_employee, invitation)
+  def send_employee_open_enrollment_invitation(email, census_employee, invitation)
     if email.present?
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
-      end
-    end
-  end
-
-  def send_initial_employee_open_enrollment_email(email, census_employee, invitation)
-    if email.present?
-      mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
-        format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        if census_employee.hired_on > TimeKeeper.date_of_record
+          format.html { render "invite_future_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        elsif census_employee.hired_on <= TimeKeeper.date_of_record
+          format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
+        end
       end
     end
   end
