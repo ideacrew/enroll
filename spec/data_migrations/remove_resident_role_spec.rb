@@ -18,10 +18,8 @@ describe RemoveResidentRole do
 
     it "should delete the resident role for person1 and not for person2" do
       subject.migrate
-      #binding.pry
       person1.reload
       person2.reload
-      binding.pry
       expect(person1.resident_role).to be(nil)
       expect(person2.resident_role).not_to be_nil
     end
