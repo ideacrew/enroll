@@ -215,12 +215,26 @@ QuotePageLoad = (function() {
         $('#nationwide #true').prop('checked', false).removeClass('active')
         $('#nationwide #false').prop('checked', false).removeClass('active')
         $('#nationwide').addClass('blocking')
+        $('#dc_in_network #false').prop('checked', false).removeClass('active')
       }
       else if ($('#nationwide').hasClass('blocking')) {
         $('#nationwide #any').prop('checked', true).addClass('active')
         $('#nationwide #true').prop('checked', false).removeClass('active')
         $('#nationwide #false').prop('checked', false).removeClass('active')
         $('#nationwide').removeClass('blocking')
+        $('#dc_in_network #true').prop('checked', false).removeClass('active')
+      }
+    }
+  }
+
+  var true_or_false_checkboxes = function(selected) {
+    var criteria_id = selected.parentNode.parentNode.id
+    if (criteria_id == 'nationwide') {
+      if (selected.id == 'true' && selected.checked) {
+        $('#nationwide #false').prop('checked', false).removeClass('active')
+      }
+      else {
+        $('#nationwide #true').prop('checked', false).removeClass('active')
       }
     }
   }
@@ -270,6 +284,7 @@ QuotePageLoad = (function() {
               $(this).removeClass('active')
           }
           disable_nationwide_if_dc_selected(selected);
+          true_or_false_checkboxes(selected);
           toggle_plans([])
           reset_selected_plans()
       })
