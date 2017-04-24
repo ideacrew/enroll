@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_conversion_flag")
 
-describe PopulateConversionFlag do
+describe PopulateConversionFlag, dbclean: :after_each do
 
   let(:given_task_name) { "populate_conversion_flag" }
   subject { PopulateConversionFlag.new(given_task_name, double(:current_scope => nil)) }
@@ -10,7 +10,7 @@ describe PopulateConversionFlag do
   let(:profile_source) { 'self_serve' }
   let!(:employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear, profile_source: profile_source, start_on: start_on, registered_on: 3.months.ago)}
 
-  describe "non conversion employer" do
+  context "non conversion employer" do
     it "should set conversion flag to false" do
       subject.migrate
       employer_profile.reload
@@ -19,7 +19,7 @@ describe PopulateConversionFlag do
     end
   end
 
-  describe "conversion employer" do
+  context "conversion employer" do
     let(:profile_source) { "conversion" }
 
     it "should set conversion flag to true" do
