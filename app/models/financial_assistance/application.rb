@@ -3,8 +3,7 @@ class FinancialAssistance::Application
   include Mongoid::Timestamps
   include AASM
 
-  embedded_in :tax_household_member, class_name: "::TaxHouseholdMember"
-
+  embedded_in :household, class_name: "::Household"
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
   
@@ -46,6 +45,8 @@ class FinancialAssistance::Application
 
   field :is_ridp_verified, type: Boolean
 
+  embeds_many :tax_households, class_name: "::TaxHousehold"
+  embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
   embeds_many :workflow_state_transitions, as: :transitional
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
@@ -168,6 +169,15 @@ class FinancialAssistance::Application
     return nil unless tax_household_member
     return @eligibility_determination if defined? @eligibility_determination
     @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
+  end
+
+  # [Application] may have 1 to Many [ED & THH]. Refactor as necessary.
+  def latest_eligibility_determination
+    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  end
+
+  def latest_active_tax_household
+    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
   end
 
   # Evaluate if receiving Alternative Benefits this year
