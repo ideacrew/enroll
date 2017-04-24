@@ -1,0 +1,10 @@
+<%= fields_for :address do |a| %>
+      <%= a.select :county, options_for_select(@counties.pluck(:county)), {include_blank: "SELECT COUNTY"}, required: true%>
+ <% end %>
+<%#= form_for(@organization) do |f| %>
+  <%#= f.fields_for :office_locations, errors: {}, fieldset: false do |o| %>
+    <%#= o.fields_for :address do |a| %>
+      <%#= a.select :county, options_for_select(@counties.pluck(:county)), {include_blank: "SELECT COUNTY"}, required: true%>
+    <%# end %>
+  <%# end %>
+<%# end %>

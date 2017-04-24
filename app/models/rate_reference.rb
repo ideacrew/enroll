@@ -32,11 +32,10 @@ end
  
    validates_presence_of :zip_code, :county, :rating_region, :multiple_counties
 
-   class << self
-   def find_rating_region(zip, county)
-     record = self.where(zip_code: zip, county: county).first
-     record.present? ? record : nil
-   end
-   end
- end
->>>>>>> County UI-2
+   #class << self
+   #def find_rating_region(zip, county)
+   # record = self.where(zip_code: zip, county: county).first
+   # record.present? ? record : nil
+   #end
+   #end
+ end>>>>>>> County UI-2
