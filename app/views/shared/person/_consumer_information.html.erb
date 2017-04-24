@@ -27,9 +27,6 @@
                                                  required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
     </div>
 
-    <div id="dialog" title="SOCIAL SECURITY INVALID" style="display: none;">
-      <p>Check the SSN you entered. This is an invalid sequence</p>
-    </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>
