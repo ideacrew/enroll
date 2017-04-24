@@ -453,6 +453,7 @@ class CensusEmployee < CensusMember
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
+      CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
     def terminate_scheduled_census_employees(as_of_date = TimeKeeper.date_of_record)
@@ -473,6 +474,25 @@ class CensusEmployee < CensusMember
       census_employees_for_termination = CensusEmployee.where(:aasm_state => "employee_termination_pending").select { |ce| ce.employment_terminated_on <= as_of_date}
       census_employees_for_termination.each do |census_employee|
         census_employee.terminate_employee_role!
+      end
+    end
+
+    def census_employee_open_enrollment_reminder_notice(date)
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:aasm_state.in => ["enrolling", "renewing_enrolling"], :open_enrollment_end_on => date+2.days}})
+      organizations.each do |org|
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+        #exclude congressional employees
+        next if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          begin
+            #exclude new hires
+            next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
+          rescue Exception => e
+            puts "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" unless Rails.env.test?
+          end
+        end
       end
     end
 
