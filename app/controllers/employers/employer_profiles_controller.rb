@@ -298,6 +298,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   #    end
     
       @counties = RateReference.where(zip_code: params[:zip_code])
+      puts @counties.inspect
       if @counties.present?
         render partial: 'employers/employer_profiles/county_field'
       else
