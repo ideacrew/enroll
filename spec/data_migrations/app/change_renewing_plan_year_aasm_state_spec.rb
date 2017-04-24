@@ -35,22 +35,14 @@ describe ChangeRenewingPlanYearAasmState do
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_publish_pending"
     end
-  end
 
-  describe "updating aasm_state of renewing application ineligible plan year", dbclean: :after_each do
-    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_application_ineligible") }
-    let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
-    let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
-
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
-      allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
-    end
-    
-    it "should update aasm_state of plan year" do
-      subject.migrate
-      plan_year.reload
-      expect(plan_year.aasm_state).to eq "renewing_enrolling"
+    ["renewing_publish_pending", "renewing_application_ineligible"].each do |plan_year_state|
+      it "should update aasm_state of plan year" do
+        plan_year.update_attributes(aasm_state: plan_year_state)
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "renewing_enrolling"
+      end
     end
   end
 end
