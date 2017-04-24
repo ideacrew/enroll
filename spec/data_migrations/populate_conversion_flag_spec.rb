@@ -19,10 +19,10 @@ describe PopulateConversionFlag do
     end
   end
 
-  describe "updating conversion flag of employer" do
+  describe "conversion employer" do
     let(:profile_source) { "conversion" }
 
-    it "should update conversion flag" do
+    it "should set conversion flag to true" do
       subject.migrate
       employer_profile.reload
       expect(employer_profile.active_plan_year.is_conversion).to be_truthy
