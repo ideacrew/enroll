@@ -263,8 +263,8 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Low Enrollment Notice',
-        notice_template: 'notices/shop_employee_notices/low_enrollment_notice_for_employer',
-        notice_builder: 'ShopEmployeeNotices::LowEnrollmentNotice',
+        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
         mpi_indicator: 'MPI_SHOP15',
         notice_trigger_element_group: {
           market_places: ['shop'],

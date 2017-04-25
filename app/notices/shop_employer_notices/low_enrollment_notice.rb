@@ -11,7 +11,7 @@ class ShopEmployerNotices::LowEnrollmentNotice < ShopEmployerNotice
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.renewing_plan_year_drafts.first || employer_profile.plan_years.plan_year_drafts.first
+    plan_year = employer_profile.renewing_plan_year_drafts.first || employer_profile.plan_year_drafts.first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :open_enrollment_end_on => plan_year.open_enrollment_end_on,
           :total_enrolled_count => plan_year.total_enrolled_count,

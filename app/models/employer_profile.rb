@@ -258,7 +258,7 @@ class EmployerProfile
   end
 
   def plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
   end
 
   def is_coversion_employer?
@@ -347,7 +347,7 @@ class EmployerProfile
   end
 
   def renewing_plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft"; set }
   end
 
   def is_primary_office_local?
