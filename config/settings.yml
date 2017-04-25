@@ -31,6 +31,8 @@ site:
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
 
+  inactivity_timeout: 87000
+
   social_media:
     facebook_url: ""
 
