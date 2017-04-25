@@ -273,6 +273,29 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       end
     end
 
+    context "when keep_existing_plan_id_is_nil" do
+      let(:old_hbx) { HbxEnrollment.new }
+      before :each do
+        user = FactoryGirl.create(:user, person: FactoryGirl.create(:person))
+        sign_in user
+        allow(hbx_enrollment).to receive(:save).and_return(true)
+        allow(hbx_enrollment).to receive(:plan=).and_return(true)
+        allow(HbxEnrollment).to receive(:find).and_return old_hbx
+        allow(old_hbx).to receive(:is_shop?).and_return true
+        allow(old_hbx).to receive(:family).and_return family
+        post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, commit: 'Keep existing plan', change_plan: 'change', hbx_enrollment_id: old_hbx.id
+      end
+
+      it "should redirect" do
+        expect(response).to have_http_status(:redirect)
+        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop', hbx_enrollment_id: old_hbx.id))
+      end
+
+      it "should get special enrollment id as nil" do
+        expect(flash[:error]).not_to match /undefined method `id' for nil:NilClass/
+      end
+    end
+
     it "should render group selection page if not valid" do
       user = FactoryGirl.create(:user, id: 96, person: FactoryGirl.create(:person))
       sign_in user
