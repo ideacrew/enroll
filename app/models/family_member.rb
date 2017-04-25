@@ -24,7 +24,7 @@ class FamilyMember
   field :former_family_id, type: BSON::ObjectId
 
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
-
+  scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
   accepts_nested_attributes_for :hbx_enrollment_exemptions
 
@@ -53,15 +53,15 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
+  delegate :indian_tribe_member, to: :person, allow_nil: true
+  delegate :naturalized_citizen, to: :person, allow_nil: true
+  delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
   associated_with_one :person, :person_id, "Person"
-
-  after_create :update_family_status_when_create
-  after_update :update_family_status_when_destroy
 
   def former_family=(new_former_family)
     raise ArgumentError.new("expected Family") unless new_former_family.is_a?(Family)
@@ -72,14 +72,6 @@ class FamilyMember
   def former_family
     return @former_family if defined? @former_family
     @former_family = Family.find(former_family_id) unless former_family_id.blank?
-  end
-
-  def update_family_status_when_create
-    parent.update_aptc_block_status
-  end
-
-  def update_family_status_when_destroy
-    parent.update_aptc_block_status unless is_active
   end
 
   def parent
@@ -141,6 +133,8 @@ class FamilyMember
   end
 
   def self.find(family_member_id)
-    Family.find_family_member(family_member_id)
+    return [] if family_member_id.nil?
+    family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
+    family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
   end
 end

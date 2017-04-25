@@ -295,6 +295,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           last_name: census_employee.last_name,
         }
         @ssn = census_employee.ssn
+        @dob = census_employee.dob
         valid_employee_params = {
           ssn: @ssn,
           gender: census_employee.gender,
@@ -329,7 +330,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
       end
 
       it "should still have a findable person" do
-        people = Person.match_by_id_info(ssn: @ssn)
+        people = Person.match_by_id_info(ssn: @ssn, dob: @dob)
         expect(people.count).to eq 1
         expect(people.first).to be_a Person
       end
@@ -499,6 +500,7 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
         let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
         let(:benefit_group_assignment) {FactoryGirl.create(:benefit_group_assignment, census_employee: census_employee, benefit_group: benefit_group)}
         let(:params) {valid_params}
+        let(:family1) { Family.new }
 
         before do
           plan_year.benefit_groups = [benefit_group]
@@ -534,6 +536,12 @@ RSpec.describe Factories::EnrollmentFactory, :dbclean => :after_each do
           it "should have work email" do
             expect(@employee_role.person.work_email.address).to eq @employee_role.census_employee.email_address
           end
+        end
+
+        it "build_employee_role should call save_relevant_coverage_households" do
+          allow(Family).to receive(:new).and_return family1
+          expect(family1).to receive(:save_relevant_coverage_households)
+          employee_role, family = Factories::EnrollmentFactory.add_employee_role(**params)
         end
       end
     end

@@ -1,30 +1,17 @@
 families = Family.where({
   "households.hbx_enrollments" => {
-   "$elemMatch" => {
-    # "aasm_state" => {
-    #   "$in" => ["enrolled_contingent", "unverified"]
-    #   },
-      "kind" => { "$ne" => "employer_sponsored" },
-      "$or" => [
-        {:terminated_on => nil },
-        {:terminated_on.gt => TimeKeeper.date_of_record}
-      ]
-    }  
-  }
-})
-
-
-# people_ids = Person.where("consumer_role.aasm_state" => /out/i, "consumer_role.lawful_presence_determination.vlp_authority" => {"$ne" => "curam"}).map(&:id)
-# families = Family.where("family_members.person_id" => {"$in" => people_ids})
-
-# families = [127825,19764117,19771408].map{|hbx_id| Person.where(:hbx_id => hbx_id).first}.map(&:primary_family)
+    "$elemMatch" => {
+      "aasm_state" => { "$in" => ["enrolled_contingent"] },
+      "effective_on" => { "$gte" => Date.new(2017,1,1)},
+  } }
+}).to_a
 
 mailing_address_missing = []
 coverage_not_found = []
 pending_ssa_validation = []
 docs_uploaded = []
 
-CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
+CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
     'Primary HbxId',
@@ -46,11 +33,13 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
   families.each do |family|
     counter += 1
 
-    next if ["564d098469702d174fa10000", "565197e569702d6e52dd0000"].include?(family.id.to_s)
+    next if ["5619ca3e54726532e5f7f800", "58a47aae082e7654050000fe", "5845a2fff1244e5da300003d", "58365eab082e76791a000023", "5619c9e954726532e51f6500", "58815e10faca1438a00000ac"].include?(family.id.to_s)
+    next if family.active_household.hbx_enrollments.where(:"special_verification_period".lte => Date.new(2017,03,20)).present?
 
     begin
 
     person = family.primary_applicant.person
+    # Additional checks for the next round of notices
     #  if (person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?)
     #   puts "already notified!!"
     #   next
@@ -58,16 +47,16 @@ CSV.open("verifications_backlog_notice_data_export_1.csv", "w") do |csv|
 
     next if person.inbox.blank?
     next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
-    if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
-      next if secure_message.created_at > 35.days.ago
-    end
+    # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
+    #   next if secure_message.created_at > 35.days.ago
+    # end
 
     if person.consumer_role.blank?
       count += 1
       next
     end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'verifications_backlog').first
+      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {

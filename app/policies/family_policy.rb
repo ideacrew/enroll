@@ -7,8 +7,11 @@ class FamilyPolicy < ApplicationPolicy
   def can_update_ssn?
     return false unless role = user.person && user.person.hbx_staff_role
     role.permission.can_update_ssn
-   end
+  end
+
+  def hbx_super_admin_visible?
+    return false unless role = user.person && user.person.hbx_staff_role
+    role.permission.can_update_ssn
+  end
 
 end
-
-

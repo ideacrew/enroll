@@ -15,6 +15,8 @@ module ShopPolicyCalculations
       member_provider.hbx_enrollment_members
     when CensusEmployee
       [member_provider] + member_provider.census_dependents
+    when QuoteHousehold
+      member_provider.quote_members
     end
   end
 
@@ -32,7 +34,7 @@ module ShopPolicyCalculations
     if age_of(member) > 20
       1.00
     else
-      if child_index(member) > 2
+      if child_index(member) > 2 && @plan.health?
         0.00
       else
         1.00

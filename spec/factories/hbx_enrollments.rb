@@ -4,7 +4,6 @@ FactoryGirl.define do
     kind "employer_sponsored"
     elected_premium_credit 0
     applied_premium_credit 0
-    association :plan, factory: [:plan, :with_premium_tables]
     effective_on {1.month.ago.to_date}
     terminated_on nil
     waiver_reason "this is the reason"
@@ -19,6 +18,17 @@ FactoryGirl.define do
     # hbx_enrollment_members
     # comments
 
+    transient do
+      enrollment_members []
+      active_year TimeKeeper.date_of_record.year
+    end
+
+    plan { create(:plan, :with_premium_tables, active_year: active_year) }
+
+    trait :with_enrollment_members do 
+      hbx_enrollment_members { enrollment_members.map{|member| FactoryGirl.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
+    end
+    
     trait :with_dental_coverage_kind do
       association :plan, factory: [:plan, :with_dental_coverage]
       coverage_kind "dental"
@@ -40,6 +50,11 @@ FactoryGirl.define do
 
     trait :shop do
       kind "employer_sponsored"
+      aasm_state "coverage_selected"
+    end
+
+    trait :cobra_shop do
+      kind "employer_sponsored_cobra"
       aasm_state "coverage_selected"
     end
 
@@ -87,7 +102,6 @@ FactoryGirl.define do
     factory :individual_csr_87_enrollment,       traits: [:individual_assisted, :active_csr_87_plan, :health_plan]
     factory :individual_catastrophic_enrollment, traits: [:individual_assisted, :catastrophic_plan, :health_plan]
     factory :shop_health_enrollment,             traits: [:shop, :health_plan]
-
   end
 
   FactoryGirl.define do

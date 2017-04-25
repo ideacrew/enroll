@@ -53,7 +53,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
-  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double)) }
+  let(:hbx_enrollment) { double("HbxEnrollment", id: "hbx_id", effective_on: double("effective_on", year: double), enrollment_kind: "open_enrollment") }
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
@@ -73,6 +73,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:plan=).with(plan).and_return(true)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
+      allow(hbx_enrollment).to receive(:can_select_coverage?).and_return true
+      allow(hbx_enrollment).to receive(:is_special_enrollment?).and_return false
       allow(benefit_group).to receive(:reference_plan).and_return(:reference_plan)
       allow(PlanCostDecorator).to receive(:new).and_return(true)
       allow(hbx_enrollment).to receive(:may_select_coverage?).and_return(true)
@@ -118,7 +120,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before :each do
         request.env["HTTP_REFERER"] = "/home"
         allow(employee_role).to receive(:hired_on).and_return(TimeKeeper.date_of_record - 10.days)
-        allow(hbx_enrollment).to receive(:may_select_coverage?).and_return false
+        allow(hbx_enrollment).to receive(:can_select_coverage?).and_return false
         allow(hbx_enrollment).to receive(:errors).and_return(errors)
         allow(errors).to receive(:full_messages).and_return("You can not keep an existing plan which belongs to previous plan year")
       end
@@ -143,6 +145,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
     let(:reference_plan) { double("Plan") }
     let(:employee_role) { double("EmployeeRole") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -161,6 +164,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       get :receipt, id: "id"
       expect(response).to have_http_status(:success)
     end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :receipt, id: "id"
+      expect(assigns(:employer_profile)).to eq employer_profile
+    end
   end
 
   context "GET thankyou" do
@@ -171,6 +183,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:reference_plan) { double("Plan") }
     let(:family) { double("Family") }
     let(:plan_year) { double("PlanYear") }
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
       allow(user).to receive(:person).and_return(person)
@@ -206,6 +219,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       sign_in(user)
       get :thankyou, id: "id", plan_id: "plan_id"
       expect(assigns(:waivable)).to be_truthy
+    end
+
+    it "should get employer_profile" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return('health')
+      allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      sign_in(user)
+      get :thankyou, id: "id", plan_id: "plan_id"
+      expect(assigns(:employer_profile)).to eq employer_profile
     end
 
     it "returns http success as BROKER" do
@@ -298,7 +320,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     it "should record termination submitted date on terminate of hbx_enrollment" do
       expect(enrollment.termination_submitted_on).to eq nil
       post :terminate, id: "hbx_id"
-      expect(enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
+      expect(enrollment.termination_submitted_on).to be_within(1.second).of TimeKeeper.datetime_of_record
       expect(response).to be_redirect
     end
   end
@@ -469,6 +491,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(person).to receive(:active_employee_roles).and_return []
+          allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           get :show, id: "hbx_id"
         end
 
@@ -485,6 +509,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           get :show, id: "hbx_id"
         end
 
@@ -501,6 +526,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
           get :show, id: "hbx_id"
@@ -511,6 +537,26 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         end
 
         it "should get default selected_aptc" do
+          expect(session[:elected_aptc]).to eq 0
+        end
+      end
+
+      context "with tax_household and plan shopping in shop market" do
+        before :each do
+          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
+          allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return []
+          allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
+          allow(hbx_enrollment).to receive(:kind).and_return 'shop'
+          get :show, id: "hbx_id"
+        end
+
+        it "should get max_aptc" do
+          expect(session[:max_aptc]).to eq 0
+        end
+
+        it "should get default selected_aptc_pct" do
           expect(session[:elected_aptc]).to eq 0
         end
       end

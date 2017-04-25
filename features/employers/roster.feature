@@ -30,3 +30,32 @@ Feature: Employer can view their employees
     Then employer should see employee roaster
     And employer should also see termination date
     And employer logs out
+  Scenario: Employer views their employees and this ER has linked EEs
+    Given an employer exists
+    And the employer has employees
+    And the employer is logged in
+    When they visit the Employee Roster
+    And employer clicks on linked employee with address
+    Then employer should not see the address on the roster
+    And employer clicks on cancel button
+    And employer clicks on linked employee without address
+    Then employer should see the address on the roster
+    And employer populates the address field
+    And employer clicks on update employee
+    Then employer should not see the address on the roster
+    And employer clicks on cancel button
+    And employer clicks on non-linked employee with address
+    Then employer should not see the address on the roster
+    And employer clicks on cancel button
+    And employer clicks on non-linked employee without address
+    Then employer should see the address on the roster
+    And employer logs out
+  Scenario: Employer adds employee with future hire date
+    Given an employer exists
+    And the employer has employees
+    And the employer is logged in
+    When they visit the Employee Roster
+    And clicks on the Add New Employee button
+    Then fill the form with hired date as future date
+    Then employer should see the message Your employee was successfully added to your roster on page
+    And employer logs out

@@ -21,9 +21,13 @@ class EmployerProfile
   INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
+  ENROLLED_STATE = %w(enrolled suspended)
 
   field :entity_kind, type: String
   field :sic_code, type: String
+
+#  field :converted_from_carrier_at, type: DateTime, default: nil
+#  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
@@ -93,16 +97,6 @@ class EmployerProfile
     CensusEmployee.find_by_employer_profile(self)
   end
 
-  def benefit_group_assignments
-    benefit_group_assignments = []
-    self.census_employees.each do |census_employee|
-      census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-        benefit_group_assignments << benefit_group_assignment
-      end
-    end
-    return benefit_group_assignments
-  end
-
   def covered_employee_roles
     covered_ee_ids = CensusEmployee.by_employer_profile_id(self.id).covered.only(:employee_role_id)
     EmployeeRole.ids_in(covered_ee_ids)
@@ -145,6 +139,8 @@ class EmployerProfile
     return unless active_broker_agency_account
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
+    active_broker_agency_account.save!
+    notify_broker_terminated
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -160,8 +156,14 @@ class EmployerProfile
   end
 
   def active_broker
-    if active_broker_agency_account
+    if active_broker_agency_account && active_broker_agency_account.writing_agent_id
       Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
+    end
+  end
+
+  def active_broker_agency_legal_name
+    if active_broker_agency_account
+      active_broker_agency_account.ba_name
     end
   end
 
@@ -180,7 +182,7 @@ class EmployerProfile
 
   def active_general_agency_legal_name
     if active_general_agency_account
-      active_general_agency_account.legal_name
+      active_general_agency_account.ga_name
     end
   end
 
@@ -212,12 +214,17 @@ class EmployerProfile
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
+    notify_general_agent_terminated
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
+  end
+
+  def notify_general_agent_terminated
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -234,7 +241,8 @@ class EmployerProfile
   end
 
   def latest_plan_year
-    plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
+    return @latest_plan_year if defined? @latest_plan_year
+    @latest_plan_year = plan_years.order_by(:'start_on'.desc).limit(1).only(:plan_years).first
   end
 
   def draft_plan_year
@@ -258,12 +266,12 @@ class EmployerProfile
   end
 
   def find_plan_year_by_effective_date(target_date)
-    plan_year = (plan_years.published + plan_years.renewing_published_state).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
     if plan_year.present?
-      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.first : plan_year
+      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.try(:first) : plan_year
     else
       plan_year
     end
@@ -320,8 +328,22 @@ class EmployerProfile
     plan_years.renewing.first
   end
 
-  def can_transmit_xml?
-    !self.renewing_plan_year.present? && !self.binder_paid?
+  def is_transmit_xml_button_disabled?
+    (!self.renewing_plan_year.present? && !self.binder_paid?) || binder_criteria_satisfied?
+  end
+
+  def binder_criteria_satisfied?
+    show_plan_year.present? &&
+    participation_count == 0 &&
+    non_owner_participation_criteria_met?
+  end
+
+  def participation_count
+    show_plan_year.additional_required_participants_count
+  end
+
+  def non_owner_participation_criteria_met?
+    show_plan_year.assigned_census_employees_without_owner.present?
   end
 
   def renewing_plan_year_drafts
@@ -330,6 +352,75 @@ class EmployerProfile
 
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
+  end
+  
+  def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
+    quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
+
+    # Perform quote link if claim_code is valid
+    if quote.present? && !quote_claim_code.blank? && quote.published?
+
+      plan_year = self.plan_years.build({
+        start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
+        open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
+        fte_count: quote.member_count
+        })
+
+      benefit_group_mapping = Hash.new
+
+      # Build each quote benefit group from quote
+      quote.quote_benefit_groups.each do |quote_benefit_group|
+        benefit_group = plan_year.benefit_groups.build({plan_option_kind: quote_benefit_group.plan_option_kind, title: quote_benefit_group.title, description: "Linked from Quote with claim code " + quote_claim_code })
+
+        # map quote benefit group to newly created plan year benefit group so it can be assigned to census employees if imported
+        benefit_group_mapping[quote_benefit_group.id.to_s] = benefit_group.id
+
+        # Assign benefit group plan information (HEALTH)
+        benefit_group.lowest_cost_plan_id = quote_benefit_group.published_lowest_cost_plan
+        benefit_group.reference_plan_id = quote_benefit_group.published_reference_plan
+        benefit_group.highest_cost_plan_id = quote_benefit_group.published_highest_cost_plan
+        benefit_group.elected_plan_ids.push(quote_benefit_group.published_reference_plan)
+        benefit_group.dental_plan_option_kind = quote_benefit_group.dental_plan_option_kind
+        benefit_group.relationship_benefits = quote_benefit_group.quote_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+
+        # Assign benefit group plan information (DENTAL )
+        benefit_group.dental_reference_plan_id = quote_benefit_group.published_dental_reference_plan
+        benefit_group.elected_dental_plan_ids = quote_benefit_group.elected_dental_plan_ids
+
+        benefit_group.dental_relationship_benefits = quote_benefit_group.quote_dental_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+
+      end
+
+      if plan_year.save!
+
+        quote.claim!
+
+        if import_census_employee == true
+          quote.quote_households.each do |qhh|
+            qhh_employee = qhh.employee
+            if qhh.employee.present?
+                quote_employee = qhh.employee
+                ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
+                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s))
+
+                qhh.dependents.each do |qhh_dependent|
+                  ce.census_dependents << CensusDependent.new(
+                    last_name: qhh_dependent.last_name, first_name: qhh_dependent.first_name, dob: qhh_dependent.dob, employee_relationship: qhh_dependent.employee_relationship
+                    )
+                end
+                ce.save(:validate => false)
+            end
+          end
+        end
+
+        return true
+
+      end
+
+    end
+
+    return false
+
   end
 
   ## Class methods
@@ -573,7 +664,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => :notify_binder_paid
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -647,7 +738,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update
+  after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -689,10 +780,11 @@ class EmployerProfile
   #   registered? or published_plan_year.enrolling?
   # end
 
-  def self.update_status_to_binder_paid(employer_profile_ids)
-    employer_profile_ids.each do |id|
-      empr = self.find(id)
-      empr.update_attribute(:aasm_state, "binder_paid")
+  def self.update_status_to_binder_paid(organization_ids)
+    organization_ids.each do |id|
+      if org = Organization.find(id)
+        org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+      end
     end
   end
 
@@ -716,6 +808,32 @@ class EmployerProfile
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
+  def notify_initial_binder_paid
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+  end
+
+  def notify_broker_added
+    changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? &&  changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.broker_added", {employer_id: self.hbx_id, event_name: "broker_added"})
+    end
+  end
+
+  def notify_broker_terminated
+    notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+  end
+
+  def notify_general_agent_added
+    changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? && changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
+    end
+  end
+
+  def conversion_employer?
+    !self.converted_from_carrier_at.blank?
+  end
+  
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
@@ -724,6 +842,11 @@ class EmployerProfile
 
   def is_conversion?
     self.profile_source == "conversion"
+  end
+
+
+  def trigger_notices(event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
 private
@@ -780,6 +903,6 @@ private
   end
 
   def plan_year_publishable?
-    published_plan_year.is_application_valid?
+    !published_plan_year.is_application_unpublishable? 
   end
 end
