@@ -262,7 +262,7 @@ class EmployerProfile
   end
 
   def is_converting?
-    is_conversion_employer? && (published_plan_year.present? && published_plan_year.is_conversion)
+    is_conversion_employer? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
   def is_conversion_employer?
