@@ -140,7 +140,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     context "employee portal" do
       it "should not match options that are in consumer portal" do
-        expect(helper.relationship_options(dependent, "")).not_to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "")).to match(/Domestic Partner/mi)
         expect(helper.relationship_options(dependent, "")).not_to match(/other tax dependent/mi)
       end
     end

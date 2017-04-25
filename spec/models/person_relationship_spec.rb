@@ -22,6 +22,23 @@ describe PersonRelationship, dbclean: :after_each do
     end
 
     let(:consumer_relationship_kinds) { [
+        "self",
+        "spouse",
+        "domestic_partner",
+        "child",
+        "parent",
+        "sibling",
+        "ward",
+        "guardian",
+        "unrelated",
+        "other_tax_dependent",
+        "aunt_or_uncle",
+        "nephew_or_niece",
+        "grandchild",
+        "grandparent"
+      ] }
+
+    let(:relationships_UI)  { [
       "self",
       "spouse",
       "domestic_partner",
@@ -33,7 +50,7 @@ describe PersonRelationship, dbclean: :after_each do
       "nephew_or_niece",
       "grandchild",
       "grandparent"
-      ] }
+    ] }
 
     let(:kinds) {  [
       "spouse",
@@ -53,6 +70,7 @@ describe PersonRelationship, dbclean: :after_each do
       "grandparent",
       "great_grandchild",
       "great_grandparent",
+      "guardian",
       "nephew_or_niece",
       "other_relationship",
       "parent",
@@ -61,25 +79,24 @@ describe PersonRelationship, dbclean: :after_each do
       "stepchild",
       "stepparent",
       "trustee",
-      "unrelated"
+      "unrelated",
+      "ward"
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
       let(:params){ valid_params.deep_merge!({kind: "other_tax_dependent"}) }
-      let(:params2){ valid_params.deep_merge!({kind: "spouse"}) }
 
       it "consumer relationships should be matched" do
         expect(BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS).to eq consumer_relationship_kinds
       end
 
-      it "should not be valid if kind is not present in person_relationship" do
-        expect(PersonRelationship.new(**params).valid?).to be_falsey
+      it "consumer relationships displayed on UI should match" do
+        expect(BenefitEligibilityElementGroup::Relationships_UI).to eq relationships_UI
       end
 
-      it "should be valid if kind is present" do
-        expect(PersonRelationship.new(**params2).valid?).to be_truthy
+      it "should be valid if kind is present in person_relationship" do
+        expect(PersonRelationship.new(**params).valid?).to be_truthy
       end
-
     end
 
     it "relationships should be sorted" do

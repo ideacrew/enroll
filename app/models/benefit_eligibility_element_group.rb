@@ -12,6 +12,23 @@ class BenefitEligibilityElementGroup
       child
       parent
       sibling
+      ward
+      guardian
+      unrelated
+      other_tax_dependent
+      aunt_or_uncle
+      nephew_or_niece
+      grandchild
+      grandparent
+    )
+
+  Relationships_UI = %w(
+      self
+      spouse
+      domestic_partner
+      child
+      parent
+      sibling
       unrelated
       aunt_or_uncle
       nephew_or_niece

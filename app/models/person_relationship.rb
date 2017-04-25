@@ -32,6 +32,7 @@ class PersonRelationship
     "grandparent",
     "great_grandchild",
     "great_grandparent",
+    "guardian",
     "nephew_or_niece",
     "other_relationship",
     "parent",
@@ -40,7 +41,21 @@ class PersonRelationship
     "stepchild",
     "stepparent",
     "trustee", # no inverse
-    "unrelated"
+    "unrelated",
+    "ward"
+  ]
+
+  Relationships_UI = [
+    "spouse",
+    "domestic_partner",
+    "child",
+    "parent",
+    "sibling",
+    "unrelated",
+    "aunt_or_uncle",
+    "nephew_or_niece",
+    "grandchild",
+    "grandparent"
   ]
 
   InverseMap = {
