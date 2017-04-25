@@ -290,15 +290,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
   
   def get_counties
-  #    if params[:id].present?
-  #      @organization = Organization.find('58eb1aa588dd7c03ca00000d')
-  #      @employer_profile = @organization.employer_profile
-  #    else
-  #      @organization = Forms::EmployerProfile.new
-  #    end
-    
+      params.permit([:child_index, :zip_code])
+      @child_index = params[:child_index]
       @counties = RateReference.where(zip_code: params[:zip_code])
-      puts @counties.inspect
       if @counties.present?
         render partial: 'employers/employer_profiles/county_field'
       else
