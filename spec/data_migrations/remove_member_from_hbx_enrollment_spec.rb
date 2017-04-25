@@ -44,7 +44,6 @@ describe RemoveMemberFromHbxEnrollment do
       end
       it "should remove the related hbx_enrollment_member from the hbx_enrollment" do
         size=hbx_enrollment.hbx_enrollment_members.size
-        puts size
         expect(hbx_enrollment.hbx_enrollment_members.size).to eq size
         subject.migrate
         household.reload
