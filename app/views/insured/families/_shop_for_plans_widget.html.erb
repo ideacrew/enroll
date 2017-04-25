@@ -51,11 +51,12 @@
         </button>
         <div class="row">
           <div class="col-sm-12">
-            <% if @person.consumer_role.present? || @person.active_employee_roles.any? %>
+            <% if @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? %>
             <% options = {shop_for_plan: 'shop_for_plan'}
               options.merge!(person_id: @person.id) if @person.present?
               options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
               options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
+              options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
             %>
             <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
             You are not under open enrollment period.
