@@ -27,6 +27,7 @@ class PlanYear
   field :terminated_on, type: Date
 
   field :imported_plan_year, type: Boolean, default: false
+  field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -958,7 +959,7 @@ class PlanYear
 
   # Checks for external plan year
   def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
+    self.employer_profile.is_conversion_employer? && self.is_conversion
   end
 
   alias_method :external_plan_year?, :can_be_migrated?
@@ -1026,7 +1027,7 @@ class PlanYear
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.converting?
+    if self.employer_profile.is_converting?
       self.employer_profile.trigger_notices("conversion_group_renewal")
     else
       self.employer_profile.trigger_notices("group_renewal_5")

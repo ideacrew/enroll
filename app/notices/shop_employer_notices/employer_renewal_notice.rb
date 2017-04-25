@@ -5,7 +5,7 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
     append_data
     generate_pdf_notice
 
-    if employer_profile.converting?
+    if employer_profile.is_converting?
       conversion_attachment
     end
     attach_envelope

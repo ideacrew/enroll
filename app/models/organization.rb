@@ -284,7 +284,7 @@ class Organization
 
   def self.upload_invoice_to_print_vendor(file_path,file_name)
     org = by_invoice_filename(file_path) rescue nil
-    if org.employer_profile.converting?
+    if org.employer_profile.is_converting?
       bucket_name= Settings.paper_notice
       begin
         doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)

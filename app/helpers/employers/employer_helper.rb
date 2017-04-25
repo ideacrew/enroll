@@ -164,7 +164,7 @@ module Employers::EmployerHelper
     plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year rescue nil
     return false if plan_year.blank?
 
-    if employer_profile.is_coversion_employer?
+    if employer_profile.is_conversion_employer?
       return false if employer_profile.plan_years.count > 2
     else
       return false if plan_year.is_renewing?

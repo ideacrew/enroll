@@ -2049,12 +2049,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "this should trigger a state transition" do
       it "should change its aasm state" do
+        workflow_plan_year_with_benefit_group.update(is_conversion: true)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
         workflow_plan_year_with_benefit_group.conversion_expire!
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "conversion_expired"
       end
 
       it "should not change its aasm state" do
+        workflow_plan_year_with_benefit_group.update(is_conversion: true)
         workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
         workflow_plan_year_with_benefit_group.save
         expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)

@@ -50,7 +50,7 @@ module EventsHelper
   end
 
   def is_initial_or_conversion_employer?(employer)
-    (employer.published_plan_year.present? && employer.renewing_published_plan_year.blank?) && (!employer.is_conversion? || (employer.is_conversion? && !employer.published_plan_year.coverage_period_contains?(employer.registered_on)))
+    (employer.published_plan_year.present? && employer.renewing_published_plan_year.blank?) && (!employer.is_conversion? || (employer.is_conversion? && !employer.published_plan_year.is_conversion))
   end
 
   def is_renewal_employer?(employer)
@@ -58,11 +58,11 @@ module EventsHelper
   end
 
   def is_renewing_conversion_employer?(employer)
-    employer.is_conversion? && employer.published_plan_year.present? && !employer.published_plan_year.coverage_period_contains?(employer.registered_on) && employer.renewing_published_plan_year.present?
+    employer.is_conversion? && employer.published_plan_year.present? && !employer.published_plan_year.is_conversion && employer.renewing_published_plan_year.present?
   end
 
   def is_new_conversion_employer?(employer)
-    employer.is_conversion? && employer.active_plan_year.present? && employer.active_plan_year.coverage_period_contains?(employer.registered_on) && employer.renewing_published_plan_year.present?
+    employer.is_conversion? && employer.active_plan_year.present? && employer.active_plan_year.is_conversion && employer.renewing_published_plan_year.present?
   end
 
   def is_renewal_or_conversion_employer?(employer)
