@@ -86,8 +86,9 @@ class PersonRelationship
   field :predecessor_id, type: BSON::ObjectId
   field :successor_id, type: BSON::ObjectId
   field :family_id, type: BSON::ObjectId
+  field :inferred_relationship, type: Boolean, default: false
 
-	validates_presence_of :relative_id, message: "Choose a relative"
+	# validates_presence_of :relative_id, message: "Choose a relative"
   validates_presence_of :predecessor_id, :successor_id
   validates :kind,
             presence: true,

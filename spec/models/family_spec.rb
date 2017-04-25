@@ -57,7 +57,7 @@ describe Family, type: :model, dbclean: :after_each do
   let(:spouse)  { FactoryGirl.create(:person)}
   let(:person) do
     p = FactoryGirl.build(:person)
-    p.person_relationships.build(relative: spouse, kind: "spouse")
+    p.person_relationships.build(predecessor_id: p.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
     p.save
     p
   end
@@ -212,7 +212,7 @@ describe Family, type: :model, dbclean: :after_each do
               let(:second_family_member_person) { FamilyMember.new(person: person) }
 
               before do
-                spouse.person_relationships.build(:relative_id => person.id, :kind => "spouse")
+                spouse.person_relationships.build(predecessor_id: spouse.id, :successor_id => person.id, :kind => "spouse", family_id: second_family.id)
                 second_family.family_members = [second_family_member_person, second_family_member_spouse]
               end
 
@@ -677,8 +677,8 @@ describe Family, "with a primary applicant" do
     }
 
     before(:each) do
-      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse")
-      allow(primary_applicant).to receive(:find_relationship_with).with(dependent).and_return(nil)
+      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse", subject.id)
+      allow(primary_applicant).to receive(:find_relationship_with).with(dependent, subject.id).and_return(nil)
     end
 
     it "should relate the person and create the family member" do
@@ -1155,8 +1155,8 @@ describe Family, "with 2 households a person and 2 extended family members", :db
   before(:each) do
     f_id = family.id
     family.add_family_member(primary, is_primary_applicant: true)
-    family.relate_new_member(family_member_person_1, "unknown")
-    family.relate_new_member(family_member_person_2, "unknown")
+    family.relate_new_member(family_member_person_1, "unrelated")
+    family.relate_new_member(family_member_person_2, "unrelated")
     family.save!
   end
 

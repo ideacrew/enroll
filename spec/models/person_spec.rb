@@ -72,9 +72,10 @@ describe Person do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship.
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil

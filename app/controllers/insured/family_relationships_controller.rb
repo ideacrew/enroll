@@ -25,6 +25,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships
+
 	end
 
   def create
@@ -39,11 +40,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
 
     respond_to do |format|
       format.html {
-        if @missing_relationships.blank?
-          redirect_to params[:redirect_url]
-        else
-          redirect_to insured_family_relationships_path(employee_role_id: params[:employee_role_id], consumer_role_id: params[:consumer_role_id], resident_role_id: params[:resident_role_id]), notice: 'Relationship was successfully updated.'
-        end
+        redirect_to insured_family_relationships_path(employee_role_id: params[:employee_role_id], consumer_role_id: params[:consumer_role_id], resident_role_id: params[:resident_role_id]), notice: 'Relationship was successfully updated.'
       }
       format.js
     end

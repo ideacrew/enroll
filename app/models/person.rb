@@ -428,31 +428,46 @@ class Person
     end.map(&:relative)
   end
 
-  def find_relationship_with(other_person)
+  def find_relationship_with(other_person, family_id)
     if self.id == other_person.id
       "self"
     else
-      person_relationship_for(other_person).try(:kind)
+      person_relationship_for(other_person, family_id).try(:kind)
     end
   end
 
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
+  def person_relationship_for(other_person, family_id)
+    person_relationships.where(successor_id: other_person.id, predecessor_id: self.id, family_id: family_id).first
+    # person_relationships.detect do |person_relationship|
+    #   person_relationship.relative_id == other_person.id
+    # end
   end
 
-  def ensure_relationship_with(person, relationship)
+  def ensure_relationship_with(person, relationship, family_id)
     return if person.blank?
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+    # existing_relationship = self.person_relationships.detect do |rel|
+    #   rel.relative_id.to_s == person.id.to_s
+    # end
+    direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: person.id).first
+    inverse_relationship = person.person_relationships.where(family_id: family_id, predecessor_id: person.id, successor_id: self.id).first
+    if direct_relationship.present? && inverse_relationship.present?
+      direct_relationship.update_attributes(:kind => relationship)
+      inverse_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
+      # existing_relationship.update_attributes(:kind => relationship)
     else
       self.person_relationships << PersonRelationship.new({
         :kind => relationship,
-        :relative_id => person.id
+        # :relative_id => person.id,
+        :successor_id => person.id,
+        :predecessor_id => self.id,
+        :family_id => family_id
+      })
+      person.person_relationships << PersonRelationship.new({
+        :kind => PersonRelationship::InverseMap[relationship],
+        # :relative_id => person.id,
+        :successor_id => self.id,
+        :predecessor_id => person.id,
+        :family_id => family_id
       })
     end
   end
@@ -891,10 +906,10 @@ class Person
       # Destroying the relationships associated to the Person other than the new updated relationship.
       if direct_relationship != nil && destroy_relation
         other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
-        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id], inferred_relationship: true).each(&:destroy)
 
         other_relations.each do |otr|
-          Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first.destroy
+          Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id, inferred_relationship: true).first.destroy
         end
       end
 

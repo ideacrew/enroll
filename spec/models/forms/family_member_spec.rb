@@ -291,8 +291,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
-      expect(new_person).to receive(:add_relationship).with(new_person2, relationship, family_id, true).and_return(true)
-      expect(new_person2).to receive(:add_relationship).with(new_person, PersonRelationship::InverseMap[relationship], family_id).and_return(true)
       expect(family).to receive(:build_relationship_matrix).and_return(true)
       subject.save
     end
@@ -300,8 +298,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     it "should create a new family member and call save_relevant_coverage_households" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
-      expect(new_person).to receive(:add_relationship).with(new_person2, relationship, family_id, true).and_return(true)
-      expect(new_person2).to receive(:add_relationship).with(new_person, PersonRelationship::InverseMap[relationship], family_id).and_return(true)
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id

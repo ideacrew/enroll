@@ -541,7 +541,8 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    #primary_applicant_person.ensure_relationship_with(person, relationship) #old_code
+    #binding.pry
+    primary_applicant_person.ensure_relationship_with(person, relationship, self.id) #old_code
     add_family_member(person)
   end
 
@@ -559,7 +560,7 @@ class Family
     is_consent_applicant  = opts[:is_consent_applicant]  || false
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
-
+    # binding.pry
     if existing_family_member
       active_household.add_household_coverage_member(existing_family_member)
       existing_family_member.is_active = true
@@ -969,8 +970,8 @@ class Family
 
       if s_ids.count > s_ids.uniq.count
         members = Person.where(:id.in => rel.to_a.flatten)
-        members.second.add_relationship(members.first, "sibling", family_id)
-        members.first.add_relationship(members.second, "sibling", family_id)
+        members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling", inferred_relationship: true)
+        members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling", inferred_relationship: true)
         missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
       end
     end
@@ -995,15 +996,15 @@ class Family
         if parent_rel1 && child_rel1
           grandchild = Person.where(id: second_rel).first
           grandparent = Person.where(id: first_rel).first
-          grandparent.add_relationship(grandchild, "grandparent", family_id)
-          grandchild.add_relationship(grandparent, "grandchild", family_id)
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
         elsif parent_rel2 && child_rel2
           grandchild = Person.where(id: first_rel).first
           grandparent = Person.where(id: second_rel).first
-          grandparent.add_relationship(grandchild, "grandparent", family_id)
-          grandchild.add_relationship(grandparent, "grandchild", family_id)
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
+          members.first.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
         else
@@ -1023,8 +1024,8 @@ class Family
         spouse_relation = Person.find(parent_rel1.successor_id).person_relationships.where(family_id: family_id, predecessor_id: parent_rel1.successor_id, successor_id: parent_rel2.successor_id, kind: "spouse").first
         if spouse_relation.present?
           members = Person.where(:id.in => rel.to_a.flatten)
-          members.first.add_relationship(members.second, "sibling", family_id)
-          members.second.add_relationship(members.first, "sibling", family_id)
+          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling", inferred_relationship: true) 
+          members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling", inferred_relationship: true)
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
         end
       end
@@ -1044,7 +1045,7 @@ private
   def family_integrity
     only_one_active_primary_family
     single_primary_family_member
-    # all_family_member_relations_defined #old_code
+    all_family_member_relations_defined #old_code
     single_active_household
     no_duplicate_family_members
   end
@@ -1076,15 +1077,15 @@ private
     self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
   end
 
-  def all_family_member_relations_defined #new_code
+  def all_family_member_relations_defined #new_code Checks only in context of primary person.
     return unless primary_family_member.present? && primary_family_member.person.present?
     primary_member = primary_family_member
     other_family_members = family_members.select { |fm| (fm.id.to_s != primary_member.id.to_s) }
-    undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member, fm).blank? }
+    undefined_relations = other_family_members.any? { |fm| find_relationship_between(primary_member.person, fm.person).blank? }
     errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   end
 
-  #old_code
+  #old_code - our only validation now is to check for the matrix completeness.
   # def all_family_member_relations_defined
   #   return unless primary_family_member.present? && primary_family_member.person.present?
   #   primary_member_id = primary_family_member.id
@@ -1094,8 +1095,8 @@ private
   #   errors.add(:family_members, "relationships between primary_family_member and all family_members must be defined") if undefined_relations
   # end
 
-  def find_relationship_between(successor, predecessor)
-    person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id).first
+  def find_relationship_between(predecessor, successor)
+    predecessor.person_relationships.where(predecessor_id: predecessor.id, successor_id: successor.id, family_id: self.id).first
   end
 
   def single_active_household

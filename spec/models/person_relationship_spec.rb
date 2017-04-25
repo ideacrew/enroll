@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe PersonRelationship, dbclean: :after_each do
-  it { should validate_presence_of :relative_id }
+  it { should validate_presence_of :predecessor_id }
+  it { should validate_presence_of :successor_id }
   it { should validate_presence_of :kind }
 
   let(:kind) {"spouse"}
@@ -17,7 +18,6 @@ describe PersonRelationship, dbclean: :after_each do
   describe ".new" do
     let(:valid_params) do
       { kind: kind,
-        relative: person,
         person: person,
         predecessor_id: person_2.id,
         successor_id: person.id
@@ -101,14 +101,6 @@ describe PersonRelationship, dbclean: :after_each do
       end
     end
 
-    context "with no relative" do
-      let(:params) {valid_params.except(:relative)}
-
-      it "should fail validation " do
-        expect(PersonRelationship.create(**params).errors[:relative_id].any?).to be_truthy
-      end
-    end
-
     context "with all valid arguments" do
       let(:params) {valid_params}
       it "should save" do
@@ -128,7 +120,6 @@ describe PersonRelationship, dbclean: :after_each do
 
     context "test for validation, with same successor and predecessor" do
       let(:params) {valid_params.except(:predecessor_id).deep_merge!({predecessor_id: person.id})}
-
       it "should not save on failed validation" do
         expect(PersonRelationship.new(**params).save).not_to be_truthy
       end

@@ -109,7 +109,7 @@ class FamilyMember
     if is_primary_applicant?
       "self"
     else
-      family.primary_applicant_person.find_relationship_with(person) unless family.primary_applicant_person.blank? || person.blank?
+      family.primary_applicant_person.find_relationship_with(person, self.family_id) unless family.primary_applicant_person.blank? || person.blank?
     end
   end
 
