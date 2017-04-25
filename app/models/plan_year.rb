@@ -27,6 +27,9 @@ class PlanYear
   field :terminated_on, type: Date
 
   field :imported_plan_year, type: Boolean, default: false
+  
+  # Plan year created to support Employer converted into system. May not be complaint with Hbx Business Rules
+  field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
   field :fte_count, type: Integer
@@ -990,7 +993,7 @@ private
 
   # Checks for external plan year
   def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
+    is_conversion
   end
 
   def is_event_date_valid?
