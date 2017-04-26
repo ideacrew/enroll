@@ -26,7 +26,8 @@ class EnrollmentDataUpdate < MongoidMigrationTask
               cancel_effective=canceled_enrollment.effective_on
               reference_effective=enrollment.effective_on
               reference_submitted=enrollment.submitted_at
-              if cancel_effective > reference_submitted && cancel_effective < reference_effective
+              if cancel_effective.present? && reference_effective.present? && reference_submitted.present?
+                if cancel_effective > reference_submitted && cancel_effective < reference_effective
                 if canceled_enrollment.kind == "individual"
                   if canceled_enrollment.effective_on.year == enrollment.effective_on.year
                     canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
@@ -40,6 +41,7 @@ class EnrollmentDataUpdate < MongoidMigrationTask
                     end
                   end
                 end
+              end
               end
             end
           end
