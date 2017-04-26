@@ -35,5 +35,14 @@ describe ChangeRenewingPlanYearAasmState do
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_publish_pending"
     end
+
+    ["renewing_publish_pending", "renewing_application_ineligible"].each do |plan_year_state|
+      it "should update aasm_state of plan year" do
+        plan_year.update_attributes(aasm_state: plan_year_state)
+        subject.migrate
+        plan_year.reload
+        expect(plan_year.aasm_state).to eq "renewing_enrolling"
+      end
+    end
   end
 end
