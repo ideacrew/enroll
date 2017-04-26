@@ -58,6 +58,7 @@ RSpec.describe 'Service Area Task', :type => :task do
       subject { imported_areas.third }
 
       it_should_behave_like "a service area reference", {
+                                                  hios_id: '82569',
                                                   service_area_id: 'MAS001',
                                                   service_area_name: 'BMC HealthNet Plan Select Network',
                                                   serves_entire_state: false,
@@ -78,6 +79,14 @@ RSpec.describe 'Service Area Task', :type => :task do
       end
       it "does not create any more elements" do
         expect(imported_areas.count).to eq(ServiceAreaReference.all.count)
+      end
+    end
+
+    context "it created the correct number of zip code sub areas" do
+      subject { ServiceAreaReference.where(county_name: "Middlesex", service_area_name: "BMC HealthNet Plan Select Network") }
+
+      it "created many service areas for each imported zip code" do
+        expect(subject.count).to eq 51
       end
     end
 
