@@ -119,11 +119,15 @@ var Quote = ( function() {
         if(coverage_kind == 'health'){
           $('.container-fluid .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
           alert('You can now select dental offerings. This is optional; employers are not required to offer dental coverage');
+          $('#publish-quote').removeClass('in')
+          $('#dental-feature-mgmt-header a').trigger('click')
         }else{
           $('.dental-panel .quote-detail-cost > tbody > tr > td > .darker_btn').removeClass('darker_btn')
         }
+        $('#publish-quote').removeClass('in')
         td.children('div').addClass('btn darker_btn')
-        $('#dental-feature-mgmt-header a').trigger('click')
+        $('#publish-quote').addClass('in')
+
     })
   }
 
