@@ -970,10 +970,12 @@ class PlanYear
 
   # Checks for external plan year
   def can_be_migrated?
-    is_conversion
+    self.employer_profile.is_conversion? && self.is_conversion
   end
 
-private
+  alias_method :external_plan_year?, :can_be_migrated?
+
+  private
 
   def log_message(errors)
     msg = yield.first
@@ -1041,7 +1043,7 @@ private
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.is_conversion?
+    if self.employer_profile.is_converting?
       self.employer_profile.trigger_notices("conversion_group_renewal")
     else
       self.employer_profile.trigger_notices("group_renewal_5")
