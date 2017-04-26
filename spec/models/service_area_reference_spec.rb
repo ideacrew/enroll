@@ -7,6 +7,7 @@ RSpec.describe ServiceAreaReference, type: :model do
     expect(create(:service_area_reference)).to be_valid
   end
 
+  it { is_expected.to validate_presence_of :hios_id }
   it { is_expected.to validate_presence_of :service_area_id }
   it { is_expected.to validate_presence_of :service_area_name }
   it { is_expected.to validate_presence_of :serves_entire_state }
@@ -15,6 +16,8 @@ RSpec.describe ServiceAreaReference, type: :model do
     subject { build(:service_area_reference, serves_entire_state: false) }
 
     it { is_expected.to validate_presence_of :county_name }
+    it { is_expected.to validate_presence_of :county_code }
+    it { is_expected.to validate_presence_of :state_code }
     it { is_expected.to validate_presence_of :serves_partial_county }
 
     context "serves_partial_county is true" do
