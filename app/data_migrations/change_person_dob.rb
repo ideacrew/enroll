@@ -1,8 +1,9 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
+require 'date'
 class ChangePersonDob< MongoidMigrationTask
   def migrate
     person=Person.where(hbx_id:ENV['hbx_id']).first
-    new_dob = ENV['new_dob']
+    new_dob = DateTime.parse.(ENV['new_dob']).to_date
     if person.nil?
       puts "No person was found by the given fein"
     else
