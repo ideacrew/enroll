@@ -161,7 +161,7 @@ module Employers::EmployerHelper
     return true if user && user.has_hbx_staff_role?
     return false if employer_profile.blank?
 
-    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year
+    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
     
     return false if plan_year.blank?
     return false if plan_year.is_renewing? && !employer_profile.is_converting?
