@@ -1,10 +1,10 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "update_user_name_and_email_on_user")
+require File.join(Rails.root, "app", "data_migrations", "update_user_or_person_records")
 
-describe UpdateUserNameAndEmailOnUser do
+describe UpdateUserOrPersonRecords do
   
-  let(:given_task_name) { "update_user_name_and_email_on_user" }
-  subject { UpdateUserNameAndEmailOnUser.new(given_task_name, double(:current_scope => nil)) }
+  let(:given_task_name) { "update_user_or_person_records" }
+  subject { UpdateUserOrPersonRecords.new(given_task_name, double(:current_scope => nil)) }
   
   describe "given a task name" do
     it "has the given task name" do
@@ -21,6 +21,7 @@ describe UpdateUserNameAndEmailOnUser do
       allow(ENV).to receive(:[]).with('user_name').and_return user.oim_id
       allow(ENV).to receive(:[]).with('headless_user').and_return ""
       allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
+      allow(ENV).to receive(:[]).with('hbx_id').and_return nil
     end
     
     it "should update the username on the user" do
@@ -53,6 +54,35 @@ describe UpdateUserNameAndEmailOnUser do
       user.person.destroy!
       subject.migrate
       expect(User.where(email: user.email).present?).to eq false
+    end
+
+    context "updating email on person record" do
+      let(:person) { FactoryGirl.create(:person)}
+
+      before do
+        allow(ENV).to receive(:[]).with('action').and_return "update_person_home_email"
+        allow(ENV).to receive(:[]).with('find_user_by').and_return nil
+        allow(ENV).to receive(:[]).with('user_email').and_return nil
+        allow(ENV).to receive(:[]).with('person_email').and_return "my_home1198@test.com"
+        allow(ENV).to receive(:[]).with('hbx_id').and_return person.hbx_id
+      end
+
+      it "should update the home email on person record" do
+        subject.migrate
+        person.reload
+        home_email = person.emails.detect { |email| email.kind == "home"}
+        expect(home_email.address).to eq "my_home1198@test.com"
+      end
+
+      it "should update the work email on person record" do
+        allow(ENV).to receive(:[]).with('action').and_return "update_person_work_email"
+        allow(ENV).to receive(:[]).with('person_email').and_return "my_work1198@test.com"
+        person.emails.first.update_attributes(kind: "work")
+        subject.migrate
+        person.reload
+        home_email = person.emails.detect { |email| email.kind == "work"}
+        expect(home_email.address).to eq "my_work1198@test.com"
+      end
     end
   end
 end
