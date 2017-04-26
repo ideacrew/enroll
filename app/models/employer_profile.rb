@@ -261,12 +261,12 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  def is_converting?
-    is_conversion_employer? && published_plan_year.present? && published_plan_year.is_conversion
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
   end
 
-  def is_conversion_employer?
-    profile_source.to_s == 'conversion'
+  def is_converting?
+    self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
   def find_plan_year_by_effective_date(target_date)
@@ -839,11 +839,6 @@ class EmployerProfile
     return nil unless org.any?
     org.first.employer_profile
   end
-
-  def is_conversion?
-    self.profile_source == "conversion"
-  end
-
 
   def trigger_notices(event)
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)

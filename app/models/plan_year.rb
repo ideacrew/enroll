@@ -961,7 +961,7 @@ class PlanYear
 
   # Checks for external plan year
   def can_be_migrated?
-    self.employer_profile.is_conversion_employer? && self.is_conversion
+    self.employer_profile.is_conversion? && self.is_conversion
   end
 
   alias_method :external_plan_year?, :can_be_migrated?
