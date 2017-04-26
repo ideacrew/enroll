@@ -50,7 +50,7 @@ describe ChangeCeDateOfTermination do
 
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:employer_profile_id) { employer_profile.id }
-    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,employment_terminated_on:TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
     let(:census_employee_params) {
       {"first_name" => "aqzz",
        "middle_name" => "",
@@ -59,7 +59,7 @@ describe ChangeCeDateOfTermination do
        "is_business_owner" => true,
        "hired_on" => "05/02/2015",
        "employer_profile_id" => employer_profile_id} }
-    let(:date) {  TimeKeeper::date_of_record - 1.days }
+    let(:date) {  (TimeKeeper::date_of_record-1.days).to_s }
     before :each do
       allow(ENV).to receive(:[]).with('ssn').and_return census_employee.ssn
       allow(ENV).to receive(:[]).with('date_of_terminate').and_return date
@@ -68,9 +68,9 @@ describe ChangeCeDateOfTermination do
       subject.migrate
       census_employee.reload
     end
-    it "should not change dot of ce not in employment termination state" do
+    it "should change dot of ce not in employment termination state" do
       ce=CensusEmployee.by_ssn(census_employee.ssn).first
-      expect(ce.employment_terminated_on).to eq TimeKeeper::date_of_record - 1.days
+      expect(ce.employment_terminated_on).to eq TimeKeeper::date_of_record-1.days
     end
   end
 end

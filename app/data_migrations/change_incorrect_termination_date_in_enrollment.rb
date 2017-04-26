@@ -5,7 +5,7 @@ class ChangeIncorrectTerminationDateInEnrollment < MongoidMigrationTask
   def migrate
     begin
       enrollment = HbxEnrollment.by_hbx_id(ENV['hbx_id'].to_s).first
-      new_termination_date = DateTime.parse(ENV['termination_date']).to_date
+      new_termination_date = Date.strptime(ENV['termination_date'],'%m/%d/%Y').to_date
 
       if enrollment.nil?
         puts "No enrollment with given hbx_id was found" unless Rails.env.test?

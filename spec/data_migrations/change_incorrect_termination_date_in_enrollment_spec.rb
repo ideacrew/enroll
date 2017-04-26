@@ -18,6 +18,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
        aasm_state: 'shopping',
        review_status: nil
     )
+
   }
 
   let(:enrollment_2) {
@@ -30,7 +31,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
       kind: "individual",
       submitted_at: TimeKeeper.date_of_record,
       aasm_state: 'coverage_terminated',
-      terminated_on: TimeKeeper.date_of_record.next_month.beginning_of_month + 1.day,
+      terminated_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
       review_status: "in review"
     )
   }
@@ -54,7 +55,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
   end
 
   context "enrollments with existing review_status" do
-    let(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days }
+    let(:date) { (TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days).to_s }
 
     before do
       allow(ENV).to receive(:[]).with('hbx_id').and_return enrollment_2.hbx_id
@@ -67,7 +68,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
     it "should modify hbx_enrollment in terminated state" do
       enrollment = HbxEnrollment.by_hbx_id(enrollment_2.hbx_id).first
       expect(enrollment.aasm_state).to eq "coverage_terminated"
-      expect(enrollment.terminated_on).to eq date
+      expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days
     end
 
   end
