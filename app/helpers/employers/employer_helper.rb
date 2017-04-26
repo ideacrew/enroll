@@ -141,7 +141,7 @@ module Employers::EmployerHelper
 
   def cobra_button(census_employee)
     disabled = current_user.has_hbx_staff_role? || true && census_employee.employment_terminated_on + 6.months > TimeKeeper.date_of_record ? false : true
-    if census_employee.employer_profile.present? && !census_employee.employer_profile.is_conversion?
+    if census_employee.employer_profile.present?
       disabled = true if census_employee.is_disabled_cobra_action?
     end
     button_text = 'COBRA'
@@ -161,14 +161,10 @@ module Employers::EmployerHelper
     return true if user && user.has_hbx_staff_role?
     return false if employer_profile.blank?
 
-    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year rescue nil
+    plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year
+    
     return false if plan_year.blank?
-
-    if employer_profile.is_conversion_employer?
-      return false if employer_profile.plan_years.count > 2
-    else
-      return false if plan_year.is_renewing?
-    end
+    return false if plan_year.is_renewing? && !employer_profile.is_converting?
 
     plan_year.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
