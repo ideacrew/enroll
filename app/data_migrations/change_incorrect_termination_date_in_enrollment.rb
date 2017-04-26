@@ -1,11 +1,11 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
-
+require 'date'
 class ChangeIncorrectTerminationDateInEnrollment < MongoidMigrationTask
 
   def migrate
     begin
       enrollment = HbxEnrollment.by_hbx_id(ENV['hbx_id'].to_s).first
-      new_termination_date = ENV['termination_date']
+      new_termination_date = DateTime.parse(ENV['termination_date']).to_date
 
       if enrollment.nil?
         puts "No enrollment with given hbx_id was found" unless Rails.env.test?
@@ -20,5 +20,4 @@ class ChangeIncorrectTerminationDateInEnrollment < MongoidMigrationTask
       puts e.message
     end
   end
-
 end
