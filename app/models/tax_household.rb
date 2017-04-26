@@ -11,7 +11,8 @@ class TaxHousehold
   include Acapi::Notifiers
   include SetCurrentUser
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  # embedded_in :application, class_name: "FinancialAssistance::Application" 
+  embedded_in :eligibility_determination
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -24,9 +25,11 @@ class TaxHousehold
   field :submitted_at, type: DateTime
 
   embeds_many :tax_household_members
-  accepts_nested_attributes_for :tax_household_members
-
   #embeds_many :eligibility_determinations
+  embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
+  
+
+  accepts_nested_attributes_for :tax_household_members
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }

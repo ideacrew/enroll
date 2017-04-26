@@ -3,6 +3,7 @@ class FinancialAssistance::Applicant
   include Mongoid::Timestamps
 
   embedded_in :application
+  embedded_in :tax_household, class_name: "::TaxHousehold"
 
   TAX_FILER_KINDS = %W(tax_filer single joint separate dependent non_filer)
   STUDENT_KINDS = %w(
