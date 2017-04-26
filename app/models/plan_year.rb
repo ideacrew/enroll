@@ -27,7 +27,7 @@ class PlanYear
   field :terminated_on, type: Date
 
   field :imported_plan_year, type: Boolean, default: false
-  
+
   # Plan year created to support Employer converted into system. May not be complaint with Hbx Business Rules
   field :is_conversion, type: Boolean, default: false
 
@@ -968,6 +968,11 @@ class PlanYear
     TimeKeeper.date_of_record.end_of_day < start_on
   end
 
+  # Checks for external plan year
+  def can_be_migrated?
+    is_conversion
+  end
+
 private
 
   def log_message(errors)
@@ -989,11 +994,6 @@ private
     else
       false
     end
-  end
-
-  # Checks for external plan year
-  def can_be_migrated?
-    is_conversion
   end
 
   def is_event_date_valid?
