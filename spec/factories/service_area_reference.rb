@@ -12,14 +12,17 @@ FactoryGirl.define do
     partial_county_justification nil
 
     trait :for_partial_state do
+      service_area_name 'Partial State Area'
       serves_entire_state false
       county_name "Foxboro"
       county_code '015'
       state_code '25'
       serves_partial_county false
+      service_area_zipcode '10010'
     end
 
     trait :for_partial_county do
+      service_area_name 'Partial County Area'
       serves_entire_state false
       county_name "Foxboro"
       county_code '015'
