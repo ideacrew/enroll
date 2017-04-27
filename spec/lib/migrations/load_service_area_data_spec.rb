@@ -15,6 +15,7 @@ RSpec.describe 'Service Area Task', :type => :task do
     before :all do
       Rake.application.rake_require 'tasks/migrations/load_service_area_data'
       Rake::Task.define_task(:environment)
+      create(:rate_reference, county_name: 'Suffolk', zip_code: '10010')
     end
 
     before :context do
@@ -49,7 +50,7 @@ RSpec.describe 'Service Area Task', :type => :task do
                                                   county_code: '025',
                                                   state_code: '25',
                                                   serves_partial_county: false,
-                                                  service_area_zipcode: nil,
+                                                  service_area_zipcode: '10010',
                                                   partial_county_justification: nil
                                                 }
     end

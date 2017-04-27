@@ -42,19 +42,20 @@ namespace :load_service_reference do
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
-
-          ServiceAreaReference.create!(
-            hios_id: hios_id,
-            service_area_id: sheet.cell(i,1),
-            service_area_name: sheet.cell(i,2),
-            serves_entire_state: false,
-            county_name: county_name,
-            county_code: county_code,
-            state_code: state_code,
-            serves_partial_county: serves_partial_county,
-            service_area_zipcode: nil,
-            partial_county_justification: nil
-          )
+            RateReference.find_zip_codes_for_county(county_name: county_name).each do |zip|
+              ServiceAreaReference.create!(
+              hios_id: hios_id,
+              service_area_id: sheet.cell(i,1),
+              service_area_name: sheet.cell(i,2),
+              serves_entire_state: false,
+              county_name: county_name,
+              county_code: county_code,
+              state_code: state_code,
+              serves_partial_county: serves_partial_county,
+              service_area_zipcode: zip,
+              partial_county_justification: nil
+            )
+          end
         end
       end
     rescue => e
