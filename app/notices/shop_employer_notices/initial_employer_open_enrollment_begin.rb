@@ -15,5 +15,6 @@ class ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin < ShopEmployerNoti
           :open_enrollment_start_on => plan_year.open_enrollment_start_on,
           :open_enrollment_end_on => plan_year.open_enrollment_end_on
         })
+    notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
   end
 end

@@ -42,7 +42,8 @@
       <tr>
         <td>
           <ul style="list-style: circle solid;">
-             <strong>Log in to your DCHealthLink.com Account</strong>
+          <li>
+            <strong>Log in to your DCHealthLink.com Account</strong>
           </li>
           </ul>
         </td>
@@ -75,14 +76,14 @@
         <td>
           <ul style="list-style: circle solid;">
           <li>
-            <strong>First Month’s Premium Payment</strong><br>Once your open enrollment period ends, you will receive an email from <%= Settings.site.short_name %> listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. on <binder payment deadline>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
+            <strong>First Month’s Premium Payment</strong><br>Once your open enrollment period ends, you will receive an email from <%= Settings.site.short_name %> listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. on <%= notice.plan_year.binder_payment_due_date %>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
             Once this first premium payment is received, your enrollments will be transmitted to the insurance companies to complete processing and setup of your group and each employee’s enrollments. The insurance companies mail member ID cards to each enrolled employee’s home address on or around the coverage effective date, this usually takes two weeks.<br></br>
             Once your coverage takes effect, you will receive regular monthly invoices from <%= Settings.site.short_name %> through the mail that include each employee’s enrollment, their premium, and the employer/employee cost breakdown. All premium payments will be made directly to <%= Settings.site.short_name %> either online, by phone or by mail.<br></br>
             <strong>Make a Secure Online Payment</strong><br>
             <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online.<br>
             <a href='https://www.e-billexpress.com/ebpp/DCHealthPay/'>https://www.e-billexpress.com/ebpp/DCHealthPay</a><br></br>
             <strong>To make a secure electronic check payment by phone</strong><br>
-            Call <%= Settings.contact_center.phone_number %> (LINK)<br>
+            Call <%= notice.hbe.phone %> (LINK)<br>
             Select your language (1 for English, 2 for Spanish, additional language options available)<br>
             Select option for Small Business Employer<br>
             Select option for Need to Make a Payment
@@ -124,7 +125,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
