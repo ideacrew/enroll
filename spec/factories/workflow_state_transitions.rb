@@ -4,7 +4,7 @@ FactoryGirl.define do
     transition_on TimeKeeper.date_of_record
     reason        "met minimum criteria"
     comment       "consumer provided proper documentation"
-    user_id       { BSON::ObjectId.from_time(TimeKeeper.datetime_of_record) }
+    user_id       { BSON::ObjectId.from_time(DateTime.now) }
   end
 
 end

@@ -4,6 +4,8 @@ RSpec.describe TimeHelper, :type => :helper do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
   let(:enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+  let(:individual_family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:individual_enrollment) {FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: individual_family.active_household)}
 
   before :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -23,10 +25,21 @@ RSpec.describe TimeHelper, :type => :helper do
   end
 
   describe "set latest date for terminating enrollment" do
-    it "sets the latest date able to terminate an enrollment to the last day of the year of the enrollment" do
-      enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
-      latest_date = Date.new(enrollment.effective_on.year, 12, 31)
-      expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
+    context "for enrollment in shop market"do
+      it "sets the latest date able to terminate an enrollment to be 1 year less 1 day from the enrollment start date" do
+        enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
+        #latest_date = Date.new(enrollment.effective_on.year, 12, 31)
+        latest_date = enrollment.effective_on + 1.year - 1.day
+        expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
+      end
+    end
+
+    context "for enrollment in individual market"do
+      it "sets the latest date able to terminate an enrollment to be the last day of the calendar year in which the enrollment starts" do
+        individual_enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
+        latest_date = Date.new(individual_enrollment.effective_on.year, 12, 31)
+        expect(helper.set_date_max_to_plan_end_of_year(individual_enrollment)).to eq(latest_date)
+      end
     end
   end
 end
