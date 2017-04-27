@@ -68,7 +68,7 @@ module Parsers::Xml::Cv::Importers
       person_demographics = fm.person_demographics
       person_relationships = fm.person_relationships
 
-      get_person_object_by(person, person_demographics, person_relationships)
+      get_person_object_by(person, person_demographics, person_relationships, @id)
     end
 
     def get_coverage_households_by_household_xml(household)

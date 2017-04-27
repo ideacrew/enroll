@@ -10,9 +10,9 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
 
     let!(:person) do
       p = FactoryGirl.build(:person)
-      p.person_relationships.build(relative: spouse, kind: "spouse")
-      p.person_relationships.build(relative: child1, kind: "child")
-      p.person_relationships.build(relative: child2, kind: "child")
+      p.person_relationships.build(predecessor_id: p.id, successor_id: spouse.id, kind: "spouse")
+      p.person_relationships.build(predecessor_id: p.id, successor_id: child1.id, kind: "child")
+      p.person_relationships.build(predecessor_id: p.id, successor_id: child2.id, kind: "child")
       p.save
       p
     end
@@ -51,6 +51,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
 
       let(:source_family) { 
          family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
+         person.person_relationships.update_all(family_id: family.id)
          primary = family.family_members.build(is_primary_applicant: true, person: person)
          dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
@@ -73,7 +74,6 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
           factory = Transcripts::EnrollmentTranscript.new
           factory.find_or_build(other_enrollment)
           transcript = factory.transcript
-
           expect(transcript[:compare]['hbx_enrollment_members']['add']).to be_present
           expect(transcript[:compare]['hbx_enrollment_members']['add']['hbx_id']['hbx_id']).to eq dependent2.hbx_id
           expect(transcript[:compare]['hbx_enrollment_members']['remove']).to be_present

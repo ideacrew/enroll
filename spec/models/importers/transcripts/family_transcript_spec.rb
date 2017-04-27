@@ -57,9 +57,9 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
       end
 
       def build_person_relationships
-        person.person_relationships.build(relative: spouse, kind: "spouse")
-        person.person_relationships.build(relative: child1, kind: "child")
-        person.person_relationships.build(relative: child2, kind: "child")
+        person.person_relationships.build(successor_id: spouse.id, predecessor_id: person.id, kind: "spouse")
+        person.person_relationships.build(successor_id: child1.id, predecessor_id: person.id, kind: "parent")
+        person.person_relationships.build(successor_id: child2.id, predecessor_id: person.id, kind: "parent")
         person.save!
       end
 

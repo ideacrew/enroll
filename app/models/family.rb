@@ -18,7 +18,8 @@ class Family
   include Sortable
   include Mongoid::Autoinc
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
+  # IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
+  IMMEDIATE_FAMILY = %w(self spouse life_partner parent guardian stepparent)
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -48,7 +49,6 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
-  embeds_many :person_relationships
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -541,7 +541,6 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    #binding.pry
     primary_applicant_person.ensure_relationship_with(person, relationship, self.id) #old_code
     add_family_member(person)
   end
@@ -560,7 +559,6 @@ class Family
     is_consent_applicant  = opts[:is_consent_applicant]  || false
 
     existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
-    # binding.pry
     if existing_family_member
       active_household.add_household_coverage_member(existing_family_member)
       existing_family_member.is_active = true

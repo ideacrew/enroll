@@ -46,7 +46,7 @@ describe FamilyMember, dbclean: :after_each do
     it "should be possible to find the primary_relationship" do
       mikes_family.dependents.each do |dependent|
         if brady_children.include?(dependent.person)
-          expect(dependent.primary_relationship).to eq "child"
+          expect(dependent.primary_relationship).to eq "parent"
         else
           expect(dependent.primary_relationship).to eq "spouse"
         end

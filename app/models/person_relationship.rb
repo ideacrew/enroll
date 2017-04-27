@@ -123,7 +123,9 @@ class PersonRelationship
 
   def relative
     return @relative if defined? @relative
-    @relative = Person.find(self.relative_id) unless self.relative_id.blank?
+    @relative = Person.find(self.successor_id) unless self.successor_id.blank?
+    # return @relative if defined? @relative
+    # @relative = Person.find(self.relative_id) unless self.relative_id.blank?
   end
 
   def invert_relationship

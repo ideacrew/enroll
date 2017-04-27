@@ -10,9 +10,9 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
 
     let!(:person) do
       p = FactoryGirl.build(:person)
-      p.person_relationships.build(relative: spouse, kind: "spouse")
-      p.person_relationships.build(relative: child1, kind: "child")
-      p.person_relationships.build(relative: child2, kind: "child")
+      p.person_relationships.build(predecessor_id: p.id , successor_id: spouse.id, kind: "spouse")
+      p.person_relationships.build(predecessor_id: p.id , successor_id: child1.id, kind: "parent")
+      p.person_relationships.build(predecessor_id: p.id , successor_id: child2.id, kind: "parent")
       p.save
       p
     end
@@ -29,6 +29,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
         })
 
       primary = family.family_members.build(is_primary_applicant: true, person: person)
+      family.save
       family
     }
 
@@ -48,14 +49,15 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       enrollment
     }
 
-    let!(:source_family) { 
-      family = Family.create({ hbx_assigned_id: '25112', e_case_id: "6754632" })
+    let!(:source_family) {
+      family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
       family.family_members.build(is_primary_applicant: true, person: person)
       family.family_members.build(is_primary_applicant: false, person: spouse)
       family.family_members.build(is_primary_applicant: false, person: child1)
       family.family_members.build(is_primary_applicant: false, person: child2)
+      person.person_relationships.update_all(family_id: family.id)
       family.save
-      family
+      family.reload
     }
 
     let(:primary) { source_family.primary_applicant }

@@ -177,7 +177,7 @@ describe Family, type: :model, dbclean: :after_each do
           context "and a second primary applicant is added" do
             let(:bob) do
               p = FactoryGirl.create(:person, first_name: "Bob")
-              person.person_relationships << PersonRelationship.new(relative: p, kind: "child")
+              person.person_relationships << PersonRelationship.new(relative: p, kind: "parent")
               p
             end
 
@@ -506,8 +506,8 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
     f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
     f.active_household.add_household_coverage_member(s_mem)
     c_mem = f.add_family_member(child)
-    child.build_relationship(f.primary_applicant.person, "parent", f.id)
-    f.primary_applicant.person.build_relationship(child, "child", f.id)
+    child.build_relationship(f.primary_applicant.person, "child", f.id)
+    f.primary_applicant.person.build_relationship(child, "parent", f.id)
     f.active_household.add_household_coverage_member(c_mem)
     f.save
     f
@@ -519,12 +519,12 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
     f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
     f.active_household.add_household_coverage_member(s_mem)
     c_mem = f.add_family_member(child)
-    child.build_relationship(f.primary_applicant.person, "parent", f.id)
-    f.primary_applicant.person.build_relationship(child, "child", f.id)
+    child.build_relationship(f.primary_applicant.person, "child", f.id)
+    f.primary_applicant.person.build_relationship(child, "parent", f.id)
     f.active_household.add_household_coverage_member(c_mem)
     g_mem = f.add_family_member(grandpa)
-    grandpa.build_relationship(f.primary_applicant.person, "child", f.id)
-    f.primary_applicant.person.build_relationship(grandpa, "parent", f.id)
+    grandpa.build_relationship(f.primary_applicant.person, "parent", f.id)
+    f.primary_applicant.person.build_relationship(grandpa, "child", f.id)
     f.active_household.add_household_coverage_member(g_mem)
     f.save
     f
@@ -1364,7 +1364,7 @@ describe Family, "given a primary applicant and 2 dependents with unrelated rela
 
   it "should not have wrong number defined relationships" do
     matrix = test_family.build_relationship_matrix
-    relationships = test_family.person_relationships
+    relationships = mike_person.person_relationships
     missing_rel = test_family.find_missing_relationships(matrix)
     expect(matrix.count).not_to eq 13
     expect(relationships.count).not_to eq 10

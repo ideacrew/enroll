@@ -174,7 +174,7 @@ class PeopleController < ApplicationController
         if @dependent.destroy
           @dependent.remove_relationship
         end
-        @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        # @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
         @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
         @flash = "Family Member Removed"
       else

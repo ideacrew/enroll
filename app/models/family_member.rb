@@ -118,7 +118,7 @@ class FamilyMember
   end
 
   def reactivate!(relationship)
-    family.primary_applicant_person.ensure_relationship_with(person, relationship)
+    family.primary_applicant_person.ensure_relationship_with(person, relationship, family.id)
     family.add_family_member(person)
   end
 

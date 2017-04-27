@@ -77,9 +77,9 @@ RSpec.describe Insured::FamilyRelationshipsController, dbclean: :after_each do
 
       it "should have relationships defined" do
         child1.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child1, "child", test_family.id)
+        primary_member.add_relationship(child1, "parent", test_family.id)
         child2.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child2, "child", test_family.id)
+        primary_member.add_relationship(child2, "parent", test_family.id)
         unrelated_member.add_relationship(primary_member, "unrelated", test_family.id)
         primary_member.add_relationship(unrelated_member, "unrelated", test_family.id)
         test_family.build_relationship_matrix
@@ -88,9 +88,9 @@ RSpec.describe Insured::FamilyRelationshipsController, dbclean: :after_each do
 
       it "should have 2 missing relationships" do
         child1.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child1, "child", test_family.id)
+        primary_member.add_relationship(child1, "parent", test_family.id)
         child2.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child2, "child", test_family.id)
+        primary_member.add_relationship(child2, "parent", test_family.id)
         unrelated_member.add_relationship(primary_member, "unrelated", test_family.id)
         primary_member.add_relationship(unrelated_member, "unrelated", test_family.id)
         matrix = test_family.build_relationship_matrix
@@ -107,9 +107,9 @@ RSpec.describe Insured::FamilyRelationshipsController, dbclean: :after_each do
 
       it "should apply sibling relationship" do
         child1.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child1, "child", test_family.id)
+        primary_member.add_relationship(child1, "parent", test_family.id)
         child2.add_relationship(primary_member, "child", test_family.id)
-        primary_member.add_relationship(child2, "child", test_family.id)
+        primary_member.add_relationship(child2, "parent", test_family.id)
         test_family.build_relationship_matrix
 
         relationship1 = test_family.find_existing_relationship(child1.id, child2.id, test_family.id)
