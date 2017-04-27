@@ -1418,4 +1418,72 @@ describe Person do
       expect(person.consumer_role.bookmark_url).to eq "/families/home"
     end
   end
+
+
+  describe "staff_for_employer" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+
+    context "employer has no staff roles assigned" do
+      it "should return an empty array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq []
+      end
+    end
+
+    context "employer has an active staff role" do
+      let(:person) { FactoryGirl.build(:person) }
+      let(:staff_params)  {{ person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active }}
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params)
+        person.save!
+      end
+
+      it "should return the person object in an array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+    end
+
+
+    context "multiple employers have same person as staff" do
+      let(:employer_profile2) { FactoryGirl.build(:employer_profile) }
+      let(:person) { FactoryGirl.build(:person) }
+
+      let(:staff_params1) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active} }
+
+      let(:staff_params2) { {person: person, employer_profile_id: employer_profile2.id, aasm_state: :is_active} }
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params1)
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+        person.save!
+      end
+
+      it "should return the person object in an array for employer 1" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+
+      it "should return the person object in an array for employer 2" do
+        expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+      end
+
+      context "target employer has staff role in inactive state" do
+        let(:staff_params3) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_closed} }
+
+        before do
+          person.employer_staff_roles = []
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params3)
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+          person.save!
+        end
+
+        it "should return empty array for target employer" do
+          expect(Person.staff_for_employer(employer_profile)).to eq []
+        end
+
+        it "should return the person object in an array for employer 2" do
+          expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+        end
+      end
+    end
+  end
 end
