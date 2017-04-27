@@ -19,7 +19,7 @@ namespace :reports do
       file_name = "#{Rails.root}/public/family_list_with_antiquated_relationships.csv"
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
-        people_id=Person.collection.aggregate([{"$match"=>{"person_relationship.kind"=>{"$in"=>["ward","guardian","other_tax_dependent"]}}},
+        people_id=Person.collection.aggregate([{"$match"=>{"person_relationships.kind"=>{"$in"=>["ward","guardian","other_tax_dependent"]}}},
                                              {"$group"=>{"_id"=>"$_id"}}]).to_a
 
         people_id.each do |person_id|
