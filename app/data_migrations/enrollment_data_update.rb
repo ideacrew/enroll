@@ -13,41 +13,31 @@ class EnrollmentDataUpdate < MongoidMigrationTask
     #IVL Enrollments should be transitioned from the Canceled state to the Terminated state.
     #SHOP Enrollments should be transitioned from the Canceled state to the Termination_Pending if coverage end date is in the future,
     #otherwise they should be transitioned to Terminated state.                                                                                                                                                                                                                                                                                  require 'csv'
-
-      families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
-      families.each do |family|
-        enrollments=family.active_household.hbx_enrollments
-        family.active_household.hbx_enrollments.where(aasm_state:"coverage_canceled").each do |canceled_enrollment|
-        enrollments.each do |enrollment|
-          if canceled_enrollment.kind == enrollment.kind
-            cancel_member=canceled_enrollment.hbx_enrollment_members.where(is_subscriber:true).first
-            reference_member=enrollment.hbx_enrollment_members.where(is_subscriber:true).first
-            if cancel_member.applicant_id == reference_member.applicant_id
-              cancel_effective=canceled_enrollment.effective_on
-              reference_effective=enrollment.effective_on
-              reference_submitted=enrollment.submitted_at
-              if cancel_effective.present? && reference_effective.present? && reference_submitted.present?
-                if cancel_effective > reference_submitted && cancel_effective < reference_effective
-                if canceled_enrollment.kind == "individual"
-                  if canceled_enrollment.effective_on.year == enrollment.effective_on.year
-                    canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
-                  end
-                elsif canceled_enrollment.kind == "employer_sponsored"
-                  if canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
-                    if canceled_enrollment.terminated_on > TimeKeeper.datetime_of_record
-                      canceled_enrollment.update_attributes(aasm_state:"coverage_termination_pending")
-                    else
-                      canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
-                    end
+    families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
+    families.each do |family|
+        begin
+          enrollments=family.active_household.hbx_enrollments
+          active_enrollments = enrollments.active
+          canceled_enrollments, enrs = enrollments.partition{|enr| enr.aasm_state == "coverage_canceled"}
+          canceled_enrollments.each do |e1|
+            active_enrollments.each do |e2|
+              if e1.present? && e2.present? && e1.kind != "coverall" && e2.kind != "coverall"
+                e1_year = e1.kind == "individual" ? e1.effective_on.year : e1.benefit_group.plan_year.start_on.year.to_i
+                e2_year = e2.kind == "individual" ? e2.effective_on.year : e2.benefit_group.plan_year.start_on.year.to_i
+                next if e1.subscriber.nil? || e2.subscriber.nil?
+                if e1.kind == e2.kind && e1_year == e2_year && e1.subscriber.applicant_id == e2.subscriber.applicant_id
+                  if e1.effective_on > e2.submitted_at && e1.effective_on < e2.effective_on
+                    aasm_state = "coverage_terminated"
+                    aasm_state = "coverage_termination_pending" if e1.terminated_on.present? && e1.terminated_on > TimeKeeper.datetime_of_record
+                    e1.update_attributes(aasm_state: aasm_state) if e1.aasm_state != aasm_state
                   end
                 end
               end
-              end
             end
           end
+        rescue Exception => e
+          puts "#{e.message} :: family id is #{family.id}"
         end
-        end
-       end
-
+      end
   end
 end
