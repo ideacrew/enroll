@@ -1400,7 +1400,7 @@ describe Person do
       end
     end
 
-    context "employer has am active staff role" do
+    context "employer has an active staff role" do
       let(:person) { FactoryGirl.build(:person) }
       let(:staff_params)  {{ person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active }}
 
