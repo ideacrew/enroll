@@ -800,6 +800,30 @@ class HbxEnrollment
   #   return @benefit_coverage_period if defined? @benefit_coverage_period
   # end
 
+  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+    enrollment = self
+
+    if family.currently_enrolled_plans(self).include?(qhp_plan.id)
+      plan_selection = PlanSelection.new(self, self.plan)
+      enrollment = plan_selection.same_plan_enrollment
+    end
+
+    if self.is_shop?
+      if benefit_group.is_congress
+        PlanCostDecoratorCongress.new(qhp_plan, enrollment, benefit_group)
+      else
+        reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
+        PlanCostDecorator.new(qhp_plan, enrollment, benefit_group, reference_plan)
+      end
+    else
+      if apply_aptc
+        UnassistedPlanCostDecorator.new(qhp_plan, enrollment, elected_aptc, tax_household)
+      else
+        UnassistedPlanCostDecorator.new(qhp_plan, enrollment)
+      end
+    end
+  end
+
   def decorated_elected_plans(coverage_kind, market=nil)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 

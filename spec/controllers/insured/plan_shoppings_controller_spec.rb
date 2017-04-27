@@ -201,6 +201,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(plan_year).to receive(:is_eligible_to_enroll?).and_return(true)
       allow(enrollment).to receive(:is_special_enrollment?).and_return false
       allow(enrollment).to receive(:can_select_coverage?).and_return(true)
+      allow(enrollment).to receive(:build_plan_premium).and_return(true)
     end
 
     it "returns http success" do
@@ -410,8 +411,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(plan2).to receive(:[]).with(:id)
       allow(plan3).to receive(:[]).with(:id)
       allow(benefit_group).to receive(:decorated_elected_plans).with(hbx_enrollment, coverage_kind).and_return(plans)
+      allow(family).to receive(:currently_enrolled_plans).and_return([])
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
+      allow(hbx_enrollment).to receive(:family).and_return(family)
+      allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+      allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
+      allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
+
       sign_in user
     end
 
@@ -482,16 +490,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
-      let(:family) {double("Family",latest_household: household)}
+      let(:family) { FactoryGirl.build(:individual_market_family) }
       let(:person) {double("Person",primary_family: family, has_active_consumer_role?: true)}
       let(:user) {double("user",person: person)}
+
+      before do
+        allow(hbx_enrollment).to receive(:family).and_return(family)
+        allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+        allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
+        allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([]) 
+      end
 
       context "with tax_household" do
         before :each do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
-          allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
           get :show, id: "hbx_id"
