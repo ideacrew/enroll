@@ -342,6 +342,13 @@ def employer_poc
     end
   end
 
+  def calender_index
+    respond_to do |format|
+      format.html { render "exchanges/scheduled_events/index" }
+      format.js {}
+    end
+  end
+
   def verification_index
     @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
     respond_to do |format|

@@ -41,6 +41,14 @@ Rails.application.routes.draw do
       get :find_sep, on: :collection
     end
 
+    resources :scheduled_events do
+      collection do
+        get 'get_system_events'
+        get 'get_holiday_events'
+        get 'no_events'
+      end
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -80,6 +88,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :calender_index
       end
 
       member do
