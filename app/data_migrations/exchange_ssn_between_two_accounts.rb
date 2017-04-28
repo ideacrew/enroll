@@ -17,12 +17,10 @@ class ExchangeSsnBetweenTwoAccounts< MongoidMigrationTask
       elsif ssn2.nil?
         puts "person with hbx_id  #{hbx_id_2} has no ssn"
       else
-        temp_ssn=(ssn1.to_i+1).to_s
-        person1.update_attributes(ssn:temp_ssn)
-        person2.update_attributes(ssn:ssn1)
-        person1.update_attributes(ssn:ssn2)
-        person1.save
-        person2.save
+        person1.unset(:encrypted_ssn)
+        person2.unset(:encrypted_ssn)
+        person1.update_attributes(ssn: ssn2)
+        person2.update_attributes(ssn: ssn1)
       end
     end
   end
