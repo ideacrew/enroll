@@ -73,7 +73,6 @@ RSpec.describe TimeHelper, :type => :helper do
     context "for individual market" do
       before do
         allow(family).to receive_message_chain("primary_applicant.person").and_return(person_with_consumer_role)
-        #allow(person_with_consumer_role).to receive(emplo)
       end
 
       it "returns minmum range as beginning of the year" do
