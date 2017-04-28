@@ -488,7 +488,7 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       it "should has the following relations under primary family person" do
-        expect(family_db.family_members.map(&:primary_relationship)).to eq ["self", "spouse", "child", "child"]
+        expect(family_db.family_members.map(&:primary_relationship)).to eq ["self", "spouse", "parent", "parent"]
       end
 
       it "updates all consumer role verifications" do

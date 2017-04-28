@@ -42,7 +42,8 @@ class PersonRelationship
     "stepparent",
     "trustee", # no inverse
     "unrelated",
-    "ward"
+    "ward",
+    "stepson_or_stepdaughter"
   ]
 
   InverseMap = {
@@ -74,7 +75,8 @@ class PersonRelationship
     #one directional
     "foster_child" => "guardian",
     "court_appointed_guardian" => "ward",
-    "adopted_child" => "parent"
+    "adopted_child" => "parent",
+    "stepson_or_stepdaughter" => "stepparent"
   }
 
   SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]

@@ -917,7 +917,7 @@ class Person
       direct_relationship.update(kind: relationship_kind)
     else
       if self.id != successor.id
-        person_relationships.create(relative_id: successor.id, family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+        person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
       end
     end
   end

@@ -65,7 +65,8 @@ describe PersonRelationship, dbclean: :after_each do
       "stepparent",
       "trustee",
       "unrelated",
-      "ward"
+      "ward",
+      "stepson_or_stepdaughter"
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
