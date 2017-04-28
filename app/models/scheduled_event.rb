@@ -8,7 +8,7 @@ class ScheduledEvent
   field :recurring_rules, type: String
   field :offset_rule, type: Integer, default: none
 
-  validates_presence_of :type, :event_name, :one_time, :start_date
+  validates_presence_of :type, :event_name, :one_time
 
   EVENT_TYPES = %W(holiday system_event)
   HOLIDAYS = %W(New_Year Christmas)

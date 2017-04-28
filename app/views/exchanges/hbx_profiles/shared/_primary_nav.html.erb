@@ -54,7 +54,7 @@
       </li>
 
       <li role="presentation"<%= menu_tab_class(active_tab, "calender-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-       <%= link_to(calender_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "calender", "role" => "tab" ) do  %>
+       <%= link_to(exchanges_scheduled_events_path, "aria-expanded" => "true", "aria-controls" => "calender", "role" => "tab" ) do  %>
         <span class="hidden-xs">Calender</span>
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Calender"></span>
        <% end %>

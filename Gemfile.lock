@@ -267,6 +267,7 @@ GEM
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
     i18n (0.7.0)
+    ice_cube (0.16.0)
     ice_nine (0.11.2)
     interactor (3.1.0)
     interactor-rails (2.0.2)
@@ -436,6 +437,12 @@ GEM
       json (~> 1.4)
     recaptcha (1.1.0)
       json
+    recurring_select (2.0.0)
+      coffee-rails (>= 3.1)
+      ice_cube (>= 0.11)
+      jquery-rails (>= 3.0)
+      rails (>= 3.2)
+      sass-rails (>= 4.0)
     redis (3.3.0)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -518,6 +525,8 @@ GEM
     shoulda-matchers (3.1.1)
       activesupport (>= 4.0.0)
     sigar (0.7.3)
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
     simple_form (3.3.1)
       actionpack (> 4, < 5.1)
       activemodel (> 4, < 5.1)
@@ -622,6 +631,7 @@ DEPENDENCIES
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
+  ice_cube
   interactor (= 3.1.0)
   interactor-rails (= 2.0.2)
   jbuilder (~> 2.0)
@@ -660,6 +670,7 @@ DEPENDENCIES
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
   recaptcha (= 1.1.0)
+  recurring_select
   redis-rails
   resque
   roo (~> 2.1.0)
@@ -671,6 +682,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
+  simple_calendar
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)

@@ -1,10 +1,20 @@
 class Exchanges::ScheduledEventsController < ApplicationController
+layout 'single_column'
  
   def new
   	@scheduled_event = ScheduledEvent.new
-  	respond_to do |format|
-      format.js { render 'new' }
+  end
+
+  def create
+    params.permit!
+    @scheduled_event = ScheduledEvent.new(params[:scheduled_event])
+    if @scheduled_event.save
+      redirect_to exchanges_scheduled_events_path
     end
+  end
+
+  def index
+    @scheduled_events = ScheduledEvent.all
   end
 
   def get_system_events

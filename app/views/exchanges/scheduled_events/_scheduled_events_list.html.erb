@@ -1,0 +1,9 @@
+<ul>
+  <% if scheduled_events.exists? %>
+    <% scheduled_events.each do |event| %>
+       <li>
+         <%= event.event_name %>
+        </li>
+    <% end %>
+  <% end %>
+</ul> 

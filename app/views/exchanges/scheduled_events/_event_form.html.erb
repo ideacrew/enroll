@@ -9,3 +9,17 @@
     <%= f.select :event_name, options_for_select(@events), selected: f.object.try(:event_name), include_blank: "SELECT EVENT", required: true %>
    </div>
 </div>
+
+<div class="container content-bottom">
+  <%= f.label :start_date %>
+  <%= f.text_field :start_date, class: "date-picker floatlabel form-control", placeholder: 'Start Date' %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :recurring_rules %>
+  <%= f.select_recurring :recurring_rules %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.submit %>
+</div>

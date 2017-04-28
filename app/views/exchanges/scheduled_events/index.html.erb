@@ -1,0 +1,23 @@
+<div class="content landing">
+	<%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+	
+	<div class="home">
+		<%= render 'shared/tab_panel' %>
+	</div>
+</div>
+
+<div class="container content-bottom">
+  <div class='container'>
+  	<div class="row">
+  		<h3 class="title-inline">Calender</h3>
+  	</div>		
+  </div>
+  
+  <div>
+    <%= link_to 'Create Event' , new_exchanges_scheduled_event_path , class: "btn btn-trans" %> 
+  </div>
+  
+  <div class= "schduled_event_list">
+    <%= render "exchanges/scheduled_events/scheduled_events_list", scheduled_events: @scheduled_events %>
+  </div>
+</div>
