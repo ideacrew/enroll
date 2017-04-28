@@ -477,9 +477,8 @@ class HbxEnrollment
     previous_enrollments(year).each do |previous_enrollment|
       generate_signature(previous_enrollment)
       if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
-        if self.effective_on > previous_enrollment.effective_on
-          previous_enrollment.terminate_coverage! if previous_enrollment.may_terminate_coverage?
-          previous_enrollment.update_current(terminated_on: effective_on - 1.day)
+        if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
+          previous_enrollment.terminate_coverage!(effective_on - 1.day)
         else
           previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
         end
