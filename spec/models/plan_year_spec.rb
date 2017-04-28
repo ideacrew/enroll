@@ -467,7 +467,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let!(:census_employee) { FactoryGirl.create(:census_employee,
                                                   employer_profile: employer_profile
                             ) }
-    let!(:renewing_plan_year)                     { py = FactoryGirl.create(:plan_year,
+    let!(:plan_year)                     { py = FactoryGirl.create(:plan_year,
                                                       start_on: plan_year_start_on,
                                                       end_on: plan_year_end_on,
                                                       open_enrollment_start_on: open_enrollment_start_on,
@@ -481,19 +481,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                                     py.save(:validate => false)
                                                     py
                                                   }
-
-    let!(:plan_year) { py = FactoryGirl.create(:plan_year,
-                                                start_on: plan_year_start_on - 1.year,
-                                                end_on: plan_year_end_on - 1.year,
-                                                open_enrollment_start_on: open_enrollment_start_on - 1.year,
-                                                open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
-                                                employer_profile: employer_profile,
-                                                aasm_state: 'active'
-                                              )}
     let!(:benefit_group_assignment) {
       BenefitGroupAssignment.create({
         census_employee: census_employee,
-        benefit_group: renewing_plan_year.benefit_groups.first,
+        benefit_group: plan_year.benefit_groups.first,
         start_on: plan_year_start_on
       })
     }
@@ -501,17 +492,17 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let!(:renewal_benefit_group_assignment) {
       BenefitGroupAssignment.create({
         census_employee: census_employee,
-        benefit_group: renewing_plan_year.benefit_groups.first,
+        benefit_group: plan_year.benefit_groups.first,
         start_on: plan_year_start_on
       })
     }
     it 'should return renewing benefit group assignment' do
-      expect(renewing_plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
     end
 
     it 'should retrun active benefit_group_assignment' do
-      renewing_plan_year.update_attributes(:'aasm_state' => 'active')
-      expect(renewing_plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
+      plan_year.update_attributes(:'aasm_state' => 'active')
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
     end
   end
 
