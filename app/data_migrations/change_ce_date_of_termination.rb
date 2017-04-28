@@ -1,9 +1,10 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
+require 'date'
 class ChangeCeDateOfTermination < MongoidMigrationTask
   def migrate
     begin
       census_employee=CensusEmployee.by_ssn(ENV['ssn']).first
-      new_termination_date = ENV['date_of_terminate']
+      new_termination_date = Date.strptime(ENV['date_of_terminate'],'%m/%d/%Y').to_date
       if census_employee.nil?
         puts "No census employee with given ssn was found" unless Rails.env.test?
       elsif census_employee.aasm_state != "employment_terminated"
