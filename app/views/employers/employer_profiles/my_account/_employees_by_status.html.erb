@@ -98,6 +98,25 @@
               </a>
             </td>
           </tr>
+          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+           <td  colspan="12"> 
+             <label>Please enter the maximum number of months the enrollee is eligile for COBRA/continuation coverage,upto a maximum of 36 months you can end this coverage earlier,however coverage will automatically be terminated after this many months.</label>
+            </td>
+            </tr>
+            <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+            <td colspan="6">
+              <label>Maximum COBRA Months</label>
+            </td>
+            <td colspan="3">
+              <div  class="input-spinner" >
+                <%= text_field_tag "cobra_max_months", "1" %>
+                <div class="input-group-btn-vertical"> 
+                  <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+                  <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+                </div>
+              </div>
+          </td>
+         </tr>
         <% end %>
         <% if census_employee.may_reinstate_eligibility? %>
          <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
