@@ -37,7 +37,7 @@ describe ChangeIncorrectTerminationDateInEnrollment do
   }
 
   context "enrollments with review_status equal nil" do
-    let(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days }
+    let(:date) { (TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days).to_s }
 
     before do
       allow(ENV).to receive(:[]).with('hbx_id').and_return enrollment_1.hbx_id
