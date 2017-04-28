@@ -5,7 +5,7 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
     append_data
     generate_pdf_notice
 
-    if employer_profile.is_conversion?
+    if (employer_profile.is_conversion? && (employer_profile.published_plan_year.present? && employer_profile.published_plan_year.coverage_period_contains?(employer_profile.registered_on)))
       conversion_attachment
     end
     attach_envelope

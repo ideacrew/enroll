@@ -247,8 +247,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     context "individual market user" do
-      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
-      let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['consumer'])}
 
       it "selects only 'individual' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)
@@ -261,8 +261,8 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     context "SHOP market user" do
-      let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
-      let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
       it "selects only 'shop' and 'both' market brokers" do
         allow(subject).to receive(:current_user).and_return(user)

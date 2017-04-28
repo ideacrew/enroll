@@ -27,6 +27,9 @@ class PlanYear
   field :terminated_on, type: Date
 
   field :imported_plan_year, type: Boolean, default: false
+  
+  # Plan year created to support Employer converted into system. May not be complaint with Hbx Business Rules
+  field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
   field :fte_count, type: Integer, default: 0
@@ -751,7 +754,7 @@ class PlanYear
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
     state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
-    state :enrolled,  :after_enter => :ratify_enrollment              # Published plan open enrollment has ended and is eligible for coverage,
+    state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
@@ -768,7 +771,7 @@ class PlanYear
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
-    state :conversion_expired # Conversion employers who did not establish eligibility in a timely manner
+    state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -892,7 +895,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled], to: :renewing_canceled
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled
     end
 
     event :conversion_expire, :after => :record_transition do
@@ -981,7 +984,7 @@ private
 
   # Checks for external plan year
   def can_be_migrated?
-    self.employer_profile.is_coversion_employer? && self.employer_profile.registered_on >= start_on && self.employer_profile.registered_on <= end_on
+    is_conversion
   end
 
   def is_event_date_valid?
@@ -1036,6 +1039,12 @@ private
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
       self.employer_profile.trigger_notices("initial_employer_denial")
     end
+  end
+
+  def initial_employer_open_enrollment_completed
+    #also check if minimum participation and non owner conditions are met by ER.
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
   end
 
   def record_transition

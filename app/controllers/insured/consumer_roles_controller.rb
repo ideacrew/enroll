@@ -84,11 +84,10 @@ class Insured::ConsumerRolesController < ApplicationController
               end
             end
           end
-
           @resident_candidate = Forms::ResidentCandidate.new(@person_params)
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
-            if found_person.present?
+            if found_person.present? && found_person.resident_role.present?
               begin
                 @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
                 if @resident_role.present?
@@ -101,13 +100,18 @@ class Insured::ConsumerRolesController < ApplicationController
                 end
               rescue Exception => e
                 flash[:error] = set_error_message(e.message)
-                redirect_to search_exchanges_consumers_path
+                redirect_to search_exchanges_residents_path
                 return
               end
               create_sso_account(current_user, @person, 15, "resident") do
-                format.html { redirect_to family_account_path }
+                respond_to do |format|
+                  format.html {
+                    redirect_to family_account_path
+                  }
+                end
               end
             end
+            return
           end
 
           found_person = @consumer_candidate.match_person

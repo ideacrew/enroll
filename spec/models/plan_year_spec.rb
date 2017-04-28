@@ -2041,6 +2041,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:workflow_plan_year_with_benefit_group) do
       py = PlanYear.new(**valid_params)
       py.aasm_state = "active"
+      py.is_conversion = true
       py.employer_profile = employer_profile
       py.benefit_groups = [benefit_group]
       py.save
@@ -2063,6 +2064,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
       it "should not trigger a state transitioin" do
         workflow_plan_year_with_benefit_group.employer_profile.registered_on = TimeKeeper.date_of_record + 45.days
+        workflow_plan_year_with_benefit_group.is_conversion = false
         workflow_plan_year_with_benefit_group.save
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
         expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)
