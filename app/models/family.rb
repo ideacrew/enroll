@@ -954,7 +954,7 @@ class Family
   end
 
   def apply_rules_and_update_relationships(matrix, family_id)
-    missing_relationship = find_missing_relationships(matrix)
+    missing_relationship =  find_missing_relationships(matrix)
 
     # Sibling rule
     missing_relationship.each do |rel|
@@ -974,41 +974,75 @@ class Family
       end
     end
 
-    # GrandParent-GrandChild Rule
+    #GP/GC
     missing_relationship.each do |rel|
-
       first_rel = rel.to_a.flatten.first
       second_rel = rel.to_a.flatten.second
+
       relation1 = Person.find(first_rel).person_relationships.where(family_id: family_id, predecessor_id: first_rel, :kind.in => ['parent', 'child']).to_a
       relation2 = Person.find(second_rel).person_relationships.where(family_id: family_id, predecessor_id: second_rel, :kind.in => ['parent', 'child']).to_a
 
       relation = relation1 + relation2
-      r_types = relation.collect(&:kind)
       s_ids = relation.collect(&:successor_id)
 
       s_ids.each do |p_id|
-        parent_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, :kind.in => ['parent', 'child']).present?
-        child_rel1 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, :kind.in => ['parent', 'child']).present?
-        parent_rel2 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: first_rel, predecessor_id: p_id, :kind.in => ['parent', 'child']).present?
-        child_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: second_rel, predecessor_id: p_id, :kind.in => ['parent', 'child']).present?
-        if parent_rel1 && child_rel1
+        parent_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, kind: "parent").first
+        child_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, kind: "child").first
+        parent_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, kind: "parent").first
+        child_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, kind: "child").first
+
+        if parent_rel1.present? && child_rel2.present?
           grandchild = Person.where(id: second_rel).first
           grandparent = Person.where(id: first_rel).first
           grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
           grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
-        elsif parent_rel2 && child_rel2
+        elsif child_rel1.present? && parent_rel2.present?
           grandchild = Person.where(id: first_rel).first
           grandparent = Person.where(id: second_rel).first
           grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
-          members.first.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
-        else
         end
       end
     end
+
+    # # GrandParent-GrandChild Rule
+    # missing_relationship.each do |rel|
+    #   first_rel = rel.to_a.flatten.first
+    #   second_rel = rel.to_a.flatten.second
+    #   relation1 = Person.find(first_rel).person_relationships.where(family_id: family_id, predecessor_id: first_rel, :kind.in => ['parent', 'child']).to_a
+    #   relation2 = Person.find(second_rel).person_relationships.where(family_id: family_id, predecessor_id: second_rel, :kind.in => ['parent', 'child']).to_a
+
+    #   relation = relation1 + relation2
+    #   r_types = relation.collect(&:kind)
+    #   s_ids = relation.collect(&:successor_id)
+
+    #   s_ids.each do |p_id|
+    #     parent_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, :kind.in => ['parent', 'child']).present?
+    #     child_rel1 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, :kind.in => ['parent', 'child']).present?
+    #     parent_rel2 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: first_rel, predecessor_id: p_id, :kind.in => ['parent', 'child']).present?
+    #     child_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: second_rel, predecessor_id: p_id, :kind.in => ['parent', 'child']).present?
+    #     if parent_rel1 && child_rel1
+    #       grandchild = Person.where(id: first_rel).first
+    #       grandparent = Person.where(id: second_rel).first
+    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
+    #       grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+    #       missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+    #       break
+    #     elsif parent_rel2 && child_rel2
+    #       grandchild = Person.where(id: first_rel).first
+    #       grandparent = Person.where(id: second_rel).first
+    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
+    #       members.first.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+    #       missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+    #       break
+    #     else
+    #     end
+    #   end
+    # end
 
     # Spouse Rule
     missing_relationship.each do |rel|
