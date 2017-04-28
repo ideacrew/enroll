@@ -22,8 +22,8 @@ class EnrollmentDataUpdate < MongoidMigrationTask
           canceled_enrollments.each do |e1|
             active_enrollments.each do |e2|
               if e1.present? && e2.present? && e1.kind != "coverall" && e2.kind != "coverall"
-                e1_year = e1.kind == "individual" ? e1.effective_on.year : e1.benefit_group.plan_year.start_on.year.to_i
-                e2_year = e2.kind == "individual" ? e2.effective_on.year : e2.benefit_group.plan_year.start_on.year.to_i
+                e1_year = e1.kind == "individual" ? e1.effective_on.year : (e1.benefit_group.present? ? e1.benefit_group.plan_year.start_on.year.to_i : nil)
+                e2_year = e2.kind == "individual" ? e2.effective_on.year : (e2.benefit_group.present? ? e2.benefit_group.plan_year.start_on.year.to_i : nil)
                 next if e1.subscriber.nil? || e2.subscriber.nil?
                 if e1.kind == e2.kind && e1_year == e2_year && e1.subscriber.applicant_id == e2.subscriber.applicant_id
                   if e1.effective_on > e2.submitted_at && e1.effective_on < e2.effective_on
