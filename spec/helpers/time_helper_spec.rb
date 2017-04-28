@@ -54,7 +54,7 @@ RSpec.describe TimeHelper, :type => :helper do
       let(:family) {FactoryGirl.create(:family, :with_primary_family_member,person: person)}
 
       before do
-        allow(person).to receive(:employee_roles).and_return([employee_role1])
+        allow(person).to receive(:active_employee_roles).and_return([employee_role1])
         allow(employer_profile).to receive(:plan_years).and_return(plan_year)
         allow(plan_year).to receive(:published_or_renewing_published).and_return(plan_year)
         allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)

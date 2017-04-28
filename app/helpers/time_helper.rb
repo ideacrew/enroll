@@ -23,7 +23,7 @@ module TimeHelper
     if person.has_consumer_role?
       min_or_max == 'min' ? TimeKeeper.date_of_record.beginning_of_year : TimeKeeper.date_of_record.end_of_year
     else
-      active_plan_years = person.employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
+      active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
       min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
     end
   end
