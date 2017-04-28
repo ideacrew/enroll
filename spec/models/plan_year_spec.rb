@@ -457,6 +457,55 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
+  
+  context 'should return correct benefit group assignments for an employee' do
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }  
+    let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
+    let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
+    let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
+    let(:effective_date)         { plan_year_start_on }
+    let!(:census_employee) { FactoryGirl.create(:census_employee,
+                                                  employer_profile: employer_profile
+                            ) }
+    let!(:plan_year)                     { py = FactoryGirl.create(:plan_year,
+                                                      start_on: plan_year_start_on,
+                                                      end_on: plan_year_end_on,
+                                                      open_enrollment_start_on: open_enrollment_start_on,
+                                                      open_enrollment_end_on: open_enrollment_end_on,
+                                                      employer_profile: employer_profile,
+                                                      aasm_state: 'renewing_enrolled'
+                                                    )
+
+                                                    blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
+                                                    py.benefit_groups = [blue]
+                                                    py.save(:validate => false)
+                                                    py
+                                                  }
+    let!(:benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: plan_year.benefit_groups.first,
+        start_on: plan_year_start_on
+      })
+    }
+
+    let!(:renewal_benefit_group_assignment) {
+      BenefitGroupAssignment.create({
+        census_employee: census_employee,
+        benefit_group: plan_year.benefit_groups.first,
+        start_on: plan_year_start_on
+      })
+    }
+    it 'should return renewing benefit group assignment' do
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq renewal_benefit_group_assignment
+    end
+
+    it 'should retrun active benefit_group_assignment' do
+      plan_year.update_attributes(:'aasm_state' => 'active')
+      expect(plan_year.enrolled_bga_for_ce(census_employee)).to eq census_employee.benefit_group_assignments.first
+    end
+  end
 
   ## Initial application workflow process
 
