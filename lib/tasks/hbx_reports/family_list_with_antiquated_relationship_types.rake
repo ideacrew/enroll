@@ -20,10 +20,9 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << header_names
         person_ids = Person.collection.aggregate([
-          {"$match" => {"person_relationship.kind" => {"$in" => ["ward","guardian","other_tax_dependent"]}}},
+          {"$match" => {"person_relationships.kind" => {"$in" => ["ward","guardian","other_tax_dependent"]}}},
           {"$group" => {"_id" => "$_id"}}
         ]).to_a
-
         person_ids.each do |person_id|
           person = Person.find(person_id[:_id])
           unless person.person_relationships.size <= 1
