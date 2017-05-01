@@ -196,7 +196,87 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
     </div>
 
     <h3>Button Groups</h3>
+    <p> we can group buttons in 3 different ways </p>
+    <h1>First type of grouping default is :</h1>
+    <div class="btn-group btn-group-lg">
+      <! ---- we can specify the button width size here >
+      <button type="button" class="btn btn-info"> Elon Musk</button>
+      <button type="button" class="btn btn-danger">Bill gates</button>
+      <button type="button" class="btn btn-warning">Mark</button>
+    </div>
+    <br>
+    <h2>SECOND VERTICAL TYPE: </h2>
+    <div class="btn-group-vertical btn-group-lg">
+      <! ---- we can specify the button width size here >
+      <button type="button" class="btn btn-info">Elon Musk</button>
+      <button type="button" class="btn btn-danger">Bill gates</button>
+      <button type="button" class="btn btn-warning">Mark</button>
+    </div>
+    <h2>THIRD JUSTIFIED TYPE :</h2>
+    <div class="btn-group btn-group-justified">
+      <! ---- we can specify the button width size here >
+      <button type="button" class="btn btn-info">Elon Musk</button>
+      <button type="button" class="btn btn-danger">Bill gates</button>
+      <button type="button" class="btn btn-warning">Mark</button>
+    </div>
+
     <h3>Panels</h3>
+    <div class="panel panel-success">  <! we can change the panel color with -info, -warning, -primary ... options >
+      <div class="panel-heading">Panel Heading for enrollment reports goes here</div>
+      <div class="panel-body">
+        <p> It will display the all the enrollment reports </p>
+          <table class="table">
+            <thead>
+            <tr>
+              <th>HBX_ID</th>
+              <th>User NAME</th>
+              <th>Employee</th>
+              <th>DOB</th>
+              <th>SSN</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <th scope="row">9898</th>
+              <td>ELON MUSK</td>
+              <td>Tesla</td>
+              <td>10-07-1991</td>
+              <td>873-98-8889</td>
+            </tr>
+            <tr>
+              <th scope="row">7878</th>
+              <td>Gates</td>
+              <td>Microsoft</td>
+              <td>10-07-1991</td>
+              <td>869-89-8888</td>
+            </tr>
+            <tr>
+              <th scope="row">9080</th>
+              <td>Mark</td>
+              <td>Facebook</td>
+              <td>10-07-1991</td>
+              <td>973-34-2323</td>
+            </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+    <p> We can put the list of panles with display them using JS and we can use Hover as well while moving the cursor to different panels</p>
+    <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">History</div>
+    <div class="panel-body">
+      <p>Here goes the respective histroy text</p>
+    </div>
+    <!-- List group -->
+    <ul class="list-group">
+      <li class="list-group-item">Bibilography</li>
+      <li class="list-group-item">Qualifications</li>
+      <li class="list-group-item">Education</li>
+      <li class="list-group-item">References</li>
+    </ul>
+  </div>
+
     <h3>Tables</h3>
     <div class="table-demo-content">
       <p>
@@ -2204,5 +2284,4 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
     </div><!-- /.demo-row -->
 
   </div><!-- /.container -->
-
 <%# end %>
