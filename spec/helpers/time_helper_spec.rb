@@ -41,4 +41,49 @@ RSpec.describe TimeHelper, :type => :helper do
       end
     end
   end
+
+  describe "SET optional_effective_on date on a SEP" do
+    let(:person_with_consumer_role) { FactoryGirl.create(:person, :with_consumer_role) }
+    let(:person_with_employee_role) { FactoryGirl.create(:person, :with_employee_role) }
+
+    context "for shop market" do
+      let(:person) {FactoryGirl.create(:person)}
+      let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+      let(:employee_role1) {FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile)}
+      let(:plan_year) {double("PlanYear")}
+      let(:family) {FactoryGirl.create(:family, :with_primary_family_member,person: person)}
+
+      before do
+        allow(person).to receive(:active_employee_roles).and_return([employee_role1])
+        allow(employer_profile).to receive(:plan_years).and_return(plan_year)
+        allow(plan_year).to receive(:published_or_renewing_published).and_return(plan_year)
+        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record - 1.month)
+        allow(plan_year).to receive(:end_on).and_return(TimeKeeper.date_of_record - 1.month + 1.year - 1.day)
+      end
+
+      it "returns minmum range as start_date of plan_year" do
+        expect(helper.sep_optional_date(family, 'min')).to eq(plan_year.start_on)
+      end
+
+      it "returns maximum range as end_date of plan_year" do
+        expect(helper.sep_optional_date(family, 'max')).to eq(plan_year.end_on)
+      end
+    end
+
+    context "for individual market" do
+      before do
+        allow(family).to receive_message_chain("primary_applicant.person").and_return(person_with_consumer_role)
+      end
+
+      it "returns minmum range as beginning of the year" do
+        beginning_of_year = TimeKeeper.date_of_record.beginning_of_year
+        expect(helper.sep_optional_date(family, 'min')).to eq(beginning_of_year)
+      end
+
+      it "returns maximum range as end of the year" do
+        end_of_year = TimeKeeper.date_of_record.end_of_year
+        expect(helper.sep_optional_date(family, 'max')).to eq(end_of_year)
+      end
+    end
+  end
 end
