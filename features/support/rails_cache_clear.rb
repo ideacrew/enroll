@@ -1,4 +1,4 @@
 Before do
   Rails.cache.clear
-  DatabaseCleaner.clean
+  DatabaseCleaner.strategy = :truncation, {:except => %w[rate_reference]}
 end

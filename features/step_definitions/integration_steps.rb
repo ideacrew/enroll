@@ -184,7 +184,8 @@ def default_office_location
   address2: "Suite 200",
   city: "AnyCity",
   state: Settings.aca.state_abbreviation,
-  zip: "20001",
+  zip: "01002",
+  county: 'Franklin',
   phone_area_code: "202",
   phone_number: "1110000",
   phone_extension: "1111"
@@ -380,6 +381,9 @@ When(/^.+ enters? office location for (.+)$/) do |location|
   find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
 
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
+  wait_for_ajax
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'SELECT COUNTY')]]").click
+  find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:county]}')]").click
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]

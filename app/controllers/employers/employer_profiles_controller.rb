@@ -293,11 +293,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       params.permit([:child_index, :zip_code])
       @child_index = params[:child_index]
       @counties = RateReference.where(zip_code: params[:zip_code])
-      if @counties.present?
-        render partial: 'employers/employer_profiles/county_field'
-      else
-        render nothing: true
-      end
+      render partial: 'employers/employer_profiles/county_field'
   end
 
   private

@@ -70,7 +70,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
-  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+  fill_in 'census_employee[address_attributes][zip]', :with => "01002"
 
   find(:xpath, "//p[contains(., 'SELECT KIND')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'home')]").click

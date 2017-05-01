@@ -11,12 +11,13 @@ require 'rspec/expectations'
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
-
+require 'rake'
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
-
+load File.expand_path("../../../lib/tasks/migrations/load_rate_reference.rake", __FILE__)
 require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
 require "rspec/rails"
-
+Rake::Task.define_task(:environment)
+Rake::Task["load_rate_reference:update_rating_regions"].invoke
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
 # selectors in your step definitions to use the XPath syntax.
@@ -42,7 +43,7 @@ ActionController::Base.allow_rescue = false
 # Remove/comment out the lines below if your app doesn't have a database.
 # For some databases (like MongoDB and CouchDB) you may need to use :truncation instead.
 begin
-  DatabaseCleaner.strategy = :truncation
+  DatabaseCleaner.strategy = :truncation, {:except => %w[rate_reference]}
 rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
