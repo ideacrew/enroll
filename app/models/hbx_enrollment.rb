@@ -515,7 +515,7 @@ class HbxEnrollment
     if is_shop?
       if self.benefit_group.plan_year.is_published?
 
-        renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
+        renewal_plan_year = self.employer_profile.renewing_published_plan_year if self.employer_profile.present?
 
         if renewal_plan_year.present?
           renewal_enrollments = self.family.active_household.hbx_enrollments.where({ 
