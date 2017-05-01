@@ -1,6 +1,5 @@
-
 require File.join(Rails.root, "lib/mongoid_migration_task")
-class MoveUSerAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
+class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
   def migrate
     hbx_id_1=ENV['hbx_id_1']
     hbx_id_2=ENV['hbx_id_2']

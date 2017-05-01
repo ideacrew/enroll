@@ -1,8 +1,8 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "move_user_account_between_two_people_accounts")
-describe MoveUSerAccountBetweenTwoPeopleAccounts do
+describe MoveUserAccountBetweenTwoPeopleAccounts do
   let(:given_task_name) { "move_user_account_between_two_people_accounts" }
-  subject { MoveUSerAccountBetweenTwoPeopleAccounts.new(given_task_name, double(:current_scope => nil)) }
+  subject { MoveUserAccountBetweenTwoPeopleAccounts.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
     it "has the given task name" do
