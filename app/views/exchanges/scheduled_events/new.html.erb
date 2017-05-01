@@ -1,3 +1,10 @@
+<div class="content landing">
+  <%= render "exchanges/hbx_profiles/shared/primary_nav", :active_tab => "home-tab" %>
+  
+  <div class="home">
+    <%= render 'shared/tab_panel' %>
+  </div>
+</div>
 <div id="create_event">
   <div class="container top-pd">
     <div class="tab-wrapper">
@@ -5,9 +12,7 @@
     </div>
   </div>
   <div id="schedules_event_form">
-    <%= form_for @scheduled_event, as: :scheduled_event, url: {action: "create"} do |f| %>
-      <%= render "event_form", f: f %>
-     <% end %>
+    <%= render "event_form" %>
   </div>
 
 </div>

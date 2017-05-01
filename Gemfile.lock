@@ -631,7 +631,6 @@ DEPENDENCIES
   font-awesome-rails (= 4.5.0.1)
   forgery
   haml
-  ice_cube
   interactor (= 3.1.0)
   interactor-rails (= 2.0.2)
   jbuilder (~> 2.0)

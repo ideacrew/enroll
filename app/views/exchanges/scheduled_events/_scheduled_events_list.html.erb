@@ -2,7 +2,7 @@
   <% if scheduled_events.exists? %>
     <% scheduled_events.each do |event| %>
        <li>
-         <%= event.event_name %>
+         <%= link_to event.event_name, edit_exchanges_scheduled_event_path(id: event.id), class: 'btn btn-normal'%>
         </li>
     <% end %>
   <% end %>

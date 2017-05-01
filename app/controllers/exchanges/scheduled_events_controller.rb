@@ -9,8 +9,13 @@ layout 'single_column'
     params.permit!
     @scheduled_event = ScheduledEvent.new(params[:scheduled_event])
     if @scheduled_event.save
+      @scheduled_event.update_attributes!(one_time: true) if @scheduled_event.recurring_rules.present?
       redirect_to exchanges_scheduled_events_path
     end
+  end
+
+  def edit
+    @scheduled_event = ScheduledEvent.find(params[:id])
   end
 
   def index
