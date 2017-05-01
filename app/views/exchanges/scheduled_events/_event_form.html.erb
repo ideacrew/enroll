@@ -1,27 +1,26 @@
-<%= form_for @scheduled_event, as: :scheduled_event, url: {action: "create"} do |f| %>
-  <div class="container content-bottom">
-    <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-      <% types = ScheduledEvent::EVENT_TYPES; types = types.rotate %>
-      <%= f.select :type, options_for_select(types.map {|a| [a.to_s.humanize, a.to_s]}, f.object.type), {include_blank: "SELECT EVENT TYPE"}, required: true, id: 'selected_scheduled_event_type', onchange: "getEvents(this.value)" %>
-    </div>
-  
-    <div id="scheduled_event" class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">   
-      <% events = ScheduledEvent.where(event_name: f.object.event_name) %>
-      <%= f.select :event_name, options_for_select(events.pluck(:event_name), f.object.event_name), include_blank: "SELECT EVENT",   required: true %>
-     </div>
+<div class="container content-bottom">
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <% types = ScheduledEvent::EVENT_TYPES; types = types.rotate %>
+    <%= f.select :type, options_for_select(types.map {|a| [a.to_s.humanize, a.to_s]}, f.object.type), {include_blank: "SELECT EVENTYPE"}, required: true, id: 'selected_scheduled_event_type', onchange: "getEvents(this.value)" %>
   </div>
-  
-  <div class="container content-bottom">
-    <%= f.label :start_date %>
-    <%= f.text_field :start_date, class: "date-picker floatlabel form-control", placeholder: 'Start Date' %>
-  </div>
-  
-  <div class="container content-bottom">
-    <%= f.label :recurring_rules %>
-    <%= f.select_recurring :recurring_rules %>
-  </div>
-  
-  <div class="container content-bottom">
-    <%= f.submit %>
-  </div>
-<% end %>
+
+  <div id="scheduled_event" class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">   
+    <% events = ScheduledEvent.where(event_name: f.object.event_name) %>
+    <%= f.select :event_name, options_for_select(events.pluck(:event_name), f.object.event_name), include_blank: "SELECT EVENT", required: true %>
+   </div>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :start_date %>
+  <%= f.text_field :start_date, class: "date-picker floatlabel form-control", placeholder: 'Start Date' %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.label :recurring_rules %>
+  <%= f.select_recurring :recurring_rules %>
+</div>
+
+<div class="container content-bottom">
+  <%= f.submit %>
+</div>
+

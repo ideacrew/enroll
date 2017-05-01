@@ -12,7 +12,9 @@
     </div>
   </div>
   <div id="schedules_event_form">
-    <%= render "event_form" %>
+    <%= form_for @scheduled_event, as: :scheduled_event, url: {action: "create"} do |f| %>
+      <%= render "event_form", f: f %>
+    <% end %>
   </div>
 
 </div>
