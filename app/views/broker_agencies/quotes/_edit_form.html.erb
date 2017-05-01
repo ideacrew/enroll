@@ -87,7 +87,7 @@
   disableSelectric = true;
 
   var counter= 1000;
-  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true});
+  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
   $(".uidatepicker").datepicker( "option", "dateFormat", "mm/dd/yy" );
   var date_handler = function() {
     $(this).datepicker();
@@ -174,7 +174,7 @@ function addEmployeeRowToFamily(family, idx) {
 								   + '</div>');
 									counter += 1 ;
 									$('#family-' + family).append(table_row);
-									$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});
+									$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
 									$(".uidatepicker").focus(date_handler);
 									$('button#remove_member_button').click(remove_member_handler);
 									//$('select').selectric('refresh');
@@ -193,7 +193,7 @@ function isEmpSelected(emp_option){
     + '</div>');
   counter += 1 ;
   $('#family-' + family).append(table_row);
-  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});
+  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
   $(".uidatepicker").focus(date_handler);
   $('button#remove_member_button').click(remove_member_handler);
 //$('select').selectric('refresh');
