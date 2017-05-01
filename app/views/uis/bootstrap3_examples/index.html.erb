@@ -350,6 +350,107 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
 
     <h3>Pagination</h3>
     <h3>Navigation</h3>
+    
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+              <img alt="Brand" src="...">
+            </a>
+          </div>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Brand</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">One more separated link</a></li>
+                </ul>
+              </li>
+            </ul>
+            <form class="navbar-form navbar-left">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#">Link</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Action</a></li>
+                  <li><a href="#">Another action</a></li>
+                  <li><a href="#">Something else here</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="#">Separated link</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">WebSiteName</a>
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#">Link</a></li>
+            <li><a href="#">Link</a></li>
+          </ul>
+          <button class="btn btn-danger navbar-btn">Button</button>
+        </div>
+      </nav><br>
+
+      <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span> 
+            </button>
+            <a class="navbar-brand" href="#">WebSiteName</a>
+          </div>
+
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#">Page 1</a></li>
+              <li><a href="#">Page 2</a></li> 
+              <li><a href="#">Page 3</a></li> 
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+              <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
     <h3>Tabs </h3>
       <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -379,7 +480,6 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
         <li class="breadcrumb-item"><a href="#">Library</a></li>
         <li class="breadcrumb-item active">Data</li>
       </ol>
-    
     <h3>Progress Bars and Sliders</h3>
 <div>
 
@@ -558,6 +658,36 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
         </ul>
 
     <h3>Badges</h3>
+      <div class="container">
+        <h2>Badges</h2>
+        <a href="#">News <span class="badge">5</span></a><br>
+        <a href="#">Comments <span class="badge">10</span></a><br>
+        <a href="#">Updates <span class="badge">2</span></a>
+      </div>
+
+      <div class="container">
+        <h2>Badges on Buttons</h2>
+        <button type="button" class="btn btn-primary">Primary <span class="badge">7</span></button><br>
+        <button type="button" class="btn btn-success">Success <span class="badge">3</span></button><br>    
+        <button type="button" class="btn btn-danger">Danger <span class="badge">5</span></button><br>     
+      </div>
+
+      <div class="container">
+      <h2>Badges</h2>
+      <a href="#">Inbox <span class="badge">42</span></a><br>
+      <button class="btn btn-primary" type="button">Messages <span class="badge">4</span></button>
+      </div>
+
+      <div class="container">
+        <h2>Badges nav-pills</h2>
+          <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active"><a href="#">Home <span class="badge">42</span></a></li>
+            <li role="presentation"><a href="#">Profile</a></li>
+            <li role="presentation"><a href="#">Messages <span class="badge">3</span></a></li>
+          </ul>
+      </div><br>
+
+      
     <h3>Tabs</h3>
     <h3>Wells</h3>
       
