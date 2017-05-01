@@ -967,8 +967,8 @@ class Family
 
       if s_ids.count > s_ids.uniq.count
         members = Person.where(:id.in => rel.to_a.flatten)
-        members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling", inferred_relationship: true)
-        members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling", inferred_relationship: true)
+        members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling")
+        members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
         missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
       end
     end
@@ -993,15 +993,15 @@ class Family
         if parent_rel1.present? && child_rel2.present?
           grandchild = Person.where(id: second_rel).first
           grandparent = Person.where(id: first_rel).first
-          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
-          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
         elsif child_rel1.present? && parent_rel2.present?
           grandchild = Person.where(id: first_rel).first
           grandparent = Person.where(id: second_rel).first
-          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
-          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
           break
         end
@@ -1027,15 +1027,15 @@ class Family
     #     if parent_rel1 && child_rel1
     #       grandchild = Person.where(id: first_rel).first
     #       grandparent = Person.where(id: second_rel).first
-    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
-    #       grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+    #       grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
     #       missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
     #       break
     #     elsif parent_rel2 && child_rel2
     #       grandchild = Person.where(id: first_rel).first
     #       grandparent = Person.where(id: second_rel).first
-    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent", inferred_relationship: true)
-    #       members.first.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild", inferred_relationship: true)
+    #       grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+    #       members.first.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
     #       missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
     #       break
     #     else
@@ -1055,8 +1055,8 @@ class Family
         spouse_relation = Person.find(parent_rel1.successor_id).person_relationships.where(family_id: family_id, predecessor_id: parent_rel1.successor_id, successor_id: parent_rel2.successor_id, kind: "spouse").first
         if spouse_relation.present?
           members = Person.where(:id.in => rel.to_a.flatten)
-          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling", inferred_relationship: true) 
-          members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling", inferred_relationship: true)
+          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling") 
+          members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
         end
       end

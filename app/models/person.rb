@@ -907,10 +907,11 @@ class Person
       # Destroying the relationships associated to the Person other than the new updated relationship.
       if direct_relationship != nil && destroy_relation
         other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
-        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id], inferred_relationship: true).each(&:destroy)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
 
         other_relations.each do |otr|
-          Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id, inferred_relationship: true).first.destroy
+          otr_relation = Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first
+          otr_relation.destroy unless otr_relation.blank?
         end
       end
 
