@@ -308,7 +308,15 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
       <p>Effective Datatables example</p>
       <%= render_datatable(@family_data_table) %>
     </div>
+
     <h3>Selects</h3>
+      <select class="custom-select">
+        <option selected>Open this select menu</option>
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+       </select>
+    
     <h3>Inputs</h3>
     <div class="form-group">
       <label for="usr">Name:</label>
@@ -348,7 +356,111 @@ Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis moll
       </div><!-- /.col-lg-6 -->
     </div><!-- /.row -->
 
-    <h3>Pagination</h3>
+    <div>
+      <h3>Pagination</h3>
+      <p>Default pagination</p>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+              <a href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+              <li><a href="#">1</a></li>
+              <li><a href="#">2</a></li>
+              <li><a href="#">3</a></li>
+              <li><a href="#">4</a></li>
+              <li><a href="#">5</a></li>
+            <li>
+              <a href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <p>Disabled and active states</p>
+
+         <nav aria-label="Page navigation">
+          <ul class="pagination">
+          <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+          <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+          <li class="disabled"><a href="#">2 <span class="sr-only">(current)</span></a></li>
+          <li class="disabled"><a href="#">3 <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </nav>
+
+
+        <p>Sizing</p>
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination pagination-lg">
+            <li>
+            <a href="#">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+            </li>
+          </ul>
+        </nav>
+
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+              <a href="#">1</a>
+              <a href="#">2</a>
+              <a href="#">3</a>
+              <a href="#">4</a>
+              <a href="#">5</a>
+            </li>
+          </ul>
+        </nav>
+        
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination pagination-sm">
+            <li>
+              <a href="#">1</a>
+              <a href="#">2</a>
+              <a href="#">3</a>
+              <a href="#">4</a>
+              <a href="#">5</a>
+            </li>
+          </ul>
+        </nav>
+
+        
+    <h3>Pager</h3>
+      <p>Default</p>
+
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li><a href="#">Previous</a></li>
+            <li><a href="#">Next</a></li>
+          </ul>
+        </nav>
+
+      <p>Aligned links</p>
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+            <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </nav>
+
+       <p>Optional disabled state</p> 
+
+          <nav aria-label="...">
+            <ul class="pager">
+              <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+              <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+          </nav>
+
+    </div>
+
     <h3>Navigation</h3>
     
       <nav class="navbar navbar-inverse">
