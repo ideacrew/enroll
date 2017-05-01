@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   end
 
   namespace :financial_assistance do
-    resources :applcations do
+    resources :applications do
       put :step, on: :member
     end
   end
