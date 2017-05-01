@@ -434,7 +434,7 @@ describe HbxEnrollment, dbclean: :after_all do
       end
     end
 
-    context "should cancel previous auto renewing enrollment" do
+    context "should shedule termination previous auto renewing enrollment" do
       before :all do
         @enrollment6 = household.create_hbx_enrollment_from(
             employee_role: mikes_employee_role,
@@ -455,8 +455,8 @@ describe HbxEnrollment, dbclean: :after_all do
         @enrollment7.cancel_previous(TimeKeeper.date_of_record.year)
       end
 
-      it "should cancel an auto renewing enrollment" do
-        expect(@enrollment6.aasm_state).to eq "coverage_canceled"
+      it "doesn't move enrollment for shop market" do
+        expect(@enrollment6.aasm_state).to eq "auto_renewing"
       end
 
       it "should not cancel current shopping enrollment" do
@@ -874,7 +874,8 @@ describe HbxProfile, "class methods", type: :model do
         hbx_enrollment2.effective_on = date + 1.day
       end
       hbx_enrollment2.select_coverage!
-      expect(hbx_enrollment1.coverage_canceled?).to be_truthy
+      hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
+      expect(hbx_enrollment1_from_db.coverage_canceled?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
@@ -888,6 +889,16 @@ describe HbxProfile, "class methods", type: :model do
 
     it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
       hbx_enrollment1.effective_on = date - 10.days
+      hbx_enrollment2.select_coverage!
+      hbx_enrollment1_from_db = HbxEnrollment.by_hbx_id(hbx_enrollment1.hbx_id).first
+      expect(hbx_enrollment1_from_db.coverage_terminated?).to be_truthy
+      expect(hbx_enrollment2.coverage_selected?).to be_truthy
+      expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
+    end
+
+    it "terminates previous enrollments if both effective on in the future" do
+      hbx_enrollment1.effective_on = date + 10.days
+      hbx_enrollment2.effective_on = date + 20.days
       hbx_enrollment2.select_coverage!
       expect(hbx_enrollment1.coverage_terminated?).to be_truthy
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
