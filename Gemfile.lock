@@ -1,6 +1,6 @@
 GIT
-  remote: ../ui_helpers
-  revision: a23331f4cdfd00b2568ad2172b36daa86250d39c
+  remote: git@github.com:dchbx/ui_helpers.git
+  revision: 908a011ebdb58b36cdcc956cc93a80caf1b9dfcd
   specs:
     ui_helpers (0.0.1)
       rails (~> 4.2.3)

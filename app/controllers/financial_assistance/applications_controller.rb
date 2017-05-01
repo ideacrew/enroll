@@ -1,4 +1,4 @@
-class FinancialAssistance::ApplicationController < ApplicationController
+class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
 
   def index
