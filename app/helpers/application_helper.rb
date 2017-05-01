@@ -1,5 +1,13 @@
 module ApplicationHelper
 
+  def deductible_display(hbx_enrollment, plan)
+    if hbx_enrollment.hbx_enrollment_members.count > 1
+      plan.family_deductible.split("|").last.squish
+    else
+      plan.deductible
+    end
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true
