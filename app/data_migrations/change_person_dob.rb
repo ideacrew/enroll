@@ -3,7 +3,7 @@ require 'date'
 class ChangePersonDob< MongoidMigrationTask
   def migrate
     person=Person.where(hbx_id:ENV['hbx_id']).first
-    new_dob = DateTime.parse.(ENV['new_dob']).to_date
+    new_dob = DateTime.strptime(ENV['new_dob'],'%m/%d/%Y')
     if person.nil?
       puts "No person was found by the given fein"
     else
