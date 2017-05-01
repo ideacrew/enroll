@@ -36,12 +36,16 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:person) { FactoryGirl.build_stubbed(:person) }
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
-
+  
     context "GET plans" do
       before :each do
+        allow(hbx_enrollment_one).to receive(:is_shop?).and_return(false)
+        allow(hbx_enrollment_one).to receive(:decorated_elected_plans).and_return([])
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(family).to receive(:active_household).and_return(household)
+        allow(family).to receive(:currently_enrolled_plans).and_return([])
+        allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
         sign_in user
-        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-        allow(person.primary_family).to receive(:active_household).and_return(household)
       end
 
       it "returns http success" do
@@ -415,10 +419,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(Date.new(2015))
       allow(hbx_enrollment).to receive(:family).and_return(family)
-      allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
-      allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
 
       sign_in user
     end
@@ -495,7 +495,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       let(:user) {double("user",person: person)}
 
       before do
-        allow(hbx_enrollment).to receive(:family).and_return(family)
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
         allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
@@ -504,6 +503,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
       context "with tax_household" do
         before :each do
+          allow(family).to receive(:latest_household).and_return(household)
           allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
