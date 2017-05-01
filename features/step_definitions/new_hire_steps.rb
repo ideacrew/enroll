@@ -91,7 +91,7 @@ And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
   end
 end
 
-Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|  
+Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
@@ -158,7 +158,7 @@ Then(/(.*) should see page with SelectPlanToTerminate button/) do |named_person|
   expect(page.find('.interaction-click-control-select-plan-to-terminate')).to be_truthy
 end
 
-When(/(.*) clicks SelectPlanToTerminate button/) do |named_person| 
+When(/(.*) clicks SelectPlanToTerminate button/) do |named_person|
   page.find('.interaction-click-control-select-plan-to-terminate').click
 end
 
@@ -218,3 +218,6 @@ When(/Employee clicks continue on the family members page/) do
   wait_for_ajax
 end
 
+And(/Employee has past created at date/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update({ :created_at => TimeKeeper.date_of_record - 1.year })
+end
