@@ -46,7 +46,10 @@ class FinancialAssistance::Application
 
   field :is_ridp_verified, type: Boolean
 
-  embeds_many :tax_households, class_name: "::TaxHousehold"
+  field :workflow, type: Hash, default: { }
+
+  #embeds_many :tax_households, class_name: "::TaxHousehold"
+  embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
 
   embeds_many :workflow_state_transitions, as: :transitional
