@@ -10,7 +10,7 @@ class ShopEmployerNotices::EmployerRenewalNotice < ShopEmployerNotice
     end
     attach_envelope
     upload_and_send_secure_message
-    send_generic_notice_alert
+    # send_generic_notice_alert
   end
 
   def append_data
