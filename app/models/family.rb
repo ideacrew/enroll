@@ -911,6 +911,14 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def create_dep_consumer_role
+    if dependents.any?
+      dependents.each do |member|
+        build_consumer_role(member)
+      end
+    end
+  end
+
 private
   def build_household
     if households.size == 0
@@ -1021,5 +1029,4 @@ private
       unset("e_case_id")
     end
   end
-
 end
