@@ -13,7 +13,7 @@ describe ChangePersonDob do
     let(:person) { FactoryGirl.create(:person)}
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("new_dob").and_return(Date.new(2011,1,1))
+      allow(ENV).to receive(:[]).with("new_dob").and_return("01/01/2011")
     end
 
     it "should change effective on date" do

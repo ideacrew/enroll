@@ -4,5 +4,5 @@ require File.join(Rails.root, "app", "data_migrations", "change_person_dob")
 
 namespace :migrations do
   desc "change_person_dob"
-  ChangeFein.define_task :change_person_dob => :environment
+  ChangePersonDob.define_task :change_person_dob => :environment
 end
