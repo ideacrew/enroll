@@ -19,7 +19,7 @@ class UpdateBenefitGroupAssignmentStartDate < MongoidMigrationTask
             plan_year = benefit_group_assignment.plan_year
             if plan_year.start_on != benefit_group_assignment.start_on
               benefit_group_assignment.update_attributes(start_on: plan_year.start_on)
-              puts "Updated benefit_group_assignment start on with plan year start on for #{organizations.first.legal_name}" unless Rails.env.test?
+              puts "Updating benefit group assignment start on for #{ce.first_name} #{ce.last_name}" unless Rails.env.test?
             end
           end 
         end
