@@ -17,10 +17,10 @@ class Household
 
   embeds_many :hbx_enrollments
   #embeds_many :tax_households # THH is embedded in Application now.
-  embeds_many :applications, class_name: "FinancialAssistance::Application"
+  #embeds_many :applications, class_name: "FinancialAssistance::Application"
   embeds_many :coverage_households, cascade_callbacks: true
 
-  accepts_nested_attributes_for :hbx_enrollments, :applications, :coverage_households
+  accepts_nested_attributes_for :hbx_enrollments, :coverage_households
 
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this

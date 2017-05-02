@@ -3,7 +3,9 @@ class FinancialAssistance::Application
   include Mongoid::Timestamps
   include AASM
 
-  embedded_in :household, class_name: "::Household"
+  #embedded_in :household, class_name: "::Household"
+  embedded_in :family, class_name: "::Family"
+
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
 
