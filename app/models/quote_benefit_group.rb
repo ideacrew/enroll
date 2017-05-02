@@ -74,8 +74,8 @@ class QuoteBenefitGroup
     self.quote_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
 
       # 'employee' relationship should be set to a min of 50%
-      initial_premium_pct = relationship.to_s == "employee" ? 50 : 0
-       self.quote_relationship_benefits.build(relationship: relationship, offered: true, premium_pct: initial_premium_pct)
+      # initial_premium_pct = relationship.to_s == "employee" ? 50 : 0
+       self.quote_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
