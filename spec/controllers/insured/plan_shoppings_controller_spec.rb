@@ -207,7 +207,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:can_select_coverage?).and_return(true)
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
       allow(enrollment).to receive(:set_special_enrollment_period).and_return(true)
-      allow(enrollment).to receive(:set_enrolled_plan_coverage_start_dates).and_return(true)
+      allow(enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
     end
 
     it "returns http success" do

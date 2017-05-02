@@ -39,6 +39,7 @@ RSpec.describe Products::QhpController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
     end
 

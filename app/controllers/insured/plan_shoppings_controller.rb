@@ -74,7 +74,7 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
-    @enrollment.set_enrolled_plan_coverage_start_dates(@plan)
+    @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
     

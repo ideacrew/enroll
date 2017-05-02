@@ -776,7 +776,7 @@ class HbxEnrollment
     end
   end
 
-  def set_enrolled_plan_coverage_start_dates(new_plan=nil)
+  def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= self.plan
     
     if self.family.currently_enrolled_plans(self).include?(new_plan.id)
