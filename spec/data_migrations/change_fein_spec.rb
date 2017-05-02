@@ -1,5 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_fein")
+
 describe ChangeFein do
   let(:given_task_name) { "change_fein" }
   subject { ChangeFein.new(given_task_name, double(:current_scope => nil)) }
@@ -9,8 +10,10 @@ describe ChangeFein do
       expect(subject.name).to eql given_task_name
     end
   end
+
   describe "changing organization's fein" do
     let(:organization) { FactoryGirl.create(:organization)}
+
     before(:each) do
       allow(ENV).to receive(:[]).with("old_fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("new_fein").and_return("987654321")
