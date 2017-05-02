@@ -53,7 +53,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @market_kind = "individual"
     end
 
-    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household, action_name: self.action_name)
+    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -66,11 +66,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-
-    if @enrollment.is_special_enrollment?
-      sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
-      @enrollment.update_current(special_enrollment_period_id: sep_id)
-    end
+    @enrollment.set_special_enrollment_period
 
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
@@ -78,9 +74,10 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
+    @enrollment.set_enrolled_plan_coverage_start_dates(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
-
     @family = @person.primary_family
+    
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -266,9 +263,10 @@ class Insured::PlanShoppingsController < ApplicationController
         @enrolled_plans = enrolled_plans.collect{|plan|
           @benefit_group.decorated_plan(plan, same_plan_enrollment, ref_plan)
         }
+      else
+        @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
     
-      @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan

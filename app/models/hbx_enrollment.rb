@@ -769,47 +769,33 @@ class HbxEnrollment
     end
   end
 
-  # def benefit_coverage_period=(new_benefit_coverage_period: nil)
-  #   if new_benefit_coverage_period.present?
-  #     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
-  #   else
-  #     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
-  #       new_benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
-  #     else
-  #       new_benefit_coverage_period = benefit_sponsorship.current_benefit_period
-  #     end
-  #   end
-
-  #   if new_benefit_coverage_period.present?
-  #     self.benefit_coverage_period_id = new_benefit_coverage_period.id
-  #     @benefit_coverage_period = new_benefit_coverage_period
-  #   end
-  # end
-
-  # def benefit_coverage_period
-  #   return @benefit_coverage_period if defined? @benefit_coverage_period
-  # end
-
-  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil, action_name: nil)
-    enrollment = self
-
-    if action_name != 'receipt' && family.currently_enrolled_plans(self).include?(qhp_plan.id)
-      plan_selection = PlanSelection.new(self, self.plan)
-      enrollment = plan_selection.same_plan_enrollment
+  def set_special_enrollment_period
+    if is_special_enrollment?
+      sep_id = is_shop? ? self.family.earliest_effective_shop_sep.id : self.family.earliest_effective_ivl_sep.id
+      self.update_current(special_enrollment_period_id: sep_id)
     end
+  end
 
+  def set_enrolled_plan_coverage_start_dates(plan)
+    if self.family.currently_enrolled_plans(self).include?(plan.id)
+      plan_selection = PlanSelection.new(self, self.plan)
+      self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    end
+  end
+
+  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil)
     if self.is_shop?
       if benefit_group.is_congress
-        PlanCostDecoratorCongress.new(qhp_plan, enrollment, benefit_group)
+        PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
       else
         reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
-        PlanCostDecorator.new(qhp_plan, enrollment, benefit_group, reference_plan)
+        PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
       end
     else
       if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, enrollment, elected_aptc, tax_household)
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
       else
-        UnassistedPlanCostDecorator.new(qhp_plan, enrollment)
+        UnassistedPlanCostDecorator.new(qhp_plan, self)
       end
     end
   end
