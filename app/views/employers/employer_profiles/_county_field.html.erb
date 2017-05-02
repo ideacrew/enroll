@@ -1,17 +1,7 @@
-<%#= fields_for(@parent_object, :fieldset => false) do |f| %>
-  <%#= f.fields_for("office_locations", @office_location, child_index: @child_index) do |o| %>
-    <%#= o.fields_for :address do |a| %>
-      <%#puts @counties.inspect%>
-      <%# @counties = RateReference.where(zip_code: a.object.try(:zip_code)) %>
-      <%#= a.select :county, options_for_select(@counties.pluck(:county)), {include_blank: "SELECT COUNTY"}, required: true%>
-    <%# end %>
-  <%# end %>
-<%# end %>
-
 <select required=required" name="organization[office_locations_attributes][<%= @child_index.to_i  %>][address_attributes][county]"
         id="organization_office_locations_address_attributes_county" tabindex="-1">
     <option value="">SELECT COUNTY</option>
-    <% @counties.pluck(:county).each do |county| %>
+    <% @counties.pluck(:county_name).each do |county| %>
       <option value="<%=county%>"><%=county%></option>
     <%end%>
 </select>
