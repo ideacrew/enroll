@@ -49,7 +49,7 @@ class Family
   embeds_many :broker_agency_accounts
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
-  embeds_many :applications, class_name: "FinancialAssistance::Application"
+  has_many :applications, class_name: "FinancialAssistance::Application"
 
   after_initialize :build_household
   before_save :clear_blank_fields

@@ -4,7 +4,7 @@ class FinancialAssistance::Application
   include AASM
 
   #embedded_in :household, class_name: "::Household"
-  embedded_in :family, class_name: "::Family"
+  belongs_to :family, class_name: "::Family"
 
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
@@ -47,9 +47,10 @@ class FinancialAssistance::Application
 
   field :is_ridp_verified, type: Boolean
 
-  #embeds_many :tax_households, class_name: "::TaxHousehold"
+  embeds_many :tax_households, class_name: "::TaxHousehold"
   embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
+
   embeds_many :workflow_state_transitions, as: :transitional
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
 

@@ -11,8 +11,8 @@ class TaxHousehold
   include Acapi::Notifiers
   include SetCurrentUser
 
-  # embedded_in :application, class_name: "FinancialAssistance::Application" 
-  embedded_in :eligibility_determination
+  embedded_in :application, class_name: "FinancialAssistance::Application" 
+  #embedded_in :eligibility_determination
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -26,7 +26,7 @@ class TaxHousehold
 
   embeds_many :tax_household_members
   #embeds_many :eligibility_determinations
-  embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
+  has_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
   
 
   accepts_nested_attributes_for :tax_household_members
