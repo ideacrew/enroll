@@ -24,28 +24,46 @@
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= csrf_meta_tags %>
   </head>
-  <body>
-    <%= render 'layouts/application_brand' %>
-    <div class="container">
-      <div id="content" role="main" aria-label="main content">
-        <% if content_for?(:two_column_layout) %>
-          <%= yield :two_column_layout %>
-        <% elsif content_for?(:one_column_layout) %>
-          <%#= content_tag(:div, class: "one_column_layout") %>
-          <div class="content <%= controller_name %> content-bottom">
-            <%= yield %>
-          </div>
-        <% else %>
-          <!-- Layout unspecified, default to single column -->
-          <div>
-            <div class="content <%= controller_name %> content-bottom">
-              <%= yield %>
+  <body class="<%= controller_name %> <%= action_name %>">
+    <header aria-label="header content"> <%= render 'layouts/application_brand' %></header>
+
+    <% if content_for?(:left_navigation) %>
+      <div class="container">
+        <div class="row">
+          <!-- Navigation Column -->
+          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 sidebar">
+            <div class="left_navigation" role="navigation" aria-label="main navigation">
+              <%= yield(:left_navigation) %>
             </div>
           </div>
-          <%#= content_for?(:content_wrapper) ? yield(:content_wrapper) : yield %>
-        <% end %>
+
+          <!-- Main Content -->
+          <main>
+            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+              <div class="flash_message"><%= flash_messages %></div>
+              <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
+              <%= content_for?(:main) ? yield(:main) : "Provide content for :main" %>
+            </div>
+          </main>
+        </div>
       </div>
-    </div> <!-- .container -->
+    <% else %>
+      <!-- Default is top navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" aria-label="main navigation">
+      <div class="container">
+          <%= content_for?(:top_navigation) ? yield(:top_navigation) : "Provide content for :top_navigation" %>
+      </div>
+        </nav>
+
+      <!-- Main Content -->
+      <div class="container">
+        <main role="main" aria-label="main content">
+          <div class="flash_message"><%= flash_messages %></div>
+          <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
+          <%= content_for?(:main) ? yield(:main) : yield %>
+        </main>
+      </div>    
+    <% end %>
 
     <%= render 'layouts/application_footer' %>
     <%= render 'layouts/application_script' %>
