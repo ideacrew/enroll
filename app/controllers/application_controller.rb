@@ -106,9 +106,14 @@ class ApplicationController < ActionController::Base
     end
 
     def set_locale
-      requested_locale = params[:locale] || user_preferred_language || extract_locale_from_accept_language_header || I18n.default_locale
-      requested_locale = I18n.default_locale unless I18n.available_locales.include? requested_locale.try(:to_sym)
-      I18n.locale = requested_locale
+      I18n.locale = (request.env['HTTP_ACCEPT_LANGUAGE'].scan(/^[a-z]{2}/).first.presence || 'en').to_sym
+
+      # TODO: (Clinton De Young) - I have set the locale to be set by the browser for convenience.  We will
+      # need to add this into the appropriate place below after we have finished testing everything.
+      #
+      # requested_locale = params[:locale] || user_preferred_language || extract_locale_from_accept_language_header || I18n.default_locale
+      # requested_locale = I18n.default_locale unless I18n.available_locales.include? requested_locale.try(:to_sym)
+      # I18n.locale = requested_locale
     end
 
     def extract_locale_from_accept_language_header
