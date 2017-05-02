@@ -68,6 +68,7 @@ var Freebies = ( function( window, undefined ) {
 			$("select[multiple!='multiple']").not('[name*="dataTable_length"], .chosen-select').selectric();
 		}
 		// apply selectric
+		$("select[multiple!='multiple']:not([name*='demo_select']):not([name*='dataTable_length'])").selectric();
 	}
 
 	// disabled enter key submitting disabeld forms in firefox -- add this to any element in the page onKeyPress="return disableEnterKey(event)"
