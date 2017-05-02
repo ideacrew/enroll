@@ -9,7 +9,7 @@
 
     <%= favicon_link_tag 'favicon.png', :rel => 'shortcut icon', :type => 'image/png', :sizes => '32x32' %>
 
-    <%= content_for?(:page_title) ? content_tag(:title, yield(:page_title)) : 
+    <%= content_for?(:page_title) ? content_tag(:title, yield(:page_title)) :
                                     content_tag(:title, "Welcome to #{Settings.site.short_name}") %>
 
     <%= content_tag(:description, yield(:page_description)) if content_for?(:page_description) %>
@@ -62,11 +62,14 @@
           <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
           <%= content_for?(:main) ? yield(:main) : yield %>
         </main>
-      </div>    
+      </div>
     <% end %>
 
     <%= render 'layouts/application_footer' %>
     <%= render 'layouts/application_script' %>
-
+    
+    <% if content_for?(:additional_scripts) %>
+      <%= yield(:additional_scripts) %>
+    <% end %>
   </body>
  </html>
