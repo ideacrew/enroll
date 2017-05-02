@@ -6,7 +6,8 @@ Feature: Employee passive renewal should be canceled when Employee waived covera
   Scenario: Renewing employee waive coverage
     Given Renewing Employer for Soren White exists with active and renewing plan year
       And I set the eligibility rule to first of month following 30 days
-      And Employee has current hired on date
+      And Employee has past hired on date
+      And Employee has past created at date
       And Employer for Soren White is under open enrollment
       And Soren White already matched and logged into employee portal
       And Soren White has active coverage and passive renewal
