@@ -48,6 +48,7 @@ class Products::QhpController < ApplicationController
     @qhp = find_qhp_cost_share_variances.first
     @source = params[:source]
     @qhp.hios_plan_and_variant_id = @qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
+    @hbx_enrollment.set_enrolled_plan_coverage_start_dates(@qhp.plan)
     @plan = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.plan)
 
     respond_to do |format|
