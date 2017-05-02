@@ -160,23 +160,12 @@ class Insured::FamiliesController < FamiliesController
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
 
     if @enrollment.present?
-      plan = @enrollment.try(:plan)
-      if @enrollment.is_shop?
-        @benefit_group = @enrollment.benefit_group
-        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-        if @benefit_group.is_congress
-          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
-        else
-          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
-        end
-      else
-        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
-      end
+      @enrollment.set_enrolled_plan_coverage_start_dates
+      @plan = @enrollment.build_plan_premium
 
       begin
         @plan.name

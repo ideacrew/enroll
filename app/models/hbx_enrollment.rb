@@ -776,14 +776,18 @@ class HbxEnrollment
     end
   end
 
-  def set_enrolled_plan_coverage_start_dates(plan)
-    if self.family.currently_enrolled_plans(self).include?(plan.id)
+  def set_enrolled_plan_coverage_start_dates(new_plan=nil)
+    new_plan ||= self.plan
+    
+    if self.family.currently_enrolled_plans(self).include?(new_plan.id)
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
     end
   end
 
-  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+    qhp_plan ||= self.plan
+
     if self.is_shop?
       if benefit_group.is_congress
         PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
