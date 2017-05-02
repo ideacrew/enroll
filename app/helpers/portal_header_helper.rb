@@ -1,7 +1,7 @@
 module PortalHeaderHelper
   def portal_display_name(controller)
     if current_user.nil?
-      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+      "<a class='portal'>#{t("welcome.byline")}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, exchanges_hbx_profiles_root_path, class: "portal"
     elsif current_user.person.try(:broker_role)
@@ -23,7 +23,7 @@ module PortalHeaderHelper
     elsif current_user.has_general_agency_staff_role?
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
     else
-      "<a class='portal'>#{Settings.site.header_message}</a>".html_safe
+      "<a class='portal'>#{t("welcome.byline")}</a>".html_safe
     end
   end
 

@@ -23,7 +23,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li>
             <a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
-              <span class="header-text">Call Customer Service</span><br/>
+              <span class="header-text"><%= t("header.call_customer_service") %></span><br/>
               <span><i class="fa fa-phone fa-lg"></i><%= Settings.contact_center.phone_number %></span>
             </a>
           </li>
@@ -31,13 +31,13 @@
             <li>
               <span class="my-portal-links">
                 <%= render partial: "shared/my_portal_links"%>
-                <span><a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a></span>
+                <span><a href="https://dchealthlink.com/help" target="_blank" class="header-text"><%= t("header.help") %></a></span>
                 <span> | </span>
-                <span><%= link_to "Logout", destroy_user_session_path, method: "delete", class: "header-text" %></span><br/>
+                <span><%= link_to t("header.logout"), destroy_user_session_path, method: "delete", class: "header-text" %></span><br/>
                 <span class="users-name"><%= user_first_name_last_name_and_suffix %></span>
                 <% unless current_user.try(:person).try(:hbx_id).nil? %>
                   &nbsp;
-                  <span>My ID: <%= truncate(current_user.person.hbx_id.upcase, length: 8, omission: '') %></span>
+                  <span><%= t("header.my_id") %>: <%= truncate(current_user.person.hbx_id.upcase, length: 8, omission: '') %></span>
                 <% end %>
               </span>
             </li>
