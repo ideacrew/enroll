@@ -15,7 +15,6 @@ class BrokerAgencies::QuotesController < ApplicationController
     if @quote.may_publish?
       @quote.publish!
       flash[:notice] = "Quote Published"
-      redirect_to my_quotes_broker_agencies_broker_role_quotes_path(@broker)
     else
       errors = @quote.quote_warnings.values
       flash[:error] = "Quote failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
