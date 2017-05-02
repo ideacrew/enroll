@@ -42,26 +42,19 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def receipt
-    person = @person
-
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
+
     if @enrollment.is_shop?
-      benefit_group = @enrollment.benefit_group
-      reference_plan = @enrollment.coverage_kind == 'dental' ? benefit_group.dental_reference_plan : benefit_group.reference_plan
-
-      if benefit_group.is_congress
-        @plan = PlanCostDecoratorCongress.new(plan, @enrollment, benefit_group)
-      else
-        @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
-      end
-
       @employer_profile = @enrollment.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
+      applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
+
+    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household, action_name: self.action_name)
+
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 

@@ -790,10 +790,10 @@ class HbxEnrollment
   #   return @benefit_coverage_period if defined? @benefit_coverage_period
   # end
 
-  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan:, elected_aptc: false, tax_household: nil, apply_aptc: nil, action_name: nil)
     enrollment = self
 
-    if family.currently_enrolled_plans(self).include?(qhp_plan.id)
+    if action_name != 'receipt' && family.currently_enrolled_plans(self).include?(qhp_plan.id)
       plan_selection = PlanSelection.new(self, self.plan)
       enrollment = plan_selection.same_plan_enrollment
     end
