@@ -18,6 +18,7 @@ module ApplicationHelper
 
   def flash_messages(opts = {})
     flash.each do |msg_type, message|
+      next if message.empty?
       msg_type_sym = msg_type.to_sym
       concat(content_tag(:div, message, class: "alert #{bootstrap_class_for(msg_type_sym)} alert-dismissible", role: 'alert') do
         concat(content_tag(:button, class: 'close', data: { dismiss: 'alert' }) do
