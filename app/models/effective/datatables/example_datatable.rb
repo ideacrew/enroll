@@ -1,6 +1,6 @@
 module Effective
   module Datatables
-    class ExampleDatatable < Effective::ArraycolumnDatatable
+    class ExampleDatatable < Effective::Datatable
       datatable do
         array_column :id
         array_column :first_name
