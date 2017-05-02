@@ -2,7 +2,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
 
   def index
-    @existing_applications = household = Family.find_by(person_id: current_user.person).active_household.applications
+    @existing_applications = household = Family.find_by(person_id: current_user.person).applications
 
     # view needs to show existing steps if any exist
     # show link to new application (new_financial_assistance_applcations_path)
@@ -31,10 +31,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def find
-    Family.find_by(person_id: current_user.person).active_household.applications.find(params[:id]) if params.key?(:id)
+    Family.find_by(person_id: current_user.person).applications.find(params[:id]) if params.key?(:id)
   end
 
   def create
-    Family.find_by(person_id: current_user.person).active_household.applications.new
+    Family.find_by(person_id: current_user.person).applications.new
   end
 end
