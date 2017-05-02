@@ -359,26 +359,37 @@
     </div>
 
     <h3>Checkboxes and Radio Buttons</h3>
+  <div class="container">
+    <div class="checkbox">
+      <label><input type="checkbox" value="">Unchecked</label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" value="" checked>Checked</label>
+    </div>
+    <div class="checkbox disabled">
+      <label><input type="checkbox" value="" disabled>Disabled unchecked</label>
+    </div>
+    <div class="checkbox checked">
+      <label><input type="checkbox" value="" disabled checked >Disabled checked</label>
+    </div>
+  </div>
 
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="input-group">
-          <span class="input-group-addon">
-            <input type="checkbox" aria-label="...">
-          </span>
-          <input type="text" class="form-control" aria-label="...">
-        </div><!-- /input-group -->
-      </div>
-
-      <div class="col-lg-6">
-        <div class="input-group">
-          <span class="input-group-addon">
-            <input type="radio" aria-label="...">
-          </span>
-          <input type="text" class="form-control" aria-label="...">
-        </div><!-- /input-group -->
-      </div><!-- /.col-lg-6 -->
-    </div><!-- /.row -->
+  <form>
+    <div class="radio">
+      <label><input type="radio" name="optradio"><span> Radio is off</span></label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" checked><span> Radio is on</span></label>
+    </div>
+    <div class="radio disabled">
+      <label><input type="radio" name="optradio" disabled><span> Disabled radio is off</span></label>
+    </div>
+  </form>
+  <form>
+    <div class="radio disabled">
+      <label><input type="radio" name="optradio" disabled checked><span> Disabled radio is off</span></label>
+    </div>
+  </form>
 
     <div>
       <h3>Pagination</h3>
