@@ -79,12 +79,12 @@ class Quote
   end
 
   def all_benefit_groups_have_plans?
-    quote_benefit_groups.map(&:plan).include?(nil) ? false : true
+    quote_benefit_groups.reject{ |q| !q.is_assigned? }.map(&:plan).include?(nil) ? false : true
   end
 
   def min_employer_contribution
     unless quote_benefit_groups.size == 0
-      quote_benefit_groups.map do |qbg|
+      quote_benefit_groups.reject{ |q| !q.is_assigned? }.map do |qbg|
         qbg.relationship_benefit_for("employee")
       end.map(&:premium_pct).min
     end

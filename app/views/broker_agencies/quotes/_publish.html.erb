@@ -1,4 +1,4 @@
-<%if @q.all_households_have_benefit_groups? && !@q.quote_benefit_groups.map(&:plan).compact.empty? %>
+<%if @q.all_households_have_benefit_groups? && @q.all_benefit_groups_have_plans? %>
   <div class="module container broker_quote_tool published">
     <div class="row">
       <div class="col-md-12">
@@ -267,7 +267,9 @@
         <br>
         <p>**Actual costs may vary.</p>
           <%= render :partial => "quote_publish_button" , :locals => { :quote => @q } %>
-        <h4> Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+        <% if @q.published? %>
+          <h4> Employer Claim Code: &nbsp;<b><%=@q.claim_code%></b></h4>
+        <% end %>
         <br>
         <%= link_to 'Download PDF' , publish_broker_agencies_broker_role_quotes_path(@broker,quote_id: @q.id, :format => "pdf"), class: "btn btn-default" , :target => "_blank " %> <br><br>
       </div>
@@ -276,7 +278,7 @@
 
 <%else%>
   <div class="alert alert-notice">
-    <h4>Please select plans for all the benefit groups by using the <b>"COMPARE COSTS / SELECT PLAN" </b> button in health plan selection</h4>
+    <h4>Please select plans for all the benefit groups assigned to households by using the <b>"COMPARE COSTS / SELECT PLAN" </b> button in health plan selection</h4>
   </div>
 <% end %>
 
