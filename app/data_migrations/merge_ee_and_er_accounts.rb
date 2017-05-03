@@ -17,6 +17,7 @@ class MergeEeAndErAccounts < MongoidMigrationTask
        else
          employee.employer_staff_roles=employer.employer_staff_roles
          employee.save!
+         employee.unset(:user_id) if employee.user_id.present?
          employee.user_id = employer.user_id
          employer.unset(:user_id)
          employee.save!
