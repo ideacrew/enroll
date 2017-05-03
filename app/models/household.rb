@@ -261,7 +261,7 @@ class Household
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: Time.now,
+      submitted_at: TimeKeeper.date_of_record,
       external_enrollment: external_enrollment,
       coverage_start: coverage_start
     )
