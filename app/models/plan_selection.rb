@@ -56,7 +56,7 @@ class PlanSelection
 
   def verify_and_set_member_coverage_start_dates
     if existing_coverage.present? && (existing_coverage.plan.hios_id == plan.hios_id)
-      hbx_enrollment.hbx_enrollment_members = set_enrollment_member_coverage_start_dates
+      hbx_enrollment = set_enrollment_member_coverage_start_dates
       hbx_enrollment.predecessor_enrollment_id = existing_coverage._id
     end
   end
@@ -65,35 +65,47 @@ class PlanSelection
     return @same_plan_enrollment if defined? @same_plan_enrollment
 
     @same_plan_enrollment = family.active_household.hbx_enrollments.new(hbx_enrollment.dup.attributes)
-    @same_plan_enrollment.hbx_enrollment_members = set_enrollment_member_coverage_start_dates
+    @same_plan_enrollment.hbx_enrollment_members = build_hbx_enrollment_members
+    @same_plan_enrollment = set_enrollment_member_coverage_start_dates(@same_plan_enrollment)
+
     @same_plan_enrollment
+  end
+
+  def build_hbx_enrollment_members
+    hbx_enrollment.hbx_enrollment_members.collect do |hbx_enrollment_member|
+      HbxEnrollmentMember.new({
+        applicant_id: hbx_enrollment_member.applicant_id,
+        eligibility_date: hbx_enrollment.effective_on,
+        coverage_start_on: hbx_enrollment.effective_on,
+        is_subscriber: hbx_enrollment_member.is_subscriber
+      })
+    end
   end
 
   def existing_coverage
     existing_enrollment_for_covered_individuals
   end
 
-  def set_enrollment_member_coverage_start_dates
-    if existing_coverage.blank?
-      hbx_enrollment.hbx_enrollment_members
-    else
+  def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
+
+    if existing_coverage.present?
       previous_enrollment_members = existing_coverage.hbx_enrollment_members
 
-      hbx_enrollment.hbx_enrollment_members.collect do |member|
+      enrollment_obj.hbx_enrollment_members.each do |member|
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
+
         if matched
           member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on
-        else
-          member.coverage_start_on = hbx_enrollment.effective_on
         end
-        member
       end
     end
+
+    enrollment_obj
   end
 
   def existing_enrollment_for_covered_individuals
     previous_active_coverages.detect{|en| 
-      (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present?
+      (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? && en.id != hbx_enrollment.id
     }
   end
 

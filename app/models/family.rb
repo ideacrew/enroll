@@ -218,6 +218,17 @@ class Family
   def renewal_benefits
   end
 
+  def currently_enrolled_plans(enrollment)
+    enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+
+    if enrollment.is_shop?
+      bg_ids = enrollment.benefit_group.plan_year.benefit_groups.map(&:id)
+      enrolled_plans = enrolled_plans.where(:benefit_group_id.in => bg_ids)
+    end
+
+    enrolled_plans.collect(&:plan_id)
+  end
+
   def enrollments
     return [] if  latest_household.blank?
     latest_household.hbx_enrollments.show_enrollments

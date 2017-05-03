@@ -42,26 +42,19 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def receipt
-    person = @person
-
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
+
     if @enrollment.is_shop?
-      benefit_group = @enrollment.benefit_group
-      reference_plan = @enrollment.coverage_kind == 'dental' ? benefit_group.dental_reference_plan : benefit_group.reference_plan
-
-      if benefit_group.is_congress
-        @plan = PlanCostDecoratorCongress.new(plan, @enrollment, benefit_group)
-      else
-        @plan = PlanCostDecorator.new(plan, @enrollment, benefit_group, reference_plan)
-      end
-
       @employer_profile = @enrollment.employer_profile
     else
       @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
-      @plan = UnassistedPlanCostDecorator.new(plan, @enrollment, @enrollment.applied_aptc_amount, @shopping_tax_household)
+      applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
+
+    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
@@ -73,30 +66,18 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     @plan = Plan.find(params.require(:plan_id))
     @enrollment = HbxEnrollment.find(params.require(:id))
-    if @enrollment.is_special_enrollment?
-      sep_id = @enrollment.is_shop? ? @enrollment.family.earliest_effective_shop_sep.id : @enrollment.family.earliest_effective_ivl_sep.id
-      @enrollment.update_current(special_enrollment_period_id: sep_id)
-    end
+    @enrollment.set_special_enrollment_period
 
     if @enrollment.is_shop?
-      @benefit_group = @enrollment.benefit_group
-      @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-      if @benefit_group.is_congress
-        @plan = PlanCostDecoratorCongress.new(@plan, @enrollment, @benefit_group)
-      else
-        @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
-      end
       @employer_profile = @enrollment.employer_profile
     else
       get_aptc_info_from_session(@enrollment)
-      if can_apply_aptc?(@plan)
-        @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment, @elected_aptc, @shopping_tax_household)
-      else
-        @plan = UnassistedPlanCostDecorator.new(@plan, @enrollment)
-      end
     end
+
+    @enrollment.reset_dates_on_previously_covered_members(@plan)
+    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
+    
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -234,12 +215,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def is_eligibility_determined_and_not_csr_100?(person)
-      csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
-        return true
-      else
-        return false
-      end
+    csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
+    (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
   end
 
   def send_receipt_emails
@@ -262,25 +239,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
-
-    @enrolled_hbx_enrollment_plan_ids = []
-
-    if @person.present? && @hbx_enrollment.present?
-      if @hbx_enrollment.is_shop?
-        if @person.active_employee_roles.present?
-          employer = @person.active_employee_roles.first.employer_profile
-          sep_effective_date = @person.primary_family.current_sep.try(:effective_on)
-          covered_plan_year = employer.plan_years.detect{|py| (py.start_on..py.end_on).cover?(sep_effective_date)}
-        end
-
-        if covered_plan_year.present?
-          id_list = covered_plan_year.benefit_groups.map(&:id)
-          @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
-        end
-      else
-        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
-      end
-    end
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
 
     if @hbx_enrollment.blank?
       @plans = []
@@ -293,9 +252,9 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
       end
-    end
 
-    build_same_plan_premiums
+      build_same_plan_premiums
+    end
 
     # for carrier search options
     carrier_profile_ids = @plans.map(&:carrier_profile_id).map(&:to_s).uniq
@@ -306,9 +265,20 @@ class Insured::PlanShoppingsController < ApplicationController
     enrolled_plans = @plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids
     if enrolled_plans.present?
       enrolled_plans = enrolled_plans.collect{|p| Plan.find(p)}
-      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
-      @enrolled_plans = plan_selection.same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
 
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.plan)
+      same_plan_enrollment = plan_selection.same_plan_enrollment
+
+      if @hbx_enrollment.is_shop?
+        ref_plan = (@hbx_enrollment.coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan)
+
+        @enrolled_plans = enrolled_plans.collect{|plan|
+          @benefit_group.decorated_plan(plan, same_plan_enrollment, ref_plan)
+        }
+      else
+        @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
+      end
+    
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan
