@@ -328,3 +328,29 @@ describe EventsHelper, "given an address_kind" do
   end
 
 end
+
+describe EventsHelper, "transforming a qualifying event kind for external xml" do
+
+  RESULT_PAIR = {
+    "relocate" => "location_change",
+    "eligibility_change_immigration_status" => "citizen_status_change",
+    "lost_hardship_exemption" => "eligibility_change_assistance",
+    "eligibility_change_income" => "eligibility_change_assistance",
+    "court_order" => "medical_coverage_order",
+    "domestic_partnership" => "entering_domestic_partnership",
+    "new_eligibility_member" => "drop_family_member_due_to_new_eligibility",
+    "new_eligibility_family" => "drop_family_member_due_to_new_eligibility",
+    "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
+    "divorce" => "divorce"
+  }
+
+  subject { EventsHelperSlug.new }
+
+  RESULT_PAIR.each_pair do |k,v|
+    it "maps \"#{k}\" to \"#{v}\"" do
+      eligibility_event = instance_double(HbxEnrollment, :eligibility_event_kind => k)
+      expect(subject.xml_eligibility_event_uri(eligibility_event)).to eq "urn:dc0:terms:v1:qualifying_life_event##{v}"
+    end
+  end
+
+end
