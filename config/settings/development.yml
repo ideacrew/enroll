@@ -9,7 +9,8 @@ site:
 
 aca:
   state_name: ""
-  state_abbreviation: ""
+  state_abbreviation: "MA"
+  market_kinds: ['shop']
   ivl:
     enrollment_due_day_of_month: 15
   shop:
