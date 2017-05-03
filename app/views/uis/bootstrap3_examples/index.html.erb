@@ -2,9 +2,82 @@
   Bootstrap 3 Example Page
 <% end %>
 
+<% content_for :left_navigation do %>
+  <!-- Sidebar -->
+  <div id="sidebar-wrapper">
+    <nav id="spy">
+      <ul class="sidebar-nav nav">
+        <li class="sidebar-brand">
+          <a href="#home"><span class="fa fa-home solo">Typography</span></a>
+        </li>
+        <li>
+          <a href="#buttons" data-scroll>
+            <span class="fa fa-anchor solo">Buttons</span>
+          </a>
+        </li>
+        <li>
+          <a href="#panels" data-scroll>
+            <span class="fa fa-anchor solo">Panels</span>
+          </a>
+        </li>
+        <li>
+          <a href="#tables" data-scroll>
+              <span class="fa fa-anchor solo">Tables</span>
+          </a>
+        </li>
+        <li>
+          <a href="#inputs" data-scroll>
+              <span class="fa fa-anchor solo">Inputs</span>
+          </a>
+        </li>
+        <li>
+          <a href="#pagination" data-scroll>
+              <span class="fa fa-anchor solo">Pagination</span>
+          </a>
+        </li>
+        <li>
+          <a href="#navigation" data-scroll>
+              <span class="fa fa-anchor solo">Navigation</span>
+          </a>
+        </li>
+        <li>
+          <a href="#progressbars" data-scroll>
+              <span class="fa fa-anchor solo">Progress Bars</span>
+          </a>
+        </li>
+        <li>
+          <a href="#tooltips" data-scroll>
+              <span class="fa fa-anchor solo">Tooltips / Popovers</span>
+          </a>
+        </li>
+        <li>
+          <a href="#alerts" data-scroll>
+              <span class="fa fa-anchor solo">Alerts</span>
+          </a>
+        </li>
+        <li>
+          <a href="#badges" data-scroll>
+              <span class="fa fa-anchor solo">Badges</span>
+          </a>
+        </li>
+        <li>
+          <a href="#wells" data-scroll>
+              <span class="fa fa-anchor solo">Wells</span>
+          </a>
+        </li>
+        <li>
+          <a href="#carousels" data-scroll>
+              <span class="fa fa-anchor solo">Carouselss</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+<% end %>
+
 <% content_for :main do %>
 
-  <h1>Typography</h1>
+  <h1 id="home">Typography</h1>
   <h3>Headings</h3>
 
   <h1>Heading 1</h1>
@@ -89,8 +162,7 @@
     <dd>This is the definition</dd>
   </dl>
 
-  <h1>Basic Elements</h1>
-    <h3>Button Classes</h3>
+    <h3 id="buttons">Button Classes</h3>
 
     <!-- Standard button -->
     <button type="button" class="btn btn-default">Default</button>
@@ -337,90 +409,115 @@
       <%= render_datatable(@family_data_table) %>
     </div>
 
-    <h3>Selects</h3>
-      <select class="custom-select">
-        <option selected>Open this select menu</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-       </select>
+       <div class="demo-row demo-inputs">
+         <div class="demo-title">
+           <h3 class="demo-panel-title" id="inputs">Inputs</h3>
+         </div>
+         <div class="demo-col">
+           <form>
+             <div class="form-group>">
+               <label class="control-label" for="large-input">Label for large input</label>
+               <input name="large-input" type="text" value="" placeholder="A large height input has class 'input-lg'" class="form-control input-lg">
+             </div>
+             <div class="form-group>">
+               <label class="control-label" for="small-input">Label for small input</label>
+               <input name="small-input" type="text" value="" placeholder="A small height input has class 'input-sm'" class="form-control input-sm">
+             </div>
+             <div class="form-group>">
+               <label class="control-label" for="default-input">Label for default input</label>
+               <input name="default-input" type="text" value="" placeholder="No additional class is necessary" class="form-control">
+             </div>
+             <p>Fields can have a 'has-feedback' class to allow them to provide user cues</p>
+             <div class="form-group has-success has-feedback">
+               <input type="text" value="A success feedback has class 'has-success'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <div class="form-group has-warning has-feedback">
+               <input type="text" value="A warning feedback has class 'has-warning'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <div class="form-group has-error has-feedback">
+               <input type="text" value="An error feedback has class 'has-error'" class="form-control">
+               <span class="form-control-feedback fa fa-check-circle"></span>
+             </div>
+             <hr />
+             <div class="form-group has-feedback">
+               <input type="text" value="An input can also be disabled" disabled="disabled" class="form-control">
+               <span class="form-control-feedback fa fa-lock"></span>
+             </div>
+           </form>
+           <hr />
+         </div>
 
-    <h3>Inputs</h3>
-    <div class="form-group">
-      <label for="usr">Name:</label>
-      <input type="text" class="form-control" id="usr">
-    </div>
-    <fieldset disabled>
-      <div class="form-group">
-        <input type="text" id="disabledTextInput" class="form-control">
-      </div>
-    </fieldset>
-    <div class="input-group">
-      <input type="text" class="form-control" id="usr">
-      <div class="input-group-btn">
-        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-th"></i></button>
-      </div>
-    </div>
-    <br>
+         <div class="demo-row">
+           <div class="demo-title">
+             <h3 class="demo-panel-title">Selects</h3>
+           </div>
 
-    <div class="input-group">
-      <input type="text" class="form-control" id="usr">
-      <div class="input-group-btn">
-        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-      </div>
-    </div>
+           <div class="demo-col">
+             <p>Select with Option Groups
+             <div class="mbl">
+               <select class="form-control select select-primary" name="demo-select" data-toggle="select">
+                 <optgroup label="Profile">
+                   <option value="0">My Profile</option>
+                   <option value="1">My Friends</option>
+                 </optgroup>
+                 <optgroup label="System">
+                   <option value="2">Messages</option>
+                   <option value="3">My Settings</option>
+                   <option value="4">Logout</option>
+                 </optgroup>
+               </select>
+             </div>
+             <br />
+             <p>Multiselect</p>
+             <div class="mbl">
+               <select multiple="multiple" class="form-control multiselect multiselect-info" data-toggle="select">
+                 <option value="0">1</option>
+                 <option value="1" selected>2</option>
+                 <option value="2" selected>3</option>
+                 <option value="3" selected>4</option>
+                 <option value="4">5</option>
+               </select>
+             </div>
 
-    <div class="input-group">
-      <div class="input-group-btn">
-        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-      </div>
-      <input type="text" class="form-control" id="usr">
-    </div>
-    
-    <h3>File Inputs</h3>
-    <label class="custom-file">
-      <input type="file" id="file" class="custom-file-input">
-      <span class="custom-file-control"></span>
-    </label>
-    <h3>Text Area</h3>
+           </div><!-- ./demo-col -->
+         </div> <!-- /.demo-row -->
 
-    <div class="form-group">
-      <label for="comment">Comment:</label>
-      <textarea class="form-control" rows="5" id="textarea"></textarea>
-    </div>
+          <h3>File Inputs</h3>
+          <label class="custom-file">
+            <input type="file" id="file" class="custom-file-input">
+            <span class="custom-file-control"></span>
+          </label>
+          <h3>Text Area</h3>
 
-    <h3>Checkboxes and Radio Buttons</h3>
-  <div class="container">
-    <div class="checkbox">
-      <label><input type="checkbox" value="">Unchecked</label>
-    </div>
-    <div class="checkbox">
-      <label><input type="checkbox" value="" checked>Checked</label>
-    </div>
-    <div class="checkbox disabled">
-      <label><input type="checkbox" value="" disabled>Disabled unchecked</label>
-    </div>
-    <div class="checkbox checked">
-      <label><input type="checkbox" value="" disabled checked >Disabled checked</label>
-    </div>
-  </div>
+          <div class="form-group">
+            <label for="comment">Comment:</label>
+            <textarea class="form-control" rows="5" id="textarea"></textarea>
+          </div>
 
-  <form>
-    <div class="radio">
-      <label><input type="radio" name="optradio"><span> Radio is off</span></label>
-    </div>
-    <div class="radio">
-      <label><input type="radio" name="optradio" checked><span> Radio is on</span></label>
-    </div>
-    <div class="radio disabled">
-      <label><input type="radio" name="optradio" disabled><span> Disabled radio is off</span></label>
-    </div>
-  </form>
-  <form>
-    <div class="radio disabled">
-      <label><input type="radio" name="optradio" disabled checked><span> Disabled radio is off</span></label>
-    </div>
-  </form>
+          <h3>Checkboxes and Radio Buttons</h3>
+
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="...">
+                </span>
+                <input type="text" class="form-control" aria-label="...">
+              </div><!-- /input-group -->
+            </div>
+
+            <div class="col-lg-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input type="radio" aria-label="...">
+                </span>
+                <input type="text" class="form-control" aria-label="...">
+              </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+          </div><!-- /.row -->
+       </div>
 
     <div>
       <h3>Pagination</h3>
@@ -1060,108 +1157,8 @@
         </div>
       </div>
 
-    <div class="demo-row">
-      <div class="demo-title">
-        <h3 class="demo-panel-title">Selects</h3>
-      </div>
 
-      <div class="demo-col">
-        <p>Select with Option Groups
-        <div class="mbl">
-          <select class="form-control select select-primary" name="demo-select" data-toggle="select">
-            <optgroup label="Profile">
-              <option value="0">My Profile</option>
-              <option value="1">My Friends</option>
-            </optgroup>
-            <optgroup label="System">
-              <option value="2">Messages</option>
-              <option value="3">My Settings</option>
-              <option value="4">Logout</option>
-            </optgroup>
-          </select>
-        </div>
-        <br />
-        <p>Multiselect</p>
-        <div class="mbl">
-          <select multiple="multiple" class="form-control multiselect multiselect-info" data-toggle="select">
-            <option value="0">1</option>
-            <option value="1" selected>2</option>
-            <option value="2" selected>3</option>
-            <option value="3" selected>4</option>
-            <option value="4">5</option>
-          </select>
-        </div>
-
-      </div><!-- ./demo-col -->
-    </div> <!-- /.demo-row -->
-
-    <div class="demo-row demo-inputs">
-      <div class="demo-title">
-        <h3 class="demo-panel-title">Inputs</h3>
-      </div>
-      <div class="demo-col">
-        <div class="form-group">
-          <input type="text" value="" placeholder="Un-Active" class="form-control input-hg">
-        </div>
-        <div class="form-group">
-          <input type="text" value="" placeholder="Un-Active" class="form-control input-lg">
-        </div>
-        <div class="form-group">
-          <input type="text" value="" placeholder="Un-Active" class="form-control">
-        </div>
-        <div class="form-group">
-          <input type="text" value="" placeholder="Un-Active" class="form-control input-sm">
-        </div>
-        <div class="form-group has-error">
-          <input type="text" value="Error" class="form-control input-hg">
-        </div>
-        <div class="form-group has-error">
-          <input type="text" value="Error" class="form-control input-lg">
-        </div>
-        <div class="form-group has-error">
-          <input type="text" value="Error" class="form-control">
-        </div>
-        <div class="form-group has-error">
-          <input type="text" value="Error" class="form-control input-sm">
-        </div>
-      </div>
-
-      <div class="demo-col">
-        <div class="form-group has-success has-feedback">
-          <input type="text" value="Success" class="form-control input-hg">
-          <span class="form-control-feedback fa fa-check-circle"></span>
-        </div>
-        <div class="form-group has-success has-feedback">
-          <input type="text" value="Success" class="form-control input-lg">
-          <span class="form-control-feedback fa fa-check-circle"></span>
-        </div>
-        <div class="form-group has-success has-feedback">
-          <input type="text" value="Success" class="form-control">
-          <span class="form-control-feedback fa fa-check-circle"></span>
-        </div>
-        <div class="form-group has-success has-feedback">
-          <input type="text" value="Success" class="form-control input-sm">
-          <span class="form-control-feedback fa fa-check-circle"></span>
-        </div>
-        <div class="form-group has-feedback">
-          <input type="text" value="Disabled" disabled="disabled" class="form-control input-hg">
-          <span class="form-control-feedback fa fa-lock"></span>
-        </div>
-        <div class="form-group has-feedback">
-          <input type="text" value="Disabled" disabled="disabled" class="form-control input-lg">
-          <span class="form-control-feedback fa fa-lock"></span>
-        </div>
-        <div class="form-group has-feedback">
-          <input type="text" value="Disabled" disabled="disabled" class="form-control">
-          <span class="form-control-feedback fa fa-lock"></span>
-        </div>
-        <div class="form-group has-feedback">
-          <input type="text" value="Disabled" disabled="disabled" class="form-control input-sm">
-          <span class="form-control-feedback fa fa-lock"></span>
-        </div>
-      </div>
-    </div><!-- /row -->
-
+    <div>
     <div class="demo-row">
       <div class="demo-title">
         <h3 class="demo-panel-title">Input Variants</h3>
@@ -2647,6 +2644,10 @@
 
       // initialize dropdowns
       $(".dropdown-toggle").dropdown();
+
+      // initialize nav spy
+      $('body').scrollspy({ target: '#spy', offset:80});
+
     });
   <% end %>
 <% end %>
