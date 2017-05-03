@@ -184,8 +184,8 @@ def default_office_location
   address2: "Suite 200",
   city: "AnyCity",
   state: Settings.aca.state_abbreviation,
-  zip: "01002",
-  county: 'Franklin',
+  zip: "01001",
+  county: 'Hampden',
   phone_area_code: "202",
   phone_number: "1110000",
   phone_extension: "1111"
