@@ -74,8 +74,9 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb" do
       render "insured/families/shop_for_plans_widget"
       expect(rendered).to have_selector("form[action='/insured/group_selections/new']")
     end
-    it "should action to find sep insured families path" do
-      allow(person).to receive(:active_employee_roles).and_return([employee_role])
+    it "should action to find sep insured families path if active employee roles are blank" do
+      allow(person).to receive(:active_employee_roles).and_return([])
+      allow(person).to receive(:consumer_role).and_return(true)
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
