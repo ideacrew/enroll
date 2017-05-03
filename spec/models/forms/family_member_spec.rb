@@ -454,6 +454,27 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       subject.update_attributes(update_attributes)
     end
   end
+
+  context "it should create the coverage household member record if found a inactive family member record" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:new_family_member) { FactoryGirl.create(:family_member, family: family, :is_active => false)}
+    before do
+      allow(family).to receive(:find_matching_inactive_member).and_return new_family_member
+      new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }.each { |chm| chm.destroy! }
+      subject.instance_variable_set(:@family, family)
+      subject.save
+      family.reload
+    end
+
+    it "should create a coverage household member record for the existing inactive family member" do
+      chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }
+      expect(chm.size).to eq 1
+    end
+
+    it "should set the inactive family_member as active" do
+      expect(new_family_member.is_active).to eq true
+    end
+  end
 end
 
 describe Forms::FamilyMember, "relationship validation" do

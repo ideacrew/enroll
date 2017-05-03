@@ -76,6 +76,7 @@ module Forms
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
         existing_inactive_family_member.save!
+        family.save!
         return true
       end
       existing_person = Person.match_existing_person(self)
@@ -88,6 +89,7 @@ module Forms
         end
         assign_person_address(existing_person)
         family_member.save!
+        family.save!
         self.id = family_member.id
         return true
       end
