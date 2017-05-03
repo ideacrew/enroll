@@ -6,13 +6,13 @@ class MoveUserAccountBetweenTwoPeopleAccounts < MongoidMigrationTask
     person1 = Person.where(hbx_id:hbx_id_1).first
     person2 = Person.where(hbx_id:hbx_id_2).first
     if person1.nil?
-      puts "No person found with hbx_id #{hbx_id_1}"
+      puts "No person found with hbx_id #{hbx_id_1}" unless Rails.env.test?
     elsif person2.nil?
-      puts "No person found with hbx_id #{hbx_id_1}"
+      puts "No person found with hbx_id #{hbx_id_1}" unless Rails.env.test?
     else
       user=person1.user
       if user.nil?
-        puts "person with hbx_id  #{hbx_id_1} has no user"
+        puts "person with hbx_id  #{hbx_id_1} has no user" unless Rails.env.test?
       else
         person2.user=person1.user
         person1.unset(:user)

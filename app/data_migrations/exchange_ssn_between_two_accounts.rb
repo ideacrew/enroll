@@ -13,9 +13,9 @@ class ExchangeSsnBetweenTwoAccounts< MongoidMigrationTask
       ssn1=person1.ssn
       ssn2=person2.ssn
       if ssn1.nil?
-        puts "person with hbx_id  #{hbx_id_1} has no ssn"
+        puts "person with hbx_id  #{hbx_id_1} has no ssn" unless Rails.env.test?
       elsif ssn2.nil?
-        puts "person with hbx_id  #{hbx_id_2} has no ssn"
+        puts "person with hbx_id  #{hbx_id_2} has no ssn" unless Rails.env.test?
       else
         person1.unset(:encrypted_ssn)
         person2.unset(:encrypted_ssn)
