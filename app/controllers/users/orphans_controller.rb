@@ -1,8 +1,7 @@
 class Users::OrphansController < ApplicationController
-  layout "two_column"
   before_action :check_agent_role
   before_action :set_orphan, only: [:show, :destroy]
-
+  
   def index
     @orphans = User.orphans
   end
