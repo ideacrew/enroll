@@ -96,6 +96,20 @@ class PlanYear
     )
   }
 
+  after_update :update_employee_benefit_packages
+
+  def update_employee_benefit_packages
+    if self.start_on_changed?
+      bg_ids = self.benefit_groups.pluck(:_id)
+      employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+      employees.each do |census_employee|
+        census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+          assignment.update_attributes(start_on: self.start_on, end_on: self.end_on)
+        end
+      end
+    end
+  end
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
