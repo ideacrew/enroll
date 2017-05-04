@@ -13,8 +13,9 @@ RSpec.describe 'Service Area Task', :type => :task do
   context "service_area:update_service_area" do
 
     before :all do
-      Rake.application.rake_require "tasks/migrations/load_service_area_data"
+      Rake.application.rake_require 'tasks/migrations/load_service_area_data'
       Rake::Task.define_task(:environment)
+      create(:rate_reference, county_name: 'Suffolk', zip_code: '10010')
     end
 
     before :context do
@@ -25,40 +26,52 @@ RSpec.describe 'Service Area Task', :type => :task do
     context "it creates ServiceArea elements correctly" do
       subject { imported_areas.first }
       it_should_behave_like "a service area reference", {
-                                                  service_area_id: "MAS001",
-                                                  service_area_name: "Service Area 1",
+                                                  hios_id: '82569',
+                                                  service_area_id: 'MAS001',
+                                                  service_area_name: 'BMC HealthNet Plan Select Network',
                                                   serves_entire_state: true,
                                                   county_name: nil,
-                                                  serves_partial_county: nil,
-                                                  service_area_zipcode: "",
+                                                  county_code: nil,
+                                                  state_code: nil,
+                                                  serves_partial_county: false,
+                                                  service_area_zipcode: nil,
                                                   partial_county_justification: nil
                                                 }
     end
 
-    context "for elements that serve partial state" do
+    context "for elements that serve partial state but total county" do
       subject { imported_areas.second }
       it_should_behave_like "a service area reference", {
-                                                  service_area_id: "MAS002",
-                                                  service_area_name: "Service Area 2",
+                                                  hios_id: '82569',
+                                                  service_area_id: 'MAS001',
+                                                  service_area_name: 'BMC HealthNet Plan Select Network',
                                                   serves_entire_state: false,
-                                                  county_name: "Barnstable - 25001",
+                                                  county_name: 'Suffolk',
+                                                  county_code: '025',
+                                                  state_code: '25',
                                                   serves_partial_county: false,
-                                                  service_area_zipcode: "",
+                                                  service_area_zipcode: '10010',
                                                   partial_county_justification: nil
                                                 }
     end
 
     context "for elements that serve partial state and partial county" do
       subject { imported_areas.third }
+
       it_should_behave_like "a service area reference", {
-                                                  service_area_id: "MAS002",
-                                                  service_area_name: "Service Area 2",
+                                                  hios_id: '82569',
+                                                  service_area_id: 'MAS001',
+                                                  service_area_name: 'BMC HealthNet Plan Select Network',
                                                   serves_entire_state: false,
-                                                  county_name: "Franklin - 25011",
+                                                  county_name: 'Middlesex',
+                                                  county_code: '017',
+                                                  state_code: '25',
                                                   serves_partial_county: true,
-                                                  service_area_zipcode: "19020",
-                                                  partial_county_justification: "XX"
+                                                  service_area_zipcode: '01730',
                                                 }
+      it "assigns the partial county justification correctly" do
+        expect(subject.partial_county_justification).to match(/Network adequacy for these products centers around the 4 hospitals that are in the network./)
+      end
     end
 
     context "if it runs again it doesn't create duplicates or throw errors" do
@@ -66,14 +79,22 @@ RSpec.describe 'Service Area Task', :type => :task do
         invoke_task
       end
       it "does not create any more elements" do
-        expect(imported_areas.count).to eq(ServiceAreaReference.all.count)        
+        expect(imported_areas.count).to eq(ServiceAreaReference.all.count)
+      end
+    end
+
+    context "it created the correct number of zip code sub areas" do
+      subject { ServiceAreaReference.where(county_name: "Middlesex", service_area_name: "BMC HealthNet Plan Select Network") }
+
+      it "created many service areas for each imported zip code" do
+        expect(subject.count).to eq 51
       end
     end
 
     private
 
     def invoke_task
-      Rake::Task["load_service_reference:update_service_areas"].invoke
+      Rake.application.invoke_task("load_service_reference:update_service_areas[SHOP_SA_BMCHP.xlsx]")
     end
   end
 end

@@ -23,8 +23,8 @@ RSpec.describe 'Load Rating Regions Task', :type => :task do
     context "it creates RateReference elements correctly" do
       subject { RateReference.first }
       it_should_behave_like "a rate reference", { zip_code: "01001",
-                                                  county: "Hampden",
-                                                  multiple_counties: false,
+                                                  county_name: "Hampden",
+                                                  zip_code_in_multiple_counties: false,
                                                   rating_region: "Rating Area 1"
                                                 }
       # Which simply replaces all of these:
@@ -46,8 +46,8 @@ RSpec.describe 'Load Rating Regions Task', :type => :task do
       context "first rate reference for zip code" do
         subject { rate_references_by_zip.first }
         it_should_behave_like "a rate reference", { zip_code: "01002",
-                                                    county: "Hampshire",
-                                                    multiple_counties: true,
+                                                    county_name: "Hampshire",
+                                                    zip_code_in_multiple_counties: true,
                                                     rating_region: "Rating Area 1"
                                                   }
       end
@@ -55,8 +55,8 @@ RSpec.describe 'Load Rating Regions Task', :type => :task do
       context "second rate reference for zip code" do
         subject { rate_references_by_zip.second }
         it_should_behave_like "a rate reference", { zip_code: "01002",
-                                                    county: "Franklin",
-                                                    multiple_counties: true,
+                                                    county_name: "Franklin",
+                                                    zip_code_in_multiple_counties: true,
                                                     rating_region: "Rating Area 1"
                                                   }
       end
