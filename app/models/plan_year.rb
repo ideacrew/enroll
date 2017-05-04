@@ -104,7 +104,8 @@ class PlanYear
       employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
       employees.each do |census_employee|
         census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
-          assignment.update_attributes(start_on: self.start_on, end_on: self.end_on)
+          assignment.update(start_on: self.start_on)
+          assignment.update(end_on: self.end_on) if assignment.end_on.present?
         end
       end
     end

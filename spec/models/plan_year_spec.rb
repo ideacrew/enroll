@@ -2340,7 +2340,6 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
       census_employee.reload
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
-      expect(census_employee.active_benefit_group_assignment.end_on).to eq modified_end_on
     end
   end
 end
