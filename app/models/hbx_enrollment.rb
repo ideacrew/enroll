@@ -1365,7 +1365,7 @@ class HbxEnrollment
  end
 
   def event_submission_date
-    submitted_at.blank? ? TimeKeeper.date_of_record : submitted_at
+    submitted_at.blank? ? Time.now : submitted_at
   end
 
   private
