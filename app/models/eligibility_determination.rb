@@ -4,7 +4,7 @@ class EligibilityDetermination
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :tax_household
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
 

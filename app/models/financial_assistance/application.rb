@@ -3,7 +3,6 @@ class FinancialAssistance::Application
   include Mongoid::Timestamps
   include AASM
 
-  #embedded_in :household, class_name: "::Household"
   belongs_to :family, class_name: "::Family"
 
   YEARS_TO_RENEW_RANGE = 0..4
@@ -48,7 +47,6 @@ class FinancialAssistance::Application
   field :is_ridp_verified, type: Boolean
 
   embeds_many :tax_households, class_name: "::TaxHousehold"
-  embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
 
   embeds_many :workflow_state_transitions, as: :transitional
