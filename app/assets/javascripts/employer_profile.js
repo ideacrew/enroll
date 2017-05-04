@@ -590,21 +590,6 @@ function checkZip(textbox, child_index) {
   return true;
 }
 
-// function getCounties(textbox, child_index) {
-//   var phoneRegex = /^\d{5}$/;
-//   if (phoneRegex.test(textbox.value)) {
-//     $.ajax({
-//       type: 'get',
-//       datatype: 'js',
-//       url: '/employers/employer_profiles/get_counties',
-//       data: {zip_code: textbox.value, child_index: child_index,},
-//       success: function (response) {
-//         $('#county' + child_index).show();
-//         $('#county' + child_index).html(response);
-//       }
-//     });
-//   }
-// }
 
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
