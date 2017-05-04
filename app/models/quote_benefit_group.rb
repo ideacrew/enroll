@@ -34,6 +34,7 @@ class QuoteBenefitGroup
   field :published_highest_cost_plan, type: BSON::ObjectId
   field :published_dental_reference_plan, type: BSON::ObjectId
   field :elected_dental_plan_ids, type: Array, default: []
+  field :elected_health_plan_ids, type: Array, default: []
 
   associated_with_one :plan, :published_reference_plan, "Plan"
   associated_with_one :lowest_cost_plan, :published_lowest_cost_plan, "Plan"
