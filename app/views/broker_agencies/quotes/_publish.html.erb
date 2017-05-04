@@ -163,6 +163,7 @@
                           <th>Employer Contribution</th>
                         </tr>
                         <% benefit_group.quote_relationship_benefits.each do|rb| %>
+                          <% next if rb.relationship == "child_26_and_over" %>
                           <tr>
                             <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
                             <td>

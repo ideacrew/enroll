@@ -7,6 +7,7 @@ class QuoteBenefitGroup
     :spouse,
     :domestic_partner,
     :child_under_26,
+    :child_26_and_over
   ]
 
   embedded_in :quote
