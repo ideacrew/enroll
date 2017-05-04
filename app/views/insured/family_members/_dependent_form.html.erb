@@ -107,22 +107,18 @@
         <% if @person.has_active_consumer_role? %>
           <br>
           <%= render 'shared/consumer_fields', f: f %>
-          <div id="dependent-address">
-            <div class="row row-form-wrapper no-buffer">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
-                <%= f.check_box :same_with_primary, {}, "true", "false" %>
-                <label for="dependent_same_with_primary">Lives with primary subscriber</label>
-              </div>
-            </div>
-            <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+        <% end %>
+        <div id="dependent-address">
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
+              <%= f.check_box :same_with_primary, {}, "true", "false" %>
+              <label for="dependent_same_with_primary">Lives with primary subscriber</label>
             </div>
           </div>
-        <% elsif @person.has_active_employee_role? %>
-          <%= f.hidden_field :same_with_primary, value: 'false' %>
-          <%= render 'shared/address_fields_for_dependent', f: f %>
-        <% end %>
-
+          <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+            <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+          </div>
+        </div>
         <%= f.hidden_field :family_id %>
         <div id="remove_confirm" class="hidden"></div>
       </div>
