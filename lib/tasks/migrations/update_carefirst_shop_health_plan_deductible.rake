@@ -1,6 +1,4 @@
-# this rake task is for merge the er account to the ee account
-# er has user, ee has no user
-#expected outcome is to access the ee account from user login
+# this rake task is to update carefirst plan with proper deductibles.
 
 require File.join(Rails.root, "app", "data_migrations", "update_carefirst_shop_health_plan_deductible")
 
