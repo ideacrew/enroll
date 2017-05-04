@@ -1,7 +1,9 @@
 <%= render "shared/person/resident_information", f: f %>
 
-<script>
-	$(document).on('ready page:load', function () {
-		Freebies.allFreebies();
-	});
-</script>
+<% content_for :additional_scripts do %>
+  <script>
+  	$(document).on('ready page:load', function () {
+  		Freebies.allFreebies();
+  	});
+  </script>
+<% end %>
