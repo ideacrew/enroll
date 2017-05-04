@@ -18,6 +18,6 @@
   <%= link_to t("welcome.hbx_portal"), exchanges_hbx_profiles_root_path, class: "btn btn-default" %>
   <% if !user_signed_in? %>
     <%= link_to t("welcome.broker_registration"), broker_registration_path, class: "btn btn-default" %>
-    <%= link_to t("welcome.general_agency_registration"), general_agency_registration_path, class: "btn btn-default" %>
+    <%= link_to t("welcome.general_agency_registration"), general_agency_registration_path, class: "btn btn-default" if general_agency_enabled? %>
   <% end %>
 </div>
