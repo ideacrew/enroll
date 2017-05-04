@@ -68,7 +68,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
     person.update_attributes(person_profile_params)
-
+    @broker_agency_profile.update_attributes(languages_spoken_params)
 
 
     if @organization.update_attributes(broker_profile_params)
@@ -384,6 +384,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
         :phone_attributes => [:kind, :area_code, :number, :extension],
         :email_attributes => [:kind, :address]
       ]
+    )
+  end
+
+  def languages_spoken_params
+    params.require(:organization).permit(
+      :languages_spoken => []
     )
   end
 
