@@ -253,23 +253,31 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def terminate_employment!(employment_terminated_on)
-    if employment_terminated_on < TimeKeeper.date_of_record
-
-      if may_terminate_employee_role?
-
-        unless employee_termination_pending?
-
-          self.employment_terminated_on = employment_terminated_on
-          self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
-
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
-
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on)  }
-
+  def terminate_employee_enrollments
+    [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].each do |assignment|
+      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
+      enrollments.each do |e| 
+        if self.employment_terminated_on < e.effective_on
+          e.cancel_coverage!(self.employment_terminated_on) if e.may_cancel_coverage?
+        else
+          if self.coverage_terminated_on < TimeKeeper.date_of_record
+            e.terminate_coverage!(self.coverage_terminated_on) if e.may_terminate_coverage?
+          else
+            e.schedule_coverage_termination!(self.coverage_terminated_on) if e.may_schedule_coverage_termination?
+          end
         end
+      end
+    end
+  end
+
+  def terminate_employment!(employment_terminated_on)
+    if may_schedule_employee_termination?
+      self.employment_terminated_on = employment_terminated_on
+      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
+    end
+
+    if employment_terminated_on < TimeKeeper.date_of_record
+      if may_terminate_employee_role?
         terminate_employee_role!
         perform_employer_plan_year_count
       else
@@ -278,21 +286,10 @@ class CensusEmployee < CensusMember
         raise CensusEmployeeError, message
       end
     else # Schedule Future Terminations as employment_terminated_on is in the future
-
-      self.employment_terminated_on = employment_terminated_on
-      self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
-
-      if may_schedule_employee_termination? || employee_termination_pending?
-          schedule_employee_termination!
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(active_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
-
-          census_employee_hbx_enrollment = HbxEnrollment.find_enrollments_by_benefit_group_assignment(renewal_benefit_group_assignment)
-          census_employee_hbx_enrollment.map { |e| self.employment_terminated_on < e.effective_on ? e.cancel_coverage!(self.employment_terminated_on) : e.schedule_coverage_termination!(self.coverage_terminated_on) }
-
-      end
+      schedule_employee_termination! if may_schedule_employee_termination?
     end
 
+    terminate_employee_enrollments
     self
   end
 
