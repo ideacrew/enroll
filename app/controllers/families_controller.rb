@@ -4,8 +4,6 @@ class FamiliesController < ApplicationController
   before_action :set_family #, only: [:index, :show, :new, :create, :edit, :update]
   # before_action :check_hbx_staff_role, except: [:welcome]
 
-  #layout "two_column"
-
   def index
     # @q = params.permit(:q)[:q]
     # page_string = params.permit(:page)[:page]
