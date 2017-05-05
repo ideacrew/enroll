@@ -1,3 +1,11 @@
+NOTICE_GENERATOR = ARGV[0]
+REMINDER_NOTICE_TRIGGERS = ["verifications_backlog", "first_verifications_reminder", "second_verifications_reminder", "third_verifications_reminder", "fourth_verifications_reminder"]
+
+unless ARGV[0].present? && REMINDER_NOTICE_TRIGGERS.include?(NOTICE_GENERATOR)
+  puts "Please enter event name - Event Names: #{REMINDER_NOTICE_TRIGGERS.join(", ")}."
+  exit
+end
+
 families = Family.where({
   "households.hbx_enrollments" => {
     "$elemMatch" => {
@@ -38,25 +46,35 @@ CSV.open("verifications_backlog_notice_data_export_#{TimeKeeper.date_of_record.s
 
     begin
 
-    person = family.primary_applicant.person
+      person = family.primary_applicant.person
     # Additional checks for the next round of notices
     #  if (person.inbox.present? && person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").present?)
     #   puts "already notified!!"
     #   next
     # end
 
-    next if person.inbox.blank?
-    next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
+      next if person.inbox.blank?
+      next if person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").blank?
     # if secure_message = person.inbox.messages.where(:"subject" => "Documents needed to confirm eligibility for your plan").first
     #   next if secure_message.created_at > 35.days.ago
     # end
 
-    if person.consumer_role.blank?
-      count += 1
-      next
-    end
+      if person.consumer_role.blank?
+        count += 1
+        next
+      end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+      case NOTICE_GENERATOR
+      when "first_verifications_reminder"
+        event_kind = ApplicationEventKind.where(:event_name => "first_verifications_reminder").first
+      when "second_verifications_reminder"
+        event_kind = ApplicationEventKind.where(:event_name => "second_verifications_reminder").first
+      when "third_verifications_reminder"
+        event_kind = ApplicationEventKind.where(:event_name => "third_verifications_reminder").first
+      when "fourth_verifications_reminder"
+        event_kind = ApplicationEventKind.where(:event_name => "fourth_verifications_reminder").first
+      end
+
       notice_trigger = event_kind.notice_triggers.first 
 
       builder = notice_trigger.notice_builder.camelize.constantize.new(person.consumer_role, {
