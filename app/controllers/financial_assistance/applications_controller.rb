@@ -1,8 +1,8 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
-  include UIHelpers::WorkflowController
+  # include UIHelpers::WorkflowController
 
   def index
-    @existing_applications = household = Family.find_by(person_id: current_user.person).applications
+    @existing_applications = Family.find_by(person_id: current_user.person).applications
 
     # view needs to show existing steps if any exist
     # show link to new application (new_financial_assistance_applcations_path)
