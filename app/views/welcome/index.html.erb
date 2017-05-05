@@ -1,7 +1,7 @@
 <div class="jumbotron">
 
-  <h1><%= l10n('welcome.welcome_to_site_name', short_name: site_short_name) %></h1>
-  <h2><%= l10n('welcome.byline') %></h2>
+  <h1><%= l10n('.welcome_to_site_name', short_name: Settings.site.short_name) %></h1>
+  <h2><%= l10n('.byline') %></h2>
 
   <% if user_signed_in? %>
     <p>
