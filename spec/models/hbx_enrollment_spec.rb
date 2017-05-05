@@ -2423,3 +2423,45 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
   end
 end
+
+describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
+
+  context 'When employee is designated as cobra' do
+
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:cobra_begin_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
+    let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
+    let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
+    
+    before do
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+    end
+
+    context 'When Enrollment Effectve date is prior to cobra begin date' do
+      it 'should reset enrollment effective date to cobra begin date' do
+        hbx_enrollment.validate_for_cobra_eligiblity
+        expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+        expect(hbx_enrollment.effective_on).to eq cobra_begin_date
+      end
+    end
+
+    context 'When Enrollment Effectve date is after cobra begin date' do
+      let(:cobra_begin_date) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
+
+      it 'should not update enrollment effective date' do
+        hbx_enrollment.validate_for_cobra_eligiblity
+        expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+        expect(hbx_enrollment.effective_on).to eq effective_on
+      end
+    end
+
+    context 'When employee not elgibile for cobra' do
+      let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
+
+      it 'should raise error' do 
+        expect{hbx_enrollment.validate_for_cobra_eligiblity}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+      end
+    end
+  end
+end
