@@ -10,6 +10,17 @@ GIT
       mongoid-compatibility
 
 GIT
+  remote: https://github.com/brianweiner/recurring_select
+  revision: 68cb143d47bcb167f7bd3d9907014020a5514f73
+  specs:
+    recurring_select (2.0.0)
+      coffee-rails (>= 3.1)
+      ice_cube (>= 0.11)
+      jquery-rails (>= 3.0)
+      rails (>= 3.2)
+      sass-rails (>= 4.0)
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: d41e5fab75a77abca64f33278150735438acfff6
   branch: development
@@ -267,7 +278,7 @@ GEM
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
     i18n (0.7.0)
-    ice_cube (0.16.0)
+    ice_cube (0.16.1)
     ice_nine (0.11.2)
     interactor (3.1.0)
     interactor-rails (2.0.2)
@@ -437,12 +448,6 @@ GEM
       json (~> 1.4)
     recaptcha (1.1.0)
       json
-    recurring_select (2.0.0)
-      coffee-rails (>= 3.1)
-      ice_cube (>= 0.11)
-      jquery-rails (>= 3.0)
-      rails (>= 3.2)
-      sass-rails (>= 4.0)
     redis (3.3.0)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -669,7 +674,7 @@ DEPENDENCIES
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
   recaptcha (= 1.1.0)
-  recurring_select
+  recurring_select!
   redis-rails
   resque
   roo (~> 2.1.0)
