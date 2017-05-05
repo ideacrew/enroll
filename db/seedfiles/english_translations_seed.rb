@@ -1,28 +1,50 @@
 puts "*"*80
 puts "::: Generating English Translations :::"
 
-Translation.find_or_initialize_by(key: "en.header.call_customer_service", value: '"Call Customer Service"').save
-Translation.find_or_initialize_by(key: "en.header.help", value: '"Help"').save
-Translation.find_or_initialize_by(key: "en.header.logout", value: '"Logout"').save
-Translation.find_or_initialize_by(key: "en.header.my_id", value: '"My ID"').save
-Translation.find_or_initialize_by(key: "en.header.my_insured_portal", value: '"My Insured Portal"').save
-Translation.find_or_initialize_by(key: "en.sign_in.create_account", value: '"Create Customer Account"').save
-Translation.find_or_initialize_by(key: "en.wecome.sign_out", value: '"Sign Out"').save
-Translation.find_or_initialize_by(key: "en.welcome.assisted_consumer_family_portal", value: '"Assisted Consumer/Family Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.broker_agency_portal", value: '"Broker Agency Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.broker_registration", value: '"Broker Registration"').save
-Translation.find_or_initialize_by(key: "en.welcome.byline", value: '"The Right Place for the Right Plan"').save
-Translation.find_or_initialize_by(key: "en.welcome.consumer_family_portal", value: '"Consumer/Family Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.employee_portal", value: '"Employee Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.employer_portal", value: '"Employer Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.general_agency_portal", value: '"General Agency Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.general_agency_registration", value: '"General Agency Registration"').save
-Translation.find_or_initialize_by(key: "en.welcome.hbx_portal", value: '"HBX Portal"').save
-Translation.find_or_initialize_by(key: "en.welcome.logout", value: '"Logout"').save
-Translation.find_or_initialize_by(key: "en.welcome.returning_user", value: '"Returning User"').save
-Translation.find_or_initialize_by(key: "en.welcome.signed_in_as", value: '"Signed in as %{current_user}"').save
-Translation.find_or_initialize_by(key: "en.welcome.welcome_email", value: '"Welcome %{current_user}"').save
-Translation.find_or_initialize_by(key: "en.welcome.welcome_to_site_name", value: '"Welcome to %{short_name}"').save
+Translation.where(key: "en.layouts.application_brand.call_customer_service").first_or_create.update_attributes!(value: '"Call Customer Service"')
+Translation.where(key: "en.layouts.application_brand.help").first_or_create.update_attributes!(value: '"Help"')
+Translation.where(key: "en.layouts.application_brand.logout").first_or_create.update_attributes!(value: '"Logout"')
+Translation.where(key: "en.layouts.application_brand.my_id").first_or_create.update_attributes!(value: '"My ID"')
+Translation.where(key: "en.shared.my_portal_links.my_insured_portal").first_or_create.update_attributes!(value: '"My Insured Portal"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.alerts_link").first_or_create.update_attributes!(value: '"Jump to the alerts section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.badges_link").first_or_create.update_attributes!(value: '"Jump to the badges section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.buttons_link").first_or_create.update_attributes!(value: '"Jump to the buttons section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.carousels_link").first_or_create.update_attributes!(value: '"Jump to the carousels section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.inputs_link").first_or_create.update_attributes!(value: '"Jump to the inputs section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.navigation_link").first_or_create.update_attributes!(value: '"Jump to the navigation section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.pagination_link").first_or_create.update_attributes!(value: '"Jump to the pagination section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.panels_link").first_or_create.update_attributes!(value: '"Jump to the panels section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.progressbars_link").first_or_create.update_attributes!(value: '"Jump to the progress bars section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.tables_link").first_or_create.update_attributes!(value: '"Jump to the tables section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.tooltips_link").first_or_create.update_attributes!(value: '"Jump to the tooltips section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.typography").first_or_create.update_attributes!(value: '"Typography"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.typography_link").first_or_create.update_attributes!(value: '"Jump to the typography section of this page"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.wells_link").first_or_create.update_attributes!(value: '"Jump to the wells section of this page"')
+Translation.where(key: "en.wecome.index.sign_out").first_or_create.update_attributes!(value: '"Sign Out"')
+Translation.where(key: "en.welcome.index.assisted_consumer_family_portal").first_or_create.update_attributes!(value: '"Assisted Consumer/Family Portal"')
+Translation.where(key: "en.welcome.index.broker_agency_portal").first_or_create.update_attributes!(value: '"Broker Agency Portal"')
+Translation.where(key: "en.welcome.index.broker_registration").first_or_create.update_attributes!(value: '"Broker Registration"')
+Translation.where(key: "en.welcome.index.byline").first_or_create.update_attributes!(value: '"The Right Place for the Right Plan"')
+Translation.where(key: "en.welcome.index.consumer_family_portal").first_or_create.update_attributes!(value: '"Consumer/Family Portal"')
+Translation.where(key: "en.welcome.index.employee_portal").first_or_create.update_attributes!(value: '"Employee Portal"')
+Translation.where(key: "en.welcome.index.employer_portal").first_or_create.update_attributes!(value: '"Employer Portal"')
+Translation.where(key: "en.welcome.index.general_agency_portal").first_or_create.update_attributes!(value: '"General Agency Portal"')
+Translation.where(key: "en.welcome.index.general_agency_registration").first_or_create.update_attributes!(value: '"General Agency Registration"')
+Translation.where(key: "en.welcome.index.hbx_portal").first_or_create.update_attributes!(value: '"HBX Portal"')
+Translation.where(key: "en.welcome.index.logout").first_or_create.update_attributes!(value: '"Logout"')
+Translation.where(key: "en.welcome.index.returning_user").first_or_create.update_attributes!(value: '"Returning User"')
+Translation.where(key: "en.welcome.index.signed_in_as").first_or_create.update_attributes!(value: '"Signed in as %{current_user}"')
+Translation.where(key: "en.welcome.index.welcome_email").first_or_create.update_attributes!(value: '"Welcome %{current_user}"')
+Translation.where(key: "en.welcome.index.welcome_to_site_name").first_or_create.update_attributes!(value: '"Welcome to %{short_name}"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.headings").first_or_create.update_attributes!(value: '"Headings"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_1").first_or_create.update_attributes!(value: '"Heading 1"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_2").first_or_create.update_attributes!(value: '"Heading 2"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_3").first_or_create.update_attributes!(value: '"Heading 3"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_4").first_or_create.update_attributes!(value: '"Heading 4"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_5").first_or_create.update_attributes!(value: '"Heading 5"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.heading_6").first_or_create.update_attributes!(value: '"Heading 6"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.body_copy").first_or_create.update_attributes!(value: '"Body Copy"')
+Translation.where(key: "en.uis.bootstrap3_examples.index.body_copy_text").first_or_create.update_attributes!(value: '"Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.  Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Donec ullamcorper nulla non metus auctor fringilla.  Maecenas sed diam eget risus varius blandit sit amet non magna. Donec id elit non mi porta gravida at eget metus. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit."')
 
 puts "::: English Translations Complete :::"
 puts "*"*80
