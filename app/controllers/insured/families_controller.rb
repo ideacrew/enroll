@@ -13,6 +13,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
+    authorize @family, :show?
     @active_admin_sep = @family.active_admin_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?

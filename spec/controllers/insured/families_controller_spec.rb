@@ -41,7 +41,7 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
-  let(:family) { double("Family", active_household: household) }
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -69,9 +69,11 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET home" do
-    before :each do
-      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+    let(:family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
 
+    before :each do
+      allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
+      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
