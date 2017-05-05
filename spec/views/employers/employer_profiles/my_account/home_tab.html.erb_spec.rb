@@ -236,14 +236,14 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display title" do
-      expect(view.content_for(:main)).to have_selector("h1", text: "My Health Benefits Program")
+      expect(rendered).to have_selector("h1", text: "My Health Benefits Program")
     end
 
     it "should display benefit groups" do
       current_plan_year.benefit_groups.each do |bg|
-        expect(view.content_for(:main)).to match(/.*#{bg.title}.*/mi)
-        expect(view.content_for(:main)).to match(/.*#{bg.description}.*/mi)
-        expect(view.content_for(:main)).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
+        expect(rendered).to match(/.*#{bg.title}.*/mi)
+        expect(rendered).to match(/.*#{bg.description}.*/mi)
+        expect(rendered).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
       end
     end
 

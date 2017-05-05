@@ -18,19 +18,19 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF"
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /my #{Settings.site.short_name}/i)
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
-    expect(view.content_for(:left_navigation)).to match(/tab=employees/)
-    expect(view.content_for(:left_navigation)).to match(/tab=benefits/)
-    expect(view.content_for(:left_navigation)).to match(/tab=documents/)
-    expect(view.content_for(:left_navigation)).to match(/tab=brokers/)
-    expect(view.content_for(:left_navigation)).to match(/tab=families/)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
+    expect(rendered).to match(/tab=employees/)
+    expect(rendered).to match(/tab=benefits/)
+    expect(rendered).to match(/tab=documents/)
+    expect(rendered).to match(/tab=brokers/)
+    expect(rendered).to match(/tab=families/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*brokers/mi)
+    expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
 
@@ -61,21 +61,21 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER of employer" 
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /my #{Settings.site.short_name}/i)
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /brokers/i)
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
-    expect(view.content_for(:left_navigation)).to match(/tab=employees/)
-    expect(view.content_for(:left_navigation)).to match(/tab=benefits/)
-    expect(view.content_for(:left_navigation)).to match(/tab=documents/)
-    expect(view.content_for(:left_navigation)).to match(/tab=brokers/)
-    expect(view.content_for(:left_navigation)).to match(/tab=families/)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to have_selector('a', text: /brokers/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
+    expect(rendered).to match(/tab=employees/)
+    expect(rendered).to match(/tab=benefits/)
+    expect(rendered).to match(/tab=documents/)
+    expect(rendered).to match(/tab=brokers/)
+    expect(rendered).to match(/tab=families/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /brokers/i)
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*brokers/mi)
+    expect(rendered).to have_selector('a', text: /brokers/i)
+    expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
 
@@ -97,18 +97,18 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER - NOT of empl
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /my #{Settings.site.short_name}/i)
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
-    expect(view.content_for(:left_navigation)).to match(/tab=employees/)
-    expect(view.content_for(:left_navigation)).to match(/tab=benefits/)
-    expect(view.content_for(:left_navigation)).to match(/tab=documents/)
-    expect(view.content_for(:left_navigation)).to match(/tab=brokers/)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
+    expect(rendered).to match(/tab=employees/)
+    expect(rendered).to match(/tab=benefits/)
+    expect(rendered).to match(/tab=documents/)
+    expect(rendered).to match(/tab=brokers/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*brokers/mi)
+    expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
 
@@ -130,19 +130,19 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS GeneralAgency" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     render "employers/employer_profiles/primary_nav", active_tab: "home"
-    expect(view.content_for(:left_navigation)).to have_selector('a', text: /my #{Settings.site.short_name}/i)
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
-    expect(view.content_for(:left_navigation)).to match(/tab=employees/)
-    expect(view.content_for(:left_navigation)).to match(/tab=benefits/)
-    expect(view.content_for(:left_navigation)).to match(/tab=documents/)
-    expect(view.content_for(:left_navigation)).to match(/tab=brokers/)
-    expect(view.content_for(:left_navigation)).to match(/tab=families/)
+    expect(rendered).to have_selector('a', text: /my #{Settings.site.short_name}/i)
+    expect(rendered).to match(/li.*class.*active.*my #{Settings.site.short_name}/mi)
+    expect(rendered).to match(/tab=employees/)
+    expect(rendered).to match(/tab=benefits/)
+    expect(rendered).to match(/tab=documents/)
+    expect(rendered).to match(/tab=brokers/)
+    expect(rendered).to match(/tab=families/)
   end
   it "should show different tabs when Broker not employer" do
     #allow(current_user).to receive("has_broker_agency_staff_role?").and_return(true)
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*brokers/mi)
+    expect(rendered).to match(/li.*class.*active.*brokers/mi)
   end
 end
 
@@ -158,12 +158,12 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS EMPLOYER" do
   it "should display the standard tabs for Employer[broker and employer control]" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "brokers"
-    expect(view.content_for(:left_navigation)).to match(/tab=inbox/)
+    expect(rendered).to match(/tab=inbox/)
   end
 
   it "should display different tabs for Employer" do
     #allow(current_user.person.broker_role).to receive('broker_agency_profile_id').and_return(88)
     render "employers/employer_profiles/primary_nav", active_tab: "benefits"
-    expect(view.content_for(:left_navigation)).to match(/li.*class.*active.*benefits/mi)
+    expect(rendered).to match(/li.*class.*active.*benefits/mi)
   end
 end
