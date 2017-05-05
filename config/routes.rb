@@ -43,9 +43,8 @@ Rails.application.routes.draw do
 
     resources :scheduled_events do
       collection do
-        get 'get_system_events'
-        get 'get_holiday_events'
-        get 'no_events'
+        get 'current_events'
+        post 'delete_current_event'
       end
     end
 
