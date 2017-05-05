@@ -188,6 +188,9 @@ class Family
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
+  def active_broker_agency_account
+    broker_agency_accounts.detect { |baa| baa.is_active? }
+  end
 
   def coverage_waived?
     latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.waived.any?
