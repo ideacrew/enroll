@@ -236,14 +236,14 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display title" do
-      expect(rendered).to have_selector("h1", text: "My Health Benefits Program")
+      expect(view.content_for(:main)).to have_selector("h1", text: "My Health Benefits Program")
     end
 
     it "should display benefit groups" do
       current_plan_year.benefit_groups.each do |bg|
-        expect(rendered).to match(/.*#{bg.title}.*/mi)
-        expect(rendered).to match(/.*#{bg.description}.*/mi)
-        expect(rendered).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
+        expect(view.content_for(:main)).to match(/.*#{bg.title}.*/mi)
+        expect(view.content_for(:main)).to match(/.*#{bg.description}.*/mi)
+        expect(view.content_for(:main)).to match(/.*#{bg.reference_plan.plan_type}.*/mi)
       end
     end
 
@@ -269,6 +269,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
     end
 
     it "should display a link to download employer guidance pdf" do
+      render partial: "employers/employer_profiles/my_account/employer_welcome"
       expect(rendered).to have_selector(".icon-left-download", text: /Download Step-by-Step Instructions/i)
     end
 
