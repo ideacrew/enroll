@@ -46,11 +46,6 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       end
     end
 
-      it "should have right navigation section" do
-        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:top_navigation)).to include('multi-line')
-      end
-
     context "with individual market disabled " do
       before do
         allow(view).to receive(:individual_market_is_enabled?).and_return(false)
