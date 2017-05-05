@@ -44,7 +44,7 @@ Translation.where(key: "ja.uis.bootstrap3_examples.index.heading_4").first_or_cr
 Translation.where(key: "ja.uis.bootstrap3_examples.index.heading_5").first_or_create.update_attributes!(value: '"Heading 5"')
 Translation.where(key: "ja.uis.bootstrap3_examples.index.heading_6").first_or_create.update_attributes!(value: '"Heading 6"')
 Translation.where(key: "ja.uis.bootstrap3_examples.index.body_copy").first_or_create.update_attributes!(value: '"Body コピー"')
-Translation.where(key: "en.uis.bootstrap3_examples.index.body_copy_text").first_or_create.update_attributes!(value: '"大きくは単節条虫亜綱と多節条虫亜綱に分けられる。一般にサナダムシとしてイメージするのは後者である。単節条虫亜綱のものは節に分かれない扁平な体で、先端に吸盤などを持つ。多節条虫亜綱のものは、頭部とそれに続く片節からなる。頭部の先端はやや膨らみ、ここに吸盤や鉤など、宿主に固着するための構造が発達する。それに続く片節は、それぞれに生殖器が含まれており、当節から分裂によって形成され、成熟すると切り離される。これは一見では体節に見えるが、実際にはそれぞれの片節が個体であると見るのが正しく、分裂した個体がつながったまま成長し、成熟するにつれて離れてゆくのである。そのため、これをストロビラともいう。長く切り離されずに10mにも達するものもあれば、常に数節のみからなる数mm程度の種もある。切り離された片節は消化管に寄生するものであれば糞と共に排出され、体外で卵が孵化するものが多い。"')
+Translation.where(key: "ja.uis.bootstrap3_examples.index.body_copy_text").first_or_create.update_attributes!(value: '"大きくは単節条虫亜綱と多節条虫亜綱に分けられる。一般にサナダムシとしてイメージするのは後者である。単節条虫亜綱のものは節に分かれない扁平な体で、先端に吸盤などを持つ。多節条虫亜綱のものは、頭部とそれに続く片節からなる。頭部の先端はやや膨らみ、ここに吸盤や鉤など、宿主に固着するための構造が発達する。それに続く片節は、それぞれに生殖器が含まれており、当節から分裂によって形成され、成熟すると切り離される。これは一見では体節に見えるが、実際にはそれぞれの片節が個体であると見るのが正しく、分裂した個体がつながったまま成長し、成熟するにつれて離れてゆくのである。そのため、これをストロビラともいう。長く切り離されずに10mにも達するものもあれば、常に数節のみからなる数mm程度の種もある。切り離された片節は消化管に寄生するものであれば糞と共に排出され、体外で卵が孵化するものが多い。"')
 
 puts "::: Japanese Translations Complete :::"
 puts "*"*80
