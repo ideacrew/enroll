@@ -210,6 +210,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
     let(:census_employee) {FactoryGirl.create(:census_employee)}
+
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
@@ -220,6 +221,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(family).to receive(:latest_household).and_return(household)
       allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       sign_in
     end
 
@@ -275,7 +277,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-
+    
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user
