@@ -17,7 +17,7 @@ class TranslationsController < ApplicationController
     respond_to do |format|
       if @translation.save
         format.html { redirect_to @translation, notice: 'Translation was successfully created.' }
-        format.json { render :show, status: :created, location: @translation }
+        format.json { render :index, status: :created, location: @translation }
       else
         format.html { render :new }
         format.json { render json: @translation.errors, status: :unprocessable_entity }
