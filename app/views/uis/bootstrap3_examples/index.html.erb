@@ -8,65 +8,67 @@
     <nav id="spy">
       <ul class="sidebar-nav nav">
         <li class="sidebar-brand">
-          <a href="#home"><span class="fa fa-home solo">Typography</span></a>
+          <a href="#home" title="<%= l10n('.typography_link') %>">
+            <span class="fa fa-home solo"><%= l10n('.typography') %></span>
+          </a>
         </li>
         <li>
-          <a href="#buttons" data-scroll>
+          <a href="#buttons" data-scroll title="<%= l10n('.buttons_link') %>">
             <span class="fa fa-anchor solo">Buttons</span>
           </a>
         </li>
         <li>
-          <a href="#panels" data-scroll>
+          <a href="#panels" data-scroll title="<%= l10n('.panels_link') %>">
             <span class="fa fa-anchor solo">Panels</span>
           </a>
         </li>
         <li>
-          <a href="#tables" data-scroll>
+          <a href="#tables" data-scroll title="<%= l10n('.tables_link') %>">
               <span class="fa fa-anchor solo">Tables</span>
           </a>
         </li>
         <li>
-          <a href="#inputs" data-scroll>
+          <a href="#inputs" data-scroll title="<%= l10n('.inputs_link') %>">
               <span class="fa fa-anchor solo">Inputs</span>
           </a>
         </li>
         <li>
-          <a href="#pagination" data-scroll>
+          <a href="#pagination" data-scroll title="<%= l10n('.inputs_link') %>">
               <span class="fa fa-anchor solo">Pagination</span>
           </a>
         </li>
         <li>
-          <a href="#navigation" data-scroll>
+          <a href="#navigation" data-scroll title="<%= l10n('.navigation_link') %>">
               <span class="fa fa-anchor solo">Navigation</span>
           </a>
         </li>
         <li>
-          <a href="#progressbars" data-scroll>
+          <a href="#progressbars" data-scroll title="<%= l10n('.progressbars_link') %>">
               <span class="fa fa-anchor solo">Progress Bars</span>
           </a>
         </li>
         <li>
-          <a href="#tooltips" data-scroll>
+          <a href="#tooltips" data-scroll title="<%= l10n('.tooltips_link') %>">
               <span class="fa fa-anchor solo">Tooltips / Popovers</span>
           </a>
         </li>
         <li>
-          <a href="#alerts" data-scroll>
+          <a href="#alerts" data-scroll title="<%= l10n('.alerts_link') %>">
               <span class="fa fa-anchor solo">Alerts</span>
           </a>
         </li>
         <li>
-          <a href="#badges" data-scroll>
+          <a href="#badges" data-scroll title="<%= l10n('.badges_link') %>">
               <span class="fa fa-anchor solo">Badges</span>
           </a>
         </li>
         <li>
-          <a href="#wells" data-scroll>
+          <a href="#wells" data-scroll title="<%= l10n('.wells_link') %>">
               <span class="fa fa-anchor solo">Wells</span>
           </a>
         </li>
         <li>
-          <a href="#carousels" data-scroll>
+          <a href="#carousels" data-scroll title="<%= l10n('.carousels_link') %>">
               <span class="fa fa-anchor solo">Carouselss</span>
           </a>
         </li>
@@ -77,24 +79,18 @@
 
 <% content_for :main do %>
 
-  <h1 id="home">Typography</h1>
-  <h3>Headings</h3>
+  <h1 id="home"><%= l10n('.typography') %></h1>
+  <h3><%= l10n('.headings') %></h3>
 
-  <h1>Heading 1</h1>
-  <h2>Heading 2</h2>
-  <h3>Heading 3</h3>
-  <h4>Heading 4</h4>
-  <h5>Heading 5</h5>
-  <h6>Heading 6</h6>
+  <h1><%= l10n('.heading_1') %></h1>
+  <h2><%= l10n('.heading_2') %></h2>
+  <h3><%= l10n('.heading_3') %></h3>
+  <h4><%= l10n('.heading_4') %></h4>
+  <h5><%= l10n('.heading_5') %></h5>
+  <h6><%= l10n('.heading_6') %></h6>
 
-  <h3>Body Copy</h3>
-  <p>
-    Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.
-
-    Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Donec ullamcorper nulla non metus auctor fringilla.
-
-    Maecenas sed diam eget risus varius blandit sit amet non magna. Donec id elit non mi porta gravida at eget metus. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
-  </p>
+  <h3><%= l10n('.body_copy') %></h3>
+  <p><%= l10n('.body_copy_text') %></p>
 
   <h3>Lead Body Copy</h3>
   <p class="lead">
