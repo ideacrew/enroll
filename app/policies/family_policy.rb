@@ -4,6 +4,7 @@ class FamilyPolicy < ApplicationPolicy
     if user_person
       primary_applicant = @record.primary_applicant
       return true if (@record.primary_applicant.person_id == user_person.id)
+      return true if can_modify_family?(user_person)
       broker_role = user_person.broker_role
       employee_roles = primary_applicant.person.active_employee_roles
       if broker_role
@@ -31,6 +32,14 @@ class FamilyPolicy < ApplicationPolicy
       end
     end
     false
+  end
+
+  def can_modify_family?(user_person)
+    hbx_staff_role = user_person.hbx_staff_role
+    return false unless hbx_staff_role
+    permission = hbx_staff_role.permission
+    return false unless permission
+    permission.modify_family
   end
 
   def updateable?
