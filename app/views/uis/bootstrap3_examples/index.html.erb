@@ -1006,60 +1006,21 @@
       <li role="presentation"><a href="#">Messages <span class="badge">3</span></a></li>
     </ul>
     <br>
+    <h3><%= l10n('.Wells') %></h3>
 
-      <h3>Modal</h3>
-      <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Large Modal</button>
-      <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <h3><%= l10n('.default_well') %></h3>
+      <div class="well"> Default well</div>
 
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Small modal</button>
-      <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-    <h3>Tabs</h3>
-    <h3>Wells</h3>
+      <h2><%= l10n('.optional_classes') %></h2>
 
-      <h3>Default well</h3>
-      <div class="well"> Default Well</div>
-
-      <h2>Optional classes</h2>
-
-        <h3>Large-well</h3>
+        <h3><%= l10n('.large_well') %></h3>
         <div class="well well-lg"> A Large Well</div>
 
-        <h3>Small-well</h3>
+        <h3><%= l10n('.small_well') %></h3>
         <div class="well well-sm"> A small Well</div>
 
-    <h3>Carousel</h3>
-      <h3>Slides only</h3>
+    <h3><%= l10n('.carousels') %></h3>
+      <h3><%= l10n('.slides_only') %></h3>
       <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner" role="listbox">
           <div class="carousel-item item active">
@@ -1074,7 +1035,7 @@
         </div>
       </div>
 
-      <h3>With controls</h3>
+      <h3><%= l10n('.with_controls') %></h3>
       <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner" role="listbox">
           <div class="carousel-item item active">
@@ -1099,7 +1060,7 @@
 
       <p> To initialize $("#carouselExampleControls").carousel(); </p>
 
-      <h3>With indicators</h3>
+      <h3><%= l10n('.with_indicators') %></h3>
       <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
           <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -1127,28 +1088,28 @@
         </a>
       </div>
 
-      <h3>With captions</h3>
+      <h3><%= l10n('.with_captions') %></h3>
       <div id="carouselWithCaptions" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner" role="listbox">
           <div class="carousel-item active carousel-item item ">
             <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/individual-family.jpg" alt="First slide">
             <div class="carousel-caption">
-              <h3>Picture One Title</h3>
-              <p>Picture One Caption</p>
+              <h3><%= l10n('.picture_one_title') %></h3>
+              <p><%= l10n('.picture_one_caption') %></p>
              </div>
           </div>
           <div class="carousel-item carousel-item item ">
             <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/small-business.jpg" alt="Second slide">
             <div class="carousel-caption">
-              <h3>Picture Two Title</h3>
-              <p>Picture Two Caption</p>
+              <h3><%= l10n('.picture_two_title') %></h3>
+              <p><%= l10n('.picture_two_caption') %></p>
             </div>
           </div>
           <div class="carousel-item carousel-item item ">
             <img class="d-block img-fluid" src="https://dchealthlink.com/sites/all/themes/dchl/img/stock/employee.jpg" alt="Third slide">
             <div class="carousel-caption">
-              <h3>Picture Three Title</h3>
-              <p>Picture Three Caption</p>
+              <h3><%= l10n('.picture_three_title') %></h3>
+              <p><%= l10n('.picture_three_caption') %></p>
             </div>
           </div>
         </div>
