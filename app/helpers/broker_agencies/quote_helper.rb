@@ -1,10 +1,12 @@
 module BrokerAgencies::QuoteHelper
-	def draft_quote_header(state,quote_name)
-		if state == "draft"
-			content_tag(:h3, "Review: Publish your #{quote_name}" )+
-			content_tag(:span, "Please review the information below before publishing your quote. Once the quote is published, no information can be changed.") 
-		end
-	end
+
+  def draft_quote_header(state,quote_name)
+    if state == "draft"
+      content_tag(:h3, "Review: Publish your #{quote_name}" )+
+      content_tag(:span, "Please review the information below before publishing your quote. Once the quote is published, no information can be changed.")
+    end
+  end
+
   def display_dental_plan_option_kind(bg)
     kind = bg.dental_plan_option_kind
     if kind == 'single_carrier'
@@ -53,7 +55,6 @@ module BrokerAgencies::QuoteHelper
       @qbg.quote_dental_relationship_benefits,
       @qbg.roster_cost_all_plans('dental'))
     elected_dental_plan_ids = options[:plan_ids].present? ? options[:plan_ids] : @qbg.elected_dental_plan_ids
-    # binding.pry
     elected_dental_plan_ids.each do |plan_id|
       p = @health_plans.detect{|plan| plan.id.to_s == plan_id.to_s}
       detailCost = Array.new

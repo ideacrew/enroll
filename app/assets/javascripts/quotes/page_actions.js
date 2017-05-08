@@ -336,12 +336,12 @@ QuotePageLoad = (function() {
           }
         });
       });
-      $('.plan_buttons .btn').on('click', function() {
+      $('.health_plan_buttons .btn').on('click', function() {
           var plan = $(this)
           delta = plan.hasClass('active') ? -1 : 1;
-          adjusted_count = $('.btn.active').size() + delta
-          if ( (adjusted_count > 25) && (delta == 1)  ) {
-            alert('You may not select more than 25 plans at a time')
+          adjusted_health_count = $('.health_plan_buttons.active').size() + delta
+          if ( (adjusted_health_count > 3) && (delta == 1)  ) {
+            alert('You may not select more than 3 health plans at a time')
             setTimeout(function(){
               plan.removeClass('active')
               var input = $(plan.children()[0])
@@ -349,7 +349,23 @@ QuotePageLoad = (function() {
             },20)
           }
           else {
-           $('#show_plan_selected_count').text('You have selected ' + String(adjusted_count) + ' plans.' )
+           $('#show_plan_selected_count').text('You have selected ' + String(adjusted_health_count) + ' plans.' )
+          }
+      })
+      $('.dental_plan_buttons .btn').on('click', function() {
+          var plan = $(this)
+          delta = plan.hasClass('active') ? -1 : 1;
+          adjusted_dental_count = $('.dental_plan_buttons.active').size() + delta
+          if ( (adjusted_dental_count > 3) && (delta == 1)  ) {
+            alert('You may not select more than 3 dental plans at a time')
+            setTimeout(function(){
+              plan.removeClass('active')
+              var input = $(plan.children()[0])
+              input.prop('checked', false)
+            },20)
+          }
+          else {
+           $('#show_dental_plan_selected_count').text('You have selected ' + String(adjusted_dental_count) + ' plans.' )
           }
       })
       $('#benefit_group_select').on('change',
