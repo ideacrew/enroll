@@ -13,7 +13,7 @@ class ChangeBrokerNpn < MongoidMigrationTask
         puts "No broker role was found with given hbx_id" unless Rails.env.test?
       else
        broker_role.update_attributes(npn:npn)
-        puts "update the npn of person #{hbx_id}" unless Rails.env.test?
+        puts "update the npn of person #{person_hbx_id}" unless Rails.env.test?
       end
     end
   end
