@@ -569,20 +569,14 @@ function checkPhone(textbox) {
 }
 
 function checkZip(textbox) {
-  var phoneRegex = /^\d{5}$/;
+  var zipRegex = /^\d{5}$/;
   if (textbox.value == '') {
     textbox.setCustomValidity('Please fill out this zipcode field.');
-  } else if(!phoneRegex.test(textbox.value)){
+  } else if(!zipRegex.test(textbox.value)){
     textbox.setCustomValidity('please enter a valid zipcode.');
   } else {
     textbox.setCustomValidity('');
-  }
-  return true;
-}
-
-function getCounties(textbox, child_index) {
-  var phoneRegex = /^\d{5}$/;
-  if (phoneRegex.test(textbox.value)) {
+    var child_index = $(textbox).data('child-index');
     $.ajax({
       type: 'get',
       datatype: 'js',
@@ -594,6 +588,7 @@ function getCounties(textbox, child_index) {
       }
     });
   }
+  return true;
 }
 
 function checkAreaCode(textbox) {

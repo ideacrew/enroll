@@ -184,7 +184,8 @@ def default_office_location
   address2: "Suite 200",
   city: "AnyCity",
   state: Settings.aca.state_abbreviation,
-  zip: "20001",
+  zip: "01001",
+  county: 'Hampden',
   phone_area_code: "202",
   phone_number: "1110000",
   phone_extension: "1111"
@@ -372,6 +373,7 @@ end
 
 When(/^.+ enters? office location for (.+)$/) do |location|
   location = eval(location) if location.class == String
+  RateReference.where(zip_code: "01001").first || FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "Test Region")
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => location[:city]
@@ -380,6 +382,8 @@ When(/^.+ enters? office location for (.+)$/) do |location|
   find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
 
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
+  wait_for_ajax
+  select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]
