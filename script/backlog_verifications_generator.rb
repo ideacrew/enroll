@@ -1,3 +1,11 @@
+NOTICE_GENERATOR = ARGV[0]
+REMINDER_NOTICE_TRIGGERS = ["verifications_backlog", "first_verifications_reminder", "second_verifications_reminder", "third_verifications_reminder", "fourth_verifications_reminder"]
+
+unless ARGV[0].present? && REMINDER_NOTICE_TRIGGERS.include?(NOTICE_GENERATOR)
+  puts "Please enter a valid event name - Event Names: #{REMINDER_NOTICE_TRIGGERS.join(", ")}."
+  exit
+end
+
 def create_directory(path)
   if Dir.exists?(path)
     FileUtils.rm_rf(path)
@@ -51,7 +59,7 @@ CSV.open("families_processed_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.c
         next
       end
 
-      event_kind = ApplicationEventKind.where(:event_name => 'second_verifications_reminder').first
+      event_kind = ApplicationEventKind.where(:event_name => NOTICE_GENERATOR).first
 
       notice_trigger = event_kind.notice_triggers.first
 
