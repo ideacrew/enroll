@@ -10,10 +10,10 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    authorize @family, :show?
     @active_admin_sep = @family.active_admin_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
