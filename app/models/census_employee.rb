@@ -392,14 +392,11 @@ class CensusEmployee < CensusMember
     renewal_benefit_group_assignment.present? && active_benefit_group_assignment != renewal_benefit_group_assignment
   end
 
-  def benefit_group_assignments_for_cobra
-    # 6 months buffer between create date and open enrollment start date indicates this is most likely a conversion and should not be picked up.
-    benefit_group_assignments.select { |bga| (bga == renewal_benefit_group_assignment) || (bga.plan_year == employer_profile.published_plan_year && employer_profile.published_plan_year.created_at < (employer_profile.published_plan_year.open_enrollment_start_on + 6.months)) }
-  end
-
   def build_hbx_enrollment_for_cobra
     family = employee_role.person.primary_family
-    hbxs = benefit_group_assignments_for_cobra.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
+
+    cobra_assignments = [active_benefit_group_assignment, renewal_benefit_group_assignment].compact
+    hbxs = cobra_assignments.map(&:latest_hbx_enrollments_for_cobra).flatten.uniq rescue []
 
     hbxs.compact.each do |hbx|
       enrollment_cobra_factory = Factories::FamilyEnrollmentCloneFactory.new
