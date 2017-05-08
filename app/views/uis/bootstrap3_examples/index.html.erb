@@ -80,6 +80,15 @@
 <% content_for :main do %>
 
   <h1 id="home"><%= l10n('.typography') %></h1>
+
+    <%= render 'typography' %>
+
+  <h3 id="buttons"><%= l10n('.buttons') %></h3>
+
+  <%= render 'buttons' %>
+
+  <h3 id="panels"><%= l10n('panels') %></h3>
+
   <h3><%= l10n('.headings') %></h3>
 
   <h1><%= l10n('.heading_1') %></h1>
