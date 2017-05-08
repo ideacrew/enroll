@@ -580,11 +580,10 @@ function checkZip(textbox) {
     $.ajax({
       type: 'get',
       datatype: 'js',
-      url: '/employers/employer_profiles/get_counties',
-      data: {zip_code: textbox.value, child_index: child_index,},
+      url: '/employers/employer_profiles/counties_for_zip_code',
+      data: { zip_code: textbox.value },
       success: function (response) {
-        $('#county' + child_index).show();
-        $('#county' + child_index).html(response);
+        $('#county-select-' + child_index + " select").html(response);
       }
     });
   }
