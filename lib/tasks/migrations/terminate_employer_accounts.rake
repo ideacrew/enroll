@@ -1,6 +1,6 @@
 # This rake task used to terminate employer active plan year && active enrollments.
 # RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/01/2017','02/28/2017']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
