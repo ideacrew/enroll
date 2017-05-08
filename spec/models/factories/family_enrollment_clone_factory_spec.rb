@@ -15,8 +15,8 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
   let!(:employer_profile) {
     create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id, elected_plan_ids: plan.to_a.map(&:id) )
   }
-
-  let(:benefit_group) { employer_profile.active_plan_year.benefit_groups.first }
+  let(:active_plan_year) { employer_profile.active_plan_year }
+  let(:benefit_group) { active_plan_year.benefit_groups.first }
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }
 
   let!(:build_plan_years_and_employees) {
@@ -65,7 +65,6 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
 
   context 'family under renewing employer' do
     let(:external_enrollment) { false }
-    let(:profile_source) { 'self_serve' }
 
     it 'should recive cobra enrollment' do
       expect(family.enrollments.size).to eq 1
@@ -79,11 +78,23 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
       generate_cobra_enrollment
       cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
       expect(cobra_enrollment.effective_on).to be >= cobra_enrollment.benefit_group.valid_plan_year.start_on
+      expect(cobra_enrollment.external_enrollment).to be_falsey
     end
   end
 
-  # context 'family under conversion employer' do
-  #   let(:external_enrollment) { true } 
-  #   let(:profile_source) { 'conversion' }
-  # end
+  context 'family under conversion employer' do
+    let(:external_enrollment) { true } 
+
+    before do
+      employer_profile.update_attributes(profile_source: 'conversion', registered_on: renewal_start - 3.months)
+    end
+
+    it 'should generate external cobra enrollment' do
+      generate_cobra_enrollment
+      cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
+      expect(cobra_enrollment.external_enrollment).to be_truthy
+      expect(cobra_enrollment.coverage_selected?).to be_truthy
+      expect(cobra_enrollment.effective_on).to eq coverage_terminated_on.next_day
+    end
+  end
 end
