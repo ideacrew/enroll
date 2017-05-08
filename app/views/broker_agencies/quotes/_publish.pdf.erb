@@ -19,7 +19,7 @@
 
           <p>Costs are based on the roster associated with this quote of  <b><%= @q.quote_households.count %></b> families:</p>
           <% @q.quote_benefit_groups.each do |benefit_group| %>
-          <% if benefit_group.dental_plan || benefit_group.plan %>
+          <%  unless benefit_group.plan.nil? %>
             <div class="panel-body">
               <h3 class="title no-buffer">
                 <%= "Benefit Group: #{benefit_group.title}" %>
@@ -198,13 +198,13 @@
             </div>
             <br>
             <% if benefit_group.elected_health_plan_ids.present? %>
-              <% quote_results = get_health_cost_comparison(benefit_group: benefit_group) %>
+              <% quote_health_results = get_health_cost_comparison(benefit_group: benefit_group) %>
               <h3>Detailed Employee cost breakdown for selected health plans:</h3>
               <table class="table table-striped table-hover table-sm panel panel-default">
                 <tr>
                   <td colspan="3" class="thead-default">
                   </td>
-                  <% quote_results.each do |qr| %>
+                  <% quote_health_results.each do |qr| %>
                     <td colspan="1" class="thead-default">
                       <div style='width: 300px'>
                         <b><%= qr[0] %></b><br>
@@ -224,11 +224,11 @@
                   <td class="thead-default">Name</td>
                   <td class="thead-default">Relationship Contribution</td>
                   <td class="thead-default">Age</td>
-                  <% quote_results.keys.each do |de| %>
+                  <% quote_health_results.keys.each do |de| %>
                     <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
                   <% end %>
                 </tr>
-                <% quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+                <% quote_health_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
                   <tr>
                     <td class="quote_detail_results">
                       <%= qr[:first_name] %>
@@ -239,9 +239,9 @@
                     <td class="quote_detail_results">
                       <%= qr[:age] %>
                     </td>
-                    <% quote_results.keys.each do |de| %>
+                    <% quote_health_results.keys.each do |de| %>
                       <td class="quote_detail_results"  style='padding-left: 100px'>
-                      <b><%= quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b>
+                      <b><%= quote_health_results[de][:detail].flatten[index][:employee_cost].round(2) %></b>
                       </td>
                     <% end %>
                   </tr>
@@ -255,7 +255,7 @@
                 <tr>
                   <td colspan="3" class="thead-default">
                   </td>
-                  <% quote_results.each do |qr| %>
+                  <% quote_dental_results.each do |qr| %>
                     <td colspan="1" class="thead-default">
                       <div style='width: 300px'>
                         <b><%= qr[0] %></b><br>
@@ -274,11 +274,11 @@
                   <td class="thead-default">Name</td>
                   <td class="thead-default">Relationship (%)</td>
                   <td class="thead-default">Age</td>
-                  <% quote_results.keys.each do |de| %>
+                  <% quote_dental_results.keys.each do |de| %>
                     <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
                   <% end %>
                 </tr>
-                <% quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
+                <% quote_dental_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
                   <tr>
                     <td class="quote_detail_results">
                       <%= qr[:first_name] %>
@@ -289,9 +289,9 @@
                     <td class="quote_detail_results">
                       <%= qr[:age] %>
                     </td>
-                    <% quote_results.keys.each do |de| %>
+                    <% quote_dental_results.keys.each do |de| %>
                       <td class="quote_detail_results"  style='padding-left: 100px'>
-                      <b><%= quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
+                      <b><%= quote_dental_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
                     <% end %>
                   </tr>
                 <% end %>
