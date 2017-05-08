@@ -34,7 +34,7 @@
         </li>
         <li>
           <a href="#pagination" data-scroll title="<%= l10n('.inputs_link') %>">
-              <span class="fa fa-anchor solo">Pagination</span>
+              <span class="fa fa-anchor solo"><%= l10n('.pagination') %></span>
           </a>
         </li>
         <li>
@@ -614,8 +614,10 @@
        </div>
 
     <div>
-      <h3>Pagination</h3>
-      <p>Default pagination</p>
+
+    <h3><%= l10n('.pagination') %></h3>
+      <p><%= l10n('.default_pagination') %></p>
+
         <nav aria-label="Page navigation">
           <ul class="pagination">
             <li>
@@ -623,11 +625,11 @@
               <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
-              <li><a href="#">1</a></li>
-              <li><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
-              <li><a href="#">5</a></li>
+              <li><a href="#"><%= l10n('.1') %></a></li>
+              <li><a href="#"><%= l10n('.2') %></a></li>
+              <li><a href="#"><%= l10n('.3') %></a></li>
+              <li><a href="#"><%= l10n('.4') %></a></li>
+              <li><a href="#"><%= l10n('.5') %></a></li>
             <li>
               <a href="#" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
@@ -636,89 +638,88 @@
           </ul>
         </nav>
 
-        <p>Disabled and active states</p>
-
+        <p><%= l10n('.disabled_and_active_states') %></p>
          <nav aria-label="Page navigation">
           <ul class="pagination">
           <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-          <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
-          <li class="disabled"><a href="#">2 <span class="sr-only">(current)</span></a></li>
-          <li class="disabled"><a href="#">3 <span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="#"><%= l10n('.1') %><span class="sr-only">(current)</span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.2') %><span class="sr-only">(current)</span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.3') %><span class="sr-only">(current)</span></a></li>
           </ul>
         </nav>
 
 
-        <p>Large Sizing</p>
 
-        <nav aria-label="Page navigation">
+        <p><%= l10n('.large_sizing') %></p>
+         <nav aria-label="Page navigation">
           <ul class="pagination pagination-lg">
             <li>
-            <a href="#">1</a>
-            <a href="#">2</a>
-            <a href="#">3</a>
-            <a href="#">4</a>
-            <a href="#">5</a>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
             </li>
           </ul>
         </nav>
 
-
-        <p>Default Sizing</p>
+      <p><%= l10n('.default_sizing') %></p>
         <nav aria-label="Page navigation">
           <ul class="pagination">
             <li>
-              <a href="#">1</a>
-              <a href="#">2</a>
-              <a href="#">3</a>
-              <a href="#">4</a>
-              <a href="#">5</a>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
             </li>
           </ul>
         </nav>
 
-        <p>Small sizing</p>
+      <p><%= l10n('.small_sizing') %></p>
         <nav aria-label="Page navigation">
           <ul class="pagination pagination-sm">
             <li>
-              <a href="#">1</a>
-              <a href="#">2</a>
-              <a href="#">3</a>
-              <a href="#">4</a>
-              <a href="#">5</a>
+            <a href="#"><%= l10n('.1') %></a>
+            <a href="#"><%= l10n('.2') %></a>
+            <a href="#"><%= l10n('.3') %></a>
+            <a href="#"><%= l10n('.4') %></a>
+            <a href="#"><%= l10n('.5') %></a>
             </li>
           </ul>
         </nav>
 
 
-    <h3>Pager</h3>
-      <p>Default</p>
-
+     <h3><%= l10n('.pager') %></h3>
+      <p><%= l10n('.default') %></p>
         <nav aria-label="Page navigation">
           <ul class="pager">
-            <li><a href="#">Previous</a></li>
-            <li><a href="#">Next</a></li>
+            <li><a href="#"><%= l10n('.previous') %></a></li>
+            <li><a href="#"><%= l10n('.next') %></a></li>
           </ul>
         </nav>
 
-      <p>Aligned links</p>
+      <p><%= l10n('.aligned_links') %></p>
         <nav aria-label="Page navigation">
           <ul class="pager">
-            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-            <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            <li class="previous"><a href="#"><span aria-hidden="true">&larr;</span><%= l10n('.older') %></a></li>
+            <li class="next"><a href="#"><%= l10n('.newer') %><span aria-hidden="true">&rarr;</span></a></li>
           </ul>
         </nav>
 
-       <p>Optional disabled state</p>
+      <p><%= l10n('.optional_disabled_state') %></p>
+        <nav aria-label="Page navigation">
+          <ul class="pager">
+            <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span><%= l10n('.older') %></a></li>
+            <li class="next"><a href="#"><%= l10n('.newer') %><span aria-hidden="true">&rarr;</span></a></li>
+          </ul>
+        </nav>
 
-          <nav aria-label="Page navigation">
-            <ul class="pager">
-              <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
-              <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
-            </ul>
-          </nav>
-
+<<<<<<< HEAD
     </div>
 
+=======
+>>>>>>> ffba7f7a9... localization for Pagination
     <h3>Navigation</h3>
     
       <nav class="navbar navbar-inverse">
