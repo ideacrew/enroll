@@ -34,7 +34,7 @@
         <div class="container-fluid">
           <div>
             <h5>Showing <strong id="x-of-plans"><%= @health_plans.count %></strong> of <strong><%= @health_plans.count %></strong>  plans based on your selection criteria</h5>
-            <div class="btn-group plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
+            <div class="btn-group plan_buttons health_plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
               <% @health_plans.each_with_index do |p,index| %>
                 <label class="btn health_plan_buttons <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
                 <input name="plans[]" <%= "checked" if params['plans'].try(:include?, p.id.to_s) %> type="checkbox" id="quote_health_plan_list" autocomplete="off" value="<%= p.id %>">
