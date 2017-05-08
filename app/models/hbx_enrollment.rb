@@ -86,7 +86,7 @@ class HbxEnrollment
   field :benefit_group_assignment_id, type: BSON::ObjectId
   field :hbx_id, type: String
   field :special_enrollment_period_id, type: BSON::ObjectId
-
+  field :predecessor_enrollment_id, type: BSON::ObjectId
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -351,6 +351,11 @@ class HbxEnrollment
     if is_shop? && benefit_group
       benefit_group.title
     end
+  end
+
+  def parent_enrollment
+    return nil if predecessor_enrollment_id.blank?
+    HbxEnrollment.find(predecessor_enrollment_id).first
   end
 
   def census_employee
@@ -777,26 +782,40 @@ class HbxEnrollment
     end
   end
 
-  # def benefit_coverage_period=(new_benefit_coverage_period: nil)
-  #   if new_benefit_coverage_period.present?
-  #     raise ArgumentError.new("expected EmployeeRole") unless new_employee_role.is_a? EmployeeRole
-  #   else
-  #     if enrollment_kind == 'special_enrollment' && family.is_under_special_enrollment_period?
-  #       new_benefit_coverage_period = benefit_sponsorship.benefit_coverage_period_by_effective_date(family.current_sep.effective_on)
-  #     else
-  #       new_benefit_coverage_period = benefit_sponsorship.current_benefit_period
-  #     end
-  #   end
+  def set_special_enrollment_period
+    if is_special_enrollment?
+      sep_id = is_shop? ? self.family.earliest_effective_shop_sep.id : self.family.earliest_effective_ivl_sep.id
+      self.update_current(special_enrollment_period_id: sep_id)
+    end
+  end
 
-  #   if new_benefit_coverage_period.present?
-  #     self.benefit_coverage_period_id = new_benefit_coverage_period.id
-  #     @benefit_coverage_period = new_benefit_coverage_period
-  #   end
-  # end
+  def reset_dates_on_previously_covered_members(new_plan=nil)
+    new_plan ||= self.plan
+    
+    if self.family.currently_enrolled_plans(self).include?(new_plan.id)
+      plan_selection = PlanSelection.new(self, self.plan)
+      self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    end
+  end
 
-  # def benefit_coverage_period
-  #   return @benefit_coverage_period if defined? @benefit_coverage_period
-  # end
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+    qhp_plan ||= self.plan
+
+    if self.is_shop?
+      if benefit_group.is_congress
+        PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
+      else
+        reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
+        PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
+      end
+    else
+      if apply_aptc
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+      else
+        UnassistedPlanCostDecorator.new(qhp_plan, self)
+      end
+    end
+  end
 
   def decorated_elected_plans(coverage_kind, market=nil)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -810,6 +829,10 @@ class HbxEnrollment
 
     tax_household = household.latest_active_tax_household_with_year(effective_on.year)
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household)
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+  end
+
+  def calculate_costs_for_plans(elected_plans)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
