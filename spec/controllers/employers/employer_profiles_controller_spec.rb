@@ -56,6 +56,31 @@ RSpec.describe Employers::EmployerProfilesController do
     end
   end
 
+  describe "GET#counties_for_zip_code" do
+    let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false)}
+    let(:person) { double("person")}
+    let(:zip_code) { '21208' }
+    before do
+      RateReference.destroy_all
+      FactoryGirl.create(:rate_reference, county_name: "Baltimore", zip_code:"21208")
+      sign_in(user)
+      get :counties_for_zip_code, { zip_code: zip_code }
+    end
+
+    it "should return supported counties for a given zip" do
+      expect(response).to render_template(:'employers/employer_profiles/_county_field')
+      expect(assigns(:counties)).to match_array(%W(Baltimore))
+    end
+    context "with a nonmatched zip" do
+      let(:zip_code) { '21224' }
+      it "should return an unsupported zip string" do
+
+        expect(assigns(:counties)).to match_array(['Zip code outside supported area'])
+      end
+    end
+
+  end
+
   describe "REDIRECT to my account if employer staff role present" do
     let(:user) { double("user")}
     let(:person) { double(:employer_staff_roles => [double("person", :employer_profile_id => double)])}
@@ -85,7 +110,7 @@ RSpec.describe Employers::EmployerProfilesController do
     ) }
     let(:person) { double("person", :employer_staff_roles => [employer_staff_role]) }
     let(:employer_staff_role) { double(:employer_profile_id => employer_profile.id) }
-    
+
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group]) }
     let(:employer_profile) { plan_year.employer_profile}
@@ -403,12 +428,12 @@ RSpec.describe Employers::EmployerProfilesController do
       @user = FactoryGirl.create(:user)
       p=FactoryGirl.create(:person, user: @user)
       @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
-      
+
 
       allow(@user).to receive(:switch_to_idp!)
       allow(Forms::EmployerProfile).to receive(:new).and_return(organization)
       allow(organization).to receive(:save).and_return(save_result)
-      
+
     end
     describe 'updateable organization' do
       before(:each) do
@@ -449,7 +474,7 @@ RSpec.describe Employers::EmployerProfilesController do
         sign_in @user
         post :create, :organization => organization_params
       end
-      
+
 
       describe "given a valid employer profile" do
         let(:save_result) { true }
@@ -477,11 +502,11 @@ RSpec.describe Employers::EmployerProfilesController do
     before(:each) do
       @user = FactoryGirl.create(:user)
       p=FactoryGirl.create(:person, user: @user)
-      @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)    
+      @hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: p)
       allow(@hbx_staff_role).to receive_message_chain('permission.modify_employer').and_return(true)
       sign_in @user
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
-      
+
       allow(@user).to receive(:switch_to_idp!)
 #      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
 #      allow(found_employer).to receive(:organization).and_return(organization)

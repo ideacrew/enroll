@@ -61,11 +61,20 @@ RSpec.describe RateReference, type: :model do
         let!(:same_county_second_zip) { create(:rate_reference, county_name: "County", zip_code: "10020") }
       end
       it "returns an array of zip codes" do
-        expect(subject.find_zip_codes_for_county(county_name: 'County')).to match_array(%w(10010 10020))
+        expect(subject.find_zip_codes_for_county_name('County')).to match_array(%w(10010 10020))
       end
 
       it "returns an empty array if nothing found" do
-        expect(subject.find_zip_codes_for_county(county_name: "Potato")).to match_array([])
+        expect(subject.find_zip_codes_for_county_name("Potato")).to match_array([])
+      end
+    end
+
+    describe "::counties_for_zip_code" do
+      let!(:first_county_region) { create(:rate_reference, county_name: "County", zip_code: "10011") }
+      let!(:different_county_same_zip) { create(:rate_reference, county_name: "County Two", zip_code: "10011") }
+
+      it "returns counties with the same zip" do
+        expect(subject.find_counties_for_zip_code("10011")).to match_array(['County', 'County Two'])
       end
     end
   end

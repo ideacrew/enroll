@@ -1,5 +1,1 @@
-<select required=required" name="organization[office_locations_attributes][<%= @child_index.to_i  %>][address_attributes][county]"
-        id="organization_office_locations_address_attributes_county" tabindex="-1">
-  <%= options_for_select @counties, selected: @counties.first %>
-
-</select>
+<%= options_for_select @counties, selected: @counties.first %>

@@ -289,12 +289,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
-  def get_counties
-      params.permit([:child_index, :zip_code])
-      @child_index = params[:child_index]
-      @counties = RateReference.where(zip_code: params[:zip_code]).pluck(:county_name)
-
+  def counties_for_zip_code
+      params.permit([:zip_code])
+      @counties = RateReference.find_counties_for_zip_code(params[:zip_code])
+      @counties.unshift("SELECT COUNTY") if @counties.count > 1
       @counties << "Zip code outside supported area" if @counties.empty?
+
 
       render partial: 'employers/employer_profiles/county_field'
   end
