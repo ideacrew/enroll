@@ -45,6 +45,7 @@ RSpec.describe TimeHelper, :type => :helper do
   describe "SET optional_effective_on date on a SEP" do
     let(:person_with_consumer_role) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:person_with_employee_role) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person) { FactoryGirl.create(:person) }
 
     context "for shop market" do
       let(:person) {FactoryGirl.create(:person)}
@@ -73,6 +74,24 @@ RSpec.describe TimeHelper, :type => :helper do
     context "for individual market" do
       before do
         allow(family).to receive_message_chain("primary_applicant.person").and_return(person_with_consumer_role)
+      end
+
+      it "returns minmum range as beginning of the year" do
+        beginning_of_year = TimeKeeper.date_of_record.beginning_of_year
+        expect(helper.sep_optional_date(family, 'min')).to eq(beginning_of_year)
+      end
+
+      it "returns maximum range as end of the year" do
+        end_of_year = TimeKeeper.date_of_record.end_of_year
+        expect(helper.sep_optional_date(family, 'max')).to eq(end_of_year)
+      end
+    end
+
+    context "for person with no consumer or active employee roles" do
+      before do
+        allow(family).to receive_message_chain("primary_applicant.person").and_return(person)
+        allow(person).to receive(:has_consumer_role?).and_return false
+        allow(person).to receive(:active_employee_roles).and_return []
       end
 
       it "returns minmum range as beginning of the year" do
