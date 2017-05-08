@@ -24,11 +24,11 @@ class Envelope < PdfReport
       fill_recipient_contact(notice)
     end
 
-    x_pos = mm2pt(150)
-    y_pos = 885 - mm2pt(57.15)
+    x_pos = mm2pt(6.15)
+    y_pos = 57
 
     if mpi_indicator.present?
-      bounding_box([x_pos, y_pos], :width => 150) do
+      bounding_box([x_pos, y_pos], :width => 300) do
         text mpi_indicator
       end
     end
