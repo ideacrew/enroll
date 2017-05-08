@@ -173,6 +173,10 @@ GEM
       timers (>= 4.1.1)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
+    chosen-rails (1.5.2)
+      coffee-rails (>= 3.2)
+      railties (>= 3.0)
+      sass-rails (>= 3.2)
     cliver (0.3.2)
     coderay (1.1.1)
     coercible (1.0.0)
@@ -612,6 +616,7 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  chosen-rails
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
