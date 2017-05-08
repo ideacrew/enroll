@@ -21,7 +21,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP1B',
@@ -41,7 +41,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP1C',
@@ -61,7 +61,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP2',
@@ -82,7 +82,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP2B',
@@ -103,7 +103,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP3A',
@@ -124,7 +124,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'SHOP3B',
@@ -145,7 +145,7 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
 
   {
@@ -201,7 +201,7 @@ shop_notice_triggers = [
       {
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8a_renewal_open_enrollment_notice_for_employee',
-        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForAutoRenewal',
         mpi_indicator: 'MPI_SHOP8A',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -222,7 +222,7 @@ shop_notice_triggers = [
       {
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
-        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForNoRenewal',
         mpi_indicator: 'MPI_SHOP8B',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -243,11 +243,53 @@ shop_notice_triggers = [
       {
         name: 'Renewal Open Enrollment available for Employee',
         notice_template: 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
-        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNotice',
+        notice_builder: 'ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled',
         mpi_indicator: 'MPI_SHOP8C',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP16',
+    title: 'Application to Offer Group Health Coverage in DC Health Link',
+    description: 'When Employer application meets minimum participation and non-owner requirements',
+    resource_name: 'employer',
+    event_name: 'initial_eligibile_employer_open_enrollment_begins',
+    notice_triggers: [
+      {
+        name: 'Initial Eligible Employer open enrollment begins',
+        notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
+        mpi_indicator: 'MPI_SHOP16',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP17',
+    title: 'Open Enrollment Completed',
+    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
+    resource_name: 'employer',
+    event_name: 'initial_employer_open_enrollment_completed',
+    notice_triggers: [
+      {
+        name: 'Initial Employee Open Enrollment Successfully Completed',
+        notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+        mpi_indicator: 'MPI_SHOP17',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -298,7 +340,7 @@ ivl_notice_triggers = [
           secondary_recipients: []
         }
       }
-    ] 
+    ]
   },
   {
     hbx_id: 'Notice20B',

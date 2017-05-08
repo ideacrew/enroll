@@ -386,19 +386,48 @@ describe Person do
         end
       end
 
-      context "with invalid Tribal Id" do
-        let(:params) {valid_params.deep_merge({tribal_id: "12124"})}
+      context "consumer fields validation" do
+        let(:params) {valid_params}
+        let(:person) { Person.new(**params) }
+        errors = { citizenship: "Citizenship status is required.",
+                         naturalized: "Naturalized citizen is required.",
+                         immigration: "Eligible immigration status is required.",
+                         native: "American Indian / Alaskan Native status is required.",
+                         tribal_id_presence: "Tribal id is required when native american / alaskan native is selected",
+                         tribal_id: "Tribal id must be 9 digits",
+                         incarceration: "Incarceration status is required." }
 
-        it "should fail validation" do
-          person = Person.new(**params)
-          person.us_citizen = "true"
-          person.indian_tribe_member = "1"
-          allow(person).to receive(:is_consumer_role).and_return(:true)
-          expect(person.valid?).to eq false
-          expect(person.errors[:base]).to eq ["Tribal id must be 9 digits"]
+        shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
+          before do
+            person.instance_variable_set(:@is_consumer_role, true)
+            person.instance_variable_set(:@indian_tribe_member, native)
+            person.instance_variable_set(:@us_citizen, citizenship)
+            person.instance_variable_set(:@eligible_immigration_status, immigration_status)
+            person.instance_variable_set(:@naturalized_citizen, naturalized)
+            person.instance_variable_set(:@indian_tribe_member, native)
+            person.tribal_id = tribal_id
+            person.is_incarcerated = incarceration
+            person.valid?
+          end
+          it "#{is_valid ? 'pass' : 'fails'} validation" do
+            expect(person.valid?).to eq is_valid
+          end
+
+          it "#{is_valid ? 'does not raise' : 'raises'} the errors #{} with #{} errors" do
+            expect(person.errors[:base].count).to eq error_list.count
+            expect(person.errors[:base]).to eq error_list
+          end
         end
-      end
 
+        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "3344", false, false, [errors[:tribal_id]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, "true", false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, false, nil, nil, false, [errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, true, nil, nil, false, [errors[:tribal_id_presence], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", false, nil, nil, true, nil, nil, false, [errors[:immigration], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
+      end
 
       context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}

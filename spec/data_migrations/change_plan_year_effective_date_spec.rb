@@ -29,6 +29,7 @@ describe ChangePlanYearEffectiveDate do
       allow(ENV).to receive(:[]).with("action_on_enrollments").and_return("")
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("")
       allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
+      plan_year.employer_profile.update_attributes(profile_source: "conversion")
     end
 
     it "should change the plan year effective on date" do
@@ -52,6 +53,9 @@ describe ChangePlanYearEffectiveDate do
     end
 
     it "should publish the plan year" do
+      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what") # No
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
       subject.migrate
       plan_year.reload
@@ -61,10 +65,30 @@ describe ChangePlanYearEffectiveDate do
     it "should revert the renewal py if received args as revert renewal" do
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
       plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "auto_renewing")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should cancel the enrollments under renewal plan year if received args as revert renewal" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_draft"
+    end
+
+    it "should cancel the enrollments under inital py if received args as revert application" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_application")
+      plan_year.update_attributes(aasm_state: "active")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "coverage_enrolled")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
     end
 
     it "should revert the inital py if received args as revert application" do
@@ -98,6 +122,17 @@ describe ChangePlanYearEffectiveDate do
       enrollment.reload
       plan_year.reload
       expect(enrollment.effective_on).to eq plan_year.start_on
+    end
+
+    it "should return an error if plan year does not belong to conversion employer" do
+      plan_year.employer_profile.update_attributes(profile_source: "self_serve")
+      expect(subject.migrate).to eq "Renewing plan year for the conversion employer is published (Or) Employer is not a conversion Employer. You cannot perform this action."
+    end
+
+    it "should return an error if plan year has published renewing plan year" do
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      expect(subject.migrate).to eq "Renewing plan year for the conversion employer is published (Or) Employer is not a conversion Employer. You cannot perform this action."
     end
   end
 end

@@ -34,7 +34,7 @@
 <%- if @tab == 'home' %>
 <% if @current_plan_year.present? %>
 <aside class="col-xs-4 employer-right-column module">
-  <% if (@current_plan_year.open_enrollment_end_on.to_date - TimeKeeper.date_of_record).to_i >= 0 %>
+  <% if (@current_plan_year.open_enrollment_end_on.to_date - Time.now.to_date).to_i >= 0 %>
     <%= render partial: 'open_enrollment_ends_panel' %>
   <% end %>
   <%= render partial: 'enrollment_report_widget' %>
