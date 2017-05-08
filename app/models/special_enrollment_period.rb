@@ -62,7 +62,7 @@ class SpecialEnrollmentPeriod
   # ADMIN FLAG
   field :admin_flag, type:Boolean
 
-  validate :optional_effective_on_dates_within_range
+  validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range
 
   validates :csl_num,
     length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
@@ -142,6 +142,13 @@ class SpecialEnrollmentPeriod
   end
 
 private
+  def next_poss_effective_date_within_range
+    return if next_poss_effective_date.blank?
+    min_date = sep_optional_date family, 'min'
+    max_date = sep_optional_date family, 'max'
+    errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
+  end
+
   def optional_effective_on_dates_within_range
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
