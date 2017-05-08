@@ -13,6 +13,12 @@ class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
+  NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request"
+  NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request"
+  NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request"
+  NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
+
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -353,7 +359,7 @@ class EmployerProfile
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -823,6 +829,22 @@ class EmployerProfile
     notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
   end
 
+  def notify_enrollment_data_request
+    notify(NFP_ENROLLMENT_DATA_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_enrollment_data_request"})
+  end
+
+  def notify_payment_history_request
+    notify(NFP_PAYMENT_HISTORY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_payment_history_request"})
+  end
+
+  def notify_pdf_request
+    notify(NFP_PDF_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_pdf_request"})
+  end
+
+  def notify_statement_summary_request
+    notify(NFP_STATEMENT_SUMMARY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_statement_summary_request"})
+  end
+
   def notify_general_agent_added
     changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     if changed_fields.present? && changed_fields.include?("start_on")
@@ -833,7 +855,7 @@ class EmployerProfile
   def conversion_employer?
     !self.converted_from_carrier_at.blank?
   end
-  
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
@@ -903,6 +925,6 @@ private
   end
 
   def plan_year_publishable?
-    !published_plan_year.is_application_unpublishable? 
+    !published_plan_year.is_application_unpublishable?
   end
 end

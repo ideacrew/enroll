@@ -11,6 +11,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  after_action :nfp_soap_request, only: [:find_employer]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -292,6 +293,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   private
+
+  def nfp_soap_request
+    @employer_profile.notify_enrollment_data_request
+    @employer_profile.notify_payment_history_request
+    @employer_profile.notify_pdf_request
+    @employer_profile.notify_statement_summary_request
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
