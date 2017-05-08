@@ -221,6 +221,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(family).to receive(:latest_household).and_return(household)
       allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(benefit_group.start_on)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       sign_in
     end
@@ -286,6 +287,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(employee_role).to receive(:is_cobra_status?).and_return(true)
       allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
+      allow(census_employee).to receive(:cobra_begin_date).and_return(TimeKeeper.date_of_record + 1.day)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match /You may not enroll for cobra after/
