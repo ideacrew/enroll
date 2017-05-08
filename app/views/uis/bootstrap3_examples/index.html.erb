@@ -14,12 +14,12 @@
         </li>
         <li>
           <a href="#buttons" data-scroll title="<%= l10n('.buttons_link') %>">
-            <span class="fa fa-anchor solo">Buttons</span>
+            <span class="fa fa-anchor solo"><%= l10n('.buttons') %></span>
           </a>
         </li>
         <li>
           <a href="#panels" data-scroll title="<%= l10n('.panels_link') %>">
-            <span class="fa fa-anchor solo">Panels</span>
+            <span class="fa fa-anchor solo"><%= l10n('.panels') %></span>
           </a>
         </li>
         <li>
@@ -158,89 +158,89 @@
     <dd>This is the definition</dd>
   </dl>
 
-    <h3 id="buttons">Button Classes</h3>
+    <h3 id="buttons"><%= l10n('.button_classes') %></h3>
 
     <!-- Standard button -->
-    <button type="button" class="btn btn-default">Default</button>
+    <button type="button" class="btn btn-default"><%= l10n('.default') %></button>
 
     <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-    <button type="button" class="btn btn-primary">Primary</button>
+    <button type="button" class="btn btn-primary"><%= l10n('.primary') %></button>
 
     <!-- Indicates a successful or positive action -->
-    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-success"><%= l10n('.success') %></button>
 
     <!-- Contextual button for informational alert messages -->
-    <button type="button" class="btn btn-info">Info</button>
+    <button type="button" class="btn btn-info"><%= l10n('.info') %></button>
 
     <!-- Indicates caution should be taken with this action -->
-    <button type="button" class="btn btn-warning">Warning</button>
+    <button type="button" class="btn btn-warning"><%= l10n('.warning') %></button>
 
     <!-- Indicates a dangerous or potentially negative action -->
-    <button type="button" class="btn btn-danger">Danger</button>
+    <button type="button" class="btn btn-danger"><%= l10n('.danger') %></button>
 
     <!-- Deemphasize a button by making it look like a link while maintaining button behavior -->
-    <button type="button" class="btn btn-link">Link</button>
+    <button type="button" class="btn btn-link"><%= l10n('.link') %></button>
 
-    <h3>Button Sizes</h3>
+    <h3><%= l10n('.button_sizes') %></h3>
     <p>
-      <button type="button" class="btn btn-primary btn-lg">Large button</button>
-      <button type="button" class="btn btn-default btn-lg">Large button</button>
+      <button type="button" class="btn btn-primary btn-lg"><%= l10n('.large_button') %></button>
+      <button type="button" class="btn btn-default btn-lg"><%= l10n('.large_button') %></button>
     </p>
     <p>
-      <button type="button" class="btn btn-primary">Default button</button>
-      <button type="button" class="btn btn-default">Default button</button>
+      <button type="button" class="btn btn-primary"><%= l10n('.default_button') %></button>
+      <button type="button" class="btn btn-default"><%= l10n('.default_button') %></button>
     </p>
     <p>
-      <button type="button" class="btn btn-primary btn-sm">Small button</button>
-      <button type="button" class="btn btn-default btn-sm">Small button</button>
+      <button type="button" class="btn btn-primary btn-sm"><%= l10n('.small_button') %></button>
+      <button type="button" class="btn btn-default btn-sm"><%= l10n('.small_button') %></button>
     </p>
     <p>
-      <button type="button" class="btn btn-primary btn-xs">Extra small button</button>
-      <button type="button" class="btn btn-default btn-xs">Extra small button</button>
-    </p>
-
-    <h3>Block Level Buttons</h3>
-    <p>
-      <button type="button" class="btn btn-primary btn-lg btn-block">Block level button</button>
-      <button type="button" class="btn btn-default btn-lg btn-block">Block level button</button>
+      <button type="button" class="btn btn-primary btn-xs"><%= l10n('.extra_small_button') %></button>
+      <button type="button" class="btn btn-default btn-xs"><%= l10n('.extra_small_button') %></button>
     </p>
 
-    <h3>Button States</h3>
-      <button type="button" class="btn btn-primary btn-lg active">Active Primary button</button>
-      <button type="button" class="btn btn-default btn-lg active">Active Default Button</button>
+    <h3><%= l10n('.block_level_buttons') %></h3>
+    <p>
+      <button type="button" class="btn btn-primary btn-lg btn-block"><%= l10n('.block_level_buttons') %></button>
+      <button type="button" class="btn btn-default btn-lg btn-block"><%= l10n('.block_level_buttons') %></button>
+    </p>
+
+    <h3><%= l10n('.button_states') %></h3>
+      <button type="button" class="btn btn-primary btn-lg active"><%= l10n('.active_primary_button') %></button>
+      <button type="button" class="btn btn-default btn-lg active"><%= l10n('.active_default_button') %></button>
     </p>
 
     <p>
-      <button type="button" class="btn btn-lg btn-primary" disabled="disabled">Disabled Primary button</button>
-      <button type="button" class="btn btn-default btn-lg" disabled="disabled">Disabled Default Button</button>
+      <button type="button" class="btn btn-lg btn-primary" disabled="disabled"><%= l10n('.disabled_primary_button') %></button>
+      <button type="button" class="btn btn-default btn-lg" disabled="disabled"><%= l10n('.disabled_default_button') %></button>
     </p>
 
-    <h3 class="demo-panel-title">Button Variants</h3>
+    <h3 class="demo-panel-title"><%= l10n('.button_variants') %></h3>
 
     <div class="demo-content">
-      <a href="#fakelink" class="btn btn-primary"><span class="fa fa-twitter"></span> It's a</a>
-      <a href="#fakelink" class="btn btn-primary ">Primary</a>
-      <a href="#fakelink" class="btn btn-primary">Button</a>
+      <a href="#fakelink" class="btn btn-primary"><span class="fa fa-twitter"></span> <%= l10n('.its_a') %></a>
+      <a href="#fakelink" class="btn btn-primary "><%= l10n('.primary') %></a>
+      <a href="#fakelink" class="btn btn-primary"><%= l10n('.button') %></a>
       <a href="#fakelink" class="btn btn-primary "><span class="fa fa-check-circle"></span></a>
-      <a href="#fakelink" class="btn btn-primary btn-embossed mlm">Embossed</a>
-      <a href="#fakelink" class="btn btn-primary btn-block">Default Fluid Button<span class="fa fa-arrow-right pull-right"></span></a>
+      <a href="#fakelink" class="btn btn-primary btn-embossed mlm"><%= l10n('.embossed') %></a>
+      <a href="#fakelink" class="btn btn-primary btn-block"><%= l10n('.default_fluid_button') %><span class="fa fa-arrow-right pull-right"></span></a>
     </div>
 
     <div>
-      <h3>Dropdowns</h3>
+      <h3><%= l10n('.dropdowns') %></h3>
 
       <!-- Single button -->
       <p>
         <div class="btn-group">
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Default Button <span class="caret"></span>
+            <%= l10n('.default_button') %> <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
+            <li><a href="#"><%= l10n('.action') %></a></li>
+            <li><a href="#"><%= l10n('.another_action') %></a></li>
+            <li><a href="#"><%= l10n('.something_else_where') %></a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
+            <li><a href="#"><%= l10n('.separated_link') %></a></li>
           </ul>
         </div>
 
@@ -249,120 +249,120 @@
           <button type="button" class="btn btn-danger">Split Button (btn-danger)</button>
           <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
-            <span class="sr-only">Toggle Dropdown</span>
+            <span class="sr-only"><%= l10n('.toggle_dropdown') %></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
+            <li><a href="#"><%= l10n('.action') %></a></li>
+            <li><a href="#"><%= l10n('.another_action') %></a></li>
+            <li><a href="#"><%= l10n('.something_else_where') %></a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
+            <li><a href="#"><%= l10n('.separated_link') %></a></li>
           </ul>
         </div>
       </p>
     </div>
 
-    <h3>Button Groups</h3>
-    <p> we can group buttons in 3 different ways </p>
-    <h4>First type of grouping default is :</h4>
+    <h3><%= l10n('.button_groups') %></h3>
+    <p> <%= l10n('.paragraph1') %></p>
+    <h4> <%= l10n('.paragraph2') %></h4>
     <div class="btn-group btn-group-lg">
       <!-- we can specify the button width size here -->
-      <button type="button" class="btn btn-info"> Elon Musk</button>
-      <button type="button" class="btn btn-danger">Bill gates</button>
-      <button type="button" class="btn btn-warning">Mark</button>
+      <button type="button" class="btn btn-info"> <%= l10n('.elon_musk') %></button>
+      <button type="button" class="btn btn-danger"><%= l10n('.bill_gates') %></button>
+      <button type="button" class="btn btn-warning"><%= l10n('.mark') %></button>
     </div>
     <br>
-    <h4>SECOND VERTICAL TYPE: </h4>
+    <h4> <%= l10n('.second_header') %></h4>
     <div class="btn-group-vertical btn-group-lg">
       <!-- we can specify the button width size here -->
-      <button type="button" class="btn btn-info">Elon Musk</button>
-      <button type="button" class="btn btn-danger">Bill gates</button>
-      <button type="button" class="btn btn-warning">Mark</button>
+      <button type="button" class="btn btn-info"><p> <%= l10n('.elon_musk') %></p></button>
+      <button type="button" class="btn btn-danger"><p> <%= l10n('.bill_gates') %></p></button>
+      <button type="button" class="btn btn-warning"><p> <%= l10n('.mark') %></p></button>
     </div>
-    <h4>THIRD JUSTIFIED TYPE :</h4>
+    <h4><%= l10n('.third_header') %></h4>
     <div class="container">
       <div class="btn-group btn-group-justified">
         <div class="btn-group">
-          <button type="button" class="btn btn-info">Elon Musk</button>
+          <button type="button" class="btn btn-info"><%= l10n('.elon_musk') %></button>
         </div>
         <div class="btn-group">
-          <button type="button" class="btn btn-info">Bill gates</button>
+          <button type="button" class="btn btn-info"><%= l10n('.bill_gates') %></button>
         </div>
         <div class="btn-group">
-          <button type="button" class="btn btn-info">Mark</button>
+          <button type="button" class="btn btn-info"><%= l10n('.mark') %></button>
         </div>
       </div>
     </div>
     <br>
-    <p> we can also mix input groups with button groups</p>
+    <p><%= l10n('.paragraph3') %></p>
     <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
      <div class="input-group">
        <span class="input-group-addon" id="btnGroupAddon">@</span>
        <input type="text" class="form-control" placeholder="dc.gov" aria-describedby="btnGroupAddon">
      </div>
     </div>
-    <h3>Panels</h3>
+    <h3><%= l10n('.panels') %></h3>
     <div class="panel panel-success">  <!-- we can change the panel color with -info, -warning, -primary ... options -->
-      <div class="panel-heading">Panel Heading for enrollment reports goes here</div>
+      <div class="panel-heading"><%= l10n('.paragraph4') %></div>
       <div class="panel-body">
-        <p> It will display the all the enrollment reports </p>
+        <p><%= l10n('.paragraph5') %></p>
           <table class="table">
             <thead>
             <tr>
-              <th>HBX_ID</th>
-              <th>User NAME</th>
-              <th>Employee</th>
-              <th>DOB</th>
-              <th>SSN</th>
+              <th><%= l10n('.hbx_id') %></th>
+              <th><%= l10n('.user_name') %></th>
+              <th><%= l10n('.employee') %></th>
+              <th><%= l10n('.dob') %></th>
+              <th><%= l10n('.ssn') %></th>
             </tr>
             </thead>
             <tbody>
             <tr>
-              <th scope="row">9898</th>
-              <td>ELON MUSK</td>
-              <td>Tesla</td>
-              <td>10-07-1991</td>
-              <td>873-98-8889</td>
+              <th scope="row"><%= l10n('.elon_id') %></th>
+              <td><%= l10n('.elon_musk') %></td>
+              <td><%= l10n('.tesla') %></td>
+              <td><%= l10n('.elon_dob') %></td>
+              <td><%= l10n('.elon_ssn') %></td>
             </tr>
             <tr>
-              <th scope="row">7878</th>
-              <td>Gates</td>
-              <td>Microsoft</td>
-              <td>10-07-1991</td>
-              <td>869-89-8888</td>
+              <th scope="row"><%= l10n('.gates_id') %></th>
+              <td><%= l10n('.gates') %></td>
+              <td><%= l10n('.microsoft') %></td>
+              <td><%= l10n('.gates_dob') %></td>
+              <td><%= l10n('.gates_ssn') %></td>
             </tr>
             <tr>
-              <th scope="row">9080</th>
-              <td>Mark</td>
-              <td>Facebook</td>
-              <td>10-07-1991</td>
-              <td>973-34-2323</td>
+              <th scope="row"><%= l10n('.mark_id') %></th>
+              <td><%= l10n('.mark') %></td>
+              <td><%= l10n('.facebook') %></td>
+              <td><%= l10n('.mark_dob') %></td>
+              <td><%= l10n('.mark_ssn') %></td>
             </tr>
             </tbody>
           </table>
       </div>
     </div>
-    <p> We can put the list of groups in panel while displaying them using JS and we can use Hover as well while moving the cursor to different panels</p>
+    <p><%= l10n('.paragraph6') %></p>
     <div class="panel panel-info">
     <!-- Default panel contents -->
-    <div class="panel-heading">History</div>
+    <div class="panel-heading"><%= l10n('.history') %></div>
     <div class="panel-body">
-      <p>Here goes the respective histroy text</p>
+      <p><%= l10n('.paragraph7') %></p>
     </div>
     <!-- List group -->
     <ul class="list-group">
-      <li class="list-group-item">Bibilography</li>
-      <li class="list-group-item">Qualifications</li>
-      <li class="list-group-item">Education</li>
-      <li class="list-group-item">References</li>
+      <li class="list-group-item"><%= l10n('.bibilography') %></li>
+      <li class="list-group-item"><%= l10n('.qualifications') %></li>
+      <li class="list-group-item"><%= l10n('.education') %></li>
+      <li class="list-group-item"><%= l10n('.references') %></li>
     </ul>
   </div>
 
-    <p> Panel Footer Example </p>
+    <p><%= l10n('.paragraph8') %></p>
     <div class="panel panel-info">
-      <div class="panel-heading">Panel header goes here</div>
+      <div class="panel-heading"><%= l10n('.paragraph9') %></div>
       <div class="panel-body">
-        Load the panel body content here
+        <%= l10n('.paragraph10') %>
       </div>
       <style>
         .panel-footer.panel-custom {
@@ -370,7 +370,7 @@
           color: white;
         }
       </style>
-      <div class="panel-footer panel-custom">Panel footer goes here </div>
+      <div class="panel-footer panel-custom"> <%= l10n('.paragraph11') %></div>
     </div>
 
     <h3>Tables</h3>
