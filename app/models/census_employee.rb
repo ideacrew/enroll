@@ -254,7 +254,7 @@ class CensusEmployee < CensusMember
   end
 
   def terminate_employee_enrollments
-    [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].each do |assignment|
+    [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
       enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
       enrollments.each do |e| 
         if self.employment_terminated_on < e.effective_on
