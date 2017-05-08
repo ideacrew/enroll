@@ -54,7 +54,7 @@
         </li>
         <li>
           <a href="#alerts" data-scroll title="<%= l10n('.alerts_link') %>">
-              <span class="fa fa-anchor solo">Alerts</span>
+              <span class="fa fa-anchor solo"><%= l10n('.alerts_link') %></span>
           </a>
         </li>
         <li>
@@ -735,52 +735,52 @@
       </nav>
       <div class="demo-row demo-tabs">
         <div class="demo-title">
-          <h3 class="demo-panel-title">Tabs</h3>
+          <h3 class="demo-panel-title"><%= l10n('.tabs') %></h3>
         </div>
         <div class="demo-content">
           <ul class="nav nav-tabs nav-append-content" role="tablist">
-            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">Popular</a></li>
-            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">Newest</a></li>
-            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab">Bestselling</a></li>
-            <li role="presentation" class="disabled"><a href="#tab4">Disabled Tab</a></li>
+            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><%= l10n('.tabs_text_1') %></a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= l10n('.tabs_text_2') %></a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= l10n('.tabs_text_3') %></a></li>
+            <li role="presentation" class="disabled"><a href="#tab4"><%= l10n('.tabs_text_4') %></a></li>
           </ul> <!-- /tabs -->
 
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="tab1">
-              <p>I'm in Section 1.</p>
+              <p><%= l10n('.tabs_text_5') %></p>
             </div>
 
             <!-- /tabs -->
             <div role="tabpanel" class="tab-pane" id="tab2">
-              <p>Howdy, I'm in Section 2.</p>
+              <p><%= l10n('.tabs_text_6') %></p>
             </div>
 
             <!-- /tabs -->
             <div role="tabpanel" class="tab-pane" id="tab3">
-              <p>Howdy, I'm in Section 3.</p>
+              <p><%= l10n('.tabs_text_7') %></p>
             </div>
 
             <div role="tabpanel" class="tab-pane" id="tab4">
-              <p>This section is disabled.</p>
+              <p><%= l10n('.tabs_text_8') %></p>
             </div>
           </div> <!-- /tab-content -->
 
           <br>
-          <p> Tab with Dropdown </p>
+          <p> <%= l10n('.tabs_text_9') %> </p>
           <ul class="nav nav-tabs">
             <li role="presentation" class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                Home<span class="caret"></span>
+               <%= l10n('.tabs_text_10') %><span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#">Sub Options</a></li>
-                <li><a href="#">Sub Options</a></li>
+                <li><a href="#"><%= l10n('.tabs_text_11') %></a></li>
+                <li><a href="#"><%= l10n('.tabs_text_11') %></a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#">Sub Option below a divider</a></li>
+                <li><a href="#"><%= l10n('.tabs_text_12') %></a></li>
               </ul>
             </li>
-            <li role="presentation"><a href="#">Profile</a></li>
-            <li role="presentation"><a href="#">Messages</a></li>
+            <li role="presentation"><a href="#"><%= l10n('.tabs_text_13') %></a></li>
+            <li role="presentation"><a href="#"><%= l10n('.tabs_text_14') %></a></li>
           </ul>
         </div> <!-- /demo-content -->
       </div> <!-- /row -->
@@ -927,71 +927,68 @@
     </div>
 
     <div class="demo-row">
-      <h3 class="demo-title">Alerts</h3>
+      <h3 class="demo-title"><%= l10n('.alerts') %></h3>
       <div class="demo-content">
         <!-- Alert Success -->
-        <div class="alert alert-success" role="alert">Create a div with class 'alert alert-success'</div>
+        <div class="alert alert-success" role="alert"><%= l10n('.alerts_text_1') %></div>
         <div class="alert alert-success">
-          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          Your computer restarted <a href="#fakelink">because of a problem</a>. Sorry for any inconvenience and appreciate your patient.
-        </div>
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button><%= l10n('.alerts_text_2') %> <a href="#fakelink"><%= l10n('.alerts_text_3') %></a>. <%= l10n('.alerts_text_4') %></div>
 
         <div class="alert alert-success">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4>Disc Space was extended twice. It’s ok?</h4>
-          <p>An error message is information displayed when an <a href="#fakelink">unexpected condition occurs</a>, usually on a computer or other device. On modern operating systems with graphical user interfaces, error messages are often displayed using dialog boxes.</p>
-          <a href="#fakelink" class="btn btn-primary btn-wide"><span class="fa fa-check-circle"></span>&nbsp;&nbsp;Hurray!</a>
-          <a href="#fakelink" class="btn btn-default btn-info btn-wide">Share on twitter</a>
+          <h4><%= l10n('.alerts_text_5') %></h4>
+          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
+          <a href="#fakelink" class="btn btn-primary btn-wide"><span class="fa fa-check-circle"></span>&nbsp;&nbsp; <%= l10n('.alerts_text_9') %></a>
+          <a href="#fakelink" class="btn btn-default btn-info btn-wide"><%= l10n('.alerts_text_10') %></a>
         </div>
 
         <!-- Alert Info -->
-        <div class="alert alert-info" role="alert">Create a div with class 'alert alert-info'</div>
+        <div class="alert alert-info" role="alert"><%= l10n('.alerts_text_10') %></div>
         <div class="alert alert-info">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          Your computer restarted <a href="#fakelink">because of a problem</a>. Sorry for any inconvenience and appreciate your patient.
+          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_4') %>
         </div>
 
         <div class="alert alert-info">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4>Information Label</h4>
-          <p>An error message is information displayed when an <a href="#fakelink">unexpected condition occurs</a>, usually on a computer or other device. On modern operating systems with graphical user interfaces, error messages are often displayed using dialog boxes.</p>
-          <a href="#fakelink" class="btn btn-info btn-wide">Turn it off now</a>
-          <a href="#fakelink" class="btn btn-default btn-wide">It’s ok</a>
+          <h4><%= l10n('.alerts_text_12') %></h4>
+          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
+          <a href="#fakelink" class="btn btn-info btn-wide"><%= l10n('.alerts_text_13') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
         </div>
 
         <!-- Alert Warning -->
-        <div class="alert alert-warning" role="alert">Create a div with class 'alert alert-warning'</div>
+        <div class="alert alert-warning" role="alert"><%= l10n('.alerts_text_15') %></div>
         <div class="alert alert-warning">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          Your computer restarted <a href="#fakelink">because of a problem</a>. Sorry for any inconvenience and appreciate your patient.
+          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_4') %>
         </div>
 
         <div class="alert alert-warning">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4>Error: The change you wanted was rejected.</h4>
-          <p>An error message is information displayed when an <a href="#fakelink">unexpected condition occurs</a>, usually on a computer or other device. On modern operating systems with graphical user interfaces, error messages are often displayed using dialog boxes.</p>
-          <a href="#fakelink" class="btn btn-warning btn-wide">Turn it off now</a>
-          <a href="#fakelink" class="btn btn-default btn-wide">It’s ok</a>
+          <h4><%= l10n('.alerts_text_16') %></h4>
+          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
+          <a href="#fakelink" class="btn btn-warning btn-wide"><%= l10n('.alerts_text_13') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
         </div>
 
         <!-- Alert Danger -->
-        <div class="alert alert-danger" role="alert">Create a div with class 'alert alert-danger'</div>
+        <div class="alert alert-danger" role="alert"><%= l10n('.alerts_text_17') %></div>
         <div class="alert alert-danger">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          Your computer restarted <a href="#fakelink">because of a problem</a>. Sorry for any inconvenience and appreciate your patient.
-        </div>
+          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_14') %></div>
 
         <div class="alert alert-danger">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4>Error: The change you wanted was rejected.</h4>
-          <p>An error message is information displayed when an <a href="#fakelink">unexpected condition occurs</a>, usually on a computer or other device. On modern operating systems with graphical user interfaces, error messages are often displayed using dialog boxes.</p>
-          <a href="#fakelink" class="btn btn-danger btn-wide">Turn it off now</a>
-          <a href="#fakelink" class="btn btn-default btn-wide">It’s ok</a>
+          <h4><%= l10n('.alerts_text_16') %></h4>
+          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
+          <a href="#fakelink" class="btn btn-danger btn-wide"><%= l10n('.alerts_text_13') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
         </div>
-        <p> Dismissible alerts</p>
+        <p><%= l10n('.alerts_text_18') %>  <%= l10n('.alerts') %></p>
         <div class="alert alert-warning alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <strong>Warning!</strong> Better check yourself, you're not looking too good.
+          <strong><%= l10n('.alerts_text_19') %></strong> <%= l10n('.alerts_text_20') %>
         </div>
 
       </div> <!-- /demo-content -->
@@ -1052,7 +1049,9 @@
         </div>
       </div>
       
-    <h3><%= l10n('.Wells') %></h3>
+    <h3><%= l10n('.tabs') %></h3>
+
+    <h3>Wells</h3>
 
       <h3><%= l10n('.default_well') %></h3>
       <div class="well"> Default well</div>
