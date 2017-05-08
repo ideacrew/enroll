@@ -14,10 +14,10 @@ class ExpireConversionEmployers < MongoidMigrationTask
         employer = EmployerProfile.find_by_fein(fein)
 
         if employer.blank?
-          puts "Employer Profile not found with fein #{fein}"
+          puts "Employer Profile not found with fein #{fein}" unless Rails.env.test?
           next
         else
-          puts "Processing (#{fein}) - #{employer.legal_name}"
+          puts "Processing (#{fein}) - #{employer.legal_name}" unless Rails.env.test?
         end
 
         csv << update_employer_plan_years(employer, start_on)
@@ -52,7 +52,7 @@ class ExpireConversionEmployers < MongoidMigrationTask
       data += [off_exchange_py.aasm_state.camelcase]
     end
 
-    data 
+    data
   end
 
   def prepend_zeros(number, n)
