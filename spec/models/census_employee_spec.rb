@@ -929,8 +929,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         context 'move the enrollment aasm state to cancel status' do
 
           before do
-            hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
-            hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
+            hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
+            hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
 
             census_employee.terminate_employment!(terminated_on)
           end
