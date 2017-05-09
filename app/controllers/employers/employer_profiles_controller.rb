@@ -156,8 +156,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
-  def new 
-    @organization = Forms::EmployerProfile.new 
+  def new
+    @organization = Forms::EmployerProfile.new
     get_sic_codes
   end
 
@@ -205,10 +205,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     sanitize_employer_profile_params
     params.permit!
     @organization = Organization.find(params[:id])
-    # @grouped_opitions = {}
-    #   SicCode.all.group_by(&:industry_group).each do |industry_group, sic_code|
-    # @grouped_opitions[industry_group] = sic_code.collect{|sc| sc.code}
-    # end
 
     #save duplicate office locations as json in case we need to refresh
     @organization_dup = @organization.office_locations.as_json
@@ -501,10 +497,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def get_sic_codes
-   @grouped_opitions = {}
+   @grouped_options = {}
    SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
-    @grouped_opitions[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} (" "#{sc.sic_code})", sc.id]}
+    @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} (" "#{sc.sic_code})", sc.id]}
    end
   end
 end
-
