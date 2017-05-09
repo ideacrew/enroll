@@ -486,6 +486,7 @@ describe Person do
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Active", last_name: "person", dob: "1993-03-30", is_active: false)
     end
 
     after(:all) do
@@ -539,6 +540,17 @@ describe Person do
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
     end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).not_to eq [@p5]
+    end
+
   end
 
   describe '.active', :dbclean => :after_each do
