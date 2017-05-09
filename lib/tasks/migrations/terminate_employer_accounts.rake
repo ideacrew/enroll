@@ -14,7 +14,7 @@ namespace :migrations do
       raise 'more than 1 employer found with given fein'
     end
 
-    puts "Processing #{organizations.first.legal_name}"
+    puts "Processing #{organizations.first.legal_name}" unless Rails.env.test?
     termination_date = Date.strptime(args[:termination_date], "%m/%d/%Y")
     end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
 
