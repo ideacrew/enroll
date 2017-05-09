@@ -44,7 +44,7 @@ namespace :migrations do
 
         enrollments.each do |hbx_enrollment|
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.update_attributes(:terminated_on => termination_date)
+            hbx_enrollment.update_attributes(terminated_on: end_on, termination_submitted_on: termination_date)
             hbx_enrollment.terminate_coverage!
             # hbx_enrollment.propogate_terminate(termination_date)
           end
