@@ -32,10 +32,7 @@
   content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Either use this personalized link to have this information pre-completed on your behalf: <br> <a target='_blank' href= '#{notice.data[:url]}'> Click this link to access the Plan Match Tool and enter your employer’s information using the details below</a>"}%>
-
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Or you can enter your employer's plan year information yourself using the details below:" } %>
+  content: "Click this link to access the Plan Match Tool and enter your employer’s information using the details below: <br> <a target='_blank' <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "1.Your employer's plan year start date: #{benefit_group.first.start_on}"} %>
