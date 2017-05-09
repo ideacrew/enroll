@@ -1,10 +1,10 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "update_broker_agency_profile")
+require File.join(Rails.root, "app", "data_migrations", "update_broker_agency_profile_id")
 
-describe UpdateBrokerAgencyProfile do
+describe UpdateBrokerAgencyProfileId do
 
-  let(:given_task_name) { "update_broker_agency_profile" }
-  subject { UpdateBrokerAgencyProfile.new(given_task_name, double(:current_scope => nil)) }
+  let(:given_task_name) { "update_broker_agency_profile_id" }
+  subject { UpdateBrokerAgencyProfileId.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
     it "has the given task name" do
@@ -23,9 +23,7 @@ describe UpdateBrokerAgencyProfile do
       broker_agency.broker_agency_profile.update_attributes(primary_broker_role: broker_role)
       broker_role.update_attributes(broker_agency_profile: broker_agency.broker_agency_profile)
       broker_agency.broker_agency_profile.approve!
-
-      @broker_agency_staff_role = FactoryGirl.create(:broker_agency_staff_role, person: person)
-      
+      @broker_agency_staff_role = FactoryGirl.create(:broker_agency_staff_role, person: person)    
       allow(ENV).to receive(:[]).with("email").and_return(user.email)
       allow(User).to receive_message_chain(:where, :first).and_return(user)
       allow(user).to receive(:person).and_return(person)
@@ -33,11 +31,10 @@ describe UpdateBrokerAgencyProfile do
     end
 
     context "broker_agency_staff_role", dbclean: :after_each do
-      it "should update broker_agency_profile" do
+      it "should update broker_agency_profile id" do
         subject.migrate
         expect(@broker_agency_staff_role.broker_agency_profile_id).to eq(person.broker_role.broker_agency_profile.id)
       end
-
     end
   end
 end

@@ -1,6 +1,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class UpdateBrokerAgencyProfile < MongoidMigrationTask
+class UpdateBrokerAgencyProfileId < MongoidMigrationTask
 
   def migrate
     user = User.where(email: ENV['email']).first
