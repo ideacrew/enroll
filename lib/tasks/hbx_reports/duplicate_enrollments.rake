@@ -2,18 +2,19 @@ require 'csv'
 
 namespace :reports do
   namespace :shop do
-    desc "List dubplicate hbx_enrollments"
+    desc "List duplicate hbx_enrollments"
     task :duplicate_enrollment_list => :environment do
       families=Family.all
       field_names  = %w(
-          hbx_id
+          enrollment_hbx_id
+          subscriber_hbx_id
           effective_on_date
           aasm_state
           kind
           coverage_kind
         )
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/dubplicate_hbx_enrollment.csv"
+      file_name = "#{Rails.root}/hbx_report/duplicate_hbx_enrollment.csv"
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         families.each do |family|
@@ -26,8 +27,9 @@ namespace :reports do
               puts family.id
               csv << [
                       enrollment.hbx_id,
+                      enrollment.subscriber.person.hbx_id,
                       enrollment.effective_on,
-                      enrollment.aasm_id,
+                      enrollment.aasm_state,
                       enrollment.kind,
                       enrollment.coverage_kind
                      ]
