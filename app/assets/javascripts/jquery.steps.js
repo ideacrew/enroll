@@ -1065,10 +1065,10 @@ function renderPagination(wizard, options, state)
 
         buttons += buttonTemplate.format("next", options.labels.next);
 
-        if (options.enableFinishButton)
-        {
-            buttons += buttonTemplate.format("finish", options.labels.finish);
-        }
+        // if (options.enableFinishButton)
+        // {
+        //     buttons += buttonTemplate.format("finish", options.labels.finish);
+        // }
 
         if (options.enableCancelButton)
         {

@@ -1,12 +1,12 @@
 <%if quote.aasm_state == "draft" %>
   <%= form_tag("/broker_agencies/broker_roles/#{@broker.id}/quotes/publish_quote", method: "post") do %>
     <%= hidden_field_tag(:id, quote.id) %>
-    <%#= submit_tag "Publish Quote", class: 'btn btn-primary ' %>
-    <div class = 'btn btn-primary' id = 'publish_quote'>Publish Quote</div>
+    <%= submit_tag "Publish Quote", class: 'btn btn-primary', id: 'publish_quote' %>
+    <!-- <div class = 'btn btn-primary' id = 'publish_quote'>Publish Quote</div> -->
   <% end %>
 <% end %>
 
-
+<!--
 <script type="text/javascript">
 
 	$('#publish_quote').on('click', function(){
@@ -17,4 +17,4 @@
 		"<% end %>"
 	})
 
-</script>
+</script> -->

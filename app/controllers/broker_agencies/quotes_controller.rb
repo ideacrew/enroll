@@ -1,11 +1,12 @@
 class BrokerAgencies::QuotesController < ApplicationController
 
+  include BrokerAgencies::QuoteHelper
+
   before_action :validate_roles, :set_broker_role
   before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote]
   before_action :format_date_params  , :only => [:update,:create]
   before_action :employee_relationship_map
   before_action :set_qhp_variables, :only => [:plan_comparison, :download_pdf]
-
 
   def view_published_quote
 
@@ -16,8 +17,9 @@ class BrokerAgencies::QuotesController < ApplicationController
       @quote.publish!
       flash[:notice] = "Quote Published"
     else
-      flash[:error] = "Unable to publish quote"
-      redirect_to my_quotes_broker_agencies_broker_role_quotes_path(@broker)
+      errors = @quote.quote_warnings.values
+      flash[:error] = "Quote failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+      redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
     end
   end
 
@@ -69,61 +71,12 @@ class BrokerAgencies::QuotesController < ApplicationController
   end
 
   def health_cost_comparison
-      @q = Quote.find(params[:quote_id]).quote_benefit_groups.find(params[:benefit_id]) # NEW
-      @quote_results = Hash.new
-      @quote_results_summary = Hash.new
-      @health_plans = Plan.shop_health_plans @q.quote.plan_year
-      unless @q.nil?
-        roster_premiums = @q.roster_cost_all_plans
-        @roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(@health_plans,
-          @q.quote_relationship_benefits, roster_premiums)
-        params['plans'].each do |plan_id|
-          p = @health_plans.detect{|plan| plan.id.to_s == plan_id}
-          detailCost = Array.new
-          @q.quote_households.each do |hh|
-            pcd = PlanCostDecoratorQuote.new(p, hh, @q, p)
-            detailCost << pcd.get_family_details_hash(@q.quote.start_on).sort_by { |m|
-             [m[:family_id], -m[:age], -m[:employer_contribution]]
-            }
-          end
-          employer_cost = @q.roster_employer_contribution(p,p)
-          @quote_results[p.name] = {:detail => detailCost,
-            :total_employee_cost => @q.roster_employee_cost(p),
-            :total_employer_cost => employer_cost,
-            plan_id: plan_id,
-            buy_up: PlanCostDecoratorQuote.buy_up(employer_cost, p.metal_level, @roster_elected_plan_bounds)
-          }
-        end
-        @quote_results = @quote_results.sort_by { |k, v| v[:total_employer_cost] }.to_h
-      end
+    get_health_cost_comparison({quote_id: params[:quote_id], benefit_id: params[:benefit_id], plan_ids: params['plans']})
     render partial: 'health_cost_comparison'
   end
 
   def dental_cost_comparison
-    @q = Quote.find(params[:quote_id]).quote_benefit_groups.find(params[:benefit_id])
-    @quote_results = Hash.new
-    @quote_results_summary = Hash.new
-    @health_plans = Plan.shop_dental_plans(@q.quote.plan_year)
-    @roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(
-      @health_plans,
-      @q.quote_dental_relationship_benefits,
-      @q.roster_cost_all_plans('dental'))
-    params['plans'].each do |plan_id|
-      p = @health_plans.detect{|plan| plan.id.to_s == plan_id}
-      detailCost = Array.new
-      @q.quote_households.each do |hh|
-        pcd = PlanCostDecoratorQuote.new(p, hh, @q, p)
-        detailCost << pcd.get_family_details_hash(@q.quote.start_on).sort_by { |m| [m[:family_id], -m[:age], -m[:employer_contribution]] }
-      end
-
-      employer_cost = @q.roster_employer_contribution(p,p)
-      @quote_results[p.name] = {:detail => detailCost,
-        :total_employee_cost => @q.roster_employee_cost(p),
-        :total_employer_cost => employer_cost,
-        plan_id: plan_id,
-      }
-    end
-    @quote_results = @quote_results.sort_by { |k, v| v[:total_employer_cost] }.to_h
+    get_dental_cost_comparison({quote_id: params[:quote_id], benefit_id: params[:benefit_id], plan_ids: params['plans']})
     render partial: 'dental_cost_comparison', layout: false
   end
 
@@ -416,6 +369,7 @@ class BrokerAgencies::QuotesController < ApplicationController
         elected_plan_choice = ['na', 'Single Plan', 'Single Carrier', 'Metal Level'][params[:elected].to_i]
         bg.plan = plan
         bg.plan_option_kind = elected_plan_choice
+        bg.elected_health_plan_ids = params[:elected_plans_list]
         roster_elected_plan_bounds = PlanCostDecoratorQuote.elected_plans_cost_bounds(Plan.shop_health_plans(@q.plan_year),
            bg.quote_relationship_benefits, bg.roster_cost_all_plans('health'))
         case elected_plan_choice
@@ -437,18 +391,18 @@ class BrokerAgencies::QuotesController < ApplicationController
         elected_plan_choice = ['na', 'single_plan', 'single_carrier', 'single_plan'][params[:elected].to_i]
         bg.dental_plan_option_kind = elected_plan_choice
         bg.dental_plan = plan
-        bg.elected_dental_plan_ids = case column_for_dental_plan_option_kind.to_i
-        when 1
-         [plan.id]
-        when 2
-         [plan.id]
-        else
-          params[:elected_plans_list].map{|plan_id| Plan.find(plan_id).id}
-        end
+        bg.elected_dental_plan_ids = params[:elected_plans_list]
+        # bg.elected_dental_plan_ids = case column_for_dental_plan_option_kind.to_i
+        # when 1
+        #  [plan.id]
+        # when 2
+        #  [plan.id]
+        # else
+        #   params[:elected_plans_list].map{|plan_id| Plan.find(plan_id).id}
+        # end
       end
       bg.save
     end
-
     @benefit_groups = @q.quote_benefit_groups
     respond_to do |format|
       format.html {render partial: 'publish'}

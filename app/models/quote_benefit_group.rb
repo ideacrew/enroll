@@ -7,6 +7,7 @@ class QuoteBenefitGroup
     :spouse,
     :domestic_partner,
     :child_under_26,
+    :child_26_and_over
   ]
 
   embedded_in :quote
@@ -33,6 +34,7 @@ class QuoteBenefitGroup
   field :published_highest_cost_plan, type: BSON::ObjectId
   field :published_dental_reference_plan, type: BSON::ObjectId
   field :elected_dental_plan_ids, type: Array, default: []
+  field :elected_health_plan_ids, type: Array, default: []
 
   associated_with_one :plan, :published_reference_plan, "Plan"
   associated_with_one :lowest_cost_plan, :published_lowest_cost_plan, "Plan"
@@ -74,8 +76,8 @@ class QuoteBenefitGroup
     self.quote_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
 
       # 'employee' relationship should be set to a min of 50%
-      initial_premium_pct = relationship.to_s == "employee" ? 50 : 0
-       self.quote_relationship_benefits.build(relationship: relationship, offered: true, premium_pct: initial_premium_pct)
+      # initial_premium_pct = relationship.to_s == "employee" ? 50 : 0
+       self.quote_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
