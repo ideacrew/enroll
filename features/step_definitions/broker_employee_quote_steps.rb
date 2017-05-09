@@ -75,9 +75,6 @@ end
 
 When(/^broker enters valid information$/) do
   fill_in 'quote[quote_name]', with: 'Test Quote'
-  select "Prospect", :from => "quote_employer_type"
-  wait_for_ajax
-  fill_in 'quote_employer_name', with: 'Test Employer 1 LLC'
   fill_in 'quote_quote_households_attributes_0_quote_members_attributes_0_dob', with: "11/11/1991"
   select "Employee", :from => "quote_quote_households_attributes_0_quote_members_attributes_0_employee_relationship"
   fill_in 'quote[quote_households_attributes][0][quote_members_attributes][0][first_name]', with: "John"
