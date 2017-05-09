@@ -15,9 +15,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-    attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 })
-    @model.attributes = survey_params(attributes)
-    @model.save!
+    if params.key? :attributes
+      attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 })
+      @model.attributes = survey_params(attributes)
+      @model.save!
+    end
 
     render 'workflow/step'
 
