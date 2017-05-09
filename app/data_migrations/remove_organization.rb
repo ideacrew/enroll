@@ -8,7 +8,7 @@ class RemoveOrganization < MongoidMigrationTask
       puts 'Issues with fein'
       return
     end
-    organizations.first.destroy
+    organizations.first.destroy!
     puts "Removed Organization with fein: #{ENV['fein']}" unless Rails.env.test?
   end
 end
