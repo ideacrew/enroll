@@ -257,7 +257,7 @@ class CensusEmployee < CensusMember
     [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
       enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
       enrollments.each do |e| 
-        if self.employment_terminated_on < e.effective_on
+        if e.effective_on > self.coverage_terminated_on
           e.cancel_coverage!(self.employment_terminated_on) if e.may_cancel_coverage?
         else
           if self.coverage_terminated_on < TimeKeeper.date_of_record
