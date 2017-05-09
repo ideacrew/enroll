@@ -188,6 +188,9 @@ class Family
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
+  def active_broker_agency_account
+    broker_agency_accounts.detect { |baa| baa.is_active? }
+  end
 
   def coverage_waived?
     latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.waived.any?
@@ -215,6 +218,17 @@ class Family
   end
 
   def renewal_benefits
+  end
+
+  def currently_enrolled_plans(enrollment)
+    enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+
+    if enrollment.is_shop?
+      bg_ids = enrollment.benefit_group.plan_year.benefit_groups.map(&:id)
+      enrolled_plans = enrolled_plans.where(:benefit_group_id.in => bg_ids)
+    end
+
+    enrolled_plans.collect(&:plan_id)
   end
 
   def enrollments

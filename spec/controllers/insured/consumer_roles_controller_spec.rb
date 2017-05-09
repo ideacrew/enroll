@@ -348,8 +348,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     let(:found_person){ [] }
     let(:resident_role){ FactoryGirl.build(:resident_role) }
 
-    #let(:person){ instance_double("Person") }
-
     before(:each) do
       allow(user).to receive(:idp_verified?).and_return false
       sign_in(user)
@@ -376,6 +374,17 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       it "should navigate to family account page" do
         allow(person).to receive(:resident_role).and_return(resident_role)
         post :match, :person => resident_parameters
+        expect(user.person.resident_role).not_to be_nil
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
+    context "with both resident and consumer roles" do
+      it "should navigate to family account page" do
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:resident_role).and_return(resident_role)
+        post :match, :person => resident_parameters
+        expect(user.person.consumer_role).not_to be_nil
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
       end
