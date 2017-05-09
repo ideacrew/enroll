@@ -13,10 +13,8 @@ describe ChangeEnrollmentTerminationDate do
   end
 
   describe "changing enrollment termiantion date" do
-
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
-
     before(:each) do
       allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
       allow(ENV).to receive(:[]).with("new_termination_date").and_return(hbx_enrollment.terminated_on + 1.month)
@@ -27,6 +25,22 @@ describe ChangeEnrollmentTerminationDate do
       subject.migrate
       hbx_enrollment.reload
       expect(hbx_enrollment.terminated_on).to eq terminated_on + 1.month
+    end
+  end
+  describe "changing enrollment member's termiantion date" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household)}
+    let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    before(:each) do
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+      allow(ENV).to receive(:[]).with("new_termination_date").and_return(hbx_enrollment.terminated_on + 1.month)
+    end
+
+    it "should change effective on date" do
+      terminated_on = hbx_enrollment.terminated_on
+      subject.migrate
+      hbx_enrollment.reload
+      expect(hbx_enrollment.hbx_enrollment_members.first.coverage_end_on).to eq terminated_on + 1.month
     end
   end
 end
