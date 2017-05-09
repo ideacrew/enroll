@@ -1,1 +1,5 @@
-<%= options_for_select @counties, selected: @counties.first %>
+<% if @single_option %>
+  <%= options_for_select @counties, selected: @counties.first %>
+<% else %>
+  <%= options_for_select @counties, selected: @counties.first, disabled: @counties.first %>
+<% end %>

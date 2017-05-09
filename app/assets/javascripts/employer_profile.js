@@ -554,6 +554,12 @@ $(document).on('change', '#address_info .office_kind_select select', function() 
     $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', true);
     $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
   };
+  if ($(this).val() == 'primary') {
+    $(this).parents('fieldset').find(".county-select").addClass('primary-office-location');
+  }
+  else {
+    $(this).parents('fieldset').find(".county-select").removeClass('primary-office-location');
+  }
 })
 
 function checkPhone(textbox) {

@@ -12,7 +12,7 @@ class OfficeLocation
 
   validates_presence_of :address
   validates_presence_of :phone, if: :primary_or_branch?
-
+  
   alias_method :is_primary?, :is_primary
 
   def parent

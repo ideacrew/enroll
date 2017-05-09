@@ -14,14 +14,14 @@ class Address
   field :address_2, type: String, default: ""
   field :address_3, type: String, default: ""
   field :city, type: String
-  field :county, type: String
+  field :county, type: String, default: ""
   field :state, type: String
   field :location_state_code, type: String
   field :zip, type: String
-  field :country_name, type: String, default: ""
   field :full_text, type: String
 
   validates_presence_of :address_1, :city, :state, :zip
+  validates_presence_of :county, if: :office_is_primary_location?
 
   validates :kind,
     inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
@@ -35,6 +35,10 @@ class Address
 
   def location
     nil #todo
+  end
+
+  def office_is_primary_location?
+    kind == 'primary'
   end
 
   def blank?

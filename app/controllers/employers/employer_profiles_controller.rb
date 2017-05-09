@@ -1,4 +1,5 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
+  include Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
@@ -292,8 +293,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def counties_for_zip_code
       params.permit([:zip_code])
       @counties = RateReference.find_counties_for_zip_code(params[:zip_code])
-      @counties.unshift("SELECT COUNTY") if @counties.count > 1
-      @counties << "Zip code outside supported area" if @counties.empty?
+      @single_option = true
+
+      if @counties.count > 1
+        @single_option = false
+        @counties.unshift("SELECT COUNTY")
+      elsif @counties.empty?
+        @counties << "Zip code outside #{aca_state_abbreviation}"
+      end
 
 
       render partial: 'employers/employer_profiles/county_field'
