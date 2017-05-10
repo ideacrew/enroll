@@ -2,8 +2,8 @@ FactoryGirl.define do
   factory :employer_profile do
     organization            { FactoryGirl.build(:organization) }
     entity_kind             "c_corporation"
-    sic_code
-    
+    sic_code "1111"
+
     transient do
       employee_roles []
     end
@@ -31,7 +31,7 @@ FactoryGirl.define do
 
     organization { FactoryGirl.build(:organization) }
     entity_kind "c_corporation"
-
+    sic_code '1111'
     transient do
       start_on TimeKeeper.date_of_record.beginning_of_month
       plan_year_state 'draft'
