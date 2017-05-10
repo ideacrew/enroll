@@ -1,15 +1,12 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateBrokerAgencyProfileId < MongoidMigrationTask
-
   def migrate
-    user = User.where(email: ENV['email']).first
-    if user.blank?
-      puts 'Issues with email'
-      return
+    person = Person.where(hbx_id: ENV['hbx_id'])
+    if person.size != 1
+      raise "Invalid Hbx Id"
     end
-     person = user.person
-     person.broker_agency_staff_roles.first.update_attributes(broker_agency_profile_id: person.broker_role.broker_agency_profile_id)
-     puts "Updating broker agency profile id for User with email: #{ENV['email']} " unless Rails.env.test?
+     person.first.broker_agency_staff_roles.first.update_attributes!(broker_agency_profile_id: person.first.broker_role.broker_agency_profile_id)
+     puts "Updating broker agency profile id for Person with hbx id: #{ENV['hbx_id']} " unless Rails.env.test?
    end
 end
