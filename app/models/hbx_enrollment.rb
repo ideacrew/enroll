@@ -492,8 +492,10 @@ class HbxEnrollment
 
     terminate_proc = lambda do |enrollment|
       if enrollment.may_terminate_coverage?
-        enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-        enrollment.terminate_coverage!
+        if !enrollment.coverage_termination_pending?
+          enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+          enrollment.terminate_coverage!
+        end
       end
     end
 
