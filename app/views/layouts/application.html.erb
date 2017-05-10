@@ -28,13 +28,23 @@
     <header aria-label="header content"> <%= render 'layouts/application_brand' %></header>
 
     <% if content_for?(:left_navigation) %>
-     <div class="container">
-       <div class="row">
-         <!-- Navigation Column -->
-        <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 sidebar">
-           <div class="left_navigation" role="navigation" aria-label="main navigation">
-            <%= yield(:left_navigation) %>
-           </div>
+      <div class="container">
+        <div class="row">
+          <!-- Navigation Column -->
+          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 sidebar">
+            <div class="left_navigation" role="navigation" aria-label="main navigation">
+              <%= yield(:left_navigation) %>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
+            <main>
+              <div class="flash_message"><%= flash_messages %></div>
+              <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
+              <%= content_for?(:main) ? yield(:main) : yield %>
+            </main>
+          </div>
         </div>
       </div>
      </div>
