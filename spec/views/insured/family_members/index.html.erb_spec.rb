@@ -8,12 +8,15 @@ describe "insured/family_members/index.html.erb" do
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
   let(:employee_role) { FactoryGirl.build(:employee_role) }
   let(:consumer_role) { FactoryGirl.build(:consumer_role) }
+  let(:dependents) { family.active_family_members }
 
   before :each do
     sign_in user
     assign :person, person
     assign :family, family
+    assign :dependents, dependents
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    allow(view).to receive(:any_dependent_invalid?).and_return(false)
   end
 
   it "should have title" do

@@ -4,6 +4,9 @@
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
 
       <% if dependent.errors.any? %>
+            <script>
+                DependentsValidationFields.disable_continue();
+            </script>
         <div class="alert alert-error">
           <h4>
             <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
@@ -155,7 +158,7 @@
 
         <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>    Confirm Member<% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));DependentsValidationFields.check_continue_button();">
           Confirm Member
         </span>
       </div>

@@ -1,3 +1,4 @@
+<% invalid = any_dependent_invalid?(@dependents) %>
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
@@ -48,8 +49,8 @@
         <br>
         <div class="row no-buffer">
           <ul class="" id="dependent_ul">
-            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-              <%= render "dependent", dependent: dependent, person: @person %>
+            <% @dependents.each do |dependent| %>
+              <%= render "dependent", dependent: dependent, person: @person, consumer_role: @consumer_role.present? %>
             <% end %>
           </ul>
         </div>
@@ -89,3 +90,9 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(document).ready(function(){
+      DependentsValidationFields.check_continue_button('<%= invalid && @consumer_role.present? %>');
+  });
+</script>

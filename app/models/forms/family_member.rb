@@ -42,9 +42,9 @@ module Forms
       if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
-        elsif @us_citizen == false && @eligible_immigration_status.nil?
+        elsif us_citizen == false && eligible_immigration_status.nil?
           self.errors.add(:base, "Eligible immigration status is required")
-        elsif @us_citizen == true && @naturalized_citizen.nil?
+        elsif us_citizen == true && naturalized_citizen.nil?
           self.errors.add(:base, "Naturalized citizen is required")
         end
         if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
