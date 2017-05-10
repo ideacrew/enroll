@@ -206,7 +206,11 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        redirect_to ridp_agreement_insured_consumer_role_index_path
+        if is_new_paper_application?(current_user, session[:original_application_type])
+          redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
+        else
+          redirect_to ridp_agreement_insured_consumer_role_index_path
+        end
       end
     else
       if save_and_exit
