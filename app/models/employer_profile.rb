@@ -250,7 +250,7 @@ class EmployerProfile
   end
 
   def published_plan_year
-    plan_years.published.first
+    plan_years.published.last
   end
 
   def show_plan_year
@@ -261,8 +261,12 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  def is_coversion_employer?
-    profile_source.to_s == 'conversion'
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
+  end
+
+  def is_converting?
+    self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
   def find_plan_year_by_effective_date(target_date)
@@ -270,11 +274,7 @@ class EmployerProfile
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
-    if plan_year.present?
-      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.try(:first) : plan_year
-    else
-      plan_year
-    end
+    (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
   end
 
   def billing_plan_year(billing_date = nil)
@@ -839,11 +839,6 @@ class EmployerProfile
     return nil unless org.any?
     org.first.employer_profile
   end
-
-  def is_conversion?
-    self.profile_source == "conversion"
-  end
-
 
   def trigger_notices(event)
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
