@@ -100,12 +100,10 @@ RSpec.describe TimeHelper, :type => :helper do
       end
 
       it "returns minmum range as beginning of the year when market kind is ivl" do
-        #beginning_of_year = TimeKeeper.date_of_record.beginning_of_year
         expect(helper.sep_optional_date(family, 'min', 'ivl')).to eq(beginning_of_year)
       end
 
       it "returns maximum range as end of the year when market kind is ivl" do
-        #end_of_year = TimeKeeper.date_of_record.end_of_year
         expect(helper.sep_optional_date(family, 'max', 'ivl')).to eq(end_of_year)
       end
 
@@ -144,7 +142,5 @@ RSpec.describe TimeHelper, :type => :helper do
         expect(helper.sep_optional_date(family, 'max')).to eq(end_of_year)
       end
     end
-
   end
-
 end
