@@ -450,6 +450,36 @@
                <input type="text" value="An input can also be disabled" disabled="disabled" class="form-control">
                <span class="form-control-feedback fa fa-lock"></span>
              </div>
+             <h3>Disabled Inputs</h3>
+             <fieldset disabled>
+               <div class="form-group">
+                 <input type="text" id="disabledTextInput" class="form-control">
+               </div>
+             </fieldset>
+             <h3>Text Area</h3>
+             <div class="form-group">
+               <label for="comment">Comment:</label>
+               <textarea class="form-control" rows="5" id="textarea"></textarea>
+             </div>
+             <h3><%= l10n('.file_input') %><</h3>
+             <label class="custom-file">
+               <input type="file" id="file" class="custom-file-input">
+               <span class="custom-file-control"></span>
+             </label>
+             <h3>Search Boxes</h3>
+             <div class="input-group">
+               <input type="text" class="form-control" id="usr">
+               <div class="input-group-btn">
+                 <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+               </div>
+             </div>
+
+             <div class="input-group">
+               <div class="input-group-btn">
+                 <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+               </div>
+               <input type="text" class="form-control" id="usr">
+             </div>
            </form>
            <hr />
          </div>

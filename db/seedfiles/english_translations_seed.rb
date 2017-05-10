@@ -70,6 +70,7 @@ translations = {
   "en.uis.bootstrap3_examples.index.tabs_text_12" => "Sub Option below a divider  ",
   "en.uis.bootstrap3_examples.index.tabs_text_13" => "Profile  ",
   "en.uis.bootstrap3_examples.index.tabs_text_14" => "Messages  ",
+  "en.uis.bootstrap3_examples.index.file_input" => "File Input",
   "en.wecome.index.sign_out" => "Sign Out",
   "en.welcome.index.assisted_consumer_family_portal" => "Assisted Consumer/Family Portal",
   "en.welcome.index.broker_agency_portal" => "Broker Agency Portal",
