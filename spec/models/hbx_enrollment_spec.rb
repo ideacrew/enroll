@@ -2423,3 +2423,81 @@ describe HbxEnrollment, 'state machine' do
     it_behaves_like "state machine transitions", :auto_renewing, :unverified, :move_to_pending!
   end
 end
+
+describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all do
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
+  let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+  let!(:census_employees){
+    FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  }
+
+  let!(:plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  }
+
+  let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+  let!(:family) {
+    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
+  }
+
+  let(:person) { family.primary_applicant.person }
+
+  context 'Employer Sponsored Coverage' do
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+       household: family.active_household,
+       coverage_kind: "health",
+       effective_on: benefit_group.start_on,
+       enrollment_kind: "open_enrollment",
+       kind: "employer_sponsored",
+       benefit_group_id: benefit_group.id,
+       employee_role_id: person.active_employee_roles.first.id,
+       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+       plan_id: plan.id
+       )
+    }
+    
+    context 'for congression employer' do
+      before do
+        allow(enrollment).to receive_message_chain("benefit_group.is_congress") { true }
+      end
+   
+      it "should build premiums" do
+        plan = enrollment.build_plan_premium(qhp_plan: plan)
+        expect(plan).to be_kind_of(PlanCostDecoratorCongress)
+      end
+    end
+
+    context 'for non congression employer' do 
+      it "should build premiums" do
+        plan = enrollment.build_plan_premium(qhp_plan: plan)
+        expect(plan).to be_kind_of(PlanCostDecorator)
+      end 
+    end
+  end
+
+  context 'Individual Coverage' do
+    let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+       household: family.active_household,
+       coverage_kind: "health",
+       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+       enrollment_kind: "open_enrollment",
+       kind: "individual",
+       plan_id: plan.id
+       )
+    }
+
+    it "should build premiums" do
+      plan = enrollment.build_plan_premium(qhp_plan: plan)
+      expect(plan).to be_kind_of(UnassistedPlanCostDecorator)
+    end
+  end
+end
