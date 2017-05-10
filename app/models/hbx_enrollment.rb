@@ -486,19 +486,6 @@ class HbxEnrollment
     end
   end
 
-  def execute_cancel_coverage(enrollment)
-    enrollment.cancel_coverage!(enrollment.effective_on) if enrollment.may_cancel_coverage?
-  end
-
-  def execute_terminate_coverage(enrollment)
-    if enrollment.may_terminate_coverage?
-      term_date = self.effective_on - 1.day
-      term_date = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum if (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum) > term_date && self.effective_on > (TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum)
-      enrollment.terminate_coverage
-      enrollment.update_current(terminated_on: term_date)
-    end
-  end
-
   def update_existing_shop_coverage
     id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
     shop_enrollments = household.hbx_enrollments.ne(id: id).shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
@@ -806,7 +793,7 @@ class HbxEnrollment
 
   def reset_dates_on_previously_covered_members(new_plan=nil)
     new_plan ||= self.plan
-    
+
     if self.family.currently_enrolled_plans(self).include?(new_plan.id)
       plan_selection = PlanSelection.new(self, self.plan)
       self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
@@ -956,7 +943,7 @@ class HbxEnrollment
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
-    return benefit_group_assignment.benefit_group, benefit_group_assignment    
+    return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
   def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
@@ -1243,7 +1230,7 @@ class HbxEnrollment
     end
 
     event :terminate_coverage, :after => :record_transition do
-      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing, 
+      transitions from: [:coverage_termination_pending, :coverage_selected, :coverage_enrolled, :auto_renewing,
                          :renewing_coverage_selected,:auto_renewing_contingent, :renewing_contingent_selected,
                          :renewing_contingent_transmitted_to_carrier, :renewing_contingent_enrolled,
                          :enrolled_contingent, :unverified],
@@ -1316,7 +1303,7 @@ class HbxEnrollment
 
       benefit_group_assignment_valid?(coverage_effective_date)
     else
-      true 
+      true
     end
   end
 
