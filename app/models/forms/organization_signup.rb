@@ -4,7 +4,7 @@ module Forms
     attr_accessor :id
     attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein, :sic_code_id
+    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein, :sic_code
     attr_reader :dob
     attr_accessor :office_locations
 
@@ -16,7 +16,7 @@ module Forms
     validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
     validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
     validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :fein, :legal_name, :sic_code_id
+    validates_presence_of :fein, :legal_name, :sic_code
     validates :entity_kind,
       inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
       allow_blank: false
@@ -136,7 +136,7 @@ module Forms
     def dob=(val)
       @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
     end
-    
+
     # Strip non-numeric characters
     def fein=(new_fein)
       @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil

@@ -26,7 +26,7 @@ class EmployerProfile
   ENROLLED_STATE = %w(enrolled suspended)
 
   field :entity_kind, type: String
-  field :sic_code_id, type: BSON::ObjectId
+  field :sic_code, type: String
 
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
@@ -66,7 +66,7 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
-  validates_presence_of :sic_code_id
+  validates_presence_of :sic_code
 
   validates :profile_source,
     inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
@@ -90,15 +90,6 @@ class EmployerProfile
   # def self.all_with_next_month_effective_date
     # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
   # end
-
-  # def sic_code
-  #   SicCode.find(self.sic_code_id)
-  # end
-
-  def sic_code
-    return @sic_code if defined? @sic_code
-    @sic_code = SicCode.find(self.sic_code_id) unless self.sic_code_id.blank?
-  end
 
   def parent
     raise "undefined parent Organization" unless organization?

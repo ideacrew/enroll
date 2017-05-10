@@ -432,13 +432,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def organization_profile_params
     params.require(:organization).permit(
       :id,
-      :employer_profile_attributes => [:legal_name, :entity_kind, :dba, :sic_code_id]
+      :employer_profile_attributes => [:legal_name, :entity_kind, :dba, :sic_code]
     )
   end
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name, :sic_code_id],
+      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name, :sic_code],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
@@ -499,7 +499,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def get_sic_codes
    @grouped_options = {}
    SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
-    @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} (" "#{sc.sic_code})", sc.id]}
+    @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
    end
   end
 end
