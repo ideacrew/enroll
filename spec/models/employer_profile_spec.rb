@@ -936,6 +936,99 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end
+
+  describe "notify_broker_update" do
+    context "notify update" do
+      let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
+      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+
+      it "notify if broker added to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        employer_profile.hire_broker_agency(broker_agency_profile)
+        employer_profile.save
+      end
+
+      it "notify if broker terminated to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        FactoryGirl.create(:broker_agency_account, employer_profile: employer_profile, is_active: 'true')
+        employer_profile.fire_broker_agency
+        employer_profile.save
+      end
+    end
+  end
+
+  describe "notify_general_agent_added" do
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+      let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+      let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+      it "notify if general_agent added to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        employer_profile.hire_general_agency(general_agency_profile, broker_role.id)
+        employer_profile.save
+      end
+    end
+  end
+
+  describe "notify_general_agent_terminated" do
+    context "notify update" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+      it "notify if general_agent terminated to employer account" do
+        expect(employer_profile).to receive(:notify).exactly(1).times
+        FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'active')
+        employer_profile.fire_general_agency!
+        employer_profile.save
+      end
+    end
+  end
+end
+
+describe EmployerProfile, ".is_converting?", dbclean: :after_each do
+
+  let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:source) { 'conversion' }
+  let(:plan_year_status) { 'renewing_enrolling' }
+
+  let(:renewing_employer) {
+    FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status, profile_source: source, registered_on: start_date - 3.months, is_conversion: true)
+  }
+
+  describe "conversion employer" do  
+
+    context "when under converting period" do
+      it "should return true" do
+        expect(renewing_employer.is_converting?).to be_truthy
+      end
+    end
+
+    context "when under next renewal cycle" do
+      let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month.prev_year }
+      let(:plan_year_status) { 'active' }
+
+      before do 
+        plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
+        plan_year_renewal_factory.employer_profile = renewing_employer
+        plan_year_renewal_factory.is_congress = false
+        plan_year_renewal_factory.renew
+      end
+
+      it "should return false" do
+        expect(renewing_employer.is_converting?).to be_falsey
+      end
+    end
+  end
+
+  describe "non conversion employer" do 
+    let(:source) { 'self_serve' }
+
+    context "under renewal cycle" do
+      it "should always return false" do
+        expect(renewing_employer.is_converting?).to be_falsey
+      end
+    end
+  end
 end
 
 # describe "#advance_day" do
