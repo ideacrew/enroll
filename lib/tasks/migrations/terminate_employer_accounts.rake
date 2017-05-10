@@ -39,7 +39,7 @@ namespace :migrations do
 
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
-          puts "Terminating employees coverage for employer #{organization.legal_name}"
+          puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
         end
 
         enrollments.each do |hbx_enrollment|
