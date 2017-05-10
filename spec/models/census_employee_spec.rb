@@ -952,28 +952,39 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived') }
 
       before do
+        allow(census_employee).to receive(:active_benefit_group_assignment).and_return(double)
         allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment, hbx_enrollment_two, hbx_enrollment_three], [])
       end
 
       termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]
       termination_dates.each do |terminated_on|
-
-        context 'move the enrollment aasm state to pending status' do
+        
+        context 'move the enrollment into proper state' do
 
           before do
             census_employee.terminate_employment!(terminated_on)
           end
 
-          it "should move the health enrollment to pending status if effective date is in past" do
-            expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+          it "should move the health enrollment to pending/terminated status" do
+            coverage_end = census_employee.earliest_coverage_termination_on(terminated_on)
+            if coverage_end < TimeKeeper.date_of_record
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
+            else
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the health enrollment" do
             expect(hbx_enrollment.terminated_on).to eq census_employee.earliest_coverage_termination_on(terminated_on)
           end
 
-          it "should move the dental enrollment to pending status if effective date is in past" do
-            expect(hbx_enrollment_two.aasm_state).to eq 'coverage_termination_pending'
+          it "should move the dental enrollment to pending/terminated status" do
+            coverage_end = census_employee.earliest_coverage_termination_on(terminated_on)
+            if coverage_end < TimeKeeper.date_of_record
+              expect(hbx_enrollment_two.aasm_state).to eq 'coverage_terminated'
+            else
+              expect(hbx_enrollment_two.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the dental enrollment" do
@@ -984,8 +995,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
         context 'move the enrollment aasm state to cancel status' do
 
           before do
-            hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
-            hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
+            hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
+            hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
 
             census_employee.terminate_employment!(terminated_on)
           end
@@ -1014,7 +1025,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           end
 
           it "should move the waived enrollment to inactive state" do
-            expect(hbx_enrollment_three.aasm_state).to eq 'inactive'
+            if terminated_on >= TimeKeeper.date_of_record
+              expect(hbx_enrollment_three.aasm_state).to eq 'inactive'
+            end
           end
 
           it "should set the coverage termination on date on the dental enrollment" do
