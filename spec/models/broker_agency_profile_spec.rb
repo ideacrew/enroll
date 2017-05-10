@@ -123,7 +123,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
           let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id,
                                           start_on: TimeKeeper.date_of_record, is_active: true)}
           let!(:my_clients)           { FactoryGirl.create_list(:employer_profile, my_client_count,
-                                          broker_agency_accounts: [broker_agency_account] )}
+                                          broker_agency_accounts: [broker_agency_account], sic_code: '1111' )}
 
           it "should find all my active employer clients" do
             expect(broker_agency_profile.employer_clients.to_a.size).to eq my_client_count
@@ -213,7 +213,7 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
       expect(broker_agency_profile.families.count).to be(2)
     end
     it "should find a linked employee" do
-      employer = organization.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile)
+      employer = organization.create_employer_profile(entity_kind: "partnership", sic_code: '1111', broker_agency_profile: broker_agency_profile)
       employee_role = FactoryGirl.create(:employee_role, person: person, employer_profile: employer)
       expect(broker_agency_profile.linked_employees.count).to eq(1)
     end
