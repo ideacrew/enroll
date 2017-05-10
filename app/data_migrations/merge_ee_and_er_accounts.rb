@@ -2,6 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MergeEeAndErAccounts < MongoidMigrationTask
   def migrate
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     employee_hbx_id= ENV['employee_hbx_id']
     employer_hbx_id= ENV['employer_hbx_id']
     if Person.where(hbx_id: employee_hbx_id).first.nil?
