@@ -49,6 +49,14 @@ module Forms
         if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
           self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
         end
+
+        if @indian_tribe_member.nil?
+          self.errors.add(:base, "native american / alaskan native status is required")
+        end
+
+        if @is_incarcerated.nil?
+          self.errors.add(:base, "Incarceration status is required")
+        end
       end
     end
 
@@ -194,7 +202,6 @@ module Forms
                   found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
                 end
       mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
-
       record = self.new({
         :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
@@ -213,6 +220,9 @@ module Forms
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
+        :naturalized_citizen => found_family_member.naturalized_citizen,
+        :eligible_immigration_status => found_family_member.eligible_immigration_status,
+        :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),

@@ -880,9 +880,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     context "change the aasm state & populates terminated on of enrollments" do
       let(:census_employee) { FactoryGirl.create(:census_employee) }
       let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health') }
-      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'dental') }
-      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state: 'renewing_waived') }
+
+      let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'health') }
+      let(:hbx_enrollment_two) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, coverage_kind: 'dental') }
+      let(:hbx_enrollment_three) { FactoryGirl.create(:hbx_enrollment, benefit_group: benefit_group, household: family.active_household, aasm_state: 'renewing_waived') }
 
       before do
         allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment, hbx_enrollment_two, hbx_enrollment_three], [])
@@ -919,6 +920,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           before do
             hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
             hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record + 10.days)
+
             census_employee.terminate_employment!(terminated_on)
           end
 

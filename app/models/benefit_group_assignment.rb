@@ -55,7 +55,7 @@ class BenefitGroupAssignment
 
   def belongs_to_offexchange_planyear?
     employer_profile = plan_year.employer_profile
-    employer_profile.is_coversion_employer? && plan_year.coverage_period_contains?(employer_profile.registered_on)
+    employer_profile.is_conversion? && plan_year.is_conversion
   end
 
   def benefit_group=(new_benefit_group)
