@@ -144,16 +144,16 @@ class SpecialEnrollmentPeriod
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
-    min_date = sep_optional_date family, 'min'
-    max_date = sep_optional_date family, 'max'
+    min_date = sep_optional_date family, 'min', self.market_kind
+    max_date = sep_optional_date family, 'max', self.market_kind
     errors.add(:next_poss_effective_date, "out of range.") if not next_poss_effective_date.between?(min_date, max_date)
   end
 
   def optional_effective_on_dates_within_range
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min'
-      max_date = sep_optional_date family, 'max'
+      min_date = sep_optional_date family, 'min', self.market_kind
+      max_date = sep_optional_date family, 'max', self.market_kind
       errors.add(:optional_effective_on, "Date #{index+1} option out of range.") if not date_option.between?(min_date, max_date)
     end
   end
