@@ -3,16 +3,18 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class TerminateEnrWithDate < MongoidMigrationTask
   def migrate
     begin
-      person_hbx_id = (ENV['person_hbx_id']).to_s
-      enr_hbx_id = (ENV['enr_hbx_id']).to_s
-      terminated_on = Date.strptime(ENV['terminated_on'].to_s, "%m/%d/%Y")
+      enr_id = (ENV['enr_id']).to_s
+      termination_date = Date.strptime(ENV['termination_date'].to_s, "%m/%d/%Y")
+      terminated_on = termination_date.end_of_month
 
-      enr = Person.where(hbx_id: person_hbx_id).first.primary_family.active_household.hbx_enrollments.where(hbx_id: enr_hbx_id).first
-      enr.terminate_coverage!(terminated_on) if enr.effective_on < terminated_on
+      hbx_enr = HbxEnrollment.find(enr_id)
 
-      puts "Terminated the enrollment with hbx_id: #{enr_hbx_id}, for the given person with hbx_id: #{person_hbx_id}, Status of Enrollment: #{enr.aasm_state} with termination date: #{enr.terminated_on} " unless Rails.env.test?
+      hbx_enr.terminate_coverage!(terminated_on)
+      hbx_enr.update_attributes!(termination_submitted_on: termination_date)
+
+      puts "Terminated the enrollment with id: #{enr_id}. Status of Enrollment: #{hbx_enr.aasm_state} with termination date: #{hbx_enr.terminated_on} " unless Rails.env.test?
     rescue
-      puts "Bad Person Record with hbx_id: #{person_hbx_id}" unless Rails.env.test?
+      puts "Bad Enrollment" unless Rails.env.test?
     end
   end
 end

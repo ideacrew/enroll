@@ -15,12 +15,11 @@ describe TerminateEnrWithDate do
   describe "terminate enrollment with terminated on date" do
     let(:person) { FactoryGirl.create(:person, :with_family, hbx_id: "1234567890") }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: Date.strptime("02/01/2017" , "%m/%d/%Y") , hbx_id: "0987654321", household: family.active_household)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, effective_on: Date.strptime("02/01/2017" , "%m/%d/%Y"), household: family.active_household)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return("1234567890")
-      allow(ENV).to receive(:[]).with("enr_hbx_id").and_return("0987654321")
-      allow(ENV).to receive(:[]).with("terminated_on").and_return("02/28/2017")
+      allow(ENV).to receive(:[]).with("enr_id").and_return(hbx_enrollment.id.to_s)
+      allow(ENV).to receive(:[]).with("termination_date").and_return("02/28/2017")
     end
 
     it "should terminate the enrollment with given terminated on date" do
