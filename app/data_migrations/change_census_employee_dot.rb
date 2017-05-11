@@ -5,7 +5,7 @@ class ChangeCensusEmployeeDot < MongoidMigrationTask
       ce=CensusEmployee.by_ssn(ENV['ssn']).first
       dot = ENV['date_of_terminate']
       if ce.nil?
-        puts "No census employee was found with the given ssn"
+        puts "No census employee was found with the given ssn" unless Rails.env.test?
       elsif ce.aasm_state != "employment_terminated"
         ce.update_attributes(aasm_state:"employment_terminated")
         ce.update_attributes(employment_terminated_on: dot)
