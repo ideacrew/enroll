@@ -1,12 +1,11 @@
 <h1>Events</h1>
-<% debugger %>
 <p>
   <strong>Name:</strong>
-  <%= @scheduled_event.name %>
+  <%= @scheduled_event.event_name %>
 </p>
 
 <p>
-  <strong>Time:</strong>
+  <strong>Start Time:</strong>
   <%= @time %>
 </p>
 
@@ -15,7 +14,4 @@
   <%= @scheduled_event.recurring_rules %>
 </p>
 
-<%= link_to "Delete All Events", exchanges_scheduled_events_path(@scheduled_event), method: :delete %>
-<%=# link_to "Delete Just This Event", event_exceptions_path(@event, event_exception: {time: @time}), method: :post %>
-<%= link_to 'Edit', edit_exchanges_scheduled_events_path(@scheduled_event) %> |
 <%= link_to 'Back', exchanges_scheduled_events_path %>

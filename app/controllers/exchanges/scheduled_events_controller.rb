@@ -19,12 +19,11 @@ layout 'single_column'
   end
 
   def show
-    debugger
     @scheduled_event = ScheduledEvent.find(params[:id])
     begin
       @time = Time.parse(params[:time])
     rescue
-      @time = @event.start_time
+      @time = @scheduled_event.start_time
     end
   end
 
