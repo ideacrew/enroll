@@ -10,7 +10,16 @@
   <div class='container'>
   	<div class="row">
   		<h3 class="title-inline">Calender</h3>
-  	</div>		
+  	</div>	
+
+    <%= month_calendar events: @calendar_events do |day, events| %>
+      <div><strong><%= day.to_s(:long) %></strong></div>
+      <% events.each do |event| %>
+        <div>
+          <%= link_to event.event_name, exchanges_scheduled_events_path(event.id, time: event.start_time) %>
+        </div>
+      <% end %>
+    <% end %>	
   </div>
   
   <div>

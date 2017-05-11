@@ -6,7 +6,8 @@ layout 'single_column'
   end
 
   def create
-    @scheduled_event = ScheduledEvent.new(params[:scheduled_event])
+    params.permit!
+    @scheduled_event = ScheduledEvent.new(scheduled_event_params)
     if @scheduled_event.save
       @scheduled_event.update_attributes!(one_time: true) if @scheduled_event.recurring_rules.present?
       redirect_to exchanges_scheduled_events_path
@@ -17,7 +18,18 @@ layout 'single_column'
     @scheduled_event = ScheduledEvent.find(params[:id])
   end
 
+  def show
+    debugger
+    @scheduled_event = ScheduledEvent.find(params[:id])
+    begin
+      @time = Time.parse(params[:time])
+    rescue
+      @time = @event.start_time
+    end
+  end
+
   def update
+    params.permit!
     @scheduled_event = ScheduledEvent.find(params[:id])
     if @scheduled_event.update_attributes!(scheduled_event_params)
       if @scheduled_event.recurring_rules.present?
@@ -31,6 +43,7 @@ layout 'single_column'
 
   def index
     @scheduled_events = ScheduledEvent.all
+    @calendar_events = @scheduled_events.flat_map{ |e| e.calendar_events(params.fetch(:start_date, Time.zone.now).to_date) }
   end
 
   def get_system_events
@@ -57,6 +70,6 @@ layout 'single_column'
   end
 
   def scheduled_event_params
-    params.require(:scheduled_event).permit(:type, :event_name, :start_date, :recurring_rules, :one_time, :offset_rule)
+    params.require(:scheduled_event).permit(:type, :event_name, :start_time, :recurring_rules, :one_time, :offset_rule)
   end
 end
