@@ -23,20 +23,15 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
           #1 check whether moveable
           #2create the new hbx_enrollment
           #3delete the old hbx_enrollment
-
           if gp.employee_roles.empty? ||  bp.employee_roles.empty?
             puts "The shop hbx_enrollment #{hbx_enrollment.id} can not moved due to two people dont linked to employee.role" unless Rails.env.test?
           else
             good_employer=gp.employee_roles.first.census_employee.employer_profile
             bad_employer=bp.employee_roles.first.census_employee.employer_profile
-            puts good_employer.active_plan_year
-            puts good_employer.active_plan_year.benefit_groups
-            puts hbx_enrollment.benefit_group_id
             if good_employer.nil? || bad_employer.nil? || good_employer.id != bad_employer.id
               puts "The shop hbx_enrollment #{hbx_enrollment.id} can not moved due to two people dont linked to the same employer" unless Rails.env.test?
             elsif good_employer.active_plan_year.benefit_groups.map{|a| a.id}.include? hbx_enrollment.benefit_group_id
               #create the new hbx_enrollment
-              puts "hihihihihi"
               gp.primary_family.active_household.create_hbx_enrollment_from(
                   employee_role: hbx_enrollment.employee_role,
                   consumer_role: hbx_enrollment.consumer_role,
