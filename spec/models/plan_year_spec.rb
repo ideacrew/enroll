@@ -2435,3 +2435,32 @@ describe PlanYear, "plan year schedule changes" do
     end
   end
 end
+
+
+describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :after_all do
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
+  let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:census_employee){
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+    employee
+  }
+  
+  context 'when plan year begin date changed' do
+    let(:modified_start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:modified_end_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+
+    it "should update benefit group assignment dates" do
+      expect(census_employee.active_benefit_group_assignment.start_on).to eq start_on
+
+      plan_year = employer_profile.active_plan_year
+      plan_year.start_on = modified_start_on
+      plan_year.end_on = modified_end_on
+      plan_year.save
+      census_employee.reload
+
+      expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
+    end
+  end
+end
