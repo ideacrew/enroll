@@ -29,7 +29,10 @@ namespace :migrations do
         employer_profile.census_employees.each do |census_employee|
           assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => renewing_plan_year.benefit_groups.map(&:id))
           assignments.each do |assignment|
-            assignment.delink_coverage! if assignment.may_delink_coverage?
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
           end
         end
 
@@ -73,7 +76,10 @@ namespace :migrations do
         employer_profile.census_employees.each do |census_employee|
           assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
           assignments.each do |assignment|
-            assignment.delink_coverage! if assignment.may_delink_coverage?
+            if assignment.may_delink_coverage?
+              assignment.delink_coverage!
+              assignment.update_attribute(:is_active, false)
+            end
           end
         end
 
