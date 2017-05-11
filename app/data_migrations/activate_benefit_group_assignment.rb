@@ -8,7 +8,7 @@ class ActivateBenefitGroupAssignment < MongoidMigrationTask
         puts "No census employee was found with given ssn"
       else
         benefit_group_assignment=census_employee.benefit_group_assignments.where(id:ENV['bga_id']).first
-        benefit_group_assignment.update_attributes(is_active: true)
+        benefit_group_assignment.make_active
       end
     rescue => e
       e.message
