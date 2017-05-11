@@ -654,6 +654,7 @@ end
 
 Then(/^.+ should see the new dependent form$/) do
 
+  expect(page).to have_content('Lives with primary subscriber')
   expect(page).to have_content('Confirm Member')
 end
 
