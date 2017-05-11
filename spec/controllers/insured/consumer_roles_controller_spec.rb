@@ -162,6 +162,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:create_dep_consumer_role)
     end
     it "should create new person/consumer role object" do
       sign_in user
