@@ -22,7 +22,6 @@ describe ImportMissingPersonContactInfo do
       last_name: "Doe",
       dob: 20.years.ago,
       gender: "male"
-
     }
   }
 
