@@ -590,12 +590,25 @@ function checkZip(textbox) {
       data: { zip_code: textbox.value },
       success: function (response) {
         $('#county-select-' + child_index + " select").html(response);
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+        if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() && 
+                $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
+        {
+            $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+        }
       }
     });
   }
   return true;
 }
-
+function validateCounty(selectField) {
+    if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
+    {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+    } else {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+    }
+}
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
   if (textbox.value == '') {

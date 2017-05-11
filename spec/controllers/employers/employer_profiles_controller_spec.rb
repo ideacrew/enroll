@@ -75,7 +75,7 @@ RSpec.describe Employers::EmployerProfilesController do
       let(:zip_code) { '21224' }
       it "should return an unsupported zip string" do
 
-        expect(assigns(:counties)).to match_array(['Zip code outside supported area'])
+        expect(assigns(:counties)).to match_array(['Zip code outside MA'])
       end
     end
 
