@@ -6,7 +6,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title">Search for your matching SIC Code</h4>
         <p>SIC (Standard Industrial Classifications) codes are used to categorize your business into the appropriate rating group</p>
-        <p>You can use browse or search through all the available codes</p>
+        <p>You can use browse or search through all the available codes -- double click to make a selection</p>
         <input id="sic_search" type="text" value="" alt="Provide a keyword related to your business"/>
       </div>
       <div class="modal-body" id="sictree">
@@ -44,6 +44,13 @@
                           },
                           'plugins': ['wholerow', 'search']
                         });
+
+    $("#sictree").on( 'dblclick', '.jstree-leaf', function(e) {
+      var sicCode = $(e.target).parent().attr('id');
+      $('#sicHelperModal').modal('toggle');
+      $("#organization_employer_profile_attributes_sic_code").val(sicCode);
+      $("#organization_employer_profile_attributes_sic_code").trigger('chosen:updated');
+    });
 
     var to = false;
     $('#sic_search').keyup(function () {

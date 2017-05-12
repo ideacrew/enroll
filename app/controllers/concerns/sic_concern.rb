@@ -39,6 +39,7 @@ module SicConcern
         id: sic.second,
         text: "#{sic.third} (#{sic.second})",
         icon: "glyphicon glyphicon-glyphicon-leaf",
+        a_attr: sic.second
       }
     end
 
