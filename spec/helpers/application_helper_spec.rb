@@ -2,6 +2,24 @@ require "rails_helper"
 
 RSpec.describe ApplicationHelper, :type => :helper do
 
+  describe "#deductible_display" do
+    let(:hbx_enrollment) {double(hbx_enrollment_members: [double, double])}
+    let(:plan) { double("Plan", deductible: "$500", family_deductible: "$500 per person | $1000 per group",) }
+
+    before :each do
+      assign(:hbx_enrollment, hbx_enrollment)
+    end
+
+    it "should return family deductible if hbx_enrollment_members count > 1" do
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.family_deductible.split("|").last.squish
+    end
+
+    it "should return individual deductible if hbx_enrollment_members count <= 1" do
+      allow(hbx_enrollment).to receive(:hbx_enrollment_members).and_return([double])
+      expect(helper.deductible_display(hbx_enrollment, plan)).to eq plan.deductible
+    end
+  end
+
   describe "#dob_in_words" do
     it "returns date of birth in words for < 1 year" do
       expect(helper.dob_in_words(0, "20/06/2015".to_date)).to eq time_ago_in_words("20/06/2015".to_date)
