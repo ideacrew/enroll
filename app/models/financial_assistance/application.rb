@@ -54,26 +54,26 @@ class FinancialAssistance::Application
   embeds_many :workflow_state_transitions, as: :transitional
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
 
-  validates_presence_of :hbx_id, :applicant_kind, :request_kind, :benchmark_plan_id
+  # validates_presence_of :hbx_id, :applicant_kind, :request_kind, :benchmark_plan_id
 
   # User must agree with terms of service check boxes
-  validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
+  # validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
 
-  validates :renewal_base_year, allow_nil: true,
-                                numericality: {
-                                  only_integer: true,
-                                  greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
-                                  less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
-                                  message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
-                                }
+  # validates :renewal_base_year, allow_nil: true,
+  #                             numericality: {
+  #                               only_integer: true,
+  #                               greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
+  #                               less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
+  #                               message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
+  #                             }
 
-  validates :years_to_renew,    allow_nil: true,
-                                numericality: {
-                                  only_integer: true,
-                                  greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
-                                  less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
-                                  message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
-                                }
+  # validates :years_to_renew,    allow_nil: true,
+  #                             numericality: {
+  #                               only_integer: true,
+  #                               greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
+  #                               less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
+  #                               message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
+  #                             }
 
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
@@ -284,6 +284,4 @@ private
 
   def is_application_valid?
   end
-
-
 end

@@ -1,4 +1,5 @@
 <div class="row">
+  <div class="col-md-12">step <%= @current_step.to_i %><%= @steps.last_step?(@current_step) %></div>
   <div class="col-md-2"></div>
   <div class="col-md-8">
     <div class="">
@@ -18,17 +19,14 @@
           <% end %>
           <% if  @steps.last_step?(@current_step) %>
             <%= submit_tag 'Finish' %>
-          <% elsif !@steps.first_step?(@current_step) %>
-            <%= button_to 'Previous Step', previous_step_for(@model, @current_step) %>
-            <%= submit_tag 'Next step' %>
           <% else %>
+            <% if !@steps.first_step?(@current_step) %>
+              <%= link_to 'Previous Step', previous_step_for %>
+            <% end %>
             <%= submit_tag 'Next step' %>
           <% end %>
         <% end %>
       </div>
-      <% unless @current_step.to_i == 1 %>
-        <%= link_to "Previous Step", controller:'surveys', action:'previous_step' %>
-      <% end %>
     </div>
   </div>
   <div class="col-md-2"></div>

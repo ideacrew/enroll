@@ -19,12 +19,18 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 })
       @model.attributes = survey_params(attributes)
       @model.save!
+      @current_step = @current_step.next_step
     end
 
-    render 'workflow/step'
+    if params.key?(:step)
+      @model.workflow = { current_step: @current_step.to_i }
+    else
+      @model.workflow = { current_step: @current_step.to_i + 1 }
+      @current_step = @current_step.next_step
+    end
+    @model.save!
 
-    # renders subsequent steps, needs id to find current_step
-    # form_for will need to be updated to handle ids in the url generation
+    render 'workflow/step'
   end
 
   private

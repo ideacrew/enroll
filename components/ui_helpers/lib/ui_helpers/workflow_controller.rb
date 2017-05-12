@@ -33,7 +33,7 @@ module UIHelpers
 
     def current_step
       if params[:step]
-        @current_step = @steps.find(params[:step])
+        @current_step = @steps.find(params[:step].to_i)
       else
         @current_step ||= @steps.find(@model.workflow['current_step'] || 1)
       end

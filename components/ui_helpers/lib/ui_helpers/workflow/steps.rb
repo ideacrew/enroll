@@ -4,7 +4,7 @@ module UIHelpers
   module Workflow
     class Steps
       def initialize(steps)
-        @steps = steps.map.with_index { |step, number| Workflow::Step.new step['step'], number + 1 }
+        @steps = steps.map.with_index { |step, number| Workflow::Step.new step['step'], number + 1, self }
       end
 
       def count
