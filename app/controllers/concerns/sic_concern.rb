@@ -8,7 +8,7 @@ module SicConcern
       @divisions << {
                       id: division_code,
                       parent: "#",
-                      icon: "glyphicon glyphicon-plus",
+                      icon: false,
                       text: SicCode.find_by(division_code: division_code).division_label.strip
                     }
 
@@ -17,7 +17,7 @@ module SicConcern
         @major_groups << {
                             id: major_group_code,
                             parent: division_code,
-                            icon: "glyphicon glyphicon-th-list",
+                            icon: false,
                             text: SicCode.find_by(division_code: division_code, major_group_code: major_group_code).major_group_label
                           }
 
@@ -26,7 +26,7 @@ module SicConcern
           @industry_groups << {
                                 id: industry_group_code,
                                 parent: major_group_code,
-                                icon: "glyphicon glyphicon-tree-deciduous",
+                                icon: false,
                                 text: SicCode.find_by(division_code: division_code, major_group_code: major_group_code, industry_group_code: industry_group_code).industry_group_label
                               }
         end
@@ -38,7 +38,7 @@ module SicConcern
         parent: sic.first,
         id: sic.second,
         text: "#{sic.third} (#{sic.second})",
-        icon: "glyphicon glyphicon-glyphicon-leaf",
+        icon: false,
         a_attr: sic.second
       }
     end
