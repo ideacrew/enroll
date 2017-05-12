@@ -1,10 +1,10 @@
 <html>
 <body>
-  Your Health Plan Open Enrollment Period has Begun
+  <b>Your Health Plan Open Enrollment Period has Begun</b>
   <br/>
   <br/>
   <div>Dear <%= census_employee.full_name.humanize.titleize %>,</div>
-  <br/><br/>
+  <br/>
   <div>
     Good News! <%= census_employee.employer_profile.legal_name %> has chosen to offer of health insurance coverage to its employees through <%= Settings.site.short_name %> and will contribute to your monthly premium to make the cost of coverage more affordable. Your new hire open enrollment period begins on <b><%= census_employee.new_hire_enrollment_period.first.to_date.to_formatted_s %></b>.
   </div>
@@ -18,10 +18,10 @@
     <b> What is New Hire Open Enrollment? </b>
     <br/>
     New Hire Open Enrollment is a one-time opportunity to enroll in health plans offered by your new employer based on your status as a new employee. After this one-time new hire open enrollment, you will have an annual open enrollment period where you will have the opportunity to make plan changes or drop coverage.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events.
-    <br/>
+    <br><br/>
     <b>To See Plan Options and Enroll: </b>
     <br/>
-    To complete the application process, please follow the steps below. You can also use this guide for New Hires to Enroll in Health Coverage through <% Settings.site.short_name %> for additional assistance.
+    To complete the application process, please follow the steps below. You can also use <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this guide</a> for <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">New Hires to Enroll in Health Coverage through <% Settings.site.short_name %></a> for additional assistance.
     <br/>
     <table class="total_table" border="0">
       <tbody>
@@ -29,16 +29,16 @@
           <td>
             <ul>
             <li style="margin-top: 0px;">
-              1.  Go to DCHealthLink.com
+              Go to <a href="#{Settings.site.short_name}">DCHealthLink.com</a>
             </li>
             <li style="margin-top: 5px;">
-              2.  Log-in or create an account as an employee
+              Log-in or create an account as an employee
             </li>
             <li style="margin-top: 5px;">
-              3.  If necessary, update your household information add any dependents
+              If necessary, update your household information add any dependents
             </li>
             <li style="margin-top: 5px;">
-              4.  Select your health plan
+              Select your health plan
             </li>
             </ul>
           </td>
@@ -46,7 +46,7 @@
       </tbody>
     </table>
 
-    <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Doing so preserves your right to enroll in your employer-sponsored health insurance through a special enrollment period (SEP), if you qualify, at a later date this year. Instructions for how to waive coverage are included in this walkthrough guide.
+    <i>Note</i>: If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name %> at this time, you must still apply to “waive” coverage. Doing so preserves your right to enroll in your employer-sponsored health insurance through a special enrollment period (SEP), if you qualify, at a later date this year. Instructions for how to waive coverage are included in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf">this walkthrough guide</a>.
 
     <h2 style="color: #007bc4;">
       For Questions or Assistance:
@@ -62,7 +62,7 @@
     <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
       <table style="width: 100%">
         <tr>
-          <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
+          <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
           <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
         </tr>
         <tr>
