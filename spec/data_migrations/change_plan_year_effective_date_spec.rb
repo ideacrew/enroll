@@ -19,6 +19,7 @@ describe ChangePlanYearEffectiveDate do
     let(:plan) { FactoryGirl.create(:plan, :with_premium_tables) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible") }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
@@ -54,6 +55,9 @@ describe ChangePlanYearEffectiveDate do
 
     it "should publish the plan year" do
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      employer = plan_year.employer_profile
+      employer.census_employees << census_employee
+      employer.save!
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).not_to eq "draft"
