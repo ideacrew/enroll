@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <div class="">
+      <% if !@current_step.heading.nil? %>
+      <h1 class="darkblue"><%= @current_step.heading %></h1>
+      <% if !@current_step.heading_text.nil? %>
+      <p ><%= @current_step.heading_text %></p>
+      <% end %>
+      <% end %>
+
+      <div class="focus_effect module">
+        <%= workflow_form_for @model do %>
+          <% @current_step.sections.each do |section| %>
+            <div class="margin-bottom-30">
+              <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+            </div>
+          <% end %>
+          <% if  @steps.last_step?(@current_step) %>
+            <%= submit_tag 'Finish' %>
+          <% elsif !@steps.first_step?(@current_step) %>
+            <%= button_to 'Previous Step', previous_step_for(@model, @current_step) %>
+            <%= submit_tag 'Next step' %>
+          <% else %>
+            <%= submit_tag 'Next step' %>
+          <% end %>
+        <% end %>
+      </div>
+      <% unless @current_step.to_i == 1 %>
+        <%= link_to "Previous Step", controller:'surveys', action:'previous_step' %>
+      <% end %>
+    </div>
+  </div>
+  <div class="col-md-2"></div>
+</div>

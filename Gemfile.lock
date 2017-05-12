@@ -1,11 +1,4 @@
 GIT
-  remote: git@github.com:dchbx/ui_helpers.git
-  revision: 908a011ebdb58b36cdcc956cc93a80caf1b9dfcd
-  specs:
-    ui_helpers (0.0.1)
-      rails (~> 4.2.3)
-
-GIT
   remote: https://github.com/aq1018/mongoid-history.git
   revision: 1c69841f823d7ebf69fb2145d307d60b1500b89c
   branch: master
@@ -44,6 +37,12 @@ GIT
       pdf-reader (~> 1.2)
       ruby-rc4
       ttfunk (~> 1.0.3)
+
+PATH
+  remote: components
+  specs:
+    ui_helpers (0.0.1)
+      rails (~> 4.2.3)
 
 PATH
   remote: project_gems/effective_datatables-2.6.14

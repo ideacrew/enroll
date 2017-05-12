@@ -1,5 +1,5 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
-  # include UIHelpers::WorkflowController
+  include UIHelpers::WorkflowController
 
   def index
     @existing_applications = Family.find_by(person_id: current_user.person).applications
