@@ -133,13 +133,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
     context "consumer_portal" do
       it "should return correct options for consumer portal" do
         expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Domestic Partner/mi)
-        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/other tax dependent/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).to match(/Spouse/mi)
+        expect(helper.relationship_options(dependent, "consumer_role_id")).not_to match(/other tax dependent/mi)
       end
     end
 
     context "employee portal" do
       it "should not match options that are in consumer portal" do
-        expect(helper.relationship_options(dependent, "")).not_to match(/Domestic Partner/mi)
+        expect(helper.relationship_options(dependent, "")).to match(/Domestic Partner/mi)
         expect(helper.relationship_options(dependent, "")).not_to match(/other tax dependent/mi)
       end
     end
