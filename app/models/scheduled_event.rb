@@ -54,6 +54,10 @@ class ScheduledEvent
     if recurring_rules.blank?
       [self]
     else
+<<<<<<< HEAD
+=======
+      #start_date = start.beginning_of_month.beginning_of_week
+>>>>>>> fix prev and next links
       end_date = start.end_of_year.end_of_month.end_of_week
       schedule(start_time).occurrences(end_date).map do |val|
         ScheduledEvent.new(id: id, event_name: event_name, start_time: val)

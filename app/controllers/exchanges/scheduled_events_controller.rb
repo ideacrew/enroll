@@ -29,21 +29,8 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     end
   end
 
-  def show
-    @scheduled_event = ScheduledEvent.find(params[:id])
-    begin
-      @time = Time.parse(params[:time])
-    rescue
-      @time = @scheduled_event.start_time
-    end
-  end
-
   def update
     params.permit!
-<<<<<<< HEAD
-=======
-    @scheduled_event = ScheduledEvent.find(params[:id])
->>>>>>> fixing minor issues
     if @scheduled_event.update_attributes!(scheduled_event_params)
       @scheduled_event.event_exceptions.delete_all
       if @scheduled_event.recurring_rules.present?
@@ -57,7 +44,6 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
 
   def index
     @scheduled_events = ScheduledEvent.all
-<<<<<<< HEAD
     @calendar_events = @scheduled_events.flat_map do |e|
       if params.key?("start_date")
         e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date)
@@ -65,9 +51,6 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
         e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date)
       end
     end
-=======
-    @calendar_events = @scheduled_events.flat_map{ |e| e.calendar_events(params.fetch(:start_date, Time.zone.now).to_date) }
->>>>>>> fixing minor issues
   end
 
   def destroy
@@ -97,7 +80,6 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     end
   end
 
-<<<<<<< HEAD
   private
 
     def scheduled_event_params
@@ -107,9 +89,4 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     def set_event
       @scheduled_event = ScheduledEvent.find(params[:id])
     end
-=======
-  def scheduled_event_params
-    params.require(:scheduled_event).permit(:type, :event_name, :start_time, :recurring_rules, :one_time, :offset_rule)
-  end
->>>>>>> fixing minor issues
 end
