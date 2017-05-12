@@ -159,7 +159,7 @@ class HbxEnrollment
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
-  scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled', 'auto_renewing']).order(created_at: :desc) }
+  scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
   scope :non_terminated, -> { where(:aasm_state.ne => 'coverage_terminated') }
@@ -417,6 +417,19 @@ class HbxEnrollment
     is_cobra_status? && future_active?
   end
 
+  def validate_for_cobra_eligiblity(role)
+    if self.is_shop?
+      if role.present? && role.is_cobra_status?
+        census_employee = role.census_employee
+        self.kind = 'employer_sponsored_cobra'
+        self.effective_on = census_employee.cobra_begin_date if census_employee.cobra_begin_date > self.effective_on
+        if census_employee.coverage_terminated_on.present? && !census_employee.have_valid_date_for_cobra?
+          raise "You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated."
+        end
+      end
+    end
+  end
+
   def generate_hbx_id
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
@@ -479,8 +492,10 @@ class HbxEnrollment
 
     terminate_proc = lambda do |enrollment|
       if enrollment.may_terminate_coverage?
-        enrollment.update_current(terminated_on: (self.effective_on - 1.day))
-        enrollment.terminate_coverage!
+        if !enrollment.coverage_termination_pending?
+          enrollment.update_current(terminated_on: (self.effective_on - 1.day))
+          enrollment.terminate_coverage!
+        end
       end
     end
 
@@ -1008,6 +1023,7 @@ class HbxEnrollment
       enrollment_member.coverage_start_on = enrollment.effective_on
       enrollment.hbx_enrollment_members << enrollment_member
     end
+
     enrollment
   end
 
