@@ -1,5 +1,6 @@
 class SicCode
   include Mongoid::Document
+  extend SicConcern
 
   field :division_code, type: String
   field :division_label, type: String

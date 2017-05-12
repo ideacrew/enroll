@@ -7,6 +7,8 @@ module SicConcern
     %w(A B C D E F G H I J).each do |division_code|
       @divisions << {
                       id: division_code,
+                      parent: "#",
+                      icon: "glyphicon glyphicon-plus",
                       text: SicCode.find_by(division_code: division_code).division_label.strip
                     }
 
@@ -15,6 +17,7 @@ module SicConcern
         @major_groups << {
                             id: major_group_code,
                             parent: division_code,
+                            icon: "glyphicon glyphicon-th-list",
                             text: SicCode.find_by(division_code: division_code, major_group_code: major_group_code).major_group_label
                           }
 
@@ -23,6 +26,7 @@ module SicConcern
           @industry_groups << {
                                 id: industry_group_code,
                                 parent: major_group_code,
+                                icon: "glyphicon glyphicon-tree-deciduous",
                                 text: SicCode.find_by(division_code: division_code, major_group_code: major_group_code, industry_group_code: industry_group_code).industry_group_label
                               }
         end
@@ -33,7 +37,8 @@ module SicConcern
       {
         parent: sic.first,
         id: sic.second,
-        text: sic.third
+        text: sic.third,
+        icon: "glyphicon glyphicon-glyphicon-leaf",
       }
     end
 

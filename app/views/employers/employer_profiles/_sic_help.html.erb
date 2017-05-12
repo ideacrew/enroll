@@ -1,0 +1,39 @@
+<!-- SIC codes helper -->
+<div id="largeModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">SIC CODES</h4>
+      </div>
+      <div class="modal-body" id="sictree">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- SIC codes helper -->
+
+<script type="text/javascript">
+  $(function() {
+    $.ajax({
+      async: true,
+      type: "GET",
+      url: "/employers/employer_profiles/generate_sic_tree",
+      dataType: "json",
+      success: function(json) {
+        createJSTrees(json);
+      }
+    });
+  });
+
+  function createJSTrees(jsonData) {
+    $("#sictree").jstree({
+      'core' : { 
+        'data' : jsonData
+      }
+    });
+  }
+</script>
