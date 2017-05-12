@@ -16,7 +16,7 @@ describe GeneralAgencyAssignment do
 
     let(:new_plan_year){ FactoryGirl.create(:plan_year) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
-    let(:general_agency_account) { FactoryGirl.create(:general_agency_account, employer_profile: employer_profile) }
+    let(:general_agency_account) { FactoryGirl.create(:general_agency_account) }
     let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id, start_on: TimeKeeper.date_of_record, is_active: true)}
     let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year], broker_agency_accounts: [broker_agency_account]) }
 
@@ -28,10 +28,10 @@ describe GeneralAgencyAssignment do
     end
 
     it "should assign general agency profile for employer" do
-      expect(broker_agency_account.broker_agency_profile_id.to_s).to eq broker_agency_profile.id.to_s
-      expect(employer_profile.broker_agency_profile.id.to_s).to eq broker_agency_profile.id.to_s
+      expect(employer_profile.general_agency_accounts.present?).to eq false
       subject.migrate
-      expect(employer_profile.general_agency_accounts.first.id.to_s).to eq general_agency_account.id.to_s
+      employer_profile.reload
+      expect(employer_profile.general_agency_accounts.present?).to eq true
     end
   end
 end

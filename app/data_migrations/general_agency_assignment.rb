@@ -11,12 +11,13 @@ class GeneralAgencyAssignment < MongoidMigrationTask
       employer_profile.plan_years.first.update_attributes({open_enrollment_end_on: open_enrollment_end_on})
 
       broker_agency_profile_id = broker_agency_profile.primary_broker_role_id
-      employer_profile.general_agency_accounts
       employer_profile.general_agency_accounts.build(general_agency_profile: general_agency_profile, start_on: TimeKeeper.datetime_of_record, broker_role_id: broker_agency_profile_id)
+
       employer_profile.save
+
       puts "GeneralAgencyProfile with id: #{ENV['general_agency_id']} is assigned to the given EmployerProfile with id: #{ENV['employer_profile_id']}" unless Rails.env.test?
-    rescue
-      puts "Bad Records" unless Rails.env.test?
+    rescue Exception => e
+      puts e.message unless Rails.env.test?
     end
   end
 end
