@@ -17,12 +17,12 @@ namespace :migrations do
       renewing_plan_year = employer_profile.plan_years.renewing.first || employer_profile.plan_years.where(aasm_state:'renewing_application_ineligible').first
 
       if renewing_plan_year.present?
-        puts "found renewing plan year for #{employer_profile.legal_name}---#{renewing_plan_year.start_on}"
+        puts "found renewing plan year for #{employer_profile.legal_name}---#{renewing_plan_year.start_on}" unless Rails.env.test?
 
         enrollments_for_plan_year(renewing_plan_year).each do |enrollment|
-          if hbx_enrollment.may_cancel_coverage?
+          if enrollment.may_cancel_coverage?
             enrollment.cancel_coverage!
-            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}"
+            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}" unless Rails.env.test?
           end
         end
 
@@ -37,13 +37,13 @@ namespace :migrations do
         end
 
         if renewing_plan_year.may_cancel_renewal?
-          puts "canceling plan year for employer #{employer_profile.legal_name}"
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
           renewing_plan_year.cancel_renewal!
         end
 
         employer_profile.revert_application! if employer_profile.may_revert_application?
       else
-        puts "renewing plan year not found for employer #{employer_profile.legal_name}"
+        puts "renewing plan year not found for employer #{employer_profile.legal_name}" unless Rails.env.test?
       end
     end
   end
@@ -64,12 +64,12 @@ namespace :migrations do
       plan_year = employer_profile.plan_years.published.first
 
       if plan_year.present?
-        puts "found  plan year for #{employer_profile.legal_name}---#{plan_year.start_on}"
+        puts "found  plan year for #{employer_profile.legal_name}---#{plan_year.start_on}" unless Rails.env.test?
 
         enrollments_for_plan_year(plan_year).each do |hbx_enrollment|
           if hbx_enrollment.may_cancel_coverage?
             hbx_enrollment.cancel_coverage!
-            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}"
+            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}" unless Rails.env.test?
           end
         end
 
@@ -85,12 +85,12 @@ namespace :migrations do
 
         if plan_year.may_cancel?
           plan_year.cancel!
-          puts "canceling plan year for employer #{employer_profile.legal_name}"
+          puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
         end
 
         employer_profile.revert_application! if employer_profile.may_revert_application?
       else
-        puts "renewing plan year not found #{employer_profile.legal_name}"
+        puts "renewing plan year not found #{employer_profile.legal_name}" unless Rails.env.test?
       end
     end
   end
