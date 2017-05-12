@@ -66,56 +66,33 @@ describe UpdateFamilyMembersIndex do
     let(:wife) { FactoryGirl.create(:person, first_name: "wifey")}
     let(:husband) { FactoryGirl.create(:person, first_name: "hubby")}
     let(:family) { FactoryGirl.build(:family) }
-    let(:family1) { FactoryGirl.build(:family) }
-    let!(:wifes_family) do
-      wife.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: "self")
-      wife.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: "spouse")
-      wife.save
-
-      family.add_family_member(wife, is_primary_applicant: true)
-      family.add_family_member(husband)
-      family.save
-      family
-    end
-
     let!(:husbands_family) do
       husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: "self")
       husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: "spouse")
       husband.save
 
-      family1.add_family_member(husband, is_primary_applicant: true)
-      family1.add_family_member(wife)
-      family1.save
-      family1
+      family.add_family_member(wife)
+      family.add_family_member(husband, is_primary_applicant: true)
+      family.save
+      family
     end
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("primary_id").and_return(wife.id)
-      allow(ENV).to receive(:[]).with("dependent_id").and_return(husband.id)
-      allow(ENV).to receive(:[]).with("primary_hbx").and_return(wife.hbx_id)
-      allow(ENV).to receive(:[]).with("dependent_hbx").and_return(husband.hbx_id)
+      allow(ENV).to receive(:[]).with("primary_hbx").and_return(husband.hbx_id)
+      allow(ENV).to receive(:[]).with("dependent_hbx").and_return(wife.hbx_id)
+      allow(ENV).to receive(:[]).with("primary_family_id").and_return(husbands_family.family_members.first.id)
+      allow(ENV).to receive(:[]).with("dependent_family_id").and_return(husbands_family.family_members.second.id)
     end
 
     it "should swap the index of family members" do
-      wife.primary_family.family_members[0].update_attributes(person_id: husband.id)
-      wife.primary_family.family_members[1].update_attributes(person_id: wife.id)
-      expect(wifes_family.family_members.first.person.first_name).to eq "wifey"
-      expect(wifes_family.family_members.second.person.first_name).to eq "hubby"
-      subject.migrate
-      wifes_family.reload
-      expect(wifes_family.family_members.first.person.first_name).to eq "hubby"
-      expect(wifes_family.family_members.second.person.first_name).to eq "wifey"
-    end
-
-    it "should update the is_primary_applicant" do
-      husband.primary_family.family_members[0].update_attributes(is_primary_applicant: true)
-      husband.primary_family.family_members[1].update_attributes(is_primary_applicant: false)
-      expect(husbands_family.family_members.first.person.first_name).to eq "hubby"
-      expect(husbands_family.family_members.second.person.first_name).to eq "wifey"
+      expect(husbands_family.family_members.first.is_primary_applicant?).to eq false
+      expect(husbands_family.family_members.second.is_primary_applicant?).to eq true
       subject.migrate
       husbands_family.reload
-      expect(husbands_family.family_members.first.person.first_name).to eq "hubby"
-      expect(husbands_family.family_members.second.person.first_name).to eq "wifey"
+      hus_fam_id = husbands_family.family_members.first.id
+      wife_fam_id = husbands_family.family_members.second.id
+      expect(husbands_family.family_members.where(id: hus_fam_id).first.is_primary_applicant?).to eq true
+      expect(husbands_family.family_members.where(id: wife_fam_id).first.is_primary_applicant?).to eq false
     end
   end
 end
