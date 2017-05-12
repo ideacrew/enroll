@@ -119,7 +119,7 @@ class PlanSelection
       :kind => hbx_enrollment.kind,
       :coverage_kind => hbx_enrollment.coverage_kind,
       :effective_on.gte => coverage_year_start,
-      :aasm_state.ne => "shopping"
+      :aasm_state.nin => ["shopping","coverage_expired"]
       }).or( 
         {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}, 
         {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
