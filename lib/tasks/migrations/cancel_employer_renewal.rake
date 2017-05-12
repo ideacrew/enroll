@@ -6,7 +6,7 @@ namespace :migrations do
   desc "Cancel renewal for employer"
   task :cancel_employer_renewal, [:fein] => [:environment] do |task, args|
 
-    feins = args[:fein].split(' ')
+    feins = args[:fein].split(' ').uniq
 
     feins.each do |fein|
 
@@ -54,7 +54,7 @@ namespace :migrations do
   desc "Cancel incorrect renewal for employer"
   task :cancel_employer_incorrect_renewal, [:fein] => [:environment] do |task, args|
 
-    feins = args[:fein].split(' ')
+    feins = args[:fein].split(' ').uniq
 
     feins.each do |fein|
 
