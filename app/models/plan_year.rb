@@ -179,6 +179,7 @@ class PlanYear
 
   def eligible_for_export?
     return false if self.aasm_state.blank?
+    return false if self.is_conversion
     !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
   end
 
