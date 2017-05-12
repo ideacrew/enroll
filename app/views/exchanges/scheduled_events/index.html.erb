@@ -11,7 +11,6 @@
   	<div class="row">
   		<h3 class="title-inline">Calender</h3>
   	</div>	
-
     <%= month_calendar events: @calendar_events do |day, events| %>
       <div><strong><%= day.to_s(:long) %></strong></div>
       <% events.each do |event| %>

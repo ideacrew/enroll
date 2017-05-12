@@ -42,7 +42,13 @@ layout 'single_column'
 
   def index
     @scheduled_events = ScheduledEvent.all
-    @calendar_events = @scheduled_events.flat_map{ |e| e.calendar_events(params.fetch(:start_date, Time.zone.now).to_date) }
+    @calendar_events = @scheduled_events.flat_map do |e|
+      if params.key?("start_date")
+        e.calendar_events(Date.strptime(params.fetch(:start_date, Time.zone.now), "%m/%d/%Y").to_date)
+      else
+        e.calendar_events((params.fetch(:start_date, Time.zone.now)).to_date)
+      end
+    end
   end
 
   def get_system_events
