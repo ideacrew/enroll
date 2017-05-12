@@ -37,7 +37,7 @@ module SicConcern
       {
         parent: sic.first,
         id: sic.second,
-        text: sic.third,
+        text: "#{sic.third} (#{sic.second})",
         icon: "glyphicon glyphicon-glyphicon-leaf",
       }
     end
