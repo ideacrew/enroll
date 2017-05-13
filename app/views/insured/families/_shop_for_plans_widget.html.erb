@@ -89,7 +89,7 @@
                 <p>Would you like to use your existing special enrollment period? "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"</p>
                 <p>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                  <%= build_link_for_sep_type(@active_admin_sep, 'Shop with existing SEP') %>
+                  <%= build_link_for_sep_type(@active_sep, 'Shop with existing SEP') %>
                 </p>
                 <p><%= link_to 'Qualify for new SEP', find_sep_insured_families_path(options) %></p>
               <% else %>

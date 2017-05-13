@@ -869,6 +869,18 @@ Then(/^I should see confirmation and continue$/) do
   click_button "Continue"
 end
 
+Then(/^I can click on Shop for Plan button$/) do
+  click_button "Shop for Plans"
+end
+
+Then(/^Page should contain existing qle$/) do
+  expect(page).to have_content 'Would you like to use your existing special enrollment period? "Married"'
+end
+
+Then(/^I can click Shop with existing SEP link$/) do
+  click_link "Shop with existing SEP"
+end
+
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
   expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
