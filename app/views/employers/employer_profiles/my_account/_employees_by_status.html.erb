@@ -4,7 +4,11 @@
 <h4>No results found</h4>
 <% end %>
 <% end %>
-  <div class="table-responsive">
+
+<% if true %>
+    <%= render_datatable(@datatable) %>
+<% else %>
+    <div class="table-responsive">
     <table class="table table-striped table-hover table-sm panel panel-default">
       <thead class="thead-default">
         <tr>
@@ -151,7 +155,7 @@
           <% end %>
        </tbody>
       </table>
-    </div>
+  </div>
   <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
   <div class="row">
     <div class="col-md-9">
@@ -163,4 +167,4 @@
       <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
     </div>
   </div>
-</div>
+<% end %>
