@@ -71,7 +71,7 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     hbx_enrollment.destroy!
     gp.primary_family.active_household.hbx_enrollments << enrollment
     gp.primary_family.active_household.save!
-    puts "Hbx Enrollment succesfully moved!!"
-    puts "Confirm the people under covered section on the enrollment!!"
+    puts "Hbx Enrollment succesfully moved!!" unless Rails.env.test?
+    puts "Confirm the people under covered section on the enrollment!!" unless Rails.env.test?
   end
 end
