@@ -9,8 +9,7 @@ describe DelinkBroker do
 
   before(:each) do
     # @broker_agency_id = broker_agency.id
-    allow(ENV).to receive(:[]).with("first_name").and_return(person.first_name)
-    allow(ENV).to receive(:[]).with("last_name").and_return(person.last_name)
+    allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     allow(ENV).to receive(:[]).with("legal_name").and_return("legal_name")
   end
 

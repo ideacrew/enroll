@@ -1,10 +1,9 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class DelinkBroker < MongoidMigrationTask
   def migrate
-    first_name = ENV['first_name']
-    last_name = ENV['last_name']
+    hbx_id = ENV['person_hbx_id']
     legal_name = ENV['legal_name']
-    person=Person.where(first_name: first_name,last_name: last_name).first
+    person=Person.where(hbx_id: hbx_id).first
     if person.broker_role
       broker_agency = FactoryGirl.create(:broker_agency_profile,:organization => {:legal_name => legal_name, :fein => "99999322"})
       #update fields
