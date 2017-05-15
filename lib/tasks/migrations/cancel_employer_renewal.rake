@@ -11,7 +11,7 @@ namespace :migrations do
     feins.each do |fein|
 
       employer_profile = EmployerProfile.find_by_fein(fein)
-      next "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
 
       # checking renewing_application_ineligible assm state plan year here, as aasm state not listed in renewing.
       renewing_plan_year = employer_profile.plan_years.renewing.first || employer_profile.plan_years.where(aasm_state:'renewing_application_ineligible').first
@@ -59,7 +59,7 @@ namespace :migrations do
     feins.each do |fein|
 
       employer_profile = EmployerProfile.find_by_fein(fein)
-      next "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
+      next puts "unable to find employer_profile with fein: #{fein}" if employer_profile.blank?
 
       plan_year = employer_profile.plan_years.published.first
 
