@@ -2,8 +2,9 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class ChangeCensusEmployeeDot < MongoidMigrationTask
   def migrate
     begin
-      ce=CensusEmployee.find(ENV['census_employee_id'])
-      dot = Date.strptime(ENV['date_of_terminate'].to_s, "%m/%d/%Y")
+      binding.pry
+      ce=CensusEmployee.where(id:ENV['census_employee_id']).first
+      dot = Date.strptime(ENV['new_dot'].to_s, "%m/%d/%Y")
       if ce.nil?
         puts "No census employee was found with the given id" unless Rails.env.test?
       elsif ce.aasm_state != "employment_terminated"
