@@ -438,11 +438,6 @@ def employer_poc
       begin
         enrollment = HbxEnrollment.find(enrollment_id)
         enrollment.reinstate if enrollment.present?
-        
-        # if enrollment.kind == "individual"
-        #   Enrollments::Replicator::Individual.new(enrollment, TimeKeeper.date_of_record + 1.day).build
-        # end
-        # # enrollment.reinstate
       rescue Exception => e
         @terminated_enrollments << enrollment_id
         next
