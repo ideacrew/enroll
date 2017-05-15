@@ -16,7 +16,7 @@ module Forms
     validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
     validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
     validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :fein, :legal_name, :sic_code
+    validates_presence_of :fein, :legal_name
     validates :entity_kind,
       inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
       allow_blank: false
