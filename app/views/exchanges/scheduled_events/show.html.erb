@@ -5,8 +5,8 @@
 </p>
 
 <p>
-  <strong>Start Time:</strong>
-  <%= @time %>
+  <strong>Time:</strong>
+  <%= @time.to_datetime %>
 </p>
 
 <p>
@@ -15,3 +15,7 @@
 </p>
 
 <%= link_to 'Back', exchanges_scheduled_events_path %>
+
+<%= link_to "Delete Event", exchanges_scheduled_event_path(@scheduled_event), method: :delete %>
+
+<%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event) %>

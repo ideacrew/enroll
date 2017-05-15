@@ -9,7 +9,7 @@ class ScheduledEvent
   field :recurring_rules, type: Hash
   field :offset_rule, type: Integer, default: none
 
-  validates_presence_of :type, :event_name, :one_time, :start_time
+  validates_presence_of :type, :event_name, :one_time, :start_time, :offset_rule
 
   EVENT_TYPES = %W(holiday system_event)
   HOLIDAYS = %W(New_Year Christmas)
@@ -38,10 +38,6 @@ class ScheduledEvent
   def schedule(start)
     schedule = IceCube::Schedule.new(start)
     schedule.add_recurrence_rule(rule)
-
-    # event_exceptions.each do |exception|
-    #   schedule.add_exception_time(exception.time)
-    # end
 
     schedule
   end
