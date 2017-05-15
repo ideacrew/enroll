@@ -2,7 +2,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class ChangeCensusEmployeeDot < MongoidMigrationTask
   def migrate
     begin
-      binding.pry
       ce=CensusEmployee.where(id:ENV['census_employee_id']).first
       dot = Date.strptime(ENV['new_dot'].to_s, "%m/%d/%Y")
       if ce.nil?

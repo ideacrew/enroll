@@ -2,14 +2,14 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_census_employee_dot")
 describe ChangeCensusEmployeeDot do
   describe "given a task name" do
-    let(:given_task_name) { "change_ce_date_of_termination" }
+    let(:given_task_name) { "change_census_employee_dot" }
     subject {ChangeCensusEmployeeDot.new(given_task_name, double(:current_scope => nil)) }
       it "has the given task name" do
         expect(subject.name).to eql given_task_name
       end
     end
   describe "census employee not in terminated state" do
-    subject {ChangeCensusEmployeeDot.new("change_ce_date_of_termination", double(:current_scope => nil)) }
+    subject {ChangeCensusEmployeeDot.new("change_census_employee_dot", double(:current_scope => nil)) }
       let(:employer_profile){ FactoryGirl.create(:employer_profile) }
       let(:employer_profile_id){ employer_profile.id }
       let(:census_employee){ FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
