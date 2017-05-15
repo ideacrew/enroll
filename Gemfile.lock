@@ -297,7 +297,6 @@ GEM
       railties (>= 3.2.16)
     json (1.8.3)
     json_pure (1.8.3)
-    jstree-rails-4 (3.3.4)
     kaminari (0.16.3)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -639,7 +638,6 @@ DEPENDENCIES
   jquery-rails (= 4.0.5)
   jquery-turbolinks
   jquery-ui-rails
-  jstree-rails-4
   kaminari
   language_list (~> 1.1.0)
   less-rails-bootstrap (~> 3.3.1.0)

@@ -43,6 +43,7 @@ module SicConcern
                 }
       if last_node
         nodes.last[:text] = node_text + " - #{next_level_code}"
+        nodes.last[:sic_code] = next_level_code
         nodes.last[:selectable] = true
       else
         nodes.last[:selectable] = false
