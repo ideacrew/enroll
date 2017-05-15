@@ -10,7 +10,11 @@ class ScheduledEvent
   field :recurring_rules, type: Hash
   field :offset_rule, type: Integer, default: 0
 
+<<<<<<< HEAD
   embeds_many :event_exceptions
+=======
+  validates_presence_of :type, :event_name, :one_time, :start_time, :offset_rule
+>>>>>>> minor issues
 
   validates_presence_of :type, :event_name, :one_time, :start_time, :message => "fields type, event_name can't be empty"
 
@@ -44,9 +48,13 @@ class ScheduledEvent
   def schedule(start)
     schedule = IceCube::Schedule.new(start)
     schedule.add_recurrence_rule(rule)
+<<<<<<< HEAD
     event_exceptions.each do |exception|
       schedule.add_exception_time(exception.time)
     end
+=======
+
+>>>>>>> minor issues
     schedule
   end
 
