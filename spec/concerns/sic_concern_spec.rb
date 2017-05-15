@@ -50,20 +50,24 @@ describe SicConverter do
     expect(SicConverter.generate_sic_array).to eq([
     {
       text: "Industry",
+      selectable: false,
         nodes: [
           {
             text: "Machinery",
+            selectable: false,
             nodes: [
               {
                 text: "Manufacturing",
+                selectable: false,
                 nodes: [
-                  { text: 'Heavy Construction Machinery Manufacturing - 1010' }
+                  { text: 'Heavy Construction Machinery Manufacturing - 1010', selectable: true }
                 ]
               },
               {
                 text: "Repair",
+                selectable: false,
                 nodes: [
-                  { text: 'Heavy Construction Machinery Repair - 1055' }
+                  { text: 'Heavy Construction Machinery Repair - 1055', selectable: true }
                 ]
               }
             ]
@@ -72,13 +76,16 @@ describe SicConverter do
       },
       {
         text: "Agriculture",
+        selectable: false,
         nodes: [
           text: "Machinery",
+          selectable: false,
           nodes: [
             {
               text: 'Wheat Harvesting',
+              selectable: false,
               nodes: [
-                  { text: 'Wheat Production - 2010' }
+                  { text: 'Wheat Production - 2010', selectable: true }
                 ]
             }
           ]
@@ -86,14 +93,17 @@ describe SicConverter do
       },
       {
         text: "Services",
+        selectable: false,
         nodes: [
           {
             text: "Software",
+            selectable: false,
             nodes: [
               {
                 text: "Custom Software Development",
+                selectable: false,
                 nodes: [
-                  { text: 'Custom Software Development Consulting - 3055'}
+                  { text: 'Custom Software Development Consulting - 3055', selectable: true}
                 ]
               }
             ]

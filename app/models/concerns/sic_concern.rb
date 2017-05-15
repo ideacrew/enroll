@@ -19,6 +19,7 @@ module SicConcern
 
       nodes << {
                   text: division_sic.division_label.strip,
+                  selectable: false,
                   nodes: generate_child_nodes(1, division_code: division_code)
                 }
     end
@@ -42,7 +43,9 @@ module SicConcern
                 }
       if last_node
         nodes.last[:text] = node_text + " - #{next_level_code}"
+        nodes.last[:selectable] = true
       else
+        nodes.last[:selectable] = false
         nodes.last[:nodes] = generate_child_nodes(next_level+1, attr.merge(child_column_sym => next_level_code))   ## Generate more nodes
       end
     end
