@@ -9,10 +9,10 @@ class ChangeCensusEmployeeDot < MongoidMigrationTask
       elsif ce.aasm_state != "employment_terminated"
         ce.update_attributes(aasm_state:"employment_terminated")
         ce.update_attributes(employment_terminated_on: dot)
-        puts "Changed census employee to termination state and employment termination date to #{dot}" unless Rails.env.test?
+        puts "Changed census employee to termination state and employment new dot to #{dot}" unless Rails.env.test?
       else
         ce.update_attributes(employment_terminated_on: dot)
-        puts "Changed census employee employment termination date to #{dot}" unless Rails.env.test?
+        puts "Changed census employee employment new dot to #{dot}" unless Rails.env.test?
       end
     rescue Exception => e
       puts e.message

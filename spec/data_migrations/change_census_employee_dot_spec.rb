@@ -25,7 +25,7 @@ describe ChangeCensusEmployeeDot do
       let(:date1){TimeKeeper.date_of_record - 5.days}
       before :each do
         allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-        allow(ENV).to receive(:[]).with('date_of_terminate').and_return "01/01/2016"
+        allow(ENV).to receive(:[]).with('new_dot').and_return "01/01/2016"
         census_employee.aasm_state="employee_termination_pending"
         census_employee.save!
         subject.migrate
@@ -39,7 +39,7 @@ describe ChangeCensusEmployeeDot do
     end
 
    describe "census employee's in terminated state" do
-    subject {ChangeCensusEmployeeDot.new("termiante_census_employee", double(:current_scope => nil)) }
+    subject {ChangeCensusEmployeeDot.new("change_census_employee_dot", double(:current_scope => nil)) }
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:employer_profile_id) { employer_profile.id }
       let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id,employment_terminated_on: TimeKeeper::date_of_record - 5.days, hired_on: "2014-11-11") }
