@@ -43,8 +43,8 @@
     function assignSelectionAndCloseModal(event, data) {
 
       $('#sicHelperModal').modal('toggle');
-      $("#organization_employer_profile_attributes_sic_code").val(data.sic_code);
-      $("#organization_employer_profile_attributes_sic_code").trigger('chosen:updated');
+      $('#<%=id%>').val(data.sic_code);
+      $('#<%=id%>').trigger('chosen:updated');
     }
     var search = function(e) {
       var pattern = $('#sic_search').val();
@@ -54,9 +54,6 @@
         exactMatch: false,
         revealResults: true
       };
-      $searchableTree.treeview('collapseAll', { silent: true });
-      $searchableTree.treeview('clearSearch');
-      $searchableTree.treeview('search', [ pattern, options ]);
     }
 
     $('#sic_search').on('keyup', search);

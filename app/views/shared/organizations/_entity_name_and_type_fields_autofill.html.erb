@@ -11,14 +11,12 @@
   <%= f.select(:entity_kind, options_for_select(entity_kinds.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, { :class => 'interaction-choice-control-organization-entity-kind'} ) %>
 </div>
 <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px">
-  <%= f.select(:sic_code, grouped_options_for_select(@grouped_options, :selected_key => f.object.sic_code), { prompt: "Select Indusry Code"}, { :class => "chosen-select"} ) %>
+  <%= f.select(:sic_code, grouped_options_for_select(@grouped_options, :selected_key => f.object.sic_code), { prompt: "Select Indusry Code"}, { :class => "chosen-select" } ) %>
 </div>
 <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd" style="margin-top: 10px; padding-left: 10px;">
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#largeModal" style="padding: 0px 5px;background-color: #005fd6; border-color: #005fd6">
-    <span class="fa fa-question-circle" aria-hidden="true" style="color: #ffffff;"></span>
-  </button>
+  <a href="#" data-toggle="modal" data-target='#sicHelperModal' title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
 </div>
-<%= render "sic_help" %>
+<%= render "sic_help" , id: 'organization_sic_code' %>
 
 <script type="text/javascript">
   $(".chosen-select").chosen({
