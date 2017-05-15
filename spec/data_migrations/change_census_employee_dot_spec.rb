@@ -51,7 +51,7 @@ describe ChangeCensusEmployeeDot do
       let(:date) {TimeKeeper::date_of_record - 1.days }
       before :each do
         allow(ENV).to receive(:[]).with('census_employee_id').and_return census_employee.id
-        allow(ENV).to receive(:[]).with('date_of_terminate').and_return "01/01/2016"
+        allow(ENV).to receive(:[]).with('new_dot').and_return "01/01/2016"
         census_employee.aasm_state="employment_terminated"
         census_employee.save
         subject.migrate
