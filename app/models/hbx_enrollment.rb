@@ -504,6 +504,9 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
+  def propogate_reinstate
+  end
+
   def propogate_selection
     if is_shop?
       update_existing_shop_coverage
@@ -1001,11 +1004,11 @@ class HbxEnrollment
   end
 
   def reinstate
-      if may_reinstate_coverage?
-        self.effective_on = terminated_on + 1.day
-        self.terminated_on= nil
-        reinstate_coverage!
-      end
+    reinstate_enrollment = enrollment.is_shop? ?
+      Enrollments::Replicator::EmployerSponsored.new(enrollment, terminated_on.next_day).build :
+      Enrollments::Replicator::Individual.new(enrollment, terminated_on.next_day).build
+
+    reinstate_enrollment.reinstate_coverage! if reinstate_enrollment.may_reinstate_coverage?
   end
 
   def self.find(id)
@@ -1251,9 +1254,8 @@ class HbxEnrollment
     end
 
     event :reinstate_coverage, :after => :record_transition do
-      transitions from: :coverage_terminated, to: :coverage_reinstated 
+      transitions from: :shopping, to: :coverage_reinstated, after: :propogate_reinstate
     end
-
   end
 
   def termination_attributes_cleared?
