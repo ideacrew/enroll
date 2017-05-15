@@ -4,13 +4,14 @@ class ShopEmployerNotices::InitialEmployerInvoiceAvailable < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
+    plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })
