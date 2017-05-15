@@ -54,6 +54,9 @@
         exactMatch: false,
         revealResults: true
       };
+      $searchableTree.treeview('collapseAll', { silent: true });    
+      $searchableTree.treeview('clearSearch');    
+      $searchableTree.treeview('search', [ pattern, options ]);
     }
 
     $('#sic_search').on('keyup', search);
