@@ -29,7 +29,7 @@ class UserMailer < ApplicationMailer
     if email.present?
       mail({to: email, subject: "Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} "}) do |format|
         if census_employee.hired_on > TimeKeeper.date_of_record
-          format.html { render "invitation_email", :locals => { :census_employee => census_employee, :invitation => invitation }}
+          format.html { render "invitation_email", :locals => { :person_name => census_employee.full_name, :invitation => invitation }}
         elsif census_employee.hired_on <= TimeKeeper.date_of_record && plan_years.any?{|py| py.employees_are_matchable?}
           format.html { render "invite_initial_employee_for_open_enrollment", :locals => { :census_employee => census_employee, :invitation => invitation }}
         end
