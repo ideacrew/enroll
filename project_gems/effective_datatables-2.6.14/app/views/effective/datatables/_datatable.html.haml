@@ -1,4 +1,3 @@
-- binding.pry
 :ruby
   effective_datatable_params = {
     id: "#{datatable.to_param}-table-#{Time.zone.now.nsec}",
@@ -17,11 +16,10 @@
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }
-- binding.pry
 - effective_model = effective_datatable_params[:id].split('-table')[0].camelcase
 - effective_model_class = "Effective::Datatables::#{effective_model}"
 - effective_filter = effective_model_class.constantize.new.try(:nested_filter_definition)
-
+- binding.pry
 .container
   - if effective_filter
     = render partial: '/datatables/shared/filter', locals: {filters: effective_filter}

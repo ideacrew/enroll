@@ -111,8 +111,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def show
     @tab = params['tab']
 
-    @datatable = Effective::Datatables::EmployeeDatatable.new(@employees)
-    binding.pry
+    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id]})
 
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees

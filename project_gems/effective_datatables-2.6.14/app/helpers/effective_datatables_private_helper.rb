@@ -8,7 +8,6 @@ module EffectiveDatatablesPrivateHelper
 
   # https://datatables.net/reference/option/columns
   def datatable_columns(datatable)
-    binding.pry
     form = nil
     simple_form_for(:datatable_filter, url: '#', html: {id: "#{datatable.to_param}-form"}) { |f| form = f }
 
@@ -28,7 +27,6 @@ module EffectiveDatatablesPrivateHelper
   end
 
   def datatable_bulk_actions(datatable)
-    binding.pry
     bulk_actions_column = datatable.table_columns.find { |_, options| options[:bulk_actions_column] }.try(:second)
     return false unless bulk_actions_column
 
