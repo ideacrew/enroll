@@ -10,17 +10,13 @@ describe UpdateFamilyMembersIndex do
       expect(subject.name).to eql given_task_name
     end
   end
-  describe "case with if both primary_person and dependent is present" do
+  describe "case with if both primary_person and dependent is not present" do
     before :each do
       allow(ENV).to receive(:[]).with("primary_hbx").and_return("")
       allow(ENV).to receive(:[]).with("dependent_hbx").and_return("")
     end
 
-    it "found no person with given primary_hbx and dependent_hbx" do
-      expect{subject.migrate}.to raise_error("some error person with hbx_id: and hbx_id: not found")
-    end
-
-    describe "case with if primary_person has family" do
+    context "case with if dependent not present" do
       before :each do
         allow(ENV).to receive(:[]).with("primary_hbx").and_return("1111")
         allow(ENV).to receive(:[]).with("dependent_hbx").and_return("")
@@ -30,27 +26,7 @@ describe UpdateFamilyMembersIndex do
       end
     end
 
-    describe "case with if dependent has family" do
-      before :each do
-        allow(ENV).to receive(:[]).with("primary_hbx").and_return("")
-        allow(ENV).to receive(:[]).with("dependent_hbx").and_return("1112")
-      end
-      it "found no family with given primary_hbx" do
-        expect{subject.migrate}.to raise_error("some error person with hbx_id: and hbx_id:1112 not found")
-      end
-    end
-
-    describe "case with if primary_person has person_relationships" do
-      before :each do
-        allow(ENV).to receive(:[]).with("primary_hbx").and_return("1111")
-        allow(ENV).to receive(:[]).with("dependent_hbx").and_return("")
-      end
-      it "found no family with given dependent_hbx" do
-        expect{subject.migrate}.to raise_error("some error person with hbx_id:1111 and hbx_id: not found")
-      end
-    end
-
-    describe "case with if dependent has family" do
+    context "case with if primary_person not present" do
       before :each do
         allow(ENV).to receive(:[]).with("primary_hbx").and_return("")
         allow(ENV).to receive(:[]).with("dependent_hbx").and_return("1112")
