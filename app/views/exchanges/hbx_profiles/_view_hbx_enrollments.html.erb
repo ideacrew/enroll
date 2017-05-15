@@ -1,6 +1,6 @@
 <br/>
 <div class="row">
-  <div class = "col-md-10 table-responsive" id="terminated_enrollemnts">
+  <div class = "col-sm-11 table-responsive" id="terminated_enrollemnts">
     <h3 class='title'></h3>
     <%= form_tag reinstate_hbx_enrollments_exchanges_hbx_profiles_path, method: :post, remote: true do %>
       <% if @enrollments.present? %>
@@ -9,6 +9,7 @@
             <tr>
               <th></th>
               <th>Medical/Dental <br/> Plans</th>
+              <th>Market</th>
               <th>Coverage <br/> Year</th>
               <th>Effective <br/> Date</th>
               <th>Termination <br/> Date</th>
@@ -23,6 +24,7 @@
             <tr>
               <td> <%= check_box_tag("enrollment_ids[]", enrollment.id, nil) %> </td>
               <td id="name"><%= enrollment.plan.name %> </td>
+              <td><%= enrollment.kind.camelcase %></td>
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
@@ -38,11 +40,8 @@
       <%end%>
       <%= submit_tag "Submit", class: 'btn btn-primary', data: {toggle: "modal", target: "#reinstate_confirm"} %>
     <%end%>
-
   </div>
-
 </div>
-
 
 <!-- modal -->
 <div class="modal fade" id="reinstate_confirm" tabindex="-1" role="dialog" aria-labelledby="brokerConfirm" role="document">
@@ -62,21 +61,45 @@
         <p style="display:inline;font-size:15px;">
           <%= @person.first_name %>
         </p>
-
       </div>
 
-      <div id="test"></div>
-      <div id="test1"></div>
-      <div id="reinstate1"></div>
-
-      <div style="margin-left:20px;">
-        <div>comments:</div>
-        <textarea rows="4" cols="75"> </textarea>
-      </div>
-
-      <div class="modal-footer" style="margin-right:190px">
-        <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-        <%= link_to "Confirm", reinstate_hbx_enrollments_exchanges_hbx_profiles_path(person_id: @person.id), class: 'btn btn-primary  mtz' %>
+      <div class="modal-body">
+        <div class="row" style="font-size: 15px;">
+          <div>
+            <label for="planName" class="col-sm-3 control-label">Plan Name</label>
+            <div class="col-sm-9">
+              <div id="reinstate-plan-name"></div>
+           </div>
+          </div>
+          <div>
+            <label for="dcHealthLinkId" class="col-sm-3 control-label">DC HealthLink Id</label>
+            <div class="col-sm-9">
+               <div id="reinstate-hbx-id"></div>
+           </div>
+          </div>
+          <div>
+            <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
+            <div class="col-sm-9">
+               <div id="reinstate-date"></div>
+          </div>
+          </div> 
+         <div>
+            <label for="comments" class="col-sm-3 control-label">Comments</label>
+            <div class="col-sm-9">
+               <textarea class="form-control" rows="3"></textarea>
+           </div>
+          </div>
+          <div>
+            <label class="col-sm-3 control-label"></label>
+            <div class="col-sm-9"></div>
+          </div>
+          <div>
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
+              <%= link_to "Confirm", reinstate_hbx_enrollments_exchanges_hbx_profiles_path(person_id: @person.id), class: 'btn btn-primary  mtz' %>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -85,9 +108,9 @@
 <script type="text/javascript">
   $("div#reinstate_confirm").on('shown.bs.modal', function(event){
     $('#terminated_enrollemnts :checkbox:checked').each(function (){
-     $('#test').html($(this).closest('tr').find("td#name").text()).css({"margin-left":"30px","font-size": "15px"});
-     $('#test1').html($(this).closest('tr').find("td#name1").text()).css({"margin-left":"30px","font-size":"15px"});
-     $('#reinstate1').html($(this).closest('tr').find("td#reinstate").text()).css({"margin-left":"30px","font-size":"15px"});
+     $('#reinstate-plan-name').html($(this).closest('tr').find("td#name").text());
+     $('#reinstate-hbx-id').html($(this).closest('tr').find("td#name1").text());
+     $('#reinstate-date').html($(this).closest('tr').find("td#reinstate").text());
      });
   });
 </script>
