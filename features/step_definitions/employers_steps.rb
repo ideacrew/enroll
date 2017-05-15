@@ -450,6 +450,7 @@ end
 
 Given /^the employer has broker agency profile$/ do
   employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.save!
 end
 
 When /^they visit the Employer Home page$/ do
