@@ -1008,6 +1008,11 @@ class HbxEnrollment
       Enrollments::Replicator::EmployerSponsored.new(enrollment, terminated_on.next_day).build :
       Enrollments::Replicator::Individual.new(enrollment, terminated_on.next_day).build
 
+    if enrollment.is_shop?
+      census_employee = enrollment.benefit_group_assignment.census_employee
+      census_employee.reinstate_employment if census_employee.is_inactive?  
+    end
+
     reinstate_enrollment.reinstate_coverage! if reinstate_enrollment.may_reinstate_coverage?
   end
 

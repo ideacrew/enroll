@@ -383,6 +383,13 @@ class CensusEmployee < CensusMember
     email.address
   end
 
+  def reinstate_employment
+    if self.may_reinstate_eligibility?
+      self.update_attributes({:employment_terminated_on => nil, :coverage_terminated_on => nil})
+      reinstate_eligibility!
+    end
+  end
+
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)
