@@ -116,17 +116,14 @@ class Employers::CensusEmployeesController < ApplicationController
     authorize EmployerProfile, :updateable?
     status = params[:status]
     termination_date = params["termination_date"]
+
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
-    else
-      termination_date = ""
+      if termination_date >= (TimeKeeper.date_of_record - 60.days)
+        @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
+      end
     end
-    last_day_of_work = termination_date
-    if termination_date.present? && termination_date >= (TimeKeeper.date_of_record - 60.days)
-      @fa = @census_employee.terminate_employment(last_day_of_work) && @census_employee.save
 
-    else
-    end
     respond_to do |format|
       format.js {
         if termination_date.present? && @fa

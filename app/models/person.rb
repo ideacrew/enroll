@@ -211,6 +211,10 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  def active_general_agency_staff_roles
+    general_agency_staff_roles.select(&:active?)
+  end
+
   def contact_addresses
     existing_addresses = addresses.to_a
     home_address = existing_addresses.detect { |addy| addy.kind == "home" }
@@ -273,17 +277,6 @@ class Person
     user.identity_verified?
   end
 
-  def consumer_fields_validations
-    if self.is_consumer_role.to_s == "true"
-      if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-        self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
-      elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
-        self.errors.add(:base, "Tribal id must be 9 digits")
-      end
-    end
-  end
-
-
   #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
@@ -318,6 +311,7 @@ class Person
       unset_sparse("user_id")
     end
   end
+
   def ssn_changed?
     encrypted_ssn_changed?
   end
@@ -365,8 +359,13 @@ class Person
     self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
   end
 
+  # Get the {Family} where this {Person} is the primary family member
+  #
+  # family itegrity ensures only one active family can be the primary for a person
+  #
+  # @return [ Family ] the family member who matches this person
   def primary_family
-    @primary_family ||= Family.find_by_primary_applicant(self)
+    @primary_family ||= Family.find_primary_applicant_by_person(self).first
   end
 
   def families
@@ -709,8 +708,11 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
-      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+      self.where(:employer_staff_roles => {
+          '$elemMatch' => {
+              employer_profile_id: employer_profile.id,
+              aasm_state: :is_active}
+          }).to_a
     end
 
     def staff_for_employer_including_pending(employer_profile)
@@ -828,7 +830,7 @@ class Person
     elsif (!eligible_immigration_status.nil?)
       self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
-      self.citizen_status = nil
+      self.errors.add(:base, "Citizenship status can't be nil.")
     end
   end
 
@@ -864,17 +866,9 @@ class Person
     ::MapReduce::FamilySearchForPerson.populate_for(self)
   end
 
-  def set_consumer_role_url
-    if consumer_role.present? && user.present?
-      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
-        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
-      end
-    end
-  end
-
-  def check_for_ridp(session_var)
+  def set_ridp_for_paper_application(session_var)
     if user && session_var == 'paper'
-      user.update_attributes(identity_final_decision_code: User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE)
+      user.ridp_by_paper_application
     end
   end
 
@@ -946,5 +940,36 @@ class Person
       errors.add(:date_of_death, "date of death cannot preceed date of birth")
       errors.add(:dob, "date of birth cannot follow date of death")
     end
+  end
+
+  def consumer_fields_validations
+    if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+      citizenship_validation
+      native_american_validation
+      incarceration_validation
+    end
+  end
+
+  def native_american_validation
+    self.errors.add(:base, "American Indian / Alaskan Native status is required.") if indian_tribe_member.to_s.blank?
+    if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+    elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
+      self.errors.add(:base, "Tribal id must be 9 digits")
+    end
+  end
+
+  def citizenship_validation
+    if @us_citizen.to_s.blank?
+      self.errors.add(:base, "Citizenship status is required.")
+    elsif @us_citizen == false && @eligible_immigration_status.nil?
+      self.errors.add(:base, "Eligible immigration status is required.")
+    elsif @us_citizen == true && @naturalized_citizen.nil?
+      self.errors.add(:base, "Naturalized citizen is required.")
+    end
+  end
+
+  def incarceration_validation
+    self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end

@@ -45,7 +45,10 @@
 //= require freebies
 //= require responsive
 //= require effective_datatables
+//= require jquery.steps
 //= require_tree .
+
+var disableSelectric = false;
 
 $(document).on('ready page:load', function () {
   Freebies.fadeElement($("body"));
@@ -754,8 +757,8 @@ $(document).on('click', '#address_info + span.form-action', function(){
   //toggling of divs that show APTC Enrollments
   $('.nav-toggle').click(function(){
     //get collapse content selector
-    var collapse_content_selector = $(this).attr('href');         
-        
+    var collapse_content_selector = $(this).attr('href');
+
     //make the collapse content to be shown or hide
     var toggle_switch = $(this);
     $(collapse_content_selector).slideToggle('fast', function(){
