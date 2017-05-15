@@ -12,7 +12,7 @@
   <div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to learn more about your benefits and sign up for insurance during open enrollment.</div>
   <br>
   <div>
-    You are now able to plan shop for insurance that will start on <%= census_employee.coverage_effective_on.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>. 
+    You are now able to plan shop for insurance that will start on <%= census_employee.coverage_effective_on.to_formatted_s %> as part of your new hire open enrollment period. To enroll into employer-sponsored insurance through <%= Settings.site.short_name %>, you must complete your application by <%= census_employee.new_hire_enrollment_period.last.to_date.to_formatted_s %>.
     <br/>
     <br/>
     <b> What is New Hire Open Enrollment? </b>
@@ -59,7 +59,7 @@
       <li>Online at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a>.</li>
     </ul>
     <% broker = census_employee.employer_profile.broker_agency_profile%>
-    <% location = broker.organization.primary_office_location %>
+    <% location = broker.organization.primary_office_location if broker.present? %>
     <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
       <table style="width: 100%">
         <tr>
