@@ -107,8 +107,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{plan.hios_id}']", text: "View Details")
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the plan start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -157,14 +157,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the Plan Start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match /effective date/i
+      expect(rendered).to match /plan start/i
     end
 
     it "should display market" do
@@ -173,6 +173,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
+    end
+    
+    it "should not show a Plan End if cobra" do
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      expect(rendered).not_to match /plan ending/i 
     end
   end
 
