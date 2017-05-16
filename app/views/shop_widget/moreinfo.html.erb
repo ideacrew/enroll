@@ -1,0 +1,381 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SHOP Dashboard</title>
+
+  <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css" href="dashStyle.css">
+
+
+</head>
+<body>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+
+<div class="module">
+<div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
+
+<ul class="nav nav-pills">
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/covered" >IVL Covered Lives</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" >IVL Policies</a></li>
+  <li class="active"><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
+</ul>
+<h6>Employees by Employer Size and Start Month</h6>
+
+ <div id="container" style="min-width: 310px; height: 240px; margin: 0 auto"></div>
+
+<table class="table table-hover table-condensed">   
+    <thead>
+      <tr>
+        <th class="texLef"></th>
+        <th>Jun16</th>
+        <th>Jul16</th>
+        <th>Aug16</th>
+        <th>Sep16</th>
+        <th>Oct16</th>
+        <th>Nov16</th>
+        <th>Dec16</th>
+        <th>Jan17</th>
+        <th>Feb17</th>
+        <th>Mar17</th>
+        <th>Apr16</th>
+        <th>May16</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">1-9 EEs</td>
+        <td>59</td>
+        <td>213</td>
+        <td>213</td>
+        <td>235</td>
+        <td>240</td>
+        <td>220</td>
+        <td>764</td>
+        <td>295</td>
+        <td>220</td>
+        <td>250</td>
+        <td>201</td>
+        <td>217</td>
+      </tr>
+      <tr>
+        <td class="texLef">10-24 EEs</td>
+        <td>17</td>
+        <td>67</td>
+        <td>61</td>
+        <td>68</td>
+        <td>71</td>
+        <td>80</td>
+        <td>326</td>
+        <td>76</td>
+        <td>40</td>
+        <td>46</td>
+        <td>39</td>
+        <td>33</td>
+      </tr>
+      <tr>
+        <td class="texLef">25-50 EEs</td>
+        <td>1</td>
+        <td>18</td>
+        <td>11</td>
+        <td>23</td>
+        <td>17</td>
+        <td>30</td>
+        <td>151</td>
+        <td>24</td>
+        <td>8</td>
+        <td>8</td>
+        <td>10</td>
+        <td>9</td>
+      </tr>
+      <tr>
+        <td class="texLef">51-100 EEs</td>
+        <td>1</td>
+        <td>18</td>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>3</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      </tr>
+      
+    </tbody>
+    </table>
+
+    <div class="row row-content">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="box-shadow: 0px 0px 5px gray;">
+
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
+    
+    <thead>
+      <tr>
+        <th class="texLef">Summary</th>
+        <th>1-9 EE</th>
+        <th>10-24 EE</th>
+        <th>25-50 EE</th>
+        <th>51-100 EE</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Covered Lives</td>
+        <td>20,440</td>
+        <td>21,470</td>
+        <td>15,755</td>
+        <td>280</td>
+        <td>57,945</td>
+      </tr>
+      <tr>
+        <td class="texLef">Employers</td>
+        <td>3,127</td>
+        <td>924</td>
+        <td>310</td>
+        <td>4</td>
+        <td>4,365</td>
+      </tr>
+      <tr>
+        <td class="texLef">Lives/Employer</td>
+        <td>6.4</td>
+        <td>23.24</td>
+        <td>50.82</td>
+        <td>70</td>
+        <td>13.27</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    <thead>
+      <tr>
+        <th class="texLef">Choice</th>
+        <th>1-9 EE</th>
+        <th>10-24 EE</th>
+        <th>25-50 EE</th>
+        <th>51-100 EE</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">1-Plan</td>
+        <td>1,539</td>
+        <td>351</td>
+        <td>111</td>
+        <td>1</td>
+        <td>2,002</td>
+      </tr>
+      <tr>
+        <td class="texLef">1-Metal</td>
+        <td>216</td>
+        <td>58</td>
+        <td>8</td>
+        <td>1</td>
+        <td>283</td>
+      </tr>
+      <tr>
+        <td class="texLef">1-Carrier</td>
+        <td>1,372</td>
+        <td>515</td>
+        <td>191</td>
+        <td>2</td>
+        <td>2,080</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td>3,127</td>
+        <td>924</td>
+        <td>310</td>
+        <td>4</td>
+        <td>4,365</td>
+      </tr>
+    </tbody>
+
+    
+</table>
+</div>
+
+<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="box-shadow: 0px 0px 5px gray;">
+<table class="table table-hover table-condensed" style="margin-top: 10px;">
+
+
+<thead>
+      <tr>
+        <th class="texLef">Broker</th>
+        <th>1-9 EE</th>
+        <th>10-24 EE</th>
+        <th>25-50 EE</th>
+        <th>51-100 EE</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Yes</td>
+        <td>2,759</td>
+        <td>892</td>
+        <td>303</td>
+        <td>4</td>
+        <td>3,958</td>
+      </tr>
+      <tr>
+        <td class="texLef">No</td>
+        <td>368</td>
+        <td>32</td>
+        <td>7</td>
+        <td>0</td>
+        <td>407</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td>3,127</td>
+        <td>924</td>
+        <td>310</td>
+        <td>4</td>
+        <td>4,365</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+
+    <thead>
+      <tr>
+        <th class="texLef">Status</th>
+        <th>1-9 EE</th>
+        <th>10-24 EE</th>
+        <th>25-50 EE</th>
+        <th>51-100 EE</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="texLef">Year 1</td>
+        <td>2,478</td>
+        <td>797</td>
+        <td>270</td>
+        <td>4</td>
+        <td>3,549</td>
+      </tr>
+      <tr>
+        <td class="texLef">Renewal Year</td>
+        <td>649</td>
+        <td>127</td>
+        <td>40</td>
+        <td>0</td>
+        <td>816</td>
+      </tr>
+      <tr>
+        <td class="texLef">Total</td>
+        <td>3,127</td>
+        <td>924</td>
+        <td>310</td>
+        <td>4</td>
+        <td>4,365</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+
+    </table>
+    </div>
+
+  </div>
+  </div>
+
+    <script type="text/javascript">
+
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: ''
+    },
+    xAxis: {
+        categories: [
+            'Jun16',
+            'Jul16',
+            'Aug16',
+            'Sep16',
+            'Oct16',
+            'Nov16',
+            'Dec16',
+            'Jan17',
+            'Feb17',
+            'Mar17',
+            'Apr17',
+            'May17'
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Employees'
+        }
+    },
+    credits: {
+            enabled: false
+        },
+    exporting: {
+            enabled: false
+        },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f} </b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: '1-9 EEs',
+        data: [59, 213, 213, 235, 240, 220, 764, 295, 220, 250, 201, 217]
+
+    }, {
+        name: '10-24 EEs',
+        data: [17, 67, 61, 68, 71, 80, 326, 76, 40, 46, 39, 33]
+
+    }, {
+        name: '25-50 EEs',
+        data: [48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 76, 40, 46, 39, 33]
+
+    }, {
+        name: '51-100 EEs',
+        data: [0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 0]
+
+    }]
+});
+    </script>
+
+  </body>
+</html>
+
