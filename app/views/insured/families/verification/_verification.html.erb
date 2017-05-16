@@ -63,14 +63,16 @@
                         <div class="col-md-6">
                           Provide verification reason:
                         </div>
-                        <div class="form-group col-md-3">
-                          <!--***  Verification update reasons -->
-                          <%= select_tag :verify_type, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: 'Reason'} %>
-                          <!--===  verification update reasons  -->
-                        </div>
-                        <div class="col-md-3">
-                          <%= link_to "Confirm", "#", class:"btn btn-default v-type-confirm-button", id:"confirm-#{person.id}-#{v_type}" %>
-                        </div>
+                        <%= form_tag update_verification_type_documents_path, method: :put do %>
+                          <%= hidden_field_tag 'person_id', person.id  %>
+                          <%= hidden_field_tag 'verification_type', v_type%>
+                          <div class="form-group col-md-3">
+                            <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+                          </div>
+                          <div class="col-md-3">
+                            <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+                          </div>
+                        <%end%>
                       </div>
                     </div>
                 <% end %>

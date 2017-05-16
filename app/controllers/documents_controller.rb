@@ -33,12 +33,13 @@ class DocumentsController < ApplicationController
   def update_verification_type
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
-    verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
     respond_to do |format|
-      if verification_result.is_a? String
-        format.html { redirect_to :back, :flash => { :success => verification_result} }
+      if VlpDocument::VERIFICATION_REASONS.include? (update_reason)
+        verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
+        message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+        format.html { redirect_to :back, :flash => { :success => message} }
       else
-        format.html { redirect_to :back, :flash => { :success => "Person verification successfully approved."} }
+        format.html { redirect_to :back, :flash => { :error => "Please provide a verification reason."} }
       end
     end
   end
