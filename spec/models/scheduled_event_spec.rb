@@ -10,5 +10,6 @@ RSpec.describe ScheduledEvent, type: :model do
   it { is_expected.to validate_presence_of :type }
   it { is_expected.to validate_presence_of :event_name }
   it { is_expected.to validate_presence_of :one_time }
-  it { is_expected.to validate_presence_of :start_date }
+  it { is_expected.to validate_presence_of :start_time }
+  it { is_expected.to validate_presence_of :offset_rule }
 end

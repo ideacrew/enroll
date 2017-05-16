@@ -10,7 +10,10 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     params.permit!
     @scheduled_event = ScheduledEvent.new(scheduled_event_params)
     if @scheduled_event.save
-      @scheduled_event.update_attributes!(one_time: true) if @scheduled_event.recurring_rules.present?
+      @scheduled_event.update_attributes!(one_time: false) if @scheduled_event.recurring_rules.present?
+      redirect_to exchanges_scheduled_events_path
+    else
+      flash[:error] = "Failed to create Scheduled Event"
       redirect_to exchanges_scheduled_events_path
     end
   end

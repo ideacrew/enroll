@@ -1,5 +1,5 @@
 <ul>
-  <% if scheduled_events.exists? %>
+  <% if scheduled_events.present? %>
     <% scheduled_events.each do |event| %>
        <li>
          <%= link_to event.event_name, edit_exchanges_scheduled_event_path(id: event.id), class: 'btn btn-normal'%>

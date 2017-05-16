@@ -5,15 +5,15 @@ class ScheduledEvent
   field :type, type: String
   field :event_name, type: String
   field :start_time, type: Date
-  field :one_time, type: Boolean, default: false
+  field :one_time, type: Boolean, default: true
   field :recurring_rules, type: Hash
   field :offset_rule, type: Integer, default: none
 
   validates_presence_of :type, :event_name, :one_time, :start_time, :offset_rule
 
   EVENT_TYPES = %W(holiday system_event)
-  HOLIDAYS = %W(New_Year Christmas)
-  SYSTEMS_EVENTS = %W(Binder_Payment_due_Date Publish_Due_Date_Of_Month)
+  HOLIDAYS = %W(New_Year MartinLuthor_bday washingtons_day memorial_day independence_day Labour_day columbus_day veterans_day Christmas Thanksgiving_day)
+  SYSTEMS_EVENTS = %W(Binder_Payment_due_Date Publish_Due_Date_Of_Month )
 
   def recurring_rules=(value)
     if RecurringSelect.is_valid_rule?(value)

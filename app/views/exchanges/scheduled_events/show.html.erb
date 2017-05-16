@@ -1,12 +1,18 @@
 <h1>Events</h1>
+
 <p>
-  <strong>Name:</strong>
+  <strong>Event Type:</strong>
+  <%= @scheduled_event.type %>
+</p>
+
+<p>
+  <strong>Event Name:</strong>
   <%= @scheduled_event.event_name %>
 </p>
 
 <p>
   <strong>Time:</strong>
-  <%= @time.to_datetime %>
+  <%= @time %>
 </p>
 
 <p>
@@ -14,8 +20,5 @@
   <%= @scheduled_event.recurring_rules %>
 </p>
 
-<%= link_to 'Back', exchanges_scheduled_events_path %>
-
-<%= link_to "Delete Event", exchanges_scheduled_event_path(@scheduled_event), method: :delete %>
-
-<%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event) %>
+<%= link_to 'Back', exchanges_scheduled_events_path, class: "btn btn-default" %>
+<%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event), class: "btn btn-default" %>
