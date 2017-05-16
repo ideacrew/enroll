@@ -11,7 +11,8 @@ class HbxEnrollment
   extend Acapi::Notifiers
 
   embedded_in :household
-
+  embeds_many :comments, as: :commentable, cascade_callbacks: true
+  
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
@@ -1071,7 +1072,15 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
+  def reinstated_enrollment_exists?
+    family.active_household.hbx_enrollments.where({:kind => self.kind, 
+      :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day, 
+      :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
+  end
+
   def reinstate
+    return if reinstated_enrollment_exists?
+
     reinstate_enrollment = self.is_shop? ?
       Enrollments::Replicator::EmployerSponsored.new(self, terminated_on.next_day).build :
       Enrollments::Replicator::Individual.new(self, terminated_on.next_day).build
@@ -1085,6 +1094,8 @@ class HbxEnrollment
       reinstate_enrollment.reinstate_coverage!
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
     end
+
+    reinstate_enrollment
   end
 
   def self.find(id)
