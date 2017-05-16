@@ -13,7 +13,7 @@
               <th>Coverage <br/> Year</th>
               <th>Effective <br/> Date</th>
               <th>Termination <br/> Date</th>
-              <th>Reinstate<br/> Date</th>
+              <th>Reinstate Effective<br/> Date</th>
               <th>Transmit <br /> Carrier EDI?</th>
               <th>DC Health<br/> Link ID</th>
               <th></th>
@@ -28,7 +28,7 @@
               <td><%= enrollment.effective_on.year %></td>
               <td><%= enrollment.effective_on %></td>
               <td><%= enrollment.terminated_on %></td>
-              <td id="reinstate"><%= Date.today %></td>
+              <td id="reinstate"><%= enrollment.terminated_on.next_day %></td>
               <td>
                 <input type="checkbox" name="myTextEditBox" value="checked" />
               </td>
@@ -72,17 +72,11 @@
            </div>
           </div>
           <div>
-            <label for="dcHealthLinkId" class="col-sm-3 control-label">DC HealthLink Id</label>
-            <div class="col-sm-9">
-               <div id="reinstate-hbx-id"></div>
-           </div>
-          </div>
-          <div>
             <label for="effectiveDate" class="col-sm-3 control-label">Effective date</label>
             <div class="col-sm-9">
-               <div id="reinstate-date"></div>
+               <div id="effective-date"></div>
           </div>
-          </div> 
+          </div>
          <div>
             <label for="comments" class="col-sm-3 control-label">Comments</label>
             <div class="col-sm-9">
@@ -109,8 +103,7 @@
   $("div#reinstate_confirm").on('shown.bs.modal', function(event){
     $('#terminated_enrollemnts :checkbox:checked').each(function (){
      $('#reinstate-plan-name').html($(this).closest('tr').find("td#name").text());
-     $('#reinstate-hbx-id').html($(this).closest('tr').find("td#name1").text());
-     $('#reinstate-date').html($(this).closest('tr').find("td#reinstate").text());
+     $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
      });
   });
 </script>
