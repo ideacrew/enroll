@@ -11,6 +11,7 @@ module Importers
 "City",
 "State",
 "Zip",
+"County",
 "Mailing Address 1",
 "Mailing Address 2",
 "City",
@@ -55,6 +56,7 @@ module Importers
       [
       :action,
       :fein,
+      :ignore,
       :ignore,
       :ignore,
       :ignore,
