@@ -11,6 +11,7 @@ describe EmployerProfile, dbclean: :after_each do
                                 address_1: "609 H St",
                                 city: "Washington",
                                 state: Settings.aca.state_abbreviation,
+                                county: "ACounty",
                                 zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }

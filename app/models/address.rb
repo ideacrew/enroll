@@ -15,6 +15,7 @@ class Address
   field :address_3, type: String, default: ""
   field :city, type: String
   field :county, type: String, default: ""
+  field :country_name, type: String, default: ""
   field :state, type: String
   field :location_state_code, type: String
   field :zip, type: String
