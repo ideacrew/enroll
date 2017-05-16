@@ -1396,8 +1396,6 @@ end
 context "Terminated enrollment re-instatement" do
   let(:current_date) { Date.new(TimeKeeper.date_of_record.year, 6, 1) }
   let(:effective_on_date)         { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
-  let(:benefit_group)             { FactoryGirl.create(:benefit_group) }
-  let!(:hbx_profile)              { FactoryGirl.create(:hbx_profile) }
   let(:terminated_on_date)        {effective_on_date + 10.days}
 
   before do

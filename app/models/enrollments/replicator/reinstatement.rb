@@ -35,11 +35,10 @@ module Enrollments
 
       def clone_hbx_enrollment_members
         base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
-          member_start_on = hbx_enrollment_member.coverage_start_on || base_enrollment.effective_on 
           members << HbxEnrollmentMember.new({
             applicant_id: hbx_enrollment_member.applicant_id,
             eligibility_date: new_effective_date,
-            coverage_start_on:  member_start_on || new_effective_date,
+            coverage_start_on: hbx_enrollment_member.coverage_start_on || base_enrollment.effective_on || new_effective_date,
             is_subscriber: hbx_enrollment_member.is_subscriber
           })
         end
