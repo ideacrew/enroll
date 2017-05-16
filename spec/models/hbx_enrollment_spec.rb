@@ -2424,6 +2424,48 @@ describe HbxEnrollment, 'state machine' do
   end
 end
 
+describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
+
+  context 'When employee is designated as cobra' do
+
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:cobra_begin_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
+    let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
+    let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
+    
+    before do
+      allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
+    end
+
+    context 'When Enrollment Effectve date is prior to cobra begin date' do
+      it 'should reset enrollment effective date to cobra begin date' do
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+        expect(hbx_enrollment.effective_on).to eq cobra_begin_date
+      end
+    end
+
+    context 'When Enrollment Effectve date is after cobra begin date' do
+      let(:cobra_begin_date) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
+
+      it 'should not update enrollment effective date' do
+        hbx_enrollment.validate_for_cobra_eligiblity(employee_role)
+        expect(hbx_enrollment.kind).to eq 'employer_sponsored_cobra'
+        expect(hbx_enrollment.effective_on).to eq effective_on
+      end
+    end
+
+    context 'When employee not elgibile for cobra' do
+      let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
+
+      it 'should raise error' do 
+        expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
+      end
+    end
+  end
+end
+
 describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all do
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active')}
   let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
@@ -2498,6 +2540,63 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
     it "should build premiums" do
       plan = enrollment.build_plan_premium(qhp_plan: plan)
       expect(plan).to be_kind_of(UnassistedPlanCostDecorator)
+    end
+  end
+end
+
+describe HbxEnrollment, dbclean: :after_all do
+  include_context "BradyWorkAfterAll"
+
+  before :all do
+    create_brady_census_families
+  end
+
+  context "Cancel / Terminate Previous Enrollments for Shop" do
+    let(:household) {mikes_family.households.first}
+    let(:coverage_household) {household.coverage_households.first}
+    let(:family) {FactoryGirl.build(:family)}
+
+    before :each do
+      allow(coverage_household).to receive(:household).and_return household
+      allow(household).to receive(:family).and_return family
+      @enrollment1 = household.create_hbx_enrollment_from(employee_role: mikes_employee_role, coverage_household: coverage_household, benefit_group: mikes_benefit_group, benefit_group_assignment: @mikes_benefit_group_assignments)
+      @enrollment1.aasm_state = "coverage_selected"
+      @enrollment1.save
+      @enrollment2 = household.create_hbx_enrollment_from(employee_role: mikes_employee_role, coverage_household: coverage_household, benefit_group: mikes_benefit_group, benefit_group_assignment: @mikes_benefit_group_assignments)
+      @enrollment2.save
+    end
+
+    it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
+      @enrollment2.update_existing_shop_coverage
+      expect(@enrollment1.aasm_state).to eq "coverage_canceled"
+    end
+  end
+
+  context "Cancel / Terminate Previous Enrollments for IVL" do
+    attr_reader :enrollment, :household, :coverage_household
+
+    let(:consumer_role) {FactoryGirl.create(:consumer_role)}
+    let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+    let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+    let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:family) {FactoryGirl.build(:family)}
+
+    before :each do
+      @household = mikes_family.households.first
+      @coverage_household = household.coverage_households.first
+      allow(benefit_coverage_period).to receive(:earliest_effective_date).and_return TimeKeeper.date_of_record
+      allow(coverage_household).to receive(:household).and_return household
+      allow(household).to receive(:family).and_return family
+      allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+      @enrollment1 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
+      @enrollment1.update_current( aasm_state: "coverage_selected", enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month                        )
+      @enrollment2 = household.create_hbx_enrollment_from(consumer_role: consumer_role, coverage_household: coverage_household, benefit_package: benefit_package)
+      @enrollment2.update_current(enrollment_signature: "somerandomthing!", effective_on: TimeKeeper.date_of_record.beginning_of_month)
+    end
+
+    it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
+      @enrollment2.cancel_previous(TimeKeeper.date_of_record.year)
+      expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
 end

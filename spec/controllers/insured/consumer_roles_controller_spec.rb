@@ -219,9 +219,18 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
+    end
+
+    it "should redirect to family members path when current user is admin & doing new paper app" do
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return true
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
     it "should not update the person" do
@@ -348,8 +357,6 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     let(:found_person){ [] }
     let(:resident_role){ FactoryGirl.build(:resident_role) }
 
-    #let(:person){ instance_double("Person") }
-
     before(:each) do
       allow(user).to receive(:idp_verified?).and_return false
       sign_in(user)
@@ -376,6 +383,17 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       it "should navigate to family account page" do
         allow(person).to receive(:resident_role).and_return(resident_role)
         post :match, :person => resident_parameters
+        expect(user.person.resident_role).not_to be_nil
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
+    context "with both resident and consumer roles" do
+      it "should navigate to family account page" do
+        allow(person).to receive(:consumer_role).and_return(consumer_role)
+        allow(person).to receive(:resident_role).and_return(resident_role)
+        post :match, :person => resident_parameters
+        expect(user.person.consumer_role).not_to be_nil
         expect(user.person.resident_role).not_to be_nil
         expect(response).to redirect_to(family_account_path)
       end

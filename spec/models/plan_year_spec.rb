@@ -575,7 +575,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Primary office must be located/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Has its principal business address in/)
         end
       end
 
@@ -591,7 +591,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -2050,12 +2050,14 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "this should trigger a state transition" do
       it "should change its aasm state" do
+        workflow_plan_year_with_benefit_group.update(is_conversion: true)
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "active"
         workflow_plan_year_with_benefit_group.conversion_expire!
         expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "conversion_expired"
       end
 
       it "should not change its aasm state" do
+        workflow_plan_year_with_benefit_group.update(is_conversion: true)
         workflow_plan_year_with_benefit_group.aasm_state = "enrolled"
         workflow_plan_year_with_benefit_group.save
         expect { workflow_plan_year_with_benefit_group.conversion_expire!}.to raise_error(AASM::InvalidTransition)

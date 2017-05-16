@@ -708,8 +708,11 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
-      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+      self.where(:employer_staff_roles => {
+          '$elemMatch' => {
+              employer_profile_id: employer_profile.id,
+              aasm_state: :is_active}
+          }).to_a
     end
 
     def staff_for_employer_including_pending(employer_profile)
@@ -863,15 +866,7 @@ class Person
     ::MapReduce::FamilySearchForPerson.populate_for(self)
   end
 
-  def set_consumer_role_url
-    if consumer_role.present? && user.present?
-      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
-        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
-      end
-    end
-  end
-
-  def check_for_paper_application(session_var)
+  def set_ridp_for_paper_application(session_var)
     if user && session_var == 'paper'
       user.ridp_by_paper_application
     end
