@@ -11,6 +11,7 @@ describe DelinkBroker do
     # @broker_agency_id = broker_agency.id
     allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     allow(ENV).to receive(:[]).with("legal_name").and_return("legal_name")
+    allow(ENV).to receive(:[]).with("fein").and_return("fein")
   end
 
   it "Should update the person broker_role id with with new broker_agency" do
