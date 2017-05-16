@@ -13,13 +13,13 @@ describe UpdateAptcDentalEnr do
   end
 
   describe "updating the applied aptc amount for a Dental Plan" do
-    let(:person) { FactoryGirl.create(:person, :with_family, hbx_id: "1234567890") }
+    let(:person) { FactoryGirl.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "dental", applied_aptc_amount: 100.00, hbx_id: "0987654321", household: family.active_household)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "dental", applied_aptc_amount: 100.00, household: family.active_household)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return("1234567890")
-      allow(ENV).to receive(:[]).with("enr_hbx_id").and_return("0987654321")
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id.to_s)
+      allow(ENV).to receive(:[]).with("enr_hbx_id").and_return(hbx_enrollment.hbx_id.to_s)
     end
 
     it "should update aptc amount only for dental plan" do
@@ -32,13 +32,13 @@ describe UpdateAptcDentalEnr do
   end
 
   describe "should not update for a Health Plan" do
-    let(:person) { FactoryGirl.create(:person, :with_family, hbx_id: "1234567000") }
+    let(:person) { FactoryGirl.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "health", applied_aptc_amount: 100.00, hbx_id: "09876543210", household: family.active_household)}
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :coverage_kind => "health", applied_aptc_amount: 100.00, household: family.active_household)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return("1234567000")
-      allow(ENV).to receive(:[]).with("enr_hbx_id").and_return("09876543210")
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id.to_s)
+      allow(ENV).to receive(:[]).with("enr_hbx_id").and_return(hbx_enrollment.hbx_id.to_s)
     end
 
     it "should not update aptc amount if it is a health plan" do
