@@ -10,7 +10,7 @@ class DelinkBroker < MongoidMigrationTask
       person.broker_role.update_attributes(broker_agency_profile_id: broker_agency.id)
       person.broker_role.save
     else
-      puts "Error for Person id: #{person.first_name}"
+      puts "Error for Person id: #{person.first_name}" unless Rails.env.test?
     end
   end
 end
