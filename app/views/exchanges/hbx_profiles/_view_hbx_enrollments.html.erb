@@ -2,7 +2,7 @@
 <div class="row">
   <div class = "col-sm-11 table-responsive" id="terminated_enrollemnts">
     <h3 class='title'></h3>
-    <%= form_tag reinstate_hbx_enrollments_exchanges_hbx_profiles_path, method: :post, remote: true do %>
+    <%= form_tag reinstate_enrollment_exchanges_hbx_profiles_path, method: :post, remote: true do %>
       <% if @enrollments.present? %>
         <table class = "table table-striped table-bordered">
           <thead>
@@ -22,7 +22,7 @@
 
           <% @enrollments.each do |enrollment| %>
             <tr>
-              <td> <%= check_box_tag("enrollment_ids[]", enrollment.id, nil) %> </td>
+              <td> <%= radio_button_tag("enrollment_id", enrollment.id, nil) %> </td>
               <td id="name"><%= enrollment.plan.name %> </td>
               <td><%= enrollment.kind.camelcase %></td>
               <td><%= enrollment.effective_on.year %></td>
@@ -38,6 +38,7 @@
 
         </table>
       <%end%>
+      
       <%= submit_tag "Submit", class: 'btn btn-primary', data: {toggle: "modal", target: "#reinstate_confirm"} %>
     <%end%>
   </div>
@@ -90,7 +91,7 @@
           <div>
             <div class="col-sm-offset-2 col-sm-10">
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-              <%= link_to "Confirm", reinstate_hbx_enrollments_exchanges_hbx_profiles_path(person_id: @person.id), class: 'btn btn-primary  mtz' %>
+              <%= link_to "Confirm", reinstate_enrollment_exchanges_hbx_profiles_path(person_id: @person.id), class: 'btn btn-primary  mtz' %>
             </div>
           </div>
         </div>
@@ -101,7 +102,7 @@
 
 <script type="text/javascript">
   $("div#reinstate_confirm").on('shown.bs.modal', function(event){
-    $('#terminated_enrollemnts :checkbox:checked').each(function (){
+    $('#terminated_enrollemnts :radio:checked').each(function (){
      $('#reinstate-plan-name').html($(this).closest('tr').find("td#name").text());
      $('#effective-date').html($(this).closest('tr').find("td#reinstate").text());
      });

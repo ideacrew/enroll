@@ -9,6 +9,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -432,18 +433,11 @@ def employer_poc
     @enrollments = @person.primary_family.terminated_enrollments
   end
 
-  def reinstate_hbx_enrollments
-    @terminated_enrollments = []
-    params[:enrollment_ids].each do |enrollment_id|
-      begin
-        enrollment = HbxEnrollment.find(enrollment_id)
-        enrollment.reinstate if enrollment.present?
-      rescue Exception => e
-        @terminated_enrollments << enrollment_id
-        next
-      end
-    end
-    redirect_to exchanges_hbx_profiles_root_path
+  def reinstate_enrollment
+    enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
+    enrollment.reinstate if enrollment.present?
+
+    redirect_to exchanges_hbx_profiles_root_path, flash: {notice: "Enrollment Reinstated successfully."}
   end
 
   def verify_dob_change

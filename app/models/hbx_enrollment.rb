@@ -1081,7 +1081,10 @@ class HbxEnrollment
       census_employee.reinstate_employment if census_employee.is_inactive?  
     end
 
-    reinstate_enrollment.reinstate_coverage! if reinstate_enrollment.may_reinstate_coverage?
+    if reinstate_enrollment.may_reinstate_coverage?
+      reinstate_enrollment.reinstate_coverage!
+      reinstate_enrollment.begin_coverage!
+    end
   end
 
   def self.find(id)
@@ -1222,10 +1225,10 @@ class HbxEnrollment
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier,
                          :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier,
                          :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
-                         :coverage_renewed, :enrolled_contingent, :unverified],
+                         :coverage_renewed, :enrolled_contingent, :unverified, :coverage_reinstated],
                     to: :coverage_enrolled, :guard => :is_shop?
 
-      transitions from: :auto_renewing, to: :coverage_selected
+      transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
       transitions from: :renewing_waived, to: :inactive
     end
 
@@ -1246,7 +1249,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
-                         :coverage_enrolled, :renewing_waived, :inactive],
+                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                     to: :coverage_canceled
     end
 

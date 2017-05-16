@@ -46,7 +46,7 @@ Rails.application.routes.draw do
 
 
       collection do
-        post :reinstate_hbx_enrollments
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
         post :families_index_datatable
