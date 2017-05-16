@@ -63,6 +63,7 @@ describe UpdateFamilyMembersIndex do
     it "should swap the index of family members" do
       expect(husbands_family.family_members.first.is_primary_applicant?).to eq false
       expect(husbands_family.family_members.second.is_primary_applicant?).to eq true
+
       subject.migrate
       husbands_family.reload
       hus_fam_id = husbands_family.family_members.first.id
