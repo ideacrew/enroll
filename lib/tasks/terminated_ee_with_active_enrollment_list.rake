@@ -9,14 +9,14 @@ namespace :report do
     task :employee_list => :environment do
       census_employees = CensusEmployee.linked.where(aasm_state: "employment_terminated",employee_role_id: {:$exists => true}).all
       field_names  = %w(
-               enrollment_hbx_id
+               census_employee_hbx_id
                first_name
                last_name
                employer_fein
                employer_legalname
                employer_dba
                census_employee_dot
-               er_sponsered_enrollment_group_id
+               er_sponsered_enrollment_hbx_id
                enrollment_state
              )
       processed_count = 0
@@ -32,21 +32,21 @@ namespace :report do
             #person=census_employee.try(:employee_roles).first.try(:person)
             benefit_group_assignments=census_employee.benefit_group_assignments
             #terminate_state=HbxEnrollment::TERMINATED_STATUSES+HbxEnrollment::CANCELED_STATUSES
-            active_state=%w(coverage_selected coverage_enrolled)
+            active_state=HbxEnrollment::ENROLLED_STATUSES
             benefit_group_assignments.each do |benefit_group_assignment|
               benefit_group_assignment.hbx_enrollments.each do |enrollment|
                 termination_verify=(active_state.include?enrollment.aasm_state)
                 employer_sponsor_verify=(enrollment.kind=="employer_sponsored")
                 if person&&employer_sponsor_verify&& termination_verify
                     csv << [
-                      enrollment.hbx_id,
+                      person.hbx_id,
                       person.first_name,
                       person.last_name,
                       employer.fein,
                       employer.legal_name,
                       employer.dba,
                       census_employee.employment_terminated_on,
-                      benefit_group_assignment.benefit_group_id,
+                      enrollment.hbx_id,
                       enrollment.aasm_state
                     ]
                     processed_count += 1
