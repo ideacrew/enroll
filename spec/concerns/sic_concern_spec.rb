@@ -60,14 +60,14 @@ describe SicConverter do
                 text: "Manufacturing",
                 selectable: false,
                 nodes: [
-                  { text: 'Heavy Construction Machinery Manufacturing - 1010', selectable: true }
+                  { text: 'Heavy Construction Machinery Manufacturing - 1010', sic_code: '1010', selectable: true }
                 ]
               },
               {
                 text: "Repair",
                 selectable: false,
                 nodes: [
-                  { text: 'Heavy Construction Machinery Repair - 1055', selectable: true }
+                  { text: 'Heavy Construction Machinery Repair - 1055', sic_code: '1055', selectable: true }
                 ]
               }
             ]
@@ -85,7 +85,7 @@ describe SicConverter do
               text: 'Wheat Harvesting',
               selectable: false,
               nodes: [
-                  { text: 'Wheat Production - 2010', selectable: true }
+                  { text: 'Wheat Production - 2010', sic_code: '2010', selectable: true }
                 ]
             }
           ]
@@ -103,7 +103,7 @@ describe SicConverter do
                 text: "Custom Software Development",
                 selectable: false,
                 nodes: [
-                  { text: 'Custom Software Development Consulting - 3055', selectable: true}
+                  { text: 'Custom Software Development Consulting - 3055', sic_code: '3055', selectable: true}
                 ]
               }
             ]
