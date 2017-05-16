@@ -41,7 +41,6 @@ class ScheduledEvent
   def schedule(start)
     schedule = IceCube::Schedule.new(start)
     schedule.add_recurrence_rule(rule)
-
     schedule
   end
 
