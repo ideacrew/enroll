@@ -1083,7 +1083,7 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!
-      reinstate_enrollment.begin_coverage!
+      reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
     end
   end
 

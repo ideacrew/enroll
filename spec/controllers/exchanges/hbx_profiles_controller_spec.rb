@@ -519,5 +519,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
     end
   end
+
+
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+    end
+  end
 end
 

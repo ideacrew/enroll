@@ -435,9 +435,15 @@ def employer_poc
 
   def reinstate_enrollment
     enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
-    enrollment.reinstate if enrollment.present?
+    
+    if enrollment.present?
+      enrollment.reinstate
+      message = "Enrollment Reinstated successfully."
+    else
+      message = "Unable to find Enrollment."
+    end
 
-    redirect_to exchanges_hbx_profiles_root_path, flash: {notice: "Enrollment Reinstated successfully."}
+    redirect_to exchanges_hbx_profiles_root_path, flash: {notice: message}
   end
 
   def verify_dob_change

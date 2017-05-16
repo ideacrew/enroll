@@ -1420,8 +1420,10 @@ context "Terminated enrollment re-instatement" do
 
     it "should re-instate enrollment" do
       ivl_enrollment.reinstate
-      reinstated_enrollment = ivl_family.active_household.hbx_enrollments.detect{|e| e.coverage_reinstated?}
+      reinstated_enrollment = ivl_family.active_household.hbx_enrollments.detect{|e| e.coverage_selected?}
+
       expect(reinstated_enrollment.present?).to be_truthy
+      expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
       expect(reinstated_enrollment.effective_on).to eq terminated_on_date.next_day
     end
   end
@@ -1482,8 +1484,10 @@ context "Terminated enrollment re-instatement" do
       end
 
       it "should have re-instate enrollment" do
-        reinstated_enrollment = family.active_household.hbx_enrollments.detect{|e| e.coverage_reinstated?}
+        reinstated_enrollment = family.active_household.hbx_enrollments.detect{|e| e.coverage_enrolled?}
+
         expect(reinstated_enrollment.present?).to be_truthy
+        expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
         expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
       end
   
