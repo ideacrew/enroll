@@ -11,7 +11,7 @@ class Envelope < PdfReport
   end
 
   def fill_envelope(notice, mpi_indicator = nil)
-    x_pos = mm2pt(30) - @margin[0]
+    x_pos = mm2pt(17.34) - @margin[0]
 
     # Enable this for Conversion renewal notice
     # if notice.respond_to?(:employer_name) && notice.employer_name.present?
