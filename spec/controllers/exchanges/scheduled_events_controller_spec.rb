@@ -11,12 +11,9 @@ RSpec.describe Exchanges::ScheduledEventsController do
       recurring_rules: {},
       :start_time => Date.today
     }}
-<<<<<<< HEAD
   after do
     ScheduledEvent.delete_all
   end
-=======
->>>>>>> specs and fixes
   before do
     sign_in(user)
   end
@@ -53,7 +50,6 @@ RSpec.describe Exchanges::ScheduledEventsController do
     end
   end
 
-<<<<<<< HEAD
   describe "update" do
     context "remove event exceptions" do
       let!(:event_exception) { FactoryGirl.create(:event_exception) }
@@ -75,8 +71,6 @@ RSpec.describe Exchanges::ScheduledEventsController do
     end
   end
 
-=======
->>>>>>> specs and fixes
   describe "GET index" do
     let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
     let(:scheduled_events) { [scheduled_event] }
@@ -93,15 +87,11 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
     it "should return supported events" do
       expect(response).to render_template(:'exchanges/scheduled_events/_get_events_field')
-<<<<<<< HEAD
       expect(assigns(:events)).to match_array(%W(Binder_Payment_due_Date Publish_Due_Date_Of_Month monthly_enrollment_due_on
                                                  initial_application_publish_due_day_of_month renewal_application_monthly_open_enrollment_end_on
                                                  renewal_application_publish_due_day_of_month renewal_application_force_publish_day_of_month
                                                  open_enrollment_monthly_end_on group_file_new_enrollment_transmit_on
                                                  group_file_update_transmit_day_of_week))
-=======
-      expect(assigns(:events)).to match_array(%W(Binder_Payment_due_Date Publish_Due_Date_Of_Month))
->>>>>>> specs and fixes
     end
   end
 
@@ -112,7 +102,6 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
     it "should return supported events" do
       expect(response).to render_template(:'exchanges/scheduled_events/_get_events_field')
-<<<<<<< HEAD
       expect(assigns(:events)).to match_array(%W(New_Year MartinLuthor_birthdday washingtons_day memorial_day independence_day
                                                  Labour_day columbus_day veterans_day Christmas Thanksgiving_day))
     end
@@ -131,9 +120,6 @@ RSpec.describe Exchanges::ScheduledEventsController do
       expect(ScheduledEvent.all.first.event_exceptions.first.time.month).to eq 8
       expect(ScheduledEvent.all.first.event_exceptions.first.time.year).to eq 2017
       expect(response).to redirect_to exchanges_scheduled_events_path
-=======
-      expect(assigns(:events)).to match_array(%W(New_Year MartinLuthor_bday washingtons_day memorial_day independence_day Labour_day columbus_day veterans_day Christmas Thanksgiving_day))
->>>>>>> specs and fixes
     end
   end
 end
