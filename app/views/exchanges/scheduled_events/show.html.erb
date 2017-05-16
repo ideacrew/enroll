@@ -6,7 +6,6 @@
 </p>
 
 <p>
-<<<<<<< HEAD
   <strong>Event Name:</strong>
   <%= @scheduled_event.event_name %>
 <p>
@@ -14,10 +13,6 @@
 <p>
   <strong>Time:</strong>
   <%= @time %>
-=======
-  <strong>Time:</strong>
-  <%= @time.to_datetime %>
->>>>>>> minor issues
 </p>
 
 <p>
@@ -25,14 +20,6 @@
   <%= @scheduled_event.recurring_rules %>
 </p>
 
-<<<<<<< HEAD
 <%= link_to 'Back', exchanges_scheduled_events_path, class: "btn btn-default" %>
 <%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event), class: "btn btn-default" %>
 <%= link_to "Delete This Occurence", delete_current_event_exchanges_scheduled_events_path(id: @scheduled_event.id, time: @time), class: "btn btn-danger", html: { method: :post } %>
-=======
-<%= link_to 'Back', exchanges_scheduled_events_path %>
-
-<%= link_to "Delete Event", exchanges_scheduled_event_path(@scheduled_event), method: :delete %>
-
-<%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event) %>
->>>>>>> minor issues
