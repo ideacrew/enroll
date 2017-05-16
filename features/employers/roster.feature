@@ -50,7 +50,6 @@ Feature: Employer can view their employees
     And employer clicks on non-linked employee without address
     Then employer should see the address on the roster
     And employer logs out
-
   Scenario: When ER searches for an EE on the roster through different tabs
     Given an employer exists
     And the employer has employees
@@ -77,3 +76,4 @@ Feature: Employer can view their employees
     And clicks on the Add New Employee button
     Then fill the form with hired date as future date
     Then employer should see the message Your employee was successfully added to your roster on page
+    And employer logs out

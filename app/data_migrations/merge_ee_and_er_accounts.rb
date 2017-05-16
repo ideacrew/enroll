@@ -21,8 +21,9 @@ class MergeEeAndErAccounts < MongoidMigrationTask
         else
           puts "Employer staff role already exist" unless Rails.env.test?
         end
+         employee.unset(:user_id) if employee.user_id.present?
          employee.user_id = employer.user_id
-         employer.unset(:user_id) if employee.user_id.present?
+         employer.unset(:user_id)
          employee.save!
          employee.user.roles.append("employee")
          employee.user.save!
