@@ -12,8 +12,8 @@ class RateReference
 
   class << self
 
-    def find_counties_for_zip_code(zip_code)
-      RateReference.where(zip_code: zip_code).pluck(:county_name)
+    def find_counties_for(**attr)
+      RateReference.where(attr).pluck(:county_name)
     end
 
     def find_rating_region(zip_code:, county_name:)
@@ -23,8 +23,8 @@ class RateReference
       region
     end
 
-    def find_zip_codes_for_county_name(county_name)
-      self.where(county_name: county_name).pluck(:zip_code)
+    def find_zip_codes_for(**attr)
+      self.where(**attr).pluck(:zip_code)
     end
   end
 end

@@ -11,6 +11,7 @@ namespace :load_service_reference do
       (ROW_DATA_BEGINS_ON..sheet.last_row).each do |i|
         serves_entire_state = to_boolean(sheet.cell(i,3))
         serves_partial_county = to_boolean(to_boolean(sheet.cell(i,5)))
+
         if serves_entire_state
           ServiceAreaReference.create!(
             hios_id: hios_id,
@@ -42,7 +43,7 @@ namespace :load_service_reference do
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
-            RateReference.find_zip_codes_for_county(county_name: county_name).each do |zip|
+            RateReference.find_zip_codes_for(county_name: county_name).each do |zip|
               ServiceAreaReference.create!(
               hios_id: hios_id,
               service_area_id: sheet.cell(i,1),
