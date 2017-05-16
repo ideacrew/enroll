@@ -25,6 +25,7 @@ Rails.application.routes.draw do
 
   
   get 'dashboard/home', to: 'dashboards#home'
+  get 'moreinfo', to: 'shop_widget#moreinfo'
 
   resources :host, only: [] do
     collection do
