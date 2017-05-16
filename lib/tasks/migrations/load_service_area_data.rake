@@ -1,6 +1,6 @@
 namespace :load_service_reference do
   desc "load service regions from xlsx file"
-  task :update_service_areas, [:file_name, :zipcode_delimiter] => :environment do |t,args|
+  task :update_service_areas, [:file_name] => :environment do |t,args|
     ROW_DATA_BEGINS_ON = 13
     begin
       file_path = File.join(Rails.root, 'lib', 'xls_templates', args[:file_name])
