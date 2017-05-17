@@ -38,11 +38,11 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     end
 
 
-    enrollment = HbxEnrollment.new( kind: hbx_enrollment.kind, enrollment_kind: hbx_enrollment.enrollment_kind, 
+    enrollment = HbxEnrollment.new( kind: hbx_enrollment.kind, enrollment_kind: hbx_enrollment.enrollment_kind,
                                     employee_role_id: employee_role_id, benefit_group_id: hbx_enrollment.benefit_group_id,
                                     benefit_group_assignment_id: benefit_group_assignment_id, effective_on: hbx_enrollment.effective_on,
                                     plan_id: hbx_enrollment.plan_id, aasm_state: hbx_enrollment.aasm_state, hbx_id: hbx_enrollment.hbx_id,
-                                    coverage_kind: hbx_enrollment.coverage_kind, elected_amount: hbx_enrollment.elected_amount, 
+                                    coverage_kind: hbx_enrollment.coverage_kind, elected_amount: hbx_enrollment.elected_amount,
                                     elected_premium_credit: hbx_enrollment.elected_premium_credit, applied_premium_credit: hbx_enrollment.applied_premium_credit,
                                     elected_aptc_pct: hbx_enrollment.elected_aptc_pct, applied_aptc_amount: hbx_enrollment.applied_aptc_amount,
                                     changing: hbx_enrollment.changing, terminated_on: hbx_enrollment.terminated_on,
@@ -50,7 +50,7 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
                                     special_enrollment_period_id: hbx_enrollment.special_enrollment_period_id, enrollment_signature: hbx_enrollment.enrollment_signature,
                                     aasm_state_date: hbx_enrollment.aasm_state_date, submitted_at: hbx_enrollment.submitted_at,
                                     original_application_type: hbx_enrollment.original_application_type, consumer_role_id: consumer_role_id,
-                                    benefit_package_id: hbx_enrollment.benefit_package_id, 
+                                    benefit_package_id: hbx_enrollment.benefit_package_id,
                                     benefit_coverage_period_id: hbx_enrollment.benefit_coverage_period_id, updated_by: hbx_enrollment.updated_by,
                                     is_active: hbx_enrollment.is_active, waiver_reason: hbx_enrollment.waiver_reason,
                                     published_to_bus_at: hbx_enrollment.published_to_bus_at, review_status: hbx_enrollment.review_status,
@@ -58,9 +58,9 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
                                     external_enrollment: hbx_enrollment.external_enrollment, is_tranding_partner_transmittable: hbx_enrollment.is_tranding_partner_transmittable
                                   )
 
-    family_members = gp.primary_family.active_family_members.select { |fm| Family::ImmediateFamily.include? fm.primary_relationship }
+    family_members = gp.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }
     family_members.each do |fm|
-      hem = HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, 
+      hem = HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant,
                                     eligibility_date: hbx_enrollment.effective_on, coverage_start_on: hbx_enrollment.effective_on
                                    )
       enrollment.hbx_enrollment_members << hem
