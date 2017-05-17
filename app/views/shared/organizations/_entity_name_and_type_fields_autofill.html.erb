@@ -18,8 +18,9 @@
     <a id="sicHelperToggle" href="#" title="I need help finding my SIC Code"><span class="fa fa-question" aria-hidden="true"></span></a>
   </div>
 </div>
-<%= render "sic_help" , sicFieldId: 'organization_sic_code' %>
-
+<div id="sicHelperWrapper" class="hidden row row-form-wrapper no-buffer">
+  <%= render "sic_help" , sicFieldId: 'organization_sic_code' %>
+</div>
 <script type="text/javascript">
   $(".chosen-select").chosen({
     width: "100%"
