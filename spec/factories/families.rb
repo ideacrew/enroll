@@ -28,7 +28,8 @@ FactoryGirl.define do
       family_members {
         [
           FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
-          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "John", last_name: "Doe"))
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "John", last_name: "Doe")),
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "Alex", last_name: "Doe"))
         ]
       }
       before(:create)  do |family, evaluator|
@@ -51,7 +52,7 @@ FactoryGirl.define do
     end
 
     family_members { [
-        FactoryGirl.create(:family_member, family: self, is_primary_applicant: true, is_active: true,
+        FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true,
             person: primary_person)
       ] }
 

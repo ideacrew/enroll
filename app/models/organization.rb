@@ -20,7 +20,7 @@ class Organization
     "foreign_embassy_or_consulate"
   ]
 
-  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_changed"}
+  FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
   field :hbx_id, type: String
 
@@ -284,12 +284,13 @@ class Organization
 
   def self.upload_invoice_to_print_vendor(file_path,file_name)
     org = by_invoice_filename(file_path) rescue nil
-    return if !org.employer_profile.is_conversion?
-    bucket_name= Settings.paper_notice
-    begin
-      doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
-    rescue Exception => e
-      puts "Unable to upload invoices to paper notices bucket"
+    if org.employer_profile.is_converting?
+      bucket_name= Settings.paper_notice
+      begin
+        doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
+      rescue Exception => e
+        puts "Unable to upload invoices to paper notices bucket"
+      end
     end
   end
 
@@ -431,9 +432,6 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-
-    def broker_agency_profile_by_fein(fein)
-      where(fein: fein).map(&:broker_agency_profile).compact
-    end
+    
   end
 end
