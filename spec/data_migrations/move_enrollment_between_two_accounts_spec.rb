@@ -38,6 +38,7 @@ describe MoveEnrollmentBetweenTwoAccount do
       allow(ENV).to receive(:[]).with('old_account_hbx_id').and_return family1.family_members[0].person.hbx_id
       allow(ENV).to receive(:[]).with('new_account_hbx_id').and_return family2.family_members[0].person.hbx_id
       allow(ENV).to receive(:[]).with('enrollment_hbx_id').and_return hbx_enrollment.hbx_id
+      consumer_role1=consumer_role1
     end
     it "should move an ivl enrollment" do
       expect(family1.active_household.hbx_enrollments).to include(hbx_enrollment)
@@ -49,7 +50,7 @@ describe MoveEnrollmentBetweenTwoAccount do
       family2.reload
       expect(family1.active_household.hbx_enrollments).not_to include(hbx_enrollment)
       expect(family2.active_household.hbx_enrollments.last.kind).to eq "individual"
-      expect(family2.active_household.hbx_enrollments.last.consumer_role).to eq hbx_enrollment.consumer_role
+      expect(family2.active_household.hbx_enrollments.last.consumer_role).to eq consumer_role1
       expect(family1.active_household.hbx_enrollments.size).to eq @size1-1
       expect(family2.active_household.hbx_enrollments.size).to eq @size2+1
     end

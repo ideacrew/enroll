@@ -35,12 +35,11 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     else
       consumer_role_id = gp.consumer_role.id
       employee_role_id = nil
-      consumer_role_id = nil
     end
 
 
     enrollment = HbxEnrollment.new( kind: hbx_enrollment.kind, enrollment_kind: hbx_enrollment.enrollment_kind, 
-                                    employee_role_id: employee_role_id, benefit_group_id: hbx_enrollment.benefit_group_id, 
+                                    employee_role_id: employee_role_id, benefit_group_id: hbx_enrollment.benefit_group_id,
                                     benefit_group_assignment_id: benefit_group_assignment_id, effective_on: hbx_enrollment.effective_on,
                                     plan_id: hbx_enrollment.plan_id, aasm_state: hbx_enrollment.aasm_state, hbx_id: hbx_enrollment.hbx_id,
                                     coverage_kind: hbx_enrollment.coverage_kind, elected_amount: hbx_enrollment.elected_amount, 
