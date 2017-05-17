@@ -1,33 +1,3 @@
-<style>
-  .list-box {
-    border: '1px sild black';
-    background: #fff;
-    width: 250px;
-  }
-  .completed, .completed > a {
-    background: #007BC4 !important;
-    font-weight: : 500;
-    color:  white;
-  } 
-  .active {
-    background: #007BC4 !important;
-    color: white;
-    font-weight: bold;
-  }
-  .active > a {
-    background: #007BC4 !important;
-    color: white;
-    font-weight: bold;
-  }
-  #mainnav {
-    margin-top: 30px;
-    margin-left: 40px;
-  }
-  .top-border-30 {
-    margin-top: 30px;
-  }
-</style>
-
 <div class="container">
         <div class="col-xs-12 horizontal-status">
   <div>
@@ -117,10 +87,22 @@
           <a  href="#" >Account Registration</a>
         </li>
         <li id="personalInformation" class="list-box">
-          <a class="scroll" href="#">Tell us about Yourself</a></li>
+          <a class="scroll" href="#">Tell us about Yourself</a>
+        </li>
         <li id="householdInfo" class="list-box">
           <a class="" href="#">Household info</a>
         </li>
+        <li id="ReviewSubmit" class="list-box">
+          <a class="" href="#">Review & submit</a>
+        </li>
+        <li id="SpecialEnrollmentPeriod" class="list-box">
+          <a class="" href="#">Special Enrollment Period</a>
+        </li>
+        <li id="EnrollInPlan" class="list-box">
+          <a class="" href="#">Enroll in Plan</a>
+        </li>
+        <li id="ConfirmPlan" class="list-box">
+          <a class="" href="#">Confirm Plan</a>
       </ul>
     </nav>
   </div>
@@ -156,11 +138,9 @@
     <nav class="top-border-30">
       <input type="submit" name="commit" value="CONTINUE" class="interaction-click-control-next-step btn btn-danger">
     </nav>
-    <br>
-    <img src="img/rnav.png" style="width: 100%;">
-    <br>
-
   </div>
+
+
 </div>
 
 
@@ -171,22 +151,22 @@
     "Address": "personalInformation",
     "Communication Preferences": "personalInformation",
     "Race / Ethnicity": "personalInformation",
-    "Who Do You Want To Enroll In a Plan?": "personalInformation",
+    "Who Do You Want To Enroll In a Plan?": "householdInfo",
     "Who Can Enroll": "householdInfo",
     "Confirm Plan and Sign Up": "householdInfo",
     "Confirm Plan and Sign Up": "householdInfo",
     "Help for Paying Coverage": "householdInfo",
     "Tax Info 1": "householdInfo",
-    "Tax Info 2": "",
-    "Job Income 1": "",
-    "Job Income 2": "",
-    "Other Income 1": "",
-    "Other Income 2": "",
-    "Adjustments 1": "",
-    "Adjustments 2": "",
-    "Other Health Coverage 1": "",
-    "Other Health Coverage 2": "",
-    "Other Questions": ""
+    "Tax Info 2": "householdInfo",
+    "Job Income 1": "householdInfo",
+    "Job Income 2": "householdInfo",
+    "Other Income 1": "householdInfo",
+    "Other Income 2": "householdInfo",
+    "Adjustments 1": "householdInfo",
+    "Adjustments 2": "householdInfo",
+    "Other Health Coverage 1": "householdInfo",
+    "Other Health Coverage 2": "householdInfo",
+    "Other Questions": "householdInfo"
   };
 
   $(function() {

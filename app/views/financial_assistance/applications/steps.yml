@@ -354,10 +354,10 @@
                   classNames: 'span-text'
 
 - step:
+    heading: Race / Ethnicity
+    heading_text: Please enter the following info. When you've finished, select CONTINUE
     sections:
       - section:
-          heading: Race / Ethnicity
-          heading_text: Please enter the following info. When you've finished, select CONTINUE
           lines:
             - cells:
                 - gutter: 12
@@ -458,12 +458,52 @@
                   type: checkbox
                   label: Other
                   classNames: 'span-text'
-
 - step:
+    heading: Help for Paying Coverage
+    heading_text: To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When youve finished,select CONTINUE.
     sections:
       - section:
-          heading: Who Do You Want To Enroll In a Plan?
-          heading_text: Select who you want to enroll in a plan, and what type of coverage you want. When youve finished, select CONTINUE.
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Do you want to apply for help paying for coverage?**
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: 'yes2'
+                  id: 'yes2'
+                  checked: true
+                  label: 'Yes'
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: 'no2'
+                  id: 'no2'
+                  checked: false
+                  label: 'No'
+                  classNames: 'span-text'
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'span-text'
+                  text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'span-text'
+                  text: 'Learn more about <a href= "#">your options</a> or <a href="#">use our Plan Match Tool</a> to see if you may qualify.'                 
+- step:
+    heading: Who Do You Want To Enroll In a Plan?
+    heading_text: Select who you want to enroll in a plan, and what type of coverage you want. When youve finished, select CONTINUE.
+    sections:
+      - section:
           lines:
             - cells:
                 - gutter: 4
@@ -575,14 +615,14 @@
                   type: raw_html
                   text: if you enroll today your enrollment will begin <b> 05/01/2017</b>
 - step:
+    heading: Confirm Plan and Sign Up
+    heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
+                  You must also provide an electronic signature at the bottom of the page. When you're finished, 
+                  select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
+                  You don't have to pay today.
+                  Important You must complete these steps to enroll.
     sections:
       - section:
-          heading: Confirm Plan and Sign Up
-          heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
-                        You must also provide an electronic signature at the bottom of the page. When you're finished, 
-                        select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
-                        You don't have to pay today.
-                        Important You must complete these steps to enroll.
           lines:
             - cells:
                 - gutter: 12
@@ -663,14 +703,14 @@
                   placeholder: LAST NAME *
                   required: true
 - step:
+    heading: Confirm Plan and Sign Up
+    heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
+                  You must also provide an electronic signature at the bottom of the page. When you're finished, 
+                  select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
+                  You don't have to pay today.
+                  Important You must complete these steps to enroll.
     sections:
       - section:
-          heading: Confirm Plan and Sign Up
-          heading_text: Please review and acknowledge the Agreement below along with the Terms and Conditions.
-                        You must also provide an electronic signature at the bottom of the page. When you're finished, 
-                        select SIGN UP FOR THIS PLAN to submit your enrollment to the insurance company.
-                        You don't have to pay today.
-                        Important You must complete these steps to enroll.
           lines:
             - cells:
                 - gutter: 12
@@ -729,52 +769,12 @@
                   name: first_name
                   placeholder: LAST NAME *
                   required: true
+
 - step:
+    heading: Tax Info 1
+    heading_text: Please complete all tax info for Mary. To go to a different person, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
-          heading: Help for Paying Coverage
-          heading_text: To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Do you want to apply for help paying for coverage?**
-                  classNames: 'span-text'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                  classNames: 'span-text'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                  classNames: 'span-text'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  classNames: 'span-text'
-                  text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  classNames: 'span-text'
-                  text: 'Learn more about <a href= "#">your options</a> or <a href="#">use our Plan Match Tool</a> to see if you may qualify.'
-- step:
-    sections:
-      - section:
-          heading: Tax Info 1
-          heading_text: Please complete all tax info for Mary. To go to a different person, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -827,10 +827,10 @@
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
 - step:
+    heading: Tax Info 2
+    heading_text: Please complete all tax info for Mary. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
-          heading: Tax Info 2
-          heading_text: Please cotypemplete all tax info for Mary. To go to a different person, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -900,10 +900,10 @@
                     - Spouse
                     - Child
 - step:
+    heading: Job Income 1
+    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
-          heading: Job Income 1
-          heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -932,10 +932,10 @@
                   classNames: 'span-text'
 
 - step:
+    heading: Job Income 2
+    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
-          heading: Job Income 2
-          heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1106,10 +1106,10 @@
                 label: 'Add Additional Job Income'
                 value: some.html
 - step:
+    heading: Other Income 1
+    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
-          heading: Other Income 1
-          heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1138,10 +1138,10 @@
                   classNames: 'span-text'
 
 - step:
+    heading: Other Income 2
+    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
-          heading: Other Income 2
-          heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1338,10 +1338,10 @@
                   label: Taxable portion of disaster relief payments.
 
 - step:
+    heading: Adjustments 1
+    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
     sections:
       - section:
-          heading: Adjustments 1
-          heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1370,10 +1370,10 @@
                   classNames: 'span-text'
 
 - step:
+    heading: Adjustments 2
+    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
     sections:
       - section:
-          heading: Adjustments 2
-          heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1449,10 +1449,10 @@
                   label: Other Deductions
                   classNames: 'span-text'
 - step:
+    heading: Other Health Coverage 1
+    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
     sections:
       - section:
-          heading: Other Health Coverage 1
-          heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1481,10 +1481,10 @@
                   classNames: 'span-text'
 
 - step:
+    heading: Other Health Coverage 2
+    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
     sections:
       - section:
-          heading: Other Health Coverage 2
-          heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -1571,10 +1571,10 @@
                   label: Peace Corps
                   classNames: 'span-text'
 - step:
+    heading: Other Questions
+    heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
     sections:
       - section:
-          heading: Other Questions
-          heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
           lines:
             - cells:
                 - gutter: 8
