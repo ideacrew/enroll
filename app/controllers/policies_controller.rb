@@ -11,10 +11,11 @@ class PoliciesController < ApplicationController
     @policy_annual_aptc=IvlPolicie::PolicyAnnualAptc.all
     @policy_family=IvlPolicie::PolicyFamily.all
     @policy_csr=IvlPolicie::PolicyCsr.all
-
-
     @policy_overall=IvlPolicie::PolicyOverall.all
 
   end
 
+  def policies_more_info
+
+  end
 end

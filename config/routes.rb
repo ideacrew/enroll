@@ -26,6 +26,7 @@ Rails.application.routes.draw do
   
   get 'dashboard/home', to: 'dashboards#home'
   get 'moreinfo', to: 'shop_widget#moreinfo'
+  get 'policy/moreinfo', to: 'policies#policies_more_info'
 
   resources :host, only: [] do
     collection do
@@ -37,7 +38,7 @@ Rails.application.routes.draw do
   resources :ivl, only: [] do
     collection do
       get 'covered', to: 'ivls#home' 
-      get 'ivl_enroll', to:'ivls#enrollment'
+      # get 'ivl_enroll', to:'ivls#enrollment'
       get 'policy', to: 'policies#home'
     end
   end
