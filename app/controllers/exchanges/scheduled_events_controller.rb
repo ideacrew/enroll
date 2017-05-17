@@ -46,9 +46,9 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     @scheduled_events = ScheduledEvent.all
     @calendar_events = @scheduled_events.flat_map do |e|
       if params.key?("start_date")
-        e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date)
+        e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date, e.offset_rule)
       else
-        e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date)
+        e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date, e.offset_rule)
       end
     end
   end

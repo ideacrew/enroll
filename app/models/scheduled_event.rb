@@ -50,12 +50,14 @@ class ScheduledEvent
     schedule
   end
 
-  def calendar_events(start)
+  def calendar_events(start, offset_rule)
     if recurring_rules.blank?
       [self]
     else
       end_date = start.end_of_year.end_of_month.end_of_week
       schedule(start_time).occurrences(end_date).map do |val|
+        val = val + offset_rule.day + 1.day if val.saturday?
+        val = val + offset_rule.day if val.sunday?
         ScheduledEvent.new(id: id, event_name: event_name, start_time: val)
       end
     end
