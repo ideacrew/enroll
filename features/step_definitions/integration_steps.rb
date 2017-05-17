@@ -371,7 +371,7 @@ Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan yea
   Caches::PlanDetails.load_record_cache!
 end
 
-When(/^.+ enters? office location for (.+)$/) do |location|
+When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
   RateReference.where(zip_code: "01001").first || FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "Test Region")
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
@@ -382,8 +382,10 @@ When(/^.+ enters? office location for (.+)$/) do |location|
   find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), '#{location[:state]}')]").click
 
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
-  wait_for_ajax
-  select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
+  if role.include? 'Employer'
+    wait_for_ajax
+    select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
+  end
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => location[:phone_extension]

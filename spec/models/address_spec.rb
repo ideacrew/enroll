@@ -188,23 +188,6 @@ describe '#matches?' do
      )
   }
   
-  describe "::validations" do
-    context "when office kind is primary" do
-      before do
-        address.kind = 'primary'
-      end
-
-      it "should not be valid without a county" do
-        expect(address.valid?).to be_falsey
-      end
-
-      it "should be valid with a county" do
-        address.county = 'Some County'
-        expect(address.valid?).to be_truthy
-      end
-    end
-  end
-
   context 'addresses are the same' do
     let(:second_address) { address.clone }
     it 'returns true' do

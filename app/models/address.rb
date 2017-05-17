@@ -22,8 +22,7 @@ class Address
   field :full_text, type: String
 
   validates_presence_of :address_1, :city, :state, :zip
-  validates_presence_of :county, if: :office_is_primary_location?
-
+  
   validates :kind,
     inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
     allow_blank: false
