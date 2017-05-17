@@ -1,22 +1,14 @@
 <!-- SIC codes helper -->
-<div id="sicHelperModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+<div id="sicHelperContent">
+      <div class="header">
         <h4 class="modal-title">Search for your matching SIC Code</h4>
         <p>SIC (Standard Industrial Classifications) codes are used to categorize your business into the appropriate rating group</p>
         <p>You can use browse or search through all the available codes -- click a SIC code to make a selection</p>
         <input id="sic_search" type="text" value="" alt="Provide a keyword related to your business"/>
         <button type="button" class="btn btn-success" id="btn-search">Search</button>
       </div>
-      <div class="modal-body" id="sictree">
+      <div id="sictree">
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
 </div>
 <!-- SIC codes helper -->
 
@@ -33,6 +25,16 @@
     });
   });
 
+  $(document).on('click', '#sicHelperToggle', displaySicHelper);
+
+  function displaySicHelper(event) {
+    event.preventDefault();
+    var sicId = "<%= sicFieldId %>";
+    $("#sicHelperWrapper").toggleClass('hidden');
+    $('html, body').animate({
+      scrollTop: $("#" + sicId).offset().top
+    }, 500);
+  }
   function createJSTrees(jsonData) {
     var $searchableTree = $("#sictree").treeview({
                               data: jsonData,
@@ -41,10 +43,9 @@
                             });
 
     function assignSelectionAndCloseModal(event, data) {
-
-      $('#sicHelperModal').modal('toggle');
-      $('#<%=id%>').val(data.sic_code);
-      $('#<%=id%>').trigger('chosen:updated');
+      $("#sicHelperWrapper").toggleClass('hidden');
+      $('#<%=sicFieldId%>').val(data.sic_code);
+      $('#<%=sicFieldId%>').trigger('chosen:updated');
     }
     var search = function(e) {
       var pattern = $('#sic_search').val();
@@ -54,8 +55,8 @@
         exactMatch: false,
         revealResults: true
       };
-      $searchableTree.treeview('collapseAll', { silent: true });    
-      $searchableTree.treeview('clearSearch');    
+      $searchableTree.treeview('collapseAll', { silent: true });
+      $searchableTree.treeview('clearSearch');
       $searchableTree.treeview('search', [ pattern, options ]);
     }
 
