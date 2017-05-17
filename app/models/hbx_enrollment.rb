@@ -12,7 +12,7 @@ class HbxEnrollment
 
   embedded_in :household
   embeds_many :comments, as: :commentable, cascade_callbacks: true
-  
+
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
 
@@ -517,7 +517,10 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
-  def propagate_reinstate
+  def propagate_reinstate(edi_required = false)
+    if edi_required
+      # Transmit edi
+    end
   end
 
   def propagate_selection
@@ -1078,7 +1081,7 @@ class HbxEnrollment
       :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
   end
 
-  def reinstate
+  def reinstate(edi: false)
     return if reinstated_enrollment_exists?
 
     reinstate_enrollment = self.is_shop? ?
@@ -1091,7 +1094,7 @@ class HbxEnrollment
     end
 
     if reinstate_enrollment.may_reinstate_coverage?
-      reinstate_enrollment.reinstate_coverage!
+      reinstate_enrollment.reinstate_coverage!(edi)
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
     end
 

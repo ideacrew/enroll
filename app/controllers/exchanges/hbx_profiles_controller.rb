@@ -437,7 +437,7 @@ def employer_poc
     enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
     
     if enrollment.present?
-      reinstated_enrollment = enrollment.reinstate
+      reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
       if params['comments'].present?
         reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
       end
