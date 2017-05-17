@@ -38,7 +38,6 @@ describe RemoveInvalidBrokerAgencyAccountsForEmployer do
         employer_profile.reload
         expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 1
         expect(employer_profile.broker_agency_accounts.first).to eq valid_broker_agency_account
-        expect(invalid_agency_account.writing_agent.present?).to eq false
       end
     end
 
