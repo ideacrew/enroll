@@ -9,7 +9,7 @@ describe ChangeSuffixPerson do
       expect(subject.name).to eql given_task_name
     end
   end
-  describe "changing person's date of birth" do
+  describe "changing person's name suffix " do
     let(:person) { FactoryGirl.create(:person, name_sfx: nil)}
     before(:each) do
       allow(ENV).to receive(:[]).with("name_sfx").and_return(nil)
