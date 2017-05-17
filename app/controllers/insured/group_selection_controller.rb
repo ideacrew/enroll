@@ -4,6 +4,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def select_market(person, params)
     return params[:market_kind] if params[:market_kind].present?
+    if params[:qle_id].present?
+      qle = QualifyingLifeEventKind.find(params[:qle_id])
+      return qle.market_kind
+    end
     if @person.try(:has_active_employee_role?)
       'shop'
     elsif @person.try(:has_active_consumer_role?)
