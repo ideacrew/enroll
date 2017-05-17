@@ -1,4 +1,3 @@
+  <%= radio_button_tag "#{cell.name}[#{cell.model}][#{cell.attribute}]", cell.value, cell.checked, class: "put-class-name-here", id: cell.id %>
 
-  <%= radio_button_tag cell.name, cell.value, cell.checked, class: cell.classNames, id: cell.id %>
-
-  <%= label_tag cell.id, cell.label,class: cell.classNames %>
+  <%= label_tag cell.id, cell.label,class: "put-class-name-here" %>

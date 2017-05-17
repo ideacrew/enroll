@@ -1,1 +1,1 @@
-<%= select_tag(cell.name, options_for_select(cell.values), disabled: cell.disabled, required: cell.required, class: cell.classNames) %>
+<%= select_tag("#{cell.name}[#{cell.model}][#{cell.attribute}]", options_for_select(cell.values), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>
