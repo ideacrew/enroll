@@ -14,13 +14,17 @@ describe ChangeRenewingPlanYearAasmState do
   end
 
   describe "updating aasm_state of the renewing plan year", dbclean: :after_each do
-    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending") }
+    let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending",benefit_groups:[benefit_group]) }
     let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
+    let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile_id: employer_profile.id,:benefit_group_assignments => [benefit_group_assignment]) }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
+      allow(ENV).to receive(:[]).with("py_state_to").and_return('')
     end
     
     it "should update aasm_state of plan year" do
@@ -43,6 +47,14 @@ describe ChangeRenewingPlanYearAasmState do
         plan_year.reload
         expect(plan_year.aasm_state).to eq "renewing_enrolling"
       end
+    end
+
+    it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] present" do
+      allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
+      census_employee.reload
+      subject.migrate
+      plan_year.reload
+      expect(plan_year.aasm_state).to eq "renewing_enrolled"
     end
   end
 end
