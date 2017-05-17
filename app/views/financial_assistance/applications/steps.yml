@@ -9,31 +9,39 @@
                   type: input
                   name: first_name
                   placeholder: FIRST NAME *
-                  classNames: 
                   required: true
+                  model: person
+                  attribute: first_name
                 - gutter: 3
                   type: input
-                  name: first_name
+                  name: middle_name
                   placeholder: MIDDLE NAME
                   required: true
+                  model: person
+                  attribute: middle_name
                 - gutter: 3
                   type: input
-                  name: first_name
+                  name: last_name
                   placeholder: LAST NAME *
                   required: true
+                  model: person
+                  attribute: last_name
                 - gutter: 3
                   type: 'dropdown'
-                  name: 'check'
-                  className: 'form-control'
+                  name: 'suffix'
                   required: true
                   values:
-                    - NONE
-                    - person two
-                    - person three
+                    - Jr.
+                    - Sr.
+                    - II
+                    - III
+                    - IV
+                    - V
+                  model: Person
+                  attribute: name_sfx
             - cells:
                 - gutter: 6
                   type: text
-                  classNames: 'span-text'
                   text: Are you applying for coverage for yourself?*
                 - gutter: 1
                   type: label_radio
@@ -42,7 +50,8 @@
                   id: 'yes1'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: consumer_role
+                  attribute: is_applying_coverage
                 - gutter: 1
                   type: label_radio
                   name: row1
@@ -50,35 +59,41 @@
                   id: 'no1'
                   checked: true
                   label: 'No'
-                  classNames: 'span-text'
+                  model: consumer_role
+                  attribute: is_applying_coverage
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 3
                   type: input
                   name: dob
                   placeholder: DATE OF BIRTH *
                   required: true
+                  model: Person
+                  attribute: dob
                 - gutter: 3
                   type: input
                   name: ssn
                   placeholder: SOCIAL SECURITY(SSN)*
                   required: true
+                  model: Person
+                  attribute: ssn
                 - gutter: 2
                   type: checkbox
-                  classNames: 'span-text'
                   label: I don't have SSN
                   name: opt_checkbox
+                  model: Person
+                  attribute: no_ssn
                 - gutter: 2
                   type: label_radio
                   name: gender
                   value: male
                   id: male
+                  model: Person
+                  attribute: gender
                   checked: true
                   label: 'Male'
-                  classNames: 'span-text'
                 - gutter: 2
                   type: label_radio
                   name: gender
@@ -86,7 +101,8 @@
                   id: female
                   checked: false
                   label: 'Female'
-                  classNames: 'span-text'
+                  model: Person
+                  attribute: gender
 - step:
     heading: More about You
     heading_text: Please answer the following questions. When you've finished SELECT Continue.
