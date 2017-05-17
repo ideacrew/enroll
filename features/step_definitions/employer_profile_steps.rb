@@ -1,4 +1,6 @@
 Given /(\w+) is a person$/ do |name|
+  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
+
   person = FactoryGirl.create(:person, first_name: name)
   @pswd = 'aA1!aA1!aA1!'
   email = Forgery('email').address
@@ -24,6 +26,8 @@ Then  /(\w+) signs in to portal/ do |name|
 end
 
 Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
+  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
+  
   email = Forgery('email').address
   visit '/'
   portal_class = '.interaction-click-control-employer-portal'
@@ -107,6 +111,8 @@ When(/(\w+) accesses the Employer Portal/) do |name|
 end
 
 Then /(\w+) decides to Update Business information/ do |person|
+  FactoryGirl.create(:sic_code, sic_code: "0111")
+
   find('.interaction-click-control-update-business-info', :wait => 10).click
   wait_for_ajax(10,2)
   screenshot('update_business_info')
@@ -186,6 +192,7 @@ Given /(\w+) has HBXAdmin privileges/ do |name|
 end
 
 Given /a FEIN for an existing company/ do
+  SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
   @fein = 100000000+rand(10000)
   o=FactoryGirl.create(:organization, fein: @fein)
   @employer_profile= FactoryGirl.create(:employer_profile, organization: o)
@@ -199,6 +206,8 @@ Given(/^(\w+) enters Employer Information/) do |name|
   fill_in 'organization[legal_name]', :with => Forgery('name').company_name
   fill_in 'organization[dba]', :with => Forgery('name').company_name
   fill_in 'organization[fein]', :with => @fein
+  select_from_chosen '0111', from: 'Select Industry Code'
+
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
   step "I enter office location for #{default_office_location}"
