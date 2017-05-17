@@ -20,7 +20,7 @@ describe ChangeRenewingPlanYearAasmState do
     let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
-    let(:renewal_benefit_group){ FactoryGirl.build(:benefit_group, plan_year: plan_year) }
+    let!(:renewal_benefit_group){ FactoryGirl.build(:benefit_group, plan_year: plan_year) }
     let(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: renewal_benefit_group)}
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment,renewal_benefit_group_assignment]) }
 
