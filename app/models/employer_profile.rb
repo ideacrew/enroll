@@ -13,6 +13,12 @@ class EmployerProfile
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
 
+  NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request"
+  NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request"
+  NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request"
+  NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
+
+
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
@@ -865,6 +871,22 @@ class EmployerProfile
 
   def notify_broker_terminated
     notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+  end
+
+  def notify_enrollment_data_request
+    notify(NFP_ENROLLMENT_DATA_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_enrollment_data_request"})
+  end
+
+  def notify_payment_history_request
+    notify(NFP_PAYMENT_HISTORY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_payment_history_request"})
+  end
+
+  def notify_pdf_request
+    notify(NFP_PDF_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_pdf_request"})
+  end
+
+  def notify_statement_summary_request
+    notify(NFP_STATEMENT_SUMMARY_REQUEST, {employer_id: self.hbx_id, event_name: "nfp_statement_summary_request"})
   end
 
   def notify_general_agent_added
