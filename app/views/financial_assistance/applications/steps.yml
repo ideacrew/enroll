@@ -1,8 +1,8 @@
 - step:
+    heading: Personal info
+    heading_text: First we need to verify whether you're new to the DC Health link or you have an existing account. Please enter your personal information. When you have finished select CONTINUE.
     sections:
       - section:
-          heading: Personal info
-          heading_text: First we need to verify whether you're new to the DC Health link or you have an existing account. Please enter your personal information. When you have finished select CONTINUE.
           lines:
             - cells:
                 - gutter: 3
@@ -88,10 +88,10 @@
                   label: 'Female'
                   classNames: 'span-text'
 - step:
+    heading: More about You
+    heading_text: Please answer the following questions. When you've finished SELECT Continue.
     sections:
       - section:
-          heading: More about You
-          heading_text: Please answer the following questions. When you've finished SELECT Continue.
           lines:
             - cells:
                 - gutter: 6
@@ -214,10 +214,10 @@
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
 - step:
+    heading: Address
+    heading_text: Please enter the following info. When you've finished SELECT Continue.
     sections:
       - section:
-          heading: Address
-          heading_text: Please enter the following info. When you've finished SELECT Continue.
           lines:
             - cells:
                 - gutter: 12
@@ -279,10 +279,10 @@
 
 
 - step:
+    heading: Communication Preferences
+    heading_text: Please enter the following info. When you've finished, select CONTINUE
     sections:
       - section:
-          heading: Communication Preferences
-          heading_text: Please enter the following info. When you've finished, select CONTINUE
           lines:
             - cells:
                 - gutter: 6

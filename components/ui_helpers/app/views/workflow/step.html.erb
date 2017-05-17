@@ -1,7 +1,130 @@
+<style>
+  .list-box {
+    border: '1px sild black';
+    background: #fff;
+    width: 250px;
+  }
+  .completed, .completed > a {
+    background: #007BC4 !important;
+    font-weight: : 500;
+    color:  white;
+  } 
+  .active {
+    background: #007BC4 !important;
+    color: white;
+    font-weight: bold;
+  }
+  .active > a {
+    background: #007BC4 !important;
+    color: white;
+    font-weight: bold;
+  }
+  #mainnav {
+    margin-top: 30px;
+    margin-left: 40px;
+  }
+  .top-border-30 {
+    margin-top: 30px;
+  }
+</style>
+
+<div class="container">
+        <div class="col-xs-12 horizontal-status">
+  <div>
+    <div class="col-xs-4 step-one step">
+      <div class="row">
+        <div class="col-xs-2">
+          <img src="/assets/ui/profilegreen_37-5ae8afdb364c873434d6dc21d4fb98aa.png" alt="Profilegreen 37">
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 1
+          </span>
+          <br>
+          <span class="dg fourteen">
+            <strong>
+              Tell us about yourself
+            </strong>
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+          <img src="/assets/ui/darkgreenarrow_354-54bfca10c5197ca11c55b96848dc2ce9.png" alt="Darkgreenarrow 354">
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4 step-two step">
+      <div class="row">
+        <div class="col-xs-2">
+          <img src="/assets/ui/cartgreen_40-a179fa7aab1dda9aef5d9b6d7b663e32.png" alt="Cartgreen 40">
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 2
+          </span>
+          <br>
+          <span class="dg fourteen">
+              Compare plans and choose
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+              <img src="/assets/ui/lightgreenarrow_354-ce0b2aa6c6532392dc649f7eaf1eb06e.png" alt="Lightgreenarrow 354">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4 step-three step">
+      <div class="row">
+        <div class="col-xs-2">
+          <img src="/assets/ui/pointergreen_42-f4916e811f2f29d50d664319bfd7d2ca.png" alt="Pointergreen 42">
+        </div>
+        <div class="col-xs-10">
+          <span class="ttu dg twelve">
+            STEP 3
+          </span>
+          <br>
+          <span class="dg fourteen">
+              Enroll
+          </span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 arrow">
+          <div class="row">
+              <img src="/assets/ui/lightgreenarrow_354-ce0b2aa6c6532392dc649f7eaf1eb06e.png" alt="Lightgreenarrow 354">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      </div>
+
 <div class="row">
-  <div class="col-md-12">step <%= @current_step.to_i %><%= @steps.last_step?(@current_step) %></div>
-  <div class="col-md-2"></div>
-  <div class="col-md-8">
+  <div class="col-md-12" style="display:none">step <%= @current_step.to_i %><%= @steps.last_step?(@current_step) %></div>
+  <div class="col-md-3">
+    <nav class=" smartscroll-nav" id="mainnav">
+      <ul class="nav nav-stacked affix" id="leftNavigation">
+        <li id="accountRegistration" class="list-box">
+          <a  href="#" >Account Registration</a>
+        </li>
+        <li id="personalInformation" class="list-box">
+          <a class="scroll" href="#">Tell us about Yourself</a></li>
+        <li id="householdInfo" class="list-box">
+          <a class="" href="#">Household info</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="col-md-7">
     <div class="">
       <% if !@current_step.heading.nil? %>
       <h1 class="darkblue"><%= @current_step.heading %></h1>
@@ -23,11 +146,57 @@
             <% if !@steps.first_step?(@current_step) %>
               <%= link_to 'Previous Step', previous_step_for %>
             <% end %>
-            <%= submit_tag 'Next step' %>
+            <%#= submit_tag 'Next step' %>
           <% end %>
         <% end %>
       </div>
     </div>
   </div>
-  <div class="col-md-2"></div>
+  <div class="col-md-2">
+    <nav class="top-border-30">
+      <input type="submit" name="commit" value="CONTINUE" class="interaction-click-control-next-step btn btn-danger">
+    </nav>
+    <br>
+    <img src="img/rnav.png" style="width: 100%;">
+    <br>
+
+  </div>
 </div>
+
+
+<script>
+  var headingMapper = {
+    "Personal info": "accountRegistration",
+    "More about You": "personalInformation",
+    "Address": "personalInformation",
+    "Communication Preferences": "personalInformation",
+    "Race / Ethnicity": "personalInformation",
+    "Who Do You Want To Enroll In a Plan?": "personalInformation",
+    "Who Can Enroll": "householdInfo",
+    "Confirm Plan and Sign Up": "householdInfo",
+    "Confirm Plan and Sign Up": "householdInfo",
+    "Help for Paying Coverage": "householdInfo",
+    "Tax Info 1": "householdInfo",
+    "Tax Info 2": "",
+    "Job Income 1": "",
+    "Job Income 2": "",
+    "Other Income 1": "",
+    "Other Income 2": "",
+    "Adjustments 1": "",
+    "Adjustments 2": "",
+    "Other Health Coverage 1": "",
+    "Other Health Coverage 2": "",
+    "Other Questions": ""
+  };
+
+  $(function() {
+    var currentHeading = "<%=@current_step.heading%>";
+    listID = headingMapper[currentHeading];
+    $('li#' + headingMapper[currentHeading] ).prevAll().addClass('completed');
+    $('li#' + headingMapper[currentHeading] ).addClass('active');
+  });
+
+  $('input[type="submit"]').on('click',function() {
+    $('form').submit();
+  })
+</script>
