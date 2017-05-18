@@ -44,7 +44,9 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
+
       collection do
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
         post :families_index_datatable
@@ -83,6 +85,7 @@ Rails.application.routes.draw do
         get :enable_or_disable_link
         post :cancel_initial_plan_year
         post :cancel_initial_plan_year_form
+        get :view_terminated_hbx_enrollments
       end
 
       member do

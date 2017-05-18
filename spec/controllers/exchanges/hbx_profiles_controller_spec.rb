@@ -328,7 +328,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in(user)
     end
 
-    it "should notice user disabled" do 
+    it "should notice user disabled" do
        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
        @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
        xhr :get, :enable_or_disable_link, @params
@@ -336,14 +336,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
        expect(flash[:notice]).to match(/Disabled user/)
     end
 
-    it "should set is_disabled to true" do 
+    it "should set is_disabled to true" do
        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
        @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
        xhr :get, :enable_or_disable_link, @params
        expect(family.reload.is_disabled).to be_truthy
     end
 
-    it "should notice user Enabled" do 
+    it "should notice user Enabled" do
        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
        family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
        @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
@@ -352,7 +352,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
        expect(flash[:notice]).to match(/Enabled user/)
     end
 
-    it "should set is_disabled to false" do 
+    it "should set is_disabled to false" do
        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
        family = FactoryGirl.create(:family, :with_primary_family_member, is_disabled: true)
        @params = {:family => family.id, family_actions_id: "family_actions_#{family.id}", :format => 'js'}
@@ -467,7 +467,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
     let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
     let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
-    
+
     it "should return authorization error for Non-Admin users" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
@@ -506,7 +506,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
-    end 
+    end
 
     it "should render update_enrollment if the save is successful" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
@@ -550,6 +550,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     it "should get general_agencies" do
       xhr :get, :general_agency_index, format: :js
       expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
+    end
+  end
+
+  describe "POST reinstate_enrollment" do
+    let(:user) { FactoryGirl.create(:user, roles: ["hbx_staff"]) }
+
+    before :each do
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      sign_in user
+    end
+
+    it "should redirect to root path" do
+      xhr :post, :reinstate_enrollment, enrollment_id: '', format: :js
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
     end
   end
 

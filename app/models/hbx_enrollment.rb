@@ -11,6 +11,7 @@ class HbxEnrollment
   extend Acapi::Notifiers
 
   embedded_in :household
+  embeds_many :comments, as: :commentable, cascade_callbacks: true
 
   ENROLLMENT_CREATED_EVENT_NAME = "acapi.info.events.policy.created"
   ENROLLMENT_UPDATED_EVENT_NAME = "acapi.info.events.policy.updated"
@@ -23,7 +24,7 @@ class HbxEnrollment
   COVERAGE_KINDS      = %w(health dental)
 
   ENROLLED_STATUSES   = %w(coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending
-                              enrolled_contingent unverified
+                              enrolled_contingent unverified coverage_reinstated
                             )
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w(coverage_terminated unverified coverage_expired void)
@@ -527,6 +528,12 @@ class HbxEnrollment
     # TODO: gereate or update passive renewal
   end
 
+  def propagate_reinstate(edi_required = false)
+    if edi_required
+      # Transmit edi
+    end
+  end
+
   def propagate_selection
     if is_shop?
       update_existing_shop_coverage
@@ -550,6 +557,10 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_applicable_for_renewal?
+
+      if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
+        return
+      end
 
       renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
 
@@ -1080,6 +1091,29 @@ class HbxEnrollment
     may_terminate_coverage? and effective_on <= TimeKeeper.date_of_record
   end
 
+  def reinstated_enrollment_exists?
+    family.active_household.hbx_enrollments.where({:kind => self.kind,
+      :plan_id => self.plan_id, :effective_on => self.terminated_on.next_day,
+      :coverage_kind => self.coverage_kind}).enrolled.any?{|e| e.workflow_state_transitions.where(:to_state => 'coverage_reinstated').any?}
+  end
+
+  def reinstate(edi: false)
+    return if reinstated_enrollment_exists?
+    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
+
+    if self.is_shop?
+      census_employee = benefit_group_assignment.census_employee
+      census_employee.reinstate_employment if census_employee.can_be_reinstated?
+    end
+
+    if reinstate_enrollment.may_reinstate_coverage?
+      reinstate_enrollment.reinstate_coverage!(edi)
+      reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
+    end
+
+    reinstate_enrollment
+  end
+
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({
@@ -1149,11 +1183,12 @@ class HbxEnrollment
     state :shopping, initial: true
     state :coverage_selected, :after_enter => :update_renewal_coverage
     state :transmitted_to_carrier
-    state :coverage_enrolled
+    state :coverage_enrolled, :after_enter => :update_renewal_coverage
 
     state :coverage_termination_pending
     state :coverage_canceled      # coverage never took effect
     state :coverage_terminated    # coverage ended
+    state :coverage_reinstated    # coverage reinstated
 
     state :coverage_expired
     state :inactive, :after_enter => :update_renewal_coverage   # indicates SHOP 'waived' coverage. :after_enter inform census_employee
@@ -1217,10 +1252,10 @@ class HbxEnrollment
       transitions from: [:auto_renewing, :renewing_coverage_selected, :renewing_transmitted_to_carrier,
                          :renewing_coverage_enrolled, :coverage_selected, :transmitted_to_carrier,
                          :auto_renewing_contingent, :renewing_contingent_selected, :renewing_contingent_transmitted_to_carrier,
-                         :coverage_renewed, :enrolled_contingent, :unverified],
+                         :coverage_renewed, :enrolled_contingent, :unverified, :coverage_reinstated],
                     to: :coverage_enrolled, :guard => :is_shop?
 
-      transitions from: :auto_renewing, to: :coverage_selected
+      transitions from: [:auto_renewing, :coverage_reinstated], to: :coverage_selected
       transitions from: :renewing_waived, to: :inactive
     end
 
@@ -1241,7 +1276,7 @@ class HbxEnrollment
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :enrolled_contingent, :unverified,
-                         :coverage_enrolled, :renewing_waived, :inactive],
+                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
                     to: :coverage_canceled
     end
 
@@ -1292,6 +1327,9 @@ class HbxEnrollment
       transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
 
+    event :reinstate_coverage, :after => :record_transition do
+      transitions from: :shopping, to: :coverage_reinstated, after: :propagate_reinstate
+    end
   end
 
   def termination_attributes_cleared?
@@ -1404,10 +1442,18 @@ class HbxEnrollment
   end
 
   def set_submitted_at
-   if submitted_at.blank?
+    if submitted_at.blank?
       write_attribute(:submitted_at, TimeKeeper.date_of_record)
-   end
- end
+    end
+  end
+
+  def is_health_enrollment?
+    coverage_kind == "health"
+  end
+
+  def is_dental_enrollment?
+    coverage_kind == "dental"
+  end
 
  def is_active_renewal_purchase?
    enrollment = self.household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(effective_on.year).by_kind(kind).cancel_eligible.last rescue nil
