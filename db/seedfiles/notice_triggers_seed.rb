@@ -275,6 +275,69 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP16',
+    title: 'Application to Offer Group Health Coverage in DC Health Link',
+    description: 'When Employer application meets minimum participation and non-owner requirements',
+    resource_name: 'employer',
+    event_name: 'initial_eligibile_employer_open_enrollment_begins',
+    notice_triggers: [
+      {
+        name: 'Initial Eligible Employer open enrollment begins',
+        notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
+        mpi_indicator: 'MPI_SHOP16',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP17',
+    title: 'Open Enrollment Completed',
+    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
+    resource_name: 'employer',
+    event_name: 'initial_employer_open_enrollment_completed',
+    notice_triggers: [
+      {
+        name: 'Initial Employee Open Enrollment Successfully Completed',
+        notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+        mpi_indicator: 'MPI_SHOP17',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP13',
+    title: 'Open Enrollment Reminder',
+    description: 'This notices goes to all the employees in the open enrollment period',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_reminder',
+    notice_triggers: [
+      {
+        name: 'Employee Open Enrollment Reminder Notice',
+        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
+        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
+        mpi_indicator: 'MPI_SHOP13',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP14',
     title: 'Open Enrollment Completed',
     description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
@@ -307,69 +370,6 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
         mpi_indicator: 'MPI_SHOP15',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP16',
-    title: 'Application to Offer Group Health Coverage in DC Health Link',
-    description: 'When Employer application meets minimum participation and non-owner requirements',
-    resource_name: 'employer',
-    event_name: 'initial_eligibile_employer_open_enrollment_begins',
-    notice_triggers: [
-      {
-        name: 'Initial Eligible Employer open enrollment begins',
-        notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
-        mpi_indicator: 'MPI_SHOP16',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP13',
-    title: 'Open Enrollment Reminder',
-    description: 'This notices goes to all the employees in the open enrollment period',
-    resource_name: 'employee_role',
-    event_name: 'employee_open_enrollment_reminder',
-    notice_triggers: [
-      {
-        name: 'Employee Open Enrollment Reminder Notice',
-        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
-        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-        mpi_indicator: 'MPI_SHOP13',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP17',
-    title: 'Open Enrollment Completed',
-    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
-    resource_name: 'employer',
-    event_name: 'initial_employer_open_enrollment_completed',
-    notice_triggers: [
-      {
-        name: 'Initial Employee Open Enrollment Successfully Completed',
-        notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP17',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
