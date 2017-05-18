@@ -11,5 +11,8 @@ class ChangePlanYearEffectiveTerminatedon < MongoidMigrationTask
     puts "Changed Enrollment effective on date to #{new_effective_on}" unless Rails.env.test?
     puts "Changed Enrollment terminated on date to #{new_terminated_on}" unless Rails.env.test?
     end
+    rescue Exception => e
+      puts e.message
+    end
   end
 end
