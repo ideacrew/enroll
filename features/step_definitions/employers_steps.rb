@@ -387,7 +387,7 @@ Then(/^.+ clicks? on the Cancel button$/) do
 end
 
 Then(/^.+ should be on the business info page with warnings$/) do
-  expect(page).to have_content 'Primary Office Location'
+  expect(page).to have_content 'Office Location'
   expect(find('.alert-error')).to have_content('Has its principal business address in the District of Columbia')
 end
 
