@@ -37,7 +37,7 @@
                     - III
                     - IV
                     - V
-                  model: Person
+                  model: person
                   attribute: name_sfx
             - cells:
                 - gutter: 6
@@ -70,27 +70,27 @@
                   name: dob
                   placeholder: DATE OF BIRTH *
                   required: true
-                  model: Person
+                  model: person
                   attribute: dob
                 - gutter: 3
                   type: input
                   name: ssn
                   placeholder: SOCIAL SECURITY(SSN)*
                   required: true
-                  model: Person
+                  model: person
                   attribute: ssn
                 - gutter: 2
                   type: checkbox
                   label: I don't have SSN
                   name: opt_checkbox
-                  model: Person
+                  model: person
                   attribute: no_ssn
                 - gutter: 2
                   type: label_radio
                   name: gender
                   value: male
                   id: male
-                  model: Person
+                  model: person
                   attribute: gender
                   checked: true
                   label: 'Male'
@@ -101,7 +101,7 @@
                   id: female
                   checked: false
                   label: 'Female'
-                  model: Person
+                  model: person
                   attribute: gender
 - step:
     heading: More about You
