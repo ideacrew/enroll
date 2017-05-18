@@ -51,6 +51,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "update" do
+<<<<<<< HEAD
     context "remove event exceptions" do
       let!(:event_exception) { FactoryGirl.create(:event_exception) }
       let!(:scheduled_event) { ScheduledEvent.all.first }
@@ -67,6 +68,13 @@ RSpec.describe Exchanges::ScheduledEventsController do
         put :update, id: scheduled_event.id, scheduled_event: event_params
         expect(scheduled_event.one_time).to eq true
         expect(response).to redirect_to exchanges_scheduled_events_path
+=======
+    context "remove event exceptions"
+      let!(:event_exception) { FactoryGirl.create(:event_exception) }
+      it "delete event exceptions" do
+        put :update, scheduled_event: event_params
+        expect(ScheduledEvent.all.first.event_exceptions.length).to eq 0
+>>>>>>> removing single recurring event
       end
     end
   end
