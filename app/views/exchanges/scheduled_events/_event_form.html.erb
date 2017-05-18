@@ -28,5 +28,8 @@
 <div class="container content-bottom">
   <%= f.submit %>
   <%= link_to 'Cancel', exchanges_scheduled_events_path, class: "btn btn-default" %>
+  <% if params[:action].to_s.downcase == 'edit' %>
+    <%= link_to "Delete Event", exchanges_scheduled_event_path(@scheduled_event), class: "btn btn-danger", method: :delete %>
+  <% end %>
 </div>
 

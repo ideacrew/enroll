@@ -46,6 +46,7 @@ Rails.application.routes.draw do
         get 'get_system_events'
         get 'get_holiday_events'
         get 'no_events'
+        post 'delete_current_event'
       end
     end
 

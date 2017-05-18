@@ -32,6 +32,7 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   def update
     params.permit!
     if @scheduled_event.update_attributes!(scheduled_event_params)
+      @scheduled_event.event_exceptions.delete_all
       if @scheduled_event.recurring_rules.present?
         @scheduled_event.update_attributes!(one_time: true)
       else
@@ -80,6 +81,17 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   def no_events
   	@events = []
   	render partial: 'exchanges/scheduled_events/get_events_field'
+  end
+
+  def delete_current_event
+    params.permit!
+    @scheduled_event = ScheduledEvent.find(params[:format])
+    if @exception = @scheduled_event.event_exceptions.create(time: params[:time])
+      redirect_to exchanges_scheduled_events_path, notice: 'Current Event was successfully destroyed.'
+    else
+      flash.alert = "Unable to add exception"
+      redirect_to exchanges_scheduled_events_path
+    end
   end
 
   private

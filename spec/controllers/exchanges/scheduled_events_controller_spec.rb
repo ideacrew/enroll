@@ -47,6 +47,16 @@ RSpec.describe Exchanges::ScheduledEventsController do
     end
   end
 
+  describe "update" do
+    context "remove event exceptions"
+      let!(:event_exception) { FactoryGirl.create(:event_exception) }
+      it "delete event exceptions" do
+        put :update, scheduled_event: event_params
+        expect(ScheduledEvent.all.first.event_exceptions.length).to eq 0
+      end
+    end
+  end
+
   describe "GET index" do
     let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
     let(:scheduled_events) { [scheduled_event] }
