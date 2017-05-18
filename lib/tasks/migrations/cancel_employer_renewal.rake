@@ -69,7 +69,7 @@ namespace :migrations do
         enrollments_for_plan_year(plan_year).each do |hbx_enrollment|
           if hbx_enrollment.may_cancel_coverage?
             hbx_enrollment.cancel_coverage!
-            puts "canceling employees coverage for employer enrollment hbx_id:#{enrollment.hbx_id}" unless Rails.env.test?
+            puts "canceling employees coverage for employer enrollment hbx_id:#{hbx_enrollment.hbx_id}" unless Rails.env.test?
           end
         end
 
