@@ -11,6 +11,9 @@ RSpec.describe Exchanges::ScheduledEventsController do
       recurring_rules: {},
       :start_time => Date.today
     }}
+  after do
+    ScheduledEvent.delete_all
+  end
   before do
     sign_in(user)
   end
@@ -48,11 +51,22 @@ RSpec.describe Exchanges::ScheduledEventsController do
   end
 
   describe "update" do
-    context "remove event exceptions"
+    context "remove event exceptions" do
       let!(:event_exception) { FactoryGirl.create(:event_exception) }
+      let!(:scheduled_event) { ScheduledEvent.all.first }
       it "delete event exceptions" do
-        put :update, scheduled_event: event_params
+        put :update, id: scheduled_event.id, scheduled_event: event_params
         expect(ScheduledEvent.all.first.event_exceptions.length).to eq 0
+        expect(response).to redirect_to exchanges_scheduled_events_path
+      end
+    end
+    context "Add recurring rules" do
+      let!(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+      it "set one time false with recurring rules" do
+        scheduled_event.update_attributes!(recurring_rules: "{\"interval\":1,\"until\":null,\"count\":null,\"validations\":{\"day_of_week\":{},\"day_of_month\":[22]},\"rule_type\":\"IceCube::MonthlyRule\",\"week_start\":0}")
+        put :update, id: scheduled_event.id, scheduled_event: event_params
+        expect(scheduled_event.one_time).to eq true
+        expect(response).to redirect_to exchanges_scheduled_events_path
       end
     end
   end
@@ -90,6 +104,22 @@ RSpec.describe Exchanges::ScheduledEventsController do
       expect(response).to render_template(:'exchanges/scheduled_events/_get_events_field')
       expect(assigns(:events)).to match_array(%W(New_Year MartinLuthor_birthdday washingtons_day memorial_day independence_day
                                                  Labour_day columbus_day veterans_day Christmas Thanksgiving_day))
+    end
+  end
+
+  describe "POST#delete_current_event" do
+    let(:scheduled_event) { FactoryGirl.create(:scheduled_event) }
+    let(:time) { Date.new(2017, 8, 22) }
+    before do
+      scheduled_event.update_attributes!(recurring_rules: "{\"interval\":1,\"until\":null,\"count\":null,\"validations\":{\"day_of_week\":{},\"day_of_month\":[22]},\"rule_type\":\"IceCube::MonthlyRule\",\"week_start\":0}")
+      post :delete_current_event, id: scheduled_event.id, time: time
+    end
+    it "should create an exception" do
+      expect(ScheduledEvent.all.first.event_exceptions.length).to eq 1
+      expect(ScheduledEvent.all.first.event_exceptions.first.time.day).to eq 22
+      expect(ScheduledEvent.all.first.event_exceptions.first.time.month).to eq 8
+      expect(ScheduledEvent.all.first.event_exceptions.first.time.year).to eq 2017
+      expect(response).to redirect_to exchanges_scheduled_events_path
     end
   end
 end

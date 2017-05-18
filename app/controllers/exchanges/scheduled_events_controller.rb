@@ -34,9 +34,9 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     if @scheduled_event.update_attributes!(scheduled_event_params)
       @scheduled_event.event_exceptions.delete_all
       if @scheduled_event.recurring_rules.present?
-        @scheduled_event.update_attributes!(one_time: true)
-      else
         @scheduled_event.update_attributes!(one_time: false)
+      else
+        @scheduled_event.update_attributes!(one_time: true)
       end
       redirect_to exchanges_scheduled_events_path
     end
@@ -84,8 +84,7 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   end
 
   def delete_current_event
-    params.permit!
-    @scheduled_event = ScheduledEvent.find(params[:format])
+    @scheduled_event = ScheduledEvent.find(params[:id])
     if @exception = @scheduled_event.event_exceptions.create(time: params[:time])
       redirect_to exchanges_scheduled_events_path, notice: 'Current Event was successfully destroyed.'
     else

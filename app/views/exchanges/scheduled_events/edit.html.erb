@@ -5,6 +5,6 @@
 		<%= render 'shared/tab_panel' %>
 	</div>
 </div>
-<%= form_for @scheduled_event, as: :scheduled_event, url: exchanges_scheduled_event_path(@scheduled_event), method: :put do |f| %>
+<%= form_for @scheduled_event, as: :scheduled_event, url: exchanges_scheduled_event_path(@scheduled_event), html: { method: :put } do |f| %>
   <%= render "event_form", f: f  %>
 <% end %>
