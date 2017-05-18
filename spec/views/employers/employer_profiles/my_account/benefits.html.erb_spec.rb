@@ -164,7 +164,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
       it "should display claim quote button" do
         render "employers/employer_profiles/my_account/benefits"
-        expect(rendered).to have_selector("a", text: "Claim Quote")
+        expect(rendered).not_to have_selector("a", text: "Claim Quote")
       end
     end
 
@@ -176,7 +176,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
 
       it "should not display add plan year button" do
         render "employers/employer_profiles/my_account/benefits"
-        expect(rendered).not_to have_selector("a", text: "Claim Quote")
+        expect(rendered).to have_selector("a", text: "Claim Quote")
       end
     end
   end
