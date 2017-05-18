@@ -1,0 +1,18 @@
+<div id="employer-selection" class='row no-buffer'>
+  <h3><%= "Employer".pluralize(@employee_role.person.active_employee_roles.size)%></h3>
+
+    <div class="n-radio-group">
+      <% @person.active_census_employees.each_with_index do |census_employee, index| %>
+        <div class="n-radio-row">
+          <label class="n-radio">
+            <% dental_benefits = census_employee.active_benefit_group.present? && census_employee.active_benefit_group.is_offering_dental? %>
+            <%= radio_button_tag 'employee_role_id', census_employee.employee_role.id, is_employer_checked?(census_employee.employee_role, census_employee), id: "census_employee_#{census_employee.id}", disabled: is_employer_disabled?(census_employee.employee_role),required: true, dental_benefits: dental_benefits,class: "n-radio"%>
+            <span class="n-radio">
+            </span>
+            <%= census_employee.employer_profile.legal_name.capitalize %>
+          </label>
+        </div>
+      <% end %>
+    </div>
+  <hr />
+</div>
