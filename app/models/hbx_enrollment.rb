@@ -542,8 +542,12 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_shop?
-      if self.benefit_group.plan_year.is_published?
 
+      if self.aasm.to_state == :coverage_enrolled && self.aasm.from_state != :coverage_reinstated
+        return
+      end
+
+      if self.benefit_group.plan_year.is_published?
         renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
 
         if renewal_plan_year.present?
@@ -1167,7 +1171,7 @@ class HbxEnrollment
     state :shopping, initial: true
     state :coverage_selected, :after_enter => :update_renewal_coverage
     state :transmitted_to_carrier
-    state :coverage_enrolled
+    state :coverage_enrolled, :after_enter => :update_renewal_coverage
 
     state :coverage_termination_pending
     state :coverage_canceled      # coverage never took effect
