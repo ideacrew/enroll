@@ -24,9 +24,10 @@ describe AddFamilyMemberToCoverageHousehold do
     it "should add a family member to household" do
       family.active_household.immediate_family_coverage_household.coverage_household_members.each do |chm|
         chm.delete
+        expect(family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq 0
         subject.migrate
         family.active_household.reload
-        expect(family.active_household.immediate_family_coverage_household.coverage_household_members).not_to eq []
+        expect(family.active_household.immediate_family_coverage_household.coverage_household_members.size).to eq 1
       end
     end
 
