@@ -1,6 +1,7 @@
 %h3 Healthcare Marketplace
 
 %p
+  The current selection will continue through the plan selection process for that enrollment, you will have the opportunity to plan shop for additional Employer Plan Year Benefits or Individual Benefits from your Employee account.
   .n-radio-group.select-employer
     - @employment_relationships.each_with_index do |er, index|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
