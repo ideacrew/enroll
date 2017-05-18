@@ -256,7 +256,7 @@ class CensusEmployee < CensusMember
   def terminate_employee_enrollments
     [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
       enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
-      enrollments.each do |e| 
+      enrollments.each do |e|
         if e.effective_on > self.coverage_terminated_on
           e.cancel_coverage!(self.employment_terminated_on) if e.may_cancel_coverage?
         else
@@ -448,6 +448,7 @@ class CensusEmployee < CensusMember
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
+      CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
     def initial_employee_open_enrollment_notice(date)
@@ -490,6 +491,25 @@ class CensusEmployee < CensusMember
           census_employee.terminate_employee_role!
         rescue Exception => e
           puts "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+        end
+      end
+    end
+
+    def census_employee_open_enrollment_reminder_notice(date)
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:aasm_state.in => ["enrolling", "renewing_enrolling"], :open_enrollment_end_on => date+2.days}})
+      organizations.each do |org|
+        plan_year = org.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+        #exclude congressional employees
+        next if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
+        census_employees = org.employer_profile.census_employees.non_terminated
+        census_employees.each do |ce|
+          begin
+            #exclude new hires
+            next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
+          rescue Exception => e
+            puts "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" unless Rails.env.test?
+          end
         end
       end
     end
