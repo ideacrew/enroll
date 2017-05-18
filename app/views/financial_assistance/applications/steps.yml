@@ -113,7 +113,6 @@
                 - gutter: 6
                   type: text
                   text: Are you a US citizen or US National.
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row1
@@ -121,7 +120,8 @@
                   id: 'yes1'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: person
+                  attribute: us_citizen
                 - gutter: 5
                   type: label_radio
                   name: row1
@@ -129,12 +129,12 @@
                   id: 'no1'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
+                  model: person
+                  attribute: us_citizen
             - cells:
                 - gutter: 6
                   type: text
                   text: Are you a naturalized citizen?*
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -142,7 +142,8 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: person
+                  attribute: naturalized_citizen
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -150,17 +151,15 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
+                  model: person
+                  attribute: naturalized_citizen
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
-
             - cells:
                 - gutter: 6
                   type: text
                   text: Are you a member of American indian or Alaskn native Tribe?*
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row3
@@ -168,7 +167,8 @@
                   id: 'yes3'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: person
+                  attribute: indian_tribe_member
                 - gutter: 5
                   type: label_radio
                   name: row3
@@ -176,13 +176,12 @@
                   id: 'no3'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
-
+                  model: person
+                  attribute: indian_tribe_member
             - cells:
                 - gutter: 6
                   type: text
                   text: Are you currently incarcerated?*
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row4
@@ -190,7 +189,8 @@
                   id: 'yes4'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: person
+                  attrubute: is_incarcerated
                 - gutter: 1
                   type: label_radio
                   name: row4
@@ -198,17 +198,16 @@
                   id: 'no4'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
+                  model: person
+                  attrubute: is_incarcerated
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 
             - cells:
                 - gutter: 6
                   type: text
                   text: Do you have disability?*
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row5
@@ -216,7 +215,8 @@
                   id: 'yes5'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
+                  model: person
+                  attrubute: is_disabled
                 - gutter: 1
                   type: label_radio
                   name: row5
@@ -224,11 +224,11 @@
                   id: 'no5'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
+                  model: person
+                  attrubute: is_disabled
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 - step:
     heading: Address
     heading_text: Please enter the following info. When you've finished SELECT Continue.
@@ -268,7 +268,6 @@
             - cells:
                 - gutter: 6
                   type: raw_html
-                  classNames: 'span-text'
                   text: 'Are you <b>temporarily</b> outside DC and <b>intend to return</b>? *'
                 - gutter: 1
                   type: label_radio
@@ -277,7 +276,6 @@
                   id: '3yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 5
                   type: label_radio
                   name: DC
@@ -285,11 +283,9 @@
                   id: '3no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
-                  classNames: 'span-text'
                   label: I am DC resident who is homeless or have no permanent address.
                   name: opt_checkbox
 
@@ -305,7 +301,6 @@
                   type: input
                   name: home_phone
                   placeholder: HOME PHONE
-                  classNames:
                   required: true
                 - gutter: 6
                   type: input
@@ -317,7 +312,6 @@
                   type: input
                   name: home_email
                   placeholder: HOME EMAIL
-                  classNames:
                   required: true
                 - gutter: 6
                   type: input
@@ -336,10 +330,8 @@
                   id: 'mail1'
                   checked: true
                   label: 'By mail only'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: raw_html
-                  classNames: 'span-text'
                   text: '|'
                 - gutter: 3
                   type: label_radio
@@ -348,11 +340,9 @@
                   id: 'email1'
                   checked: false
                   label: 'By email only'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: raw_html
                   text: '|'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: label_radio
                   name: receive_notices
@@ -360,15 +350,12 @@
                   id: 'mail_email_1'
                   checked: false
                   label: 'Both mail and email'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 4
                   type: dropdown
                   name: state
                   values:
                     - English
-                  classNames: 'span-text'
-
 - step:
     heading: Race / Ethnicity
     heading_text: Please enter the following info. When you've finished, select CONTINUE
@@ -379,101 +366,119 @@
                 - gutter: 12
                   type: text
                   text: What is your race/ethnicity?
-                  classNames: 'span-text'
                 - gutter: 12
                   type: text
                   text: Check all that apply?
-                  classNames: 'span-text'
             - cells:
                 - gutter: 3
                   type: checkbox
                   label: White 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Filipino
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Native Hawaiian
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Other Pacific Islander
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Black or African American 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Japanese
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Samoan
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: American Indian or Alaskan 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Asian Indian 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Korean
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Guamanian or Chamorro
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: other
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: chinese 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Vietnamese
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Other Asian 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
             - cells:
                 - gutter: 12
                   type: text
                   text: IF HISPANIC/LATINO(OPTIONAL-check all that apply)
-                  classNames: 'span-text'
                 - gutter: 4
                   type: checkbox
                   label: Mexican 
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Chicano/a
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Cuba
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Mexican American
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Puerto Rican
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Other
-                  classNames: 'span-text'
+                  model: person
+                  attrinute: ethnicity
 - step:
     heading: Help for Paying Coverage
     heading_text: To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When youve finished,select CONTINUE.
@@ -484,7 +489,6 @@
                 - gutter: 6
                   type: text
                   text: Do you want to apply for help paying for coverage?**
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -492,7 +496,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -500,20 +503,16 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'span-text'
                   text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'span-text'
                   text: 'Learn more about <a href= "#">your options</a> or <a href="#">use our Plan Match Tool</a> to see if you may qualify.'                 
 - step:
     heading: Who Do You Want To Enroll In a Plan?
@@ -526,7 +525,6 @@
                   type: input
                   name: name
                   placeholder: NAME
-                  classNames:
                   required: true
                 - gutter: 4
                   type: input
@@ -553,7 +551,6 @@
                   type: input
                   name: name
                   placeholder: NAME
-                  classNames:
                   required: true
                 - gutter: 4
                   type: input
@@ -579,7 +576,6 @@
                   type: input
                   name: name
                   placeholder: NAME
-                  classNames:
                   required: true
                 - gutter: 4
                   type: input
@@ -644,11 +640,9 @@
                 - gutter: 12
                   type: text
                   text: Agreement
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'small-padding-top-bottom'
                   text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b>
                         I can report changes by going online and logging into "My Account", by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
                         or by submitting information via mail or in-person at one of the Department of Human Services' Service Centers. <br> <br>
@@ -669,7 +663,6 @@
                 - gutter: 12
                   type: text
                   text: Terms and Conditions
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -695,18 +688,15 @@
                 - gutter: 4
                   type: text
                   text: Electronic Signature
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: span-text
                   text: When I type my name below, it means I sign the form and promise that all of the information in it is true and complete to the nest of my knowledge.
             - cells:
                 - gutter: 4
                   type: input
                   name: first_name
                   placeholder: FIRST NAME *
-                  classNames:
                   required: true
                 - gutter: 4
                   type: input
@@ -732,17 +722,14 @@
                 - gutter: 12
                   type: text
                   text: Agreement
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames: 'small-padding-top-bottom'
                   text:  <b>I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b>
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: I further agree with the remainder of the information in this agreement
-                  classNames: 'span-text'
 
       - section:
           lines:
@@ -750,30 +737,25 @@
                 - gutter: 12
                   type: text
                   text: Terms and Conditions
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: I agree with the Terms and Conditions described here *
-                  classNames: 'span-text'
       - section:
           lines:  
             - cells:
                 - gutter: 4
                   type: text
                   text: Electronic Signature
-                  classNames: span-text
             - cells:
                 - gutter: 12
                   type: text
-                  classNames: span-text
                   text: When I type my name below, it means I sign the form and promise that all of the information in it is true and complete to the nest of my knowledge.
             - cells:
                 - gutter: 4
                   type: input
                   name: first_name
                   placeholder: FIRST NAME *
-                  classNames:
                   required: true
                 - gutter: 4
                   type: input
@@ -796,7 +778,6 @@
                 - gutter: 6
                   type: text
                   text: Will this person file taxes for 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -804,7 +785,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -812,16 +792,13 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: text
                   text: Will this person be claimed as somebody else’s tax dependent for 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -829,7 +806,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -837,11 +813,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 - step:
     heading: Tax Info 2
     heading_text: Please complete all tax info for Mary. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
@@ -852,7 +826,6 @@
                 - gutter: 6
                   type: text
                   text: Will this person file taxes for 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -860,7 +833,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -868,16 +840,13 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: text
                   text: Will this person be claimed as somebody else’s tax dependent for 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -885,7 +854,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -893,22 +861,17 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: text
                   text: This person will be claimed as a dependent by *
-                  classNames: 'span-text'
                   required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames: 'span-text'
                   required: true
                   values:
                     - Select who will claim this person
@@ -925,7 +888,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have any income from a job in 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -933,7 +895,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -941,11 +902,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 
 - step:
     heading: Job Income 2
@@ -957,7 +916,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have any income from a job in 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -965,7 +923,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -973,22 +930,17 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: text
                   text: What Kind of job income is this?*
-                  classNames: 'span-text small-padding-left-right small-padding-top-bottom'
                   required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames: 'span-text'
                   required: true
                   values:
                     - Select who will calim this person
@@ -1000,13 +952,10 @@
                   type: input
                   name: amount
                   placeholder: AMOUNT *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames:
                   required: true
                   values:
                     - HOW OFTEN
@@ -1016,49 +965,41 @@
                   type: input
                   name: from
                   placeholder: FROM *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: input
                   name: to
                   placeholder: TO *
-                  classNames:
                   required: true
             - cells:
                 - gutter: 6
                   type: input
                   name: employer_name
                   placeholder: EMPLOYER NAME *
-                  classNames:
                   required: true
                 - gutter: 6
                   type: input
                   name: employer_phone
                   placeholder: EMPLOYER PHONE
-                  classNames:
             - cells:
                 - gutter: 6
                   type: input
                   name: employer_address_line_1
                   placeholder: EMP ADD LINE 1 
-                  classNames:
                   required: true
                 - gutter: 6
                   type: input
                   name: employer_address_line_2
                   placeholder: EMP ADD LINE 2 *
-                  classNames:
             - cells:
                 - gutter: 3
                   type: input
                   name: city
                   placeholder: CITY *
-                  classNames:
                   required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
                   required: true
                   values:
                     - Choose State
@@ -1068,19 +1009,15 @@
                   type: input
                   name: zip
                   placeholder: ZIP *
-                  classNames:
                   required: true
             - cells:
                 - gutter: 6
                   type: text
                   text: What Kind of job income is this?*
-                  classNames: 'span-text small-padding-left-right small-padding-top-bottom'
                   required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames: 'span-text'
                   required: true
                   values:
                     - Select who will calim this person
@@ -1092,13 +1029,10 @@
                   type: input
                   name: amount
                   placeholder: AMOUNT *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames:
                   required: true
                   values:
                     - HOW OFTEN
@@ -1108,13 +1042,11 @@
                   type: input
                   name: from
                   placeholder: FROM *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: input
                   name: to
                   placeholder: TO *
-                  classNames:
                   required: true
             - cells:
               - gutter: 12
@@ -1131,7 +1063,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have any income from a job in 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1139,7 +1070,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1147,11 +1077,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 
 - step:
     heading: Other Income 2
@@ -1163,7 +1091,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have any income from a job in 2017? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1171,7 +1098,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1179,11 +1105,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -1192,34 +1116,27 @@
                 - gutter: 12
                   type: checkbox
                   label: Unemployment
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Pension
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Retirement Account
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Alimoney Received 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 3
                   type: input
                   name: amount
                   placeholder: AMOUNT *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames:
                   required: true
                   values:
                     - HOW OFTEN
@@ -1229,32 +1146,26 @@
                   type: input
                   name: from
                   placeholder: FROM *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: input
                   name: to
                   placeholder: TO *
-                  classNames:
                   required: true
 
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Net Farming/Fishing
-                  classNames: 'span-text'
             - cells:
                 - gutter: 3
                   type: input
                   name: amount
                   placeholder: AMOUNT *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames:
                   required: true
                   values:
                     - HOW OFTEN
@@ -1264,98 +1175,80 @@
                   type: input
                   name: from
                   placeholder: FROM *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: input
                   name: to
                   placeholder: TO *
-                  classNames:
                   required: true
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Net Rental/Royality
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Alaska Permanent Fund dividends
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Alternative Trade Adjustment Assistance (ATAA) or Reemployment
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Trade Adjustment Assistance payments
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Cancelled debts
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Dividends on insurance policies 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Gambling winnings, including awards, prizes, jackpots, and contest winnings 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Hobby Income
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Jury Duty pay
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Losses on certain corrective retirement plan distributions of excess deferrals
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Non business income (earned from rating personal property; only applies if you are not a Real Estate professional.)
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Recapture of a charitable contribution deduction
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Recoveries(reimbursements you received for previously deducted expenses, such as medical expenses, and other deductions)
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Taxable distributions form a health savings account (HSA) or an Archer MSA 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Taxable HSA distributions deemed to be. Income because you did not remain an eligible individual during the testing period
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
-                  classNames: 'span-text'
                   label: Taxable portion of disaster relief payments.
 
 - step:
     heading: Adjustments 1
-    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
+    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -1363,7 +1256,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have adjustments to income in 2017 ? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1371,7 +1263,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1379,7 +1270,6 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -1387,7 +1277,7 @@
 
 - step:
     heading: Adjustments 2
-    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
+    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -1395,7 +1285,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have adjustments to income in 2017 ? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1403,7 +1292,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1411,11 +1299,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -1424,19 +1310,15 @@
                 - gutter: 12
                   type: checkbox
                   label: Alimony Paid
-                  classNames: 'span-text'
             - cells:
                 - gutter: 3
                   type: input
                   name: amount
                   placeholder: AMOUNT *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: 'dropdown'
                   name: 'check'
-                  classNames: 'form-control'
-                  classNames:
                   required: true
                   values:
                     - HOW OFTEN
@@ -1446,27 +1328,23 @@
                   type: input
                   name: from
                   placeholder: FROM *
-                  classNames:
                   required: true
                 - gutter: 3
                   type: input
                   name: to
                   placeholder: TO *
-                  classNames:
                   required: true
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Student Loan Interest
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Other Deductions
-                  classNames: 'span-text'
 - step:
     heading: Other Health Coverage 1
-    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
+    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -1474,7 +1352,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person currently have access to other  coverage, including through John Appleseed ? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1482,7 +1359,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1490,15 +1366,13 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
 
 - step:
     heading: Other Health Coverage 2
-    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When you've finished, select CONTINUE.
+    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -1506,7 +1380,6 @@
                 - gutter: 6
                   type: text
                   text: Does this person currently have access to other  coverage, including through John Appleseed ? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1514,7 +1387,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1522,11 +1394,9 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -1535,57 +1405,46 @@
                 - gutter: 12
                   type: checkbox
                   label: Alimony Paid
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: text
-                  classNames: 'span-text'
                   text: Coverage Source (check all that apply) *
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Employer-sponsored coverage
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Continuation coverage from a former employer(COBRA) 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Coverage purchased on the individual market 
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Medicaid
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: CHIP (Childeren's Health Insurance Program)
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Medicare
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Tricare
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: VA
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: checkbox
                   label: Peace Corps
-                  classNames: 'span-text'
 - step:
     heading: Other Questions
     heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
@@ -1596,7 +1455,6 @@
                 - gutter: 8
                   type: text
                   text: Has this person applied for an SSN *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1604,7 +1462,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1612,12 +1469,10 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: Is this person pregnant? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1625,7 +1480,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1633,12 +1487,10 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: Is this person blind? *
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1646,7 +1498,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1654,12 +1505,10 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: Does this person need help with daily life activities, such as dressing or bathing?
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1667,7 +1516,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1675,12 +1523,10 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: Does this person need help paying for any medical bills from the last 3 months?
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1688,7 +1534,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1696,12 +1541,10 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: Was this person in foster care at age 18 or older?
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -1709,7 +1552,6 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 3
                   type: label_radio
                   name: row2
@@ -1717,9 +1559,7 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
-                  classNames: 'span-text'
             - cells:
                 - gutter: 12
                   type: raw_html
-                  classNames:
                   text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
