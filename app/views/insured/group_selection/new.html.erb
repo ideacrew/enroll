@@ -52,7 +52,7 @@
                 <% Plan::MARKET_KINDS.each_with_index do |kind, index| %>
                   <div class="n-radio-row">
                     <label class="n-radio" for="market_kind_<%= kind %>">
-                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: (@market_kind == kind), disabled: (@disable_market_kind == kind) %>
+                      <%= radio_button_tag 'market_kind', kind, index == 0, id: "market_kind_#{kind}", required: true, class: "n-radio", checked: is_market_kind_checked?(kind), disabled: is_market_kind_disabled?(kind) %>
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
@@ -86,7 +86,7 @@
                     <div class="n-radio-row">
                       <label class="n-radio">
                         <% dental_benefits = census_employee.active_benefit_group.present? && census_employee.active_benefit_group.is_offering_dental? %>
-                        <%= radio_button_tag 'employee_role_id', census_employee.employee_role.id, census_employee.employee_role.id == @employee_role.id, id: "census_employee_#{census_employee.id}", required: true, dental_benefits: dental_benefits,class: "n-radio"%>
+                        <%= radio_button_tag 'employee_role_id', census_employee.employee_role.id, is_employer_checked?(census_employee.employee_role, census_employee), id: "census_employee_#{census_employee.id}", disabled: is_employer_disabled?(census_employee.employee_role),required: true, dental_benefits: dental_benefits,class: "n-radio"%>
                         <span class="n-radio">
                         </span>
                         <%= census_employee.employer_profile.legal_name.capitalize %>
@@ -96,7 +96,6 @@
                 </div>
               <hr />
             </div>
-            <% @other_employee_role = @person.active_employee_roles.detect {|er| er.id != @employee_role.id} %>
           <% end %>
 
           <% if can_shop_resident?(@person) %>
@@ -117,7 +116,7 @@
               <div class="n-radio-group">
                 <div class="n-radio-row">
                   <label class="n-radio" for="coverage_kind_health">
-                    <%= radio_button_tag 'coverage_kind', 'health', true, id: 'coverage_kind_health', class: 'n-radio' %>
+                    <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Health
@@ -126,7 +125,7 @@
 
                 <div id="dental-radio-button" class="n-radio-row <%= 'dn' if can_shop_shop?(@person) && !@employee_role.is_dental_offered? %>">
                   <label class="n-radio" for="coverage_kind_dental">
-                    <%= radio_button_tag 'coverage_kind', 'dental', false, id: 'coverage_kind_dental', class: 'n-radio' %>
+                    <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
                     Dental
@@ -243,6 +242,7 @@ function setGroupSelectionHandlers(){
         }
       });
 
+      $("#coverage_kind_health").prop("checked", true);
       $('#shop-coverage-household').show();
       $('#ivl-coverage-household').hide();
       $('#ivl-coverage-household input').removeProp('checked');
@@ -257,7 +257,7 @@ function setGroupSelectionHandlers(){
   }
 
   if ( $('#market_kind_shop').is(':checked') ) {
-    $("#coverage_kind_health").prop("checked", true);
+    // $("#coverage_kind_health").prop("checked", true);
     $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
     employers.each(function(){
       if($(this).is(":checked") && $(this).attr('dental_benefits') == 'true'){
@@ -283,6 +283,7 @@ function setGroupSelectionHandlers(){
   }
 
   employers.on("change", function(){
+    $("#coverage_kind_health").prop("checked", true);
     if($(this).is(":checked")){
       setDentalBenefits($(this).attr('dental_benefits'));
     }
