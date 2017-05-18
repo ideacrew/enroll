@@ -1,4 +1,4 @@
-module HbxEnrollments
+module Enrollments
   module Replicator
     class IndividualMarketRenewal < Renewal
     end
