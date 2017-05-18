@@ -19,13 +19,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Your employee open enrollment period closed on <EE OE end date> and your group did not meet at least one of the eligibility requirements listed below. As a result, your group is not eligible to obtain employer-sponsored health insurance effective <Renewal Date> at this time. Your group’s current coverage and all active employees’ enrollments will terminate on <Coverage End Date>."} %>
+  content: "Your employee open enrollment period closed on #{notice.plan_year.open_enrollment_end_on} and your group did not meet at least one of the eligibility requirements listed below. As a result, your group is not eligible to obtain employer-sponsored health insurance effective #{notice.plan_year.start_on} at this time. Your group’s current coverage and all active employees’ enrollments will terminate on #{notice.plan_year.end_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<b><At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage. OR/ One non-owner employee enrolled in health coverage.></b>"} %>
+  content: "<strong>#{notice.plan_year.warnings.join(' and ')}</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through DCHealthLink.com. Please note that you must meet the two requirements listed above to be eligible to obtain employer-sponsored health insurance through #{Settings.site.short_name}."} %>
+  content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>. Please note that you must meet the two requirements listed above to be eligible to obtain employer-sponsored health insurance through #{Settings.site.short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "If you are unable to satisfy the minimum participation requirement, you will only be able to offer #{Settings.site.short_name} coverage during the special annual enrollment period at the end of each year, during which employers can offer group health coverage effective January 1st without contributing 50% to employees’ premiums or meeting the two-thirds minimum participation requirement. Groups must have at least one non-owner employee enrolled to be eligible for coverage through #{Settings.site.short_name}, including during the special annual enrollment period."} %>
