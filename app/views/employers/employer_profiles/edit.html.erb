@@ -1,4 +1,6 @@
 <% content_for :left_navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<%= render "employer_form" %>
+<% content_for :main do %>
+  <%= render "employer_form" %>
+<% end %>
