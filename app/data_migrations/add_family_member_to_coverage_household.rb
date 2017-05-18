@@ -9,8 +9,12 @@ class AddFamilyMemberToCoverageHousehold < MongoidMigrationTask
       family = person.primary_family
       if family.present?
         family_member = person.primary_family.primary_applicant
-        family.active_household.add_household_coverage_member(family_member)
-        family.save
+        if family_member.present?
+          family.active_household.add_household_coverage_member(family_member)
+          family.save
+        else
+          raise "No Family Member Found"
+        end
       else
         raise "No Family Found"
       end
