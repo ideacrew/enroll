@@ -190,7 +190,7 @@
                   checked: true
                   label: 'Yes'
                   model: person
-                  attrubute: is_incarcerated
+                  attribute: is_incarcerated
                 - gutter: 1
                   type: label_radio
                   name: row4
@@ -199,7 +199,7 @@
                   checked: false
                   label: 'No'
                   model: person
-                  attrubute: is_incarcerated
+                  attribute: is_incarcerated
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -216,7 +216,7 @@
                   checked: true
                   label: 'Yes'
                   model: person
-                  attrubute: is_disabled
+                  attribute: is_disabled
                 - gutter: 1
                   type: label_radio
                   name: row5
@@ -225,7 +225,7 @@
                   checked: false
                   label: 'No'
                   model: person
-                  attrubute: is_disabled
+                  attribute: is_disabled
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
