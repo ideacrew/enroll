@@ -296,6 +296,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP13',
+    title: 'Open Enrollment Reminder',
+    description: 'This notices goes to all the employees in the open enrollment period',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_reminder',
+    notice_triggers: [
+      {
+        name: 'Employee Open Enrollment Reminder Notice',
+        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
+        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
+        mpi_indicator: 'MPI_SHOP13',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
