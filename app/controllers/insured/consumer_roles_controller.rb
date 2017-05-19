@@ -243,7 +243,6 @@ class Insured::ConsumerRolesController < ApplicationController
     binding.pry
     policy_name = exception.policy.class.to_s.underscore
     if @current_user.has_consumer_role?
-      flash[:error] = "We're sorry. Due to circumstances beyond your control an error has occured. Please contact customer service at 1-855-532-5465 for more information."
       respond_to do |format|
         format.html { redirect_to edit_insured_consumer_role_path(@current_user.person.consumer_role) }
       end
