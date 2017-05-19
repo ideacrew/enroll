@@ -24,11 +24,11 @@ RSpec.describe "insured/families/_employers_selection.html.erb" do
   end
 
   it "should get legal_name of employer" do
-    expect(rendered).to have_content(er1.legal_name)
-    expect(rendered).to have_content(er2.legal_name)
+    expect(rendered).to have_content(er1.legal_name.capitalize)
+    expect(rendered).to have_content(er2.legal_name.capitalize)
   end
 
   it "should have form" do
-    expect(rendered).to have_selector('form')
+    expect(rendered).not_to have_selector('form')
   end
 end

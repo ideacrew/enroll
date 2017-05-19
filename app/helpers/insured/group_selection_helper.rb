@@ -101,11 +101,11 @@ module Insured
       end
     end
 
-    def is_employer_checked?(employee_role, census_employee)
+    def is_employer_checked?(employee_role)
       if @mc_market_kind.present?
-        !(is_employer_disabled?(census_employee.employee_role)) || census_employee.employee_role.id == @employee_role.id
+        !(is_employer_disabled?(employee_role))
       else
-        census_employee.employee_role.id == @employee_role.id
+        employee_role.id == @employee_role.id
       end
     end
 
