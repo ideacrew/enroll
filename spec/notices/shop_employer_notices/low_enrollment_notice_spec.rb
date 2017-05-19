@@ -56,7 +56,7 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
     end
     context "initial employer" do
       let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
-      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'draft' ) }
+      let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
       let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
 
       it "should return draft plan year information" do
@@ -74,7 +74,7 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
       let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
       let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
       let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-      let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
+      let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolling' ) }
       let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
 
       it "should return renewing draft plan year information" do

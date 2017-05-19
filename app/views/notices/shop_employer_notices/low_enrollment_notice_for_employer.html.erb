@@ -51,26 +51,12 @@
           <strong>Log in to your DCHealthLink.com Account</strong><br>
         </li>
         <li style="margin-top: 5px;">
-          <strong>Employee Enrollments</strong><br>Share <u><a href='https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf'>Employees How to Enroll in a Plan through <%= Settings.site.short_name%></a></u> with your eligible employees to guide them through the enrollment process. If you are the point of contact for the group, you can follow this guide to enroll in a plan - <u><a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf'>Employers Enrolling as Employees.</a></u><br></br>
+          <strong>Monitor Employee Enrollments</strong><br>Share <u><a href='https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf'>Employees How to Enroll in a Plan through <%= Settings.site.short_name%></a></u> with your eligible employees to guide them through the enrollment process. If you are the point of contact for the group, you can follow this guide to enroll in a plan - <u><a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf'>Employers Enrolling as Employees.</a></u><br></br>
           <strong><i>Employers should review their roster to ensure that owners and family members of owners ensure that any employees who are also owners (or family members of owners) are identified as owners on their roster.</i></strong> For your group to receive coverage through the Small Business Marketplace, you must have at least one non-owner enrolled in a health plan at the end of each annual employee open enrollment period. 
 
         </li>
         <li style="margin-top: 5px;">
-          <strong>First Month’s Premium Payment</strong><br>Once your open enrollment period ends, you will receive an email from <%= Settings.site.short_name %> listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong><i>required</i></strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
-          Once this first premium payment is received, your enrollments will be transmitted to the insurance companies to complete processing and setup of your group and each employee’s enrollments. The insurance companies mail member ID cards to each enrolled employee’s home address on or around the coverage effective date, this usually takes two weeks.<br></br>
-          Once your coverage takes effect, you will receive regular monthly invoices from <%= Settings.site.short_name %> through the mail that include each employee’s enrollment, their premium, and the employer/employee cost breakdown. All premium payments will be made directly to <%= Settings.site.short_name %> either online, by phone or by mail.<br></br>
-          <strong>Make a Secure Online Payment</strong><br>
-          <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf'>Employers Paying Your Premiums Online guide<%= Settings.site.short_name%></a> to make your premium payment online here: <a href='https://www.e-BillExpress.com/ebpp/DCHealthPay'>https://www.e-BillExpress.com/ebpp/DCHealthPay</a>.<br></br>
-          <strong>To make a secure electronic check payment by phone</strong><br>
-          Call <%= Settings.contact_center.phone_number%> (LINK)<br>
-          Select your language (1 for English, 2 for Spanish, additional language options available)<br>
-          Select option for Small Business Employer<br>
-          Select option for Need to Make a Payment<br>
-        </li>
-        <li style="margin-top: 5px;">
-          <strong>Dental Coverage through <%= Settings.site.short_name %></strong><br>Employers who have chosen to offer dental coverage to their employees should be aware that<br>
-          There is no minimum participation requirement for dental coverage<br>
-          You will receive one bill for both medical and dental benefits.
+          <strong>When your open enrollment period closes, you will receive additional information from <%= Settings.site.short_name %> about your group’s status and payment instructions, if applicable.</strong>
         </li>
         </ul>
       </td>
@@ -87,10 +73,13 @@
       <td>
         <ul style="list-style: circle solid;">
         <li style="margin-top: 5px;">
-           <strong>By calling <%= Settings.contact_center.phone_number%></strong>
+          By calling <%= Settings.contact_center.phone_number%>
         </li>
         <li style="margin-top: 5px;">
            <strong>TTY</strong>: 711
+        </li>
+        <li style="margin-top: 5px;">
+          Online at <a href="#{Settings.site.home_url}"><%= "#{Settings.site.website_name}"%></a>
         </li>
         </ul>
       </td>

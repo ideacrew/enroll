@@ -9,6 +9,7 @@ site:
   home_url: "https://www.dchealthlink.com/"
   login_url: "https://app.dchealthlink.com/"
   trained_expert_url: "https://www.dchealthlink.com/find-expert"
+  website_name: "www.DCHealthLink.com"
 
   social_media:
     facebook_url: ""
