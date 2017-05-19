@@ -38,9 +38,9 @@ class Insured::GroupSelectionController < ApplicationController
       @benefit = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.select{|bcp| bcp.contains?(correct_effective_on)}.first.benefit_packages.select{|bp|  bp[:title] == "individual_health_benefits_#{correct_effective_on.year}"}.first
     end
 
-    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
+    if (@change_plan == 'change_by_qle' || @change_plan == "existing_plan" || @enrollment_kind == 'sep')
       @disable_market_kind = "shop"
-      @disable_market_kind = "individual" if @market_kind == "shop"
+      @disable_market_kind = "individual" if @market_kind == "employer_sponsored"
     end
 
     insure_hbx_enrollment_for_shop_qle_flow

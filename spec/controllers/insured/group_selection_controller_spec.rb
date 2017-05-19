@@ -128,8 +128,17 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
-      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'employer_sponsored', consumer_role_id: consumer_role.id
       expect(assigns(:disable_market_kind)).to eq "individual"
+    end
+
+    it "should disable shop market kind if selected market kind is individual in dual role SEP" do
+      allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
+
+      sign_in user
+      get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', consumer_role_id: consumer_role.id
+      expect(assigns(:disable_market_kind)).to eq "shop"
     end
 
     context "individual" do
