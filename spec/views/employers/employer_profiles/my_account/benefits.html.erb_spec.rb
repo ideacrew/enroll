@@ -157,6 +157,7 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
       end
     end
 
+
     context "contain_nonrenewable_ee" do
       it "should render a pop-up template if ineligible EE's present" do
         allow(view).to receive(:contain_nonrenewable_ee).and_return true
@@ -168,6 +169,30 @@ RSpec.describe "employers/employer_profiles/my_account/_benefits.html.erb" do
         allow(view).to receive(:contain_nonrenewable_ee).and_return false
         render "employers/employer_profiles/my_account/benefits"
         expect(rendered).not_to have_selector("p", text: 'By clicking "Publish" you understand that one or more of your employees are currently enrolled')
+      end
+    end
+
+    context "when employer have active plan year"do
+      before do
+        allow(employer_profile).to receive(:is_new_employer?).and_return(true)
+        allow(employer_profile).to receive(:active_plan_year).and_return(true)
+      end
+
+      it "should display claim quote button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).not_to have_selector("a", text: "Claim Quote")
+      end
+    end
+
+    context "when employer do not have active plan year"do
+      before do
+        allow(employer_profile).to receive(:is_new_employer?).and_return(true)
+        allow(employer_profile).to receive(:active_plan_year).and_return(false)
+      end
+
+      it "should not display add plan year button" do
+        render "employers/employer_profiles/my_account/benefits"
+        expect(rendered).to have_selector("a", text: "Claim Quote")
       end
     end
   end
