@@ -29,6 +29,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:consumer_role) {double(dob: (TimeKeeper.date_of_record - 20.years))}
     let(:benefit_package) {double}
 
+    before :each do
+      allow(benefit_package).to receive_message_chain(:benefit_coverage_period,:earliest_effective_date).and_return TimeKeeper.date_of_record 
+    end
+
     it "should return true when 0..0" do
       allow(benefit_package).to receive(:age_range).and_return (0..0)
       expect(rule.is_age_range_satisfied?).to eq true
@@ -174,6 +178,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       before :each do
         allow(benefit_package).to receive(:residency_status).and_return ["state_resident", "other"]
+        allow(benefit_package).to receive_message_chain(:benefit_coverage_period,:earliest_effective_date).and_return TimeKeeper.date_of_record 
       end
 
       it "return true if is dc resident" do
@@ -419,6 +424,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         let(:rule3) { InsuredEligibleForBenefitRule.new(consumer_role_two, benefit_package, family: family) }
 
         it "should return true if person is primary applicant" do
+          # allow(benefit_package).to receive(:earliest_effective_date).and_return(true)
           expect(rule3.is_family_relationships_satisfied?).to eq true
         end
 
