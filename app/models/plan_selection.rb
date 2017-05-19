@@ -102,6 +102,7 @@ class PlanSelection
   end
 
   def existing_enrollment_for_covered_individuals
+    return nil if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group.blank?
     previous_active_coverages.detect{|en| 
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? && en.id != hbx_enrollment.id
     }
@@ -114,16 +115,23 @@ class PlanSelection
       coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
     end
 
-    family.active_household.hbx_enrollments.where({
+    enrollments = family.active_household.hbx_enrollments.where({
       :_id.ne => hbx_enrollment.id,
       :kind => hbx_enrollment.kind,
       :coverage_kind => hbx_enrollment.coverage_kind,
       :effective_on.gte => coverage_year_start,
-      :aasm_state.nin => ["shopping","coverage_expired"]
       }).or( 
         {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}, 
-        {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
+        {:aasm_state => 'coverage_terminated', :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
       ).order("effective_on DESC")
+
+    
+    if hbx_enrollment.is_shop?
+      plan_year = hbx_enrollment.benefit_group.plan_year
+      enrollments.where(:benefit_group_id.in => plan_year.benefit_groups.pluck(:_id))   
+    else
+      enrollments
+    end
   end
 
   def family
