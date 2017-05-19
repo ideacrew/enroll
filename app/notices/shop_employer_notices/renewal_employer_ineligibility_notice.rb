@@ -1,25 +1,27 @@
 class ShopEmployerNotices::RenewalEmployerIneligibilityNotice < ShopEmployerNotice
 
-def deliver
+  def deliver
     build
     append_data
     generate_pdf_notice
+    shop_dchl_rights_attachment
+    shop_non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def append_data
-    renewing_plan_year = employer_profile.plan_years.where(:assm_state => "renewing_application_ineligible").first
+    renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_application_ineligible").first
     active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
 
     plan_year_warnings = []
     renewing_plan_year.enrollment_errors.each do |k, v|
       case k.to_s
-      when "non_business_owner_enrollment_count"
-        plan_year_warnings << "At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage"
       when "enrollment_ratio"
-        plan_year_warnings << "Primary business address not located in the District of Columbia"
+        plan_year_warnings << "At least two-thirds of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
+      when "non_business_owner_enrollment_count"
+        plan_year_warnings << "One non-owner employee enrolled in health coverage"
       end
     end
 
