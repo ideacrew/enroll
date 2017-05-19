@@ -47,39 +47,39 @@
           </div>
         </div>
 
-        <div class="col-xs-2" id="employees-filter">
+        <!--<div class="col-xs-2" id="employees-filter">-->
 
-          <div class="filter" onclick="$(this).closest('.col-xs-2').find('.filter-options').toggle();">
-            Filter By <i class="fa fa-chevron-down"></i>
-          </div>
-          <div class="filter-options">
-            <h4>Filter By <i class="fa fa-chevron-up"></i></h4>
-            <div class="form-inline button-group-wrapper">
-              <div aria-label="" class="btn-group" role="group">
-                <div class="btn-group" data-toggle="buttons" name="employee_family_tabs">
-                  <label class="btn btn-default active">
-                    <input autocomplete="off" checked id="terminated_no" name="options" type="radio" value="active">
-                    Active
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="terminated_yes" name="options" type="radio" value="terminated">
-                    Terminated
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="family_all" name="options" type="radio" value="all">
-                    All
-                  </label>
-                  <label class="btn btn-default">
-                    <input autocomplete="off" id="cobra" name="options" type="radio" value="cobra">
-                    COBRA Continuation
-                  </label>
-                </div>
-              </div>
-              <span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>
-            </div>
-          </div>
+          <!--<div class="filter" onclick="$(this).closest('.col-xs-2').find('.filter-options').toggle();">-->
+            <!--Filter By <i class="fa fa-chevron-down"></i>-->
+          <!--</div>-->
+          <!--<div class="filter-options">-->
+            <!--<h4>Filter By <i class="fa fa-chevron-up"></i></h4>-->
+            <!--<div class="form-inline button-group-wrapper">-->
+              <!--<div aria-label="" class="btn-group" role="group">-->
+                <!--<div class="btn-group" data-toggle="buttons" name="employee_family_tabs">-->
+                  <!--<label class="btn btn-default active">-->
+                    <!--<input autocomplete="off" checked id="terminated_no" name="options" type="radio" value="active">-->
+                    <!--Active-->
+                  <!--</label>-->
+                  <!--<label class="btn btn-default">-->
+                    <!--<input autocomplete="off" id="terminated_yes" name="options" type="radio" value="terminated">-->
+                    <!--Terminated-->
+                  <!--</label>-->
+                  <!--<label class="btn btn-default">-->
+                    <!--<input autocomplete="off" id="family_all" name="options" type="radio" value="all">-->
+                    <!--All-->
+                  <!--</label>-->
+                  <!--<label class="btn btn-default">-->
+                    <!--<input autocomplete="off" id="cobra" name="options" type="radio" value="cobra">-->
+                    <!--COBRA Continuation-->
+                  <!--</label>-->
+                <!--</div>-->
+              <!--</div>-->
+              <!--<span name="employee_families_url" style="display:none"><%= employers_employer_profile_path(@employer_profile) %></span>-->
+            <!--</div>-->
+          <!--</div>-->
 
-          </div>
+          <!--</div>-->
       <% end %>
     </div>
     <% if @employer_profile.census_employees.count > 0 %>
