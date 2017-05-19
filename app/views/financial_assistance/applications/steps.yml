@@ -46,7 +46,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row1
-                  value: 'yes1'
+                  value: false
                   id: 'yes1'
                   checked: true
                   label: 'Yes'
@@ -55,7 +55,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row1
-                  value: 'no1'
+                  value: true
                   id: 'no1'
                   checked: true
                   label: 'No'
@@ -302,22 +302,30 @@
                   name: home_phone
                   placeholder: HOME PHONE
                   required: true
+                  model: person[phone]
+                  attribute: full_phone_number
                 - gutter: 6
                   type: input
                   name: mobile_phone 
                   placeholder: MOBILE PHONE
                   required: true
+                  model: person[phone]
+                  attribute: full_phone_number
             - cells:
                 - gutter: 6
                   type: input
                   name: home_email
                   placeholder: HOME EMAIL
                   required: true
+                  model: person[email]
+                  attribute: address
                 - gutter: 6
                   type: input
                   name: work_email
                   placeholder: WORK EMAIL
                   required: true
+                  model: person[email]
+                  attribute: address
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -330,6 +338,8 @@
                   id: 'mail1'
                   checked: true
                   label: 'By mail only'
+                  model: person[email]
+                  attribute: address
                 - gutter: 1
                   type: raw_html
                   text: '|'
@@ -374,77 +384,77 @@
                   type: checkbox
                   label: White 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Filipino
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Native Hawaiian
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Other Pacific Islander
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Black or African American 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Japanese
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Samoan
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: American Indian or Alaskan 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Asian Indian 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Korean
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Guamanian or Chamorro
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: other
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: chinese 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Vietnamese
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 3
                   type: checkbox
                   label: Other Asian 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
             - cells:
                 - gutter: 12
                   type: text
@@ -453,32 +463,32 @@
                   type: checkbox
                   label: Mexican 
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Chicano/a
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Cuba
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Mexican American
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Puerto Rican
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
                 - gutter: 4
                   type: checkbox
                   label: Other
                   model: person
-                  attrinute: ethnicity
+                  attribute: ethnicity
 - step:
     heading: Help for Paying Coverage
     heading_text: To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When youve finished,select CONTINUE.
@@ -503,9 +513,13 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
+                  model:
+                  attribute:
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
+                  model:
+                  attribute:
             - cells:
                 - gutter: 12
                   type: raw_html
@@ -785,6 +799,8 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_required_to_file_taxes
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -792,6 +808,8 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_required_to_file_taxes
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -806,6 +824,8 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -813,6 +833,8 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -833,6 +855,8 @@
                   id: 'yes2'
                   checked: true
                   label: 'Yes'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -840,6 +864,8 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -861,6 +887,8 @@
                   id: 'no2'
                   checked: false
                   label: 'No'
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -878,6 +906,8 @@
                     - Employee
                     - Spouse
                     - Child
+                  model: FinancialAssistance::Applicant
+                  attribute: is_claimed_as_tax_dependent
 - step:
     heading: Job Income 1
     heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
@@ -940,47 +970,86 @@
                   required: true
                 - gutter: 6
                   type: 'dropdown'
-                  name: 'check'
+                  name: 'income_kind'
                   required: true
                   values:
                     - Select who will calim this person
-                    - Employee
-                    - Spouse
-                    - Child
+                    - alimony_and_maintenance
+                    - american_indian_and_alaskan_native
+                    - capital_gains
+                    - dividend
+                    - employer_funded_disability
+                    - estate_trust
+                    - farming_and_fishing
+                    - foreign
+                    - interest
+                    - lump_sum_amount
+                    - military
+                    - net_self_employment
+                    - other
+                    - pension_retirement_benefits
+                    - permanent_workers_compensation
+                    - prizes_and_awards
+                    - rental_and_royalty
+                    - scholorship_payments
+                    - social_security_benefit
+                    - supplemental_security_income
+                    - tax_exempt_interest
+                    - unemployment_insurance
+                    - wages_and_salaries
+                    - income_from_irs
+                  model: Income
+                  atribute: kind
             - cells:
                 - gutter: 3
                   type: input
                   name: amount
                   placeholder: AMOUNT *
                   required: true
+                  model: Income
+                  atribute: amount
                 - gutter: 3
-                  type: 'dropdown'
-                  name: 'check'
+                  type: dropdown
+                  name: frequency
                   required: true
                   values:
-                    - HOW OFTEN
-                    - ONE 
-                    - TWO
+                    - biweekly 
+                    - daily 
+                    - half_yearly 
+                    - monthly 
+                    - quarterly 
+                    - weekly 
+                    - yearly
+                  model: Income
+                  atribute: frequency_kind 
                 - gutter: 3
                   type: input
-                  name: from
+                  name: start_on
                   placeholder: FROM *
                   required: true
+                  model: Income
+                  atribute: start_on
                 - gutter: 3
                   type: input
-                  name: to
+                  name: end_on
                   placeholder: TO *
                   required: true
+                  model: Income
+                  atribute: end_on
             - cells:
                 - gutter: 6
                   type: input
                   name: employer_name
                   placeholder: EMPLOYER NAME *
                   required: true
+                  model: Income
+                  atribute: employer_name
                 - gutter: 6
                   type: input
                   name: employer_phone
                   placeholder: EMPLOYER PHONE
+                  model: Income
+                  atribute: employer_phone
             - cells:
                 - gutter: 6
                   type: input

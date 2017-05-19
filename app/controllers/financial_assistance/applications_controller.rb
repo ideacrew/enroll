@@ -16,10 +16,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def step
     if params.key? :attributes
-      attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 })
-      @model.attributes = survey_params(attributes)
-      @model.save!
-      @current_step = @current_step.next_step
+      attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 }) if params[:attributes].present?
+      #@model.attributes = survey_params(attributes)
+      #@model.save!
+      #@current_step = @current_step.next_step
     end
 
     if params.key?(:step)
