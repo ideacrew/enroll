@@ -9,7 +9,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household, hbx_enrollment_members: [hbx_enrollment_member, hbx_enrollment_member_two]) }
     let(:hbx_enrollment_member) { FactoryGirl.build_stubbed(:hbx_enrollment_member) }
     let(:hbx_enrollment_member_two) { FactoryGirl.build_stubbed(:hbx_enrollment_member, is_subscriber: false) }
-    
+
     it "it should return subscribers full name in span with dependent-text class" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
       allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
@@ -32,8 +32,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     end
 
     it "it should return options" do
-      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
       date = TimeKeeper.date_of_record
+      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
       expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month+1.day).to_s, 'fixed_first_of_next_month']]
     end
   end
@@ -213,7 +213,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         allow(ENV).to receive(:[]).with("AWS_ENV").and_return("prod")
         expect(helper.tax_info_url).to eq "https://dchealthlink.com/individuals/tax-documents"
       end
-    end 
+    end
 
     context "non-production environment" do
       it "should redirect from test environment" do
@@ -225,18 +225,18 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   describe "show_download_tax_documents_button?" do
     let(:person) { FactoryGirl.create(:person)}
-    
+
     before do
       helper.instance_variable_set(:@person, person)
     end
-    
+
     context "as consumer" do
       let(:consumer_role) {FactoryGirl.build(:consumer_role)}
       context "had a SSN" do
         before do
           person.consumer_role = consumer_role
             person.ssn = '123456789'
-        end   
+        end
         it "should display the download tax documents button" do
          expect(helper.show_download_tax_documents_button?).to eq true
         end
@@ -252,7 +252,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       context "had no SSN" do
         before do
           person.ssn = ''
-        end   
+        end
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button?).to eq false
@@ -287,13 +287,13 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     before do
       helper.instance_variable_set(:@person, person)
     end
-    
-    context "current user is hbx staff" do 
+
+    context "current user is hbx staff" do
       let(:current_user) { FactoryGirl.create(:user, :roles => ['hbx_staff'], :person => person) }
       before do
         sign_in current_user
       end
-    
+
       context "person is consumer role" do
         let(:consumer_role) {FactoryGirl.build(:consumer_role)}
         before do
@@ -304,7 +304,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
           before do
             person.ssn = '123456789'
           end
-          it "should not display the download tax documents button" do   
+          it "should not display the download tax documents button" do
             expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
           end
         end
@@ -313,7 +313,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
           before do
             person.ssn = ''
           end
-          it "should display the download tax documents button" do   
+          it "should display the download tax documents button" do
             expect(helper.show_download_tax_documents_button_on_documents_page?).to eq true
           end
         end
@@ -325,7 +325,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
           person.employee_roles = [employee_role]
           person.ssn = ''
         end
-        it "should not display the download tax documents button" do   
+        it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
         end
       end
@@ -341,7 +341,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       context "has SSN" do
         before do
           person.ssn = '123456789'
-        end   
+        end
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
@@ -382,17 +382,17 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     context "current user is consumer and employee" do
       let(:current_user) { FactoryGirl.create(:user, :roles => ['consumer_role', 'employee_role'], :person => person) }
       let(:consumer_role) {FactoryGirl.build(:consumer_role)}
-      let(:employee_role) {FactoryGirl.build(:employee_role)}   
+      let(:employee_role) {FactoryGirl.build(:employee_role)}
       before do
         sign_in current_user
         person.consumer_role = consumer_role
         person.employee_roles = [employee_role]
-      end 
+      end
 
       context "has SSN" do
         before do
           person.ssn = '123456789'
-        end   
+        end
 
         it "should not display the download tax documents button" do
           expect(helper.show_download_tax_documents_button_on_documents_page?).to eq false
