@@ -321,47 +321,22 @@ describe Person do
 
       context "has_multiple_active_employers?" do
         let(:person) { FactoryGirl.build(:person) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-        let(:ce2) { FactoryGirl.build(:census_employee) }
+        let(:er1) { double("EmployeeRole1") }
+        let(:er2) { double("EmployeeRole2") }
 
         it "should return false without census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([])
+          allow(person).to receive(:active_employee_roles).and_return([])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return false with only one census_employee" do
-          allow(person).to receive(:active_census_employees).and_return([ce1])
+          allow(person).to receive(:active_employee_roles).and_return([er1])
           expect(person.has_multiple_active_employers?).to be_falsey
         end
 
         it "should return true with two census_employees" do
-          allow(person).to receive(:active_census_employees).and_return([ce1, ce2])
+          allow(person).to receive(:active_employee_roles).and_return([er1, er2])
           expect(person.has_multiple_active_employers?).to be_truthy
-        end
-      end
-
-      context "active_census_employees" do
-        let(:person) { FactoryGirl.build(:person) }
-        let(:employee_role) { FactoryGirl.build(:employee_role) }
-        let(:ce1) { FactoryGirl.build(:census_employee) }
-
-        it "should get census_employees by active_employee_roles" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get census_employees by CensusEmployee match" do
-          allow(person).to receive(:active_employee_roles).and_return([])
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
-        end
-
-        it "should get uniq census_employees" do
-          allow(person).to receive(:active_employee_roles).and_return([employee_role])
-          allow(employee_role).to receive(:census_employee).and_return(ce1)
-          allow(CensusEmployee).to receive(:matchable).and_return([ce1])
-          expect(person.active_census_employees).to eq [ce1]
         end
       end
       

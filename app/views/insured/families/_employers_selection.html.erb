@@ -1,8 +1,8 @@
 <h3>Employers</h3>
 <div class="n-radio-group">
-  <% @person.active_census_employees.each do |census_employee| %>
+  <% @person.active_employee_roles.each do |employee_role| %>
     <div class="n-radio-row">
-      <span class="n-radio"><%= census_employee.employer_profile.legal_name.capitalize %></span>
+      <span class="n-radio"><%= employee_role.census_employee.employer_profile.legal_name.capitalize %></span>
     </div>
   <% end %>
 </div>

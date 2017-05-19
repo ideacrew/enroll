@@ -241,7 +241,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :hbx_enrollment, hbx_enrollment
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
-      allow(person).to receive(:active_census_employees).and_return []
       allow(person).to receive(:active_employee_roles).and_return []
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(employee_role).to receive(:employer_profile).and_return(employer_profile)
@@ -303,7 +302,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(person).to receive(:has_employer_benefits?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return []
-      allow(person).to receive(:active_census_employees).and_return []
       allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render file: "insured/group_selection/new.html.erb"
