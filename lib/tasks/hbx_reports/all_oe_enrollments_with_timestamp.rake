@@ -41,8 +41,8 @@ namespace :reports do
             next if hbx_enrollment.workflow_state_transitions.map(&:to_state).include?("auto_renewing")
             next if hbx_enrollment.submitted_at
 
-            next unless family.primary_applicant
-            person = family.primary_applicant.person
+            next unless hbx_enrollment.subscriber && hbx_enrollment.subscriber.person
+            person = hbx_enrollment.subscriber.person
 
             next unless hbx_enrollment.plan
             plan = hbx_enrollment.plan
