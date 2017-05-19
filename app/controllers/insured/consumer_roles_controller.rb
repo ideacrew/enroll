@@ -190,7 +190,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -238,6 +238,25 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def user_not_authorized(exception)
+    binding.pry
+    policy_name = exception.policy.class.to_s.underscore
+    if @current_user.has_consumer_role?
+      flash[:error] = "We're sorry. Due to circumstances beyond your control an error has occured. Please contact customer service at 1-855-532-5465 for more information."
+      respond_to do |format|
+        format.html { redirect_to edit_insured_consumer_role_path(@current_user.person.consumer_role) }
+      end
+    else
+      flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
+      respond_to do |format|
+        format.json { redirect_to destroy_user_session_path }
+        format.html { redirect_to destroy_user_session_path }
+        format.js   { redirect_to destroy_user_session_path }
+      end
+    end
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },

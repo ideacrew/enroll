@@ -35,9 +35,9 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   def edit?
-    if @user.has_role? :hbx_staff
-      true
-    elsif @user.has_role? :consumer
+    if @user.person && @user.person.hbx_staff_role
+      @user.person.hbx_staff_role.permission.can_update_ssn
+    elsif @user.has_consumer_role?
       @user.person.consumer_role.id == @record.id
     else
       false
