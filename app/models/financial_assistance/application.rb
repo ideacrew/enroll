@@ -48,10 +48,11 @@ class FinancialAssistance::Application
 
   field :workflow, type: Hash, default: { }
 
-  embeds_many :tax_households, class_name: "::TaxHousehold"
+  #embeds_many :tax_households, class_name: "::TaxHousehold"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
-
+  embeds_many :eligibility_determination, class_name: “::EligibilityDetermination”
   embeds_many :workflow_state_transitions, as: :transitional
+
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
 
   # validates_presence_of :hbx_id, :applicant_kind, :request_kind, :benchmark_plan_id
@@ -162,26 +163,18 @@ class FinancialAssistance::Application
     tax_household_member.family_member
   end
 
-  def eligibility_determination=(ed_instance)
-    return unless ed_instance.is_a? EligibilityDetermination
-    self.eligibility_determination_id = ed_instance._id
-    @eligibility_determination = ed_instance
-  end
+  # The following methods will need to be refactored as there are multiple eligibility determinations - per THH
+  # def eligibility_determination=(ed_instance)
+  #   return unless ed_instance.is_a? EligibilityDetermination
+  #   self.eligibility_determination_id = ed_instance._id
+  #   @eligibility_determination = ed_instance
+  # end
 
-  def eligibility_determination
-    return nil unless tax_household_member
-    return @eligibility_determination if defined? @eligibility_determination
-    @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
-  end
-
-  # [Application] may have 1 to Many [ED & THH]. Refactor as necessary.
-  def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
-  end
-
-  def latest_active_tax_household
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
-  end
+  # def eligibility_determination
+  #   return nil unless tax_household_member
+  #   return @eligibility_determination if defined? @eligibility_determination
+  #   @eligibility_determination = tax_household_member.eligibility_determinations.detect { |elig_d| elig_d._id == self.eligibility_determination_id }
+  # end
 
   # Evaluate if receiving Alternative Benefits this year
   def is_receiving_benefit?
@@ -275,6 +268,14 @@ class FinancialAssistance::Application
       total_incomes[y] = (income_this_year - deductions_this_year) * 0.01
     end
     total_incomes
+  end
+
+  def all_tax_households
+    tax_households = []
+    applicants.each do |applicant|
+       tax_households << applicant.tax_household
+    end
+    tax_households.uniq
   end
 
 private

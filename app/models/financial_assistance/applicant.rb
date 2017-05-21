@@ -117,6 +117,10 @@ class FinancialAssistance::Applicant
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
 
+  def is_ia_eligible?
+    is_ia_eligible
+  end
+
   def is_tax_dependent?
     tax_filer_kind.present? && tax_filer_kind == "tax_dependent"
   end

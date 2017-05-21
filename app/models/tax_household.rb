@@ -11,7 +11,7 @@ class TaxHousehold
   include Acapi::Notifiers
   include SetCurrentUser
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  #embedded_in :application, class_name: "FinancialAssistance::Application"
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -19,12 +19,17 @@ class TaxHousehold
   field :allocated_aptc, type: Money, default: 0.00
   field :is_eligibility_determined, type: Boolean, default: false
 
+  # To link an EligibilityDetermination applicable to the TaxHousehold.
+  # We may receive multiple ED’s (Curam, Haven, Admin), but there will be
+  # one chosen based on the priority (Admin > Curam > Haven) and stored.
+  field :eligibility_determination_id, type: BSON::ObjectId
+
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
-  embeds_many :eligibility_determinations
+  #embeds_many :tax_household_members
+  #embeds_many :eligibility_determinations
   has_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
   
 
@@ -33,31 +38,24 @@ class TaxHousehold
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
-  def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
-  end
+  # def latest_eligibility_determination
+  #   eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  # end
 
   def current_csr_eligibility_kind
-    latest_eligibility_determination.csr_eligibility_kind
+    eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
   end
 
   def current_csr_percent
-    latest_eligibility_determination.csr_percent
+    eligibility_determination.present? ? eligibility_determination.csr_percent : 0
   end
 
   def current_max_aptc
-    eligibility_determination = latest_eligibility_determination
-    #TODO need business rule to decide how to get the max aptc
-    #during open enrollment and determined_at
-    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
-      eligibility_determination.max_aptc
-    else
-      0
-    end
+    eligibility_determination.present? ? eligibility_determination.max_aptc : 0
   end
 
   def aptc_members
-    tax_household_members.find_all(&:is_ia_eligible?)
+    applicants.find_all(&:is_ia_eligible?)
   end
 
   def aptc_ratio_by_member

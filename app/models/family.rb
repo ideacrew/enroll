@@ -190,6 +190,8 @@ class Family
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
+  scope :approved_applications, ->{ where(:"applications.aasm_state".in => ["approved"]) }
+  scope :approved_applications_for_year, ->(year) { where(:"applications.aasm_state".in => ["approved"]).and(:"applications.assistance_year" => year) }
 
   def coverage_waived?
     latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.waived.any?
@@ -693,6 +695,21 @@ class Family
 
   def any_unverified_enrollments?
     enrollments.verification_needed.any?
+  end
+
+  def active_approved_application
+    # Returns the most recent application that is approved (has eligibility determination) for the current year.
+    applications.where(aasm_state: "approved", assistance_year: TimeKeeper.date_of_record.year).order_by(:submitted_at => 'desc').first
+  end
+
+  def approved_applications_for_year(year)
+    # Returns the last application that is approved (has eligibility determination) for a given year.
+    applications.where(aasm_state: "approved", assistance_year: year)
+  end
+
+  def approved_applications
+    # Returns all approved applications
+    applications.where(aasm_state: "approved")
   end
 
   class << self

@@ -4,9 +4,11 @@ class EligibilityDetermination
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  embedded_in :tax_household
+  embedded_in :application, class_name: “FinancialAssistance::Application”
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
+
+  SOURCE_KINDS  = %w(Admin Curam Haven)
 
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
@@ -39,7 +41,7 @@ class EligibilityDetermination
   # DEPRECATED - use determined_at
   field :determined_on, type: DateTime
 
-  # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
+  # Source of the Eligibility Determination. Admin, Curam or Haven
   field :source, type: String
 
   before_validation :set_premium_credit_strategy, :set_determined_at
@@ -59,6 +61,9 @@ class EligibilityDetermination
       in: CSR_KINDS,
       message: "%{value} is not a valid cost sharing eligibility kind"
     }
+
+  validates :source,
+    inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" }
 
   def csr_percent_as_integer=(new_csr_percent)
     super
