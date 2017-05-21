@@ -118,6 +118,10 @@ class EligibilityDetermination
     end
   end
 
+  def tax_household
+    application.all_tax_households.where(eligibility_determination_id: self.id).first
+  end
+
 private
   def set_premium_credit_strategy
     self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
