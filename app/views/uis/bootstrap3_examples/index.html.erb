@@ -461,7 +461,7 @@
                <label for="comment"><%= l10n('.comment') %></label>
                <textarea class="form-control" rows="5" id="textarea"></textarea>
              </div>
-             <h3><%= l10n('.file_input') %><</h3>
+             <h3><%= l10n('.file_input') %></h3>
              <label class="custom-file">
                <input type="file" id="file" class="custom-file-input">
                <span class="custom-file-control"></span>
@@ -796,48 +796,48 @@
         </div>
         <div class="demo-content">
           <ul class="nav nav-tabs nav-append-content" role="tablist">
-            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><%= l10n('.tabs_text_1') %></a></li>
-            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= l10n('.tabs_text_2') %></a></li>
-            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= l10n('.tabs_text_3') %></a></li>
-            <li role="presentation" class="disabled"><a href="#tab4"><%= l10n('.tabs_text_4') %></a></li>
+            <li role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><%= l10n('.popular') %></a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= l10n('.newest') %></a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= l10n('.bestselling') %></a></li>
+            <li role="presentation" class="disabled"><a href="#tab4"><%= l10n('.disabled_tab') %></a></li>
           </ul> <!-- /tabs -->
 
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="tab1">
-              <p><%= l10n('.tabs_text_5') %></p>
+              <p><%= l10n('.section_one') %></p>
             </div>
 
             <!-- /tabs -->
             <div role="tabpanel" class="tab-pane" id="tab2">
-              <p><%= l10n('.tabs_text_6') %></p>
+              <p><%= l10n('.section_two') %></p>
             </div>
 
             <!-- /tabs -->
             <div role="tabpanel" class="tab-pane" id="tab3">
-              <p><%= l10n('.tabs_text_7') %></p>
+              <p><%= l10n('.section_three') %></p>
             </div>
 
             <div role="tabpanel" class="tab-pane" id="tab4">
-              <p><%= l10n('.tabs_text_8') %></p>
+              <p><%= l10n('.section_disbaled') %></p>
             </div>
           </div> <!-- /tab-content -->
 
           <br>
-          <p> <%= l10n('.tabs_text_9') %> </p>
+          <p> <%= l10n('.tab_dropdown') %> </p>
           <ul class="nav nav-tabs">
             <li role="presentation" class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-               <%= l10n('.tabs_text_10') %><span class="caret"></span>
+               <%= l10n('.home') %><span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
-                <li><a href="#"><%= l10n('.tabs_text_11') %></a></li>
-                <li><a href="#"><%= l10n('.tabs_text_11') %></a></li>
+                <li><a href="#"><%= l10n('.sub_options') %></a></li>
+                <li><a href="#"><%= l10n('.sub_options') %></a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#"><%= l10n('.tabs_text_12') %></a></li>
+                <li><a href="#"><%= l10n('.sub_option_divider') %></a></li>
               </ul>
             </li>
-            <li role="presentation"><a href="#"><%= l10n('.tabs_text_13') %></a></li>
-            <li role="presentation"><a href="#"><%= l10n('.tabs_text_14') %></a></li>
+            <li role="presentation"><a href="#"><%= l10n('.profile') %></a></li>
+            <li role="presentation"><a href="#"><%= l10n('.messages') %></a></li>
           </ul>
         </div> <!-- /demo-content -->
       </div> <!-- /row -->
@@ -987,65 +987,65 @@
       <h3 class="demo-title"><%= l10n('.alerts') %></h3>
       <div class="demo-content">
         <!-- Alert Success -->
-        <div class="alert alert-success" role="alert"><%= l10n('.alerts_text_1') %></div>
+        <div class="alert alert-success" role="alert"><%= l10n('.div_alert_success') %></div>
         <div class="alert alert-success">
-          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button><%= l10n('.alerts_text_2') %> <a href="#fakelink"><%= l10n('.alerts_text_3') %></a>. <%= l10n('.alerts_text_4') %></div>
+          <button type="button" class="close fa fa-cross" data-dismiss="alert"></button><%= l10n('.your_computer') %> <a href="#fakelink"><%= l10n('.because_problem') %></a> <%= l10n('.sorry_for_inconvenience') %></div>
 
         <div class="alert alert-success">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4><%= l10n('.alerts_text_5') %></h4>
-          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
-          <a href="#fakelink" class="btn btn-primary btn-wide"><span class="fa fa-check-circle"></span>&nbsp;&nbsp; <%= l10n('.alerts_text_9') %></a>
-          <a href="#fakelink" class="btn btn-default btn-info btn-wide"><%= l10n('.alerts_text_10') %></a>
+          <h4><%= l10n('.disc_space') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-primary btn-wide"><span class="fa fa-check-circle"></span>&nbsp;&nbsp; <%= l10n('.hurray') %></a>
+          <a href="#fakelink" class="btn btn-default btn-info btn-wide"><%= l10n('.share_on_twitter') %></a>
         </div>
 
         <!-- Alert Info -->
-        <div class="alert alert-info" role="alert"><%= l10n('.alerts_text_10') %></div>
+        <div class="alert alert-info" role="alert"><%= l10n('.div_alert_info') %></div>
         <div class="alert alert-info">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_4') %>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %>
         </div>
 
         <div class="alert alert-info">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4><%= l10n('.alerts_text_12') %></h4>
-          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
-          <a href="#fakelink" class="btn btn-info btn-wide"><%= l10n('.alerts_text_13') %></a>
-          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
+          <h4><%= l10n('.information_label') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-info btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
         </div>
 
         <!-- Alert Warning -->
-        <div class="alert alert-warning" role="alert"><%= l10n('.alerts_text_15') %></div>
+        <div class="alert alert-warning" role="alert"><%= l10n('.div_alert_warning') %></div>
         <div class="alert alert-warning">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_4') %>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %>
         </div>
 
         <div class="alert alert-warning">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4><%= l10n('.alerts_text_16') %></h4>
-          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
-          <a href="#fakelink" class="btn btn-warning btn-wide"><%= l10n('.alerts_text_13') %></a>
-          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
+          <h4><%= l10n('.error_the_change') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-warning btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
         </div>
 
         <!-- Alert Danger -->
-        <div class="alert alert-danger" role="alert"><%= l10n('.alerts_text_17') %></div>
+        <div class="alert alert-danger" role="alert"><%= l10n('.div_alert_danger') %></div>
         <div class="alert alert-danger">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <%= l10n('.alerts_text_2') %><a href="#fakelink"><%= l10n('.alerts_text_3') %></a><%= l10n('.alerts_text_14') %></div>
+          <%= l10n('.your_computer') %><a href="#fakelink"><%= l10n('.because_problem') %></a><%= l10n('.sorry_for_inconvenience') %></div>
 
         <div class="alert alert-danger">
           <button type="button" class="close fa fa-cross" data-dismiss="alert"></button>
-          <h4><%= l10n('.alerts_text_16') %></h4>
-          <p><%= l10n('.alerts_text_6') %><a href="#fakelink"><%= l10n('.alerts_text_7') %></a><%= l10n('.alerts_text_8') %></p>
-          <a href="#fakelink" class="btn btn-danger btn-wide"><%= l10n('.alerts_text_13') %></a>
-          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.alerts_text_14') %></a>
+          <h4><%= l10n('.error_the_change') %></h4>
+          <p><%= l10n('.an_error_message') %><a href="#fakelink"><%= l10n('.unexpected_condition') %></a><%= l10n('.usually_on_a_computer') %></p>
+          <a href="#fakelink" class="btn btn-danger btn-wide"><%= l10n('.turn_it_off') %></a>
+          <a href="#fakelink" class="btn btn-default btn-wide"><%= l10n('.its_ok') %></a>
         </div>
-        <p><%= l10n('.alerts_text_18') %>  <%= l10n('.alerts') %></p>
+        <p><%= l10n('.dismissible') %>  <%= l10n('.alerts') %></p>
         <div class="alert alert-warning alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <strong><%= l10n('.alerts_text_19') %></strong> <%= l10n('.alerts_text_20') %>
+          <strong><%= l10n('.warning') %></strong> <%= l10n('.better_check_yourself') %>
         </div>
 
       </div> <!-- /demo-content -->
