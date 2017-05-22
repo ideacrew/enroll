@@ -49,7 +49,7 @@ function setGroupSelectionHandlers(){
     });
   }
 
-  if ( $('#market_kind_shop').is(':checked') ) {
+  if ( ($('#market_kind_shop').length && $('#market_kind_shop').is(':checked')) || (!($('#market_kind_shop').length) && $('#shop-coverage-household').length) ) {
     // $("#coverage_kind_health").prop("checked", true);
     $("#ivl-coverage-household input[type=checkbox]").prop("checked", false);
     employers.each(function(){
