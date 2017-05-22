@@ -14,7 +14,7 @@ describe GeneralAgencyAssignment do
 
   describe "general agency profile assignment for employer" do
 
-    let(:new_plan_year){ FactoryGirl.create(:plan_year) }
+    let(:new_plan_year){ FactoryGirl.create(:plan_year, aasm_state: "active") }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:general_agency_account) { FactoryGirl.create(:general_agency_account) }
     let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id, start_on: TimeKeeper.date_of_record, is_active: true)}
@@ -25,6 +25,7 @@ describe GeneralAgencyAssignment do
       allow(ENV).to receive(:[]).with("employer_profile_id").and_return(employer_profile.id.to_s)
       allow(ENV).to receive(:[]).with("broker_agency_id").and_return(broker_agency_profile.id.to_s)
       allow(ENV).to receive(:[]).with("open_enrollment_end_on").and_return("04/08/2017")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return("active")
     end
 
     it "should assign general agency profile for employer" do
