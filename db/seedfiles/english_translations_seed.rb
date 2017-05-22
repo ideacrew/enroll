@@ -32,6 +32,7 @@ translations = {
   "en.uis.bootstrap3_examples.index.tables_link" => "Jump to the tables section of this page",
   "en.uis.bootstrap3_examples.index.tooltips_link" => "Jump to the tooltips section of this page",
   "en.uis.bootstrap3_examples.index.text_area" => "Text Area",
+  "en.uis.bootstrap3_examples.index.comment" => "Comment",
   "en.uis.bootstrap3_examples.index.check_box" => "Check Box",
   "en.uis.bootstrap3_examples.index.checked" => "Do you have insurance before",
   "en.uis.bootstrap3_examples.index.unchecked" => "Do you have insurance before",
