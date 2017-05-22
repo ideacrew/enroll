@@ -8,7 +8,7 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
                                                                        start_on: start_date,
                                                                        end_on: start_date + 1.year - 1.day,
                                                                        open_enrollment_start_on: start_date - 1.month,
-                                                                       open_enrollment_end_on: (start_date - 1.month).beginning_of_month +  9.days,
+                                                                       open_enrollment_end_on: (start_date - 1.month).beginning_of_month + 9.days,
                                                                        fte_count: old_plan_year.fte_count,
                                                                        pte_count: old_plan_year.pte_count,
                                                                        msp_count: old_plan_year.msp_count,
@@ -47,23 +47,37 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
   end
 
   def migrate
-    organizations = Organization.where(fein: ENV['fein'])
 
-    if organizations.size == 0
-      raise 'No employer found'
-    elsif organizations.size > 1
-      raise 'more than 1 employer found with given fein'
+    begin
+      organizations = Organization.where(fein: ENV['fein'])
+
+      if organizations.size == 0
+        raise 'No employer found'
+      elsif organizations.size > 1
+        raise 'more than 1 employer found with given fein'
+      end
+
+      organization = organizations.first
+
+      exiting_plan_year = organization.employer_profile.plan_years.where(start_on: DateTime.strptime(ENV['old_py_start_on'], "%m%d%Y")).first
+
+      if exiting_plan_year.blank?
+        raise "Plan year with start date #{ENV['old_py_start_on']} not found"
+      end
+
+      new_plan_year = create_initial_plan_year(organization, exiting_plan_year, ENV['new_py_start_on'])
+
+      puts "\nExisting plan year created."
+      puts exiting_plan_year.inspect
+
+      puts "\nNew plan year created."
+      puts new_plan_year.inspect
+
+      puts "\n"
+
+    rescue Exception => e
+      puts e.message
     end
-
-    organization = organizations.first
-
-    exiting_plan_year = organization.employer_profile.plan_years.where(start_on: DateTime.strptime(ENV['old_py_start_on'], "%m%d%Y")).first
-
-    if exiting_plan_year.blank?
-      raise "Plan year with start date #{ENV['old_py_start_on']} not found"
-    end
-
-    create_initial_plan_year(organization, exiting_plan_year, ENV['new_py_start_on'])
   end
 end
 
