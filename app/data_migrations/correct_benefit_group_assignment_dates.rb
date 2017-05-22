@@ -1,6 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class CorrectBenefitGroupAssignmentDates < MongoidMigrationTask  
+class CorrectBenefitGroupAssignmentDates < MongoidMigrationTask
+  
   def migrate
     count = 0 
     Organization.exists(:employer_profile => true).each do |org|
@@ -19,14 +20,11 @@ class CorrectBenefitGroupAssignmentDates < MongoidMigrationTask
 
           if !(benefit_group.start_on..benefit_group.end_on).cover?(assignment.start_on)
             assignment.update(start_on: benefit_group.start_on)
-            puts "Fixed start date for #{census_employee.full_name}"
           end
 
-          if assignment.end_on.present?
-            if !(benefit_group.start_on..benefit_group.end_on).cover?(assignment.end_on) || assignment.end_on < assignment.start_on
-              assignment.update(end_on: benefit_group.end_on)
-              puts "Fixed end date for #{census_employee.full_name}"
-            end
+          next if assignment.end_on.blank?
+          if !(benefit_group.start_on..benefit_group.end_on).cover?(assignment.end_on) || assignment.end_on < assignment.start_on
+            assignment.update(end_on: benefit_group.end_on)
           end
         end
       end
