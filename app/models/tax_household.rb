@@ -19,11 +19,6 @@ class TaxHousehold
   field :allocated_aptc, type: Money, default: 0.00
   field :is_eligibility_determined, type: Boolean, default: false
 
-  # To link an EligibilityDetermination applicable to the TaxHousehold.
-  # We may receive multiple ED’s (Curam, Haven, Admin), but there will be
-  # one chosen based on the priority (Admin > Curam > Haven) and stored.
-  field :eligibility_determination_id, type: BSON::ObjectId
-
   field :effective_starting_on, type: Date
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
