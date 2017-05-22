@@ -423,6 +423,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
     allow(family_member).to receive(:citizen_status)
+    allow(family_member).to receive(:naturalized_citizen)
+    allow(family_member).to receive(:eligible_immigration_status)
+    allow(family_member).to receive(:indian_tribe_member)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
     allow(Family).to receive(:find).and_return family

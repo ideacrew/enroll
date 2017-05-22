@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
@@ -173,23 +174,12 @@ class Insured::FamiliesController < FamiliesController
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
 
     if @enrollment.present?
-      plan = @enrollment.try(:plan)
-      if @enrollment.is_shop?
-        @benefit_group = @enrollment.benefit_group
-        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-        if @benefit_group.is_congress
-          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
-        else
-          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
-        end
-      else
-        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
-      end
+      @enrollment.reset_dates_on_previously_covered_members
+      @plan = @enrollment.build_plan_premium
 
       begin
         @plan.name
