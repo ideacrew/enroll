@@ -5,7 +5,7 @@ class EligibilityDetermination
   include HasFamilyMembers
 
   embedded_in :application, class_name: “FinancialAssistance::Application”
-
+  belongs_to :tax_household
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
 
   SOURCE_KINDS  = %w(Admin Curam Haven)
@@ -116,10 +116,6 @@ class EligibilityDetermination
       end
       ed.first unless ed.blank?
     end
-  end
-
-  def tax_household
-    application.all_tax_households.where(eligibility_determination_id: self.id).first
   end
 
 private

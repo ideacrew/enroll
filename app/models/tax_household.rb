@@ -31,7 +31,7 @@ class TaxHousehold
   #embeds_many :tax_household_members
   #embeds_many :eligibility_determinations
   has_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
-  
+  has_many :eligibility_determinations
 
   accepts_nested_attributes_for :tax_household_members
 
