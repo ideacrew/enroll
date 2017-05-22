@@ -240,11 +240,10 @@ class Insured::ConsumerRolesController < ApplicationController
   private
 
   def user_not_authorized(exception)
-    binding.pry
     policy_name = exception.policy.class.to_s.underscore
-    if @current_user.has_consumer_role?
+    if current_user.has_consumer_role?
       respond_to do |format|
-        format.html { redirect_to edit_insured_consumer_role_path(@current_user.person.consumer_role) }
+        format.html { redirect_to edit_insured_consumer_role_path(current_user.person.consumer_role.id) }
       end
     else
       flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
