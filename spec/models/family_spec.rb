@@ -271,7 +271,6 @@ describe Family, type: :model, dbclean: :after_each do
       end
       it "writing_agent is popular" do
         carols_family.hire_broker_agency(writing_agent.id)
-        puts writing_agent2.inspect
         carols_family.hire_broker_agency(writing_agent2.id)
         carols_family.hire_broker_agency(writing_agent.id)
         mikes_family.hire_broker_agency(writing_agent.id)
@@ -454,7 +453,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
