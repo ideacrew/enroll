@@ -40,10 +40,11 @@ RSpec.describe Insured::FamiliesController do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true, inbox: inbox) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
+  let(:inbox) { double("Inbox", post_message: true, save: true)}
   let(:family_members) { [double("FamilyMember")] }
   let(:employee_roles) { [double("EmployeeRole")] }
   let(:resident_role) { FactoryGirl.create(:resident_role) }
@@ -671,6 +672,8 @@ RSpec.describe Insured::FamiliesController do
         family.broker_agency_accounts = [
           FactoryGirl.build(:broker_agency_account, family: family)
         ]
+        allow(family).to receive(:primary_applicant).and_return(double("FamilyMember", person: person))
+        allow(person).to receive(:full_name).and_return("such test, much wow")
         allow(Family).to receive(:find).and_return family
         delete :delete_consumer_broker , :id => family.id
       end
