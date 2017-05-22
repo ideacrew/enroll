@@ -1,6 +1,7 @@
 class ScheduledEvent
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ScheduledEventService  
 
   field :type, type: String
   field :event_name, type: String
