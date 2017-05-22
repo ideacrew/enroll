@@ -317,6 +317,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP26',
+    title: 'Reminder to publish Application',
+    description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Initial Employer Application -  Reminder to publish',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+        mpi_indicator: 'MPI_SHOP26',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
