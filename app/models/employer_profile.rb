@@ -526,6 +526,16 @@ class EmployerProfile
       })
     end
 
+    def initial_employers_reminder_to_publish(new_date)
+      start_on = new_date.next_month.beginning_of_month
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => start_on,
+          :"aasm_state" => "draft"
+        }
+      })
+    end
+
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
@@ -586,6 +596,17 @@ class EmployerProfile
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
+          end
+        end
+
+        #Initial employer reminder notice to publish plan year 2 days prior to PY start date.
+        if new_date == (new_date.next_month.beginning_of_month - 2.days)
+          initial_employers_reminder_to_publish(new_date).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send application reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
           end
         end
       end
