@@ -2,7 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_hbx_id")
 
 describe UpdateHbxId do
-  let(:given_task_name) { "remove_hbx" }
+  let(:given_task_name) { "update_hbx_id" }
   subject { UpdateHbxId.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
