@@ -11,7 +11,7 @@ class ChangeSuffixPerson < MongoidMigrationTask
         person.update_attributes(name_sfx: "")
         person.save
       else
-        puts "Person not found for hbx_id #{hbx_ids}"
+        puts "Person not found for hbx_id #{hbx_id}"
       end
     end
   end
