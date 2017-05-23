@@ -600,7 +600,7 @@ class EmployerProfile
 
         #Initial employer reminder notice to publish plan year 2 days prior to PY start date.
         start_on = (new_date+2.months).beginning_of_month
-        if new_date == start_on-1.months-2.days
+        if new_date+2.days == start_on.last_month
           initial_employers_reminder_to_publish(start_on).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
