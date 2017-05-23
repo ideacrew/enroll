@@ -11,7 +11,7 @@ class UpdateVerificationTypes < MongoidMigrationTask
       begin
         person.consumer_role.update_all_verification_types unless person.consumer_role.all_types_verified?
       rescue
-        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}"
+        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}" unless Rails.env.test?
       end
     end
   end
