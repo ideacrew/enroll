@@ -526,8 +526,7 @@ class EmployerProfile
       })
     end
 
-    def initial_employers_reminder_to_publish(new_date)
-      start_on = new_date.next_month.beginning_of_month
+    def initial_employers_reminder_to_publish(start_on)
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"start_on" => start_on,
@@ -600,8 +599,9 @@ class EmployerProfile
         end
 
         #Initial employer reminder notice to publish plan year 2 days prior to PY start date.
-        if new_date == (new_date.next_month.beginning_of_month - 2.days)
-          initial_employers_reminder_to_publish(new_date).each do |organization|
+        start_on = (new_date+2.months).beginning_of_month
+        if new_date == start_on-1.months-2.days
+          initial_employers_reminder_to_publish(start_on).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
             rescue Exception => e
