@@ -54,26 +54,19 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
       if organizations.size == 0
         raise 'No employer found'
       elsif organizations.size > 1
-        raise 'more than 1 employer found with given fein'
+        raise "More than 1 employers found with given fein #{ENV['fein']}"
       end
 
       organization = organizations.first
 
-      exiting_plan_year = organization.employer_profile.plan_years.where(start_on: DateTime.strptime(ENV['old_py_start_on'], "%m%d%Y")).first
+      existing_plan_year = organization.employer_profile.plan_years.where(start_on: DateTime.strptime(ENV['old_py_start_on'], "%m%d%Y")).first
 
-      if exiting_plan_year.blank?
+      if existing_plan_year.blank?
         raise "Plan year with start date #{ENV['old_py_start_on']} not found"
       end
 
-      new_plan_year = create_initial_plan_year(organization, exiting_plan_year, ENV['new_py_start_on'])
-
-      puts "\nExisting plan year created."
-      puts exiting_plan_year.inspect
-
-      puts "\nNew plan year created."
-      puts new_plan_year.inspect
-
-      puts "\n"
+      new_plan_year = create_initial_plan_year(organization, existing_plan_year, ENV['new_py_start_on'])
+      new_plan_year.force_publish!
 
     rescue Exception => e
       puts e.message
