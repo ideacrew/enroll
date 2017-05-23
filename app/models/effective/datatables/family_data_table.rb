@@ -17,7 +17,7 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Add SEP', add_sep_form_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),
-             add_sep_link_type( pundit_allow(Family, :can_update_ssn?) ) ],
+             add_sep_link_type( pundit_allow(HbxProfile, :can_add_sep?) ) ],
            ['View SEP History', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"),terminate_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
@@ -93,7 +93,7 @@ module Effective
         ],
         families: [
           {scope: 'all', label: 'All'},
-          {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
+          {scope: 'by_enrollment_individualfamil_market', label: 'Individual Enrolled', subfilter: :individual_options},
           {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
           {scope: 'non_enrolled', label: 'Non Enrolled'},
         ],

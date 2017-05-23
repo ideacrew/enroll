@@ -1,6 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include Exchanges::HbxProfilesHelper
   include DataTablesAdapter
+  include Pundit
   include SepAll
   include EventsHelper
   include Exchanges::HbxProfilesHelper
@@ -211,6 +212,7 @@ def employer_poc
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
