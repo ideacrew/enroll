@@ -10,6 +10,8 @@ namespace :reports do
         Primary_family_member_first_name
         Primary_family_member_last_namer
         Primary_family_member_hbx_id
+        Consumer_role_?
+        Employee_role_?
         Member_first_name
         Member_last_name
         Member_hbx_id
@@ -34,6 +36,8 @@ namespace :reports do
                           person.first_name,
                           person.last_name,
                           person.hbx_id,
+                          person.consumer_role.present? ? "Yes" : "No" ,
+                          person.employee_roles.present? ? "Yes" : "No" ,
                           relationship.relative.first_name,
                           relationship.relative.last_name,
                           relationship.relative.hbx_id,
