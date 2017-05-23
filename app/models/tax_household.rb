@@ -28,7 +28,7 @@ class TaxHousehold
   has_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
   has_many :eligibility_determinations
 
-  accepts_nested_attributes_for :tax_household_members
+  #accepts_nested_attributes_for :tax_household_members
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
