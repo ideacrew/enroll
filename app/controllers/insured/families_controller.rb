@@ -165,7 +165,8 @@ class Insured::FamiliesController < FamiliesController
     end
 
     if @enrollment.present?
-      @enrollment.reset_dates_on_previously_covered_members
+      plan_selection = PlanSelection.new(@enrollment, @enrollment.plan)
+      plan_selection.verify_and_set_member_coverage_start_dates
       @plan = @enrollment.build_plan_premium
 
       begin

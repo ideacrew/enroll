@@ -816,7 +816,14 @@ end
 
 RSpec.describe Insured::FamiliesController do
   describe "GET purchase" do
-    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:hbx_enrollment) { 
+       FactoryGirl.build(:hbx_enrollment,
+       household: family.active_household,
+       coverage_kind: "health",
+       effective_on: TimeKeeper.date_of_record.beginning_of_month,
+       enrollment_kind: "open_enrollment",
+       kind: "individual"
+    )}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, person: person) }
