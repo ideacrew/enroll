@@ -40,18 +40,17 @@ describe ConsumerRolePolicy do
   end
 
   permissions :edit? do
-    let(:person) { FactoryGirl.build(:person) }
-    let(:consumer_person) { FactoryGirl.build(:person) }
-    let(:consumer_user) {FactoryGirl.create(:user, person: hbx_staff_person)}
-    let(:hbx_staff_person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
-    let(:user) { double("user", :person => person, :has_hbx_staff_role? => true, :has_consumer_role? => true) }
-    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: hbx_staff_person)}
-    let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
+    let(:hbx_staff_user) {FactoryGirl.create(:user, person: person)}
+    let(:person) { FactoryGirl.create(:person, :with_hbx_staff_role) }
+    let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person)}
+    let(:permission) { FactoryGirl.create(:permission)}
 
     it "grants access when hbx_staff" do
-      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
-      allow(person).to receive(:consumer_role).and_return consumer_role
-      expect(subject).to permit(user, consumer_role)
+      allow(hbx_staff_role).to receive(:permission).and_return permission
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      allow(hbx_staff_user).to receive(:person).and_return person
+      allow(permission).to receive(:can_update_ssn).and_return true
+      expect(subject).to permit(hbx_staff_user, consumer_role)
     end
 
     it "denies access when normal user" do
@@ -76,6 +75,5 @@ describe ConsumerRolePolicy do
         expect(subject).not_to permit(user, consumer_role)
       end
     end
-
   end
 end
