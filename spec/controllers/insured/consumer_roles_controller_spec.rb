@@ -425,23 +425,5 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       end
     end
 
-    context "broker" do
-      let(:user){ FactoryGirl.create(:user, :broker) }
-      it "should let in a broker" do
-        binding.pry
-        sign_in user
-        get :edit, id: consumer_role.id
-
-      end
-    end
-
-    context "admin" do
-      let(:user){ FactoryGirl.create(:user, :admin) }
-      it "should let in an admin" do
-        sign_in user
-        get :edit, id: consumer_role.id
-
-      end
-    end
   end
 end
