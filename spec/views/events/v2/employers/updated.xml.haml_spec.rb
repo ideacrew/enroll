@@ -146,12 +146,25 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     end
 
     context "person of contact" do
+
       before do
         allow(employer).to receive(:staff_roles).and_return([staff])
       end
       it "should be included in xml" do
         render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
         expect(rendered).to have_selector('contact', count: 1)
+      end
+    end
+
+    context "when manual gen of cv = true" do
+
+      before :each do
+        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: true }
+        @doc = Nokogiri::XML(rendered)
+      end
+
+      it "should return all eligible for export plan years" do
+        expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
       end
     end
 
