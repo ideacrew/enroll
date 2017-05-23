@@ -123,7 +123,7 @@ class PlanSelection
       :coverage_kind => hbx_enrollment.coverage_kind,
       :effective_on.gte => coverage_year_start,
       }).or( 
-        {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES}, 
+        {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
         {:aasm_state => 'coverage_terminated', :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
       ).order("effective_on DESC")
   end
