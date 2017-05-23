@@ -50,7 +50,7 @@ class FinancialAssistance::Application
 
   #embeds_many :tax_households, class_name: "::TaxHousehold"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
-  embeds_many :eligibility_determination, class_name: “::EligibilityDetermination”
+  embeds_many :eligibility_determination, class_name: "::EligibilityDetermination"
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
