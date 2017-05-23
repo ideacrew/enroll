@@ -811,7 +811,7 @@ class PlanYear
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
       transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      # transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?
+      transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
     end
@@ -1080,6 +1080,11 @@ class PlanYear
     #also check if minimum participation and non owner conditions are met by ER.
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+  end
+
+  def renewal_employer_ineligibility_notice
+    return true if benefit_groups.any? { |bg| bg.is_congress? }
+    self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
   end
 
   def record_transition
