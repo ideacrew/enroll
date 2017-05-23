@@ -17,6 +17,7 @@ module Effective
           }, :sortable => false, :filter => false
         #table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :sortable => false, :filter => false
         table_column :eligibility, :proc => Proc.new { |row| eligibility_criteria(@employer_profile) }, :filter => false
         table_column :broker, :proc => Proc.new { |row|
             @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
@@ -85,12 +86,7 @@ module Effective
       end
 
       def global_search_method
-        val = params[:search][:value]
-        if val.match(/\d{9}/)
-          :datatable_search_fein
-        else
-          :datatable_search
-        end
+        :datatable_search
       end
 
       def search_column(collection, table_column, search_term, sql_column)
