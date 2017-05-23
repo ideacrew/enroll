@@ -312,7 +312,10 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
   plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, fte_count: 2, aasm_state: :published
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, 
+    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, 
+    fte_count: 2, aasm_state: :published, is_conversion: (kind.downcase == 'conversion' ? true : false)
+    
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
@@ -918,3 +921,16 @@ Then(/Devops can verify session logs/) do
   #user was a consumer
   expect(user.person.consumer_role).not_to be nil
 end
+
+Given(/^a Hbx admin with read and write permissions and employers$/) do
+  p_staff=FactoryGirl.create :permission, :hbx_update_ssn
+  person = people['Hbx AdminEnrollments']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  org1 = FactoryGirl.create(:organization, legal_name: 'Acme Agency', hbx_id: "123456")
+  employer_profile = FactoryGirl.create :employer_profile, organization: org1
+  org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
+  employer_profile = FactoryGirl.create :employer_profile, organization: org2
+end
+
