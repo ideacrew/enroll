@@ -57,6 +57,14 @@ describe BuildShopEnrollment do
       it "should create enrollment with reference plan id" do
         expect(person.primary_family.active_household.hbx_enrollments.first.plan_id).to eq benefit_group.reference_plan.id
       end
+
+      it "should create hbx enrollment member records" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.hbx_enrollment_members.size).to eq 1
+      end
+
+      it "should have one hbx enrollment member record as primary" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.hbx_enrollment_members.where(is_subscriber: true).size).to eq 1
+      end
     end
 
     context "with plan details" do

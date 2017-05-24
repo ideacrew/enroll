@@ -43,6 +43,14 @@ class BuildShopEnrollment < MongoidMigrationTask
       enrollment = HbxEnrollment.new(kind: "employer_sponsored", enrollment_kind: "open_enrollment", employee_role_id: employee_role.id, benefit_group_id: benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment.effective_on = effective_on
       enrollment.plan_id = plan.present? ? plan.id : benefit_group.reference_plan.id
+      family_members = person.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }
+      family_members.each do |fm|
+        hem = HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant,
+                                      eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
+                                     )
+        enrollment.hbx_enrollment_members << hem
+        puts "Added coverage for #{fm.person.full_name}" unless Rails.env.test?
+      end
       person.primary_family.active_household.hbx_enrollments << enrollment
       person.primary_family.active_household.save!
       enrollment.update_attributes(aasm_state: "coverage_selected")
