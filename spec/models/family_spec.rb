@@ -233,10 +233,11 @@ describe Family, type: :model, dbclean: :after_each do
     end
 
     context "when a broker account is created for the Family" do
-      let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
+      #let(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, family:carols_family)}
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
       let(:writing_agent)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id) }
-      let(:broker_agency_profile2) { FactoryGirl.build(:broker_agency_profile) }
-      let(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
+      let(:broker_agency_profile2) { FactoryGirl.create(:broker_agency_profile) }
+      let!(:writing_agent2)         { FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id) }
       it "adds a broker agency account" do
         carols_family.hire_broker_agency(writing_agent.id)
         expect(carols_family.broker_agency_accounts.length).to eq(1)
@@ -445,7 +446,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
