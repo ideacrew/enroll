@@ -36,6 +36,11 @@ RSpec.describe CarrierProfile, :type => :model do
       it "should save" do
         expect(carrier_profile.save).to be_truthy
       end
+
+      it "should not be restricted to single choice" do
+        expect(carrier_profile.restricted_to_single_choice?).to be_falsey
+      end
+      
       context "and it is saved" do
         before do
           carrier_profile.save

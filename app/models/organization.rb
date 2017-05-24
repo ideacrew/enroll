@@ -223,9 +223,12 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
-  def self.valid_carrier_names
+  def self.valid_carrier_names(filters = { single_choice_included: false })
     Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        unless (filters[:single_choice_included])
+          next carrier_names if org.carrier_profile.restricted_to_single_choice?
+        end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
         carrier_names
       end
@@ -255,8 +258,8 @@ class Organization
     Organization.valid_dental_carrier_names.invert.to_a
   end
 
-  def self.valid_carrier_names_for_options
-    Organization.valid_carrier_names.invert.to_a
+  def self.valid_carrier_names_for_options(**args)
+    Organization.valid_carrier_names(args).invert.to_a
   end
 
   def self.upload_invoice(file_path,file_name)
