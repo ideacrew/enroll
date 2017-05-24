@@ -24,6 +24,7 @@ describe LinkEmployeesToEmployer do
     let(:census_employee5) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
     
     before(:each) do
+      binding.pry
       allow(ENV).to receive(:[]).with('ce1').and_return census_employee
       allow(ENV).to receive(:[]).with("ce2").and_return census_employee2
       allow(ENV).to receive(:[]).with("ce3").and_return census_employee3
@@ -32,7 +33,8 @@ describe LinkEmployeesToEmployer do
     end
     
     it "employees should have eligible state" do
-      plan_year.force_publish!
+      #plan_year.update(aasm_state:'published')
+      #subject.migrate
     end
   end
     
