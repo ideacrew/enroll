@@ -4,7 +4,7 @@ class Household
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild}
+  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner}
 
   embedded_in :family
 
@@ -35,7 +35,7 @@ class Household
 
   def active_hbx_enrollments
     actives = hbx_enrollments.collect() do |list, enrollment|
-      if enrollment.plan.present? && 
+      if enrollment.plan.present? &&
          (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
          (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
 
@@ -55,7 +55,7 @@ class Household
   end
 
   def add_household_coverage_member(family_member)
-    if ImmediateFamily.include?(family_member.primary_relationship)
+    if Family::IMMEDIATE_FAMILY.include?(family_member.primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
       extended_family_coverage_household.remove_family_member(family_member)
     else
@@ -200,6 +200,10 @@ class Household
     end
   end
 
+  def latest_tax_household_with_year(year)
+    tax_households.tax_household_with_year(year).try(:last)
+  end
+
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -248,17 +252,20 @@ class Household
     true
   end
 
-  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil)
+  def new_hbx_enrollment_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil,enrollment_kind:nil,external_enrollment: false)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
+      resident_role: resident_role,
       coverage_household: coverage_household,
       benefit_group: benefit_group,
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: Time.now
+      submitted_at: Time.now,
+      external_enrollment: external_enrollment,
+      coverage_start: coverage_start
     )
   end
 
@@ -309,7 +316,25 @@ class Household
     hbx_enrollments.enrolled
   end
 
-  def hbx_enrollments_with_aptc_by_year(year)
+  def active_hbx_enrollments_with_aptc_by_year(year)
     hbx_enrollments.active.enrolled.with_aptc.by_year(year).where(changing: false).entries
+  end
+
+  def hbx_enrollments_with_aptc_by_date(date)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(date.year).gte(effective_on: date)
+  end
+
+  def hbx_enrollments_with_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
+  end
+
+  def eligibility_determinations_for_year(year)
+    eds = []
+    tax_households.tax_household_with_year(year).each do |th|
+      th.eligibility_determinations.each do |ed|
+        eds << ed
+      end
+    end
+    eds
   end
 end

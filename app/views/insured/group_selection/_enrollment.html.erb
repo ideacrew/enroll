@@ -3,8 +3,12 @@
 <div class="panel panel-default min-h">
 
   <div class="panel-heading">
-    <h4><%= plan.active_year %> <%= plan.coverage_kind.capitalize %> Coverage <span class="separator">DCHL</span></h4>
-    <hr>
+    <h4>
+      <%= hbx_enrollment.coverage_year %> <%= plan.coverage_kind.capitalize %> Coverage
+      <span class="separator">
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : 'Individual & Family' %>
+      </span>
+    </h4>
   </div>
 
   <div class="panel-body">
@@ -16,8 +20,8 @@
           <div><p><%= render_plan_type_details(plan) %></p></div>
           <div>
             <p>
-              <label>Premium:</label> <strong><%= number_to_currency(hbx_enrollment.total_premium) %></strong>/month
-              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.try(:subscriber).try(:person).try(:hbx_id) %></strong>
+              <label>Premium:</label> <strong><%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %></strong>/month
+              <label class="bullet-separator">&nbsp;DCHL ID:</label> <strong><%= hbx_enrollment.hbx_id %></strong>
             </p>
           </div>
             <% names = hbx_enrollment.covered_members_first_names %>
@@ -56,7 +60,7 @@
           </div>
           <div class="col-xs-4">
             <a href="#">
-              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Carrier Contact Info</div>
+              <i class="fa fa-phone fa-2x pull-left"></i><div class="fa-icon-label">Plan Contact Info</div>
             </a>
           </div>
           <div class="col-xs-4">

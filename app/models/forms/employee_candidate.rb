@@ -9,6 +9,7 @@ module Forms
 
     attr_accessor :user_id
     attr_accessor :dob_check
+    attr_accessor :is_applying_coverage
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -26,7 +27,7 @@ module Forms
     attr_reader :dob
 
     def dob=(val)
-      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      @dob = val.class == Date ? val : Date.strptime(val, "%Y-%m-%d") rescue nil
     end
 
     # TODO fix and use as the only way to match census employees for the employee flow or blow this away

@@ -175,7 +175,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:family) { double }
     let(:benefit_group) { instance_double("BenefitGroup") }
     let(:employer_profile) { double }
-    let(:census_employee) { instance_double("CensusEmployee", :hired_on => hired_on ) }
+    let(:census_employee) { instance_double("CensusEmployee", :hired_on => hired_on, :is_linked? => true) }
     let(:employee_role) { instance_double("EmployeeRole", :benefit_group => benefit_group, :new_census_employee => census_employee, :person => person, :id => "212342345") }
     let(:effective_date) { double }
     let(:employment_relationship) {
@@ -191,7 +191,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
         allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
         allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
-        allow(census_employee).to receive(:employee_role_linked?).and_return(true)
+        allow(census_employee).to receive(:is_linked?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)

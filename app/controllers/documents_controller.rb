@@ -32,32 +32,23 @@ class DocumentsController < ApplicationController
 
   def update_verification_type
     v_type = params[:verification_type]
-    if v_type == "Social Security Number"
-      @person.consumer_role.update_attributes(:ssn_validation => "valid",
-                                              :ssn_update_reason => params[:verification_reason])
-    elsif v_type == "American Indian Status"
-      @person.consumer_role.update_attributes(:native_validation => "valid",
-                                              :native_update_reason => params[:verification_reason])
-    else
-      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
-      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
-                                             {:v_type => v_type,
-                                              :update_reason => params[:verification_reason]
-                                             } )
-    end
-    @person.consumer_role.verify_ivl_by_admin if @person.all_types_verified?
+    update_reason = params[:verification_reason]
+    verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
     respond_to do |format|
-      format.html {
-        flash[:notice] = "Verification successfully approved."
-        redirect_to :back
-      }
+      if verification_result.is_a? String
+        format.html { redirect_to :back, :flash => { :success => verification_result} }
+      else
+        format.html { redirect_to :back, :flash => { :success => "Person verification successfully approved."} }
+      end
     end
   end
 
   def enrollment_verification
      family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments) &&  family.active_household.hbx_enrollments.verification_needed.first
-       family.active_household.hbx_enrollments.verification_needed.first.evaluate_individual_market_eligiblity
+     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+         enrollment.evaluate_individual_market_eligiblity
+       end
        family.save!
        respond_to do |format|
          format.html {
@@ -87,7 +78,9 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_docs_state
-    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:docs_status])
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+      enrollment.update_attributes(:review_status => "ready")
+    end
     flash[:success] = "Your documents were sent for verification."
     redirect_to :back
   end
@@ -96,20 +89,22 @@ class DocumentsController < ApplicationController
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
       set_current_person
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:review_status => params[:status])
+      @person.primary_family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+        enrollment.update_attributes(:review_status => "in review")
+      end
     end
     redirect_to verification_insured_families_path
   end
 
   def extend_due_date
     family = Family.find(params[:family_id])
-      if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-        if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-          family.active_household.hbx_enrollments.verification_needed.first.special_verification_period += 30.days
-          family.save!
+      if family.any_unverified_enrollments?
+        if family.enrollments.verification_needed.first.special_verification_period
+          new_date = family.enrollments.verification_needed.first.special_verification_period += 30.days
+          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => new_date)
           flash[:success] = "Special verification period was extended for 30 days."
         else
-          family.active_household.hbx_enrollments.verification_needed.first.update_attributes(:special_verification_period => TimeKeeper.date_of_record + 30.days)
+          family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => TimeKeeper.date_of_record + 30.days)
           flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
         end
       else

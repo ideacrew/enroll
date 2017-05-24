@@ -263,7 +263,13 @@ RSpec.describe Employers::CensusEmployeesController do
                          aasm_state: 'coverage_terminated'
       )
     end
-
+    let(:expired_enrollment) do
+      FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "individual",
+                         aasm_state: 'coverage_expired'
+      )
+    end
     it "should be render show template" do
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
@@ -415,6 +421,66 @@ RSpec.describe Employers::CensusEmployeesController do
     end
   end
 
+  describe "for cobra" do
+    let(:hired_on) { TimeKeeper.date_of_record }
+    let(:cobra_date) { hired_on + 10.days }
+    before do
+      sign_in @user
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(CensusEmployee).to receive(:find).and_return(census_employee)
+      census_employee.update(aasm_state: 'employment_terminated', hired_on: hired_on, employment_terminated_on: (hired_on + 2.days))
+      allow(census_employee).to receive(:build_hbx_enrollment_for_cobra).and_return(true)
+      allow(controller).to receive(:authorize).and_return(true)
+    end
+
+    context 'Get cobra' do
+      it "should be redirect" do
+        allow(census_employee).to receive(:update_for_cobra).and_return true
+        xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+        expect(flash[:notice]).to eq "Successfully update Census Employee."
+        expect(response).to have_http_status(:success)
+      end
+
+      context "with cobra date" do
+        it "should cobra census employee" do
+          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+          expect(response).to have_http_status(:success)
+          expect(assigns[:cobra_date]).to eq cobra_date
+        end
+
+        it "should not cobra census_employee" do
+          allow(census_employee).to receive(:update_for_cobra).and_return false
+          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+          expect(response).to have_http_status(:success)
+          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+        end
+      end
+
+      context "without cobra date" do
+        it "should throw error" do
+          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: "", :format => :js
+          expect(response).to have_http_status(:success)
+          expect(assigns[:cobra_date]).to eq ""
+          expect(flash[:error]).to eq "Please enter cobra date."
+        end
+      end
+    end
+
+    context 'Get cobra_reinstate' do
+      it "should get notice" do
+        allow(census_employee).to receive(:reinstate_eligibility!).and_return true
+        xhr :get, :cobra_reinstate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
+        expect(flash[:notice]).to eq 'Successfully update Census Employee.'
+      end
+
+      it "should get error" do
+        allow(census_employee).to receive(:reinstate_eligibility!).and_return false
+        xhr :get, :cobra_reinstate, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, :format => :js
+        expect(flash[:error]).to eq "Unable to update Census Employee."
+      end
+    end
+  end
+
   describe "GET rehire" do
     it "should be error without rehiring_date" do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -500,6 +566,18 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(response).to render_template("benefit_group")
+    end
+  end
+  
+  describe "Update census member email" do
+    it "expect census employee to have a email present" do 
+      expect(census_employee.email.present?).to eq true
+    end
+    
+    it "should allow emails to be updated to nil" do
+      census_employee.email.update(address:'', kind:'')
+      expect(census_employee.email.kind).to eq ''
+      expect(census_employee.email.address).to eq ''
     end
   end
 end

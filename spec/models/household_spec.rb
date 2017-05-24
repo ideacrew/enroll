@@ -16,6 +16,10 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
     expect(subject.enrolled_hbx_enrollments).to eq []
   end
 
+  it "ImmediateFamily should have domestic partner" do
+    expect(Household::ImmediateFamily.include?('domestic_partner')).to eq true
+  end
+
   context "new_hbx_enrollment_from" do
     let(:consumer_role) {FactoryGirl.create(:consumer_role)}
     let(:person) { double(primary_family: family)}
@@ -126,11 +130,43 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   end
 
-
-
   it "ImmediateFamily should have stepchild" do
-    expect(Household::ImmediateFamily.include?('stepchild')).to eq true
+    expect(Family::IMMEDIATE_FAMILY.include?('stepchild')).to eq true
   end
+
+  context "eligibility determinations for a household" do
+    #let!(:tax_household1) {FactoryGirl.create(:tax_household }
+    let(:year) { TimeKeeper.date_of_record.year }
+    let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:household) {FactoryGirl.create(:household, family: family)}
+    let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
+    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
+    let(:tax_household3) {FactoryGirl.create(:tax_household, household: household)}
+    let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
+    let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2)}
+    let(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3)}
+
+    it "should return all the eligibility determinations across all tax households when there is one eligibility determination per tax household" do
+      tax_household1.eligibility_determinations = [eligibility_determination1]
+      tax_household2.eligibility_determinations = [eligibility_determination2]
+      household.tax_households = [tax_household1, tax_household2]
+      expect(household.eligibility_determinations_for_year(year).size).to eq 2
+      household.eligibility_determinations_for_year(year).each do |ed|
+        expect(household.eligibility_determinations_for_year(year)).to include(ed)
+      end
+    end
+
+    it "should return all the eligibility determinations across all tax households when there is more than one eligibility determination in some tax household" do
+      tax_household1.eligibility_determinations = [eligibility_determination1, eligibility_determination3]
+      tax_household2.eligibility_determinations = [eligibility_determination2]
+      household.tax_households = [tax_household1, tax_household2]
+      expect(household.eligibility_determinations_for_year(year).size).to eq 3
+      household.eligibility_determinations_for_year(year).each do |ed|
+        expect(household.eligibility_determinations_for_year(year)).to include(ed)
+      end
+    end
+  end
+
 
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
@@ -144,4 +180,25 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   #     expect(subject.enrolled_hbx_enrollments).to eq hbx_enrollments
   #   end
   # end
+end
+
+
+describe Household, "for dependent with domestic partner relationship", type: :model, dbclean: :after_each do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+  let(:person) do
+    p = FactoryGirl.build(:person)
+    p.person_relationships.build(relative: person_two, kind: "domestic_partner")
+    p.save
+    p
+  end
+  let(:person_two)  { FactoryGirl.create(:person)}
+  let(:family_member) { FactoryGirl.create(:family_member, family: family, person: person_two)}
+  before(:each) do
+    family.relate_new_member(person_two, "domestic_partner")
+    family.save!
+  end
+  it "should have the extended family member in the extended coverage household" do
+     immediate_coverage_members = family.active_household.immediate_family_coverage_household.coverage_household_members
+     expect(immediate_coverage_members.length).to eq 2
+  end
 end

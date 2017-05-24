@@ -10,7 +10,7 @@ RSpec.describe Plan, dbclean: :after_each do
   end
 
   def active_year;
-    2016;
+    TimeKeeper.date_of_record.year;
   end
 
   def hios_id;
@@ -520,7 +520,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "should return health plans without silver" do
         plans = [plan1, plan3]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_household:nil).to_a).to include(plan1,plan3)
       end
 
       it "should return health plans" do

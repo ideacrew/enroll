@@ -166,6 +166,11 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
+  scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
+  scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
+  scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
+  scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
+
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -270,6 +275,7 @@ class Plan
 
   scope :by_health_metal_levels,                ->(metal_levels)    { any_in(metal_level: metal_levels) }
   scope :by_carrier_profile,                    ->(carrier_profile_id) { where(carrier_profile_id: carrier_profile_id) }
+  scope :by_carrier_profile_for_bqt,            ->(carrier_profile_id) { where(:carrier_profile_id.in => carrier_profile_id) }
 
   scope :health_metal_levels_all,               ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS << "catastrophic") }
   scope :health_metal_levels_sans_catastrophic, ->{ any_in(metal_level: REFERENCE_PLAN_METAL_LEVELS) }
@@ -308,8 +314,7 @@ class Plan
   end
 
   def cat_age_off_renewal_plan
-    return @cat_age_off_renewal_plan if defined? @cat_age_off_renewal_plan
-    @cat_age_off_renewal_plan = Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
+    Plan.find(cat_age_off_renewal_plan_id) unless cat_age_off_renewal_plan_id.blank?
   end
 
   # has_one renewal_plan
@@ -358,9 +363,16 @@ class Plan
     end
   end
 
+  def dental?
+    coverage_kind && coverage_kind.downcase == "dental"
+  end
+
+  def health?
+    coverage_kind && coverage_kind.downcase == "health"
+  end
+
   def is_dental_only?
-    return false if self.coverage_kind.blank?
-    self.coverage_kind.downcase == "dental"
+    dental?
   end
 
   def can_use_aptc?
@@ -374,6 +386,38 @@ class Plan
 
   def is_csr?
     (EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.values - [EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.default]).include? csr_variant_id
+  end
+
+  def deductible_integer
+    (deductible && deductible.gsub(/\$/,'').gsub(/,/,'').to_i) || nil
+  end
+
+  def hsa_plan?
+    name = self.name
+    regex = name.match("HSA")
+    if regex.present?
+      return true
+    else
+      return false
+    end
+  end
+
+  def renewal_plan_type
+    hios = self.hios_base_id
+    kp = ["94506DC0390001","94506DC0390002","94506DC0390003","94506DC0390004","94506DC0390005","94506DC0390006","94506DC0390007","94506DC0390008","94506DC0390009","94506DC0390010","94506DC0390011"]
+    cf_nonhsa = ["78079DC0160001","78079DC0160002","86052DC0400003"]
+    cf_reg = ["86052DC0400001","86052DC0400002","86052DC0400004","86052DC0400007","86052DC0400008","78079DC0210001","78079DC0210002","78079DC0210003","78079DC0210004"]
+    cf_hsa = ["86052DC0400005","86052DC0400006","86052DC0400009"]
+    return "2017 Plan" if self.active_year != 2016
+    if kp.include?(hios)
+      return "KP"
+    elsif cf_nonhsa.include?(hios)
+      return "CFNONHSA"
+    elsif cf_reg.include?(hios)
+      return "CFREG"
+    elsif cf_hsa.include?(hios)
+      return "CFHSA"
+    end
   end
 
   class << self
@@ -425,6 +469,76 @@ class Plan
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year).with_premium_tables
         end
       end
+    end
+
+    def shop_plans coverage_kind, year
+      if coverage_kind == 'health'
+        shop_health_plans year
+      else
+        shop_dental_plans year
+      end
+    end
+
+    def shop_health_plans year
+      $shop_plan_cache = {} unless defined? $shop_plan_cache
+      if $shop_plan_cache[year].nil?
+        $shop_plan_cache[year] =
+          Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
+            Plan.valid_shop_health_plans('metal_level', metal_level, year)
+        end.flatten
+      end
+      $shop_plan_cache[year]
+    end
+
+    def shop_dental_plans year
+      shop_dental_by_active_year year
+    end
+
+    def build_plan_selectors market_kind, coverage_kind, year
+      plans = shop_plans coverage_kind, year
+      selectors = {}
+      if coverage_kind == 'dental'
+        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.unshift('any')
+      else
+        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.unshift('any')
+      end
+      selectors[:carriers] = plans.map{|p|
+        id = p.carrier_profile_id
+        carrier_profile = CarrierProfile.find(id)
+        [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
+        }.uniq.unshift(['any','any'])
+      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+      selectors[:dc_network] =  ['any', 'true', 'false']
+      selectors[:nationwide] =  ['any', 'true', 'false']
+      selectors
+    end
+
+    def build_plan_features market_kind, coverage_kind, year
+      plans = shop_plans coverage_kind, year
+      feature_array = []
+      plans.each{|plan|
+
+        characteristics = {}
+        characteristics['plan_id'] = plan.id.to_s
+        if coverage_kind == 'dental'
+          characteristics['dental_level'] = plan.dental_level
+        else
+          characteristics['metal'] = plan.metal_level
+        end
+        characteristics['carrier'] = plan.carrier_profile.organization.legal_name
+        characteristics['plan_type'] = plan.plan_type
+        characteristics['deductible'] = plan.deductible_integer
+        characteristics['carrier_abbrev'] = plan.carrier_profile.abbrev
+        characteristics['nationwide'] = plan.nationwide
+        characteristics['dc_in_network'] = plan.dc_in_network
+
+        if plan.deductible_integer.present?
+          feature_array << characteristics
+        else
+          Rails.logger.error("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}")
+        end
+      }
+      feature_array
     end
   end
 end

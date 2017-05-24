@@ -1,10 +1,10 @@
 class QhpBuilder
-  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
-  LOGGER = Logger.new(LOG_PATH)
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
+    log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
+    @logger = Logger.new(log_path)
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -121,8 +121,8 @@ class QhpBuilder
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
     puts "Check the log file #{LOG_PATH}"
     puts "*"*80
-    LOGGER.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
-    LOGGER.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
+    @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
+    @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
   end
 
   def validate_and_persist_qhp
@@ -130,9 +130,9 @@ class QhpBuilder
       associate_plan_with_qhp
       @qhp.save!
       @success_plan_counter += 1
-      LOGGER.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
+      @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
-      LOGGER.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
     end
   end
 
@@ -152,7 +152,7 @@ class QhpBuilder
     plans_to_update.each do |up_plan|
       nation_wide, dc_in_network = parse_nation_wide_and_dc_in_network
       up_plan.update_attributes(
-          name: @qhp.plan_marketing_name.squish!,
+          # name: @qhp.plan_marketing_name.squish!,
           hios_id: up_plan.coverage_kind == "dental" ? up_plan.hios_id.split("-").first : up_plan.hios_id,
           hios_base_id: up_plan.hios_id.split("-").first,
           # csr_variant_id: up_plan.hios_id.include?("-") ? up_plan.hios_id.split("-").last : "",
@@ -193,7 +193,7 @@ class QhpBuilder
             csr_variant_id: csr_variant_id).to_a
           next if plan.present?
           new_plan = Plan.new(
-            name: @qhp.plan_marketing_name.squish!,
+            name: cost_share_variance.plan_marketing_name.squish!,
             hios_id: cost_share_variance.hios_plan_and_variant_id,
             hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
             csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
