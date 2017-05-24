@@ -46,6 +46,20 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
                                        })
   end
 
+  def force_publish!(new_plan_year)
+    if new_plan_year.may_force_publish? && new_plan_year.application_errors.empty?
+      new_plan_year.force_publish!
+    else
+      new_plan_year.workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: new_plan_year.aasm_state,
+          to_state: 'enrolling'
+      )
+      new_plan_year.update_attribute(:aasm_state, 'enrolling')
+      new_plan_year.save!
+    end
+    new_plan_year
+  end
+
   def migrate
 
     begin
@@ -66,8 +80,18 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
       end
 
       new_plan_year = create_initial_plan_year(organization, existing_plan_year, ENV['new_py_start_on'])
-      new_plan_year.force_publish!
 
+      force_publish!(new_plan_year)
+
+      unless Rails.env.test?
+        puts "\nExisting plan year created."
+        puts existing_plan_year.inspect
+
+        puts "\nNew plan year created."
+        puts new_plan_year.inspect
+
+        puts "\n"
+      end
     rescue Exception => e
       puts e.message
     end
