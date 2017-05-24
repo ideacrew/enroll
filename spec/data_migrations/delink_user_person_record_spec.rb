@@ -23,9 +23,9 @@ describe DelinkUserPersonRecord do
 
     context "delink person from user" do
       it "should delink user" do
-        expect(person.user).to eq nil
         subject.migrate
         person.reload
+        expect(person.user).to eq nil
       end
     end
   end
