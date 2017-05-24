@@ -574,19 +574,6 @@ class EmployerProfile
           open_enrollment_factory.begin_open_enrollment
         end
 
-        organizations_for_low_enrollment_notice(new_date).each do |organization|
-          begin
-            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-            #exclude congressional employees
-            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-              trigger_notices("low_enrollment_notice_for_employer")
-            end
-          rescue Exception => e
-            puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
-          end
-        end
-
         organizations_for_open_enrollment_end(new_date).each do |organization|
           open_enrollment_factory.employer_profile = organization.employer_profile
           open_enrollment_factory.end_open_enrollment
@@ -610,6 +597,19 @@ class EmployerProfile
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
           end
+        end
+      end
+
+      organizations_for_low_enrollment_notice(new_date).each do |organization|
+        begin
+          plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+          #exclude congressional employees
+          next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+          if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+            trigger_notices("low_enrollment_notice_for_employer")
+          end
+        rescue Exception => e
+          puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
         end
       end
 
