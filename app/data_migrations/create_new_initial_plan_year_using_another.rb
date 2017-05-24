@@ -84,7 +84,7 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
       force_publish!(new_plan_year)
 
       unless Rails.env.test?
-        puts "\nExisting plan year created."
+        puts "\nExisting plan year."
         puts existing_plan_year.inspect
 
         puts "\nNew plan year created."
