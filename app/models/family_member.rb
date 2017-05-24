@@ -23,6 +23,8 @@ class FamilyMember
   # Immediately preceding family where this person was a member
   field :former_family_id, type: BSON::ObjectId
 
+  validate :no_duplicate_family_members
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
@@ -53,8 +55,12 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
+  delegate :indian_tribe_member, to: :person, allow_nil: true
+  delegate :naturalized_citizen, to: :person, allow_nil: true
+  delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
+  delegate :is_applying_coverage, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -133,5 +139,14 @@ class FamilyMember
     return [] if family_member_id.nil?
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
+  end
+
+  private 
+
+  def no_duplicate_family_members
+    return unless family
+    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
+    end
   end
 end
