@@ -11,9 +11,7 @@ describe LinkEmployeesToEmployer do
     end
   end
   
-  describe "census employee's not linked" do
-    subject { LinkEmployeesToEmployer.new("link_employees_to_employer", double(:current_scope => nil)) }
-    
+  describe "census employee's not linked" do    
     let(:plan_year) { FactoryGirl.create(:plan_year) }
     let!(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
@@ -35,7 +33,6 @@ describe LinkEmployeesToEmployer do
     
     it "employees should have eligible state" do
       plan_year.force_publish!
-      binding.pry
     end
   end
     
