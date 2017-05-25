@@ -1,0 +1,3 @@
+<%if @family.is_applying_for_asistance?%>
+  <%= link_to "Add Info", new_financial_assistance_application_path(:family_id => @family.id, :family_member_id => family_member_id), :class => "btn btn-default" %>
+<%end%>

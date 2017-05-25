@@ -1,5 +1,6 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
+  #skip_before_filter :verify_authenticity_token, :only => :step
 
   def index
     @existing_applications = Family.find_by(person_id: current_user.person).applications
@@ -9,17 +10,26 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def new
+    @family = Family.find(params[:family_id])
+    @family_member = @family.family_members.find(params[:family_member_id])
     render 'workflow/step'
-
     # renders out first step
   end
 
   def step
-    if params.key? :attributes
-      attributes = params[:attributes].merge(workflow: { current_step: @current_step.to_i + 1 }) if params[:attributes].present?
-      #@model.attributes = survey_params(attributes)
-      #@model.save!
-      #@current_step = @current_step.next_step
+    @family = Family.find(params[:family_id])
+    @family_member = @family.family_members.find(params[:family_member_id])
+    attributes = []
+    params.each {|param| attributes << {param.first => param.second} if param.first.include?"_attributes"}
+
+    attributes.each do  |attribute_params|
+      attribute_params.each do |model_key, instance_value| # model_key: applicants_attributes & instance_value: {"0"=>{"is_required_to_file_taxes"=>"no"}}
+        embedded_model = model_key.split("_").first
+        model_params = embedded_model == "applicants" ? instance_value.first.last.merge!(family_member_id: @family_member.id) : instance_value.first.last
+        build_params = survey_params(model_params)
+        @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 })
+        @model.update_attributes!(survey_params(hash_to_param(attribute_params)))
+      end
     end
 
     if params.key?(:step)
@@ -34,15 +44,25 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   private
+
+  def hash_to_param param_hash
+    ActionController::Parameters.new(param_hash)
+  end
+
   def survey_params(attributes)
     attributes.permit!
   end
 
   def find
-    Family.find_by(person_id: current_user.person).applications.find(params[:id]) if params.key?(:id)
+    #Family.find_by(person_id: current_user.person).applications.find(params[:id]) if params.key?(:id)
+    current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
+    # Can you have two active application ?
+    # Which one does it pick on “Add Info?”
+    #TODO: Baaed on the above find the application that is currently in progress. application_in_progress?
   end
 
   def create
-    Family.find_by(person_id: current_user.person).applications.new
+    current_user.person.primary_family.applications.new
   end
+
 end

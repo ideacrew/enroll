@@ -43,6 +43,7 @@ class FinancialAssistance::Applicant
     undergraduate
     vocational
   )
+  field :family_member_id, type: BSON::ObjectId
 
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
