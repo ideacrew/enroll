@@ -184,7 +184,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
-    let(:user) { double(:idp_verified? => true) }
+    let(:user) { double(:idp_verified? => true, person: person) }
 
     context "can construct_employee_role" do
       before :each do
