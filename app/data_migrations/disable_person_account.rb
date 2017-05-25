@@ -6,7 +6,7 @@ class DisablePersonAccount< MongoidMigrationTask
     if person.nil?
       puts "No person was found by the given fein"
     else
-      person.update_attributes(is_active:"false")
+      person.update_attributes!(is_active: false, is_disabled: true)
       puts "Disable person with hbx_id #{hbx_id}" unless Rails.env.test?
     end
   end
