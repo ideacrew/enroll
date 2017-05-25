@@ -15,17 +15,17 @@ describe ChangeNewHireRule do
   describe "changing new hire rule" do
 
     context " changing effective on kind" do
-      let(:organization) { FactoryGirl.create(:organization, fein: "123456789")}
-      let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
+      let(:organization) { FactoryGirl.create(:organization)}
+      let(:benefit_group)     { FactoryGirl.build(:benefit_group, effective_on_kind: "date_of_hire")}
       let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
       let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
 
       before(:each) do
-        allow(ENV).to receive(:[]).with("fein").and_return("123456789")
+        allow(ENV).to receive(:[]).with("fein").and_return organization.fein
+        allow(ENV).to receive(:[]).with("plan_year_state").and_return plan_year.aasm_state
       end
 
       it "will change the effective on kind for the benefit group from date_of_hire to first_of_month" do
-        benefit_group.effective_on_kind = "date_of_hire"
         subject.migrate
         benefit_group.reload
         expect(benefit_group.effective_on_kind).to eq "first_of_month"
