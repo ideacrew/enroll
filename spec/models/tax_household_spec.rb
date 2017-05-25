@@ -237,3 +237,12 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 end
+
+describe Family, "generate_family_id if hbx_assigned_id blank", dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
+
+  it "generate_family_id" do
+    family.generate_family_id
+  end
+end
