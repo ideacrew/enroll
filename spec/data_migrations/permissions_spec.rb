@@ -53,4 +53,28 @@ describe DefinePermissions do
     expect(Person.first.hbx_staff_role.permission.can_complete_resident_application).to be true
     end
   end
+  describe 'update permissions for hbx staff role to add sep' do
+    let(:given_task_name) {':hbx_admin_can_add_sep'}
+    before do
+      User.all.delete
+      Person.all.delete
+      @hbx_staff_person = FactoryGirl.create(:person)
+      @hbx_read_only_person = FactoryGirl.create(:person)
+      @hbx_csr_supervisor_person = FactoryGirl.create(:person)
+      hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+      hbx_read_only_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_read_only_person, subrole: "hbx_read_only", permission_id: Permission.hbx_read_only.id)
+      hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+      subject.hbx_admin_can_add_sep
+    end
+    it "updates can_complete_resident_application to true" do
+    expect(Person.all.count).to eq(3)
+    expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
+    expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be true
+    expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be true
+    #verifying that the rake task updated only the correct subroles
+    expect(Permission.hbx_csr_tier1.can_add_sep).to be false
+    expect(Permission.hbx_csr_tier2.can_add_sep).to be false
+    expect(Permission.developer.can_add_sep).to be false
+    end
+  end
 end
