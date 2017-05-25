@@ -158,7 +158,7 @@
 
         <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>    Confirm Member<% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));DependentsValidationFields.check_continue_button();">
+        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.checkRequiredFields($(this));">
           Confirm Member
         </span>
       </div>
