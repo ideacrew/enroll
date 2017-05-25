@@ -1794,7 +1794,7 @@ describe HbxEnrollment, "given an enrollment kind of 'special_enrollment'" do
 
 end
 
-describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'" do
+describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean: :after_each  do
   subject { HbxEnrollment.new({:enrollment_kind => "open_enrollment"}) }
 
   it "should not have an eligibility event date" do

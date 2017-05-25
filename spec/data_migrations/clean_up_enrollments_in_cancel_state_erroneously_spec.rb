@@ -50,7 +50,7 @@ describe CleanUpEnrollmentsInCancelStateErroneously do
     e1.reload
     e2.reload
     expect(e1.terminated_on).to eq (e2.effective_on)
-    expect(e1.aasm_state).to eq "coverage_canceled"
+    expect(e1.aasm_state).to eq "coverage_expired"
   end
   
 end

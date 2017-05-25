@@ -31,7 +31,7 @@ class CleanUpEnrollmentsInCancelStateErroneously < MongoidMigrationTask
                       if terminate_effective > active_submitted.to_date
                         # Expected Outcome:
                         # 1. Enrollments should be changed from the Terminated to Canceled.
-                         terminated_enrollment.update(aasm_state:'coverage_canceled')
+                         terminated_enrollment.update(aasm_state:'coverage_expired')
                         # 2. Coverage end date for affected enrollments should be equal to the enrollment effective date.
                          terminated_enrollment.update(terminated_on:active_effective)
                         # 3. Provide an output identifying the following: Primary Subscriber HBX ID, E1 HBX ID, E1 effective date, E1 Market type, E2 HBX ID
