@@ -81,6 +81,8 @@ class CreateNewInitialPlanYearUsingAnother < MongoidMigrationTask
 
       new_plan_year = create_initial_plan_year(organization, existing_plan_year, ENV['new_py_start_on'])
 
+      existing_plan_year.cancel!
+
       force_publish!(new_plan_year)
 
       unless Rails.env.test?
