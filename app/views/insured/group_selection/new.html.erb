@@ -7,9 +7,11 @@
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
+        <div style="font-size :24px">
         <%if @effective_on_date.present? %>
-          EFFECTIVE DATE: <%= @effective_on_date %>
+          EFFECTIVE DATE: <span style="color: red;"><%= @effective_on_date %></span>
         <%end%>
+        </div>
         <h3>Who Needs Coverage?</h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.id) if @employee_role %>
