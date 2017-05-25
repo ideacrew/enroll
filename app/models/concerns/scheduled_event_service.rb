@@ -4,13 +4,11 @@ module ScheduledEventService
   included do
     # has_many employers
     def self.individual_market_monthly_enrollment_due_on
-      @individual_market_monthly_enrollment_due_on ||=
-           ScheduledEvent.where(:event_name => "ivl_monthly_enrollment_due_on").first.try(:start_time).try(:day) || Setting.individual_market_monthly_enrollment_due_on
+      @individual_market_monthly_enrollment_due_on ||= ScheduledEvent.day_of_month_for("ivl_monthly_enrollment_due_on") || Setting.individual_market_monthly_enrollment_due_on
     end
 
     def self.shop_market_binder_payment_due_on
-      @shop_market_binder_payment_due_on ||=
-          ScheduledEvent.where(:event_name => "shop_binder_payment_due_on").first.try(:start_time).try(:day) || Settings.aca.shop_market.binder_payment_due_on
+      @shop_market_binder_payment_due_on ||= ScheduledEvent.day_of_month_for("shop_binder_payment_due_on") || Settings.aca.shop_market.binder_payment_due_on
     end
 
     def self.shop_market_initial_application_publish_due_day_of_month
