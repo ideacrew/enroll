@@ -108,15 +108,15 @@ class PlanSelection
   end
 
   def previous_active_coverages
+    enrollments = family.active_household.hbx_enrollments.where(:effective_on.lt => hbx_enrollment.effective_on)
     coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
 
     if hbx_enrollment.is_shop?
       coverage_year_start = hbx_enrollment.benefit_group.start_on
-      bg_ids = hbx_enrollment.benefit_group.plan_year.benefit_group.pluck(:_id)
+      bg_ids = hbx_enrollment.benefit_group.plan_year.benefit_groups.pluck(:_id)
+      enrollments = enrollments.where(:benefit_group_id.in => bg_ids)
     end
 
-    enrollments = family.active_household.hbx_enrollments.where(:effective_on.lt => hbx_enrollment.effective_on)
-    enrollments = enrollments.where(:benefit_group_id.in => bg_ids) if hbx_enrollment.is_shop?
     enrollments.where({
       :_id.ne => hbx_enrollment.id,
       :kind => hbx_enrollment.kind,
