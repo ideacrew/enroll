@@ -4,7 +4,7 @@ class ImportMissingPersonContactInfo < MongoidMigrationTask
   def migrate
     Person.where(employee_roles: {:$exists => true}).where(:$or => [{addresses: {:$exists => false}}, {emails: {:$exists => false}}]).each do |person|
       begin
-        ces = person.active_census_employees
+        ces = person.active_employee_roles.map{|er| er.census_employee }
         if ces.present?
           ces.each do |census_employee|
             if census_employee.address.present?
