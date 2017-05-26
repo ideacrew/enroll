@@ -1350,6 +1350,14 @@ class HbxEnrollment
     employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
  end
 
+ def enrollment_composite_rating_tier
+    relationships=[]
+    self.hbx_enrollment_members.map(&:family_member).map(&:relationship).each do |relationship|
+    relationships << PlanCostDecorator.benefit_relationship(relationship)
+    end
+    find_relationship(relationships)
+ end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
@@ -1364,6 +1372,20 @@ class HbxEnrollment
     else
       self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")
       false
+    end
+  end
+
+  def find_relationship(relationships)
+   rel = relationships.uniq.join(",")
+   case rel
+    when 'employee'
+     'employee_only'
+    when 'employee,spouse', 'employee,domestic_partner'
+     'employee_and_spouse'
+    when 'employee,child_under_26'
+     'employee_and_one_or_dependents'
+    else
+     'family'
     end
   end
 end

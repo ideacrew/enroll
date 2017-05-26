@@ -850,6 +850,10 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
+  def rating_region
+    RateReference.where(county_name: self.organization.primary_office_location.address.county).first.rating_region
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
