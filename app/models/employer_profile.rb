@@ -598,17 +598,35 @@ class EmployerProfile
           end
         end
 
-        #Initial employer reminder notice to publish plan year 2 days prior to PY start date.
+        #Initial employer reminder notices to publish plan year.
         start_on = (new_date+2.months).beginning_of_month
+        start_on_1 = (new_date+1.month).beginning_of_month
         if new_date+2.days == start_on.last_month
           initial_employers_reminder_to_publish(start_on).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send application reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        elsif new_date+1.day == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        elsif new_date-5.days== start_on_1.last_month
+          initial_employers_reminder_to_publish(start_on_1).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
             end
           end
         end
+
       end
 
       # Employer activities that take place monthly - on first of month
