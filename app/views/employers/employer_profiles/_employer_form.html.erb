@@ -53,7 +53,8 @@
              </thead>
             <% @staff.each do |staff| %>
               <tr style='border: 1px solid #d5d5d5; height: 50px; '>
-                <td style='padding: 10px'><%= check_box_tag('primary_poc', {}, checked = staff.is_primary_poc, data: {id:staff.id, emp_id:@employer_profile.id}) %>
+                <td style='padding: 10px'><%= check_box_tag('primary_poc', {}, checked = staff.is_primary_poc, data: {id:
+                  staff.id, emp_id:@employer_profile.id}) %>
                 </td>
                 <td style='padding: 10px'><%= staff.first_name %></td>
                 <td><%= staff.last_name %></td>

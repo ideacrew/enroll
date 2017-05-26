@@ -1,6 +1,7 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
-  before_action :check_access_to_employer_profile,:updateable?
+  before_action :check_access_to_employer_profile # :except => [:make_primary_poc]
+  before_action :updateable?
 
   def create
 
@@ -61,9 +62,10 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
   def updateable?
     authorize EmployerProfile, :updateable?
   end
+  
   # Check to see if current_user is authorized to access the submitted employer profile
   def check_access_to_employer_profile
-    employer_profile = EmployerProfile.find(params[:id])
+    employer_profile = EmployerProfile.find(params[:id]) || EmployerProfile.find(params[:emp_id])
     policy = ::AccessPolicies::EmployerProfile.new(current_user)
     policy.authorize_edit(employer_profile, self)
   end
