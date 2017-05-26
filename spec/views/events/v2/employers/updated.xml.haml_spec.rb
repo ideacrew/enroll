@@ -6,7 +6,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "CountyName") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }

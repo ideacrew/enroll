@@ -5,7 +5,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
 
-  let(:user) { FactoryGirl.create(:user) } 
+  let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.create(:person, user: user) }
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
 
@@ -645,7 +645,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:bad_entity_kind) { "fraternity" }
       let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "SomeCounty") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -712,7 +712,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:bad_entity_kind) { "fraternity" }
     let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "Bucks") }
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
