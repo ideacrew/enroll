@@ -554,6 +554,12 @@ $(document).on('change', '#address_info .office_kind_select select', function() 
     $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', true);
     $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
   };
+  if ($(this).val() == 'primary') {
+    $(this).parents('fieldset').find(".county-select").addClass('primary-office-location');
+  }
+  else {
+    $(this).parents('fieldset').find(".county-select").removeClass('primary-office-location');
+  }
 })
 
 function checkPhone(textbox) {
@@ -569,17 +575,40 @@ function checkPhone(textbox) {
 }
 
 function checkZip(textbox) {
-  var phoneRegex = /^\d{5}$/;
+  var zipRegex = /^\d{5}$/;
   if (textbox.value == '') {
     textbox.setCustomValidity('Please fill out this zipcode field.');
-  } else if(!phoneRegex.test(textbox.value)){
+  } else if(!zipRegex.test(textbox.value)){
     textbox.setCustomValidity('please enter a valid zipcode.');
   } else {
     textbox.setCustomValidity('');
+    var child_index = $(textbox).data('child-index');
+    $.ajax({
+      type: 'get',
+      datatype: 'js',
+      url: '/employers/employer_profiles/counties_for_zip_code',
+      data: { zip_code: textbox.value },
+      success: function (response) {
+        $('#county-select-' + child_index + " select").html(response);
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+        if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() && 
+                $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
+        {
+            $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+        }
+      }
+    });
   }
   return true;
 }
-
+function validateCounty(selectField) {
+    if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
+    {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+    } else {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+    }
+}
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
   if (textbox.value == '') {

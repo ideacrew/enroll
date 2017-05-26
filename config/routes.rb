@@ -254,6 +254,7 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
         get 'inbox'
+        get 'counties_for_zip_code'
       end
       resources :plan_years do
         get 'reference_plans'

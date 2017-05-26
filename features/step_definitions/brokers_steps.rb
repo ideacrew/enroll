@@ -270,3 +270,27 @@ Then(/^.+ continues to the consumer home page$/) do
   wait_and_confirm_text(/Continue/)
   @browser.a(text: /Continue/).click
 end
+
+Given(/^zip code for county exists as rate reference$/) do
+ FactoryGirl.create(:rate_reference, zip_code: '01010', county_name: 'Test County', rating_region: "Test Region", 
+    zip_code_in_multiple_counties: true)
+end
+#
+Given(/^enters the existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'
+end
+
+Then(/^the county should be autopopulated appropriately$/) do
+  wait_for_ajax
+  select 'Test County', :from => "organization[office_locations_attributes][0][address_attributes][county]"
+  expect(page).to have_select("organization[office_locations_attributes][0][address_attributes][county]", :selected => 'Test County')
+end
+
+Given(/^enters a non existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '11011'
+end
+
+Then(/^the county should not be autopopulated appropriately$/) do
+  wait_for_ajax
+  expect(page).not_to have_select("organization[office_locations_attributes][0][address_attributes][county]", :options => ['Test County'])
+end

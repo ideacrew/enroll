@@ -20,6 +20,7 @@ Then /^they should see the new general agency form$/ do
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
+  FactoryGirl.create(:rate_reference, zip_code: "01002", county: "Franklin", rating_region: "Test Region")
   fill_in 'organization[first_name]', with: Forgery(:name).first_name
   fill_in 'organization[last_name]', with: Forgery(:name).last_name
   fill_in 'jq_datepicker_ignore_organization[dob]', with: (TimeKeeper.datetime_of_record - rand(20..50).years).strftime('%m/%d/%Y')
@@ -41,7 +42,9 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   find(:xpath, "//p[contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[contains(., 'DC')]").click
 
-  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '20001'
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01002'
+  wait_for_ajax
+  select "#{location[:county]}", :from => "organization[office_locations_attributes][0][address_attributes][county]"
 
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', with: Forgery(:address).phone.match(/\((\d\d\d)\)/)[1]
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', with: Forgery(:address).phone.match(/\)(.*)$/)[1]

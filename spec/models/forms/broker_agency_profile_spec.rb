@@ -70,6 +70,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       address_1: "99 N ST",
       city: "washignton",
       state: Settings.aca.state_abbreviation,
+      county: "County",
       zip: "20006"
     }
   }
@@ -341,6 +342,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
      address_1: "99 N ST",
      city: "washignton",
      state: "dc",
+     county: "County",
      zip: "20006"
    }
  }

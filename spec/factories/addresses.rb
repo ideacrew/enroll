@@ -5,7 +5,8 @@ FactoryGirl.define do
     sequence(:address_2, 111) { |n| "##{n}" }
     city 'Washington'
     state Settings.aca.state_abbreviation
-    sequence(:zip, 11111)
+    zip '01002'
+    county 'Franklin'
 
     trait :work_kind do
       kind 'work'

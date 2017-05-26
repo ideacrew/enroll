@@ -32,6 +32,7 @@ def people_for_cobra
 end
 
 When(/^(.*) create a new account for employer$/) do |named_person|
+  find('.interaction-click-control-create-account').click
   person = people_for_cobra[named_person]
   fill_in "user[oim_id]", :with => person[:email]
   fill_in "user[password]", :with => person[:password]
@@ -70,7 +71,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//li[contains(., 'GA')]").click
 
-  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+  fill_in 'census_employee[address_attributes][zip]', :with => "01002"
 
   find(:xpath, "//p[contains(., 'SELECT KIND')]").click
   find(:xpath, "//li[@data-index='1'][contains(., 'home')]").click
@@ -169,7 +170,7 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   email_address = person[:email]
   password = person[:password]
 
-  click_link "Sign In Existing Account"
+  #click_link "Sign In Existing Account"
   expect(page).to have_content('Sign In')
 
   fill_in "user[login]", with: email_address

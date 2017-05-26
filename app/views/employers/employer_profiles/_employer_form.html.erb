@@ -120,7 +120,8 @@
             <h2> Office Locations </h2>
             <% @row = false %>
             <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location,block| %>
-              <%= render partial: 'shared/office_location_fields', locals: {f: office_location} %>
+              <%= render partial: 'shared/office_location_fields', locals: {f: office_location, child_index: 
+              f.object.office_locations.length - 1} %>
               <% @row = true %>
             <% end %>
             <br/>
