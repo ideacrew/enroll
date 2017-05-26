@@ -1,0 +1,2 @@
+module FinancialAsistance::PreWorkflowHelper
+end
