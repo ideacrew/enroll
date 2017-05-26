@@ -56,7 +56,7 @@
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
           <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
-            <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
+            <%= link_to 'Add Member'.html_safe, new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :class => "btn btn-default" %>
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
 

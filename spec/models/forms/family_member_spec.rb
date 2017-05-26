@@ -282,8 +282,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
       allow(new_family_member).to receive(:person).and_return new_person
-      allow(primary_person).to receive(:person).and_return new_person2
-      allow(family.primary_applicant).to receive(:person).and_return new_person2
       allow(subject).to receive(:assign_person_address).and_return true
       allow(subject).to receive(:relationship).and_return relationship
     end
@@ -455,21 +453,29 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   end
 
   describe "when updated" do
-    let(:primary_person) {family.primary_applicant}
-    let(:person1) { double(:save => true, :errors => double(:has_key? => false)) }
 
-    it "should update the relationship of the dependent" do
-      allow(person1).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
-      allow(subject).to receive(:assign_person_address).and_return true
-      allow(primary_person).to receive(:person).and_return person1
-      expect(person).to receive(:add_relationship).with(person1, relationship, family_id).and_return true
-      expect(person1).to receive(:add_relationship).with(person, PersonRelationship::InverseMap[relationship], family_id, true).and_return true
-      subject.update_attributes(update_attributes)
+    it "should update the person properties of the dependent" do
+    allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+    allow(subject).to receive(:assign_person_address).and_return true
+    subject.update_attributes(update_attributes)
     end
 
-    it "should update the attributes of the person" do
+    it "should update the person properties of the person" do
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
       subject.update_attributes(update_attributes)
+    end
+  end
+
+  describe "update existing relationship" do
+    let(:dependent_person) {FactoryGirl.create(:family_member, family: test_family).person}
+    let(:primary_person) {test_family.primary_applicant.person}
+    let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    it "should the old relationship from spouse to child" do
+      primary_person.person_relationships.create(predecessor_id: primary_person.id, :successor_id => dependent_person.id, :kind => "spouse", family_id: test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "spouse"
+      primary_person.add_relationship(dependent_person, "child", test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "child"
     end
   end
 end
