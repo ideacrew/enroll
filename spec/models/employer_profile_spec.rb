@@ -989,6 +989,23 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       end
     end
   end
+  
+  describe "rating_region" do
+    context "employer profile with county code" do
+      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Boston", state: "MA", zip: "02119",county: "SomeCounty") }
+      let!(:employer_profile) { FactoryGirl.build(:employer_profile) }
+      let(:office_location) { FactoryGirl.build(:office_location,is_primary: true, address: address)}
+      let!(:organization) { FactoryGirl.create(:organization, employer_profile:employer_profile, office_locations:[office_location]) }
+
+      before do
+      FactoryGirl.create(:rate_reference, county_name: "SomeCounty", rating_region: "Region 1",zip_code:"21208")
+      end
+
+      it "should return employer rating region" do
+        expect(employer_profile.rating_region).to eq 'Region 1'
+      end
+    end
+  end
 end
 
 # describe "#advance_day" do
