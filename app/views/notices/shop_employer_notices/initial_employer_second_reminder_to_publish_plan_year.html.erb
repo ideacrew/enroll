@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Final Reminder – Action Required to Complete <%= notice.primary_fullname %> Application for Employer-sponsored Coverage with <%= Settings.site.short_name %> </h3></td>
+      <td><h3>Action Required to Complete <%= notice.primary_fullname %> Application for Employer-sponsored Coverage with <%= Settings.site.short_name %> – Deadline Extended</h3></td>
     </tr>
   </tbody>
 </table>
@@ -19,7 +19,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with DC Health Link. To apply for coverage starting on <coverage start date>, please complete your application before <5th of the month prior to renewal date, MM/DD/YYYY >."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with DC Health Link. The deadline to complete your application has been extended to <5th of the month prior to renewal date, MM/DD/YYYY >. Please complete your application by this date or you may have to reapply for coverage starting at a later date. To apply for coverage starting on <coverage start date>, please complete your application before <1st of the month prior to renewal date, MM/DD/YYYY >."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "For detailed information on how to complete your application for employer-sponsored coverage, please see this walkthrough guide on DC Health Link’s website. Additional resources can also be found on the Forms section of DC Health Link’s website and in the “Questions and Assistance” section below."} %>
@@ -77,7 +77,7 @@
       <td>
         <ul style="list-style: circle solid;">
         <li>
-          <strong>Finalize Coverage and Pay First Month’s Premium</strong><br> 
+          <strong>Finalize Coverage and Pay First Month’s Premium</strong><br>
           Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received and cleared no later than 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%> in order for your coverage to take effect on <%=notice.plan_year.start_on%>. Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
           If your first month’s premium is not received and cleared by 5:00 p.m. on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.
         </li>
