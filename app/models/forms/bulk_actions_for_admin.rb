@@ -1,16 +1,34 @@
 module Forms
-  class UpdateTerminateEnrollment
+  class BulkActionsForAdmin
 
     attr_reader :result
     attr_reader :row
     attr_reader :family_id
 
     def initialize(*arguments)
-      params = arguments.extract_options!
+      @params = arguments.extract_options!
       @result = {success: [], failure: []}
       @row = params[:family_actions_id]
       @family_id = params[:family_id]
-      params.each do |key, value|
+    end
+
+    def cancel_enrollments
+      @params.each do |key, value|
+        if key.to_s[/cancel_hbx_.*/]
+          hbx = HbxEnrollment.find(params[key.to_s])
+          begin
+            hbx.cancel_coverage! if hbx.may_cancel_coverage?
+            @result[:success] << hbx
+          rescue
+            @result[:failure] << hbx
+          end
+        end
+        set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
+      end
+    end
+
+    def terminate_enrollments
+      @params.each do |key, value|
         if key.to_s[/terminate_hbx_.*/]
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
