@@ -1,10 +1,10 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "remove_policy")
+require File.join(Rails.root, "app", "data_migrations", "cancel_policy")
 
-describe RemovePolicy do
+describe CancelPolicy do
 
-  let(:given_task_name) { "remove_policy" }
-  subject { RemovePolicy.new(given_task_name, double(:current_scope => nil)) }
+  let(:given_task_name) { "cancel_policy" }
+  subject { CancelPolicy.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
     it "has the given task name" do
@@ -24,7 +24,6 @@ describe RemovePolicy do
     it "should change aasm state to canceled" do
       subject.migrate
       hbx_enrollment.reload
-      puts hbx_enrollment.inspect
       expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
     end
   end

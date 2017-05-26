@@ -1,6 +1,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class RemovePolicy < MongoidMigrationTask
+class CancelPolicy < MongoidMigrationTask
   def migrate
     begin
       enrollment = HbxEnrollment.by_hbx_id(ENV['hbx_id'].to_s)
