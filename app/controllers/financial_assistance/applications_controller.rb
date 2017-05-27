@@ -17,17 +17,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-    @family = Family.find(params[:family_id])
-    @family_member = @family.family_members.find(params[:family_member_id])
     attributes = []
     params.each {|param| attributes << {param.first => param.second} if param.first.include?"_attributes"}
 
     attributes.each do  |attribute_params|
-      attribute_params.each do |model_key, instance_value| # model_key: applicants_attributes & instance_value: {"0"=>{"is_required_to_file_taxes"=>"no"}}
-        embedded_model = model_key.split("_").first
-        model_params = embedded_model == "applicants" ? instance_value.first.last.merge!(family_member_id: @family_member.id) : instance_value.first.last
-        build_params = survey_params(model_params)
-        @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 })
+      attribute_params.each do |model_key, params_instance|
+        update_params(model_key, params_instance, params)
         @model.update_attributes!(survey_params(hash_to_param(attribute_params)))
       end
     end
@@ -39,7 +34,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       @current_step = @current_step.next_step
     end
     @model.save!
-
     render 'workflow/step'
   end
 
@@ -51,6 +45,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def survey_params(attributes)
     attributes.permit!
+  end
+
+  def update_params(model_key, params_instance, params)
+    binding.pry
+    @family = Family.find(params[:family_id]) if params[:family_id].present?
+    @family_member = @family.family_members.find(params[:family_member_id]) if params[:family_member_id].present?
+    @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 }) # Add workflow params
+    params_instance.first.last.merge!(family_member_id: @family_member.id) if model_key == "applicants_attributes" # Add foreign key reference to appplicant
   end
 
   def find
