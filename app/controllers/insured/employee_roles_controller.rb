@@ -3,6 +3,7 @@ class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role_permissions_edit, only: [:edit]
   before_action :check_employee_role_permissions_update, only: [:update]
   include ErrorBubble
+  include EmployeeRoles
 
   def welcome
   end
@@ -83,6 +84,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @person = Forms::EmployeeRole.new(person, @employee_role)
     @person.addresses = [] #fix unexpected duplicates issue
     if @person.update_attributes(object_params)
+      set_notice_preference(@person, @employee_role)
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
