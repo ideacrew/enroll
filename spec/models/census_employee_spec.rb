@@ -958,7 +958,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       termination_dates = [TimeKeeper.date_of_record - 5.days, TimeKeeper.date_of_record, TimeKeeper.date_of_record + 5.days]
       termination_dates.each do |terminated_on|
-        
+
         context 'move the enrollment into proper state' do
 
           before do
@@ -997,24 +997,39 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
           before do
             hbx_enrollment.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
             hbx_enrollment_two.update_attribute(:effective_on, TimeKeeper.date_of_record.next_month)
-
             census_employee.terminate_employment!(terminated_on)
           end
 
           it "should cancel the health enrollment if effective date is in future" do
-            expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            else
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the health enrollment" do
-            expect(hbx_enrollment.terminated_on).to eq nil
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.terminated_on).to eq nil
+            else
+              expect(hbx_enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+            end
           end
 
           it "should cancel the dental enrollment if effective date is in future" do
-            expect(hbx_enrollment_two.aasm_state).to eq 'coverage_canceled'
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+            else
+              expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
+            end
           end
 
           it "should set the coverage termination on date on the dental enrollment" do
-            expect(hbx_enrollment_two.terminated_on).to eq nil
+            if census_employee.coverage_terminated_on < hbx_enrollment.effective_on
+              expect(hbx_enrollment_two.terminated_on).to eq nil
+            else
+              expect(hbx_enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+            end
           end
         end
 
