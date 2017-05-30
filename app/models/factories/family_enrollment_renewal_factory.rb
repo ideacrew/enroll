@@ -3,35 +3,21 @@ module Factories
     include Mongoid::Document
 
     # Renews a family's active enrollments from current plan year
-    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications, :coverage_renewal_factory
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications
 
     def initialize
       @disable_notifications = false
-      @coverage_renewal_factory = ShopEnrollmentRenewalFactory.new
     end
 
-    def renew_enrollment(enrollment)
-      coverage_renewal_factory.assign_attributes({
+    def renew_enrollment(enrollment: nil, waiver: false)
+      ShopEnrollmentRenewalFactory.new({
         family: family, 
         census_employee: census_employee, 
         employer: employer, 
         renewing_plan_year: renewing_plan_year, 
-        enrollment: enrollment
-      })
-     
-      coverage_renewal_factory.renew_coverage
-    end
-
-    def renew_waiver(waiver = nil)
-      coverage_renewal_factory.assign_attributes({
-        family: family, 
-        census_employee: census_employee, 
-        employer: employer, 
-        renewing_plan_year: renewing_plan_year,
-        enrollment: nil
-      })
-
-      coverage_renewal_factory.renew_waived_enrollment(waiver)
+        enrollment: enrollment,
+        is_waiver: waiver
+      }).renew_coverage
     end
 
     def renew
@@ -75,10 +61,13 @@ module Factories
             active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
             if active_enrollment.present? && active_enrollment.inactive?
               # renew_waived_enrollment(active_enrollment)
-              renew_waiver(active_enrollment)
+              # renew_waiver(active_enrollment)
+              renew_enrollment(enrollment: active_enrollment, waiver: true)
+
               ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
             elsif renewal_plan_offered_by_er?(active_enrollment)
-              renew_enrollment(active_enrollment)
+
+              renew_enrollment(enrollment: active_enrollment)
 
               # renewal_enrollment = renewal_builder(active_enrollment)
               # renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
@@ -93,7 +82,7 @@ module Factories
           end
         elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
           # renew_waived_enrollment
-          renew_waiver
+          renew_enrollment(enrollment: nil, waiver: true)
           ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
         end
       rescue Exception => e
