@@ -7,8 +7,13 @@ class DeactivateEmployerStaffRole < MongoidMigrationTask
     person= Person.by_hbx_id(ENV['hbx_id']).first
 
     if organization.present? && person.present?
-      Person.deactivate_employer_staff_role(person.id, organization.employer_profile.id)
-      puts "Deactivated employer staff role" unless Rails.env.test?
+      poc_found = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == organization.employer_profile.id.to_s && !role.is_closed?}
+      if poc_found
+        Person.deactivate_employer_staff_role(person.id, organization.employer_profile.id)
+        puts "Deactivated employer staff role" unless Rails.env.test?
+      else
+        puts "No employer staff role found" unless Rails.env.test?
+      end
     else
       unless Rails.env.test?
         puts "No organization was found by the given fein: #{ENV['fein']}" if organization.blank?
