@@ -33,6 +33,7 @@ describe UpdateOldEnrollmentsToCoverageTerminated do
       expect(hbx_enrollment.aasm_state).to eq "coverage_terminated"
       expect(hbx_enrollment2.aasm_state).to eq "coverage_canceled"
       expect(hbx_enrollment3.hbx_id).to eq hbx_enrollment2.hbx_id
+      expect(hbx_enrollment2.plan_id).to eq hbx_enrollment.plan_id
     end
   end
 end
