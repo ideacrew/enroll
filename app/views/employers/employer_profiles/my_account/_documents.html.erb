@@ -1,34 +1,36 @@
-<div class="documents-tab">
-  <h1>Documents</h1>
-  <h4 class="starter">
-    The Documents folder is a safe and convenient way for you to view and keep track of important notices and communications you receive from <%= site_short_name %>. You'll receive an email notification when there are new documents for you to review.
-  </h4>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Document Title</th>
-        <th>Document Type</th>
-        <th>Date</th>
-      </tr>
-    </thead>
 
-    <tbody>
-      <%# unless @employer_profile.has_consumer_role? %>
-        <tr>
-          <td>N/A</td>
-          <td>N/A</td>
-          <td>N/A</td>
-        </tr>
-      <%# else %>
-          <%# @person.consumer_role.vlp_documents.select do |doc| doc.identifier.present? end.each do |doc| %>
-            <tr>
-              <td><%#= doc.title %></td>
-              <td><%#= doc.subject %></td>
-              <td><%#= doc.created_at.try(:to_date) %></td>
-            </tr>
-          <%# end %>
-      <%# end %>
-    </tbody>
-  </table>
-
+<div class="col-xs-10" style="text-align: right;top: 40px;margin-left: 35px;">
+  <div class="row">
+    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, modal: 'upload'), remote: 'true', class: "btn btn-default " %>
+  </div>
 </div>
+
+
+<div style="width:90%">
+  <%= render_datatable(@datatable) %>
+  <div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div style="margin:1em; border: 1px solid;padding: 1em;">
+          <h4>MA DOR FORM-X</h4>
+          <p> There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
+          <p style="text-align: right">
+            <button class = "btn btn-default" >Cancel</button>
+            <button class = "btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button>
+            <button class = "btn btn-default" >Print</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+    initializeDataTables();
+    jQuery('.buttons-csv').hide()
+    jQuery('.buttons-excel').hide()
+</script>
+
+<style>
+  .container{
+      width: 100%;
+  }
+</style>
