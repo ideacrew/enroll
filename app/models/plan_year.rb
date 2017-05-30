@@ -96,6 +96,21 @@ class PlanYear
     )
   }
 
+  after_update :update_employee_benefit_packages
+
+  def update_employee_benefit_packages
+    if self.start_on_changed?
+      bg_ids = self.benefit_groups.pluck(:_id)
+      employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+      employees.each do |census_employee|
+        census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+          assignment.update(start_on: self.start_on)
+          assignment.update(end_on: self.end_on) if assignment.end_on.present?
+        end
+      end
+    end
+  end
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -463,23 +478,19 @@ class PlanYear
   end
 
   def enrolled_by_bga
-    benefit_group_ids = self.benefit_groups.map(&:id)
-    candidate_benefit_group_assignments = eligible_to_enroll.map do |ce|
-        enrolled_bga_for_ce ce, benefit_group_ids
-    end.compact
-    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
-    bgas = candidate_benefit_group_assignments.select do |bga|
-      enrolled_benefit_group_assignment_ids.include?(bga.id)
-    end
+     candidate_benefit_group_assignments = eligible_to_enroll.map{|ce| enrolled_bga_for_ce(ce)}.compact
+     enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+     bgas = candidate_benefit_group_assignments.select do |bga|
+       enrolled_benefit_group_assignment_ids.include?(bga.id)
+     end
   end
 
-  # TODO Get definition of enrolled count from @dan/@ram/@hannah
-  def enrolled_bga_for_ce ce, benefit_group_ids
-    bg_assignment = ce.benefit_group_assignments.detect{|assignment|
-      renewing = is_renewing? && !(assignment.initialized?) && !(assignment.coverage_terminated?)
-      enrolled = renewing || assignment.is_active?
-      enrolled && benefit_group_ids.include?(assignment.benefit_group_id)
-    }
+  def enrolled_bga_for_ce ce
+     if is_renewing?
+       ce.renewal_benefit_group_assignment
+     else
+       ce.active_benefit_group_assignment
+     end
   end
 
   def calc_active_health_assignments_for(employee_pool)
