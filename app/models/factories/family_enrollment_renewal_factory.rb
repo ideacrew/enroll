@@ -9,19 +9,20 @@ module Factories
       @disable_notifications = false
     end
 
-    def renew_enrollment(enrollment: nil, waiver: false)
+    def renew_enrollment(enrollment: nil, waiver: false, coverage_kind:)
       ShopEnrollmentRenewalFactory.new({
         family: family, 
         census_employee: census_employee, 
         employer: employer, 
         renewing_plan_year: renewing_plan_year, 
         enrollment: enrollment,
-        is_waiver: waiver
+        is_waiver: waiver,
+        coverage_kind: coverage_kind
       }).renew_coverage
     end
 
     def find_active_coverage(coverage_kind)
-      active_plan_year = employer.plan_years.published_plan_years_by_date(renewing_plan_year.start_on.prev_day).first
+      active_plan_year = employer.plan_years.published_plan_years_by_date(@plan_year_start_on.prev_day).first
       bg_ids = active_plan_year.benefit_groups.pluck(:_id)
 
       shop_enrollments = family.active_household.hbx_enrollments.shop_market.enrolled_and_waived.by_coverage_kind(coverage_kind)
@@ -30,21 +31,35 @@ module Factories
       shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
     end
 
+    def employer_offering_coverage_kind?(coverage_kind)
+      coverage_kind == 'dental' ? 
+        (census_employee.renewal_benefit_group_assignment.benefit_group.is_offering_dental?) : true
+    end
+
+    def verify_and_populate_benefit_group_assignment
+      if census_employee.renewal_benefit_group_assignment.blank?
+        benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
+        census_employee.add_renew_benefit_group_assignment(benefit_group)
+        census_employee.save!
+      end
+    end
+
     def renew
       raise ArgumentError unless defined?(family)
+      verify_and_populate_benefit_group_assignment
 
       HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
+        next unless employer_offering_coverage_kind?(coverage_kind) 
+        @plan_year_start_on = renewing_plan_year.start_on
         active_enrollment = find_active_coverage(coverage_kind)
 
         begin
           if active_enrollment.present?
+            renewal_enrollments = family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind)
+            renewal_enrollments = renewal_enrollments.where({:benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id)})
 
-            renewal_enrollments = family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where({
-              :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id)
-              })
-
+            active_renewals  = renewal_enrollments.enrolled_and_waived
             passive_renewals = renewal_enrollments.renewing
-            active_renewals = renewal_enrollments.enrolled_and_waived
 
             if active_renewals.present?
               passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
@@ -53,18 +68,18 @@ module Factories
 
             if passive_renewals.blank?
               if active_enrollment.present? && active_enrollment.inactive?
-                renew_enrollment(enrollment: active_enrollment, waiver: true)
+                renew_enrollment(enrollment: active_enrollment, waiver: true, coverage_kind: coverage_kind)
                 trigger_notice { "employee_open_enrollment_unenrolled" }
               elsif renewal_plan_offered_by_er?(active_enrollment)
-                renew_enrollment(enrollment: active_enrollment)
+                renew_enrollment(enrollment: active_enrollment, coverage_kind: coverage_kind)
                 trigger_notice { "employee_open_enrollment_auto_renewal" }
               else
-                renew_enrollment(enrollment: nil, waiver: true)
+                renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
                 trigger_notice { "employee_open_enrollment_no_auto_renewal" }
               end
             end
           elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
-            renew_enrollment(enrollment: nil, waiver: true)
+            renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
             trigger_notice { "employee_open_enrollment_unenrolled" }
           end
         rescue Exception => e
@@ -131,5 +146,3 @@ module Factories
 
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
-
-

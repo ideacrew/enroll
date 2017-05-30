@@ -127,7 +127,7 @@ module Factories
     def renew_waived_enrollment
       renewal_enrollment = family.active_household.hbx_enrollments.new
 
-      renewal_enrollment.coverage_kind = enrollment.try(:coverage_kind) || "health"
+      renewal_enrollment.coverage_kind = enrollment.try(:coverage_kind) || coverage_kind || "health"
       renewal_enrollment.enrollment_kind = "open_enrollment"
       renewal_enrollment.kind = enrollment.try(:kind) || "employer_sponsored"
 

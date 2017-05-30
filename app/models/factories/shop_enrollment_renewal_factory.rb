@@ -2,7 +2,7 @@ module Factories
   class ShopEnrollmentRenewalFactory
     include EnrollmentRenewalBuilder
 
-    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications, :is_waiver
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :is_waiver, :coverage_kind
 
     def initialize(params)
       params.each do |key, value|
@@ -108,6 +108,7 @@ module Factories
 
     def set_instance_variables
       @family = enrollment.family
+      @coverage_kind = enrollment.coverage_kind
 
       if enrollment.employee_role.present?
         @census_employee = enrollment.employee_role.census_employee

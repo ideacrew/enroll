@@ -113,8 +113,13 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
           expect(family.enrollments.size).to eq 1
           expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
           generate_passive_renewal
-          expect(family.enrollments.size).to eq 1
           expect(family.enrollments.map(&:aasm_state)).not_to include('auto_renewing')
+        end
+
+        it 'should receive a waiver' do
+          generate_passive_renewal
+          waiver = family.active_household.hbx_enrollments.where(:coverage_kind => 'health', :aasm_state => 'renewing_waived')
+          expect(waiver.present?).to be_truthy
         end
       end
     end
@@ -336,42 +341,22 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
         family_rec.reload
       }
 
-      context 'when passive renewal already exists and employer changed plan offerings' do
+      context 'when employer not offering renewal coverage for current enrolled plan' do
 
-        it 'should be canceld' do
-          generate_passive_renewal
-          passive_renewal = family.active_household.hbx_enrollments.renewing.first
-          expect(passive_renewal.auto_renewing?).to be_truthy
-
+        before do 
           renewal_benefit_group.reference_plan_id = new_renewal_plan.id
           renewal_benefit_group.elected_plans= [new_renewal_plan]
           renewal_benefit_group.save!
-
           generate_passive_renewal
-          passive_renewal.reload
-
-          expect(passive_renewal.coverage_canceled?).to be_truthy
         end
-      end
 
-      context 'passive renewal not exists and employer changed plan offerings' do
-
-        it 'should generate passive renewal' do
-          renewal_benefit_group.reference_plan_id = new_renewal_plan.id
-          renewal_benefit_group.elected_plans= [new_renewal_plan]
-          renewal_benefit_group.save!
-
-          generate_passive_renewal
+        it 'should not generate a passive renewal' do 
           expect(family.active_household.hbx_enrollments.renewing.blank?).to be_truthy
+        end
 
-          renewal_benefit_group.reference_plan_id = renewal_plan.id
-          renewal_benefit_group.elected_plans= [renewal_plan]
-          renewal_benefit_group.save!
-
-          generate_passive_renewal
-
-          passive_renewal = family.active_household.hbx_enrollments.renewing.first
-          expect(passive_renewal.auto_renewing?).to be_truthy
+        it 'should generate a passive waiver' do
+          waiver = family.active_household.hbx_enrollments.where(:coverage_kind => 'health', :aasm_state => 'renewing_waived')
+          expect(waiver.present?).to be_truthy
         end
       end
     end
