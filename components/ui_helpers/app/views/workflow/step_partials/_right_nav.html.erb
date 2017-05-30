@@ -2,7 +2,7 @@
   <nav class="top-border-30">
     <input type="submit" name="commit" value="CONTINUE" class="interaction-click-control-next-step btn btn-danger">
   </nav>
-  <p class="small-left-margin very-small-margin-top faded"><%= link_to 'Previous', previous_step_for %></p>
+  <p class="small-left-margin very-small-margin-top faded"><%= link_to 'Previous', previous_step_for(@family_member.id) %></p>
   <p class="small-left-margin very-small-margin-top faded">Save & Exit</p>
   <p class="row small-left-margin small-right-margin small-margin-top">
     If you select Save & Exit, you can save your work and continue where you left off the next time you login.

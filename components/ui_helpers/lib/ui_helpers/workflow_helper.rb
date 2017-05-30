@@ -6,14 +6,13 @@ module UIHelpers
       else
         [send("step_#{model.class.name.underscore.gsub('/', '_')}_path", model), :put]
       end
-
       form_tag path, method: method do
         yield
       end
     end
 
-    def previous_step_for
-      send("go_to_step_#{@model.class.name.underscore.gsub('/', '_')}_path", @model.id, @current_step.to_i - 1)
+    def previous_step_for member_id
+      send("go_to_step_#{@model.class.name.underscore.gsub('/', '_')}_path", @model.id, @current_step.to_i - 1, member_id)
     end
   end
 end

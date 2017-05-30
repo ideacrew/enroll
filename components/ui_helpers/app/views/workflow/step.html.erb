@@ -14,8 +14,8 @@
 
       <div class="focus_effect module">
         <%= workflow_form_for @model do %>
-          <%= hidden_field_tag "family_id", @family.id %>
-          <%= hidden_field_tag "family_member_id", @family_member.id %>
+          <%= hidden_field_tag "family_id", @family_member.family.id %>
+          <%= hidden_field_tag "member_id", @family_member.id %>
           <% @current_step.sections.each do |section| %>
             <div class="margin-bottom-30">
               <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
@@ -25,7 +25,7 @@
             <%= submit_tag 'Finish' %>
           <% else %>
             <% if !@steps.first_step?(@current_step) %>
-              <%= link_to 'Previous Step', previous_step_for %>
+              <%= link_to 'Previous Step', previous_step_for(@family_member.id)%>
             <% end %>
             <%#= submit_tag 'Next step' %>
           <% end %>

@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     resources :applications do
       put :step, on: :member
       post :step, on: :collection
-      get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+      get 'step/:step/:member_id', on: :member, action: 'step', as: 'go_to_step'
     end
   end
 
