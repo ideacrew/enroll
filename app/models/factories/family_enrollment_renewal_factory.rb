@@ -20,76 +20,65 @@ module Factories
       }).renew_coverage
     end
 
-    def renew
-      # if enrollment.present?
-      #   set_instance_variables
-      # end
+    def find_active_coverage(coverage_kind)
+      active_plan_year = employer.plan_years.published_plan_years_by_date(renewing_plan_year.start_on.prev_day).first
+      bg_ids = active_plan_year.benefit_groups.pluck(:_id)
 
+      shop_enrollments = family.active_household.hbx_enrollments.shop_market.enrolled_and_waived.by_coverage_kind(coverage_kind)
+      shop_enrollments = shop_enrollments.where(:benefit_group_id.in => bg_ids, :aasm_state.ne => 'coverage_termination_pending')
+
+      shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
+    end
+
+    def renew
       raise ArgumentError unless defined?(family)
 
-      # excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
-      #                       renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-      #                     )
-      # shop_enrollments = family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e }
-      ## Works only for data migrated into Enroll
-      ## FIXME add logic to support Enroll native renewals
+      HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
+        active_enrollment = find_active_coverage(coverage_kind)
 
-      # return true if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
+        begin
+          if active_enrollment.present?
 
-      shop_enrollments  = family.active_household.hbx_enrollments.enrolled.shop_market.by_coverage_kind('health').to_a
-      shop_enrollments += family.active_household.hbx_enrollments.waived.to_a
+            renewal_enrollments = family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where({
+              :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id)
+              })
 
-      if shop_enrollments.any?{|enrollment| renewing_plan_year.benefit_groups.map(&:id).include?(enrollment.benefit_group_id) }
-        return true
-      end
+            passive_renewals = renewal_enrollments.renewing
+            active_renewals = renewal_enrollments.enrolled_and_waived
 
-      @plan_year_start_on  = renewing_plan_year.start_on
-      prev_plan_year_start = @plan_year_start_on - 1.year
-      prev_plan_year_end   = @plan_year_start_on - 1.day
-
-      shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
-      shop_enrollments.reject!{|enrollment| enrollment.coverage_termination_pending? }
-      begin
-        if shop_enrollments.present?
-          passive_renewals = family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES).to_a
-
-          passive_renewals.reject! do |renewal|
-            renewal.benefit_group.elected_plan_ids.include?(renewal.plan_id) ? false : (renewal.cancel_coverage!; true)
-          end
-
-          if passive_renewals.blank?
-            active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
-            if active_enrollment.present? && active_enrollment.inactive?
-              # renew_waived_enrollment(active_enrollment)
-              # renew_waiver(active_enrollment)
-              renew_enrollment(enrollment: active_enrollment, waiver: true)
-
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
-            elsif renewal_plan_offered_by_er?(active_enrollment)
-
-              renew_enrollment(enrollment: active_enrollment)
-
-              # renewal_enrollment = renewal_builder(active_enrollment)
-              # renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
-              # renewal_enrollment.decorated_hbx_enrollment
-              # save_renewal_enrollment(renewal_enrollment, active_enrollment)
-
-
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renewal_enrollment.coverage_kind == "dental" || disable_notifications
-            else
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal") unless disable_notifications
+            if active_renewals.present?
+              passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
+              next
             end
+
+            if passive_renewals.blank?
+              if active_enrollment.present? && active_enrollment.inactive?
+                renew_enrollment(enrollment: active_enrollment, waiver: true)
+                trigger_notice { "employee_open_enrollment_unenrolled" }
+              elsif renewal_plan_offered_by_er?(active_enrollment)
+                renew_enrollment(enrollment: active_enrollment)
+                trigger_notice { "employee_open_enrollment_auto_renewal" }
+              else
+                renew_enrollment(enrollment: nil, waiver: true)
+                trigger_notice { "employee_open_enrollment_no_auto_renewal" }
+              end
+            end
+          elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
+            renew_enrollment(enrollment: nil, waiver: true)
+            trigger_notice { "employee_open_enrollment_unenrolled" }
           end
-        elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
-          # renew_waived_enrollment
-          renew_enrollment(enrollment: nil, waiver: true)
-          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
+        rescue Exception => e
+          puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
         end
-      rescue Exception => e
-        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
 
-      return family
+      family
+    end
+
+    def trigger_notice
+      if !disable_notifications
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield)
+      end
     end
 
     def renewal_plan_offered_by_er?(enrollment)
