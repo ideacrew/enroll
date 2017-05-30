@@ -48,6 +48,7 @@ describe UpdateFullPhoneNumber do
         organization.office_locations.first.phone.number ="2222222"
         organization.office_locations.first.phone.area_code = "456"
         organization.office_locations.first.phone.extension = "908"
+        organization.office_locations.first.phone.unset(:full_phone_number)
         organization.office_locations.first.phone.save!
         subject.migrate
         organization.office_locations.first.phone.reload
