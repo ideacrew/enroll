@@ -29,38 +29,34 @@ namespace :reports do
         break unless canceled_enrollments.size >= 1
         other_enrollments = enrollments - canceled_enrollments
         break unless other_enrollments.size > 0
-
         canceled_enrollments.each do |canceled_enrollment|
-          other_enrollments.each do |enrollment|
-            break unless canceled_enrollment.kind == enrollment.kind
-            break unless canceled_enrollment.subscriber && enrollment.subscriber
-            cancel_member=canceled_enrollment.subscriber
-            reference_member=enrollment.subscriber
-            break unless cancel_member.person.id == reference_member.person.id
-            break unless canceled_enrollment.effective_on && enrollment.effective_on && enrollment.submitted_at
-            cancel_effective=canceled_enrollment.effective_on
-            reference_effective=enrollment.effective_on
-            reference_submitted=enrollment.submitted_at
-            break unless cancel_effective > reference_submitted && cancel_effective < reference_effective
-            if canceled_enrollment.kind == "individual"
-              return unless canceled_enrollment.effective_on.year == enrollment.effective_on.year
-              csv << [cancel_member.person.hbx_id,
+            kind = canceled_enrollment.kind
+            next unless canceled_enrollment.subscriber
+            person_id = canceled_enrollment.subscriber.person.id
+            effective = canceled_enrollment.effective_on
+
+            other_enrollments = other_enrollments.select{|a| a.subscriber  && a.effective_on  && a.submitted_at  }
+            other_enrollments = other_enrollments.select{|a| a.kind == kind && a.subscriber.person.id == person_id  && effective > a.submitted_at && effective < a.effective_on }
+
+            next unless other_enrollments.size > 0
+            other_enrollments.each do |enrollment|
+              if kind == "individual" && effective.year == enrollment.effective_on.year
+                csv << [canceled_enrollment.subscriber.person.hbx_id,
                       canceled_enrollment.hbx_id,
                       canceled_enrollment.effective_on,
                       canceled_enrollment.kind,
                       enrollment.hbx_id
                       ]
 
-            elsif canceled_enrollment.kind == "employer_sponsored"
-              return unless canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
-              csv << [cancel_member.person.hbx_id,
+              elsif kind == "employer_sponsored" && canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
+                csv << [canceled_enrollment.subscriber.person.hbx_id,
                       canceled_enrollment.hbx_id,
                       canceled_enrollment.effective_on,
                       canceled_enrollment.kind,
                       enrollment.hbx_id
                       ]
               end
-          end
+            end
         end
       end
     end
