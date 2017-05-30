@@ -1,7 +1,13 @@
-<% events = @events - ScheduledEvent.all.pluck(:event_name) %>
-<select required=required" name="scheduled_event[event_name]" tabindex="-1">
-    <option value="">SELECT EVENT</option>
-    <% events.each do |event| %>
-      <option value="<%=event%>"><%=event%></option>
-    <%end%>
-</select> 
+<% if event == 'system' %>
+  <% events = @events - ScheduledEvent.all.pluck(:event_name) %>
+  <select required=required" name="scheduled_event[event_name]" tabindex="-1">
+      <option value="">SELECT EVENT</option>
+      <% events.each do |event| %>
+        <option value="<%=event%>"><%=event%></option>
+      <%end%>
+  </select>
+<% else %>
+  <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+    <%= text_field(:scheduled_event, :event_name, size: 20, placeholder: 'Event Name') %>
+  </div>
+<% end %>

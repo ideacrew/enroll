@@ -14,8 +14,6 @@ class ScheduledEvent
   validates_presence_of :type, :event_name, :one_time, :start_time, :message => "fields type, event_name can't be empty"
 
   EVENT_TYPES = %W(system holiday)
-  HOLIDAYS = %W(new_year martinluthor_birthdday washingtons_day memorial_day independence_day
-                Labour_day columbus_day veterans_day Christmas Thanksgiving_day)
   SYSTEM_EVENTS = %W(binder_payment_due_date publish_due_date_of_month ivl_monthly_open_enrollment_due_on shop_initial_application_publish_due_day_of_month shop_renewal_application_monthly_open_enrollment_end_on
                        shop_renewal_application_publish_due_day_of_month shop_renewal_application_force_publish_day_of_month shop_open_enrollment_monthly_end_on shop_group_file_new_enrollment_transmit_on
                        shop_group_file_update_transmit_day_of_week)

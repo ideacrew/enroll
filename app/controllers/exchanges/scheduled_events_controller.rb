@@ -67,7 +67,8 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     when 'holiday'
       @events = ScheduledEvent::HOLIDAYS
     end
-    render partial: 'exchanges/scheduled_events/get_events_field'
+    render partial: 'exchanges/scheduled_events/get_events_field', locals: { event: params[:event] }
+    
   end
 
   def delete_current_event
