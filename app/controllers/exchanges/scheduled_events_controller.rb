@@ -61,11 +61,8 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   end
 
   def current_events
-    case params[:event]
-    when 'system'
+    if params[:event] == 'system'
       @events = ScheduledEvent::SYSTEM_EVENTS
-    when 'holiday'
-      @events = ScheduledEvent::HOLIDAYS
     end
     render partial: 'exchanges/scheduled_events/get_events_field', locals: { event: params[:event] }
     
