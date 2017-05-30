@@ -61,5 +61,38 @@ describe ChangeEnrollmentDetails do
       it_behaves_like "revert termination", "terminated_on", nil
       it_behaves_like "revert termination", "termination_submitted_on", nil
     end
+
+
+    context "terminate enrollment with given termination date" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "terminate"
+        allow(ENV).to receive(:[]).with("terminated_on").and_return "01/01/2016"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      def actual_result(term_enrollment, val)
+        case val
+          when "aasm_state"
+            term_enrollment.aasm_state
+          when "terminated_on"
+            term_enrollment.terminated_on
+          when "termination_submitted_on"
+            term_enrollment.termination_submitted_on
+        end
+      end
+
+      shared_examples_for "termination" do |val, result|
+        it "should equals #{result}" do
+          expect(actual_result(hbx_enrollment, val)).to eq result
+        end
+      end
+
+      it_behaves_like "termination", "aasm_state", "coverage_terminated"
+      it_behaves_like "termination", "terminated_on", Date.strptime("01/01/2016", "%m/%d/%Y")
+      it_behaves_like "termination", "termination_submitted_on", TimeKeeper.date_of_record
+
+    end
   end
 end
