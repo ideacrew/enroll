@@ -30,7 +30,7 @@ class ScheduledEvent
     if value.blank?
       super(TimeKeeper.date_of_record)
     else
-      super(value.to_date) rescue super(Date.strptime(value, "%m/%d/%Y").to_date)
+      super(Date.strptime(value, "%m/%d/%Y").to_date) rescue super(value.to_date) 
     end
   end
 

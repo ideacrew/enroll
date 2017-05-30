@@ -44,7 +44,7 @@ Rails.application.routes.draw do
     resources :scheduled_events do
       collection do
         get 'current_events'
-        post 'delete_current_event'
+        get 'delete_current_event'
       end
     end
 
