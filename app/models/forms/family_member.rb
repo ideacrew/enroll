@@ -29,7 +29,7 @@ module Forms
     validates_presence_of :dob
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
-    validate :consumer_fields_validation if individual_market_is_enabled?
+    validate :consumer_fields_validation
 
     attr_reader :dob
 
@@ -40,6 +40,7 @@ module Forms
     end
 
     def consumer_fields_validation
+      return true unless individual_market_is_enabled?
       if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
