@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "create_new_initial_plan_year_using_another")
 
-describe CreateNewInitialPlanYearUsingAnother do
+describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
   let(:given_task_name) { "create_new_initial_plan_year_using_another" }
   subject { CreateNewInitialPlanYearUsingAnother.new(given_task_name, double(:current_scope => nil)) }
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
