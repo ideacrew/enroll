@@ -61,7 +61,24 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
+    # person.update_attributes(person_profile_params)
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
+    office_locations = broker_agency_profile.office_locations
+    office_locations.each do |office_location|
+      # && office_location.phones.kind == “phone main”
+      if person.phones.any?
+        person.phones.first.update_attributes(country_code: office_location.phone.country_code,
+                                              area_code: office_location.phone.area_code,
+                                              number: office_location.phone.number,
+                                              extension: office_location.phone.extension)
+        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
+        person.phones.first.update_attributes(full_phone_number: full_phone)
+      end
+    end
+
     person.update_attributes(person_profile_params)
+    person.save!
+
     @broker_agency_profile.update_attributes(languages_spoken_params)
 
 
