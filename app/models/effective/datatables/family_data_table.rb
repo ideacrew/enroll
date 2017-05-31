@@ -56,8 +56,9 @@ module Effective
       end
 
       def aptc_csr_link_type(family, allow)
-        return "disabled" # DISABLING APTC FEATURE.
-        family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
+        #return "disabled" # DISABLING APTC FEATURE.
+        #family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
+        family.approved_applications_for_year(TimeKeeper.date_of_record.year).present? && allow ? 'ajax' : 'disabled'
       end
 
       def add_sep_link_type(allow)

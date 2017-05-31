@@ -174,8 +174,7 @@ class FinancialAssistance::Applicant
   end
 
   def family_member
-    return @family_member if defined?(@family_member)
-    @family_member = family_members.detect { |member| member.is_primary_applicant? }
+    @family_member ||= FamilyMember.find(family_member_id)
   end
 
   def consumer_role
@@ -184,8 +183,7 @@ class FinancialAssistance::Applicant
   end
 
   def person
-    return @person if defined?(@person)
-    @person = family_member.person
+    @person ||= family_member.person
   end
 
   # Use income entries to determine hours worked

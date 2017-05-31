@@ -8,9 +8,9 @@ module UIHelpers
       # anything you would want to do in every controller, for example: add a class attribute
       #class_attribute :class_attribute_available_on_every_controller, instance_writer: false
 
-      before_filter :find_or_create
-      before_filter :load_steps
-      before_filter :current_step
+      before_filter :find_or_create, only: :step
+      before_filter :load_steps, only: :step
+      before_filter :current_step, only: :step
     end
 
     module ClassMethods
@@ -40,6 +40,8 @@ module UIHelpers
     end
 
     def find_or_create
+
+
       @model = find || create
     end
   end

@@ -1,0 +1,72 @@
+- step:
+    heading: Tax Info
+    heading_text: Please complete all tax info for Mary. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Will this person file taxes for 2017? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_required_to_file_taxes
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_required_to_file_taxes
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_claimed_as_tax_dependent
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_claimed_as_tax_dependent
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: This person will be claimed as a dependent by *
+                  required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: 'check'
+                  required: true
+                  values:
+                    - Select who will claim this person
+                    - Employee
+                    - Spouse
+                    - Child
+                  model: applicant
+                  attribute: is_joint_tax_filing #TODO: Map to right attribute

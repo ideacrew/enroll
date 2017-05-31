@@ -10,13 +10,34 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def new
-    @family = Family.find(params[:family_id])
-    @family_member = @family.family_members.find(params[:family_member_id])
-    render 'workflow/step'
-    # renders out first step
+    # /financial_assistance/applications/new
+    # basically just shows a button to start a new application
+    # posts to create
+    #@family = Family.find(params[:family_id])
+    #@family_member = @family.family_members.find(params[:family_member_id])
+    @application = FinancialAssistance::Application.new
+  end
+
+  def create
+    # new POSTs to here
+    # needs to create a new application, populate with existing information,
+    # like applications from existing families
+    # redirects to the edit (or show) view
+    @application = current_user.person.primary_family.applications.new
+    @application.applicants = @current_user.person.primary_family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
+    @application.save!
+    redirect_to edit_financial_assistance_application_path(@application)
+  end
+
+  def edit
+    # displays in progress application
+    @application = FinancialAssistance::Application.find(params[:id])
   end
 
   def step
+    binding.pry
     @family_member = FamilyMember.find(params[:member_id])
     @family = @family_member.family
     attributes = []
@@ -36,6 +57,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       @current_step = @current_step.next_step
     end
     @model.save!
+    binding.pry
     render 'workflow/step'
   end
 
@@ -58,9 +80,4 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     # TODO:Find the latest application in-progress
     current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
   end
-
-  def create
-    current_user.person.primary_family.applications.new
-  end
-
 end

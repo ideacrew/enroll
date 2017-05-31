@@ -25,9 +25,13 @@ Rails.application.routes.draw do
 
   namespace :financial_assistance do
     resources :applications do
+      resources :applicants
       put :step, on: :member
       post :step, on: :collection
       get 'step/:step/:member_id', on: :member, action: 'step', as: 'go_to_step'
+    end
+    resources :applicants, only: [] do
+      resources :incomes
     end
   end
 
