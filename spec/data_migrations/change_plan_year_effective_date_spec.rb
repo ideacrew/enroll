@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_plan_year_effective_date")
 
-describe ChangePlanYearEffectiveDate do
+describe ChangePlanYearEffectiveDate, dbclean: :after_each do
 
   let(:given_task_name) { "change_plan_year_effective_date" }
   subject { ChangePlanYearEffectiveDate.new(given_task_name, double(:current_scope => nil)) }

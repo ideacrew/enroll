@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_benefit_package")
 
-describe RemoveBenefitPackage do
+describe RemoveBenefitPackage, dbclean: :after_each do
 
   let(:given_task_name) { "remove_benefit_package" }
   subject { RemoveBenefitPackage.new(given_task_name, double(:current_scope => nil)) }
