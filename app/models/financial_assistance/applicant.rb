@@ -101,6 +101,8 @@ class FinancialAssistance::Applicant
   field :is_resident_post_092296, type: Boolean, default: false
   field :is_vets_spouse_or_child, type: Boolean, default: false
 
+  field :workflow, type: Hash, default: { }
+  
   embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    inverse_of: :benefit,    class_name: "::FinancialAssistance::Benefit"
