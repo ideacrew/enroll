@@ -519,5 +519,25 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
     end
   end
+
+  describe "GET get_user_info" do
+    let(:user) { double("User", :has_hbx_staff_role? => true)}
+    let(:person) { double("Person", id: double)}
+    let(:family_id) { double("Family_ID")}
+
+    before do
+      sign_in user
+      allow(Person).to receive(:find).with("#{person.id}").and_return person
+      xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
+    end
+
+    it "should populate the person instance variable" do
+      expect(assigns(:person)).to eq person
+    end
+
+    it "should populate the row id to instance variable" do
+      expect(assigns(:element_to_replace_id)).to eq "#{family_id}"
+    end
+  end
 end
 
