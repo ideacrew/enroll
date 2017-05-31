@@ -5,10 +5,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
 
   def edit
-  	binding.pry
-  	@model = @application.applicants.find(params[:id])
-  	load_steps
-  	current_step
+  	@applicant = @application.applicants.find(params[:id])
   end
 
   private

@@ -37,7 +37,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-    binding.pry
     @family_member = FamilyMember.find(params[:member_id])
     @family = @family_member.family
     attributes = []
@@ -57,7 +56,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       @current_step = @current_step.next_step
     end
     @model.save!
-    binding.pry
     render 'workflow/step'
   end
 

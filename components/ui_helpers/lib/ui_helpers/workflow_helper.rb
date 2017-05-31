@@ -2,10 +2,11 @@ module UIHelpers
   module WorkflowHelper
     def workflow_form_for(model, &block)
       path, method = if model.new_record?
-        [send("step_#{model.class.name.pluralize.underscore.gsub('/', '_')}_path"), :post]
+        [controller.request.path.sub('new', 'step'), :post]
       else
-        [send("step_#{model.class.name.underscore.gsub('/', '_')}_path", model), :put]
+        [controller.request.path.sub('new', "#{model.id}/step"), :put]
       end
+
       form_tag path, method: method do
         yield
       end

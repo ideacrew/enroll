@@ -1,17 +1,19 @@
-class FinancialAssistance::DeductionsController < ApplicationController
+class FinancialAssistance::IncomesController < ApplicationController
   include UIHelpers::WorkflowController
 
-  before_filter :find_applicant
+  before_filter :find_application_and_applicant
 
-
-  def edit
-    @model = @applicant.incomes.find(params[:id])
+  def new
+    @model = @applicant.incomes.build
     load_steps
     current_step
+
+    render 'workflow/step'
   end
 
   private
-  def find_applicant
-    @applicant = #Query to find applicant here
+  def find_application_and_applicant
+    @application = FinancialAssistance::Application.find(params[:application_id])
+    @applicant = @application.applicants.find(params[:applicant_id])
   end
 end

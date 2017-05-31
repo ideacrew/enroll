@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -25,13 +25,21 @@ Rails.application.routes.draw do
 
   namespace :financial_assistance do
     resources :applications do
-      resources :applicants
       put :step, on: :member
       post :step, on: :collection
-      get 'step/:step/:member_id', on: :member, action: 'step', as: 'go_to_step'
-    end
-    resources :applicants, only: [] do
-      resources :incomes
+      get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+
+      resources :applicants do
+        put :step, on: :member
+        post :step, on: :collection
+        get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+
+        resources :incomes do
+          put :step, on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+      end
     end
   end
 
@@ -218,7 +226,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate

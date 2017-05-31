@@ -1,6 +1,7 @@
-Display information collected from applicant
+<%= @applicant.person.full_name %>
 
-link to the step where the information can be collected
+<% @applicant.incomes.each do |income| %>
+  <%= link_to "Edit this income", go_to_step_financial_assistance_application_applicant_income(@application, @applicant, income, 1) %>
+<% end %>
 
-list incomes
-link to new income
+<%= link_to "Add an income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
