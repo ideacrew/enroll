@@ -1,4 +1,4 @@
-class ShopNotices::InitialEmployerEligibilityNotice < ShopNotice
+class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
 
   def deliver
     build

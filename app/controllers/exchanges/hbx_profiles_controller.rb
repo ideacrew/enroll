@@ -260,7 +260,7 @@ def employer_poc
           hbx.cancel_coverage! if hbx.may_cancel_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -295,7 +295,7 @@ def employer_poc
           hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
