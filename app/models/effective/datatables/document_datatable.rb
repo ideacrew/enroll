@@ -8,8 +8,8 @@ module Effective
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
         table_column :Status, :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i> status' }, :filter => false, :sortable => false
-        table_column :Name, :proc => Proc.new { |row| link_to row.legal_name,"Dcoument", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
-        table_column :Type, :proc => Proc.new { |row| link_to "Employer Attestation" }, :filter => false, :sortable => false
+        table_column :Name, :proc => Proc.new { |row| link_to row.title,"Dcoument", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
+        table_column :Type, :proc => Proc.new { |row| "Employer Attestation" }, :filter => false, :sortable => false
         table_column :Size, :proc => Proc.new { |row| "3MB" }, :filter => false, :sortable => false
         table_column :Date, :proc => Proc.new { |row| "05/26/2017" }, :filter => false, :sortable => false
         table_column :Owner, :proc => Proc.new { |row| "D Thomas" }, :filter => false, :sortable => false
@@ -20,8 +20,7 @@ module Effective
       end
 
       def collection
-        employers = Organization.all_employer_profiles
-        @employer_collection = employers
+        Document.all
       end
 
       def global_search?
