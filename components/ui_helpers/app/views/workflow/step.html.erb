@@ -14,8 +14,8 @@
 
       <div class="focus_effect module">
         <%= workflow_form_for @model do %>
-          <%= hidden_field_tag "family_id", @family_member.family.id %>
-          <%= hidden_field_tag "member_id", @family_member.id %>
+          <%#= hidden_field_tag "family_id", @family_member.family.id %>
+          <%#= hidden_field_tag "member_id", @family_member.id %>
           <% @current_step.sections.each do |section| %>
             <div class="margin-bottom-30">
               <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
