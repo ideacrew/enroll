@@ -31,9 +31,15 @@ module Forms
     attr_reader :dob
 
     def ssn_or_checkbox
+      return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
+
       if ssn.blank? && no_ssn == "0"
         errors.add(:base, 'Check No SSN box or enter a valid SSN')
       end
+    end
+
+    def is_applying_coverage?
+      is_applying_coverage == "true"
     end
 
     def dob=(val)

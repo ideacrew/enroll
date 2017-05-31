@@ -46,33 +46,24 @@
           <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
             <span>Is <%= @person.first_name %> applying for coverage?</span>
           </div>
-            <%
-            first_checked = true
-            second_checked = false
-            if @person.consumer_role.present?
-              first_checked = @person.consumer_role.is_applying_coverage
-              second_checked = !@person.consumer_role.is_applying_coverage
-            end
-            %>
-          <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
-            <div class="radio">
-              <%= f.radio_button :is_applying_coverage, true, class: "required floatlabel", id: 'is_applying_coverage_true', required: true, checked: first_checked %>
-              <label for="is_applying_coverage_true"><span>TRUE</span></label>
-            </div>
-          </div>
-          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-            <div class="radio">
-              <%= f.radio_button :is_applying_coverage, false, class: "required floatlabel", id: 'is_applying_coverage_false', required: true, checked: second_checked %>
-              <label for="is_applying_coverage_false"><span>FALSE</span></label>
-            </div>
-          </div>
+            <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
+          <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
         </div>
         <% end %>
-
       </div>
     </div>
-  </div><br>
-
+  </div>
+<% if @person.has_active_consumer_role? && @person.has_active_employee_role? && @person.ssn.present? %>
+  <br>
+<div id="employer-coverage-msg">
+  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+    <div class="alert alert-success alert-dismissible">
+      Your answer to this question does not apply to coverage offered by an employer.
+    </div>
+  </div>
+    </div>
+    <% end %>
+  <br />
   <% if @person.has_active_consumer_role? %>
   <div id="consumer_fields_sets">
     <%= render 'shared/consumer_fields', f: f %><br>

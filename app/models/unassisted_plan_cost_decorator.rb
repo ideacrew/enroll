@@ -19,7 +19,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def age_of(member)
-    member.age_on_eligibility_date
+    member.age_on_effective_date
   end
 
   def child_index(member)

@@ -12,6 +12,7 @@ site:
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
 
+
   social_media:
     facebook_url: ""
 
@@ -46,6 +47,7 @@ aca:
   state_abbreviation: "MA"
   market_kinds: ["shop"]
   general_agency_enabled: false
+
 #
   qle:
     with_in_sixty_days: 60

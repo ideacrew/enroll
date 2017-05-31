@@ -1,19 +1,53 @@
 function isApplyingCoverage(target){
 
-fields = 'input[name='+target+']'
-
+fields = "input[name='" + target + "[is_applying_coverage]']"
+    $("#employer-coverage-msg").hide();
+    $("#ssn-coverage-msg").hide();
   if($(fields).length > 0){
+    addEventOnNoSsn(target);
+    addEventOnSsn(target);
     if($(fields).not(":checked").val() == "true"){
       $("#consumer_fields_sets").hide();
+      $("#employer-coverage-msg").show();
+      if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+        $("#ssn-coverage-msg").show();
+      }
+
     }
     $(fields).change(function () {
       if($(fields).not(":checked").val() == "true"){
         $("#consumer_fields_sets").hide();
+        $("#employer-coverage-msg").show();
+        if($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(":checked")){
+          $("#ssn-coverage-msg").show();
+        }
       }else{
         $("#consumer_fields_sets").show();
+        $("#employer-coverage-msg").hide();
+        $("#ssn-coverage-msg").hide();
       }
     });
   }
+}
+
+function addEventOnNoSsn(target){
+  $("input[name='" + target + "[no_ssn]']").change(function() {
+    if($(this).is(":checked")) {
+       $("#ssn-coverage-msg").hide();
+    }else if($("input[name='" + target + "[ssn]']").val() == '' && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+        $("#ssn-coverage-msg").show();
+    }
+  });
+}
+
+function addEventOnSsn(target){
+  $("input[name='" + target + "[ssn]']").keyup(function() {
+    if($(this).val() != '') {
+       $("#ssn-coverage-msg").hide();
+    }else if( !$("input[name='" + target + "[no_ssn]']").is(":checked") && $("input[name='" + target + "[is_applying_coverage]']").not(":checked").val() == "true"){
+        $("#ssn-coverage-msg").show();
+    }
+  });
 }
 
 function applyListenersFor(target) {
@@ -70,6 +104,7 @@ function applyListenersFor(target) {
       $('#tribal_id').val("");
     }
   });
+
 }
 
 function showOnly(selected) {
@@ -314,5 +349,5 @@ $(document).ready(function() {
     PersonValidations.validationForVlpDocuments(e);
   });
 
-  isApplyingCoverage('"person[is_applying_coverage]"');
+  isApplyingCoverage("person");
 });

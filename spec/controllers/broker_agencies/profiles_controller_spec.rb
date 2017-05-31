@@ -275,7 +275,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "when only shop is enabled" do
+
+    context "SHOP market user" do
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
       before :each do
         DatabaseCleaner.clean

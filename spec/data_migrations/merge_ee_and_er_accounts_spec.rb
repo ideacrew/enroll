@@ -12,74 +12,6 @@ describe MergeEeAndErAccounts do
     end
   end
 
-
-  # ER Account
-  # Username: nlonghi@coastalstates.org
-  # e-Mail: nlonghi@coastalstates.org
-  # User Roles: employer_staff
-  # Last Sign In: 12/05/2016 20:12
-  # First Name: Norma
-  # Last Name: Longihi
-  # HBX ID: 19895435
-  # Person Created At: 12/05/2016 20:00
-  # Person Roles: employer_staff_roles
-  #
-  # EE account
-  # no user record
-  # First Name: Norma
-  # Last Name: Longhi
-  # HBX ID: 19892264
-  # Person Created At: 11/25/2016 20:55
-  # e-Case ID:
-
-
-  # pee = Person.where(hbx_id: /19892264/i).first
-  # pemp = Person.where(hbx_id: /19895435/i).first
-  # pee.employer_staff_roles
-  # pemp.employer_staff_roles.size
-  # pemp.employer_staff_roles.first
-  # EmployerProfile.find("5838a0ddfaca1467200003c0").organization
-  # pee.employer_staff_roles = pemp.employer_staff_roles
-  # pee.save!
-  #
-  # pee.user
-  # pee.user_id = pemp.user_id
-  # pemp.unset(:user_id)
-  # pee.save!
-  # pee.user.roles.append("employee")
-  # pee.user.save!
-
-
-  # def migrate
-  #   employee_hbx_id= ENV['employee_hbx_id']
-  #   employer_hbx_id= ENV['employer_hbx_id']
-  #   if Person.where(hbx_id: employee_hbx_id).nil?
-  #     puts "No employee found with given hbx_id"
-  #   elsif Person.where(hbx_id: employer_hbx_id).nil?
-  #     puts "No employer found with givin hbx_id"
-  #   else
-  #     employee=Person.where(hbx_id: employee_hbx_id).first
-  #     employer=Person.where(hbx_id: employer_hbx_id).first
-  #     if employer.employer_staff_roles.nil?
-  #       puts "No employer staff role attached to the employer"
-  #     else
-  #       employer_staff_role=employer.employer_staff_roles.first
-  #       if employer_staff_role.employer_profile_id.nil?
-  #         puts "No employer_profile_id found with employer staff role"
-  #       else
-  #         employee.employer_staff_roles=employer.employer_staff_roles
-  #         employee.save!
-  #       end
-  #       employee.user_id = employer.user_id
-  #       employer.unset(:user_id)
-  #       employee.save!
-  #       employee.user.roles.append("employee")
-  #       employee.user.save!
-  #     end
-  #   end
-  # end
-
-
   describe "merge ee and er roles" do
 
     let!(:user) { FactoryGirl.create(:user, person: employer_staff_role.person)}
@@ -94,22 +26,15 @@ describe MergeEeAndErAccounts do
 
     context "giving a new state" do
       it "should assign user to the employee" do
+        expect(person.employer_staff_roles).to eq []
         expect(person.user).to eq nil
         expect(employer_staff_role.person.user).not_to eq nil
-        puts Person.all.map{|p| p.user.inspect}
         subject.migrate
         person.reload
+        expect(person.employer_staff_roles).not_to eq nil
         expect(person.user).not_to eq nil
+        expect(person.user.roles).to include("employee")
       end
-
-      # it "should not change it's state" do
-      #   plan_year.aasm_state = "renewing_enrolling"
-      #   plan_year.save
-      #   subject.migrate
-      #   plan_year.reload
-      #   expect(plan_year.aasm_state).to eq "renewing_enrolling"
-      # end
-
     end
   end
 end

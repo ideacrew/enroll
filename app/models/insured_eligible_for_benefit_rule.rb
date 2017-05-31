@@ -49,7 +49,7 @@ class InsuredEligibleForBenefitRule
         end
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
-      status = set_status_and_error_if_not_applying_coverage if is_applying_coverage_status_satisfied? == false
+      status = set_status_and_error_if_not_applying_coverage if @role.class.name == "ConsumerRole" && is_applying_coverage_status_satisfied? == false
       return status, @errors
     end
     [false]
@@ -127,7 +127,7 @@ class InsuredEligibleForBenefitRule
       return true if person.is_dc_resident?
 
       #TODO person can have more than one families
-      person.families.last.family_members.active.each do |family_member|
+      @family.family_members.active.each do |family_member|
         if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
           return true
         end
