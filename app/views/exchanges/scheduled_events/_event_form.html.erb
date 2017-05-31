@@ -9,7 +9,7 @@
       <%= text_field(:scheduled_event, :event_name, size: 20) %>
     <% else %>
       <% events = ScheduledEvent::SYSTEM_EVENTS  %>
-      <%= f.select :event_name, options_for_select(events, f.object.event_name), include_blank: "SELECT EVENT", required: true %>
+      <%= f.select :event_name, options_for_select(events.map { |s| [s.humanize, s] }, f.object.event_name), include_blank: "SELECT EVENT", required: true %>
     <% end %>
    </div>
 </div>
