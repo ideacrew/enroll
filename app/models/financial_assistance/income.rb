@@ -56,6 +56,8 @@ class FinancialAssistance::Income
   #field :has_education_scholarship_income, type: Boolean #infer from income kinds
   field :submitted_at, type: DateTime
 
+  field :workflow, type: Hash, default: { }
+
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,

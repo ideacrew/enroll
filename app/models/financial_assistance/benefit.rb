@@ -47,6 +47,8 @@ class FinancialAssistance::Benefit
   field :end_on, type: Date
   field :submitted_at, type: DateTime
 
+  field :workflow, type: Hash, default: { }
+
   validates :start_on, presence: true
 
   validates_length_of :title, 
