@@ -1,9 +1,13 @@
 class Exchanges::ScheduledEventsController < ApplicationController
 layout 'single_column'
 before_action :set_event, only: [:show, :edit, :update, :destroy]
+before_action :get_events, only: [:index, :list]
  
   def new
   	@scheduled_event = ScheduledEvent.new
+  end
+
+  def list
   end
 
   def create
@@ -43,7 +47,6 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   end
 
   def index
-    @scheduled_events = ScheduledEvent.all
     @calendar_events = @scheduled_events.flat_map do |e|
       if params.key?("start_date")
         e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date)
@@ -86,5 +89,9 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
   
     def set_event
       @scheduled_event = ScheduledEvent.find(params[:id])
+    end
+
+    def get_events
+      @scheduled_events = ScheduledEvent.all
     end
 end

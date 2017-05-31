@@ -1,6 +1,5 @@
 <div class="content landing">
 	<%= render "exchanges/scheduled_events/primary_nav", :active_tab => "home-tab" %>
-	
 	<div class="home">
 		<%= render 'shared/tab_panel' %>
 	</div>
@@ -8,6 +7,10 @@
 
 <div class="container content-bottom">
   <div class='container'>
+    <div class="row">
+      <%= link_to 'Create Event' , new_exchanges_scheduled_event_path , class: "btn btn-default" %>
+      <%= link_to 'List Of Events' , list_exchanges_scheduled_events_path , class: "btn btn-default" %>
+    </div>
   	<div class="row">
   		<h3 class="title-inline">Calender</h3>
   	</div>	
@@ -19,13 +22,5 @@
         </div>
       <% end %>
     <% end %>	
-  </div>
-  
-  <div>
-    <%= link_to 'Create Event' , new_exchanges_scheduled_event_path , class: "btn btn-trans" %> 
-  </div>
-  
-  <div class= "schduled_event_list">
-    <%= render "exchanges/scheduled_events/scheduled_events_list", scheduled_events: @scheduled_events %>
   </div>
 </div>
