@@ -11,7 +11,6 @@ RSpec.describe ScheduledEvent, type: :model do
   it { is_expected.to validate_presence_of :event_name }
   it { is_expected.to validate_presence_of :one_time }
   it { is_expected.to validate_presence_of :start_time }
-  it { is_expected.to validate_presence_of :offset_rule }
 
   context "convert recurring rules into hash" do
   	let(:event_params) { {
