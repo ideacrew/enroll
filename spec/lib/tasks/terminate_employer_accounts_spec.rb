@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'rake'
 
-describe 'terminating employer active plan year & enrollments' do
+describe 'terminating employer active plan year & enrollments', :dbclean => :around_each do
   describe 'migrations:terminate_employer_account' do
 
     let(:benefit_group) { FactoryGirl.create(:benefit_group)}
