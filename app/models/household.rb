@@ -16,7 +16,7 @@ class Household
   field :is_active, type: Boolean, default: true
 
   embeds_many :hbx_enrollments
-  #embeds_many :tax_households # THH is embedded in Application now.
+  embeds_many :tax_households
   #embeds_many :applications, class_name: "FinancialAssistance::Application"
   embeds_many :coverage_households, cascade_callbacks: true
 

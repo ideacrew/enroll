@@ -12,6 +12,7 @@ class TaxHousehold
   include SetCurrentUser
 
   #embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :household
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
