@@ -24,6 +24,13 @@ describe Forms::FamilyMember do
     end
   end
 
+  it "should not require validations on indian_tribe_member" do
+    subject.is_consumer_role = "true"
+    subject.is_applying_coverage = "false"
+    subject.valid?
+    expect(subject).not_to have_errors_on(:tribal_id)
+  end
+
   it "should require a gender" do
     expect(subject).to have_errors_on(:gender)
   end

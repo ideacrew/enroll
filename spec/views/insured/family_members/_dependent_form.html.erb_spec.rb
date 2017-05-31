@@ -42,6 +42,10 @@ describe "insured/family_members/_dependent_form.html.erb" do
         expect(rendered).to have_selector('div#tribal_container')
         expect(rendered).to have_content('Are you a member of an American Indian or Alaskan Native tribe? *')
       end
+
+      it "should display the is_applying_coverage field option" do
+        expect(rendered).to match /Is this person applying for coverage?/
+      end
     end
 
     context "when individual market is disabled" do
@@ -110,6 +114,10 @@ describe "insured/family_members/_dependent_form.html.erb" do
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
       expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+    end
+
+    it "should not display the is_applying_coverage field option" do
+      expect(rendered).not_to match /Is this person applying for coverage?/
     end
 
     it "should have address info area" do

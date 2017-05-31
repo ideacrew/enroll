@@ -58,6 +58,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @consumer_candidate = Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
+    @use_person = true #only used to manupulate form data
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil

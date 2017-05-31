@@ -13,6 +13,8 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     stub_template "shared/_consumer_fields.html.erb" => ''
     sign_in current_user
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+    assign(:consumer_role, person.consumer_role)
+    assign(:person, person)
     render partial: "insured/consumer_roles/form", locals: {f: mock_form}
   end
 
@@ -27,4 +29,9 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   it "should display only one no_dc_address" do
     expect(rendered).to have_selector('input#no_dc_address', count: 1)
   end
+
+  it "should display the is_applying_coverage field option" do
+    expect(rendered).to match /Is this person applying for coverage?/
+  end
+
 end
