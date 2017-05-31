@@ -7,7 +7,7 @@
       <%end%>
   </select>
 <% else %>
-  <div class="event_text_field">
-    <%= text_field(:scheduled_event, :event_name, size: 20, placeholder: 'Event Name', height: "128") %>
+  <div>
+    <%= text_field(:scheduled_event, :event_name, size: 20, placeholder: 'Event Name', class: "event_text_field") %>
   </div>
 <% end %>
