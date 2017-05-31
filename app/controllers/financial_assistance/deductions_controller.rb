@@ -5,13 +5,13 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
 
   def edit
-    @model = @applicant.incomes.find(params[:id])
-    load_steps
-    current_step
+  	@model = @applicant.deductions.find(params[:id])
+  	load_steps
+  	current_step
   end
 
   private
   def find_applicant
-    @applicant = #Query to find applicant here
+  	@applicant = #Query to find applicant here
   end
 end
