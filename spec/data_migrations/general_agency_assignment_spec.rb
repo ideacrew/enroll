@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "general_agency_assignment")
 
-describe GeneralAgencyAssignment do
+describe GeneralAgencyAssignment, dbclean: :around_each do
 
   let(:given_task_name) { "general_agency_assignment" }
   subject { GeneralAgencyAssignment.new(given_task_name, double(:current_scope => nil)) }
