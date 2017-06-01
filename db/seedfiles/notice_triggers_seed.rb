@@ -347,7 +347,7 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Initial Employer Application - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_first_reminder_to_publish_plan_year',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
         mpi_indicator: 'MPI_SHOP26',
         notice_trigger_element_group: {
@@ -368,7 +368,7 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_final_reminder_to_publish_plan_year',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
         mpi_indicator: 'MPI_SHOP27',
         notice_trigger_element_group: {
@@ -389,7 +389,7 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_second_reminder_to_publish_plan_year',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
         mpi_indicator: 'MPI_SHOP28',
         notice_trigger_element_group: {
