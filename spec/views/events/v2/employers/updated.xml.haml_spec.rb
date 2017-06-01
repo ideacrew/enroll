@@ -45,8 +45,8 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   describe "given a employer" do
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:benefit_group2)     { FactoryGirl.build(:benefit_group)}
-    let(:plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month+ 2.month - 1.year, end_on:TimeKeeper.date_of_record.end_of_month + 1.months, benefit_groups: [benefit_group], aasm_state:'active',created_at:TimeKeeper.date_of_record)}
-    let(:future_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, end_on:TimeKeeper.date_of_record.end_of_month + 1.month, benefit_groups: [benefit_group2], aasm_state:'renewing_enrolled')}
+    let(:plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month+ 2.month - 1.year, end_on:(TimeKeeper.date_of_record + 1.month).end_of_month, benefit_groups: [benefit_group], aasm_state:'active',created_at:TimeKeeper.date_of_record)}
+    let(:future_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, end_on:(TimeKeeper.date_of_record + 1.month).end_of_month, benefit_groups: [benefit_group2], aasm_state:'renewing_enrolled')}
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
     let(:user){FactoryGirl.create(:user)}
     let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone, :user_id => user.id)}
