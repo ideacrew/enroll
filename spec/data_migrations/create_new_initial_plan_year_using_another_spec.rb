@@ -19,7 +19,7 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
     end
   end
 
-  describe "force_publish!" do
+  describe "force_publish!", dbclean: :after_each do
     context "plan_year.application_errors absent" do
       before do
         plan_year = benefit_group.plan_year
