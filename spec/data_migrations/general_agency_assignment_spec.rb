@@ -14,11 +14,11 @@ describe GeneralAgencyAssignment, dbclean: :around_each do
 
   describe "general agency profile assignment for employer" do
 
-    let(:new_plan_year){ FactoryGirl.create(:plan_year, aasm_state: "active") }
+    let!(:new_plan_year){ FactoryGirl.create(:plan_year, aasm_state: "active", employer_profile: employer_profile) }
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:general_agency_account) { FactoryGirl.create(:general_agency_account) }
     let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id, start_on: TimeKeeper.date_of_record, is_active: true)}
-    let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year], broker_agency_accounts: [broker_agency_account]) }
+    let(:employer_profile){ FactoryGirl.create(:employer_profile, broker_agency_accounts: [broker_agency_account]) }
     let(:end_on) { TimeKeeper.date_of_record.last_month + 7.days }
 
     before(:each) do
