@@ -69,7 +69,7 @@
                   placeholder: AMOUNT *
                   required: true
                   model: income
-                  atribute: amount
+                  attribute: amount
                 - gutter: 3
                   type: dropdown
                   name: frequency
@@ -83,21 +83,21 @@
                     - weekly 
                     - yearly
                   model: income
-                  atribute: frequency_kind 
+                  attribute: frequency_kind 
                 - gutter: 3
                   type: input
                   name: start_on
                   placeholder: FROM *
                   required: true
                   model: income
-                  atribute: start_on
+                  attribute: start_on
                 - gutter: 3
                   type: input
                   name: end_on
                   placeholder: TO *
                   required: true
                   model: income
-                  atribute: end_on
+                  attribute: end_on
             # Temporarily Commented. TODO: Build Model Associants for Employers Demographic Info.
             # - cells:
             #     - gutter: 6
@@ -106,13 +106,13 @@
             #       placeholder: EMPLOYER NAME *
             #       required: true
             #       model: income
-            #       atribute: employer_name
+            #       attribute: employer_name
             #     - gutter: 6
             #       type: input
             #       name: employer_phone
             #       placeholder: EMPLOYER PHONE
             #       # model: income
-            #       # atribute: employer_phone
+            #       # attribute: employer_phone
             # - cells:
             #     - gutter: 6
             #       type: input

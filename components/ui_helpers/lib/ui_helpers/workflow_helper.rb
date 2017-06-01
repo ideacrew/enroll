@@ -13,7 +13,7 @@ module UIHelpers
     end
 
     def previous_step_for
-      send("go_to_step_#{@model.class.name.underscore.gsub('/', '_')}_path", @model.id, @current_step.to_i - 1)
+      controller.request.path + "/#{@current_step.to_i - 1}"
     end
   end
 end
