@@ -69,4 +69,4 @@
                     - Spouse
                     - Child
                   model: applicant
-                  attribute: is_joint_tax_filing #TODO: Map to right attribute
+                  attribute: claimed_as_tax_dependent_by

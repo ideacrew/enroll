@@ -1,3 +1,2 @@
-  <%= radio_button_tag "#{cell.model.try(:pluralize)}_attributes[0][#{cell.attribute}]", cell.value, cell.checked, class: "put-class-name-here", id: cell.id %>
-
-  <%= label_tag cell.id, cell.label,class: "put-class-name-here" %>
+<%= radio_button_tag cell.name_attribute, cell.value, cell.checked, class: "put-class-name-here", id: cell.id %>
+<%= label_tag cell.id, cell.label,class: "put-class-name-here" %>

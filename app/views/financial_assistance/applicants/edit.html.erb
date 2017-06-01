@@ -1,5 +1,7 @@
-<%= @applicant.person.full_name %>
+<h4><%= @applicant.person.full_name %></h4>
 
+<%= link_to "Applicant Info", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
+<br />
 <% @applicant.incomes.each do |income| %>
   <%= link_to "Edit this income", go_to_step_financial_assistance_application_applicant_income(@application, @applicant, income, 1) %>
 <% end %>

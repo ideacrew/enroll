@@ -40,8 +40,6 @@ module UIHelpers
     end
 
     def find_or_create
-
-
       @model = find || create
     end
   end

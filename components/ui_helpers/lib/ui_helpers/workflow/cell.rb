@@ -25,7 +25,7 @@ module UIHelpers
       end
 
       def name_attribute(field=nil)
-        "attributes[#{attribute}]"
+        "#{@model}[#{attribute}]"
       end
     end
   end

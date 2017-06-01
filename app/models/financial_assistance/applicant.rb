@@ -53,6 +53,7 @@ class FinancialAssistance::Applicant
   field :tax_filer_kind, type: String, default: "tax_filer"
   field :is_joint_tax_filing, type: Boolean, default: false
   field :is_claimed_as_tax_dependent, type: Boolean
+  field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false

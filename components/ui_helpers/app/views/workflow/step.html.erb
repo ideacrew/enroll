@@ -22,7 +22,7 @@
             <%= submit_tag 'Finish' %>
           <% else %>
             <% if !@steps.first_step?(@current_step) %>
-              <%= link_to 'Previous Step', previous_step_for(@family_member.id)%>
+              <%= link_to 'Previous Step', previous_step_for%>
             <% end %>
             <%= submit_tag 'Next step' %>
           <% end %>
