@@ -18,7 +18,7 @@ def people
       ssn: "670991234",
       home_phone: "2025551234",
       email: 'soren@dc.gov',
-      password: 'aA1!aA1!bB2@',
+      password: 'aA1!aA1!aA1!',
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112",
@@ -32,7 +32,7 @@ def people
       dob: "01/01/1980",
       ssn: "786120965",
       email: 'patrick.doe@dc.gov',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Broker Assisted" => {
       first_name: 'Broker',
@@ -40,7 +40,7 @@ def people
       dob: "05/02/1976",
       ssn: "761234567",
       email: 'broker.assisted@dc.gov',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Fred" => {
       first_name: 'Fred',
@@ -48,7 +48,7 @@ def people
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'fred@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Megan" => {
       first_name: 'Megan',
@@ -56,15 +56,15 @@ def people
       dob: defined?(@u) ? @u.adult_dob : "08/13/1979",
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'megan@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Hbx Admin" => {
       email: 'admin@dc.gov',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "CareFirst Broker" => {
       first_name: 'Broker',
@@ -72,7 +72,7 @@ def people
       dob: "05/07/1977",
       ssn: "761111111",
       email: 'broker.martin@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "John Wood" => {
       first_name: "John",
@@ -82,7 +82,7 @@ def people
       dba: "Acmega LLC",
       fein: "890112233",
       email: 'johb.wood@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "John Doe" => {
       first_name: "John",
@@ -93,7 +93,7 @@ def people
       fein: defined?(@u) ? @u.fein : '123123123',
       ssn: defined?(@u) ? @u.ssn : "761234567",
       email: defined?(@u) ? @u.email : 'tronics@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Jack Cobra" => {
       first_name: "Jack",
@@ -101,7 +101,7 @@ def people
       dob: "08/10/1960",
       ssn: "196008107",
       email: "jack@cobra.com",
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Jack Employee" => {
       first_name: "Jack",
@@ -109,7 +109,7 @@ def people
       dob: "08/10/1960",
       ssn: "196008111",
       email: "jack@employee.com",
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Tim Wood" => {
       first_name: "Tim",
@@ -119,7 +119,7 @@ def people
       dba: "Legal LLC",
       fein: "890000223",
       email: 'tim.wood@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Tronics" => {
       first_name: "Tronics",
@@ -129,11 +129,11 @@ def people
       dba: "Tronics",
       fein: defined?(@u) ? @u.fein : '123123123',
       email: defined?(@u) ? @u.email : 'tronics@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "CSR" => {
       email: "sherry.buckner@dc.gov",
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     },
     "Hbx AdminEnrollments" => {
       first_name: "Hbx Admin",
@@ -143,7 +143,7 @@ def people
       dba: "Tronics",
       fein: defined?(@u) ? @u.fein : '123123123',
       email: defined?(@u) ? @u.email : 'hxadmin_enroll@example.com',
-      password: 'aA1!aA1!bB2@'
+      password: 'aA1!aA1!aA1!'
     }
   }
 end
@@ -312,10 +312,10 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
   plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
-    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, 
+    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, 
     fte_count: 2, aasm_state: :published, is_conversion: (kind.downcase == 'conversion' ? true : false)
-
+    
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 

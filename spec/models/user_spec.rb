@@ -107,15 +107,15 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "11Eab@1ss"})}
-      it 'has a character more than 2 times' do
+      let(:params){valid_params.deep_merge!({password: "11E11@1ss"})}
+      it 'has a character more than 4 times' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["cannot repeat any character more than 2 times"]
+        expect(User.create(**params).errors[:password]).to eq ["cannot repeat any character more than 4 times"]
       end
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "11E22@ss"})}
+      let(:params){valid_params.deep_merge!({password: "11E11@ss"})}
       it 'has only 3 alphabetical characters' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["must have at least 4 alphabetical characters"]
@@ -123,7 +123,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "12_-35786464DDDss"})}
+      let(:params){valid_params.deep_merge!({password: "12_-66746464DDDss"})}
       it 'repeats a consecutive character more than once' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["must not repeat consecutive characters more than once"]
