@@ -617,12 +617,15 @@ class EmployerProfile
               puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
             end
           end
-        elsif new_date-5.days== start_on_1.last_month
-          initial_employers_reminder_to_publish(start_on_1).each do |organization|
-            begin
-              organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
-            rescue Exception => e
-              puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+        else
+          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
+          if (new_date + 3.days) == plan_year_due_date
+            initial_employers_reminder_to_publish(start_on_1).each do |organization|
+              begin
+                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+              rescue Exception => e
+                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              end
             end
           end
         end
