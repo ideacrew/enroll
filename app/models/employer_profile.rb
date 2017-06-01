@@ -619,7 +619,7 @@ class EmployerProfile
           end
         else
           plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
-          if (new_date + 3.days) == plan_year_due_date
+          if (new_date + 2.days) == plan_year_due_date
             initial_employers_reminder_to_publish(start_on_1).each do |organization|
               begin
                 organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
