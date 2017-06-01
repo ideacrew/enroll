@@ -19,7 +19,7 @@
       <tr>
         <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
         <td> <%= user.present? ? user.email : "Nil" %> </td>
-        <td> <%= user.present? ? user.roles.each { |role| role.capitalize! }.join(", ") : "Nil" %> </td>
+        <td> <%= user.present? ? user.roles.collect(&:humanize).join(", ") : "Nil" %> </td>
         <td> <%= user.present? ? TimeKeeper.date_according_to_exchange_at(user.last_sign_in_at) : "Nil" %> </td>
         <td> <%= TimeKeeper.date_according_to_exchange_at(@person.created_at) %> </td>
         <td> <%= @person.primary_family.e_case_id || "Nil" %> </td>
