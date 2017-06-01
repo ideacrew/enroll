@@ -6,7 +6,7 @@ class BenefitGroup
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-  PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
+  PLAN_OPTION_KINDS = %w(sole_source single_plan single_carrier metal_level)
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 1, 30, 60]
   TERMINATE_ON_KINDS = %w(end_of_month)
@@ -65,6 +65,9 @@ class BenefitGroup
 
   embeds_many :dental_relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  embeds_many :composite_tier_contributions, cascade_callbacks: true
+  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
 
@@ -166,6 +169,8 @@ class BenefitGroup
     return if reference_plan_id.nil?
 
     if plan_option_kind == "single_plan"
+      plans = [reference_plan]
+    elsif plan_option_kind == "sole_source"
       plans = [reference_plan]
     else
       if plan_option_kind == "single_carrier"
@@ -405,6 +410,8 @@ class BenefitGroup
 
   def elected_plans_by_option_kind
     case plan_option_kind
+    when "sole_source"
+      Plan.where(id: reference_plan_id).first
     when "single_plan"
       Plan.where(id: reference_plan_id).first
     when "single_carrier"
@@ -485,6 +492,15 @@ class BenefitGroup
         ce.find_or_build_benefit_group_assignment(benefit_groups.first)
       end
     end
+  end
+
+  def group_size_factor_for(plan)
+  end
+
+  def composite_rating_tier_premium_for(composite_rating_tier)
+  end
+
+  def composite_employer_contribution_factor_for(composite_rating_tier)
   end
 
   private
