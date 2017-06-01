@@ -29,8 +29,8 @@ end
 Then(/Individual creates HBX account$/) do
   click_button 'Create account', :wait => 10
   fill_in "user[oim_id]", :with => (@u.email :email)
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password]", :with => "aA1!aA1!bB2@"
+  fill_in "user[password_confirmation]", :with => "aA1!aA1!bB2@"
   screenshot("create_account")
   click_button "Create account"
 end
@@ -180,8 +180,8 @@ end
 Then(/Individual creates a new HBX account$/) do
   click_button 'Create account', :wait => 10
   fill_in "user[oim_id]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password]", :with => "aA1!aA1!bB2@"
+  fill_in "user[password_confirmation]", :with => "aA1!aA1!bB2@"
   screenshot("create_account")
   click_button "Create account"
 end
@@ -212,7 +212,7 @@ end
 
 And(/I signed in$/) do
   fill_in "user[login]", :with => "testflow@test.com"
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password]", :with => "aA1!aA1!bB2@"
   click_button 'Sign in'
 end
 
@@ -310,8 +310,8 @@ end
 Then(/Second user creates an individual account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email :email2)
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!bB2@")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!bB2@")
   screenshot("create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end
@@ -355,7 +355,7 @@ end
 When(/^a CSR exists/) do
   p = FactoryGirl.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
   sleep 2 # Need to wait on factory
-  FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
+  FactoryGirl.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!bB2@", password_confirmation: "aA1!aA1!bB2@", person: p, roles: ["csr"] )
 end
 
 When(/^CSR accesses the HBX portal$/) do
@@ -365,7 +365,7 @@ When(/^CSR accesses the HBX portal$/) do
   find('.interaction-click-control-sign-in-existing-account').click
   fill_in "user[login]", :with => "sherry.buckner@dc.gov"
   find('#user_email').set("sherry.buckner@dc.gov")
-  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  fill_in "user[password]", :with => "aA1!aA1!bB2@"
   find('.interaction-click-control-sign-in').click
 end
 
@@ -412,8 +412,8 @@ end
 Then(/^(\w+) creates a new account$/) do |person|
   find('.interaction-click-control-create-account').click
   fill_in 'user[email]', with: (@u.email 'email' + person)
-  fill_in 'user[password]', with: "aA1!aA1!aA1!"
-  fill_in 'user[password_confirmation]', with: "aA1!aA1!aA1!"
+  fill_in 'user[password]', with: "aA1!aA1!bB2@"
+  fill_in 'user[password_confirmation]', with: "aA1!aA1!bB2@"
   click_button 'Create account'
 end
 
@@ -438,7 +438,7 @@ When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In Existing Account'
   fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
-  fill_in 'user[password]', with: "aA1!aA1!aA1!"
+  fill_in 'user[password]', with: "aA1!aA1!bB2@"
   click_button 'Sign in'
 end
 
@@ -497,8 +497,8 @@ end
 Then(/^Aptc user create consumer role account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set("aptc@dclink.com")
-  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
-  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
+  @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!bB2@")
+  @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!bB2@")
   screenshot("aptc_create_account")
   scroll_then_click(@browser.input(value: "Create account"))
 end

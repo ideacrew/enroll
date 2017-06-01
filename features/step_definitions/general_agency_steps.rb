@@ -98,8 +98,8 @@ end
 
 When(/^.+ registers? with valid information for staff$/) do
   fill_in "user[oim_id]", with: "jack.martin@example.com"
-  fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  fill_in "user[password]", with: "aA1!aA1!bB2@"
+  fill_in "user[password_confirmation]", with: "aA1!aA1!bB2@"
   click_button 'Create account'
 end
 
@@ -136,8 +136,8 @@ end
 
 When(/^.+ registers with valid information for ga flow$/) do
   fill_in "user[oim_id]", with: "broker.martin@example.com"
-  fill_in "user[password]", with: "aA1!aA1!aA1!"
-  fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
+  fill_in "user[password]", with: "aA1!aA1!bB2@"
+  fill_in "user[password_confirmation]", with: "aA1!aA1!bB2@"
   click_button 'Create account'
 end
 
@@ -192,7 +192,7 @@ When(/^General Agency staff logs on the General Agency Portal$/) do
 
   fill_in "user[login]", with: "jack.martin@example.com"
   find('#user_login').set("jack.martin@example.com")
-  fill_in "user[password]", with: "aA1!aA1!aA1!"
+  fill_in "user[password]", with: "aA1!aA1!bB2@"
   fill_in "user[login]", :with => "jack.martin@example.com" unless find(:xpath, '//*[@id="user_login"]').value == "jack.martin@example.com"
   find('.interaction-click-control-sign-in').click
 end

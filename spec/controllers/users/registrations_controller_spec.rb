@@ -5,7 +5,7 @@ RSpec.describe Users::RegistrationsController do
   context "create" do
     let(:curam_user){ double("CuramUser") }
     let(:email){ "test@example.com" }
-    let(:password){ "aA1!aA1!aA1!"}
+    let(:password){ "aA1!aA1!bB2@"}
 
     context "when the email is in the black list" do
 

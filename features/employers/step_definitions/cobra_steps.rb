@@ -7,7 +7,7 @@ def people_for_cobra
       dob: "08/10/1960",
       ssn: "196008107",
       email: "jack@cobra.com",
-      password: 'aA1!aA1!aA1!'
+      password: 'aA1!aA1!bB2@'
     },
     "Jack Employee" => {
       first_name: "Jack",
@@ -15,7 +15,7 @@ def people_for_cobra
       dob: "08/10/1960",
       ssn: "196008111",
       email: "jack@employee.com",
-      password: 'aA1!aA1!aA1!'
+      password: 'aA1!aA1!bB2@'
     },
     "Jack Doe" => {
       first_name: "Jack",
@@ -26,7 +26,7 @@ def people_for_cobra
       fein: "050000000",
       ssn: "197810118",
       email: "jack@dc.gov",
-      password: 'aA1!aA1!aA1!'
+      password: 'aA1!aA1!bB2@'
     },
   }
 end
@@ -163,7 +163,7 @@ Then(/employer should see the message Your employee was successfully added to yo
   expect(page).to have_content('Your employee was successfully added to your roster')
   person = people_for_cobra['Jack Employee']
   expect(page).to have_content(person[:first_name])
-  expect(page).to have_content(person[:last_name])  
+  expect(page).to have_content(person[:last_name])
   expect(page).to have_content((TimeKeeper.date_of_record + 1.days).to_s)
 end
 
@@ -235,7 +235,7 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
   element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
@@ -275,11 +275,12 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Coverage Termination Pending')
   unless TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Selected')
+    expect(page).to have_content('Coverage Termination Pending')
   else
     expect(page).to have_content('Coverage Enrolled')
+    expect(page).to have_content('Terminated')
   end
 end
 
