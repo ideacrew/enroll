@@ -89,7 +89,7 @@ namespace :migrations do
       end
 
       plan_year.force_publish!  # enrolling
-      plan_year.activate! if plan_year.can_be_activated?  # to active state
+      plan_year.activate!  # to active state
     end
 
   end
