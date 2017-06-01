@@ -35,7 +35,7 @@ def generate_approved_broker (broker, wk_addr, wk_phone, wk_email, email)
   broker.save!
   broker.approve!
   broker.broker_agency_accept!
-  broker.person.user = User.create!(email: email, oim_id: email, 'password'=>'aA1!aA1!bB2@', roles: ['broker'])
+  broker.person.user = User.create!(email: email, oim_id: email, 'password'=>'aA1!aA1!aA1!', roles: ['broker'])
   broker.person.save!
 end
 
@@ -56,7 +56,7 @@ generate_approved_broker(bk1, wk_addr, wk_phone, wk_email, 'jane.curtin@example.
 #bk1.save!
 #bk1.approve!
 #bk1.broker_agency_accept!
-#p3.user = User.create!(email: 'jane.curtin@example.com', 'password'=>'aA1!aA1!bB2@')
+#p3.user = User.create!(email: 'jane.curtin@example.com', 'password'=>'aA1!aA1!aA1!')
 #p3.save!
 puts "::: Creating ConsumerRole Roles:::"
 c0 = ConsumerRole.new(person: p0, is_incarcerated: false, is_applicant: true, is_state_resident: true, citizen_status: "us_citizen")

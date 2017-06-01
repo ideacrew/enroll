@@ -1,6 +1,6 @@
 Given /(\w+) is a person$/ do |name|
   person = FactoryGirl.create(:person, first_name: name)
-  @pswd = 'aA1!aA1!bB2@'
+  @pswd = 'aA1!aA1!aA1!'
   email = Forgery('email').address
   user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
@@ -28,7 +28,7 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   visit '/'
   portal_class = '.interaction-click-control-employer-portal'
   find(portal_class).click
-  @pswd = 'aA1!aA1!bB2@'
+  @pswd = 'aA1!aA1!aA1!'
   fill_in "user[oim_id]", :with => email
   fill_in "user[password]", :with => @pswd
   fill_in "user[password_confirmation]", :with => @pswd
