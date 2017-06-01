@@ -41,6 +41,8 @@
 - elsif ridp == true && step == 2
   = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
 - elsif step == 2
+- elsif step == 7 && defined? url
+  = link_to 'Continue', url, class: "btn btn-lg btn-primary #{css_class} btn-block", id: 'btn-continue'
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4
