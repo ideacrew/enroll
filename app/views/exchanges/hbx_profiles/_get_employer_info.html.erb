@@ -7,11 +7,11 @@
       </tr>
       <% address = @organization.primary_office_location.address %>
       <tr>
-        <th> Address </th>
+        <th> Address: </th>
         <td> <%= address.address_1 + ',' + address.address_2 %></td>
       </tr>
       <tr>
-        <th> Locale </th>
+        <th> Locale: </th>
         <td> <%= address.city + ',' + address.state + ',' + address.zip %></td>
       </tr>
   </table>
