@@ -2,10 +2,19 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
+<% case notice.notification_type %>
+<% when "initial_employer_first_reminder_to_publish_plan_year" %>
+  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+<% when "initial_employer_second_reminder_to_publish_plan_year" %>
+  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
+<% when "initial_employer_final_reminder_to_publish_plan_year" %>
+  <% subject = "Final Reminder – Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+<% end %>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Action Required to Complete <%= notice.primary_fullname %>’s Application for Employer-sponsored Coverage with <%= Settings.site.short_name %> </h3></td>
+      <td><h3> <%= subject %> </h3></td>
     </tr>
   </tbody>
 </table>
@@ -18,11 +27,20 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<% case notice.notification_type %>
+<% when "initial_employer_first_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/%d/%Y")}."} %>
+<% when "initial_employer_second_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}. Please complete your application by this date or you may have to reapply for coverage starting at a later date. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/%d/%Y")}."} %>
+<% when "initial_employer_final_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "For detailed information on how to complete your application for employer-sponsored coverage, please see this walkthrough guide on #{Settings.site.short_name}’s website. Additional resources can also be found on the Forms section of #{Settings.site.short_name}’s website and in the “Questions and Assistance” section below."} %>
+  content: "For detailed information on how to complete your application for employer-sponsored coverage, please see this <a href='https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf'>walkthrough guide</a> on #{Settings.site.short_name}’s website. Additional resources can also be found on the <a href='https://dchealthlink.com/forms#en%7Cemployers'>Forms section</a> of #{Settings.site.short_name}’s website and in the “Questions and Assistance” section below."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note in order to participate in #{Settings.site.short_name}, your group must meet eligibility requirements:",
