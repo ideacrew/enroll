@@ -1,11 +1,12 @@
-# This rake task is used to create plan year for expection case with plan plan year info
-# RAILS_ENV=production bundle exec rake migrations:create_published_plan_year
+# This rake task is used to create plan year for expection case with plan year info.
+
+# RAILS_ENV=production bundle exec rake migrations:create_active_plan_year
 
 namespace :migrations do
 
   desc "create plan year with info"
 
-  task :create_published_plan_year => :environment do
+  task :create_active_plan_year => :environment do
 
     organization = Organization.where(fein: /520858689/).last
     employer_profile = organization.employer_profile
@@ -80,6 +81,7 @@ namespace :migrations do
         if census_employee.employee_role.present?
           census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.each do |hbx|
             if hbx.effective_on.strftime('%Y-%m-%d') == "2016-07-01"
+              # one of census employee has 2 enrollemnts in coverage selected state, updating benefit group assignment and benfit group.
               hbx.update_attributes(benefit_group_id:benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments.where(benefit_group_id:benefit_group.id).first.id)
             end
           end
