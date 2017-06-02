@@ -81,6 +81,7 @@ FactoryGirl.define do
     end_on { start_on + 1.year - 1.day }
     open_enrollment_start_on { start_on - 1.month }
     imported_plan_year true
+    fte_count { 5 }
 
     open_enrollment_end_on do
       end_date = renewing ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on : Settings.aca.shop_market.open_enrollment.monthly_end_on

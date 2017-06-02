@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_plan_year_effective_date")
 
-describe ChangePlanYearEffectiveDate do
+describe ChangePlanYearEffectiveDate, dbclean: :after_each do
 
   let(:given_task_name) { "change_plan_year_effective_date" }
   subject { ChangePlanYearEffectiveDate.new(given_task_name, double(:current_scope => nil)) }
@@ -19,6 +19,7 @@ describe ChangePlanYearEffectiveDate do
     let(:plan) { FactoryGirl.create(:plan, :with_premium_tables) }
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id, :aasm_state => "eligible") }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("fein").and_return(plan_year.employer_profile.parent.fein)
@@ -29,6 +30,7 @@ describe ChangePlanYearEffectiveDate do
       allow(ENV).to receive(:[]).with("action_on_enrollments").and_return("")
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("")
       allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return [plan]
+      plan_year.employer_profile.update_attributes(profile_source: "conversion")
     end
 
     it "should change the plan year effective on date" do
@@ -52,7 +54,13 @@ describe ChangePlanYearEffectiveDate do
     end
 
     it "should publish the plan year" do
+      allow(ENV).to receive(:[]).with("REDIS_URL").and_return("redis://what") # No
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_QUIET").and_return("what") # Idea
+      allow(ENV).to receive(:[]).with("REDIS_NAMESPACE_DEPRECATIONS").and_return("what") # WTF
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("force_publish")
+      employer = plan_year.employer_profile
+      employer.census_employees << census_employee
+      employer.save!
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).not_to eq "draft"
@@ -61,10 +69,30 @@ describe ChangePlanYearEffectiveDate do
     it "should revert the renewal py if received args as revert renewal" do
       allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
       plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "auto_renewing")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should cancel the enrollments under renewal plan year if received args as revert renewal" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_renewal")
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
       allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq "renewing_draft"
+    end
+
+    it "should cancel the enrollments under inital py if received args as revert application" do
+      allow(ENV).to receive(:[]).with("plan_year_state").and_return("revert_application")
+      plan_year.update_attributes(aasm_state: "active")
+      enrollment.update_attributes(benefit_group_id: plan_year.benefit_groups.first.id, aasm_state: "coverage_enrolled")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      subject.migrate
+      enrollment.reload
+      expect(enrollment.aasm_state).to eq "coverage_canceled"
     end
 
     it "should revert the inital py if received args as revert application" do
@@ -98,6 +126,17 @@ describe ChangePlanYearEffectiveDate do
       enrollment.reload
       plan_year.reload
       expect(enrollment.effective_on).to eq plan_year.start_on
+    end
+
+    it "should output an error if plan year does not belong to conversion employer" do
+      plan_year.employer_profile.update_attributes(profile_source: "self_serve")
+      expect(subject.migrate).to eq nil
+    end
+
+    it "should output an error if plan year has published renewing plan year" do
+      plan_year.update_attributes(aasm_state: "renewing_enrolling")
+      allow(ENV).to receive(:[]).with("aasm_state").and_return(plan_year.aasm_state)
+      expect(subject.migrate).to eq nil
     end
   end
 end
