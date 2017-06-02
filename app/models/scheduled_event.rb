@@ -53,7 +53,7 @@ class ScheduledEvent
     else
       end_date = start.end_of_year.end_of_month.end_of_week
       schedule(start_time).occurrences(end_date).map do |val|
-        ScheduledEvent.new(id: id, event_name: event_name, start_time: val)
+        ScheduledEvent.new(id: id, event_name: event_name, start_time: val, one_time: false)
       end
     end
   end

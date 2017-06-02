@@ -29,7 +29,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
-      subject { ScheduledEvent.find_by(event_name: 'Martin Luthor Bday') }
+      subject { ScheduledEvent.find_by(event_name: 'Martin Luther King Jr Birthday') }
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,
@@ -37,7 +37,7 @@ RSpec.describe 'Load Federal Holidays Task', :type => :task do
                                                 }
     end
     context "it creates holiday ScheduledEvent  elements correctly" do
-      subject { ScheduledEvent.find_by(event_name: 'Washington Bday') }
+      subject { ScheduledEvent.find_by(event_name: "President's Day") }
       it_should_behave_like "a federal holiday", { type: "federal",
                                                   offset_rule: 0,
                                                   one_time: true,

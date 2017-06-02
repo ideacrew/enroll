@@ -4,13 +4,13 @@ namespace :load_federal_holidays do
     begin
       ScheduledEvent.find_or_create_by!(
           type: 'federal',
-          event_name: 'Martin Luthor Bday',
+          event_name: 'Martin Luther King Jr Birthday',
           offset_rule: 0,
           start_time: nth_wday(3, 1, 1, Date.today.year)
           )
       ScheduledEvent.find_or_create_by!(
           type: 'federal',
-          event_name: 'Washington Bday',
+          event_name: "President's Day",
           offset_rule: 0,
           start_time: nth_wday(3, 1, 2, Date.today.year)
           )

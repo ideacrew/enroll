@@ -18,6 +18,6 @@ describe "exchanges/scheduled_events/show.html.erb" do
     expect(rendered).to have_text(/Christmas/)
     expect(rendered).to have_text(/Back/)
     expect(rendered).to have_text(/Edit/)
-    expect(rendered).to have_text(/Delete This Occurence/)
+    expect(rendered).to have_text(/Delete Event/)
   end
 end
