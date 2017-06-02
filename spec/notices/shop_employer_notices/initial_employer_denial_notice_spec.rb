@@ -10,12 +10,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
                             :name =>'Denial of Initial Employer Application/Request for Clarifying Documentation',
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_denial_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerDenialNotice',
+                            :event_name => 'initial_employer_denial',
                             :mpi_indicator => 'MPI_SHOP2B',
                             :title => "Employer Denial Notice"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
