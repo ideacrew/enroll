@@ -58,6 +58,7 @@ class Plan
 
   # for dental plans only, metal level -> high/low values
   field :dental_level, type: String
+  field :carrier_special_plan_identifier, type: String
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -133,6 +134,8 @@ class Plan
   validates_inclusion_of :active_year,
     in: 2014..(TimeKeeper.date_of_record.year + 3),
     message: "%{value} is an invalid active year"
+
+  validates_length_of :carrier_special_plan_identifier, minimum: 1, allow_nil: true
 
   ## Scopes
   default_scope -> {order("name ASC")}
