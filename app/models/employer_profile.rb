@@ -594,12 +594,28 @@ class EmployerProfile
 
         # Reminder notices to renewing employers to publish thier plan years.
         start_on = (new_date+1.month).beginning_of_month
-        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-2
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
           renewal_employers_reminder_to_publish(start_on).each do |organization|
             begin
-              organization.employer_profile.trigger_notices("renewal_employer_reminder_to_publish_plan_year")
+              organization.employer_profile.trigger_notices("renewal_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              puts "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-6
+          renewal_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("renewal_employer_second_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-2
+          renewal_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("renewal_employer_final_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
             end
           end
         end

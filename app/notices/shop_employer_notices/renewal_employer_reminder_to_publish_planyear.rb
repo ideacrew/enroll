@@ -11,7 +11,7 @@ class ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear < ShopEmploy
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
+    plan_year = employer_profile.plan_years.where(:aasm_state => "draft").first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
         })
