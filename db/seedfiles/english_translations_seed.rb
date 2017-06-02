@@ -15,6 +15,7 @@ translations = [
   USERS_ORPHANS_TRANSLATIONS,
   WELCOME_INDEX_TRANSLATIONS,
   BUTTON_PANEL_EXAMPLE_TRANSLATIONS
+  WELCOME_INDEX_TRANSLATIONS
 ].reduce({}, :merge)
 
 translations.keys.each do |k|
