@@ -10,12 +10,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
                             :name =>'Initial Employer Application -  Reminder to publish',
                             :notice_template => 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+                            :event_name => 'initial_employer_first_reminder_to_publish_plan_year',
                             :mpi_indicator => 'MPI_SHOP26',
                             :title => "Reminder to publish Application"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
