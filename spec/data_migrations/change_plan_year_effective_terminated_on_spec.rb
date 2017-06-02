@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_plan_year_effective_terminated_on")
 
-describe ChangePlanYearEffectiveTerminatedon do
+describe ChangePlanYearEffectiveTerminatedon, dbclean: :after_each do
 
   let(:given_task_name) { "change_plan_year_effective_terminated_on" }
   subject { ChangePlanYearEffectiveTerminatedon.new(given_task_name, double(:current_scope => nil)) }
@@ -13,7 +13,7 @@ describe ChangePlanYearEffectiveTerminatedon do
   end
 
   describe "changing plan year's state" do
-    
+
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
 
@@ -25,11 +25,11 @@ describe ChangePlanYearEffectiveTerminatedon do
 
     it "should change effective on date" do
       effective_on = hbx_enrollment.effective_on
-      terminated_on = TimeKeeper.date_of_record 
+      terminated_on = TimeKeeper.date_of_record
       subject.migrate
       hbx_enrollment.reload
       expect(hbx_enrollment.effective_on).to eq effective_on + 1.month
-      expect(TimeKeeper.date_of_record).to eq terminated_on 
+      expect(TimeKeeper.date_of_record).to eq terminated_on
     end
   end
 end
