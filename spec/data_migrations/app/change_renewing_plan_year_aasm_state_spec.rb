@@ -2,7 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_renewing_plan_year_aasm_state")
 
 
-describe ChangeRenewingPlanYearAasmState do
+describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
   let(:given_task_name) { "change_renewing_plan_year_aasm_state" }
   subject { ChangeRenewingPlanYearAasmState.new(given_task_name, double(:current_scope => nil)) }
@@ -29,7 +29,7 @@ describe ChangeRenewingPlanYearAasmState do
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('')
     end
-    
+
     it "should update aasm_state of plan year" do
       subject.migrate
       plan_year.reload
