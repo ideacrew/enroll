@@ -61,7 +61,7 @@
           <%= f.hidden_field :invitation_id %>
           <br/>
           <div class="actions text-center">
-              <%= f.submit "Create account", class: "btn btn-primary btn-lg g-recaptcha", data: {callback: "submitInvisibleRecaptchaForm", sitekey: "6LfxjCMUAAAAAOk9kDKwAiAXCBugl3vnwU0_7Qrj"} %>
+              <%= f.submit "Create account", class: "btn btn-primary btn-lg g-recaptcha", data: {callback: "submitInvisibleRecaptchaForm", sitekey: "#{recaptcha_site_key}"} %>
               <br/>
               <br/>
             <span>
