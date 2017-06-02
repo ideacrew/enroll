@@ -2,10 +2,19 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
+<% case notice.notification_type %>
+<% when "renewal_employer_first_reminder_to_publish_plan_year" %>
+  <% subject = "Final Reminder - Action is Required to Renew Employer-sponsored Health Coverage on #{Settings.site.short_name}" %>
+<% when "renewal_employer_second_reminder_to_publish_plan_year" %>
+  <% subject = "Action Required to Renew Employer-sponsored Health Coverage on #{Settings.site.short_name} – Deadline Extended" %>
+<% when "renewal_employer_final_reminder_to_publish_plan_year" %>
+  <% subject = "Final Reminder - Action is Required to Renew Employer-sponsored Health Coverage on #{Settings.site.short_name}" %>
+<% end %>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Final Reminder - Action is Required to Renew Employer-sponsored Health Coverage on <%= Settings.site.short_name %></h3></td>
+      <td><h3><%= subject %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -18,8 +27,17 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<% case notice.notification_type %>
+<% when "renewal_employer_first_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.start_on-1.month).strftime("%m/#{(Settings.aca.shop_market.renewal_application.publish_due_day_of_month-5)}/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
+<% when "renewal_employer_second_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on}. The deadline to complete your renewal application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.renewal_application.publish_due_day_of_month}/%Y")}. Please complete your application by this date."} %>
+<% when "renewal_employer_final_reminder_to_publish_plan_year" %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Action is needed in order for your employer-sponsored health coverage with #{Settings.site.short_name} to renew on #{notice.plan_year.start_on}. Renewal employers will need to complete their renewal applications before #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.renewal_application.publish_due_day_of_month}/%Y")}. #{Settings.site.short_name}’s Small Business Support Team would like to offer one-on-one assistance with you or your broker in completing the renewal application."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Your employees will also have until #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on}/%Y")} to make their plan selections."} %>
@@ -45,27 +63,21 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Additional Resources for your New My #{Settings.site.short_name} Accounts:"],
     heading: '', sub_heading: ''} %>
+
 <table class="total_table" border="0">
   <tbody>
     <tr>
       <td>
         <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          Employers Managing Your Employee Roster <br>
-          <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf">https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf</a>
-        </li>
-        </ul>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          Employers Enrolling as Employees<br>
-          <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf">https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf</a>
-        </li>
-        </ul>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 5px;">
-          Employers Logging in to the Update <%= Settings.site.short_name %> for the first time<br>
-          <a href="https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf">https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf</a>
-        </li>
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Managing-Your-Employee-Roster.pdf">Employers Managing Your Employee Roster</a>
+          </li>
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf">Employers Enrolling as Employees</a>
+          </li>
+          <li style="margin-top: 5px;">
+            <a href="https://dchealthlink.com/sites/default/files/v2/forms/Existing-Employers-First-Login-to-Updated-DC-Health-Link.pdf">Employers Logging in to the Update <%= Settings.site.short_name %> for the first time</a>
+          </li>
         </ul>
       </td>
     </tr>
