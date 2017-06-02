@@ -4,12 +4,13 @@ module Forms
     attr_reader :result
     attr_reader :row
     attr_reader :family_id
+    attr_reader :params
 
     def initialize(*arguments)
       @params = arguments.extract_options!
       @result = {success: [], failure: []}
-      @row = params[:family_actions_id]
-      @family_id = params[:family_id]
+      @row = @params[:family_actions_id]
+      @family_id = @params[:family_id]
     end
 
     def cancel_enrollments
