@@ -18,7 +18,7 @@ class Family
   include Sortable
   include Mongoid::Autoinc
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
+  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -925,6 +925,14 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def create_dep_consumer_role
+    if dependents.any?
+      dependents.each do |member|
+        build_consumer_role(member)
+      end
+    end
+  end
+
 private
   def build_household
     if households.size == 0
@@ -1035,5 +1043,4 @@ private
       unset("e_case_id")
     end
   end
-
 end
