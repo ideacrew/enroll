@@ -56,7 +56,10 @@ module Factories
         begin
           if active_enrollment.present?
             renewal_enrollments = family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind)
-            renewal_enrollments = renewal_enrollments.where({:benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id)})
+            renewal_enrollments = renewal_enrollments.where({
+              :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id), 
+              :effective_on => renewing_plan_year.start_on
+            })
 
             active_renewals  = renewal_enrollments.enrolled_and_waived
             passive_renewals = renewal_enrollments.renewing
@@ -65,7 +68,7 @@ module Factories
               passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
               next
             end
-
+            
             if passive_renewals.blank?
               if active_enrollment.present? && active_enrollment.inactive?
                 renew_enrollment(enrollment: active_enrollment, waiver: true, coverage_kind: coverage_kind)
