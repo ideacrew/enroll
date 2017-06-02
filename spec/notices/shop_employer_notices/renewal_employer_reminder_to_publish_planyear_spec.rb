@@ -12,12 +12,14 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear do
                             :name =>'Renewal Employer reminder to publish plan year.',
                             :notice_template => 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
                             :notice_builder => 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+                            :event_name => 'renewal_employer_final_reminder_to_publish_plan_year',
                             :mpi_indicator => 'MPI_SHOP29',
                             :title => "Group Renewal – Reminder to Publish"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
