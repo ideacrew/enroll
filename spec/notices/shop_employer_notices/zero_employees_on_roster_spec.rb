@@ -17,7 +17,7 @@ RSpec.describe ShopEmployerNotices::ZeroEmployeesOnRoster do
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name.
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
