@@ -45,6 +45,7 @@ Rails.application.routes.draw do
       collection do
         get 'current_events'
         get 'delete_current_event'
+        get 'list'
       end
     end
 
