@@ -119,12 +119,53 @@ Then(/^Employer should see a form to enter information about employee, address a
   click_button "Create Employee"
 end
 
+Then(/^fill the form with hired date as future date$/) do
+  person = people_for_cobra['Jack Employee']
+  # Census Employee
+  fill_in 'census_employee[first_name]', with: person[:first_name]
+  fill_in 'census_employee[last_name]', with: person[:last_name]
+  find(:xpath, "//p[contains(., 'NONE')]").click
+  find(:xpath, "//li[contains(., 'Jr.')]").click
+
+  fill_in 'jq_datepicker_ignore_census_employee[dob]', :with => person[:dob]
+  fill_in 'census_employee[ssn]', :with => person[:ssn]
+
+  find(:xpath, "//label[@for='census_employee_gender_male']").click
+
+  fill_in 'jq_datepicker_ignore_census_employee[hired_on]', :with => (TimeKeeper.date_of_record + 1.days).to_s
+
+  # Address
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
+  fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
+
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, "//li[contains(., 'GA')]").click
+
+  fill_in 'census_employee[address_attributes][zip]', :with => "30228"
+
+  find(:xpath, "//p[contains(., 'SELECT KIND')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., 'home')]").click
+
+  fill_in 'census_employee[email_attributes][address]', :with => person[:email]
+
+  click_button "Create Employee"
+end
+
 And(/^.+ should see census employee created success message for (.*)$/) do |named_person|
   person = people_for_cobra[named_person]
   expect(page).to have_content('Census Employee is successfully created.')
   screenshot("employer_census_new_family_success_message")
   expect(page).to have_content(person[:first_name])
   expect(page).to have_content(person[:last_name])
+end
+
+Then(/employer should see the message Your employee was successfully added to your roster on page/) do
+  expect(page).to have_content('Your employee was successfully added to your roster')
+  person = people_for_cobra['Jack Employee']
+  expect(page).to have_content(person[:first_name])
+  expect(page).to have_content(person[:last_name])  
+  expect(page).to have_content((TimeKeeper.date_of_record + 1.days).to_s)
 end
 
 And(/^.+ should see the status of cobra_eligible$/) do
@@ -195,7 +236,8 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  find('tr.even i.fa-trash-o').click
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
   click_link 'Terminate Employee'
@@ -216,8 +258,11 @@ Then(/^.+ should see the status of Employment terminated$/) do
 end
 
 When(/^.+ cobra one employee$/) do
-  find('a.show_cobra_confirm').click
-  find('a.cobra_confirm_submit').click
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
+  element.find('a.show_cobra_confirm').click
+
+  employee_id = element.find('a', :text => 'Employee Jr.')[:href].match(/^.*\/census_employees\/(\w+).*/i)[1]
+  find("tr.cobra_confirm_#{employee_id}").find('a.cobra_confirm_submit').click
 end
 
 Then(/^.+ should see cobra successful msg/) do
@@ -231,7 +276,7 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Terminated')
+  expect(page).to have_content('Coverage Termination Pending')
   unless TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Selected')
   else
@@ -278,4 +323,8 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find('.reference-plans label').click
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
+end
+
+And(/clicks on the Add New Employee button/) do
+  find('.interaction-click-control-add-new-employee').click
 end
