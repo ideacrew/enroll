@@ -1,16 +1,58 @@
-<h2>Application in progress</h2>
-
-<table>
-	<thead>
-		<th>Applicant Name</th>
-		<th></th>
-	</thead>
-<tbody>
-	<% @application.applicants.each do |applicant| %>
+<div class="container bottom-pd">
+	<div class="row">
+		<h3 class="title-inline"><b>Financial Assistance Application</b></h3>
+	</div>
+	<table class="table table-sm">
 		<tr>
-			<td><%= applicant.family_member.person.full_name %></td>
-			<td><%= link_to "Add Info", edit_financial_assistance_application_applicant_path(@application, applicant) %></td>
+			<td><h4><b>ID #</b> <%=@application.id%></h4></td>
+			<td><h4><b>Status:</b> <%=@application.aasm_state%></h4></td>
 		</tr>
-	<% end %>
-</tbody
-</table>
+	</table>
+  <div class="row input-no-pd">
+	<h4><b>Primary Applicant</b><h4>
+	<%= render 'fa_table', members: [@family.primary_applicant] %>
+
+	<%if @family.dependents.present?%>
+		<h4><b>Household Members</b><h4>
+		<%= render 'fa_table', members: @family.dependents %>
+	<%end%>
+
+	<div class="row input-no-pd small">
+		<h3>Next Step : Add Household Members </h3>
+		<p>You must include all members of your household in the application, even if they're not enrolling in coverage.</p>
+		<i class="fa fa-question-circle"><small><a href="" data-toggle="modal" data-target="#help-me-decide"> Help me decide who is in my household</a></small></i>
+		<br /> <br />
+		<div> <%= button_to "Add a Household Member", "", :id => "", :class => "btn btn-secondary", :method => :get %></div>
+	</div>
+	<div>
+		<h4>OR</h4>
+	</div>
+	<div class="row input-no-pd small">
+		<h3>Review and Continue</h3>
+		<p>If you have added everyone in your household, continue below:</p>
+		<div> <%= button_to "Review and Continue", "", :id => "", :class => "btn btn-success", :method => :get %></div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div id="help-me-decide" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Help me decide who is in my household</h4>
+      </div>
+      <div class="modal-body">
+        <p>Add More info here...</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+

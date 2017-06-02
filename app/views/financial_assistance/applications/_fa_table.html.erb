@@ -1,0 +1,24 @@
+<table class="table table-striped">
+	<thead>
+		<tr>
+		  <th>Name</th>
+		  <th>Age</th>
+		  <th>Needs Coverage?</th>
+		  <th>Status?</th>
+		  <th>Verified?</th>
+		  <th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+	<%members.each do |member|%>
+		<tr>
+		  <td><%=member.person.full_name%></td>
+		  <td><%=member.person.age_on(TimeKeeper.date_of_record)%></td>
+		  <td>Yes</td>
+		  <td><%=@application.aasm_state%></td>
+		  <td>No</td>
+		  <td><%= link_to "Add Info", edit_financial_assistance_application_applicant_path(@application, @application.applicants.find_by(family_member_id: member.id)), class: "btn btn-info" %></td>
+		</tr>
+	<%end%>
+	</tbody>
+</table>

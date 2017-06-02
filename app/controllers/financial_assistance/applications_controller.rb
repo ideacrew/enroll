@@ -33,6 +33,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def edit
     # displays in progress application
+    @family = current_user.person.primary_family
     @application = FinancialAssistance::Application.find(params[:id])
   end
 
