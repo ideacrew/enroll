@@ -17,7 +17,9 @@
 		  <td>Yes</td>
 		  <td><%=@application.aasm_state%></td>
 		  <td>No</td>
-		  <td><%= link_to "Add Info", edit_financial_assistance_application_applicant_path(@application, @application.applicants.find_by(family_member_id: member.id)), class: "btn btn-info" %></td>
+		  <td>
+			<%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(@application, @application.applicants.find_by(family_member_id: member.id), 1), class: "btn btn-info"  %>
+		  </td>
 		</tr>
 	<%end%>
 	</tbody>

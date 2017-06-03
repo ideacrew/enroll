@@ -64,7 +64,11 @@ class FinancialAssistance::Applicant
   field :student_school_kind, type: String
   field :student_status_end_on, type: String
 
-  field :is_self_attested_blind_or_disabled, type: Boolean, default: false
+  #split this out : change XSD too.
+  #field :is_self_attested_blind_or_disabled, type: Boolean, default: false
+  field :is_self_attested_blind, type: Boolean, default: false
+  field :is_self_attested_disabled, type: Boolean, default: false
+
   field :is_self_attested_long_term_care, type: Boolean, default: false
 
   field :is_veteran, type: Boolean, default: false

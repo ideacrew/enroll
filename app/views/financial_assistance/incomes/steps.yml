@@ -1,6 +1,6 @@
 - step:
     heading: Job Income
-    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
+    heading_text: Please complete all tax info for  <family-member-name-placeholder>. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -8,6 +8,7 @@
                 - gutter: 6
                   type: text
                   text: Does this person expect to have any income from a job in 2017? *
+                  secondary-text: Does this person expect to have income from other sources in 2017? *
                 - gutter: 1
                   type: label_radio
                   name: row2

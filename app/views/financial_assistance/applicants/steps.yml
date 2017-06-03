@@ -1,6 +1,6 @@
 - step:
     heading: Tax Info
-    heading_text: Please complete all tax info for Mary. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
+    heading_text: Please complete all tax info for <family-member-name-placeholder>. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
     sections:
       - section:
           lines:
@@ -13,7 +13,7 @@
                   name: row2
                   value: true
                   id: 'yes2'
-                  checked: true
+                  #checked: true
                   label: 'Yes'
                   model: applicant
                   attribute: is_required_to_file_taxes
@@ -22,7 +22,7 @@
                   name: row2
                   value: false
                   id: 'no2'
-                  checked: false
+                  #checked: false
                   label: 'No'
                   model: applicant
                   attribute: is_required_to_file_taxes
@@ -38,7 +38,7 @@
                   name: row2
                   value: true
                   id: 'yes2'
-                  checked: true
+                  #checked: true
                   label: 'Yes'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
@@ -47,7 +47,7 @@
                   name: row2
                   value: false
                   id: 'no2'
-                  checked: false
+                  #checked: false
                   label: 'No'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
@@ -70,3 +70,146 @@
                     - Child
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
+- step:
+    heading: Other Questions
+    heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Has this person applied for an SSN *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_ssn_applied
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_ssn_applied
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Is this person pregnant? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_pregnant
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_pregnant
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Is this person blind? * #is_self_attested_blind_or_disabled
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_self_attested_blind
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_self_attested_blind
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Does this person need help with daily life activities, such as dressing or bathing?  #has_daily_living_help
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: has_daily_living_help
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: has_daily_living_help
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Does this person need help paying for any medical bills from the last 3 months? #need_help_paying_bills
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: need_help_paying_bills
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: need_help_paying_bills
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Was this person in foster care at age 18 or older? #
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_former_foster_care
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_former_foster_care
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
+
