@@ -2305,7 +2305,7 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           passive_renewal.reload
 
           expect(passive_renewal.coverage_canceled?).to be_truthy 
-          new_passive = family.enrollments.where(:aasm_state => 'auto_renewing').first
+          new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
           expect(new_passive.plan).to eq new_renewal_plan
         end
       end

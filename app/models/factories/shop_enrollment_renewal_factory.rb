@@ -8,7 +8,7 @@ module Factories
       params.each do |key, value|
         instance_variable_set("@#{key}", value)
       end
-      @plan_year_start_on = renewing_plan_year.start_on
+      @plan_year_start_on = renewing_plan_year.start_on if renewing_plan_year.present?
     end
 
     def renew_coverage
@@ -26,7 +26,6 @@ module Factories
         passive_renewals.each do |renewal|
           renewal.cancel_coverage! if renewal.may_cancel_coverage!
         end
-
         if is_coverage_active?
           generate_passive_renewal
         else
