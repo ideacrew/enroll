@@ -3,7 +3,6 @@ class FinancialAssistance::Applicant
   include Mongoid::Timestamps
 
   embedded_in :application
-  belongs_to :tax_household, class_name: "::TaxHousehold"
 
   TAX_FILER_KINDS = %W(tax_filer single joint separate dependent non_filer)
   STUDENT_KINDS = %w(
@@ -44,6 +43,7 @@ class FinancialAssistance::Applicant
     vocational
   )
   field :family_member_id, type: BSON::ObjectId
+  field :tax_household_id, type: BSON::ObjectId
 
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
@@ -56,6 +56,7 @@ class FinancialAssistance::Applicant
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
   field :is_ia_eligible, type: Boolean, default: false
+  field :is_subscriber, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
 
@@ -115,6 +116,7 @@ class FinancialAssistance::Applicant
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
   validates_presence_of :has_fixed_address
+  validate :strictly_boolean
 
   validates :tax_filer_kind,
     inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
@@ -129,8 +131,30 @@ class FinancialAssistance::Applicant
     is_ia_eligible
   end
 
+  def is_subscriber?
+    is_subscriber
+  end
+
+  def is_medicaid_chip_eligible?
+    is_medicaid_chip_eligible
+  end
+
   def is_tax_dependent?
     tax_filer_kind.present? && tax_filer_kind == "tax_dependent"
+  end
+
+  def strictly_boolean
+    unless is_ia_eligible.is_a? Boolean
+      self.errors.add(:base, "is_ia_eligible should be a boolean")
+    end
+
+    unless is_medicaid_chip_eligible.is_a? Boolean
+      self.errors.add(:base, "is_medicaid_chip_eligible should be a boolean")
+    end
+
+    unless is_subscriber.is_a? Boolean
+      self.errors.add(:base, "is_subscriber should be a boolean")
+    end
   end
 
   #### Use Person.consumer_role values for following
@@ -202,4 +226,39 @@ class FinancialAssistance::Applicant
     person.is_tobacco_user || "unknown"
   end
 
+  def family
+    family_member.family
+  end
+
+  def tax_household
+    return nil unless tax_household_id
+    family.active_approved_application.tax_households.where(id: tax_household_id).first
+  end
+
+  def age_on_effective_date
+    return @age_on_effective_date unless @age_on_effective_date.blank?
+    dob = family_member.person.dob
+    coverage_start_on = Forms::TimeKeeper.new.date_of_record
+    return unless coverage_start_on.present?
+    age = coverage_start_on.year - dob.year
+
+    # Shave off one year if coverage starts before birthday
+    if coverage_start_on.month == dob.month
+      age -= 1 if coverage_start_on.day < dob.day
+    else
+      age -= 1 if coverage_start_on.month < dob.month
+    end
+
+    @age_on_effective_date = age
+  end
+
+  def eligibility_determinations
+    return nil unless tax_household
+    tax_household.eligibility_determinations
+  end
+
+  def preferred_eligibility_determination
+    return nil unless tax_household
+    tax_household.preferred_eligibility_determination
+  end
 end

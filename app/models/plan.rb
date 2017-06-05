@@ -451,12 +451,18 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:)
+    def individual_plans(coverage_kind:, active_year:, tax_households:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+        csr_kinds = []
+        #TODO select the right csr_kind from the array of csr_kinds.
+        tax_households.each do |tax_household|
+          csr_kinds << tax_household.try(:preferred_eligibility_determination).try(:csr_eligibility_kind)
+        end
+
+        csr_kind = csr_kinds.blank? ? nil : csr_kinds.first
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

@@ -163,11 +163,12 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @family_member_ids = params[:family_member_ids]
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
+    shopping_tax_household = get_tax_household_from_family_members(@person, @family_member_ids)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+      @max_aptc = total_aptc_on_tax_households(shopping_tax_household, @hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else
@@ -189,8 +190,8 @@ class Insured::PlanShoppingsController < ApplicationController
   def plans
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    if @person.primary_family.active_household.latest_active_tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person)
+    if @person.primary_family.active_approved_application.tax_households.present?
+      if is_eligibility_determined_and_not_csr_100?(@person, params[:family_member_ids])
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -220,13 +221,18 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person)
-      csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
+  def is_eligibility_determined_and_not_csr_100?(person, family_member_ids)
+    primary_family = person.primary_family
+    family_members = primary_family.family_members.where(id: family_member_ids)
+    family_member_ids.each do |key, member|
+      tax_household = primary_family.active_approved_application.tax_household_for_family_member(member)
+      csr_eligibility_kind = primary_family.active_approved_application.current_csr_eligibility_kind(tax_household.id)
       if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+        @eligibility_kind = csr_eligibility_kind
         return true
-      else
-        return false
       end
+      return false
+    end
   end
 
   def send_receipt_emails
