@@ -250,7 +250,6 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    binding.pry
     params_parser = ::Forms::BulkActionsForAdmin.new(params)
     @result = params_parser.result
     @row = params_parser.row
