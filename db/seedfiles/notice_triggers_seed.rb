@@ -359,6 +359,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP32',
+    title: 'Group Ineligible to Obtain Coverage',
+    description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
+    resource_name: 'employer',
+    event_name: 'initial_employer_ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Initial Employer ineligible to obtain coverage.',
+        notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
+        mpi_indicator: 'MPI_SHOP32',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

@@ -1,4 +1,4 @@
-class ShopEmployerNotices::InitialEmployerIneilibilityNotice < ShopEmployerNotice
+class ShopEmployerNotices::InitialEmployerIneligibilityNotice < ShopEmployerNotice
 
   def deliver
     build
@@ -10,11 +10,7 @@ class ShopEmployerNotices::InitialEmployerIneilibilityNotice < ShopEmployerNotic
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.first
-    notice.plan_year = PdfTemplates::PlanYear.new({
-          :start_on => plan_year.start_on,
-          :open_enrollment_end_on => plan_year.open_enrollment_end_on,
-        })
+    plan_year = employer_profile.plan_years.where(:aasm_state => "application_ineligible").first
 
     plan_year_warnings = []
     plan_year.enrollment_errors.each do |k, v|
@@ -25,6 +21,11 @@ class ShopEmployerNotices::InitialEmployerIneilibilityNotice < ShopEmployerNotic
         plan_year_warnings << "One non-owner employee enrolled in health coverage"
       end
     end
+    notice.plan_year = PdfTemplates::PlanYear.new({
+          :start_on => plan_year.start_on,
+          :open_enrollment_end_on => plan_year.open_enrollment_end_on,
+          :warnings => plan_year_warnings
+        })
   end
 
 end
