@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_invalid_broker_agency_accounts_for_employer")
 
-describe RemoveInvalidBrokerAgencyAccountsForEmployer do
+describe RemoveInvalidBrokerAgencyAccountsForEmployer, dbclean: :after_each do
   let(:given_task_name) { "remove_invalid_broker_agency_accounts_for_employer" }
   subject { RemoveInvalidBrokerAgencyAccountsForEmployer.new(given_task_name, double(:current_scope => nil)) }
 

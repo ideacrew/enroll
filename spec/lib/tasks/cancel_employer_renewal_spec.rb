@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'rake'
 
-describe 'Cancel employer plan year & enrollments' do
+describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
 
   let(:benefit_group) { FactoryGirl.create(:benefit_group)}
   let(:benefit_group1) { FactoryGirl.create(:benefit_group)}

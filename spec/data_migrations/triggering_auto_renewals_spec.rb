@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "triggering_auto_renewals")
 
-describe TriggeringAutoRenewals do
+describe TriggeringAutoRenewals, dbclean: :after_each do
 
   let(:given_task_name) { "triggering_auto_renewals" }
   subject { TriggeringAutoRenewals.new(given_task_name, double(:current_scope => nil)) }
@@ -14,8 +14,8 @@ describe TriggeringAutoRenewals do
 
   describe "deleting existing waived renewal enrollment and creating auto renewing enrollment", dbclean: :after_each do
 
-    let(:organization) { 
-      org = FactoryGirl.create :organization, legal_name: "Corp 1" 
+    let(:organization) {
+      org = FactoryGirl.create :organization, legal_name: "Corp 1"
       employer_profile = FactoryGirl.create :employer_profile, organization: org, profile_source: "conversion"
       active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :created_at => Date.new(2015,9,1), :start_on => Date.new(2015,12,1), :end_on => Date.new(2016,11,30),
       :open_enrollment_start_on => Date.new(2015,10,1), :open_enrollment_end_on => Date.new(2015, 11, 10), fte_count: 37
@@ -34,7 +34,7 @@ describe TriggeringAutoRenewals do
         family = Family.find_or_build_from_employee_role(employee_role)
         renewal_plan = FactoryGirl.create(:plan)
         plan = FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)
-        
+
 
         enrollment_two = HbxEnrollment.create_from(
           employee_role: employee_role,
