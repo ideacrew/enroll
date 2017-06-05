@@ -55,7 +55,25 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
         expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
       end
     end
-    
-  end
+
+    context "when renewal_plan_year_passive_renewal" do
+
+      before(:each) do
+        allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
+        allow(ENV).to receive(:[]).with("action").and_return("renewal_plan_year_passive_renewal")
+      end
+
+      it "should create renewing plan year and passive enrollments" do
+        expect(employer_profile.plan_years.map(&:aasm_state)).to eq ['active']
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected']
+        subject.migrate
+        employer_profile.reload
+        active_household.reload
+        expect(employer_profile.plan_years.map(&:aasm_state)).to eq ['active','renewing_enrolling']
+        expect(family.active_household.hbx_enrollments.map(&:aasm_state)).to eq ['coverage_selected','auto_renewing']
+      end
     end
+  end
+
+end
 
