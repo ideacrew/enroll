@@ -622,7 +622,7 @@ end
 
 describe "#benefit_group", dbclean: :after_each do
   subject { EmployeeRole.new(:person => person, :employer_profile => organization.employer_profile, :census_employee => census_employee) }
-  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+  let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '121456689') }
   let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
