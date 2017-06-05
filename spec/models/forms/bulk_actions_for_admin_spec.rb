@@ -14,13 +14,19 @@ describe Forms::BulkActionsForAdmin, ".cancel_enrollments" do
     Forms::BulkActionsForAdmin.new(params)
   }
 
-  context 'initialize new form model' do
-    before :each do
+  context 'initialize new form model with the params from the controller' do
 
+    it "should store the value of params[:family_id] in the @family_id variable" do
+      expect(subject.family_id).to eq(params[:family_id])
     end
 
-    it "should initialize @params[:commit] with \"Submit\" " do
-      expect(subject.params[:commit]).to eq("Submit")
+    it "should store the value of params[:family_actions_id] in the @row variable" do
+      expect(subject.row).to eq(params[:family_actions_id])
     end
+
+    it "should store the value of params[:result] in the @row variable" do
+      expect(subject.row).to eq(params[:family_actions_id])
+    end
+
   end
 end
