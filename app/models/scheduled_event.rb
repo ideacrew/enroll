@@ -1,6 +1,7 @@
 class ScheduledEvent
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ScheduledEventService
 
   field :type, type: String
   field :event_name, type: String
@@ -47,7 +48,7 @@ class ScheduledEvent
     schedule
   end
 
-  def calendar_events(start)
+  def calendar_events(start, offset_rule)
     if recurring_rules.blank?
       [self]
     else
@@ -55,6 +56,14 @@ class ScheduledEvent
       schedule(start_time).occurrences(end_date).map do |val|
         ScheduledEvent.new(id: id, event_name: event_name, start_time: val, one_time: false)
       end
+    end
+  end
+
+  def self.day_of_month_for(event_name)
+    begin
+      ScheduledEvent.find_by!(event_name: event_name).start_time.day
+    rescue Mongoid::Errors::DocumentNotFound
+      nil
     end
   end
 end
