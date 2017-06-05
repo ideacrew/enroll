@@ -441,12 +441,35 @@ class BenefitGroup
     end
   end
 
+  # Interface for composite and list bill.
+  # Defines the methods needed for calculation of both composite and list
+  # bill values.
+
+  # Provide the sic factor for this benefit group.
+  def sic_factor_for(plan)
+  end
+
+  # Provide the base factor for this composite rating tier.
+  def composite_rating_tier_factor_for(composite_rating_tier)
+  end
+
+  # Provide the rating area value for this benefit group.
+  def rating_area
+  end
+
+  # Provide the participation rate factor for this group.
+  def composite_participation_rate_factor_for(plan)
+  end
+
+  # Provide the group size factor for this benefit group.
   def group_size_factor_for(plan)
   end
 
+  # Provide the premium for a given composite rating tier.
   def composite_rating_tier_premium_for(composite_rating_tier)
   end
 
+  # Provide the contribution factor for a given composite rating tier.
   def composite_employer_contribution_factor_for(composite_rating_tier)
   end
 
