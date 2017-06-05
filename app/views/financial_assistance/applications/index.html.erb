@@ -1,7 +1,56 @@
-<% if @existing_applications.empty? %>
- <%= link_to "new application", new_financial_assistance_application_path, class: "btn btn-default"  %>
-<% else %>
-  <% @existing_applications.each do |application| %>
- <%= link_to "existing application", step_financial_assistance_application_path(application), class: "btn btn-default"  %>
-  <% end %>
-<% end %>
+<div class="container bottom-pd">
+	<div class="row">
+		<h3 class="title-inline"><b>Your Financial Asistance Applications</b></h3>
+	</div>
+	<div class="form-group">
+		<div class="">
+			<%= form_tag({:action => 'create'}, {:method => 'post'}) do %>
+				<%= submit_tag "Start new application", class: "btn btn-success btn-sm" %>
+			<% end %>
+			<%= raw "&nbsp;" * 10%>
+			<%#= link_to "Cancel", "", class: "btn btn-default btn-sm"  %>
+		</div>
+	</div>
+	<div>
+		<p>
+		Here You may apply for asistance with the amount that you pay for health care insurance premiums, deductibles, copayments, and coinsurance. We will ask information about your family and household members, including: citizenship, income, expenses and any existing insurance coverage. Once you complete tand submit the application, we will determine if you are eligible to receive assistance, along with the type and amount. You may then shop and enroll in coverage using this assistance.
+		</p>
+	</div>
+	<%if @applications.present?%>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+				  <th>ID</th>
+				  <th>Status</th>
+				  <th>Started On</th>
+				  <th>Submitted On</th>
+				  <th>Determination</th>
+				  <th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+			<% @applications.each do |application| %>
+				<tr>
+				  <td><%=application.id%></td>
+				  <td><%=application.aasm_state%></td>
+				  <td><%=application.created_at%></td>
+				  <td></td>
+				  <td></td>
+				  <%
+					dropdown = [
+						['Update Application', edit_financial_assistance_application_path(application), 'static'],
+						['Print', "", 'disabled'],
+						['Delete', "", 'disabled'],
+						['Copy to new application', "", 'disabled']
+					]
+				  %>
+				  <td>
+					<%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: ""}, formats: :html%>
+
+				  </td>
+				</tr>
+			<%end%>
+			</tbody>
+		</table>
+	<%end%>
+</div>

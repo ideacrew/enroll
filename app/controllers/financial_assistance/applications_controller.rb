@@ -3,8 +3,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   #skip_before_filter :verify_authenticity_token, :only => :step
 
   def index
-    @existing_applications = Family.find_by(person_id: current_user.person).applications
-
+    @applications = current_user.person.primary_family.applications
     # view needs to show existing steps if any exist
     # show link to new application (new_financial_assistance_applcations_path)
   end
