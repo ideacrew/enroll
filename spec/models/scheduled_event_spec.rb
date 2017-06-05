@@ -57,7 +57,7 @@ RSpec.describe ScheduledEvent, type: :model do
   	  expect(scheduled_event1.start_time).to eq Date.strptime(value, "%m/%d/%Y").to_date
   	end
   end
-   
+  
   context "Calender Event" do
     let(:schedule_event_with_empty_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, :offset_3)}
     let(:scheduled_event_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, :offset_3)}
