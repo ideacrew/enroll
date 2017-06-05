@@ -39,20 +39,20 @@ namespace :migrations do
 
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
-          puts "Terminating employees coverage for employer #{organization.legal_name}"
+          puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
         end
 
         enrollments.each do |hbx_enrollment|
           if hbx_enrollment.may_terminate_coverage?
-            hbx_enrollment.update_attributes(:terminated_on => termination_date)
             hbx_enrollment.terminate_coverage!
+            hbx_enrollment.update_attributes!(terminated_on: end_on, termination_submitted_on: termination_date)
             # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
 
         if plan_year.may_terminate?
-          plan_year.update_attributes(end_on: end_on, :terminated_on => termination_date)
           plan_year.terminate!
+          plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
         end
       end
 
