@@ -11,7 +11,6 @@ RSpec.describe ScheduledEvent, type: :model do
   it { is_expected.to validate_presence_of :event_name }
   it { is_expected.to validate_presence_of :one_time }
   it { is_expected.to validate_presence_of :start_time }
-  it { is_expected.to validate_presence_of :offset_rule }
 
   context "convert recurring rules into hash" do
   	let(:event_params) { {
@@ -55,16 +54,5 @@ RSpec.describe ScheduledEvent, type: :model do
   	it "set start time value is entered" do
   	  expect(scheduled_event1.start_time).to eq Date.strptime(value, "%m/%d/%Y").to_date
   	end
-
-    describe "class methods" do
-      context "::start_time_for" do
-        ## returns the start time in days for a reqeusted ScheduledEvent, returns nil if nothing is found
-        let!(:existing_event) { create(:scheduled_event, event_name: 'ivl_monthly_enrollment_due_on', start_time: Date.new(2016,1,10) )}
-
-        it "returns the start time in days" do
-          expect(ScheduledEvent.day_of_month_for('ivl_monthly_enrollment_due_on')).to eq(10)
-        end
-      end
-    end
   end
 end

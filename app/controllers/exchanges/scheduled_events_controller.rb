@@ -13,8 +13,8 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
       @scheduled_event.update_attributes!(one_time: false) if @scheduled_event.recurring_rules.present?
       redirect_to exchanges_scheduled_events_path
     else
-      flash[:error] = "Failed to create Scheduled Event"
-      redirect_to exchanges_scheduled_events_path
+      flash[:error] = @scheduled_event.errors.values.flatten.to_sentence
+      render action: :new
     end
   end
 
@@ -60,27 +60,14 @@ before_action :set_event, only: [:show, :edit, :update, :destroy]
     end
   end
 
-  def get_system_events
-  	@events = ScheduledEvent::SYSTEMS_EVENTS
-    if @events.present?
-      render partial: 'exchanges/scheduled_events/get_events_field'
-    else
-      render nothing: true
+  def current_events
+    case params[:event]
+    when 'system'
+      @events = ScheduledEvent::SYSTEM_EVENTS
+    when 'holiday'
+      @events = ScheduledEvent::HOLIDAYS
     end
-  end
-
-  def get_holiday_events
-  	@events = ScheduledEvent::HOLIDAYS
-    if @events.present?
-      render partial: 'exchanges/scheduled_events/get_events_field'
-    else
-      render nothing: true
-    end
-  end
-
-  def no_events
-  	@events = []
-  	render partial: 'exchanges/scheduled_events/get_events_field'
+    render partial: 'exchanges/scheduled_events/get_events_field'
   end
 
   def delete_current_event

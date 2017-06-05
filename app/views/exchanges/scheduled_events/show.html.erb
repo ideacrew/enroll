@@ -22,4 +22,4 @@
 
 <%= link_to 'Back', exchanges_scheduled_events_path, class: "btn btn-default" %>
 <%= link_to "Edit", edit_exchanges_scheduled_event_path(@scheduled_event), class: "btn btn-default" %>
-<%= link_to "Delete This Event", delete_current_event_exchanges_scheduled_events_path(id: @scheduled_event.id, time: @time), class: "btn btn-danger", html: { method: :post } %>
+<%= link_to "Delete This Occurence", delete_current_event_exchanges_scheduled_events_path(id: @scheduled_event.id, time: @time), class: "btn btn-danger", html: { method: :post } %>
