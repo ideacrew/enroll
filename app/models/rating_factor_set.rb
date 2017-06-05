@@ -8,6 +8,8 @@ class RatingFactorSet
   field :default_factor_value, type: Float
   field :carrier_profile_id, type: BSON::ObjectId
 
+  field :max_integer_factor_key, type: Integer
+
   embeds_many :rating_factor_entries
 
   validates_presence_of :carrier_profile_id, :allow_blank => false

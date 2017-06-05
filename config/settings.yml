@@ -126,6 +126,7 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+  use_simple_employer_calculation_model: false
 
 paper_notice: 'paper-notices'
 

@@ -2,6 +2,7 @@ class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
   include ::Eligibility::BenefitGroup
+  include Config::AcaModelConcern
 
   embedded_in :plan_year
 
@@ -463,6 +464,24 @@ class BenefitGroup
 
   # Provide the group size factor for this benefit group.
   def group_size_factor_for(plan)
+    if use_simple_employer_calculation_model?
+      return 1.0
+    end
+    factor_carrier_id = plan.carrier_profile_id
+    @gsf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_gsf_for(k)
+    end
+    @gsf_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_gsf_for(carrier_id)
+    year = plan_year.start_on.year
+    if plan_option_kind == "sole_source"
+      # TODO: get 'actual' group size based on state of plan year
+      EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, group_size_count)
+    else
+      EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, 1)
+    end
   end
 
   # Provide the premium for a given composite rating tier.
@@ -471,6 +490,12 @@ class BenefitGroup
 
   # Provide the contribution factor for a given composite rating tier.
   def composite_employer_contribution_factor_for(composite_rating_tier)
+  end
+
+  # Count of enrolled employees - either estimated or actual depending on plan
+  # year status
+  def group_size_count
+    1
   end
 
   private
