@@ -80,30 +80,18 @@ RSpec.describe Exchanges::ScheduledEventsController do
     end
   end
 
-  describe "GET#get_system_events" do    
+  describe "GET#current_events" do
     before do
-      get :get_system_events
+      get :current_events, event: 'system'
     end
 
     it "should return supported events" do
       expect(response).to render_template(:'exchanges/scheduled_events/_get_events_field')
-      expect(assigns(:events)).to match_array(%W(Binder_Payment_due_Date Publish_Due_Date_Of_Month monthly_enrollment_due_on
-                                                 initial_application_publish_due_day_of_month renewal_application_monthly_open_enrollment_end_on
-                                                 renewal_application_publish_due_day_of_month renewal_application_force_publish_day_of_month
-                                                 open_enrollment_monthly_end_on group_file_new_enrollment_transmit_on
-                                                 group_file_update_transmit_day_of_week))
-    end
-  end
-
-  describe "GET#get_holiday_events" do
-    before do
-      get :get_holiday_events
-    end
-
-    it "should return supported events" do
-      expect(response).to render_template(:'exchanges/scheduled_events/_get_events_field')
-      expect(assigns(:events)).to match_array(%W(New_Year MartinLuthor_birthdday washingtons_day memorial_day independence_day
-                                                 Labour_day columbus_day veterans_day Christmas Thanksgiving_day))
+      expect(assigns(:events)).to match_array(["binder_payment_due_date", "ivl_monthly_open_enrollment_due_on", "publish_due_date_of_month",
+                                               "shop_group_file_new_enrollment_transmit_on", "shop_group_file_update_transmit_day_of_week",
+                                               "shop_initial_application_publish_due_day_of_month", "shop_open_enrollment_monthly_end_on",
+                                               "shop_renewal_application_force_publish_day_of_month", "shop_renewal_application_monthly_open_enrollment_end_on",
+                                               "shop_renewal_application_publish_due_day_of_month"])
     end
   end
 
