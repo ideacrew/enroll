@@ -12,6 +12,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   layout 'single_column'
 
+  EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
+    "2"     => "legal_name",
+    "4"     => "employer_profile.aasm_state",
+    "5"     => "employer_profile.plan_years.start_on"
+  }
+
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
   end
@@ -61,8 +67,25 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
-    person.update_attributes(person_profile_params)
+    # person.update_attributes(person_profile_params)
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
+    office_locations = broker_agency_profile.office_locations
+    office_locations.each do |office_location|
+      # && office_location.phones.kind == “phone main”
+      if person.phones.any?
+        person.phones.first.update_attributes(country_code: office_location.phone.country_code,
+                                              area_code: office_location.phone.area_code,
+                                              number: office_location.phone.number,
+                                              extension: office_location.phone.extension)
+        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
+        person.phones.first.update_attributes(full_phone_number: full_phone)
+      end
+    end
 
+    person.update_attributes(person_profile_params)
+    person.save!
+
+    @broker_agency_profile.update_attributes(languages_spoken_params)
 
 
     if @organization.update_attributes(broker_profile_params)
@@ -110,7 +133,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     query = Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
 
-    @total_records = query.total_count    
+    @total_records = query.total_count
     @records_filtered = query.filtered_count
 
     @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
@@ -200,6 +223,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def employer_datatable
+
+    order_by = EMPLOYER_DT_COLUMN_TO_FIELD_MAP[params[:order]["0"][:column]].try(:to_sym)
+
     cursor        = params[:start]  || 0
     page_size     = params[:length] || 10
 
@@ -214,6 +240,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.unscoped.by_broker_role(broker_role_id)
     end
 
+    if order_by.present?
+      # If searching on column 5 (PY start_on), also sort by aasm_state
+      @orgs = params[:order]["0"][:column] == 5 ? @orgs.order_by(:'employer_profile.plan_years.aasm_state'.asc, order_by.send(params[:order]["0"][:dir])) : @orgs.order_by(order_by.send(params[:order]["0"][:dir]))
+    end
+
     total_records = @orgs.count
 
     if params[:search][:value].present?
@@ -222,7 +253,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
 
     employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
-    employer_ids = employer_profiles.map(&:id)
+    employer_ids = employer_profiles.present? ? employer_profiles.map(&:id) : []
     @census_totals = Hash.new(0)
     census_member_counts = CensusMember.collection.aggregate([
       { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
@@ -238,7 +269,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
     @draw = dt_query.draw
-    @employer_profiles = employer_profiles
+    @employer_profiles = employer_profiles.present? ? employer_profiles : []
     render
   end
 
@@ -363,12 +394,19 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def broker_profile_params
     params.require(:organization).permit(
-      #:employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :legal_name,
+      :dba,
       :office_locations_attributes => [
         :address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip],
         :phone_attributes => [:kind, :area_code, :number, :extension],
         :email_attributes => [:kind, :address]
       ]
+    )
+  end
+
+  def languages_spoken_params
+    params.require(:organization).permit(
+      :languages_spoken => []
     )
   end
 

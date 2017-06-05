@@ -17,10 +17,6 @@
             <% if @employer_profile.present? %>
             <strong><%= @employer_profile.legal_name %></strong><br>
             <% end %>
-            <%
-            if @enrollment.benefit_package_name.present? && !@enrollment.is_cobra_status? %>
-              <strong>Benefit Package: <%= @enrollment.benefit_package_name %></strong><br>
-            <% end %>
             <strong><%= @plan.carrier_profile.legal_name %> <%= @plan.name %></strong><br>
             Benefit: <%= @enrollment.coverage_kind %><br>
             Metal level : <%= display_dental_metal_level @plan %><br>
@@ -44,7 +40,6 @@
 
         <%= render :partial => "insured/plan_shoppings/waive_confirmation", :locals => { :enrollment => @enrollment } if @enrollment.employee_role.present? %>
       </div>
-
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
         <% if @change_plan.blank? && @market_kind == "individual" %>
           <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
