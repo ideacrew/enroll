@@ -17,7 +17,6 @@ describe "exchanges/scheduled_events/index.html.erb" do
     expect(rendered).to have_text(/Previous/)
     expect(rendered).to have_text(/Next/)
     expect(rendered).to have_text(/Create Event/)
-    expect(rendered).to have_text(/Christmas/)
     expect(rendered).to have_text(/Mon/)
     expect(rendered).to have_text(/Tue/)
     expect(rendered).to have_text(/Wed/)
