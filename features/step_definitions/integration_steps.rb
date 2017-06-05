@@ -874,11 +874,11 @@ Then(/^I can click on Shop for Plan button$/) do
 end
 
 Then(/^Page should contain existing qle$/) do
-  expect(page).to have_content 'Would you like to use your existing special enrollment period? "Married"'
+  expect(page).to have_content 'You qualify for a Special Enrollment Period (SEP) because you "Married"'
 end
 
 Then(/^I can click Shop with existing SEP link$/) do
-  click_link "Shop with existing SEP"
+  click_link "Shop Now"
 end
 
 Then(/^I should see the dependents and group selection page$/) do
