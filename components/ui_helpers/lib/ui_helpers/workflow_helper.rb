@@ -21,11 +21,16 @@ module UIHelpers
 
     # Radio Button
     def radio_checked? model, cell
-      cell.value  == model.send(cell.attribute) ? true : false
+      cell.value  == model.send(cell.attribute) ? true : false if cell.attribute.present?
     end
 
     # Dropdown
     def selected_value model, cell
+      model.send(cell.attribute)
+    end
+
+    # Text Input
+    def input_text_value model, cell
       model.send(cell.attribute)
     end
 

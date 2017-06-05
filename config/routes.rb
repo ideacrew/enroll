@@ -36,6 +36,18 @@ Rails.application.routes.draw do
         get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
 
         resources :incomes do
+          put 'step(/:step)', action: 'step', on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+
+        resources :benefits do
+          put :step, on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+
+        resources :deductions do
           put :step, on: :member
           post :step, on: :collection
           get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
