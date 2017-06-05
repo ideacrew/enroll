@@ -111,7 +111,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def show
     @tab = params['tab']
 
-    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id]})
+    # Conditional based columns has to display so we are passing arguments
+    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], renewal: @employer_profile.renewing_plan_year.present?, terminated: ['terminated', 'all'].include?(status), renewal_status: @employer_profile.renewing_published_plan_year.present?})
 
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
