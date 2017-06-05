@@ -12,7 +12,6 @@ describe "exchanges/scheduled_events/show.html.erb" do
   it "should display show page info" do
   	render template: "exchanges/scheduled_events/edit.html.erb"
     expect(rendered).to have_text(/Holiday/)
-    expect(rendered).to have_text(/Christmas/)
     expect(rendered).to have_text(/Offset rule/)
   end
 end
