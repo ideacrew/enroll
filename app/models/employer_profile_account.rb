@@ -116,7 +116,7 @@ private
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      transition_at: TimeKeeper.datetime_of_record.utc
+      transition_at: Time.now.utc
     )
   end
 

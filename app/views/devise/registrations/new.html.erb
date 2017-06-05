@@ -1,3 +1,4 @@
+<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
 <div class="container top-pd module" id='signup'>
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div class="col-md-6 col-sm-8 col-xs-12">
@@ -60,8 +61,10 @@
 
           <%= f.hidden_field :invitation_id %>
           <br/>
+          <div class="recaptcha-error"></div>
+          <div class="recaptcha" id="captcha-widget"></div>
           <div class="actions text-center">
-              <%= f.submit "Create account", class: "btn btn-primary btn-lg g-recaptcha", data: {callback: "submitInvisibleRecaptchaForm", sitekey: "#{recaptcha_site_key}"} %>
+              <%= f.submit "Create account", class: "btn btn-primary btn-lg" %>
               <br/>
               <br/>
             <span>

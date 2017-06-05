@@ -23,7 +23,7 @@ When /^they complete the new general agency form and hit the 'Submit' button$/ d
   FactoryGirl.create(:rate_reference, zip_code: "01002", county: "Franklin", rating_region: "Test Region")
   fill_in 'organization[first_name]', with: Forgery(:name).first_name
   fill_in 'organization[last_name]', with: Forgery(:name).last_name
-  fill_in 'jq_datepicker_ignore_organization[dob]', with: (TimeKeeper.datetime_of_record - rand(20..50).years).strftime('%m/%d/%Y')
+  fill_in 'jq_datepicker_ignore_organization[dob]', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')
   find('.interaction-field-control-organization-email').click
   fill_in 'organization[email]', with: Forgery(:email).address
   fill_in 'organization[npn]', with: '2222222222'

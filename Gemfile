@@ -111,10 +111,14 @@ group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
   gem "parallel_tests"
-  gem 'certified'
 end
 
 group :development, :test do
+  # YARD documentation generation tool: http://yardoc.org/
+  gem 'yard', '~> 0.9.5'
+  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'railroady', '~> 1.5.2'
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'pry'
   gem 'pry-rails'

@@ -1,12 +1,13 @@
 class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
+  include ::Eligibility::BenefitGroup
 
   embedded_in :plan_year
 
   attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-  PLAN_OPTION_KINDS = %w(single_plan single_carrier metal_level)
+  PLAN_OPTION_KINDS = %w(sole_source single_plan single_carrier metal_level)
   EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
   OFFSET_KINDS = [0, 1, 30, 60]
   TERMINATE_ON_KINDS = %w(end_of_month)
@@ -65,6 +66,9 @@ class BenefitGroup
 
   embeds_many :dental_relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
+
+  embeds_many :composite_tier_contributions, cascade_callbacks: true
+  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
 
@@ -167,6 +171,8 @@ class BenefitGroup
 
     if plan_option_kind == "single_plan"
       plans = [reference_plan]
+    elsif plan_option_kind == "sole_source"
+      plans = [reference_plan]
     else
       if plan_option_kind == "single_carrier"
         plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
@@ -189,7 +195,6 @@ class BenefitGroup
 
     set_lowest_and_highest(plans)
   end
-
 
   def set_lowest_and_highest(plans)
     if plans.size > 0
@@ -269,24 +274,6 @@ class BenefitGroup
     return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
   end
 
-  def effective_on_for(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      date_of_hire_effective_on_for(date_of_hire)
-    when "first_of_month"
-      first_of_month_effective_on_for(date_of_hire)
-    end
-  end
-
-  def effective_on_for_cobra(date_of_hire)
-    case effective_on_kind
-    when "date_of_hire"
-      [plan_year.start_on, date_of_hire].max
-    when "first_of_month"
-      [plan_year.start_on, eligible_on(date_of_hire)].max
-    end
-  end
-
   def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
     write_attribute(:employer_max_amt_in_cents, dollars_to_cents(new_employer_max_amt_in_cents))
   end
@@ -314,8 +301,6 @@ class BenefitGroup
        self.dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
-
-
 
   def simple_benefit_list(employee_premium_pct, dependent_premium_pct, employer_max_amount)
     [
@@ -405,6 +390,8 @@ class BenefitGroup
 
   def elected_plans_by_option_kind
     case plan_option_kind
+    when "sole_source"
+      Plan.where(id: reference_plan_id).first
     when "single_plan"
       Plan.where(id: reference_plan_id).first
     when "single_carrier"
@@ -438,39 +425,6 @@ class BenefitGroup
     end
   end
 
-  def eligible_on(date_of_hire)
-    if effective_on_kind == "date_of_hire"
-      date_of_hire
-    else
-      if effective_on_offset == 1
-        date_of_hire.end_of_month + 1.day
-      else
-        if (date_of_hire + effective_on_offset.days).day == 1
-          (date_of_hire + effective_on_offset.days)
-        else
-          (date_of_hire + effective_on_offset.days).end_of_month + 1.day
-        end
-      end
-    end
-  end
-
-  ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-  def valid_plan_year    
-    if employer_profile.is_coversion_employer?
-      plan_year.coverage_period_contains?(employer_profile.registered_on) ? plan_year.employer_profile.renewing_plan_year : plan_year
-    else
-      plan_year
-    end
-  end
-
-  def date_of_hire_effective_on_for(date_of_hire)
-    [valid_plan_year.start_on, date_of_hire].max
-  end
-
-  def first_of_month_effective_on_for(date_of_hire)
-    [valid_plan_year.start_on, eligible_on(date_of_hire)].max
-  end
-
   def delete_benefit_group_assignments_and_enrollments # Also assigns default benefit group assignment
     self.employer_profile.census_employees.each do |ce|
       benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
@@ -482,9 +436,41 @@ class BenefitGroup
         end
 
         benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
-        ce.find_or_build_benefit_group_assignment(benefit_groups.first)
+        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
       end
     end
+  end
+
+  # Interface for composite and list bill.
+  # Defines the methods needed for calculation of both composite and list
+  # bill values.
+
+  # Provide the sic factor for this benefit group.
+  def sic_factor_for(plan)
+  end
+
+  # Provide the base factor for this composite rating tier.
+  def composite_rating_tier_factor_for(composite_rating_tier)
+  end
+
+  # Provide the rating area value for this benefit group.
+  def rating_area
+  end
+
+  # Provide the participation rate factor for this group.
+  def composite_participation_rate_factor_for(plan)
+  end
+
+  # Provide the group size factor for this benefit group.
+  def group_size_factor_for(plan)
+  end
+
+  # Provide the premium for a given composite rating tier.
+  def composite_rating_tier_premium_for(composite_rating_tier)
+  end
+
+  # Provide the contribution factor for a given composite rating tier.
+  def composite_employer_contribution_factor_for(composite_rating_tier)
   end
 
   private

@@ -1,0 +1,2 @@
+class SicCodeRatingFactorSet < RatingFactorSet
+end
