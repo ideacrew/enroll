@@ -2,7 +2,6 @@ module Factories
   class FamilyEnrollmentRenewalFactory
     include Mongoid::Document
 
-    # Renews a family's active enrollments from current plan year
     attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications
 
     def initialize
@@ -101,7 +100,7 @@ module Factories
 
     def trigger_notice
       if !disable_notifications
-        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield)
+        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
       end
     end
 

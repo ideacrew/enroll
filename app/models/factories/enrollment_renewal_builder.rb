@@ -12,13 +12,6 @@ module Factories
       end
     end
 
-    def renewal_builder(active_enrollment)
-      renewal_enrollment = family.active_household.hbx_enrollments.new
-      renewal_enrollment = assign_common_attributes(active_enrollment, renewal_enrollment)
-      renewal_enrollment.renew_enrollment
-      renewal_enrollment
-    end
-
     def save_renewal_enrollment(renewal_enrollment, active_enrollment)
       if renewal_enrollment.save
         renewal_enrollment
@@ -46,7 +39,7 @@ module Factories
 
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
-
+       
       if @census_employee.renewal_benefit_group_assignment.blank?
         @census_employee.add_renew_benefit_group_assignment(@renewing_plan_year.benefit_groups.first)
       end

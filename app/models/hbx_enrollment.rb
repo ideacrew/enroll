@@ -537,7 +537,6 @@ class HbxEnrollment
   def update_renewal_coverage
     if is_shop?
       if self.benefit_group.plan_year.is_published?
-
         renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
 
         if renewal_plan_year.present?
@@ -550,10 +549,7 @@ class HbxEnrollment
           renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
 
           begin
-            factory = Factories::FamilyEnrollmentRenewalFactory.new
-            factory.enrollment = self
-            factory.disable_notifications = true
-            factory.renew
+            Factories::ShopEnrollmentRenewalFactory.new({enrollment: self}).update_passive_renewal
           rescue Exception => e
             Rails.logger.error { e }
           end

@@ -36,7 +36,6 @@ FactoryGirl.define do
       plan_year_state 'draft'
       renewal_plan_year_state 'renewing_draft'
       reference_plan_id { FactoryGirl.create(:plan).id }
-      # elected_plan_ids { FactoryGirl.build(:plan).to_a.map(&:id) }
       renewal_reference_plan_id { FactoryGirl.create(:plan).id }
       dental_reference_plan_id nil
       dental_renewal_reference_plan_id nil

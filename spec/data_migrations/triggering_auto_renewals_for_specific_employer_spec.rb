@@ -57,8 +57,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "auto_renewing").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "auto_renewing").size).to eq 1
       end
 
       it "should trigger a renewing waived enrollment if the previous existing enrollment is inactive", dbclean: :after_each do
@@ -66,8 +66,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 2
-        expect(household.hbx_enrollments.where(aasm_state: "renewing_waived").size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 2
+        expect(household.hbx_enrollments.by_coverage_kind('health').where(aasm_state: "renewing_waived").size).to eq 1
       end
 
       it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
@@ -76,7 +76,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 1
       end
     end
 
@@ -90,8 +90,8 @@ describe TriggeringAutoRenewalsForSpecificEmployer do
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
-        expect(household.hbx_enrollments.size).to eq 1
-        expect(household.hbx_enrollments.first.aasm_state).to eq "renewing_waived"
+        expect(household.hbx_enrollments.by_coverage_kind('health').size).to eq 1
+        expect(household.hbx_enrollments.by_coverage_kind('health').first.aasm_state).to eq "renewing_waived"
       end
     end
   end
