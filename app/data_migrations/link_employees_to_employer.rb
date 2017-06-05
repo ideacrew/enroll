@@ -2,11 +2,11 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class LinkEmployeesToEmployer < MongoidMigrationTask
   def migrate
-    ce1 = CensusEmployee.find(ENV['ce1'].to_s)
-    ce2 = CensusEmployee.find(ENV['ce2'].to_s)
-    ce3 = CensusEmployee.find(ENV['ce3'].to_s)
-    ce4 = CensusEmployee.find(ENV['ce4'].to_s)
-    ce5 = CensusEmployee.find(ENV['ce5'].to_s)
+    ce1 = CensusEmployee.find(ENV['ce1'])
+    ce2 = CensusEmployee.find(ENV['ce2'])
+    ce3 = CensusEmployee.find(ENV['ce3'])
+    ce4 = CensusEmployee.find(ENV['ce4'])
+    ce5 = CensusEmployee.find(ENV['ce5'])
     if ce1.present?
       ce1.link_employee_role!
     else

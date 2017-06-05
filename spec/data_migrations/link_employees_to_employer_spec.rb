@@ -1,11 +1,12 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "link_employees_to_employer")
 
-describe LinkEmployeesToEmployer do
-  describe "given a task name" do
-    let(:given_task_name) { "termiante_census_employee" }
-    subject { LinkEmployeesToEmployer.new(given_task_name, double(:current_scope => nil)) }
+describe LinkEmployeesToEmployer, dbclean: :after_each do
 
+  let(:given_task_name) { "link_employees_to_employer" }
+  subject { LinkEmployeesToEmployer.new(given_task_name, double(:current_scope => nil)) }
+
+  describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
     end
@@ -24,18 +25,30 @@ describe LinkEmployeesToEmployer do
     let(:census_employee5) { FactoryGirl.create(:census_employee, employer_profile_id: plan_year.employer_profile.id)}
     
     before(:each) do
-      binding.pry
-      allow(ENV).to receive(:[]).with('ce1').and_return census_employee
+      allow(ENV).to receive(:[]).with("ce1").and_return census_employee
       allow(ENV).to receive(:[]).with("ce2").and_return census_employee2
       allow(ENV).to receive(:[]).with("ce3").and_return census_employee3
       allow(ENV).to receive(:[]).with("ce4").and_return census_employee4
       allow(ENV).to receive(:[]).with("ce5").and_return census_employee5
     end
-    
-    it "employees should have eligible state" do
-      #plan_year.update(aasm_state:'published')
-      #subject.migrate
+    it "employees should have eligible state then employee role linked states" do
+      plan_year.update(aasm_state:'published')
+      expect(census_employee.aasm_state).to eq "eligible"
+      expect(census_employee2.aasm_state).to eq "eligible"
+      expect(census_employee3.aasm_state).to eq "eligible"
+      expect(census_employee4.aasm_state).to eq "eligible"
+      expect(census_employee5.aasm_state).to eq "eligible"
+      subject.migrate
+      census_employee.reload
+      census_employee2.reload
+      census_employee3.reload
+      census_employee4.reload
+      census_employee5.reload
+      expect(census_employee.aasm_state).to eq "employee_role_linked"
+      expect(census_employee2.aasm_state).to eq "employee_role_linked"
+      expect(census_employee3.aasm_state).to eq "employee_role_linked"
+      expect(census_employee4.aasm_state).to eq "employee_role_linked"
+      expect(census_employee5.aasm_state).to eq "employee_role_linked"
     end
-  end
-    
+  end 
 end
