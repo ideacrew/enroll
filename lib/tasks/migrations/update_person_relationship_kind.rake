@@ -3,5 +3,5 @@ require File.join(Rails.root, "app", "data_migrations", "update_person_relations
 # RAILS_ENV=production bundle exec rake migrations:update_person_relationship_kind hbx_id=19810245
 namespace :migrations do
   desc "Changing relationship kind for person record"
-  ChangeRelationshipKind.define_task :update_person_relationship_kind => :environment
+  UpdatePersonRelationshipKind.define_task :update_person_relationship_kind => :environment
 end 
