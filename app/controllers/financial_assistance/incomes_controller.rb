@@ -14,6 +14,10 @@
   def step
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
+
+    model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
+    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
+
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
 
     if params.key?(:step)

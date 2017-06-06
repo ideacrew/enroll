@@ -130,8 +130,7 @@ private
 
   def start_on_must_precede_end_on
     return unless start_on.present? && end_on.present?
-    # TODO : Fix this validation. Getting wrong end_on date from what is selected in the UI
-    #errors.add(:end_on, "can't occur before start on date") if end_on < start_on
+    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
   end
 
 end
