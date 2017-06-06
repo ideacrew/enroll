@@ -58,9 +58,9 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show_employee
-    @employee_id = params[:employee_id]
+    @employee_id = params[:census_employee_id]
+   @census_employee = CensusEmployee.find(params[:census_employee])
   end
-
 
   def update
     authorize EmployerProfile, :updateable?

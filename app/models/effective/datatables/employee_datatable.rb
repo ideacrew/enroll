@@ -58,11 +58,11 @@ module Effective
           dropdown = [
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
               ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
-              ['Terminate', employers_employer_profile_census_employee_show_employee_path(@employer_profile, row), 'ajax'],
+              ['Terminate', show_employee_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: "census_employeeid_#{row.id.to_s}", census_employee: row.id), 'ajax'],
               ['Rehire', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static'],
               ['Initiate Cobra', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static']
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "census_employeeid_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
