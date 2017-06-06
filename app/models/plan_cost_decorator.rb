@@ -79,7 +79,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def reference_plan_member_premium(member)
-    Caches::PlanDetails.lookup_rate(reference_plan.id, plan_year_start_on, age_of(member))
+    Caches::PlanDetails.lookup_rate(reference_plan.id, plan_year_start_on, age_of(member)) * (benefit_group.sic_factor_for(@plan).to_f * benefit_group.group_size_factor_for(@plan).to_f)
   end
 
   def reference_premium_for(member)
@@ -92,8 +92,8 @@ class PlanCostDecorator < SimpleDelegator
 
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
-    if relationship_benefit && relationship_benefit.offered?
-      value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member))
+    if relationship_benefit && relationship_benefit.offered? && benefit_group
+      value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member)) * (benefit_group.sic_factor_for(@plan).to_f * benefit_group.group_size_factor_for(@plan).to_f)
       BigDecimal.new("#{value}").round(2).to_f
     else
       0.00
