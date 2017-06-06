@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_organization")
 
-describe RemoveOrganization do
+describe RemoveOrganization, dbclean: :after_each do
 
   let(:given_task_name) { "remove_organization" }
   subject { RemoveOrganization.new(given_task_name, double(:current_scope => nil)) }
