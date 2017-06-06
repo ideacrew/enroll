@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "move_enrollment_between_two_accounts")
 
-describe MoveEnrollmentBetweenTwoAccount do
+describe MoveEnrollmentBetweenTwoAccount, dbclean: :after_each do
 
   let(:given_task_name) { "move_enrollment_between_two_accounts" }
   subject { MoveEnrollmentBetweenTwoAccount.new(given_task_name, double(:current_scope => nil)) }

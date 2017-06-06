@@ -1,11 +1,11 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "update_user_or_person_records")
 
-describe UpdateUserOrPersonRecords do
-  
+describe UpdateUserOrPersonRecords, dbclean: :after_each do
+
   let(:given_task_name) { "update_user_or_person_records" }
   subject { UpdateUserOrPersonRecords.new(given_task_name, double(:current_scope => nil)) }
-  
+
   describe "given a task name" do
     it "has the given task name" do
       expect(subject.name).to eql given_task_name
@@ -13,8 +13,8 @@ describe UpdateUserOrPersonRecords do
   end
 
   describe "update username & email on user and also destroying headless user", dbclean: :after_each do
-    
-    let(:user) { FactoryGirl.create(:user, :with_family)}    
+
+    let(:user) { FactoryGirl.create(:user, :with_family)}
     before do
       allow(ENV).to receive(:[]).with('action').and_return ""
       allow(ENV).to receive(:[]).with('user_email').and_return user.email
@@ -23,7 +23,7 @@ describe UpdateUserOrPersonRecords do
       allow(ENV).to receive(:[]).with('find_user_by').and_return "email"
       allow(ENV).to receive(:[]).with('hbx_id').and_return nil
     end
-    
+
     it "should update the username on the user" do
       allow(ENV).to receive(:[]).with('action').and_return "update_UserName"
       allow(ENV).to receive(:[]).with('user_name').and_return "UpdatE@This"
