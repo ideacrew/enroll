@@ -171,6 +171,7 @@ GEM
       timers (>= 4.1.1)
     celluloid-supervision (0.20.5)
       timers (>= 4.1.1)
+    certified (1.0.0)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
     cliver (0.3.2)
@@ -612,6 +613,7 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  certified
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
