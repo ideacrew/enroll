@@ -495,7 +495,11 @@ class BenefitGroup
   # Count of enrolled employees - either estimated or actual depending on plan
   # year status
   def group_size_count
-    1
+    if plan_year.estimate_group_size?
+      census_employees.select { |ce| ce.expected_to_enroll? }.length
+    else
+      1
+    end 
   end
 
   private

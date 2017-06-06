@@ -742,6 +742,12 @@ class CensusEmployee < CensusMember
     enrollments.compact.uniq
   end
 
+
+  # TODO: Implement for 16019 and children
+  def expected_to_enroll?
+    raise NotImplementedError.new("Implement when employers can specify who they expect to enroll.")
+  end
+
   private
 
   def record_transition

@@ -51,16 +51,24 @@ end
 
 describe BenefitGroup, "for a plan year which should estimate the group size" do
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
-  let(:estimated_enrolling_employees) { double }
+
+  let(:census_employees) do
+    [
+      instance_double(CensusEmployee, :expected_to_enroll? => true),
+      instance_double(CensusEmployee, :expected_to_enroll? => true),
+      instance_double(CensusEmployee, :expected_to_enroll? => false)
+    ]
+  end
   
   subject { BenefitGroup.new(:plan_year => plan_year) }
 
   before :each do
-    allow(plan_year).to receive(:estimate_group_size?).and_return(false)
+    allow(plan_year).to receive(:estimate_group_size?).and_return(true)
+    allow(CensusEmployee).to receive(:find_all_by_benefit_group).with(subject).and_return(census_employees)
   end
 
   it "provides the group_size_count based on the employees expected to enroll" do
-    expect(subject.group_size_count).to eq estimated_enrolling_employees
+    expect(subject.group_size_count).to eq 2
   end
 end
 
