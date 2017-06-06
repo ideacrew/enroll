@@ -15,8 +15,6 @@ module Factories
 
       raise FamilyEnrollmentRenewalFactoryError, 'Active plan year missing' if @active_plan_year.blank?
 
-      verify_and_populate_benefit_group_assignment
-
       HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
         next unless employer_offering_coverage_kind?(coverage_kind)
         active_enrollment = find_active_coverage(coverage_kind)
@@ -78,14 +76,6 @@ module Factories
         (census_employee.renewal_benefit_group_assignment.benefit_group.is_offering_dental?) : true
     end
 
-    def verify_and_populate_benefit_group_assignment
-      if census_employee.renewal_benefit_group_assignment.blank?
-        benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
-        census_employee.add_renew_benefit_group_assignment(benefit_group)
-        census_employee.save!
-      end
-    end
-
     def renew_enrollment(enrollment: nil, waiver: false, coverage_kind:)
       ShopEnrollmentRenewalFactory.new({
         family: family, 
@@ -106,13 +96,7 @@ module Factories
 
     def renewal_plan_offered_by_er?(enrollment)
       if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
-        if census_employee.renewal_benefit_group_assignment.blank?
-          benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
-          census_employee.add_renew_benefit_group_assignment(benefit_group)
-          census_employee.save!
-        end
-        
-        benefit_group = census_employee.renewal_benefit_group_assignment.benefit_group
+        benefit_group = census_employee.renewal_benefit_group_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
         elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
       else

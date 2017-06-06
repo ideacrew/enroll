@@ -72,7 +72,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
 
       it "should not trigger an enrollment if we already have an enrollment with renewing plan year", dbclean: :after_each do
         hbx_enrollment.update_attributes(:benefit_group_id => organization.employer_profile.renewing_plan_year.benefit_groups.first.id, :benefit_group_assignment => census_employee.renewal_benefit_group_assignment)
-        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on + 1.month)
+        hbx_enrollment.update_attribute(:effective_on, organization.employer_profile.renewing_plan_year.start_on)
         subject.migrate
         household = organization.employer_profile.census_employees.first.employee_role.person.primary_family.active_household
         household.reload
