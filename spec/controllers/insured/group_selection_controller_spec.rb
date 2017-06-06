@@ -243,7 +243,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     context "when keep_existing_plan" do
       let(:old_hbx) { HbxEnrollment.new }
-      let(:special_enrollment) { FactoryGirl.build(:special_enrollment_period) }
+      let(:special_enrollment) { FactoryGirl.build(:special_enrollment_period, family: family) }
       before :each do
         user = FactoryGirl.create(:user, person: FactoryGirl.create(:person))
         sign_in user
