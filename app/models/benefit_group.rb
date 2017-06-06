@@ -448,6 +448,19 @@ class BenefitGroup
 
   # Provide the sic factor for this benefit group.
   def sic_factor_for(plan)
+    if use_simple_employer_calculation_model?
+      return 1.0
+    end
+    factor_carrier_id = plan.carrier_profile_id
+    @scff_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_scf_for(k)
+    end
+    @scff_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_scf_for(carrier_id)
+    year = plan_year.start_on.year
+    SicCodeRatingFactorSet.value_for(carrier_id, year, plan_year.sic_code)
   end
 
   # Provide the base factor for this composite rating tier.
@@ -456,10 +469,28 @@ class BenefitGroup
 
   # Provide the rating area value for this benefit group.
   def rating_area
+    @rating_area ||= plan_year.rating_area
   end
 
   # Provide the participation rate factor for this group.
   def composite_participation_rate_factor_for(plan)
+    factor_carrier_id = plan.carrier_profile_id
+    @cprf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_cprf_for(k)
+    end
+    @cprf_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_cprf_for(carrier_id)
+    year = plan_year.start_on.year
+    waived_and_active_count = if plan_year.estimate_group_size?
+                                census_employees.select { |ce| ce.expected_to_enroll? }.length
+                              else
+                                all_active_and_waived_health_enrollments.length
+                              end 
+    total_employees = census_employees.count
+    part_rate = waived_and_active_count/(total_employees * 1.0)
+    EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, part_rate)
   end
 
   # Provide the group size factor for this benefit group.
@@ -477,7 +508,6 @@ class BenefitGroup
   def lookup_cached_gsf_for(carrier_id)
     year = plan_year.start_on.year
     if plan_option_kind == "sole_source"
-      # TODO: get 'actual' group size based on state of plan year
       EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, group_size_count)
     else
       EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, 1)
@@ -500,6 +530,14 @@ class BenefitGroup
     else
       all_active_health_enrollments.length
     end 
+  end
+
+  def all_active_and_waived_health_enrollments
+    benefit_group_assignments.flat_map do |bga|
+      bga.active_and_waived_enrollments.reject do |en|
+        en.dental?
+      end
+    end
   end
 
   def all_active_health_enrollments
