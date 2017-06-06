@@ -13,7 +13,7 @@ module Effective
         end
 
         table_column :EmployeeName, :width => '50px', :proc => Proc.new { |row|
-          (link_to row.full_name, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>")
+          (link_to row.full_name, employers_employer_profile_census_employee_path(@employer_profile.id, row.id)) + raw("<br>")
         }, :sortable => false, :filter => false
 
          table_column :dob, :label => 'DOB', :proc => Proc.new { |row|
@@ -56,8 +56,9 @@ module Effective
 
          table_column :Action, :width => '50px', :proc => Proc.new { |row|
            dropdown = [
+               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
                ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
-               ['Terminate', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static'],
+               ['Terminate', employers_employer_profile_census_employee_show_employee_path(@employer_profile, row), 'ajax'],
                ['Rehire', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static'],
                ['Initiate Cobra', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static']
            ]

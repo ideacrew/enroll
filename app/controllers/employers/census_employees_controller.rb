@@ -57,6 +57,16 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
+  def show_employee
+    getActionParams
+    @employee_id = params[:employee_id]
+  end
+
+  def getActionParams
+
+  end
+
+
   def update
     authorize EmployerProfile, :updateable?
     @status = params[:status]
