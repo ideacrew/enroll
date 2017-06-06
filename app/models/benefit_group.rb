@@ -464,7 +464,18 @@ class BenefitGroup
   end
 
   # Provide the base factor for this composite rating tier.
-  def composite_rating_tier_factor_for(composite_rating_tier)
+  def composite_rating_tier_factor_for(composite_rating_tier, plan)
+    factor_carrier_id = plan.carrier_profile_id
+    lookup_key = [factor_carrier_id, composite_rating_tier]
+    @crtbf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_crtbf_for(k)
+    end
+    @crtbf_cache[lookup_key]
+  end
+
+  def lookup_cached_crtbf_for(carrier_tier_pair)
+    year = plan_year.start_on.year
+    CompositeRatingTierFactorSet.value_for(carrier_tier_pair.first, year, carrier_tier_pair.last)
   end
 
   # Provide the rating area value for this benefit group.
@@ -516,10 +527,28 @@ class BenefitGroup
 
   # Provide the premium for a given composite rating tier.
   def composite_rating_tier_premium_for(composite_rating_tier)
+    @crtp_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_crtp_for(k)
+    end
+    @crtp_cache[composite_rating_tier]
+  end
+
+  def lookup_cached_crtp_for(composite_rating_tier)
+    ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+    plan_year.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
   end
 
   # Provide the contribution factor for a given composite rating tier.
   def composite_employer_contribution_factor_for(composite_rating_tier)
+    @cecf_cache ||= Hash.new do |h, k|
+       h[k] = lookup_cached_eccf_for(k)
+    end
+    @cecf_cache[composite_rating_tier]
+  end
+
+  def lookup_cached_eccf_for(composite_rating_tier)
+    ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+    ct_contribution.contribution_factor
   end
 
   # Count of enrolled employees - either estimated or actual depending on plan
