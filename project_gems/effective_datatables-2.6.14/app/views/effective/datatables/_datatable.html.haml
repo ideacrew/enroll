@@ -7,7 +7,7 @@
       'effective-form-inputs' => defined?(EffectiveFormInputs),
       'bulk-actions' => datatable_bulk_actions(datatable),
       'columns' => datatable_columns(datatable),
-      'input-js-options' => false,
+      'input-js-options' => local_assigns[:input_js_options],
       'simple' => datatable.simple?.to_s,
       'source' => effective_datatables.datatable_path(datatable, {format: 'json'}.merge(attributes: datatable.attributes)).chomp('?'),
       'default-order' => datatable_default_order(datatable),
@@ -16,9 +16,11 @@
       'total-records' => (datatable.to_json[:recordsTotal] || 0)
     }
   }
+
 - effective_model = effective_datatable_params[:id].split('-table')[0].camelcase
 - effective_model_class = "Effective::Datatables::#{effective_model}"
 - effective_filter = effective_model_class.constantize.new.try(:nested_filter_definition)
+
 .container
   - if effective_filter
     = render partial: '/datatables/shared/filter', locals: {filters: effective_filter}

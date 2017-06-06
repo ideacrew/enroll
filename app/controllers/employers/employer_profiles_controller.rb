@@ -201,11 +201,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def show_pending
   end
 
-
-  def show_employee
-    @employee_replace = params[:census_employee_id]
-  end
-
   def update
     sanitize_employer_profile_params
     params.permit!

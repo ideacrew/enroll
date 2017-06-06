@@ -1,39 +1,38 @@
 <% if @search %>
-<% if @census_employees.present? %>
-<% else %>
-<h4>No results found</h4>
+    <% if @census_employees.present? %>
+    <% else %>
+        <h4>No results found</h4>
+    <% end %>
 <% end %>
-<% end %>
-      <div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 10%;">
-        <div class="row">
-            <%= pundit_span(EmployerProfile, :updateable?) %>
-            <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add New Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
-        </div>
-      </div>
+<div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 10%;">
+  <div class="row">
+    <%= pundit_span(EmployerProfile, :updateable?) %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add New Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
+  </div>
+</div>
 
-      <div style="width:90%">
-        <%= raw render_datatable(@datatable)  %>
-      </div>
-      <script type="text/javascript" charset="utf-8">
-          initializeDataTables();
-          $('.buttons-csv').hide()
-          $('.buttons-excel').hide()
-      </script>
-        <style>
-          .container
-          {
-            width:100%;
-          }
-        </style>
+<div style="width:90%">
+  <%= raw render_datatable(@datatable) %>
+</div>
+<script type="text/javascript" charset="utf-8">
+    initializeDataTables();
+    $('.buttons-csv').hide()
+    $('.buttons-excel').hide()
+</script>
+<style>
+  .container {
+    width: 100%;
+  }
+</style>
 
-    <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
-    <div class="row">
-      <div class="col-md-9">
-        <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
+<%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
+<div class="row">
+  <div class="col-md-9">
+    <% if (@total_census_employees_quantity.present? || !params[:page].nil?) && (@total_census_employees_quantity != @census_employees.count) %>
         <%= render 'shared/alph_paginate', url: employers_employer_profile_path(@employer_profile), alphs: @page_alphabets, remote: true, status: status, full_index_url: employers_employer_profile_path(@employer_profile, status: status, employee_name: params[:employee_name]) %>
-        <% end %>
-      </div>
-      <div class="col-md-3 text-right content-bottom">
-        <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
-      </div>
-    </div>
+    <% end %>
+  </div>
+  <div class="col-md-3 text-right content-bottom">
+    <h4><%= "#{@census_employees.count} out of #{@total_census_employees_quantity}" if @total_census_employees_quantity.present? %></h4>
+  </div>
+</div>

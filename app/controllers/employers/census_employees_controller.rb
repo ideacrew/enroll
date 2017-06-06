@@ -58,12 +58,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def show_employee
-    getActionParams
     @employee_id = params[:employee_id]
-  end
-
-  def getActionParams
-
   end
 
 
