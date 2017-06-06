@@ -59,12 +59,12 @@ RSpec.describe ScheduledEvent, type: :model do
   end
   
   context "Calender Event" do
-    let(:schedule_event_with_empty_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, :offset_3)}
-    let(:scheduled_event_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, :offset_3)}
-    let(:friday_offset_1) { FactoryGirl.create(:scheduled_event, :offset_1, :start_on_friday)}
-    let(:friday_offset_2) { FactoryGirl.create(:scheduled_event, :offset_2, :start_on_friday) }
-    let(:sunday_offset_1) { FactoryGirl.create(:scheduled_event, :offset_1, :start_on_sunday) }
-    let(:saturday_offset_1) { FactoryGirl.create(:scheduled_event, :offset_4, :start_on_saturday) }
+    let(:schedule_event_with_empty_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, offset_rule: 3)}
+    let(:scheduled_event_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, offset_rule: 3)}
+    let(:friday_offset_1) { FactoryGirl.create(:scheduled_event, :start_on_friday, offset_rule: 1)}
+    let(:friday_offset_2) { FactoryGirl.create(:scheduled_event, :start_on_friday, offset_rule: 2) }
+    let(:sunday_offset_1) { FactoryGirl.create(:scheduled_event, :start_on_sunday, offset_rule: 1) }
+    let(:saturday_offset_1) { FactoryGirl.create(:scheduled_event, :start_on_saturday, offset_rule: 4) }
 
     it "should get self event" do
       array = schedule_event_with_empty_recurring_rules.calendar_events(schedule_event_with_empty_recurring_rules.start_time, 4)
