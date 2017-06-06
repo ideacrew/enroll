@@ -13,7 +13,7 @@ class ChangePersonNameSuffix < MongoidMigrationTask
   end
 
   def migrate
-    filename = "people_with_potential_bad_suffixes.csv"
+    filename = ENV['filename']
 
     CSV.foreach(filename, headers: true) do |csv_row|
       process_row(csv_row)
