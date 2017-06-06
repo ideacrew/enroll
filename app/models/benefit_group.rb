@@ -561,6 +561,14 @@ class BenefitGroup
     end 
   end
 
+  def composite_rating_enrollment_objects
+    if plan_year.estimate_group_size?
+      census_employees.select { |ce| ce.expected_to_enroll? }
+    else
+      all_active_health_enrollments
+    end 
+  end
+
   def all_active_and_waived_health_enrollments
     benefit_group_assignments.flat_map do |bga|
       bga.active_and_waived_enrollments.reject do |en|
