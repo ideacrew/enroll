@@ -4,7 +4,7 @@ FactoryGirl.define do
     first_name 'John'
     # middle_name 'X'
     sequence(:last_name) {|n| "Smith#{n}" }
-    name_sfx 'Jr'
+    # name_sfx 'Jr'
     dob "1972-04-04".to_date
     is_incarcerated false
     is_active true
