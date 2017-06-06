@@ -29,9 +29,8 @@
       flash[:notice] = 'Income Info Added.'
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
     else
-      render 'workflow/step' 
+      render 'workflow/step'
     end
-    
   end
 
   private

@@ -1,12 +1,12 @@
 class FinancialAssistance::DeductionsController < ApplicationController
   include UIHelpers::WorkflowController
 
-  before_filter :find_applicant
+  before_filter :find_application_and_applicant
 
   def new
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
-    current_step 
+    current_step
     render 'workflow/step'
   end
 
@@ -32,7 +32,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     @model.save!
 
     if @steps.last_step?(@current_step) && params[model_name].present?
-      flash[:notice] = 'Income Info Added.'
+      flash[:notice] = 'Deduction Info Added.'
       redirect_to edit_financial_assistance_application_path(@application)
     else
       render 'workflow/step'
@@ -41,25 +41,16 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
 
   private
+  def find_application_and_applicant
+    @application = FinancialAssistance::Application.find(params[:application_id])
+    @applicant = @application.applicants.find(params[:applicant_id])
+  end
 
   def create
     FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
   end
 
-  def find_applicant
-      @application = FinancialAssistance::Application.find(params[:application_id])
-  end
-
   def permit_params(attributes)
     attributes.permit!
   end
-
-  def find
-    begin
-      FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:income_id])
-    rescue
-      nil
-    end
-  end
-  
 end
