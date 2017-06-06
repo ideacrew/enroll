@@ -296,6 +296,69 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP13',
+    title: 'Open Enrollment Reminder',
+    description: 'This notices goes to all the employees in the open enrollment period',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_reminder',
+    notice_triggers: [
+      {
+        name: 'Employee Open Enrollment Reminder Notice',
+        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
+        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
+        mpi_indicator: 'MPI_SHOP13',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP14',
+    title: 'Open Enrollment Completed',
+    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
+    resource_name: 'employer',
+    event_name: 'initial_employer_open_enrollment_completed',
+    notice_triggers: [
+      {
+        name: 'Initial Employee Open Enrollment Successfully Completed',
+        notice_template: 'notices/shop_employee_notices/17_initial_ee_open_enrollment_completed',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
+        mpi_indicator: 'MPI_SHOP14',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP15',
+    title: 'Notice of Low Enrollment - Action Needed',
+    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
+    resource_name: 'employer',
+    event_name: 'low_enrollment_notice_for_employer',
+    notice_triggers: [
+      {
+        name: 'Low Enrollment Notice',
+        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOP15',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP16',
     title: 'Application to Offer Group Health Coverage in DC Health Link',
     description: 'When Employer application meets minimum participation and non-owner requirements',
@@ -338,27 +401,6 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP13',
-    title: 'Open Enrollment Reminder',
-    description: 'This notices goes to all the employees in the open enrollment period',
-    resource_name: 'employee_role',
-    event_name: 'employee_open_enrollment_reminder',
-    notice_triggers: [
-      {
-        name: 'Employee Open Enrollment Reminder Notice',
-        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
-        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-        mpi_indicator: 'MPI_SHOP13',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employee"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
     hbx_id: 'SHOP19',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
@@ -391,48 +433,6 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
         mpi_indicator: 'MPI_SHOP20',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP14',
-    title: 'Open Enrollment Completed',
-    description: 'All initial Employers who complete their initial Open Enrollment Period and satisfy the minimum participation and non-owner enrollmnet requirements',
-    resource_name: 'employer',
-    event_name: 'initial_employer_open_enrollment_completed',
-    notice_triggers: [
-      {
-        name: 'Initial Employee Open Enrollment Successfully Completed',
-        notice_template: 'notices/shop_employee_notices/17_initial_ee_open_enrollment_completed',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP14',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP15',
-    title: 'Notice of Low Enrollment - Action Needed',
-    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
-    resource_name: 'employer',
-    event_name: 'low_enrollment_notice_for_employer',
-    notice_triggers: [
-      {
-        name: 'Low Enrollment Notice',
-        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
-        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOP15',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -496,6 +496,69 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
         notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
         mpi_indicator: 'MPI_SHOP28',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP29',
+    title: 'Group Renewal – Final Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer publishing deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_final_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP29',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP30',
+    title: 'Group Renewal – Second Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 1 day prior to the renewal employer soft deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_second_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP30',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP31',
+    title: 'Group Renewal – First Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer soft deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_first_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP31',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
