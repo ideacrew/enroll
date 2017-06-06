@@ -10,6 +10,9 @@ describe "exchanges/scheduled_events/show.html.erb" do
   end
 
   it "should display show page info" do
+    def view.scheduled_event
+      @scheduled_event ||= ScheduledEvent.find(params[:id])
+    end
   	render template: "exchanges/scheduled_events/show"
   	expect(rendered).to have_text(/Events/)
     expect(rendered).to have_text(/Event Type/)
