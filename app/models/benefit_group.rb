@@ -498,8 +498,16 @@ class BenefitGroup
     if plan_year.estimate_group_size?
       census_employees.select { |ce| ce.expected_to_enroll? }.length
     else
-      1
+      all_active_health_enrollments.length
     end 
+  end
+
+  def all_active_health_enrollments
+    benefit_group_assignments.flat_map do |bga|
+      bga.active_enrollments.reject do |en|
+        en.dental?
+      end
+    end
   end
 
   private

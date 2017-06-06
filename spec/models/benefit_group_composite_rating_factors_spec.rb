@@ -75,14 +75,20 @@ end
 describe BenefitGroup, "for a plan year which should NOT estimate the group size" do
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
   let(:employee_enrollment_count) { double }
+  let(:benefit_group_assignment_1) { instance_double(BenefitGroupAssignment, :active_enrollments => [enrollment_1, enrollment_2]) }
+  let(:benefit_group_assignment_2) { instance_double(BenefitGroupAssignment, :active_enrollments => [enrollment_3]) }
+  let(:enrollment_1) { instance_double(HbxEnrollment, :dental? => false) }
+  let(:enrollment_2) { instance_double(HbxEnrollment, :dental? => true) }
+  let(:enrollment_3) { instance_double(HbxEnrollment, :dental? => false) }
   
   subject { BenefitGroup.new(:plan_year => plan_year) }
 
   before :each do
     allow(plan_year).to receive(:estimate_group_size?).and_return(false)
+    allow(BenefitGroupAssignment).to receive(:by_benefit_group_id).with(subject.id).and_return([benefit_group_assignment_1, benefit_group_assignment_2])
   end
 
-  it "provides the group_size_count based on the employees expected to enroll" do
-    expect(subject.group_size_count).to eq employee_enrollment_count
+  it "provides the group_size_count based on the employees who have enrolled" do
+    expect(subject.group_size_count).to eq 2
   end
 end

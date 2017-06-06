@@ -1409,6 +1409,10 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def dental?
+    coverage_kind == "dental"
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
