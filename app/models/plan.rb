@@ -458,8 +458,11 @@ class Plan
       when 'health'
         csr_kinds = []
         #TODO select the right csr_kind from the array of csr_kinds.
-        tax_households.each do |tax_household|
-          csr_kinds << tax_household.try(:preferred_eligibility_determination).try(:csr_eligibility_kind)
+
+        if tax_households.present?
+          tax_households.each do |tax_household|
+            csr_kinds << tax_household.try(:preferred_eligibility_determination).try(:csr_eligibility_kind)
+          end
         end
 
         csr_kind = csr_kinds.blank? ? nil : csr_kinds.first

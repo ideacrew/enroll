@@ -295,6 +295,11 @@ class FinancialAssistance::Application
     tax_households
   end
 
+  def eligibility_determinations_for_year(year)
+    return nil unless self.assistance_year == year
+    self.eligibility_determinations
+  end
+
 private
   def set_submission_date
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record)

@@ -164,6 +164,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @family_member_ids = params[:family_member_ids]
+    
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_tax_household_from_family_members(@person, @family_member_ids)
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'

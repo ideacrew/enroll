@@ -326,13 +326,13 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
-  def eligibility_determinations_for_year(year)
-    eds = []
-    applications.where(assistance_year: year).each do |app|
-      app.eligibility_determinations.each do |ed|
-        eds << ed
-      end
-    end
-    eds
-  end
+  # def eligibility_determinations_for_year(year)
+  #   eds = []
+  #   applications.where(assistance_year: year).each do |app|
+  #     app.eligibility_determinations.each do |ed|
+  #       eds << ed
+  #     end
+  #   end
+  #   eds
+  # end
 end

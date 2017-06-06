@@ -6,6 +6,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       context "width standard plan present" do
         let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
         let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+        let(:application) { FactoryGirl.create(:application, family: family) }
         let(:person) { FactoryGirl.build_stubbed(:person) }
         let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
         let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -14,7 +15,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           sign_in user
           allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-          allow(person.primary_family).to receive(:active_household).and_return(household)
+          allow(person.primary_family).to receive(:active_approved_application).and_return(application)
         end
 
         @controller = Insured::PlanShoppingsController.new
@@ -33,6 +34,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:application) { FactoryGirl.create(:application, family: family) }
     let(:person) { FactoryGirl.build_stubbed(:person) }
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -41,7 +43,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before :each do
         sign_in user
         allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-        allow(person.primary_family).to receive(:active_household).and_return(household)
+        allow(person.primary_family).to receive(:active_approved_application).and_return(application)
       end
 
       it "returns http success" do
@@ -57,6 +59,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
+  # let(:family_member_id) { double }
   let(:family_members){ [family_member, family_member] }
   let(:benefit_group) {double("BenefitGroup", is_congress: false)}
   let(:reference_plan) {double("Plan")}
@@ -401,6 +404,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
+      allow(controller).to receive(:get_tax_household_from_family_members).and_return []
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -493,6 +497,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+          allow(controller).to receive(:get_tax_household_from_family_members).and_return [tax_household]
           get :show, id: "hbx_id"
         end
 
