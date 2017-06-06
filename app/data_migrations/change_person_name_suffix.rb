@@ -8,7 +8,7 @@ class ChangePersonNameSuffix < MongoidMigrationTask
       puts "Person not found for the given HBX ID: #{csv_row["HBX_ID"]}" unless Rails.env.test?
     else
       person.update_attributes(name_sfx: correct_suffix)
-      puts "Changed suffix to #{correct_suffix}" unless Rails.env.test?
+      puts "Changed suffix of #{person.full_name} (HBX ID: #{person.hbx_id}) to #{correct_suffix}" unless Rails.env.test?
     end
   end
 
