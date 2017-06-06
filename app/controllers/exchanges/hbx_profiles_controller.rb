@@ -222,7 +222,8 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
-  def enable_or_disable_link  
+
+  def enable_or_disable_link
      getActionParams
      @family.update_attribute(:is_disabled, !@family.is_disabled)
      @element_to_replace_id = params[:family_actions_id]
@@ -230,6 +231,11 @@ def employer_poc
      respond_to do |format|
        format.js { render inline: "location.reload();"  }
      end
+  end
+
+  def get_user_info
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
   end
 
   def update_effective_date
@@ -450,7 +456,7 @@ def employer_poc
 
   def reinstate_enrollment
     enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
-    
+
     if enrollment.present?
       reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
       if reinstated_enrollment.present? && params['comments'].present?
