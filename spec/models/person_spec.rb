@@ -1376,57 +1376,93 @@ describe Person do
     end
 
     it "should return true if user present & got paper in session variable" do
-      expect(person.check_for_paper_application('paper')).to eq true
+      expect(person.set_ridp_for_paper_application('paper')).to eq true
     end
 
     it "should return nil if no user present" do
       allow(person).to receive(:user).and_return nil
-      expect(person.check_for_paper_application('paper')).to eq nil
+      expect(person.set_ridp_for_paper_application('paper')).to eq nil
     end
 
     it "should return nil if session variable is not paper" do
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
 
     it "should return nil if session variable is nil" do
-      expect(person.check_for_paper_application(nil)).to eq nil
+      expect(person.set_ridp_for_paper_application(nil)).to eq nil
     end
 
     it "should return nil if no user present & if session var is not paper" do
       person.user.destroy!
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
   end
 
-  describe "changing the bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, user: user) }
-    let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
-    let(:user) { FactoryGirl.create(:user)}
-    before(:each) do
-      allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
-    end
 
-    it "should not change the bookmark_url if they not passed RIDP" do
-      person.user.update_attributes(:idp_verified => false)
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
-    end
+  describe "staff_for_employer" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
-    it "should not change the bookmark_url if they don't have addresses" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.addresses.to_a.each do |add|
-        add.delete
+    context "employer has no staff roles assigned" do
+      it "should return an empty array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq []
       end
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
-    it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/families/home"
+    context "employer has an active staff role" do
+      let(:person) { FactoryGirl.build(:person) }
+      let(:staff_params)  {{ person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active }}
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params)
+        person.save!
+      end
+
+      it "should return the person object in an array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+    end
+
+
+    context "multiple employers have same person as staff" do
+      let(:employer_profile2) { FactoryGirl.build(:employer_profile) }
+      let(:person) { FactoryGirl.build(:person) }
+
+      let(:staff_params1) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active} }
+
+      let(:staff_params2) { {person: person, employer_profile_id: employer_profile2.id, aasm_state: :is_active} }
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params1)
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+        person.save!
+      end
+
+      it "should return the person object in an array for employer 1" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+
+      it "should return the person object in an array for employer 2" do
+        expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+      end
+
+      context "target employer has staff role in inactive state" do
+        let(:staff_params3) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_closed} }
+
+        before do
+          person.employer_staff_roles = []
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params3)
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+          person.save!
+        end
+
+        it "should return empty array for target employer" do
+          expect(Person.staff_for_employer(employer_profile)).to eq []
+        end
+
+        it "should return the person object in an array for employer 2" do
+          expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+        end
+      end
     end
   end
 end

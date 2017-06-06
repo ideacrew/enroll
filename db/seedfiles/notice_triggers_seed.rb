@@ -192,6 +192,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP6',
+    title: 'Action Needed – Add all Eligible Employees to your Roster',
+    description: 'This notice goes to all the employers with zero employees on roster when published',
+    resource_name: 'employer',
+    event_name: 'zero_employees_on_roster',
+    notice_triggers: [
+      {
+        name: 'Zero Employees on Rotser',
+        notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
+        notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
+        mpi_indicator: 'MPI_SHOP6',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP8A',
     title: 'Your Health Plan Open Enrollment Period has Begun',
     description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
@@ -287,6 +308,48 @@ shop_notice_triggers = [
         notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
         mpi_indicator: 'MPI_SHOP17',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP13',
+    title: 'Open Enrollment Reminder',
+    description: 'This notices goes to all the employees in the open enrollment period',
+    resource_name: 'employee_role',
+    event_name: 'employee_open_enrollment_reminder',
+    notice_triggers: [
+      {
+        name: 'Employee Open Enrollment Reminder Notice',
+        notice_template: 'notices/shop_employee_notices/13_employee_open_enrollment_reminder',
+        notice_builder: 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
+        mpi_indicator: 'MPI_SHOP13',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP20',
+    title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
+    description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_invoice_available',
+    notice_triggers: [
+      {
+        name: 'Initial Employer first invoice available in the account',
+        notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+        mpi_indicator: 'MPI_SHOP20',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

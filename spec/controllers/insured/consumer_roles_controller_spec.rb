@@ -162,6 +162,8 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     before(:each) do
       allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
       allow(consumer_role).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:create_dep_consumer_role)
     end
     it "should create new person/consumer role object" do
       sign_in user
@@ -219,9 +221,18 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     it "should update existing person" do
       allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
+    end
+
+    it "should redirect to family members path when current user is admin & doing new paper app" do
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return true
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
     it "should not update the person" do
@@ -389,5 +400,32 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         expect(response).to redirect_to(family_account_path)
       end
     end
+  end
+
+  describe "Get edit consumer role" do
+    let(:consumer_role2){ FactoryGirl.build(:consumer_role, :bookmark_url => "http://localhost:3000/insured/consumer_role/591f44497af8800bb5000016/edit") }
+    before(:each) do
+      current_user = user
+      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role).and_return(consumer_role2)
+      allow(consumer_role).to receive(:save!).and_return(true)
+      allow(consumer_role).to receive(:bookmark_url=).and_return(true)
+      allow(user).to receive(:has_consumer_role?).and_return(true)
+
+    end
+
+    context "with bookmark_url pointing to another person's consumer role" do
+
+      it "should redirect to the edit page of the consumer role of the current user" do
+        sign_in user
+        get :edit, id: "test"
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
+      end
+    end
+
   end
 end
