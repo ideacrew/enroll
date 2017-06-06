@@ -1,9 +1,38 @@
-<h4><%= @applicant.person.full_name %></h4>
+<div class="container bottom-pd">
+	<div class="row">
+		<h3 class="title-inline"><b>Edit Applicants Information</b></h3>
+	</div>
+	<h4>Tax Info.,Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4> 
+  <div class="row input-no-pd">
+</div>
 
-<%= link_to "Applicant Info", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
+
+<%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
 <br />
-<% @applicant.incomes.each do |income| %>
-  <%= link_to "Edit this income", go_to_step_financial_assistance_application_applicant_income(@application, @applicant, income, 1) %>
-<% end %>
 
-<%= link_to "Add an income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
+<div>
+	<% if @applicant.incomes.present? %>
+		<h4>Edit Existing Income(s)</h4>
+		<table class="table">
+			<th>Income Type</th>
+			<th></th>
+			<% @applicant.incomes.each do |income| %>
+			<tr>
+				<td><%=income.kind%></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_income_path(@application, @applicant, income, 1) %></td>
+			</tr>
+			<% end %>
+		</table>
+	<%end%>
+</ div>
+<%= link_to "Add Incomes", new_financial_assistance_application_applicant_income_path(@application, @applicant) %><br>
+
+<hr />
+
+<%= link_to "Add Benefits", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
+<hr />
+<%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+<br> <br>
+<hr />
+
+<%= link_to "BACK TO ALL HOUSEHOLD MEMBERS", edit_financial_assistance_application_path(@application) %> (Go back and work on another person.)

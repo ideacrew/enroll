@@ -28,6 +28,8 @@
       <%= render 'workflow/text', cell: cell %>
     <% when 'input' %>
       <%= render 'workflow/input', cell: cell %>
+    <% when 'input_date' %>
+      <%= render 'workflow/input_date', cell: cell %>
     <% when 'label' %>
       <%= render 'workflow/label', cell: cell %>
     <% when 'raw_html' %>

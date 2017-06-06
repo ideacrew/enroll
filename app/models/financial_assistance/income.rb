@@ -34,12 +34,12 @@ class FinancialAssistance::Income
 
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
 
-  TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
+  #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
 
-  WAGE_TYPE_KINDS = %W(W2 1099)
+  #WAGE_TYPE_KINDS = %W(W2 1099)
 
   field :title, type: String
-  field :kind, as: :income_type, type: String
+  field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
   field :wage_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
@@ -68,14 +68,14 @@ class FinancialAssistance::Income
   validates :kind,            presence: true,
                               inclusion: { in: KINDS, message: "%{value} is not a valid income type" }
 
-  validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
+  # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
 
   validates :frequency_kind,  presence: true,
                               inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
   validates :start_on,        presence: true
 
-  validates :tax_form,        presence: true,
-                              inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
+  # validates :tax_form,        presence: true,
+  #                             inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
   validate :start_on_must_precede_end_on
 
   before_create :set_submission_timestamp
@@ -130,7 +130,8 @@ private
 
   def start_on_must_precede_end_on
     return unless start_on.present? && end_on.present?
-    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
+    # TODO : Fix this validation. Getting wrong end_on date from what is selected in the UI
+    #errors.add(:end_on, "can't occur before start on date") if end_on < start_on
   end
 
 end

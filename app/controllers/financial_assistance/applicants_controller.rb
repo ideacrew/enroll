@@ -15,19 +15,18 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
 
     if params.key?(model_name)
-		@model.workflow = { current_step: @current_step.to_i + 1 }
-		@current_step = @current_step.next_step
+		  @model.workflow = { current_step: @current_step.to_i + 1 }
+		  @current_step = @current_step.next_step
     else
-		@model.workflow = { current_step: @current_step.to_i }
+		  @model.workflow = { current_step: @current_step.to_i }
     end
     @model.save!
-    
-	if @steps.last_step?(@current_step)
-		# Go to income ?
-		render 'workflow/step'
-	else
-		render 'workflow/step'
-	end
+
+    if params[:commit] == "Finish"
+      redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+    else
+      render 'workflow/step'
+    end
   end
 
 
