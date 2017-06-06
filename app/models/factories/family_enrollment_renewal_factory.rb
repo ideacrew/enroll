@@ -11,7 +11,7 @@ module Factories
     def renew
       raise ArgumentError unless defined?(family)
       @plan_year_start_on = renewing_plan_year.start_on
-      @active_plan_year = employer.plan_years.published_plan_years_by_date(@plan_year_start_on.prev_day).first
+      @active_plan_year = employer.plan_years.published_and_expired_plan_years_by_date(@plan_year_start_on.prev_day).first
 
       raise FamilyEnrollmentRenewalFactoryError, 'Active plan year missing' if @active_plan_year.blank?
 
@@ -54,10 +54,10 @@ module Factories
     end
 
     def find_active_coverage(coverage_kind)
-      shop_enrollments = family.active_household.hbx_enrollments.shop_market.enrolled_and_waived.by_coverage_kind(coverage_kind)
+      shop_enrollments = family.active_household.hbx_enrollments.shop_market.by_coverage_kind(coverage_kind)
       shop_enrollments = shop_enrollments.where({
         :benefit_group_id.in => @active_plan_year.benefit_groups.pluck(:_id),
-        :aasm_state.ne => 'coverage_termination_pending'
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['inactive', 'coverage_expired'] - ['coverage_termination_pending']
       })
 
       shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
