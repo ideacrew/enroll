@@ -291,6 +291,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 
