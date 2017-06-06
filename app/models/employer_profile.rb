@@ -7,6 +7,7 @@ class EmployerProfile
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include StateTransitionPublisher
+  include Config::AcaModelConcern
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -852,6 +853,14 @@ class EmployerProfile
 
   def trigger_notices(event)
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+  end
+
+  def rating_area
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    RateReference.rating_area_for(primary_office_location)
   end
 
 private
