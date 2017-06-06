@@ -58,7 +58,7 @@ Caches::MongoidCache.with_cache_for(Plan) do
       subscriber_hbx_id = hbx_enrollment.subscriber.hbx_id rescue ""
       hbx_enrollment.hbx_enrollment_members.each do |hbx_em|
         person = hbx_em.person rescue ""
-        next if person.blank? rescue byebug
+        next if person.blank?
         hbx_id = hbx_em.hbx_id
         first_name = person.first_name
         last_name = person.last_name
