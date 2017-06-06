@@ -97,6 +97,18 @@ module Queries
       self
     end
 
+    def filter_to_active_terminated_expired
+      add({
+        "$match" => {
+          "households.hbx_enrollments.plan_id" => { "$ne" => nil},
+          "households.hbx_enrollments.aasm_state" => { "$in" => 
+            (HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + %w(coverage_terminated coverage_expired coverage_canceled))
+          }
+        }
+      })
+      self  
+    end
+
     def filter_to_individual
       add({
         "$match" => {
