@@ -981,6 +981,25 @@ class PlanYear
 
   alias_method :external_plan_year?, :can_be_migrated?
 
+  def estimate_group_size?
+    [
+     "draft",
+     "publish_pending",
+     "eligibility_review",
+     "published",
+     "published_invalid",
+     "enrolling",
+     "application_ineligible",
+     "canceled",
+     "renewing_draft",
+     "renewing_published",
+     "renewing_publish_pending",
+     "renewing_enrolling",
+     "renewing_application_ineligible",
+     "renewing_canceled"
+    ].include?(aasm_state)
+  end
+
   private
 
   def log_message(errors)
