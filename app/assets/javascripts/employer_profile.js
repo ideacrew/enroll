@@ -425,16 +425,20 @@ $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
       filter = $(this).val();
-      search = $("#census_employee_search input#employee_name").val();
+      search = $("#census_employee_search input#employee_search").val();
       $('#employees_' + filter).siblings().hide();
       $('#employees_' + filter).show();
       $.ajax({
         url: $('span[name=employee_families_url]').text() + '.js',
         type: "GET",
-        data : { 'status': filter, 'employee_name': search },
+        data : { 'status': filter, 'employee_search': search },
         crossDomain: true,
         xhrFields: {
           withCredentials: true
+        },
+        success: function (data) {
+          $("#status").val(filter);
+          $("#filter-span").text(filter);
         }
       });
     })
@@ -541,7 +545,7 @@ function setProgressBar(){
 }
 
 $(document).on('click', '#census_employee_search_clear', function() {
-  $('form#census_employee_search input#employee_name').val('');
+  $('form#census_employee_search input#employee_search').val('');
   $("form#census_employee_search").submit();
 })
 
