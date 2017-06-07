@@ -2,7 +2,7 @@ class FinancialAssistance::Income
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :application, class_name: "::FinancialAssistance::Application"
+  embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
   TITLE_SIZE_RANGE = 3..30
   KINDS = %W(
@@ -57,6 +57,9 @@ class FinancialAssistance::Income
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
+
+  embeds_one :employer_address, class_name: "::Address"
+  embeds_one :employer_phone, class_name: "::Phone"
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 

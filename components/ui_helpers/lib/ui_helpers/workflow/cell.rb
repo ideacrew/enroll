@@ -1,7 +1,7 @@
 module UIHelpers
   module Workflow
     class Cell
-      attr_accessor :gutter, :text, :type, :values, :disabled, :name, :options, :fields, :identifier, :attribute, :model, :required, :label, :placeholder, :value, :checked, :for, :id
+      attr_accessor :gutter, :text, :type, :values, :disabled, :name, :options, :fields, :identifier, :attribute, :model, :accessor, :required, :label, :placeholder, :value, :checked, :for, :id
 
       def initialize(attributes)
         @gutter = attributes['gutter']
@@ -13,6 +13,7 @@ module UIHelpers
         @identifier = attributes['identifier']
         @model = attributes['model']
         @attribute = attributes['attribute']
+        @accessor = attributes['accessor']
         @disabled = !!attributes['disabled'] ? false : attributes['disabled']
         @required = !!attributes['required'] ? false : attributes['required']
         @name = attributes['name']
