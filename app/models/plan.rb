@@ -461,7 +461,9 @@ class Plan
 
         if tax_households.present?
           tax_households.each do |tax_household|
-            csr_kinds << tax_household.try(:preferred_eligibility_determination).try(:csr_eligibility_kind)
+            if tax_household.preferred_eligibility_determination.present?
+              csr_kinds << tax_household.preferred_eligibility_determination.csr_eligibility_kind
+            end
           end
         end
 

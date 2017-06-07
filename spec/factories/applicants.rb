@@ -3,7 +3,6 @@ FactoryGirl.define do
     association :application
 
     is_ia_eligible false
-    is_subscriber false
     is_medicaid_chip_eligible false
     has_fixed_address true
     tax_filer_kind "tax_filer"

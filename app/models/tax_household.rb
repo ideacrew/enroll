@@ -175,8 +175,8 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    tax_household_members.detect do |tax_household_member|
-      tax_household_member.is_subscriber == true
+    applicants.each do |applicant|
+      return applicant if applicant.family_member.is_primary_applicant?
     end
   end
 
@@ -187,15 +187,12 @@ class TaxHousehold
 
   def preferred_eligibility_determination
     return nil unless family.active_approved_application
-    family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id).each do |ed|
-      if ed.source == "Admin"
-        return ed
-      elsif ed.source == "Curam"
-        return ed
-      else
-        return ed
-      end
-    end
+    eds = family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
+    admin_ed = eds.where(source: "Admin").first
+    curam_ed = eds.where(source: "Curam").first
+    return admin_ed if admin_ed.present?
+    return curam_ed if curam_ed.present?
+    return eds.first
   end
 
   def eligibility_determinations

@@ -56,7 +56,6 @@ class FinancialAssistance::Applicant
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
   field :is_ia_eligible, type: Boolean, default: false
-  field :is_subscriber, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
 
@@ -131,10 +130,6 @@ class FinancialAssistance::Applicant
     is_ia_eligible
   end
 
-  def is_subscriber?
-    is_subscriber
-  end
-
   def is_medicaid_chip_eligible?
     is_medicaid_chip_eligible
   end
@@ -150,10 +145,6 @@ class FinancialAssistance::Applicant
 
     unless is_medicaid_chip_eligible.is_a? Boolean
       self.errors.add(:base, "is_medicaid_chip_eligible should be a boolean")
-    end
-
-    unless is_subscriber.is_a? Boolean
-      self.errors.add(:base, "is_subscriber should be a boolean")
     end
   end
 
