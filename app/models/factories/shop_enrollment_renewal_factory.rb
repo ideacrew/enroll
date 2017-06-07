@@ -74,20 +74,6 @@ module Factories
       })
     end
 
-    def renewal_plan_offered_by_er?(enrollment)
-      if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
-        if @census_employee.renewal_benefit_group_assignment.blank?
-          benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
-          @census_employee.add_renew_benefit_group_assignment(benefit_group)
-          @census_employee.save!
-        end
-        
-        benefit_group = @census_employee.renewal_benefit_group_assignment.benefit_group
-        elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
-        elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
-      end
-    end
-
     def set_instance_variables
       @family = enrollment.family
       @coverage_kind = enrollment.coverage_kind
