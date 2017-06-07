@@ -246,9 +246,16 @@ Rails.application.routes.draw do
       get 'export_census_employees'
       get 'bulk_employee_upload_form'
       post 'bulk_employee_upload'
+
       member do
         get "download_invoice"
+        get 'new_document'
+        post 'download_documents'
+        post 'delete_documents'
+        post 'upload_document'
+
       end
+
       collection do
         get 'welcome'
         get 'search'
@@ -497,6 +504,10 @@ Rails.application.routes.draw do
       put :enrollment_docs_state
       put :extend_due_date
       get :fed_hub_request
+    end
+
+    member do
+      get :download_employer_document
     end
   end
 

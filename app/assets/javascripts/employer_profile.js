@@ -49,6 +49,10 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
+  function showActionNeeded(){
+    $('.interaction-click-control-documents').html('Documents <span class="label label-danger">Action Needed</span>')
+  }
+
   function validateEditPlanYear() {
     editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
@@ -344,6 +348,7 @@ var EmployerProfile = ( function( window, undefined ) {
       validatePlanYear : validatePlanYear,
       validateCobraBeginDate : validateCobraBeginDate,
       viewDetails : viewDetails,
+      showActionNeeded : showActionNeeded,
       viewCobraDateField : viewCobraDateField,
       submitCobraDate : submitCobraDate,
     };
