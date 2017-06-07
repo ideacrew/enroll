@@ -78,7 +78,7 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model do
 
         let(:child_age) { TimeKeeper.date_of_record - 10.years }
 
-        context 'employer not offering coverage for dependent' do
+        context 'when employer not offering coverage for dependent' do
 
           before do
             renewal_benefit_group.relationship_benefits.where(:relationship => 'spouse').first.update(:offered => false)
@@ -95,6 +95,22 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model do
             expect(health_renewal.hbx_enrollment_members.size).to eq 2
             expect(health_renewal.hbx_enrollment_members.collect{|e| e.hbx_id}).to eq [person.hbx_id, child.hbx_id]
           end 
+        end
+
+        context 'when child aged off' do
+          let(:child_age) { TimeKeeper.date_of_record - 27.years }
+
+          it 'should not include child in passive renewal' do
+            expect(family.active_household.hbx_enrollments.renewing.empty?).to be_truthy
+            expect(enrollment.hbx_enrollment_members.size).to eq 3
+            generate_passive_renewal
+
+            health_renewal = family.active_household.hbx_enrollments.by_coverage_kind('health').renewing.first
+
+            expect(health_renewal.present?).to be_truthy
+            expect(health_renewal.hbx_enrollment_members.size).to eq 2
+            expect(health_renewal.hbx_enrollment_members.collect{|e| e.hbx_id}).to eq [person.hbx_id, spouse.hbx_id]
+          end
         end
       end
     end
