@@ -277,21 +277,11 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/cancel_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          hbx.cancel_coverage! if hbx.may_cancel_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.cancel_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/cancel_enrollment_result.js.erb"}
     end
@@ -311,22 +301,11 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    @result = {success: [], failure: []}
-    @row = params[:family_actions_id]
-    @family_id = params[:family_id]
-    params.each do |key, value|
-      if key.to_s[/terminate_hbx_.*/]
-        hbx = HbxEnrollment.find(params[key.to_s])
-        begin
-          termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-          hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
-          @result[:success] << hbx
-        rescue
-          @result[:failure] << hbx
-        end
-      end
-      set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
-    end
+    params_parser = ::Forms::BulkActionsForAdmin.new(params)
+    @result = params_parser.result
+    @row = params_parser.row
+    @family_id = params_parser.family_id
+    params_parser.terminate_enrollments
     respond_to do |format|
       format.js { render :file => "datatables/terminate_enrollment_result.js.erb"}
     end
