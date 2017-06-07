@@ -91,7 +91,6 @@ describe ChangeEnrollmentDetails do
 
       it_behaves_like "termination", "aasm_state", "coverage_terminated"
       it_behaves_like "termination", "terminated_on", Date.strptime("01/01/2016", "%m/%d/%Y")
-      it_behaves_like "termination", "termination_submitted_on", TimeKeeper.date_of_record
 
     end
   end
