@@ -15,7 +15,12 @@ module ApplicationHelper
   end
 
   def copyright_notice
-    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
+    if TimeKeeper.date_of_record.year.to_s == Settings.site.copyright_period_start.to_s
+      copyright_attribution = "#{Settings.site.copyright_period_start} #{Settings.site.long_name}"
+    else
+      copyright_attribution = "#{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+    end
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -647,6 +652,4 @@ module ApplicationHelper
       "2. You have 0 non-owner employees on your roster"
     end
   end
-
-
 end

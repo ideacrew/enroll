@@ -9,9 +9,13 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should delegate_method(:is_active).to :organization }
 
   let(:organization) {FactoryGirl.create(:organization)}
-  let(:market_kind) {"both"}
+  let(:market_kind) {"shop"}
   let(:bad_market_kind) {"commodities"}
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+
+  before :each do
+    stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop', 'individual', 'both'])
+  end
 
   describe ".new" do
     let(:valid_params) do
@@ -27,6 +31,18 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
       it "should not save" do
         expect(GeneralAgencyProfile.new(**params).save).to be_falsey
+      end
+    end
+
+    context "with individual disabled" do
+      let(:bad_market_kind) { "individual" }
+      before do
+        stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop'])
+      end
+      it "returns an error if individual is market kind" do
+        expect(
+          GeneralAgencyProfile.create(**valid_params.merge(market_kind: bad_market_kind)).errors[:market_kind]
+        ).to eq [market_kind_error_message]
       end
     end
 

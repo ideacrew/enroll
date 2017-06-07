@@ -17,8 +17,38 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
   let(:bad_market_kind) {"commodities"}
   let(:primary_broker_role) { FactoryGirl.create(:broker_role) }
 
-  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid practice area"}
+  let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
+  let(:enabled_market_kinds) { %W[shop individual both] }
 
+  before :each do
+    stub_const("BrokerAgencyProfile::MARKET_KINDS", enabled_market_kinds)
+  end
+
+  describe "individual market can be toggled..." do
+    let(:invalid_params) do
+      {
+        organization: organization,
+        market_kind: bad_market_kind,
+        entity_kind: "s_corporation",
+        primary_broker_role: primary_broker_role
+      }
+    end
+
+    context "when it is enabled" do
+      let(:bad_market_kind) { "commodities" }
+      it "should fail validation for individual" do
+        expect(BrokerAgencyProfile.create(**invalid_params).errors[:market_kind]).to eq [market_kind_error_message]
+      end
+    end
+
+    context "when it is disabled" do
+      let(:bad_market_kind) { "individual" }
+      let(:enabled_market_kinds) { %W[shop] }
+      it "should fail validation for individual" do
+        expect(BrokerAgencyProfile.create(**invalid_params).errors[:market_kind]).to eq [market_kind_error_message]
+      end
+    end
+  end
 
   describe ".new" do
     let(:valid_params) do

@@ -182,8 +182,8 @@ def default_office_location
   {
   address1: "623a Spalding Ct",
   address2: "Suite 200",
-  city: "Washington",
-  state: "DC",
+  city: "AnyCity",
+  state: Settings.aca.state_abbreviation,
   zip: "20001",
   phone_area_code: "202",
   phone_number: "1110000",
@@ -556,6 +556,18 @@ end
 Then(/^Employee should see the matched employee record form$/) do
   expect(page).to have_content('Acme Inc.')
   screenshot("employer_search_results")
+end
+
+Then(/^Employee should see the shop market place workflow as default$/) do
+  within('.select-employer') do
+    expect(page).to have_content('Enroll as an employee of Acme Inc.')
+  end
+end
+
+Then(/^Employee should not see the individual market place workflow$/) do
+  within('.select-employer') do
+    expect(page).not_to have_css('#individual-benefits')
+  end
 end
 
 # TODO: needs to be merged

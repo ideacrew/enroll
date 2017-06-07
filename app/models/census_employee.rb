@@ -5,6 +5,7 @@ class CensusEmployee < CensusMember
   # include Validations::EmployeeInfo
   include Autocomplete
   include Acapi::Notifiers
+  include Config::AcaModelConcern
   require 'roo'
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
@@ -799,9 +800,9 @@ class CensusEmployee < CensusMember
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
     cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
+      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months) &&
       coverage_terminated_on <= cobra_begin_date &&
-      cobra_begin_date <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months)
+      cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 
   def has_employee_role_linked?

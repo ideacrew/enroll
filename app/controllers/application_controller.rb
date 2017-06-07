@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   include Pundit
+  include Config::SiteConcern
+  include Config::AcaConcern
+  include Config::ContactCenterConcern
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
@@ -143,7 +146,7 @@ class ApplicationController < ActionController::Base
         unless request.format.js?
           session[:portal] = url_for(params)
         end
-        redirect_to new_user_registration_path
+        redirect_to new_user_session_path
       end
     rescue Exception => e
       message = {}

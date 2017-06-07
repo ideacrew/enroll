@@ -286,6 +286,10 @@ When /^the broker visits their general agencies page$/ do
   find(".interaction-click-control-general-agencies").click
 end
 
+Then /^the broker should not see the link General Agencies/ do
+  expect(page).should_not have_link('General Agencies')
+end
+
 When /^the broker set default ga$/ do
   first(:xpath, "//a[contains(., 'Select Default GA')]").click
 end
@@ -417,4 +421,12 @@ end
 
 When /^the broker click the link of clear default ga$/ do
   click_link "Clear Default GA"
+end
+
+Then(/^he should be able to see the Assign link under his profile$/) do
+ expect(page).to have_selector('#assign-tab')
+end
+
+Then(/^he should not be able to see the Assign link under his profile$/) do
+expect(page).not_to have_selector('#assign-tab')
 end

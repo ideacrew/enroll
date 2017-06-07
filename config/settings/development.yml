@@ -1,16 +1,17 @@
 
 site:
-  short_name: "DC Health Link"
+  short_name: "Health Connector"
   long_name: ""
 
-  call_center: 
-    name: "DC Health Link's Customer Care Center"
+  call_center:
+    name: "Health Connector's Customer Care Center"
     phone_number: "1-855-532-5465"
 
 aca:
-  state_name: "District of Columbia"
-  state_abbreviation: "DC"
-  ivl: 
+  state_name: ""
+  state_abbreviation: "MA"
+  market_kinds: ['shop']
+  ivl:
     enrollment_due_day_of_month: 15
   shop:
     retroactive_termination_maximum: 60.days

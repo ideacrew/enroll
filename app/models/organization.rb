@@ -44,14 +44,12 @@ class Organization
   field :updated_by, type: BSON::ObjectId
 
   embeds_many :office_locations, cascade_callbacks: true, validate: true
-
+  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
   embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
-  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
-
   accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by

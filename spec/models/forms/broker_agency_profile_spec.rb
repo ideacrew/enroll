@@ -39,7 +39,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
 
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency, fein: "223230323") }
   let(:employer_profile) { FactoryGirl.create(:employer_profile, fein: "333230323") }
-
+  let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }
   let(:attributes) { {
     first_name: 'joe',
     last_name: 'smith',
@@ -49,7 +49,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     legal_name: 'useragency',
     fein: "223232323",
     entity_kind: "c_corporation",
-    market_kind: "individual",
+    market_kind: market_kind,
     working_hours: "0",
     accept_new_clients: "0",
     office_locations_attributes: office_locations
@@ -69,7 +69,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       kind: "primary",
       address_1: "99 N ST",
       city: "washignton",
-      state: "dc",
+      state: Settings.aca.state_abbreviation,
       zip: "20006"
     }
   }
@@ -193,7 +193,7 @@ end
 
 
 describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
-
+  let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }
   let(:attributes) { {
     first_name: "steve",
     last_name: "smith",
@@ -203,7 +203,7 @@ describe Forms::BrokerAgencyProfile, ".match_or_create_person" do
     legal_name: 'useragency',
     fein: "223232323",
     entity_kind: "c_corporation",
-    market_kind: "individual"
+    market_kind: market_kind
   }.merge(other_attributes)}
 
   let(:other_attributes) { {} }
@@ -309,7 +309,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
   let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, organization: organization) }
   let(:broker_role) { broker_agency_profile.primary_broker_role }
   let(:person) { broker_role.person }
-
+  let(:market_kind) { Settings.aca.market_kinds.include?("individual") ? "individual" : "shop" }
   let(:attributes) { {
     id: organization.id,
     first_name: 'joe',
@@ -321,7 +321,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
     dba: organization.dba,
     home_page: 'dchealth.com',
     entity_kind: broker_agency_profile.entity_kind,
-    market_kind: "individual",
+    market_kind: market_kind,
     languages_spoken: ["English"],
     working_hours: "0",
     accept_new_clients: "0",
@@ -366,8 +366,8 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
 
   it "should update broker_agency_profile info" do
     broker_agency_profile.reload
-    expect(@form.market_kind).to eq "individual"
-    expect(broker_agency_profile.market_kind).to eq "individual"
+    expect(@form.market_kind).to eq market_kind
+    expect(broker_agency_profile.market_kind).to eq market_kind
     expect(broker_agency_profile.languages_spoken).to eq ["English"]
   end
 
