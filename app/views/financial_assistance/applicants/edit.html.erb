@@ -29,6 +29,21 @@
 
 <hr />
 
+<div>
+	<% if @applicant.benefits.present? %>
+		<h4>Edit Existing Benefit(s)</h4>
+		<table class="table">
+			<th>Income Type</th>
+			<th></th>
+			<% @applicant.benefits.each do |benefit| %>
+			<tr>
+				<td><%=benefit.kind%></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1) %></td>
+			</tr>
+			<% end %>
+		</table>
+	<%end%>
+</ div>
 <%= link_to "Add Benefit", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
 <hr />
 <%= link_to "Add Deduction", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
