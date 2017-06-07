@@ -13,7 +13,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model do
   }
 
   let!(:employer_profile) {
-    create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id, elected_plan_ids: plan.to_a.map(&:id) )
+    create(:employer_with_renewing_planyear, start_on: renewal_start, renewal_plan_year_state: 'renewing_enrolling', reference_plan_id: plan.id)
   }
   let(:active_plan_year) { employer_profile.active_plan_year }
   let(:benefit_group) { active_plan_year.benefit_groups.first }
