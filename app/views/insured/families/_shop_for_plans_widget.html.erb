@@ -83,15 +83,16 @@
                   <%= format_date ivl_enrollment_effective_date %>.
                 </p>  
               <% end %>
-              <br/>
               
               <% if @family.active_seps.last && !dual_role_without_shop_sep?%>
                 <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"
+                  <br/>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
                   <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>
                 </p>
-                <br/>
-                <p>There are other types of Special Enrollment Periods that may allow you to start your coverage on a different date. <%= link_to 'Qualify for a new SEP', find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
+                <p>There are other types of Special Enrollment Periods that may allow you to start your coverage on a different date. 
+                  <br/>
+                <%= link_to 'Qualify for a new SEP', find_sep_insured_families_path(options), class: "btn btn-default pull-left" %></p>
               <% else %>
                 <p>Open enrollment is over, but you still may be able to enroll now if you qualify for a Special Enrollment Period. We need to ask you some questions to see if you qualify. <%= link_to "Continue ", find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
               <% end %>
