@@ -5,7 +5,7 @@ RSpec.describe "insured/plan_shoppings/_coverage_information.html.erb" do
   let(:plan){FactoryGirl.create(:plan)}
 
   let(:employer_profile) {
-    FactoryGirl.create(:employer_with_planyear, plan_year_state: 'active', reference_plan_id: plan.id, elected_plan_ids: [plan.id])
+    FactoryGirl.create(:employer_with_planyear, plan_year_state: 'active', reference_plan_id: plan.id)
   }
 
   let(:employee_role){FactoryGirl.create(:employee_role)}
