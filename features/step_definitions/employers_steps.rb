@@ -387,7 +387,7 @@ Then(/^.+ clicks? on the Cancel button$/) do
 end
 
 Then(/^.+ should be on the business info page with warnings$/) do
-  expect(page).to have_content 'Primary Office Location'
+  expect(page).to have_content 'Office Location'
   expect(find('.alert-error')).to have_content('Has its principal business address in the District of Columbia')
 end
 
@@ -454,6 +454,7 @@ end
 
 Given /^the employer has employees$/ do
   employees employer_profile: employer.employer_profile
+  employees.last.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: TimeKeeper.date_of_record - 5.days)
 end
 
 Given /^the employer is logged in$/ do
@@ -493,6 +494,41 @@ And /^employer clicks on linked employee with address$/ do
   expect(page).to have_content "Eddie Vedder"
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
+
+Then /^ER should land on (.*) EE tab$/ do |val|
+  expect(page).to have_content val.upcase
+end
+
+And /^ER enters (.*) EE name on search bar$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  search_item = val == "active" ? employees.first.last_name : ter
+  page.fill_in('employee_search', :with => search_item)
+end
+
+And /^ER clicks on search button$/ do
+  find(".interaction-click-control-search").trigger('click')
+end
+
+Then /^ER should see the (.*) searched EE on the roster page$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}
+  search_item = val == "active" ? employees.first.full_name : ter.full_name
+  page.should have_selector(:link_or_button, search_item)
+end
+
+And /^ER should see no results$/ do
+  expect(page).to have_content /No results found/
+end
+
+Then /^ER clears the search value in the search box$/ do
+  page.fill_in('employee_search', :with => nil)
+end
+
+Then /^ER should see all the terminated employees$/ do
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  expect(page).to have_content ter
+  expect(page).not_to have_content employees.first.last_name
+end
+
 
 Then /^employer should not see the address on the roster$/ do
   expect(page).not_to have_content /Address/
