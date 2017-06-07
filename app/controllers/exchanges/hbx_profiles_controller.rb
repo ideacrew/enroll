@@ -222,7 +222,6 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
-
   def enable_or_disable_link
      getActionParams
      @family.update_attribute(:is_disabled, !@family.is_disabled)
@@ -234,8 +233,14 @@ def employer_poc
   end
 
   def get_user_info
-    @person = Person.find(params[:person_id])
-    @element_to_replace_id = params[:family_actions_id]
+    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    if params[:person_id].present?
+      @person = Person.find(params[:person_id])
+    else
+      @employer_actions = true
+      @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
+      @organization = Organization.find(@element_to_replace_id.split("_").last)
+    end
   end
 
   def update_effective_date
