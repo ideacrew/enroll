@@ -25,6 +25,7 @@ class CompositeRatingBaseRatesCalculator
     benefit_group.composite_tier_contributions.each do |ctc|
       ctc.estimated_tier_premium = rate_lookup[ctc.composite_rating_tier]
     end
+    benefit_group.save!
   end
 
   def assign_final_premiums
@@ -32,6 +33,7 @@ class CompositeRatingBaseRatesCalculator
     benefit_group.composite_tier_contributions.each do |ctc|
       ctc.final_tier_premium = rate_lookup[ctc.composite_rating_tier]
     end
+    benefit_group.save!
   end
 
   protected 

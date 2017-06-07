@@ -785,7 +785,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled
+    state :renewing_enrolled, :after_enter => [:renewal_successful]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
 
@@ -1059,9 +1059,13 @@ class PlanYear
   end
 
   # When publishing happens, 'freeze' the sic code and rating area
+  # Also do any composite estimation needed
   def record_sic_and_rating_area
     self.recorded_sic_code = employer_profile.sic_code
     self.recorded_rating_area = employer_profile.rating_area
+    self.benefit_groups.each do |bg|
+      bg.estimate_composite_rates
+    end
   end
 
   def trigger_renewal_notice
@@ -1110,8 +1114,17 @@ class PlanYear
 
   def initial_employer_open_enrollment_completed
     #also check if minimum participation and non owner conditions are met by ER.
+    benefit_groups.each do |bg|
+      bg.finalize_composite_rates
+    end
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+  end
+
+  def renewal_successful
+    benefit_groups.each do |bg|
+      bg.finalize_composite_rates
+    end
   end
 
   def record_transition
