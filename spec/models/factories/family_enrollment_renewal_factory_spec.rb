@@ -69,9 +69,10 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
           context 'when employer offering renewal plans' do
             it 'should renew the coverage' do
+              expect(current_family.active_household.hbx_enrollments.renewing.by_coverage_kind(coverage_kind).present?).to be_falsey
               generate_renewal
               expect(current_family.active_household.hbx_enrollments.renewing.by_coverage_kind(coverage_kind).present?).to be_truthy
-            end 
+            end
           end
 
           context 'when employer changed plan offerings and renewal plans not offered' do

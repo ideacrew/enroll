@@ -2295,18 +2295,37 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
         let(:sep){
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
- 
-        it 'should cancel passive renewal and create new passive' do 
-          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
-          expect(passive_renewal).not_to be_nil
 
-          new_enrollment.select_coverage!
-          family.reload
-          passive_renewal.reload
+        context 'when employee passively renewed coverage' do 
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
-          new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
-          expect(new_passive.plan).to eq new_renewal_plan
+          it 'should cancel passive renewal and create new passive' do 
+            passive_renewal = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(passive_renewal).not_to be_nil
+
+            new_enrollment.select_coverage!
+            family.reload
+            passive_renewal.reload
+
+            expect(passive_renewal.coverage_canceled?).to be_truthy 
+            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(new_passive.plan).to eq new_renewal_plan
+          end
+        end
+
+        context 'when employee actively renewed coverage' do
+
+          it 'should not cancel active renewal and should not generate passive' do 
+            renewal_coverage = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            renewal_coverage.update(aasm_state: 'coverage_selected')
+
+            new_enrollment.select_coverage!
+            family.reload
+            renewal_coverage.reload
+
+            expect(renewal_coverage.coverage_canceled?).to be_falsey
+            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(new_passive.blank?).to be_truthy
+          end
         end
       end
 
