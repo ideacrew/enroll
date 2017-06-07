@@ -41,7 +41,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def terminate_enrollment(enrollment)
     terminated_on = Date.strptime(ENV['terminated_on'].to_s, "%m/%d/%Y")
-    enrollment.update_attributes!(terminated_on: terminated_on, termination_submitted_on:TimeKeeper.date_of_record, aasm_state: "coverage_terminated")
+    enrollment.update_attributes!(terminated_on: terminated_on, aasm_state: "coverage_terminated")
     puts "terminate enrollment on #{terminated_on}" unless Rails.env.test?
   end
 end
