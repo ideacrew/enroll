@@ -20,6 +20,22 @@ class CompositeRatingBaseRatesCalculator
     tier_rate_values
   end
 
+  def assign_estimated_premiums
+    rate_lookup = tier_rates
+    benefit_group.composite_tier_contributions.each do |ctc|
+      ctc.estimated_tier_premium = rate_lookup[ctc.composite_rating_tier]
+    end
+  end
+
+  def assign_final_premiums
+    rate_lookup = tier_rates
+    benefit_group.composite_tier_contributions.each do |ctc|
+      ctc.final_tier_premium = rate_lookup[ctc.composite_rating_tier]
+    end
+  end
+
+  protected 
+
   def create_denominator
     grouped_denominators = selected_enrollment_objects.group_by { |eno| eno.composite_rating_tier }.map { |k, v| [k, v.size] }
     grouped_denominators.inject(0.00) do |acc, pair|
