@@ -1,5 +1,6 @@
 module UIHelpers
   module WorkflowHelper
+
     def workflow_form_for(model, &block)
       path, method = if model.new_record?
         [controller.request.path.sub('new', 'step'), :post]
@@ -26,14 +27,25 @@ module UIHelpers
 
     # Dropdown
     def selected_value model, cell
-      model.send(cell.attribute)
+      if cell.accessor.nil?
+        model.send(cell.attribute)
+      else
+        access_path = cell.accessor.join('.')
+        related_model = model.instance_eval(access_path)
+        related_model.send(cell.attribute) if related_model.present?
+      end
     end
 
     # Text Input
     def input_text_value model, cell
-      model.send(cell.attribute)
+      if cell.accessor.nil?
+        model.send(cell.attribute)
+      else
+        access_path = cell.accessor.join('.')
+        related_model = model.instance_eval(access_path)
+        related_model.send(cell.attribute) if related_model.present?
+      end
     end
-
 
     # Personalize heading_text from steps.yml
     def personalize_heading_text(heading_text)

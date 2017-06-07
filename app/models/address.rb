@@ -7,6 +7,8 @@ class Address
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
 
+  embedded_in :income, class_name: "::FinancialAssistance::Income"
+
   KINDS = %W(home work mailing)
   OFFICE_KINDS = %W(primary mailing branch)
 

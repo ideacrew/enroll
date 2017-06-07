@@ -98,47 +98,69 @@
                   required: true
                   model: income
                   attribute: end_on
-            # Temporarily Commented. TODO: Build Model Associants for Employers Demographic Info.
-            # - cells:
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_name
-            #       placeholder: EMPLOYER NAME *
-            #       required: true
-            #       model: income
-            #       attribute: employer_name
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_phone
-            #       placeholder: EMPLOYER PHONE
-            #       # model: income
-            #       # attribute: employer_phone
-            # - cells:
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_address_line_1
-            #       placeholder: EMP ADD LINE 1 
-            #       required: true
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_address_line_2
-            #       placeholder: EMP ADD LINE 2 *
-            # - cells:
-            #     - gutter: 3
-            #       type: input
-            #       name: city
-            #       placeholder: CITY *
-            #       required: true
-            #       type: 'dropdown'
-            #       name: 'check'
-            #       required: true
-            #       values:
-            #         - Choose State
-            #         - District of Columbia
-            #         - Massachussets
-            #     - gutter: 3
-            #       type: input
-            #       name: zip
-            #       placeholder: ZIP *
-            #       required: true
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_name
+                  placeholder: EMPLOYER NAME *
+                  required: true
+                  model: income
+                  attribute: employer_name
+                - gutter: 6
+                  type: input
+                  name: employer_phone
+                  placeholder: EMPLOYER PHONE
+                  model: employer_phone
+                  accessor:
+                    - employer_phone
+                  attribute: full_phone_number
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_1
+                  placeholder: EMP ADD LINE 1
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_1
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_2
+                  placeholder: EMP ADD LINE 2 *
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_2
+            - cells:
+                - gutter: 3
+                  type: input
+                  name: city
+                  placeholder: CITY *
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: city
+                - gutter: 3
+                  type: 'dropdown'
+                  name: 'check'
+                  required: true
+                  values:
+                    - Choose State
+                    - District of Columbia
+                    - Massachussets
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: state
+                - gutter: 3
+                  type: input
+                  name: zip
+                  placeholder: ZIP *
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: zip
             

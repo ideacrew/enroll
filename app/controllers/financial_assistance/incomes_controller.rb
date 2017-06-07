@@ -3,9 +3,9 @@
   include UIHelpers::WorkflowController
 
   before_filter :find_application_and_applicant
-  #skip_before_action :verify_authenticity_token
+
   def new
-    @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).incomes.build
+    @model = @applicant.incomes.build
     load_steps
     current_step
     render 'workflow/step'
@@ -15,6 +15,7 @@
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
+    update_employer_contact(@model, params)
 
     if params.key?(:step)
       @model.workflow = { current_step: @current_step.to_i }
@@ -34,13 +35,32 @@
   end
 
   private
+
+  def update_employer_contact model, params
+    if params[:employer_phone].present?
+      @model.build_employer_phone
+      params[:employer_phone].merge!(kind: "work") # hack to get pass phone validations
+      @model.employer_phone.update_attributes!(permit_params(params[:employer_phone]))
+    end
+    if params[:employer_address].present?
+      @model.build_employer_address
+      params[:employer_address].merge!(kind: "work") # hack to get pass phone validations
+      @model.employer_address.update_attributes!(permit_params(params[:employer_address]))
+    end
+  end
+
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
     @applicant = @application.applicants.find(params[:applicant_id])
   end
 
   def create
-    FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).incomes.build
+    @application = FinancialAssistance::Application.find(params[:application_id])
+    @applicant = @application.applicants.find(params[:applicant_id])
+    @model = @applicant.incomes.build
+    # @model.build_employer_phone
+    # @model.build_employer_address
+    # @model
   end
 
   def permit_params(attributes)

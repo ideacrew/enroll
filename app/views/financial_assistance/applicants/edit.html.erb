@@ -1,8 +1,8 @@
 <div class="container bottom-pd">
 	<div class="row">
-		<h3 class="title-inline"><b>Edit Applicants Information</b></h3>
+		<h3 class="title-inline"><b>Edit Applicant</b></h3>
 	</div>
-	<h4>Tax Info.,Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4> 
+	<h4>Tax Info, Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4> 
   <div class="row input-no-pd">
 </div>
 
@@ -25,13 +25,13 @@
 		</table>
 	<%end%>
 </ div>
-<%= link_to "Add Incomes", new_financial_assistance_application_applicant_income_path(@application, @applicant) %><br>
+<%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %><br>
 
 <hr />
 
-<%= link_to "Add Benefits", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
+<%= link_to "Add Benefit", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
 <hr />
-<%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+<%= link_to "Add Deduction", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
 <br> <br>
 <hr />
 

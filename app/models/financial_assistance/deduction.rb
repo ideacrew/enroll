@@ -2,7 +2,7 @@ class FinancialAssistance::Deduction
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :application, class_name: "::FinancialAssistance::Application"
+  embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
 
   TITLE_SIZE_RANGE = 3..30
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
