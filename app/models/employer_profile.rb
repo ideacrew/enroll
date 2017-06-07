@@ -604,7 +604,7 @@ class EmployerProfile
         if new_date+2.days == start_on.last_month
           initial_employers_reminder_to_publish(start_on).each do |organization|
             begin
-              organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
               puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
             end
