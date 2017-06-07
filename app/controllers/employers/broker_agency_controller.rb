@@ -40,6 +40,10 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
+    if @employer_profile.broker_agency_profile.present?
+      send_broker_delete_msg(@employer_profile,@employer_profile.broker_agency_profile)
+    end
+
 
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
