@@ -748,6 +748,10 @@ class CensusEmployee < CensusMember
     raise NotImplementedError.new("Implement when employers can specify who they expect to enroll.")
   end
 
+  # TODO: Implement for 16219
+  def composite_rating_tier
+  end
+
   private
 
   def record_transition

@@ -258,6 +258,8 @@ class BenefitGroup
   def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
+    elsif self.sole_source? && (!plan.dental?)
+      CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier)
     else
       PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
@@ -583,6 +585,22 @@ class BenefitGroup
         en.dental?
       end
     end
+  end
+
+  def sole_source?
+    plan_option_kind == "sole_source"
+  end
+
+  def estimate_composite_rates
+    return(nil) unless sole_source?
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first)
+    rate_calc.assign_estimated_premiums
+  end
+
+  def finalize_composite_rates
+    return(nil) unless sole_source?
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first)
+    rate_calc.assign_final_premiums
   end
 
   private

@@ -251,6 +251,8 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       let(:person1) {FactoryGirl.create(:person)}
       let(:person2) {FactoryGirl.create(:person,dob: TimeKeeper.date_of_record - 20.years)}
       let(:child) {double(primary_relationship: "ward")}
+      let(:is_composite_rated) { false }
+      let(:renewing_enrollment) { instance_double(HbxEnrollment, :composite_rated? => is_composite_rated) }
       let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
       let!(:plan_year_start_on) {TimeKeeper.date_of_record}
       before :each do
@@ -259,31 +261,47 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
         subject.instance_variable_set(:@plan_year_start_on, plan_year_start_on)
       end
 
+      describe "for a composite rated enrollment" do
+        let(:is_composite_rated) { true }
+
+        it "covers spouse" do
+          expect(subject.is_relationship_offered_and_member_covered?(spouse,renewing_enrollment)).to be_truthy
+        end
+
+        it "covers domestic_partner" do
+          expect(subject.is_relationship_offered_and_member_covered?(domestic_partner,renewing_enrollment)).to be_truthy
+        end
+
+        it "covers children" do
+          expect(subject.is_relationship_offered_and_member_covered?(child,renewing_enrollment)).to be_truthy
+        end
+      end
+
       it "should return true if spouse relationship offered and covered in active enrollment" do
         allow(spouse).to receive(:is_covered_on?).and_return(true)
-        expect(subject.is_relationship_offered_and_member_covered?(spouse,benefit_group)).to be_truthy
+        expect(subject.is_relationship_offered_and_member_covered?(spouse,renewing_enrollment)).to be_truthy
       end
 
       it "should return false if domestic_partner relationship not offered" do
         allow(domestic_partner).to receive(:is_covered_on?).and_return(true)
-        expect(subject.is_relationship_offered_and_member_covered?(domestic_partner,benefit_group)).to be_falsey
+        expect(subject.is_relationship_offered_and_member_covered?(domestic_partner,renewing_enrollment)).to be_falsey
       end
 
       it "should return true if employee relationship offered and covered in active enrollment" do
         allow(employee).to receive(:is_covered_on?).and_return(true)
-        expect(subject.is_relationship_offered_and_member_covered?(employee,benefit_group)).to be_truthy
+        expect(subject.is_relationship_offered_and_member_covered?(employee,renewing_enrollment)).to be_truthy
       end
 
       it "should return false if relationship is child_over_26" do
         allow(child).to receive(:is_covered_on?).and_return(true)
         allow(child).to receive(:person).and_return person1
-        expect(subject.is_relationship_offered_and_member_covered?(child,benefit_group)).to be_falsey
+        expect(subject.is_relationship_offered_and_member_covered?(child, renewing_enrollment)).to be_falsey
       end
 
       it "should return true if child relationship(child_under_26) offered and covered in active enrollment" do
         allow(child).to receive(:is_covered_on?).and_return(true)
         allow(child).to receive(:person).and_return person2
-        expect(subject.is_relationship_offered_and_member_covered?(child,benefit_group)).to be_truthy
+        expect(subject.is_relationship_offered_and_member_covered?(child,renewing_enrollment)).to be_truthy
       end
     end
 
