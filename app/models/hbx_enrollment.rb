@@ -1427,6 +1427,7 @@ class HbxEnrollment
 
   # TODO: Implement behaviour by 16219.
   def composite_rating_tier
+    return false unless composite_rated?
     relationships=[]
     self.hbx_enrollment_members.map(&:family_member).map(&:relationship).each do |relationship|
       relationships << PlanCostDecorator.benefit_relationship(relationship)
