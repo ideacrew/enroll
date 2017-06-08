@@ -534,8 +534,12 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def is_applicable_for_renewal?
+    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
+  end
+
   def update_renewal_coverage
-    if is_shop?
+    if is_applicable_for_renewal?
       employer = benefit_group.plan_year.employer_profile
       if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin
