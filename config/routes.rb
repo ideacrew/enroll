@@ -48,7 +48,7 @@ Rails.application.routes.draw do
         end
 
         resources :deductions do
-          put :step, on: :member
+          put 'step(/:step)', action: 'step', on: :member
           post :step, on: :collection
           get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
         end

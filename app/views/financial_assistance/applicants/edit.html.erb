@@ -58,7 +58,24 @@
 </ div>
 <%= link_to "Add Benefit", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
 <hr />
-<%= link_to "Add Deduction", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+
+<div>
+	<% if @applicant.deductions.present? %>
+		<h4>Edit Existing Deductions (Income)</h4>
+		<table class="table">
+			<th>Deduction Income Type</th>
+			<th></th>
+			<% @applicant.deductions.each do |deduction| %>
+			<tr>
+				<td><%= deduction.kind %></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1)  %></td>
+			</tr>
+			<% end %>
+		</table>
+	<%end%>
+</div>
+<%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+
 <br> <br>
 <hr />
 

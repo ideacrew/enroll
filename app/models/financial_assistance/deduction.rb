@@ -16,13 +16,16 @@ class FinancialAssistance::Deduction
       rent_or_royalties
       self_employment_sep_simple_and_qualified_plans
       self_employed_health_insurance
+      student_loan_interest
       moving_expenses
       health_savings_account
+      ira_deduction
       reservists_performing_artists_and_fee_basis_government_official_expenses
+      tution_and_fees
     )
 
   field :title, type: String
-  field :kind, as: :deduction_type, type: String
+  field :kind, as: :deduction_type, type: String, default: 'alimony_paid'
   field :amount, type: Money, default: 0.0
   field :start_on, type: Date
   field :end_on, type: Date
@@ -47,6 +50,8 @@ class FinancialAssistance::Deduction
   validate :start_on_must_precede_end_on
 
   before_create :set_submission_timestamp
+
+
 
 private
 
