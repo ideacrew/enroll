@@ -2,7 +2,6 @@ module UIHelpers
   module WorkflowHelper
 
     def workflow_form_for(model, &block)
-      binding.pry
       path, method = if model.new_record?
         [controller.request.path.sub('new', 'step'), :post]
       else

@@ -5,7 +5,19 @@
 	<h4>Tax Info, Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4> 
   <div class="row input-no-pd">
 </div>
-
+<table class="table">
+	<tr>
+		<th>Applicant Name</th>
+		<th>Claimed as Tax Dependent?</th>
+		<th>Claimed dependent by</th>
+		<th></th>
+	</tr>
+	<tr>
+		<td><%=@applicant.family_member.person.full_name%></td>
+		<td><%=@applicant.is_claimed_as_tax_dependent%></td>
+		<td><%=@applicant.claimed_as_tax_dependent_by%></td>
+	</tr>
+</table>
 
 <%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
 <br />
@@ -33,7 +45,7 @@
 	<% if @applicant.benefits.present? %>
 		<h4>Edit Existing Benefit(s)</h4>
 		<table class="table">
-			<th>Income Type</th>
+			<th>Benefit Type</th>
 			<th></th>
 			<% @applicant.benefits.each do |benefit| %>
 			<tr>

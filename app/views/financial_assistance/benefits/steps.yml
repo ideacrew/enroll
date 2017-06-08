@@ -81,7 +81,6 @@
                   id: 'yes2'
                   # checked: true
                   label: 'Yes'
-                  classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -301,11 +300,3 @@
                     - yearly
                   model: benefit
                   attribute: employee_cost
-
-
-
-
-
-
-
-

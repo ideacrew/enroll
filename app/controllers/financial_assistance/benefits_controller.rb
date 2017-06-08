@@ -12,17 +12,15 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
   def step
     model_name = @model.class.to_s.split('::').last.downcase
-    binding.pry
     model_params = params[model_name]
-    binding.pry
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
     update_employer_contact(@model, params)
 
-    if params.key?(:step)
-      @model.workflow = { current_step: @current_step.to_i }
-    else
+    if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i + 1 }
       @current_step = @current_step.next_step
+    else
+      @model.workflow = { current_step: @current_step.to_i }
     end
     @model.save!
     if params[:commit] == "Finish"
