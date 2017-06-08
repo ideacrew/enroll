@@ -1,5 +1,5 @@
 <% content_for :horizontal_status do %>
-  <%#= render :partial => 'shared/progress_bar.html.erb'%>
+  <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
 <%= form_tag(insured_interactive_identity_verification_path(id: @transaction_id), :enctype =>"multipart/form-data", html: { multipart: true }, method: :put) do %>
     <div class="container">
