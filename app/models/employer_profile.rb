@@ -863,6 +863,18 @@ class EmployerProfile
     RateReference.rating_area_for(primary_office_location)
   end
 
+  def service_areas
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    ServiceAreaReference.service_areas_for(primary_office_location)
+  end
+
+  def service_area_carriers
+    service_areas.collect { |service_area| service_area.hios_id }
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)

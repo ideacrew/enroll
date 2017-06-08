@@ -120,11 +120,15 @@ RSpec.describe Organization, dbclean: :after_each do
 
   describe "class method", dbclean: :after_each do
     let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
+    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1, hbx_carrier_id: '11111')}
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2, hbx_carrier_id: '22222')}
     let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
     let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
+
+    let!(:carrier_one_service_area) { create(:service_area_reference, service_area_zipcode: '10001', hios_id: carrier_profile_1.hbx_carrier_id) }
+    let(:address) { double(zip: '10001')}
+    let(:office_location) { double(address: address)}
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
@@ -156,6 +160,13 @@ RSpec.describe Organization, dbclean: :after_each do
         carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
         carrier_names[single_choice_carrier.id.to_s] = single_choice_carrier.legal_name
         expect(Organization.valid_carrier_names(single_choice_included: true)).to match_array carrier_names
+      end
+
+      it "can filter out by service area" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+
+        expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
       end
     end
 

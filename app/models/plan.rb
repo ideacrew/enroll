@@ -173,7 +173,7 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-
+  scope :for_hios_ids,          ->(hios_ids) { where(hios_id: hios_ids) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }

@@ -61,6 +61,11 @@ class CarrierProfile
       list_embedded Organization.exists(carrier_profile: true).order_by([:legal_name]).to_a
     end
 
+    def carriers_for(employer_profile)
+      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.hios_id }.uniq
+      where(issuer_hios_id: servicing_hios_ids)
+    end
+
     def first
       all.first
     end

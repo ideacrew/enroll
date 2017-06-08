@@ -17,10 +17,22 @@ class ServiceAreaReference
     unless: Proc.new { |a| a.serves_entire_state? }
   validates :partial_county_justification, presence: true,
     if: Proc.new { |a| a.serves_partial_county? }
-  
+
   scope :serving_entire_state, -> { where(serves_entire_state: true) }
 
-  def self.areas_valid_for_zip_code(zip_code:)
-    self.where(service_area_zipcode: zip_code) + self.serving_entire_state.to_a
+  class << self
+    def areas_valid_for_zip_code(zip_code:)
+      where(service_area_zipcode: zip_code) + self.serving_entire_state.to_a
+    end
+
+    def service_areas_for(office_location)
+      address = office_location.address
+      areas_valid_for_zip_code(zip_code: address.zip)
+    end
+
+    def valid_for?(office_location: , carrier_profile:)
+      where(service_area_zipcode: office_location.address.zip, hios_id: carrier_profile.hbx_carrier_id).any?
+    end
   end
+
 end
