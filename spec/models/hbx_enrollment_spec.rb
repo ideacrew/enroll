@@ -2327,6 +2327,19 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
     end
   end
 
+  context '#is_applicable_for_renewal' do
+    let(:benefit_group) { double("BenefitGroup", :plan_year => double("PlanYear", :is_published? => true))}
+    let(:enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment)}
+    it "should return false if benefit group is nil for shop enrollment" do
+      expect(enrollment.is_applicable_for_renewal?).to eq false
+    end
+
+    it "should return true if benefit group & published plan year present for shop enrollment" do
+      allow(enrollment).to receive(:benefit_group).and_return benefit_group
+      expect(enrollment.is_applicable_for_renewal?).to eq true
+    end
+  end
+
   context "market_name" do
     it "for shop" do
       enrollment.kind = 'employer_sponsored'

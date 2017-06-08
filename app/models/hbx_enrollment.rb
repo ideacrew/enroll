@@ -533,29 +533,31 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def is_applicable_for_renewal?
+    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
+  end
+
   def update_renewal_coverage
-    if is_shop?
-      if self.benefit_group.plan_year.is_published?
+    if is_applicable_for_renewal?
 
-        renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
+      renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
 
-        if renewal_plan_year.present?
-          renewal_enrollments = self.family.active_household.hbx_enrollments.where({
-            :coverage_kind => self.coverage_kind,
-            :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
-          }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
+      if renewal_plan_year.present?
+        renewal_enrollments = self.family.active_household.hbx_enrollments.where({
+          :coverage_kind => self.coverage_kind,
+          :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
+        }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
 
-          renewal_enrollments.reject!{|e| e.inactive?}
-          renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
+        renewal_enrollments.reject!{|e| e.inactive?}
+        renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
 
-          begin
-            factory = Factories::FamilyEnrollmentRenewalFactory.new
-            factory.enrollment = self
-            factory.disable_notifications = true
-            factory.renew
-          rescue Exception => e
-            Rails.logger.error { e }
-          end
+        begin
+          factory = Factories::FamilyEnrollmentRenewalFactory.new
+          factory.enrollment = self
+          factory.disable_notifications = true
+          factory.renew
+        rescue Exception => e
+          Rails.logger.error { e }
         end
       end
     end
