@@ -1,13 +1,13 @@
-<% if @search %>
-    <% if @census_employees.present? %>
-    <% else %>
-        <h4>No results found</h4>
-    <% end %>
+<% if @search || params[:employee_search] %>
+<% if @census_employees.present? %>
+<% else %>
+<h4>No results found</h4>
 <% end %>
-<div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 10%;">
+    <% end %>
+<div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 5%;">
   <div class="row">
     <%= pundit_span(EmployerProfile, :updateable?) %>
-    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add New Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
+    <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
   </div>
 </div>
 

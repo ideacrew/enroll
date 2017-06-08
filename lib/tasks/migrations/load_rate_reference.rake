@@ -24,5 +24,4 @@ namespace :load_rate_reference do
     return false  if value == false  || value =~ (/(false|f|no|n|0)$/i)
     raise ArgumentError.new("invalid value for Boolean: \"#{value}\"")
   end
-
 end

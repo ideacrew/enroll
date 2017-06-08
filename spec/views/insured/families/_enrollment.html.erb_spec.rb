@@ -39,7 +39,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
-  context "without consumer_role" do
+  context "without consumer_role", dbclean: :before_each do
     let(:mock_organization){ instance_double("Organization", hbx_id: "3241251524", legal_name: "ACME Agency", dba: "Acme", fein: "034267010")}
     let(:mock_carrier_profile) { instance_double("CarrierProfile", :dba => "a carrier name", :legal_name => "name", :organization => mock_organization) }
     let(:plan) { double("Plan",
@@ -107,8 +107,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{plan.hios_id}']", text: "View Details")
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the plan start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -130,10 +130,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     context "when outside Employers open enrollment period and not a new hire" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       before :each do
         allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
         allow(census_employee).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
-
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+        allow(hbx_enrollment).to receive(:total_employee_cost).and_return(111)
+        allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -153,14 +157,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the Plan Start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match /effective date/i
+      expect(rendered).to match /plan start/i
     end
 
     it "should display market" do
@@ -169,6 +173,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
+    end
+    
+    it "should not show a Plan End if cobra" do
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      expect(rendered).not_to match /plan ending/i 
     end
   end
 

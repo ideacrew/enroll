@@ -1,4 +1,5 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
+  include Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
                                        :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote]
@@ -293,6 +294,21 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def counties_for_zip_code
+      params.permit([:zip_code])
+      @counties = RateReference.find_counties_for(zip_code: params[:zip_code])
+      @single_option = true
+
+      if @counties.count > 1
+        @single_option = false
+        @counties.unshift("SELECT COUNTY")
+      elsif @counties.empty?
+        @counties << "Zip code outside #{aca_state_abbreviation}"
+      end
+
+
+      render partial: 'employers/employer_profiles/county_field'
+  end
 
   private
 
@@ -425,7 +441,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     params.require(:organization).permit(
       :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
       :office_locations_attributes => [
-        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip]},
+        {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
         {:email_attributes => [:kind, :address]},
         :is_primary

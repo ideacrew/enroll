@@ -8,7 +8,7 @@ class FixIncorrectEffectiveDates < MongoidMigrationTask
 
     organizations.each do |organization|
       employer_profile = organization.employer_profile
-      puts "Processing Employer: #{employer_profile.legal_name}"
+      puts "Processing Employer: #{employer_profile.legal_name}" unless Rails.env.test?
       plan_year = employer_profile.plan_years.where(start_on: plan_year_begin.prev_year).first
       id_list = plan_year.benefit_groups.map(&:id)
 
@@ -51,13 +51,13 @@ class FixIncorrectEffectiveDates < MongoidMigrationTask
   end
 
   def organizations
-    Organization.where(:"employer_profile.plan_years" => 
+    Organization.where(:"employer_profile.plan_years" =>
       { :$elemMatch => {:start_on => plan_year_begin.prev_year, :aasm_state.in => PlanYear::PUBLISHED}},
       :"employer_profile.profile_source" => 'conversion')
   end
 
   def published_organizations
-    Organization.where(:"employer_profile.plan_years" => 
+    Organization.where(:"employer_profile.plan_years" =>
       { :$elemMatch => {:start_on => plan_year_begin, :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE}},
       :"employer_profile.profile_source" => 'conversion')
   end

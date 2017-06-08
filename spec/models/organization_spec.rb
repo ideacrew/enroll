@@ -120,14 +120,14 @@ RSpec.describe Organization, dbclean: :after_each do
 
   describe "class method", dbclean: :after_each do
     let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
+    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
+    let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
-      carrier_profile_1
-      carrier_profile_2
       Rails.cache.clear
     end
 
@@ -137,17 +137,30 @@ RSpec.describe Organization, dbclean: :after_each do
         carrier_names = {}
         carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
         carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        expect(Organization.valid_carrier_names).to eq carrier_names
+        expect(Organization.valid_carrier_names).to match_array carrier_names
       end
 
       it "valid_carrier_names_for_options" do
         carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options).to eq carriers
+        expect(Organization.valid_carrier_names_for_options).to match_array carriers
+      end
+
+      it "valid_carrier_names_for_options passes arguments" do
+        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s], [single_choice_carrier.legal_name, single_choice_carrier.id.to_s]]
+        expect(Organization.valid_carrier_names_for_options(single_choice_included: true)).to match_array carriers
+      end
+
+      it "can filter out single choice only options" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+        carrier_names[single_choice_carrier.id.to_s] = single_choice_carrier.legal_name
+        expect(Organization.valid_carrier_names(single_choice_included: true)).to match_array carrier_names
       end
     end
 
     context "binder_paid" do
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location) { OfficeLocation.new(
           is_primary: true,

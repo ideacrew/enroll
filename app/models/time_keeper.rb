@@ -1,4 +1,5 @@
 class TimeKeeper
+  include Config::AcaModelConcern
   include Mongoid::Document
   include Singleton
   include Acapi::Notifiers
@@ -68,7 +69,7 @@ class TimeKeeper
   def push_date_of_record
     BenefitSponsorship.advance_day(self.date_of_record)
     EmployerProfile.advance_day(self.date_of_record)
-    Family.advance_day(self.date_of_record)
+    Family.advance_day(self.date_of_record) if individual_market_is_enabled?
     HbxEnrollment.advance_day(self.date_of_record)
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)

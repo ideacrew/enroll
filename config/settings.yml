@@ -12,6 +12,7 @@ site:
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
 
+
   social_media:
     facebook_url: ""
 
@@ -46,6 +47,7 @@ aca:
   state_abbreviation: "MA"
   market_kinds: ["shop"]
   general_agency_enabled: false
+
 #
   qle:
     with_in_sixty_days: 60
@@ -123,6 +125,9 @@ aca:
     group_file:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
+
+  use_simple_employer_calculation_model: false
+  carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
 
 
 paper_notice: 'paper-notices'

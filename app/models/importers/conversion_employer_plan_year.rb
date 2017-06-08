@@ -59,6 +59,7 @@ module Importers
       plan_year_attrs[:benefit_groups] = [map_benefit_group(found_carrier)]
       # plan_year_attrs[:imported_plan_year] = true
       plan_year_attrs[:aasm_state] = "active"
+      plan_year_attrs[:is_conversion] = true
       PlanYear.new(plan_year_attrs)
     end
 
