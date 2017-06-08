@@ -10,6 +10,10 @@ class RateReference
   validates_uniqueness_of :zip_code, :scope => :county_name
   validates_uniqueness_of :county_name, :scope => :zip_code
 
+  # TODO: Lookup of rating area string for a given address
+  def self.rating_area_for(address)
+  end
+
   class << self
 
     def find_counties_for(**attr)
