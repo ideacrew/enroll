@@ -1421,6 +1421,21 @@ class HbxEnrollment
     coverage_kind == "dental"
   end
 
+  # TODO: Implement behaviour by 16219.
+  def composite_rating_tier
+    relationships=[]
+    self.hbx_enrollment_members.map(&:family_member).map(&:relationship).each do |relationship|
+      relationships << PlanCostDecorator.benefit_relationship(relationship)
+    end
+    find_relationship(relationships)
+  end
+
+  def composite_rated?
+    return false if dental?
+    return false if benefit_group_id.blank?
+    benefit_group.sole_source?
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
