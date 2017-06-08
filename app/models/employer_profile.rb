@@ -886,6 +886,10 @@ class EmployerProfile
     end
   end
 
+  def has_document?
+    !self.documents.blank?
+  end
+  
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
@@ -943,7 +947,5 @@ private
     !published_plan_year.is_application_unpublishable?
   end
 
-  def has_document?
-    !self.documents.blank?
-  end
+
 end
