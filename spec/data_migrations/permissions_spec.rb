@@ -69,8 +69,8 @@ describe DefinePermissions do
     it "updates can_complete_resident_application to true" do
     expect(Person.all.count).to eq(3)
     expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
-    expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be true
-    expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be true
+    expect(@hbx_read_only_person.hbx_staff_role.permission.can_add_sep).to be false
+    expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_add_sep).to be false
     #verifying that the rake task updated only the correct subroles
     expect(Permission.hbx_csr_tier1.can_add_sep).to be false
     expect(Permission.hbx_csr_tier2.can_add_sep).to be false
