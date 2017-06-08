@@ -15,6 +15,10 @@ Rails.application.routes.draw do
     resources :orphans, only: [:index, :show, :destroy]
   end
 
+  resources :users do
+    post :unlock, :on => :member
+  end
+
   resources :saml, only: [] do
     collection do
       post :login

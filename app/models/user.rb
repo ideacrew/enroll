@@ -11,7 +11,7 @@ class User
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
+  devise :database_authenticatable, :registerable, :lockable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
   validates_presence_of :oim_id
@@ -147,6 +147,11 @@ class User
   field :last_portal_visited, type: String
   field :idp_verified, type: Boolean, default: false
 
+  ## Lockable
+  field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
+  field :unlock_token,    type: String # Only if unlock strategy is :email or :both
+  field :locked_at,       type: Time
+
   index({preferred_language: 1})
   index({approved: 1})
   index({roles: 1},  {sparse: true}) # MongoDB multikey index
@@ -185,11 +190,6 @@ class User
   # field :confirmed_at,         type: Time
   # field :confirmation_sent_at, type: Time
   # field :unconfirmed_email,    type: String # Only if using reconfirmable
-
-  ## Lockable
-  # field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
-  # field :unlock_token,    type: String # Only if unlock strategy is :email or :both
-  # field :locked_at,       type: Time
 
   before_save :ensure_authentication_token
 
@@ -371,6 +371,14 @@ class User
 
     def current_user=(user)
       Thread.current[:current_user] = user
+    end
+
+    def logins_before_captcha
+      4
+    end
+
+    def login_captcha_required?(login)
+      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
     end
 
     def current_user
