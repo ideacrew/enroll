@@ -12,6 +12,7 @@ module Effective
         end
 
         table_column :EmployeeName, :width => '50px', :proc => Proc.new { |row|
+          @employer_profile = row.employer_profile
           (link_to row.full_name, employers_employer_profile_census_employee_path(@employer_profile.id, row.id)) + raw("<br>")
         }, :sortable => false, :filter => false
 
@@ -54,6 +55,7 @@ module Effective
         end
 
         table_column :Action, :width => '50px', :proc => Proc.new { |row|
+          @employer_profile = row.employer_profile
           # Has to specify the valid route path for rehire and initiate cobra
           dropdown = [
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -70,7 +72,7 @@ module Effective
         return @employee_collection if defined? @employee_collection
         employer_profile = EmployerProfile.find(attributes["id"])
         @employer_profile = employer_profile
-        @employee_collection = employer_profile.census_employees
+        @employee_collection = employer_profile.census_employees.active
       end
 
       def nested_filter_definition
@@ -78,11 +80,11 @@ module Effective
         filters = {
             employers:
                 [
-                    {scope: 'all', label: 'Active & COBRA'},
-                    {scope: 'employer_profiles_applicants', label: 'Active only'},
-                    {scope: 'employer_profiles_COBRA', label: 'COBRA only'},
-                    {scope: 'employer_profiles_terminated', label: 'Terminated'},
-                    {scope: 'employer_profiles_enrolled', label: 'All'}
+                    {scope: 'eligible', label: 'Active & COBRA'},
+                    {scope: 'active', label: 'Active only'},
+                    {scope: 'by_cobra', label: 'COBRA only'},
+                    {scope: 'terminated', label: 'Terminated'},
+                    {scope: 'eligible', label: 'All'}
                 ],
             top_scope: :employers
         }
