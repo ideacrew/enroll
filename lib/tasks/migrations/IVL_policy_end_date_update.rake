@@ -10,10 +10,20 @@ namespace :migrations do
       enrollment = HbxEnrollment.by_hbx_id(hbx_id)
       next unless enrollment.size == 1
       if enrollment.first.effective_on < terminated_on
+         enrollment.first.workflow_state_transitions << WorkflowStateTransition.new(
+                                                       from_state: enrollment.first.aasm_state,
+                                                       to_state: "coverage_terminated"
+                                                       )
          enrollment.first.update_attributes(aasm_state: "coverage_terminated")
          enrollment.first.update_attributes(terminated_on: terminated_on)
       elsif enrollment.first.effective_on == terminated_on
-        enrollment.first.update_attributes(aasm_state: "coverage_canceled")
+        if enrollment.first.aasm_state != "coverage_canceled"
+          enrollment.first.workflow_state_transitions << WorkflowStateTransition.new(
+              from_state: enrollment.first.aasm_state,
+              to_state: "coverage_canceled"
+          )
+          enrollment.first.update_attributes(aasm_state: "coverage_canceled")
+        end
       else
         puts "Termination date should not be earlier than effective on date for enrollment #{hbx_id}" unless Rails.env.test?
       end
