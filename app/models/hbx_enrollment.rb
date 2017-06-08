@@ -1409,14 +1409,6 @@ class HbxEnrollment
     employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
  end
 
- def enrollment_composite_rating_tier
-    relationships=[]
-    self.hbx_enrollment_members.map(&:family_member).map(&:relationship).each do |relationship|
-    relationships << PlanCostDecorator.benefit_relationship(relationship)
-    end
-    find_relationship(relationships)
- end
-
   def event_submission_date
     submitted_at.blank? ? Time.now : submitted_at
   end
