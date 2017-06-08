@@ -44,6 +44,8 @@ class FinancialAssistance::Application
   field :attestation_terms, type: Boolean
   field :submission_terms, type: Boolean
 
+  field :request_full_determination, type: Boolean
+
   field :is_ridp_verified, type: Boolean
 
   field :workflow, type: Hash, default: { }
