@@ -86,6 +86,9 @@ class CensusEmployee < CensusMember
   scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
 
+  # scope :emplyee_profiles_active_cobra,        ->{ where(aasm_state: "eligible") }
+  scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}
+
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
   # scope :covered,     ->{ where( "benefit_group_assignments.aasm_state" => "coverage_selected" ) }

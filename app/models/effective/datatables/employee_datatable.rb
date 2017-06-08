@@ -59,7 +59,7 @@ module Effective
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
               ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
               ['Terminate', show_employee_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: "census_employeeid_#{row.id.to_s}", census_employee: row.id), 'ajax'],
-              ['Rehire', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static'],
+              ['Rehire', rehire_employee_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: "census_employeeid_#{row.id.to_s}", census_employee: row.id), 'ajax'],
               ['Initiate Cobra', generate_invoice_exchanges_hbx_profiles_path(ids: [row]), 'static']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "census_employeeid_#{row.id.to_s}"}, formats: :html
@@ -70,10 +70,11 @@ module Effective
         return @employee_collection if defined? @employee_collection
         employer_profile = EmployerProfile.find(attributes["id"])
         @employer_profile = employer_profile
-        @employee_collection = employer_profile.census_employees.active
+        @employee_collection = employer_profile.census_employees
       end
 
       def nested_filter_definition
+        # name = collection
         filters = {
             employers:
                 [

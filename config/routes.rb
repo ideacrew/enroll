@@ -290,6 +290,7 @@ Rails.application.routes.draw do
         get :cobra
         collection do
           get :show_employee
+          get :rehire_employee
         end
         get :cobra_reinstate
         get :benefit_group, on: :member

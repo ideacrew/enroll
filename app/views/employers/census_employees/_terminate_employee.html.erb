@@ -9,7 +9,7 @@
               <span class="lg fourteen">(termination date must be within the past 60 days)</span>
             </h5>
             <div class="pull-right" style="margin-top: 2px;">
-              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (@census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
+              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (@census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (@census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
               <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, @census_employee.id) %>" href="javascript:;" id="remove_<%= @census_employee.id %>">
                 Terminate Employee
               </a>
