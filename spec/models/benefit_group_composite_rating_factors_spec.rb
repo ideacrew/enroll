@@ -184,3 +184,78 @@ describe BenefitGroup, "being asked for rating area" do
     expect(subject.rating_area).to eq(rating_area)
   end
 end
+
+describe BenefitGroup, "given a composite tier contribution with an estimated premium value, and a plan year that should estimate" do
+  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
+  let(:estimated_tier_premium) { 1234.23 }
+  let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
+  
+  subject do
+    BenefitGroup.new(:plan_year => plan_year, :composite_tier_contributions => [
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :estimated_tier_premium => estimated_tier_premium) 
+    ])
+  end
+
+  before :each do
+    allow(plan_year).to receive(:estimate_group_size?).and_return(true)
+  end
+
+  it "has the estimated premium" do
+    expect(subject.composite_rating_tier_premium_for(composite_rating_tier)).to eq estimated_tier_premium
+  end
+end
+
+describe BenefitGroup, "given a composite tier contribution with a final premium value, and a plan year that should NOT estimate" do
+  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
+  let(:final_tier_premium) { 1234.23 }
+  let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
+  
+  subject do
+    BenefitGroup.new(:plan_year => plan_year, :composite_tier_contributions => [
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :final_tier_premium => final_tier_premium) 
+    ])
+  end
+
+  before :each do
+    allow(plan_year).to receive(:estimate_group_size?).and_return(false)
+  end
+
+  it "has the final premium" do
+    expect(subject.composite_rating_tier_premium_for(composite_rating_tier)).to eq final_tier_premium 
+  end
+end
+
+describe BenefitGroup, "given a composite tier contribution with an employer contribution percent" do
+  let(:employer_contribution_percent) { 50.00 }
+  let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
+  
+  subject do
+    BenefitGroup.new(:composite_tier_contributions => [
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :employer_contribution_percent => employer_contribution_percent) 
+    ])
+  end
+
+  it "has the correct contribution factor" do
+    expect(subject.composite_employer_contribution_factor_for(composite_rating_tier)).to eq 0.5
+  end
+end
+
+describe BenefitGroup, "asked for a composite rating tier base factor for a plan and a particular composite rating tier" do
+  let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
+  let(:carrier_profile_id) { double }
+  let(:plan) { instance_double(Plan, :carrier_profile_id => carrier_profile_id) }
+  let(:composite_rating_tier_base_factor) { 1.01 }
+  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
+  
+  subject do
+    BenefitGroup.new(:plan_year => plan_year)
+  end
+
+  before :each do
+    allow(CompositeRatingTierFactorSet).to receive(:value_for).with(carrier_profile_id, 2015, composite_rating_tier).and_return(composite_rating_tier_base_factor)
+  end
+
+  it "has the correct composite rating tier factor" do
+    expect(subject.composite_rating_tier_factor_for(composite_rating_tier, plan)).to eq composite_rating_tier_base_factor
+  end
+end

@@ -10,4 +10,8 @@ class CompositeTierContribution
 
   validates_inclusion_of :composite_rating_tier, in: CompositeRatingTier::NAMES, allow_blank: false
   validates_inclusion_of :employer_contribution_percent, in: (0.00...100.00), allow_blank: false
+
+  def contribution_factor
+    employer_contribution_percent * 0.01
+  end
 end

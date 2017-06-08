@@ -1,5 +1,9 @@
 module Caches
   class PlanDetails
+    # TODO: Implemented by 16310
+    def self.lookup_rate_with_area(plan_id, rate_schedule_date, effective_age, rating_area)
+    end
+
     def self.lookup_rate(plan_id, rate_schedule_date, effective_age)
       calc_age = age_bounding(plan_id, effective_age)
       age_record = $plan_age_lookup[plan_id][calc_age].detect do |pt|
