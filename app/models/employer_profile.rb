@@ -277,6 +277,15 @@ class EmployerProfile
     (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
   end
 
+  def earliest_plan_year_start_on_date
+   plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+   plan_years.reject!{|py| py.can_be_migrated? }
+   plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+   if !plan_year.blank?
+     plan_year.start_on
+   end
+ end
+
   def billing_plan_year(billing_date = nil)
     billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
     plan_year = find_plan_year_by_effective_date(billing_report_date)
@@ -517,6 +526,15 @@ class EmployerProfile
       })
     end
 
+    def initial_employers_reminder_to_publish(start_on)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => start_on,
+          :"aasm_state" => "draft"
+        }
+      })
+    end
+
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
@@ -579,6 +597,39 @@ class EmployerProfile
             plan_year.force_publish!
           end
         end
+
+        #Initial employer reminder notices to publish plan year.
+        start_on = (new_date+2.months).beginning_of_month
+        start_on_1 = (new_date+1.month).beginning_of_month
+        if new_date+2.days == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        elsif new_date+1.day == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        else
+          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
+          if (new_date + 2.days) == plan_year_due_date
+            initial_employers_reminder_to_publish(start_on_1).each do |organization|
+              begin
+                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+              rescue Exception => e
+                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              end
+            end
+          end
+        end
+
       end
 
       # Employer activities that take place monthly - on first of month
