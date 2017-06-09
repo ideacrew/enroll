@@ -605,6 +605,7 @@ function checkZip(textbox) {
   }
   return true;
 }
+
 function validateCounty(selectField) {
     if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
     {
@@ -613,6 +614,17 @@ function validateCounty(selectField) {
         $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
     }
 }
+
+$(document).on('submit', '#new_organization', function() {
+  var retVal = true;
+  if ($("#organization_sic_code").length && !$("#organization_sic_code option:selected").val())
+  { 
+    $("#sic_warning").html('Please fill Standard Indusry Code');
+    retVal = false;
+  }
+  return retVal;
+});
+
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
   if (textbox.value == '') {

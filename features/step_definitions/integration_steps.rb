@@ -22,6 +22,7 @@ def people
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112",
+      sic: "0111",
       mlegal_name: "Cogswell Cogs, Inc",
       mdba: "Cogswell Cogs, Inc",
       mfein: "211141467"
@@ -81,6 +82,7 @@ def people
       legal_name: "Acmega LLC",
       dba: "Acmega LLC",
       fein: "890112233",
+      sic: "0111",
       email: 'johb.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -118,6 +120,7 @@ def people
       legal_name: "Legal LLC",
       dba: "Legal LLC",
       fein: "890000223",
+      sic: "0111",
       email: 'tim.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -417,7 +420,7 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[legal_name]', :with => employer[:legal_name]
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
-
+  select_from_chosen '0111', from: 'Select Industry Code'
 
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
@@ -486,6 +489,7 @@ When(/^.* visit the Employer portal$/) do
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
+  FactoryGirl.create(:sic_code, sic_code: "0111")
   expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   screenshot("employer_sign_up_welcome")
 end
