@@ -258,6 +258,25 @@ describe EmployerProfile, dbclean: :after_each do
 
    end
 
+   context ".find_earliest_start_on_date_among_published_plans" do
+    let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
+    let(:employer_profile)    { EmployerProfile.new(**valid_params, plan_years: [active_plan_year, renewing_plan_year]) }
+    let(:renewing_plan_year)   {
+      FactoryGirl.build(:plan_year,
+        open_enrollment_start_on: TimeKeeper.date_of_record + 1.day,
+        open_enrollment_end_on: TimeKeeper.date_of_record + 10.days,
+        start_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.day,
+        end_on: TimeKeeper.date_of_record.next_month.end_of_month + 1.year,
+        aasm_state: 'renewing_published')
+    }
+    context 'when any type of plans are present' do
+      let(:employer_profile)     { EmployerProfile.new(**valid_params, plan_years: [renewing_plan_year, active_plan_year]) }
+      it "should return earliest start_on date among plans" do
+        expect(employer_profile.earliest_plan_year_start_on_date).to eq [active_plan_year.start_on, renewing_plan_year.start_on].min
+      end
+    end
+  end
+
   context ".billing_plan_year" do
     let(:active_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'published') }
     let(:employer_profile)    { EmployerProfile.new(**valid_params, plan_years: [active_plan_year, renewing_plan_year]) }
@@ -332,7 +351,7 @@ describe EmployerProfile, dbclean: :after_each do
 
   context "has hired a broker" do
   end
-  
+
   context "has employees that have enrolled in coverage" do
     let(:benefit_group)       { FactoryGirl.build(:benefit_group)}
     let(:plan_year)           { FactoryGirl.build(:plan_year, benefit_groups: [benefit_group]) }
