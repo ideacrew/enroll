@@ -46,7 +46,7 @@ class EmployerInvoice
   end
 
   def send_email_notice
-    if (@organization.employer_profile.is_converting? || (@organization.is_new_employer? && @organization.invoices.size > 1))
+    unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
       subject = "Invoice Now Available"
       body = "Your invoice is now available in your employer profile under Billing tab. Thank You"
       message_params = {
