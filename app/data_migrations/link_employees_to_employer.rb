@@ -7,30 +7,15 @@ class LinkEmployeesToEmployer < MongoidMigrationTask
     ce3 = CensusEmployee.find(ENV['ce3'])
     ce4 = CensusEmployee.find(ENV['ce4'])
     ce5 = CensusEmployee.find(ENV['ce5'])
-    if ce1.present?
-      ce1.link_employee_role!
-    else
-      raise "No Census Employee found for ce1"
-    end
-    if ce2.present?
-      ce2.link_employee_role!
-    else
-      raise "No Census Employee found for ce2"
-    end
-    if ce3.present?
-      ce3.link_employee_role!
-    else
-      raise "No Census Employee found for ce3"
-    end
-    if ce4.present?
-      ce4.link_employee_role!
-    else
-      raise "No Census Employee found for ce4"
-    end
-    if ce5.present?
-      ce5.link_employee_role!
-    else
-      raise "No Census Employee found for ce5"
+    
+    arr = [ce1, ce2, ce3, ce4, ce5]
+    
+    arr.each do |a|
+      if a.present?
+        a.link_employee_role!
+      else
+        raise "No Census Employee found for #{a}"
+      end
     end
   end
 end
