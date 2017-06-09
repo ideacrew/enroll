@@ -7,22 +7,16 @@ namespace :migrations do
       hbx_id = policy["Policy ID"].to_s
       termination_date = policy["UPDATED END DATE"]
       terminated_on = Date.strptime(termination_date.to_s, "%m/%d/%y")
-      enrollment = HbxEnrollment.by_hbx_id(hbx_id)
-      next unless enrollment.size == 1
-      if enrollment.first.effective_on < terminated_on
-         enrollment.first.workflow_state_transitions << WorkflowStateTransition.new(
-                                                       from_state: enrollment.first.aasm_state,
-                                                       to_state: "coverage_terminated"
-                                                       )
-         enrollment.first.update_attributes(aasm_state: "coverage_terminated")
-         enrollment.first.update_attributes(terminated_on: terminated_on)
-      elsif enrollment.first.effective_on == terminated_on
-        if enrollment.first.aasm_state != "coverage_canceled"
-          enrollment.first.workflow_state_transitions << WorkflowStateTransition.new(
-              from_state: enrollment.first.aasm_state,
-              to_state: "coverage_canceled"
-          )
-          enrollment.first.update_attributes(aasm_state: "coverage_canceled")
+      enrollment = HbxEnrollment.by_hbx_id(hbx_id).first
+      next if enrollment.blank?
+      enrollment_state = enrollment.aasm_state
+      if enrollment.effective_on < terminated_on
+        enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: terminated_on)
+        enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_terminated"})
+      elsif enrollment.effective_on == terminated_on
+        if !enrollment.coverage_canceled?
+          enrollment.update_attributes(aasm_state: "coverage_canceled")
+          enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_canceled"})
         end
       else
         puts "Termination date should not be earlier than effective on date for enrollment #{hbx_id}" unless Rails.env.test?
