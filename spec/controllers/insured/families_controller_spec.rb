@@ -460,7 +460,7 @@ RSpec.describe Insured::FamiliesController do
       @qle = FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: date)
-      special_enrollment_period.selected_effective_on = date.strftime('%m/%d/%Y') 
+      special_enrollment_period.selected_effective_on = date.strftime('%m/%d/%Y')
       special_enrollment_period.qualifying_life_event_kind = @qle
       special_enrollment_period.qle_on = date.strftime('%m/%d/%Y')
       special_enrollment_period.save
@@ -475,7 +475,7 @@ RSpec.describe Insured::FamiliesController do
       it "should redirect" do
         special_enrollment_period = @family.special_enrollment_periods.last
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep',effective_on_date: special_enrollment_period.effective_on}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep',effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id}))
       end
     end
 
@@ -488,7 +488,7 @@ RSpec.describe Insured::FamiliesController do
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep'}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
       end
     end
   end
@@ -856,7 +856,7 @@ RSpec.describe Insured::FamiliesController do
   let(:key) {"sample-key"}
   let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}" }
   let(:params) { {family: {identifier: doc_id}} }
-  
+
     context "Failed Download" do
       it "fails with an error message" do
         allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
