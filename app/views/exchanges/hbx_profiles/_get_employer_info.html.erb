@@ -40,8 +40,12 @@
             <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
             <td> <%= user.present? ? user.email : "Nil" %> </td>
             <td> <%= user.present? ? user.roles.collect(&:humanize).join(", ") : "Nil" %> </td>
-            <td> <%= user.present? ? TimeKeeper.date_according_to_exchange_at(user.last_sign_in_at) : "Nil" %> </td>
-            <td> <%= person.created_at.in_time_zone("Eastern Time (US & Canada)").to_datetime %> </td>
+            <% if user.present? %>
+              <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+            <% else %>
+              <td> Nil </td>
+            <% end %>
+            <td> <%= person.created_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= person.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
             <td> <%= person.work_phone_or_best %> </td>
             <td> <%= person_roles.join(", ") %> </td>
           </tr>
