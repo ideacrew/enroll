@@ -260,10 +260,6 @@ def employer_poc
     end
   end
 
-  def set_transmit_flag(hbx_id)
-    HbxEnrollment.find(hbx_id).update_attributes!(is_tranding_partner_transmittable: true)
-  end
-
   def terminate_enrollment
     @hbxs = Family.find(params[:family]).all_enrollments.can_terminate
     @row = params[:family_actions_id]

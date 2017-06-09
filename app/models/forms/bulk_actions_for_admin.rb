@@ -14,21 +14,24 @@ module Forms
     end
 
     def cancel_enrollments
+      cancelled_enrollments_transmission_info = {}
       @params.each do |key, value|
         if key.to_s[/cancel_hbx_.*/]
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
             hbx.cancel_coverage! if hbx.may_cancel_coverage?
             @result[:success] << hbx
+            cancelled_enrollments_transmission_info[hbx.id] = params.key?("transmit_hbx_#{hbx.id.to_s}") ? true : false
           rescue
             @result[:failure] << hbx
           end
         end
-        set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
       end
+      cancelled_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
     end
 
     def terminate_enrollments
+      terminated_enrollments_transmission_info = {}
       @params.each do |key, value|
         if key.to_s[/terminate_hbx_.*/]
           hbx = HbxEnrollment.find(params[key.to_s])
@@ -36,18 +39,25 @@ module Forms
             termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
             hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
             @result[:success] << hbx
+            terminated_enrollments_transmission_info[hbx.id] = params.key?("transmit_hbx_#{hbx.id.to_s}") ? true : false
           rescue
             @result[:failure] << hbx
           end
         end
-        set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
       end
+      terminated_enrollments_transmission_info.each { |hbx_id, transmit_flag| handle_edi_transmissions(hbx_id, transmit_flag) }
     end
 
     private
 
-    def set_transmit_flag(hbx_id)
-      HbxEnrollment.find(hbx_id).update_attributes!(is_tranding_partner_transmittable: true)
+    def handle_edi_transmissions(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
+      hbx = HbxEnrollment.find(hbx_id)
+      ### Handle EDI transmission here ###
+      if transmit_flag
+
+      else
+
+      end
     end
   end
 end
