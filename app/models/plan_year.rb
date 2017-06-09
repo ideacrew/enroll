@@ -1049,7 +1049,7 @@ class PlanYear
   end
 
   def initial_employer_ineligibility_notice
-    return true if benefit_group.any?{|bg| bg.is_congress?}
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
   end
 
