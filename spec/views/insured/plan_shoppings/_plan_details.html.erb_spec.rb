@@ -4,6 +4,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:person) { FactoryGirl.create(:person, :with_family ) }
+  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:application) { FactoryGirl.create(:application, family: family1) }
 
 
 
@@ -48,8 +50,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       allow(plan).to receive(:is_csr?).and_return false
       family = person.primary_family
       active_household = family.households.first
-      tax_household = FactoryGirl.create(:tax_household, household: active_household )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, application: application )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -111,8 +114,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       allow(view).to receive(:current_cost).and_return(52)
       family = person.primary_family
       active_household = family.households.first
-      tax_household = FactoryGirl.create(:tax_household, household: active_household )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, application: application )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -159,6 +163,9 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       allow(plan).to receive(:is_csr?).and_return false
       allow(plan).to receive(:coverage_kind).and_return('dental')
       allow(plan).to receive(:metal_level).and_return('dental')
+      family = person.primary_family
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -178,13 +185,14 @@ context "with tax household and eligibility determination of csr_94" do
     assign(:hbx_enrollment, hbx_enrollment)
     assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
     assign(:carrier_names_map, {})
+    assign(:eligibility_kind, "csr_94")
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
-    allow(view).to receive(:params).and_return :market_kind => 'individual'
-      family = person.primary_family
-      active_household = family.households.first
-      tax_household = FactoryGirl.create(:tax_household, household: active_household )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+    allow(view).to receive(:params).and_return({:market_kind => 'individual'})
+    family = person.primary_family
+    application.update_attributes!(family: family)
+    tax_household = FactoryGirl.create(:tax_household, application: application )
+    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -207,8 +215,9 @@ context "with tax household and eligibility determination of csr_94" do
       allow(view).to receive(:params).and_return :market_kind => 'shop'
       family = person.primary_family
       active_household = family.households.first
-      tax_household = FactoryGirl.create(:tax_household, household: active_household )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household )
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, application: application )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -231,8 +240,9 @@ context "with tax household and eligibility determination of csr_94" do
       allow(plan).to receive(:is_csr?).and_return false
       family = person.primary_family
       active_household = family.households.first
-      tax_household = FactoryGirl.create(:tax_household, household: active_household )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_eligibility_kind: 'csr_100' )
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, application: application )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application, csr_eligibility_kind: "csr_100", source: "Curam" )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 

@@ -456,8 +456,9 @@ class Plan
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
+
         csr_kinds = []
-        #TODO select the right csr_kind from the array of csr_kinds.
+        csr_kind = nil
 
         if tax_households.present?
           tax_households.each do |tax_household|
@@ -467,7 +468,13 @@ class Plan
           end
         end
 
-        csr_kind = csr_kinds.blank? ? nil : csr_kinds.first
+        #Selects the right csr_kind from the array of csr_kinds.
+        csr_kind = "csr_94" if csr_kinds.include? "csr_94"
+        csr_kind = "csr_87" if csr_kinds.include? "csr_87"
+        csr_kind = "csr_73" if csr_kinds.include? "csr_73"
+        csr_kind = "csr_100" if csr_kinds.include? "csr_100"
+
+
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else
