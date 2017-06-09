@@ -94,7 +94,7 @@ module Effective
         ],
         families: [
           {scope: 'all', label: 'All'},
-          {scope: 'by_enrollment_individualfamil_market', label: 'Individual Enrolled', subfilter: :individual_options},
+          {scope: 'by_enrollment_individual_market', label: 'Individual Enrolled', subfilter: :individual_options},
           {scope: 'by_enrollment_shop_market', label: 'Employer Sponsored Coverage Enrolled', subfilter: :employer_options},
           {scope: 'non_enrolled', label: 'Non Enrolled'},
         ],

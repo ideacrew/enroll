@@ -59,7 +59,5 @@ class DefinePermissions < MigrationTask
   end
   def hbx_admin_can_add_sep
     Permission.hbx_staff.update_attributes!(can_add_sep: true)
-    Permission.hbx_read_only.update_attributes!(can_add_sep: true)
-    Permission.hbx_csr_supervisor.update_attributes!(can_add_sep: true)
   end
 end
