@@ -339,6 +339,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP19',
+    title: 'Group Ineligible to Obtain Coverage',
+    description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Renewal Group Ineligible to Obtain Coverage',
+        notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
+        mpi_indicator: 'MPI_SHOP19',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP20',
     title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
     description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
@@ -664,7 +685,6 @@ ivl_notice_triggers = [
   },
 ]
 
-
 shop_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
@@ -672,6 +692,3 @@ end
 ivl_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
-
-
-
