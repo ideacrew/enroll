@@ -1417,7 +1417,7 @@ context "Terminated enrollment re-instatement" do
   context "for Individual market" do
     let(:ivl_family)        { FactoryGirl.create(:family, :with_primary_family_member) }
 
-    let(:ivl_enrollment)    { 
+    let(:ivl_enrollment)    {
       FactoryGirl.create(:hbx_enrollment,
         household: ivl_family.latest_household,
         coverage_kind: "health",
@@ -1482,14 +1482,14 @@ context "Terminated enrollment re-instatement" do
       enrollment.reload
       ce.reload
     end
-    
+
     it "should have terminated enrollment & cenuss employee" do
       expect(enrollment.coverage_terminated?).to be_truthy
       expect(ce.employment_terminated?).to be_truthy
     end
 
-    context 'when re-instated' do 
-      before do 
+    context 'when re-instated' do
+      before do
         enrollment.reinstate
       end
 
@@ -1500,7 +1500,7 @@ context "Terminated enrollment re-instatement" do
         expect(reinstated_enrollment.workflow_state_transitions.where(:to_state => 'coverage_reinstated').present?).to be_truthy
         expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
       end
-  
+
       it 'should re-instate census employee' do
         ce.reload
         expect(ce.employee_role_linked?).to be_truthy
@@ -2442,17 +2442,36 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
 
-        it 'should cancel passive renewal and create new passive' do
-          passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
-          expect(passive_renewal).not_to be_nil
+        context 'when employee passively renewed coverage' do
 
-          new_enrollment.select_coverage!
-          family.reload
-          passive_renewal.reload
+          it 'should cancel passive renewal and create new passive' do
+            passive_renewal = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(passive_renewal).not_to be_nil
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy
-          new_passive = family.enrollments.where(:aasm_state => 'auto_renewing').first
-          expect(new_passive.plan).to eq new_renewal_plan
+            new_enrollment.select_coverage!
+            family.reload
+            passive_renewal.reload
+
+            expect(passive_renewal.coverage_canceled?).to be_truthy
+            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(new_passive.plan).to eq new_renewal_plan
+          end
+        end
+
+        context 'when employee actively renewed coverage' do
+
+          it 'should not cancel active renewal and should not generate passive' do
+            renewal_coverage = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            renewal_coverage.update(aasm_state: 'coverage_selected')
+
+            new_enrollment.select_coverage!
+            family.reload
+            renewal_coverage.reload
+
+            expect(renewal_coverage.coverage_canceled?).to be_falsey
+            new_passive = family.enrollments.by_coverage_kind('health').where(:aasm_state => 'auto_renewing').first
+            expect(new_passive.blank?).to be_truthy
+          end
         end
       end
 
@@ -2628,7 +2647,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
-    
+
     before do
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
@@ -2654,7 +2673,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     context 'When employee not elgibile for cobra' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
-      it 'should raise error' do 
+      it 'should raise error' do
         expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
