@@ -1,1 +1,302 @@
-# Add benefits steps here.
+- step:
+    sections:
+      - section:
+          heading: Other Health Coverage for Mary
+          heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Is this person currently enrolled in health coverage ? *
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: person_enrolled
+                  value: true
+                  id: 'yes2'
+                  # checked: true
+                  label: 'Yes'
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: person_enrolled
+                  value: false
+                  id: 'no2'
+                  # checked: false
+                  label: 'No'
+                  classNames: 'span-text'
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Where can this person access coverage?*
+                  required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: kind
+                  required: true
+                  values:
+                    - employer_sponsored_insurance
+                    - cobra
+                    - private_individual_and_family_coverage
+                    - medicaid
+                    - child_health_insurance_plan
+                    - medicare
+                    - tricare
+                    - veterans_administration_health_benefits
+                    - peace_corps_health_benefits
+                  model: benefit
+                  attribute: kind
+            - cells:
+                - gutter: 3
+                  type: input_date
+                  placeholder: Start On *
+                  required: true
+                  model: benefit
+                  attribute: start_on
+                - gutter: 3
+                  type: input_date
+                  placeholder: End On *
+                  required: true
+                  model: benefit
+                  attribute: end_on
+- step:
+    sections:
+      - section:
+          heading: Other Health Coverage for Mary
+          heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Does this person currently have access to other health coverage, including through another person in your household ? *
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  # checked: true
+                  label: 'Yes'
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  # checked: false
+                  label: 'No'
+                  classNames: 'span-text'
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  Where can this person access coverage ?*
+                  required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: kind
+                  required: true
+                  values:
+                    - employer_sponsored_insurance
+                    - cobra
+                    - private_individual_and_family_coverage
+                    - medicaid
+                    - child_health_insurance_plan
+                    - medicare
+                    - tricare
+                    - veterans_administration_health_benefits
+                    - peace_corps_health_benefits
+                  model: benefit
+                  attribute: kind
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: '<strong> Please Note: </strong> Have this employers Human Resource Department fill out the Employer Coverage Tool to answer the questions in this section.'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 12
+                  type: input
+                  name: employer_name
+                  placeholder: EMPLOYER NAME *
+                  required: true
+                  model: benefit
+                  attribute: employer_name
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_1
+                  placeholder: EMPLOYER ADDRESS  Line 1 *
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_1
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_2
+                  placeholder: EMPLOYER ADDRESS Line 2(APT, UNIT, ETC)
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_2
+            - cells:
+                - gutter: 3
+                  type: input
+                  name: city
+                  placeholder: CITY*
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: city
+                - gutter: 3
+                  type: 'dropdown'
+                  name: 'check'
+                  required: true
+                  values:
+                    - Choose State
+                    - District of Columbia
+                    - Massachussets
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: state
+                - gutter: 3
+                  type: input
+                  name: zip
+                  placeholder: ZIP *
+                  required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: zip
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_phone
+                  placeholder: EMPLOYER PHONE
+                  required: true
+                  model: employer_phone
+                  accessor:
+                    - employer_phone
+                  attribute: full_phone_number
+                - gutter: 6
+                  type: input
+                  name: employer_indentification_no.
+                  placeholder: EMPLOYER IDENTIFICATION NO.(EIN)
+                  required: true
+                  model: benefit
+                  attribute: employer_id
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: is_eligible
+                  value: true
+                  id: 'yes2'
+                  label: 'Yes'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_eligible
+                - gutter: 1
+                  type: label_radio
+                  name: is_eligible
+                  value: false
+                  id: 'no2'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_eligible
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  Does this employer offer a health plan that meets the minimum value standard ? *
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: employer_sponsored
+                  value: true
+                  id: 'yes2'
+                  model: benefit
+                  attribute: is_employer_sponsored
+                  label: 'Yes'
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  name: employer_sponsored
+                  value: false
+                  id: 'no2'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_employer_sponsored
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: 'dropdown'
+                  name: kind
+                  required: true
+                  values:
+                    - employee and spouse
+                  model: benefit
+                  attribute: kind
+                - gutter: 3
+                  type: input_date
+                  placeholder: Start On *
+                  required: true
+                  model: benefit
+                  attribute: start_on
+                - gutter: 3
+                  type: input_date
+                  placeholder: End On *
+                  required: true
+                  model: benefit
+                  attribute: end_on
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 4
+                  type: input
+                  name: amount
+                  placeholder: AMOUNT*
+                  required: true
+                  model: benefit
+                  attribute: employee_cost
+                - gutter: 6
+                  type: 'dropdown'
+                  name: frequency
+                  required: true
+                  values:
+                    - biweekly 
+                    - daily 
+                    - half_yearly 
+                    - monthly 
+                    - quarterly 
+                    - weekly 
+                    - yearly
+                  model: benefit
+                  attribute: employee_cost

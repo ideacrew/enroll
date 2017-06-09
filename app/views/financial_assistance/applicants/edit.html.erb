@@ -5,7 +5,19 @@
 	<h4>Tax Info, Incomes, Benefits and Deductions for <b><%= @applicant.person.full_name %></b></h4> 
   <div class="row input-no-pd">
 </div>
-
+<table class="table">
+	<tr>
+		<th>Applicant Name</th>
+		<th>Claimed as Tax Dependent?</th>
+		<th>Claimed dependent by</th>
+		<th></th>
+	</tr>
+	<tr>
+		<td><%=@applicant.family_member.person.full_name%></td>
+		<td><%=@applicant.is_claimed_as_tax_dependent%></td>
+		<td><%=@applicant.claimed_as_tax_dependent_by%></td>
+	</tr>
+</table>
 
 <%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
 <br />
@@ -29,9 +41,41 @@
 
 <hr />
 
+<div>
+	<% if @applicant.benefits.present? %>
+		<h4>Edit Existing Benefit(s)</h4>
+		<table class="table">
+			<th>Benefit Type</th>
+			<th></th>
+			<% @applicant.benefits.each do |benefit| %>
+			<tr>
+				<td><%=benefit.kind%></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1) %></td>
+			</tr>
+			<% end %>
+		</table>
+	<%end%>
+</ div>
 <%= link_to "Add Benefit", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %><br>
 <hr />
-<%= link_to "Add Deduction", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+
+<div>
+	<% if @applicant.deductions.present? %>
+		<h4>Edit Existing Deductions (Income)</h4>
+		<table class="table">
+			<th>Deduction Income Type</th>
+			<th></th>
+			<% @applicant.deductions.each do |deduction| %>
+			<tr>
+				<td><%= deduction.kind %></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1)  %></td>
+			</tr>
+			<% end %>
+		</table>
+	<%end%>
+</div>
+<%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+
 <br> <br>
 <hr />
 

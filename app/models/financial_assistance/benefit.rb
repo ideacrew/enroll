@@ -49,18 +49,23 @@ class FinancialAssistance::Benefit
 
   field :workflow, type: Hash, default: { }
 
-  validates :start_on, presence: true
+  field :employer_name, type: String
+  field :employer_id, type: Integer
+  
+  embeds_one :employer_address, class_name: "::Address"
+  embeds_one :employer_phone, class_name: "::Phone"
+  # validates :start_on, presence: true
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
                       message: "pick a name length between #{TITLE_SIZE_RANGE}"
 
-  validates :kind,    presence: true, 
-                      inclusion: { 
-                        in: KINDS, 
-                        message: "%{value} is not a valid alternative benefit type" 
-                      }
+  # validates :kind,    presence: true, 
+  #                     inclusion: { 
+  #                       in: KINDS, 
+  #                       message: "%{value} is not a valid alternative benefit type" 
+  #                     }
 
   validate :start_on_must_precede_end_on
 
@@ -83,7 +88,7 @@ private
 
   def start_on_must_precede_end_on
     return unless start_on.present? && end_on.present?
-    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
+    # errors.add(:end_on, "can't occur before start on date") if end_on < start_on
   end
 
 end
