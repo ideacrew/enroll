@@ -20,16 +20,6 @@ class ChangeInitialPlanYearAasmState< MongoidMigrationTask
           plan_year.revert_application! if ['application_ineligible','published_invalid','eligibility_review'].include?(plan_year.aasm_state)
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?  # for plan year in publish_pending state
           plan_year.force_publish! if plan_year.may_force_publish?
-
-          if  plan_year.may_force_publish? && !plan_year.is_publish_date_valid?
-            plan_year.workflow_state_transitions << WorkflowStateTransition.new(
-                from_state: plan_year.aasm_state,
-                to_state: 'enrolling'
-            )
-            plan_year.update_attributes!(aasm_state:'enrolling')
-            plan_year.employer_profile.application_accepted! if plan_year.employer_profile.may_application_accepted?
-          end
-
           puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
         end
       else

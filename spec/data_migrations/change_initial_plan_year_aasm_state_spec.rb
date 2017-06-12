@@ -43,12 +43,10 @@ describe ChangeInitialPlanYearAasmState, dbclean: :after_each do
 
     it "should update plan year aasm state of plan year after force publish date" do
       canceled_plan_year.update_attributes(aasm_state:'application_ineligible') # before migration
-      allow(canceled_plan_year).to receive(:is_publish_date_valid?).and_return(false)
       subject.migrate
       canceled_plan_year.reload
       canceled_plan_year.employer_profile.reload
       expect(canceled_plan_year.aasm_state).to eq "enrolling" # after migration
-      expect(canceled_plan_year.employer_profile.aasm_state).to eq "registered"
     end
 
   end
