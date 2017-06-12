@@ -27,8 +27,10 @@ namespace :migrations do
       if ee.nil?
         puts "No employee role found for enrollment #{hbx_id}"
       else
-        hbx_enrollment.update_attributes(employee_role_id:ee.id)
+        unless hbx_enrollment.update_attributes(employee_role_id:ee.id)
+          puts "Employee Role not updated on #{hbx_id}"
+        end
       end
     end
-    end
+  end
 end
