@@ -30,7 +30,7 @@
 	<div class="row input-no-pd small">
 		<h3>Review and Continue</h3>
 		<p>If you have added everyone in your household, continue below:</p>
-		<div> <%= button_to "Review and Continue", "", :id => "", :class => "btn btn-success", :method => :get %></div>
+		<div> <%= button_to "Review and Continue", go_to_step_financial_assistance_application_path(@application, 1), :id => "", :class => "btn btn-success", :method => :get %></div>
 	</div>
 </div>
 

@@ -15,6 +15,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     #@family = Family.find(params[:family_id])
     #@family_member = @family.family_members.find(params[:family_member_id])
     @application = FinancialAssistance::Application.new
+    @model = @application
+    load_steps
+    current_step
+    render 'workflow/step'
   end
 
   def create
@@ -37,26 +41,21 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-    @family_member = FamilyMember.find(params[:member_id])
-    @family = @family_member.family
-    attributes = []
-    params.each {|param| attributes << {param.first => param.second} if param.first.include?"_attributes"}
-
-    attributes.each do  |attribute_params|
-      attribute_params.each do |model_key, params_instance|
-        update_params(model_key, params_instance, params)
-        @model.update_attributes!(permit_params(hash_to_param(attribute_params)))
-      end
+     model_name = @model.class.to_s.split('::').last.downcase
+     model_params = params[model_name]
+     @model.update_attributes!(permit_params(model_params)) if model_params.present?
+     if params.key?(model_name)
+       @model.workflow = { current_step: @current_step.to_i + 1}
+       @current_step = @current_step.next_step
+     else
+       @model.workflow = { current_step: @current_step.to_i}
+     end
+     @model.save!
+     if params[:commit] == "Finish"
+       redirect_to edit_financial_assistance_application_path(@application)
+     else
+       render 'workflow/step'
     end
-
-    if params.key?(:step)
-      @model.workflow = { current_step: @current_step.to_i }
-    else
-      @model.workflow = { current_step: @current_step.to_i + 1 }
-      @current_step = @current_step.next_step
-    end
-    @model.save!
-    render 'workflow/step'
   end
 
   private
@@ -76,6 +75,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def find
     # TODO:Find the latest application in-progress
-    current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
+    @application = current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
   end
 end

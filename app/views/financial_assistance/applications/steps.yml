@@ -1,770 +1,229 @@
 - step:
-    heading: Tax Info
-    heading_text: Please complete all tax info for Mary. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
+    heading: Submit Application
+    heading_text: Please complete all tax info for  <family-member-name-placeholder>. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
     sections:
       - section:
           lines:
             - cells:
-                - gutter: 6
-                  type: text
-                  text: Will this person file taxes for 2017? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: true
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                  model: applicant
-                  attribute: is_required_to_file_taxes
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: false
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                  model: applicant
-                  attribute: is_required_to_file_taxes
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: <b> I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong.I may also be asked to provide additional information, if found eligible, Medicaid or private health insurance coverage, with or without financial assistance, will be extended for another year for myself and/or members of my application group, child support, veterans payments, or supplemental security income( SSI).
             - cells:
-                - gutter: 6
-                  type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: true
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                  model: applicant
-                  attribute: is_claimed_as_tax_dependent
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: false
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                  model: applicant
-                  attribute: is_claimed_as_tax_dependent
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  - gutter: 12
+                    type: checkbox
+                    classNames: 'span-text'
+                    label: I Agree *
+                    model: application
+                    name: medicaid_terms
+                    attribute: medicaid_terms
+      - section:
+          lines:
             - cells:
-                - gutter: 6
-                  type: text
-                  text: This person will be claimed as a dependent by *
-                  required: true
-                - gutter: 6
-                  type: 'dropdown'
-                  name: 'check'
-                  required: true
-                  values:
-                    - Select who will claim this person
-                    - Employee
-                    - Spouse
-                    - Child
-                  model: applicant
-                  attribute: is_joint_tax_filing #TODO: Map to right attribute
+                - gutter: 12
+                  type: raw_html
+                  classNames: span-text
+                  text: "<b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
+                        I can report changes by going online and logging into 'My Account', by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
+                        or by submitting information via mail or in-person at one of the Department of Human Services' Service Centers. <br> <br>
 
-- step:
-    heading: Job Income
-    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person expect to have any income from a job in 2017? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: true
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: false
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: What Kind of job income is this?*
-                  required: true
-                - gutter: 6
-                  type: 'dropdown'
-                  name: 'income_kind'
-                  required: true
-                  values:
-                    - Select who will calim this person
-                    - alimony_and_maintenance
-                    - american_indian_and_alaskan_native
-                    - capital_gains
-                    - dividend
-                    - employer_funded_disability
-                    - estate_trust
-                    - farming_and_fishing
-                    - foreign
-                    - interest
-                    - lump_sum_amount
-                    - military
-                    - net_self_employment
-                    - other
-                    - pension_retirement_benefits
-                    - permanent_workers_compensation
-                    - prizes_and_awards
-                    - rental_and_royalty
-                    - scholorship_payments
-                    - social_security_benefit
-                    - supplemental_security_income
-                    - tax_exempt_interest
-                    - unemployment_insurance
-                    - wages_and_salaries
-                    - income_from_irs
-                  model: income
-                  attribute: kind
-            - cells:
-                - gutter: 3
-                  type: input
-                  name: amount
-                  placeholder: AMOUNT *
-                  required: true
-                  model: income
-                  atribute: amount
-                - gutter: 3
-                  type: dropdown
-                  name: frequency
-                  required: true
-                  values:
-                    - biweekly 
-                    - daily 
-                    - half_yearly 
-                    - monthly 
-                    - quarterly 
-                    - weekly 
-                    - yearly
-                  model: income
-                  atribute: frequency_kind 
-                - gutter: 3
-                  type: input
-                  name: start_on
-                  placeholder: FROM *
-                  required: true
-                  model: income
-                  atribute: start_on
-                - gutter: 3
-                  type: input
-                  name: end_on
-                  placeholder: TO *
-                  required: true
-                  model: income
-                  atribute: end_on
-            # Temporarily Commented. TODO: Build Model Associants for Employers Demographic Info.
-            # - cells:
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_name
-            #       placeholder: EMPLOYER NAME *
-            #       required: true
-            #       model: income
-            #       atribute: employer_name
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_phone
-            #       placeholder: EMPLOYER PHONE
-            #       # model: income
-            #       # atribute: employer_phone
-            # - cells:
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_address_line_1
-            #       placeholder: EMP ADD LINE 1 
-            #       required: true
-            #     - gutter: 6
-            #       type: input
-            #       name: employer_address_line_2
-            #       placeholder: EMP ADD LINE 2 *
-            # - cells:
-            #     - gutter: 3
-            #       type: input
-            #       name: city
-            #       placeholder: CITY *
-            #       required: true
-            #     - gutter: 6
-            #       type: 'dropdown'
-            #       name: 'check'
-            #       required: true
-            #       values:
-            #         - Choose State
-            #         - District of Columbia
-            #         - Massachussets
-            #     - gutter: 3
-            #       type: input
-            #       name: zip
-            #       placeholder: ZIP *
-            #       required: true
-            # - cells:
-            #     - gutter: 6
-            #       type: text
-            #       text: What Kind of job income is this?*
-            #       required: true
-            #     - gutter: 6
-            #       type: 'dropdown'
-            #       name: 'check'
-            #       required: true
-            #       values:
-            #         - Select who will calim this person
-            #         - Employee
-            #         - Spouse
-            #         - Child
-            # - cells:
-            #     - gutter: 3
-            #       type: input
-            #       name: amount
-            #       placeholder: AMOUNT *
-            #       required: true
-            #     - gutter: 3
-            #       type: 'dropdown'
-            #       name: 'check'
-            #       required: true
-            #       values:
-            #         - HOW OFTEN
-            #         - ONE 
-            #         - TWO
-            #     - gutter: 3
-            #       type: input
-            #       name: from
-            #       placeholder: FROM *
-            #       required: true
-            #     - gutter: 3
-            #       type: input
-            #       name: to
-            #       placeholder: TO *
-            #       required: true
-            # - cells:
-            #   - gutter: 12
-            #     type: 'anchor'
-            #     label: 'Add Additional Job Income'
-            #     value: some.html
-- step:
-    heading: Other Income 1
-    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person expect to have any income from a job in 2017? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                        I'm the person whose name appears in the signaature line below. I understand that I'm submitting an application for health insurance and that
+                        information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
 
-- step:
-    heading: Other Income 2
-    heading_text: Please complete all tax info for  Mary. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
-    sections:
+                        I ve reviewd the information in this application, and I attest under penalty of perjury, that it is accurate and complete to the best of my knowledge,
+                        I understand if Im not truthful, there may be a penalty, including retroactive termination of my coverage and a obligation to repy all medical claims
+                        previouslt covered by the health insurance"
+            - cells:
+                  - gutter: 12
+                    type: checkbox
+                    label: I Agree *
+                    name: medicaid_terms
+                    model: application
+                    attribute: report_change_terms
       - section:
           lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person expect to have any income from a job in 2017? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: '<strong>Check all that apply</strong>, and give the amount & how often this person receives this income. <br> <strong> NOTE</strong>: You <strong>do not need to tell us</strong> about child support, veterans payments, or supplemental security income(SSI).*'
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Unemployment
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Pension
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Retirement Account
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Alimoney Received 
-            - cells:
-                - gutter: 3
-                  type: input
-                  name: amount
-                  placeholder: AMOUNT *
-                  required: true
-                - gutter: 3
-                  type: 'dropdown'
-                  name: 'check'
-                  required: true
-                  values:
-                    - HOW OFTEN
-                    - ONE 
-                    - TWO
-                - gutter: 3
-                  type: input
-                  name: from
-                  placeholder: FROM *
-                  required: true
-                - gutter: 3
-                  type: input
-                  name: to
-                  placeholder: TO *
-                  required: true
-
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Net Farming/Fishing
-            - cells:
-                - gutter: 3
-                  type: input
-                  name: amount
-                  placeholder: AMOUNT *
-                  required: true
-                - gutter: 3
-                  type: 'dropdown'
-                  name: 'check'
-                  required: true
-                  values:
-                    - HOW OFTEN
-                    - ONE 
-                    - TWO
-                - gutter: 3
-                  type: input
-                  name: from
-                  placeholder: FROM *
-                  required: true
-                - gutter: 3
-                  type: input
-                  name: to
-                  placeholder: TO *
-                  required: true
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Net Rental/Royality
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Alaska Permanent Fund dividends
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Alternative Trade Adjustment Assistance (ATAA) or Reemployment
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Trade Adjustment Assistance payments
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Cancelled debts
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Dividends on insurance policies 
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Gambling winnings, including awards, prizes, jackpots, and contest winnings 
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Hobby Income
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Jury Duty pay
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Losses on certain corrective retirement plan distributions of excess deferrals
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Non business income (earned from rating personal property; only applies if you are not a Real Estate professional.)
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Recapture of a charitable contribution deduction
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Recoveries(reimbursements you received for previously deducted expenses, such as medical expenses, and other deductions)
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Taxable distributions form a health savings account (HSA) or an Archer MSA 
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Taxable HSA distributions deemed to be. Income because you did not remain an eligible individual during the testing period
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Taxable portion of disaster relief payments.
-
-- step:
-    heading: Adjustments 1
-    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
-    sections:
+              - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'span-text'
+                    text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any healthcare received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
+              - cells:
+                  - gutter: 12
+                    type: checkbox
+                    label: I Agree *
+                    classNames: 'span-text'
+                    model: application
+                    attribute: medicaid_insurance_collection_terms
       - section:
           lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person expect to have adjustments to income in 2017 ? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
+              - cells:
+                - gutter: 12
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: "<b>Does any child on this application have a parent living outside of the home?</b>"
+                - gutter: 2
+                  type: label_radio
+                  name: row1
+                  value: 'yes1'
+                  id: 'yes1'
+                  label: 'Yes'
                   classNames: 'span-text'
+                  model: application
+                  attribute: parent_living_out_of_home_terms
+                - gutter: 2
+                  type: label_radio
+                  name: row1
+                  value: 'no1'
+                  id: 'no1'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: application
+                  attribute: parent_living_out_of_home_terms
+              - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'span-text'
+                    text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my case worker and I may not have to cooperate."
+              - cells:
+                  - gutter: 12
+                    type: checkbox
+                    label: I Agree *
+                    classNames: 'span-text'
+                    model: application
+                    attribute: attestation_terms
+      - section:
+          lines:
+              - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "I have reviewed the information in this application and I attest under penalty of perjury that it is accurate and complete to the best of my knowledge. I understand if I am not truthful, there may be a penalty."
+              - cells:
+                  - gutter: 12
+                    type: checkbox
+                    label: I Agree *
+                    classNames: 'span-text'
+                    model: application
+                    attribute: submission_terms
+- step:
+    heading: Your Preferences
+    heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time.<br>"
+            - cells:
+                  - gutter: 2
+                    type: label_radio
+                    label: I Agree *
+                    classNames: 'span-text'
+                    # model: application
+                    # name: medicaid_terms
+                    # attribute: medicaid_terms
+                  - gutter: 2
+                    type: label_radio
+                    classNames: 'span-text'
+                    label: I disagree *
+                    # model: application
+                    # name: medicaid_terms
+                    # attribute: medicaid_terms
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: How long would you like your eligibility for help paying for cost saving to be renewed? *
+                  - gutter: 12
+                    type: label_radio
+                    label: 5 years
+                    classNames: 'span-text'
+                    model: application
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 4 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 3 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 2 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 1 year
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label
+                    label: "None "
+                    classNames: 'span-text btn btn-danger'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+      - section:
+          heading: Voter Registration
+          heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+          lines:
+            - cells:
+                  - gutter: 8
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: Would you like to have an application to register to vote mailed to you?
+                  - gutter: 2
+                    type: label_radio
+                    label: "Yes"
+                    classNames: 'span-text'
+                    model: application
+                    name: 
+                    attribute: 
+                  - gutter: 2
+                    type: label_radio
+                    label: "No"
+                    classNames: 'span-text'
+                    model: application
+                    name: 
+                    attribute:  
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to register to vote at this time.<br>
+                    You may file a complaint if you believe that someone has interfered with: <br><br>
+                    * Your right to register or not register to vote <br>
+                    * Your right to privacy in deciding whether or not to register to vote <br>
+                    * Your right to choose your own political party or other political choice <br><br>
 
-- step:
-    heading: Adjustments 2
-    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person expect to have adjustments to income in 2017 ? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: '<strong>Check all that apply</strong>, and give the amount & how often this person receives this income. <br> <strong> NOTE</strong>: You <strong>do not need to tell us</strong> about child support, veterans payments, or supplemental security income(SSI).*'
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Alimony Paid
-            - cells:
-                - gutter: 3
-                  type: input
-                  name: amount
-                  placeholder: AMOUNT *
-                  required: true
-                - gutter: 3
-                  type: 'dropdown'
-                  name: 'check'
-                  required: true
-                  values:
-                    - HOW OFTEN
-                    - ONE
-                    - TWO
-                - gutter: 3
-                  type: input
-                  name: from
-                  placeholder: FROM *
-                  required: true
-                - gutter: 3
-                  type: input
-                  name: to
-                  placeholder: TO *
-                  required: true
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Student Loan Interest
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Other Deductions
-- step:
-    heading: Other Health Coverage 1
-    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person currently have access to other  coverage, including through John Appleseed ? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-
-- step:
-    heading: Other Health Coverage 2
-    heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person currently have access to other  coverage, including through John Appleseed ? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: '<strong>Check all that apply</strong>, and give the amount & how often this person receives this income. <br> <strong> NOTE</strong>: You <strong>do not need to tell us</strong> about child support, veterans payments, or supplemental security income(SSI).*'
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Alimony Paid
-            - cells:
-                - gutter: 12
-                  type: text
-                  text: Coverage Source (check all that apply) *
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Employer-sponsored coverage
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Continuation coverage from a former employer(COBRA) 
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Coverage purchased on the individual market 
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Medicaid
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: CHIP (Childeren's Health Insurance Program)
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Medicare
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Tricare
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: VA
-            - cells:
-                - gutter: 12
-                  type: checkbox
-                  label: Peace Corps
-- step:
-    heading: Other Questions
-    heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Has this person applied for an SSN *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Is this person pregnant? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Is this person blind? *
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Does this person need help with daily life activities, such as dressing or bathing?
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Does this person need help paying for any medical bills from the last 3 months?
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Was this person in foster care at age 18 or older?
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: 'yes2'
-                  id: 'yes2'
-                  checked: true
-                  label: 'Yes'
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: 'no2'
-                  id: 'no2'
-                  checked: false
-                  label: 'No'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
+                    <b>To file a complaint, contact:</b><br>
+                    D.C. Board of Elections<br>
+                    441 4th Street, N.W.<br>
+                    Suite 250-North<br>
+                    Washington, DC 20001<br>
+                    Phone: (202) 727-2525 <br>"
