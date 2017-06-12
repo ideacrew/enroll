@@ -1,9 +1,12 @@
 class FinancialAssistance::BenefitsController < ApplicationController
   include UIHelpers::WorkflowController
+  include NavigationHelper
 
   before_filter :find_application_and_applicant
 
    def new
+    @selectedTab = "healthCoverage"
+    @allTabs = NavigationHelper::getAllYmlTabs
     @model = @applicant.benefits.build
     load_steps
     current_step
@@ -11,6 +14,8 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def step
+    @selectedTab = "healthCoverage"
+    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
 

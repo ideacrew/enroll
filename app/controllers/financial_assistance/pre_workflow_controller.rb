@@ -1,7 +1,9 @@
 class FinancialAssistance::PreWorkflowController < ApplicationController
-  # include NavigationHelper
+  include NavigationHelper
 
   def help_paying_coverage
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
     @transaction_id = params[:id]
   end
 

@@ -2,6 +2,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include NavigationHelper
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
@@ -26,6 +27,8 @@ class Insured::ConsumerRolesController < ApplicationController
 
 
   def search
+    @selectedTab = "accountRegistration"
+    @allTabs = NavigationHelper::getAllTabs
     @no_previous_button = true
     @no_save_button = true
     if params[:aqhp].present?
@@ -52,6 +55,9 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def match
+    @selectedTab = "accountRegistration"
+    @selectedStepId = "personalInfo"
+    @allTabs = NavigationHelper::getAllTabs
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id})
 
@@ -186,6 +192,8 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
+    @selectedTab = "moreAboutYou"
+    @allTabs = NavigationHelper::getAllTabs
     #authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
@@ -221,6 +229,8 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def ridp_agreement
+    @selectedTab = "moreAboutYou"
+    @allTabs = NavigationHelper::getAllTabs
     set_current_person
     if @person.completed_identity_verification?
       redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)

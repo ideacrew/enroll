@@ -1,9 +1,12 @@
 class FinancialAssistance::DeductionsController < ApplicationController
   include UIHelpers::WorkflowController
+  include NavigationHelper
 
   before_filter :find_application_and_applicant
 
   def new
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
@@ -11,6 +14,10 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def step
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
 

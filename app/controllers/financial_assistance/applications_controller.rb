@@ -1,5 +1,6 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
+  include NavigationHelper
   #skip_before_filter :verify_authenticity_token, :only => :step
 
   def index
