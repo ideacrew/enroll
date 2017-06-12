@@ -134,12 +134,22 @@ RSpec.describe TaxHousehold, type: :model do
       let(:applicant1) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household.id, family_member_id: family_member1.id) }
       let(:applicant2) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household.id, family_member_id: family_member2.id) }
 
-      it "can return ratio hash" do
+      before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
         allow(plan).to receive(:premium_for).and_return(110)
         allow(tax_household).to receive(:aptc_members).and_return([applicant1, applicant2])
+      end
+
+      it "can return ratio hash" do
         expect(tax_household.aptc_ratio_by_member.class).to eq Hash
         result = {family_member1.id.to_s =>0.5, family_member2.id.to_s =>0.5}
+        expect(tax_household.aptc_ratio_by_member).to eq result
+      end
+
+      it "should return 1.0 ratio for first family member as second family member is eligible for medicaid" do
+        applicant2.update_attributes(:is_medicaid_chip_eligible => true)
+        expect(tax_household.aptc_ratio_by_member.class).to eq Hash
+        result = {family_member1.id.to_s =>1.0}
         expect(tax_household.aptc_ratio_by_member).to eq result
       end
     end
@@ -276,16 +286,30 @@ RSpec.describe TaxHousehold, type: :model do
       let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
       let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
 
-      it "can return ratio hash" do
+      before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
         allow(plan).to receive(:premium_for).and_return(110)
         allow(tax_household1).to receive(:aptc_members).and_return([applicant1, applicant2])
         allow(tax_household2).to receive(:aptc_members).and_return([applicant3, applicant4])
+      end
+
+      it "can return ratio hash" do
         expect(tax_household1.aptc_ratio_by_member.class).to eq Hash
         result1 = {family_member1.id.to_s =>0.5, family_member2.id.to_s =>0.5}
         expect(tax_household1.aptc_ratio_by_member).to eq result1
         expect(tax_household2.aptc_ratio_by_member.class).to eq Hash
         result2 = {family_member3.id.to_s =>0.5, family_member4.id.to_s =>0.5}
+        expect(tax_household2.aptc_ratio_by_member).to eq result2
+      end
+
+      it "should return 1.0 ratio for first family member in both tax households" do
+        applicant2.update_attributes(:is_medicaid_chip_eligible => true)
+        applicant4.update_attributes(:is_uqhp_eligible => true)
+        expect(tax_household1.aptc_ratio_by_member.class).to eq Hash
+        result1 = {family_member1.id.to_s =>1.0}
+        expect(tax_household1.aptc_ratio_by_member).to eq result1
+        expect(tax_household2.aptc_ratio_by_member.class).to eq Hash
+        result2 = {family_member3.id.to_s =>1.0}
         expect(tax_household2.aptc_ratio_by_member).to eq result2
       end
     end
