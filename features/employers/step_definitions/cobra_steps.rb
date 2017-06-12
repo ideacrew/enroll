@@ -24,6 +24,7 @@ def people_for_cobra
       legal_name: "BestLife",
       dba: "BestLife",
       fein: "050000000",
+      sic_code: "1111",
       ssn: "197810118",
       email: "jack@dc.gov",
       password: 'aA1!aA1!aA1!'
@@ -164,7 +165,7 @@ Then(/employer should see the message Your employee was successfully added to yo
   expect(page).to have_content('Your employee was successfully added to your roster')
   person = people_for_cobra['Jack Employee']
   expect(page).to have_content(person[:first_name])
-  expect(page).to have_content(person[:last_name])  
+  expect(page).to have_content(person[:last_name])
   expect(page).to have_content((TimeKeeper.date_of_record + 1.days).to_s)
 end
 
@@ -211,7 +212,7 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   email_address = person[:email]
   password = person[:password]
 
-  #click_link "Sign In Existing Account"
+  click_link "Sign In Existing Account"
   expect(page).to have_content('Sign In')
 
   fill_in "user[login]", with: email_address
@@ -236,7 +237,7 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
   element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
