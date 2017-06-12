@@ -750,7 +750,27 @@ class CensusEmployee < CensusMember
 
   # TODO: Implement for 16219
   def composite_rating_tier
+    relationships=[]
+    relationships = self.census_dependents.map(&:employee_relationship)
+    find_relationship(relationships)
   end
+
+  private
+
+  def find_relationship(relationships)
+   rel = relationships.uniq.join(",")
+   case rel
+    when ''
+     'employee_only'
+    when 'spouse', 'domestic_partner'
+     'employee_and_spouse'
+    when 'child_under_26'
+     'employee_and_one_or_dependents'
+    else
+     'family'
+    end
+  end
+
 
   private
 

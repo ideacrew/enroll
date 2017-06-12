@@ -1753,4 +1753,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     end
   end
+
+  describe "#composite_rating_tier" do
+    let(:census_employee) { FactoryGirl.create(:census_employee)}
+
+    shared_examples_for "find_relationship_based_on_census_dependents_relationships" do |relationship, relationship_text|
+
+      let(:census_dependent) { double("CensusDependent", :employee_relationship => "#{relationship}")}
+
+      before do
+        allow(census_employee).to receive(:census_dependents).and_return([census_dependent])
+      end
+
+      it "should return the result of find_relationship method" do
+        expect(census_employee.composite_rating_tier).to eq relationship_text
+      end
+    end
+
+    it_behaves_like "find_relationship_based_on_census_dependents_relationships", "", "employee_only"
+    it_behaves_like "find_relationship_based_on_census_dependents_relationships", "spouse", "employee_and_spouse"
+    it_behaves_like "find_relationship_based_on_census_dependents_relationships", "domestic_partner", "employee_and_spouse"
+    it_behaves_like "find_relationship_based_on_census_dependents_relationships", "child_under_26", "employee_and_one_or_dependents"
+    it_behaves_like "find_relationship_based_on_census_dependents_relationships", "something", "family"
+  end
 end
