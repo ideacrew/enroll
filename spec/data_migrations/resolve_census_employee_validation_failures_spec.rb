@@ -66,7 +66,7 @@ describe ResolveCensusEmployeeValidationFailures do
             assignment.save(:validate => false)
           end
 
-          it 'should fix the enrollment' do
+          it 'should remove the incorrect enrollment id' do
             assignment = ce.active_benefit_group_assignment
             subject.migrate
             assignment.reload
