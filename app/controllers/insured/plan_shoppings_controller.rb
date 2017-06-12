@@ -165,8 +165,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @family_member_ids = params[:family_member_ids]
     
-    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     shopping_tax_household = get_tax_household_from_family_members(@person, @family_member_ids)
+    set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
+
     if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_household
       @max_aptc = total_aptc_on_tax_households(shopping_tax_household, @hbx_enrollment)
@@ -189,6 +190,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
+    @family_member_ids = params[:family_member_ids]
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
     if @person.primary_family.active_approved_application.tax_households.present?
@@ -225,15 +227,17 @@ class Insured::PlanShoppingsController < ApplicationController
   def is_eligibility_determined_and_not_csr_100?(person, family_member_ids)
     primary_family = person.primary_family
     family_members = primary_family.family_members.where(id: family_member_ids)
+    csr_kinds = []
     family_member_ids.each do |key, member|
-      tax_household = primary_family.active_approved_application.tax_household_for_family_member(member)
-      csr_eligibility_kind = primary_family.active_approved_application.current_csr_eligibility_kind(tax_household.id)
-      if (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
-        @eligibility_kind = csr_eligibility_kind
-        return true
+      applicant = primary_family.active_approved_application.applicants.where(family_member_id: member).first
+      if applicant.is_medicaid_chip_eligible == true || applicant.is_uqhp_eligible == true
+        return false
       end
-      return false
+      tax_household = primary_family.active_approved_application.tax_household_for_family_member(member)
+      csr_kind = primary_family.active_approved_application.current_csr_eligibility_kind(tax_household.id)
+      csr_kinds << csr_kind if EligibilityDetermination::CSR_KINDS.include? csr_kind
     end
+    !csr_kinds.include? "csr_100"
   end
 
   def send_receipt_emails
@@ -264,6 +268,8 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
 
+    family_member_ids = @family_member_ids.collect { |k,v| v} if @family_member_ids.present?
+
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     if @hbx_enrollment.blank?
@@ -273,9 +279,9 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @market_kind == 'individual'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, nil ,family_member_ids)
       elsif @market_kind == 'coverall'
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind, family_member_ids)
       end
     end
     # for carrier search options

@@ -59,7 +59,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   let(:household){ double("Household") }
   let(:family){ double("Family") }
   let(:family_member){ double("FamilyMember", dob: 28.years.ago) }
-  # let(:family_member_id) { double }
   let(:family_members){ [family_member, family_member] }
   let(:benefit_group) {double("BenefitGroup", is_congress: false)}
   let(:reference_plan) {double("Plan")}

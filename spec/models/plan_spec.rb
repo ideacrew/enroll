@@ -508,6 +508,9 @@ RSpec.describe Plan, dbclean: :after_each do
       let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
       let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
       let(:tax_household) { double(preferred_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:primary_family_member) { family.primary_applicant }
+      let(:application) { FactoryGirl.create(:application, family: family) }
 
       before :each do
         Plan.delete_all
@@ -515,17 +518,19 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "should return dental plans" do
         plans = [plan4]
-        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_households:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_households:nil, family_member_ids:nil).to_a).to eq plans
       end
 
       it "should return health plans without silver" do
         plans = [plan1, plan3]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households:nil, family_member_ids:nil).to_a).to eq plans
       end
 
       it "should return health plans" do
         plans = [plan2]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household]).to_a).to eq plans
+        allow(tax_household).to receive(:family).and_return family
+        allow(application).to receive(:applicants).and_return nil
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids:nil).to_a).to eq plans
       end
     end
   end

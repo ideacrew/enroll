@@ -59,6 +59,8 @@ class FinancialAssistance::Applicant
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
+  field :is_uqhp_eligible, type: Boolean, default: false
+  field :is_totally_ineligible, type: Boolean, default: false
 
   field :is_student, type: Boolean, default: false
   field :student_kind, type: String

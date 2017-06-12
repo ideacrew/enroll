@@ -451,7 +451,7 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_households:)
+    def individual_plans(coverage_kind:, active_year:, tax_households:, family_member_ids:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
@@ -461,6 +461,11 @@ class Plan
         csr_kind = nil
 
         if tax_households.present?
+          tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant| 
+            if applicant.is_medicaid_chip_eligible == true || applicant.is_uqhp_eligible == true
+              csr_kinds << "csr_100"
+            end
+          end
           tax_households.each do |tax_household|
             if tax_household.preferred_eligibility_determination.present?
               csr_kinds << tax_household.preferred_eligibility_determination.csr_eligibility_kind

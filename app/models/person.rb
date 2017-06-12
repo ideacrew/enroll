@@ -269,7 +269,7 @@ class Person
   end
 
   def check_tax_households family
-    family.households.first.tax_households.present? ? true : false
+    family.applications.first.tax_households.present? ? true : false
   end
 
   def completed_identity_verification?
