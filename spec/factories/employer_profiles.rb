@@ -45,11 +45,11 @@ FactoryGirl.define do
 
     factory :employer_with_planyear do
       after(:create) do |employer, evaluator|
-        create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on, aasm_state: evaluator.plan_year_state, with_dental: evaluator.with_dental, reference_plan: evaluator.reference_plan_id)
+        create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on, aasm_state: evaluator.plan_year_state, with_dental: evaluator.with_dental, reference_plan: evaluator.reference_plan_id, dental_reference_plan: evaluator.dental_reference_plan_id)
       end
     end
 
-    factory :employer_with_renewing_planyear do 
+    factory :employer_with_renewing_planyear do
       after(:create) do |employer, evaluator|
         create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on - 1.year, aasm_state: 'active', is_conversion: evaluator.is_conversion, with_dental: evaluator.with_dental, reference_plan: evaluator.reference_plan_id, dental_reference_plan: evaluator.dental_reference_plan_id)
         create(:custom_plan_year, employer_profile: employer, start_on: evaluator.start_on, aasm_state: evaluator.renewal_plan_year_state, renewing: true, with_dental: evaluator.with_dental, reference_plan: evaluator.renewal_reference_plan_id, dental_reference_plan: evaluator.dental_renewal_reference_plan_id)

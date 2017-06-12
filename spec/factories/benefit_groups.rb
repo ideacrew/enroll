@@ -33,7 +33,7 @@ FactoryGirl.define do
       FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: self, relationship: :disabled_child_26_and_over, premium_pct: 40, employer_max_amt:  200.00),
       FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: self, relationship: :child_26_and_over,          premium_pct:  0, employer_max_amt:    0.00, offered: false),
       ] }
-
+            
       dental_plan_option_kind "single_plan"
       dental_reference_plan_id {FactoryGirl.create(:plan, :with_premium_tables)._id}
       elected_dental_plan_ids { [ self.dental_reference_plan_id ]}
