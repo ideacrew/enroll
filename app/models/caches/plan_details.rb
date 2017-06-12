@@ -2,9 +2,10 @@ module Caches
   class PlanDetails
     def self.lookup_rate_with_area(plan_id, rate_schedule_date, effective_age, rating_area)
       calc_age = age_bounding(plan_id, effective_age)
-      pt = $plan_age_lookup_with_rating_area[plan_id][calc_age][0]
-      status = (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date) && (pt[:rating_area] == rating_area)
-      pt[:cost] if status
+      age_record = $plan_age_lookup_with_rating_area[plan_id][calc_age][rating_area].detect do |pt|
+        (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
+      end
+      age_record[:cost]
     rescue
       0
     end
@@ -35,6 +36,7 @@ module Caches
           :maximum => plan.maximum_age
         }
         $plan_age_lookup[plan.id] = {}
+        $plan_age_lookup_with_rating_area[plan.id] = {}
         plan.premium_tables.each do |pt|
           unless $plan_age_lookup[plan.id].has_key?(pt.age)
             $plan_age_lookup[plan.id][pt.age] = []
@@ -46,18 +48,20 @@ module Caches
               :cost => pt.cost
             }
           )
-        end 
-      end
-    end
-
-    def self.load_record_cache_with_rating_area!
-      $plan_age_lookup_with_rating_area = $plan_age_lookup
-      Plan.all.each do |plan|
-        plan.premium_tables.each do |pt|
-          unless $plan_age_lookup_with_rating_area[plan.id][pt.age][0].has_key?(:rating_area)
-            $plan_age_lookup_with_rating_area[plan.id][pt.age][0][:rating_area] = pt.rating_area
+          unless $plan_age_lookup_with_rating_area[plan.id].has_key?(pt.age)
+            $plan_age_lookup_with_rating_area[plan.id][pt.age] = {}
           end
-        end
+          unless $plan_age_lookup_with_rating_area[plan.id][pt.age].has_key?(pt.rating_area)
+            $plan_age_lookup_with_rating_area[plan.id][pt.age][pt.rating_area] = []
+          end
+          $plan_age_lookup_with_rating_area[plan.id][pt.age][pt.rating_area].push(
+            {
+              :start_on => pt.start_on,
+              :end_on => pt.end_on,
+              :cost => pt.cost
+            }
+          )
+        end 
       end
     end
 
