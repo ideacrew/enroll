@@ -12,6 +12,7 @@ module Effective
       	    Effective::Datatables::QuoteDatatable.broker_role_id, row),
       	  data: { no_turbolink: true }      		},
       	  :sortable => false, :filter => false
+        table_column :effective_date, :proc => Proc.new { |row| row.start_on }, :filter => false
       	table_column :claim_code, proc: Proc.new { |row| row.claim_code}, :sortable => false, :filter => false
       	table_column :family_count, proc: Proc.new { |row| row.quote_households.count}, :sortable => false, :filter => false
       	table_column :state, proc: Proc.new { |row| row.aasm_state}, :sortable => false, :filter => false

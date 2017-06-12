@@ -2,7 +2,7 @@ class ShopEmployerNotice < Notice
 
   Required= Notice::Required + []
 
-  attr_accessor :employer_profile
+  attr_accessor :employer_profile, :key
 
   def initialize(employer_profile, args = {})
     self.employer_profile = employer_profile
@@ -12,6 +12,7 @@ class ShopEmployerNotice < Notice
     args[:to] = employer_profile.staff_roles.first.work_email_or_best
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
+    self.key = args[:key]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
@@ -25,6 +26,7 @@ class ShopEmployerNotice < Notice
   end
 
   def build
+    notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id
@@ -51,6 +53,10 @@ class ShopEmployerNotice < Notice
 
   def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+  end
+
+  def shop_dchl_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_dchl_rights.pdf')]
   end
 
   def non_discrimination_attachment

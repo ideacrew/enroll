@@ -18,6 +18,10 @@ module TimeHelper
     end
   end
 
+  def set_default_termination_date_value(enrollment)
+    TimeKeeper.date_of_record.between?(set_date_min_to_effective_on(enrollment), set_date_max_to_plan_end_of_year(enrollment)) ? TimeKeeper.date_of_record : set_date_max_to_plan_end_of_year(enrollment)
+  end
+
   def sep_optional_date family, min_or_max, market_kind=nil
     person = family.primary_applicant.person
     has_dual_roles         = person.has_consumer_role? && person.has_active_employee_role?
