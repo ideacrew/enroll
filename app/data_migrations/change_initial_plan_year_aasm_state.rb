@@ -19,10 +19,9 @@ class ChangeInitialPlanYearAasmState< MongoidMigrationTask
           end
           plan_year.revert_application! if ['application_ineligible','published_invalid','eligibility_review'].include?(plan_year.aasm_state)
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?  # for plan year in publish_pending state
+          plan_year.force_publish! if plan_year.may_force_publish?
 
-          if plan_year.may_force_publish? && plan_year.is_publish_date_valid?
-            plan_year.force_publish!
-          else  # for plan year force publish date passed scenario
+          if  plan_year.may_force_publish? && !plan_year.is_publish_date_valid?
             plan_year.workflow_state_transitions << WorkflowStateTransition.new(
                 from_state: plan_year.aasm_state,
                 to_state: 'enrolling'
