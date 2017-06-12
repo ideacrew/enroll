@@ -1,6 +1,7 @@
 module Effective
   class MongoidDatatable < Effective::Datatable
     def global_search_method
+      debugger
       :datatable_search
     end
 
