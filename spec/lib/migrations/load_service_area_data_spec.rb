@@ -1,5 +1,5 @@
-require 'rails_helper'
-# 
+# require 'rails_helper'
+#
 # RSpec.shared_examples "a service area reference" do |attributes|
 #   attributes.each do |attribute, value|
 #     it "should return #{value} from ##{attribute}" do
@@ -8,7 +8,7 @@ require 'rails_helper'
 #   end
 # end
 #
-# RSpec.describe 'Service Area Task', :type => :task do
+# RSpec.describe 'Service Area Task', :type => :task, dbclean: :around_each do
 #
 #   context "service_area:update_service_area" do
 #
