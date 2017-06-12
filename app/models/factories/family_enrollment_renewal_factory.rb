@@ -66,22 +66,22 @@ module Factories
     def find_renewal_enrollments(coverage_kind)
       renewal_enrollments = family.active_household.hbx_enrollments.shop_market.by_coverage_kind(coverage_kind)
       renewal_enrollments.where({
-        :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id), 
+        :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id),
         :effective_on => renewing_plan_year.start_on
         })
     end
 
     def employer_offering_coverage_kind?(coverage_kind)
-      coverage_kind == 'dental' ? 
+      coverage_kind == 'dental' ?
         (census_employee.renewal_benefit_group_assignment.benefit_group.is_offering_dental?) : true
     end
 
     def renew_enrollment(enrollment: nil, waiver: false, coverage_kind:)
       ShopEnrollmentRenewalFactory.new({
-        family: family, 
-        census_employee: census_employee, 
-        employer: employer, 
-        renewing_plan_year: renewing_plan_year, 
+        family: family,
+        census_employee: census_employee,
+        employer: employer,
+        renewing_plan_year: renewing_plan_year,
         enrollment: enrollment,
         is_waiver: waiver,
         coverage_kind: coverage_kind

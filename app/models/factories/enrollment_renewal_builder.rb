@@ -39,7 +39,7 @@ module Factories
 
     def clone_shop_enrollment(active_enrollment, renewal_enrollment)
       # Find and associate with new ER benefit group
-       
+
       if @census_employee.renewal_benefit_group_assignment.blank?
         @census_employee.add_renew_benefit_group_assignment(@renewing_plan_year.benefit_groups.first)
       end
@@ -142,6 +142,7 @@ module Factories
       renewal_enrollment.benefit_group_assignment_id = benefit_group_assignment.id
       renewal_enrollment.benefit_group_id = benefit_group_assignment.benefit_group_id
       renewal_enrollment.effective_on = benefit_group_assignment.benefit_group.start_on
+      renewal_enrollment.employee_role_id = @census_employee.employee_role_id
       renewal_enrollment.waiver_reason = enrollment.try(:waiver_reason) || "I do not have other coverage"
       renewal_enrollment.renew_waived
       renewal_enrollment.submitted_at = TimeKeeper.datetime_of_record
