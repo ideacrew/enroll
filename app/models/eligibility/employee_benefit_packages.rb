@@ -17,7 +17,7 @@ module Eligibility
     end
 
     def find_or_create_benefit_group_assignment(benefit_groups)
-      bg_assignments = benefit_group_assignments.where(:benefit_group_id => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
+      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
 
       if bg_assignments.present?
         valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
