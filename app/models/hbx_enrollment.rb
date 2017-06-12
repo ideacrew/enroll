@@ -157,6 +157,7 @@ class HbxEnrollment
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
+  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
@@ -539,23 +540,10 @@ class HbxEnrollment
 
   def update_renewal_coverage
     if is_applicable_for_renewal?
-
-      renewal_plan_year = self.benefit_group.employer_profile.renewing_published_plan_year
-
-      if renewal_plan_year.present?
-        renewal_enrollments = self.family.active_household.hbx_enrollments.where({
-          :coverage_kind => self.coverage_kind,
-          :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
-        }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
-
-        renewal_enrollments.reject!{|e| e.inactive?}
-        renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
-
+      employer = benefit_group.plan_year.employer_profile
+      if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
         begin
-          factory = Factories::FamilyEnrollmentRenewalFactory.new
-          factory.enrollment = self
-          factory.disable_notifications = true
-          factory.renew
+          Factories::ShopEnrollmentRenewalFactory.new({enrollment: self}).update_passive_renewal
         rescue Exception => e
           Rails.logger.error { e }
         end
