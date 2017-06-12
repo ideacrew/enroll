@@ -364,6 +364,7 @@ describe Person do
       context "consumer fields validation" do
         let(:params) {valid_params}
         let(:person) { Person.new(**params) }
+        let!(:consumer_role) { FactoryGirl.create(:consumer_role, citizen_status: nil)}
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
@@ -374,16 +375,17 @@ describe Person do
 
         shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
           before do
+            allow(person).to receive(:consumer_role).and_return consumer_role
             person.instance_variable_set(:@is_consumer_role, true)
             person.instance_variable_set(:@indian_tribe_member, native)
             person.instance_variable_set(:@us_citizen, citizenship)
             person.instance_variable_set(:@eligible_immigration_status, immigration_status)
             person.instance_variable_set(:@naturalized_citizen, naturalized)
-            person.instance_variable_set(:@indian_tribe_member, native)
             person.tribal_id = tribal_id
             person.is_incarcerated = incarceration
             person.valid?
           end
+
           it "#{is_valid ? 'pass' : 'fails'} validation" do
             expect(person.valid?).to eq is_valid
           end
