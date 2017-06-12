@@ -4,7 +4,7 @@ require File.join(Rails.root, "app", "data_migrations", "update_dental_relations
 describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
 
   let(:given_task_name) { "update_dental_relationship_benefits" }
-  subject { UpdateDentalRelationShipBenefits.new(given_task_name, double(:current_scope => nil)) }
+  subject { UpdateDentalRelationshipBenefits.new(given_task_name, double(:current_scope => nil)) }
 
 
   describe "given a task name" do
@@ -41,7 +41,7 @@ describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
     it "should change person relationships kind" do
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group)
       allow(benefit_group).to receive(:dental_relationship_benefits).and_return([dental_relationship_benefit])
-      UpdateDentalRelationShipBenefits.migrate(organization.fein,plan_year.start_on,benefit_group.id,"spouse")
+      UpdateDentalRelationshipBenefits.migrate(organization.fein,plan_year.start_on,benefit_group.id,"spouse")
     end
 
   end
