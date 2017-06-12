@@ -30,6 +30,7 @@ module Caches
     def self.load_record_cache!
       $plan_age_bounds = {}
       $plan_age_lookup = {}
+      $plan_age_lookup_with_rating_area = {}
       Plan.all.each do |plan|
         $plan_age_bounds[plan.id] = {
           :minimum => plan.minimum_age,
