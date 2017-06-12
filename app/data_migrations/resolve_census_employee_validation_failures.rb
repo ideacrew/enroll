@@ -22,7 +22,7 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
       if enrollment.benefit_group_id != enrollment.benefit_group_assignment.benefit_group_id
         employee = enrollment.benefit_group_assignment.census_employee
         new_assignment = employee.benefit_group_assignments.where(:benefit_group_id => enrollment.benefit_group_id).first
-        new_assignment = create_new_benefit_group_assignment(employee, benefit_group) if assignment.blank?
+        new_assignment = create_new_benefit_group_assignment(employee, benefit_group) if new_assignment.blank?
         enrollment.update(benefit_group_assignment_id: new_assignment.id)
         puts "Updated benefit group assignment for HbxId: #{enrollment.hbx_id}" unless Rails.env.test?
       end
