@@ -26,9 +26,10 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'shop') }
       let!(:reference_plan)  {  FactoryGirl.create(:plan, :with_premium_tables, market: 'shop') }
 
-      let!(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
+      let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 
       before do
+        allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
       end
@@ -80,9 +81,10 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       let!(:plan) { FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
       let!(:reference_plan)  {  FactoryGirl.create(:plan, :with_dental_coverage, :with_premium_tables, market: 'shop') }
 
-      let!(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
+      let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 
       before do
+        allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:dental_relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
       end
