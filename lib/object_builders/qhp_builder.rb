@@ -204,7 +204,8 @@ class QhpBuilder
             # carrier_profile_id: "53e67210eb899a460300000d",
             carrier_profile_id: get_carrier_id(@carrier_name),
             coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
-            dental_level: @dental_metal_level
+            dental_level: @dental_metal_level,
+            service_area_id: @qhp.service_area_id
             )
           if new_plan.valid?
             new_plan.save!
