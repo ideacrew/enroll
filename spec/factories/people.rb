@@ -81,13 +81,19 @@ FactoryGirl.define do
 
     trait :with_consumer_role do
       after(:create) do |p, evaluator|
-        create_list(:consumer_role, 1, person: p)
+        create_list(:consumer_role, 1, person: p, dob: p.dob)
       end
     end
 
     trait :with_employee_role do
       after(:create) do |p, evaluator|
         create_list(:employee_role, 1, person: p)
+      end
+    end
+
+    trait :with_resident_role do
+      after(:create) do |p, evaluator|
+        create_list(:resident_role, 1, person: p)
       end
     end
 

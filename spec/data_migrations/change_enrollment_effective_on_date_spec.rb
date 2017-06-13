@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "change_enrollment_effective_on_date")
 
-describe ChangeEnrollmentEffectiveOnDate do
+describe ChangeEnrollmentEffectiveOnDate, dbclean: :after_each do
 
   let(:given_task_name) { "change_enrollment_effective_on_date" }
   subject { ChangeEnrollmentEffectiveOnDate.new(given_task_name, double(:current_scope => nil)) }
@@ -13,7 +13,7 @@ describe ChangeEnrollmentEffectiveOnDate do
   end
 
   describe "changing plan year's state" do
-    
+
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
 
