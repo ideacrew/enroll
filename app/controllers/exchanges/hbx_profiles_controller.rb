@@ -203,7 +203,6 @@ def employer_poc
   end
 
   def user_account_index
-    #@selector = params[:scopes][:selector] if params[:scopes].present?
     @datatable = Effective::Datatables::UserAccountDatatable.new
   end
 
