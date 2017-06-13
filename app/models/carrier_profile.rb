@@ -17,7 +17,7 @@ class CarrierProfile
   field :shop_dental, type: Boolean
   field :restricted_to_single_choice, type: Boolean, default: false
 
-  field :issuer_hios_id, type: String
+  field :issuer_hios_ids, type: Array
   field :issuer_state, type: String, default: "DC"
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
