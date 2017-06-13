@@ -93,11 +93,12 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def rate_lookup(the_plan, start_on_date, age, member, benefit_group)
-    if @use_simple_calculations
-      (Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) * large_family_factor(member))
+    rate_value = if @use_simple_calculations
+      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) 
     else
-      (Caches::PlanDetails.lookup_rate_with_area(the_plan.id, start_on_date, age, benefit_group.rating_area) * large_family_factor(member)) * (benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f)
+      Caches::PlanDetails.lookup_rate_with_area(the_plan.id, start_on_date, age, benefit_group.rating_area)
     end
+    (rate_value * large_family_factor(member) * benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f).round(2)
   end
 
   def premium_for(member)
