@@ -147,7 +147,7 @@ RSpec.describe TaxHousehold, type: :model do
       end
 
       it "should return 1.0 ratio for first family member as second family member is eligible for medicaid" do
-        applicant2.update_attributes(:is_medicaid_chip_eligible => true)
+        applicant2.update_attributes(:is_totally_ineligible => true)
         expect(tax_household.aptc_ratio_by_member.class).to eq Hash
         result = {family_member1.id.to_s =>1.0}
         expect(tax_household.aptc_ratio_by_member).to eq result

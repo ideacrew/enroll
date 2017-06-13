@@ -542,9 +542,9 @@ RSpec.describe Plan, dbclean: :after_each do
         let(:tax_household2) { FactoryGirl.create(:tax_household, application: application) }
         let(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_94", tax_household_id: tax_household2.id) }
         let(:applicant1) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: primary_family_member.id) }
-        let(:applicant2) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_medicaid_chip_eligible: true) }
+        let(:applicant2) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_totally_ineligible: true) }
         let(:applicant3) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member3.id) }
-        let(:applicant4) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member4.id, is_uqhp_eligible: true) }
+        let(:applicant4) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member4.id, is_medicaid_chip_eligible: true) }
         let(:family_member_ids) { [primary_family_member.id.to_s, family_member4.id.to_s] }
 
         it "should return health plans without silver" do
