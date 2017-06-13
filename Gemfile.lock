@@ -189,6 +189,7 @@ GEM
       timers (>= 4.1.1)
     celluloid-supervision (0.20.5)
       timers (>= 4.1.1)
+    certified (1.0.0)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
     chosen-rails (1.5.2)
@@ -458,7 +459,7 @@ GEM
     rake (11.1.2)
     rdoc (4.2.2)
       json (~> 1.4)
-    recaptcha (1.1.0)
+    recaptcha (4.3.1)
       json
     redis (3.3.0)
     redis-actionpack (4.0.1)
@@ -635,6 +636,7 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  certified
   chosen-rails
   coffee-rails (~> 4.1.0)
   combine_pdf
@@ -688,7 +690,7 @@ DEPENDENCIES
   railroady (~> 1.5.2)
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
-  recaptcha (= 1.1.0)
+  recaptcha (= 4.3.1)
   recurring_select!
   redis-rails
   resque

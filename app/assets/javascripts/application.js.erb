@@ -765,6 +765,10 @@ $(document).on('click', '#address_info + span.form-action', function(){
     });
   });
 
+var submitInvisibleRecaptchaForm = function () {
+    document.getElementById("invisible-recaptcha-form").submit();
+};
+
   $(document).ready(function(){
     $("#person_first_name").change(function() {
       var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()

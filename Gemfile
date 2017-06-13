@@ -99,7 +99,7 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 gem 'wicked_pdf', '1.0.6'
 
 # provide recaptcha services
-gem "recaptcha", '1.1.0'
+gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
 
 gem 'jquery-datatables-rails', '3.4.0'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
@@ -112,6 +112,7 @@ group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
   gem "parallel_tests"
+  gem "certified"
 end
 
 group :development, :test do
