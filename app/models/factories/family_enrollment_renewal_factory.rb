@@ -2,7 +2,7 @@ module Factories
   class FamilyEnrollmentRenewalFactory
     include Mongoid::Document
 
-    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :enrollment, :disable_notifications
+    attr_accessor :family, :census_employee, :employer, :renewing_plan_year, :disable_notifications, :active_plan_year
 
     def initialize
       @disable_notifications = false
@@ -10,6 +10,7 @@ module Factories
 
     def renew
       raise ArgumentError unless defined?(family)
+
       @plan_year_start_on = renewing_plan_year.start_on
       @active_plan_year = employer.plan_years.published_and_expired_plan_years_by_date(@plan_year_start_on.prev_day).first
 
@@ -76,9 +77,16 @@ module Factories
         })
     end
 
+    def renewal_assignment
+      if renewing_plan_year.active?
+        census_employee.active_benefit_group_assignment
+      else
+        census_employee.renewal_benefit_group_assignment
+      end
+    end
+
     def employer_offering_coverage_kind?(coverage_kind)
-      coverage_kind == 'dental' ? 
-        (census_employee.renewal_benefit_group_assignment.benefit_group.is_offering_dental?) : true
+      coverage_kind == 'dental' ? renewal_assignment.benefit_group.is_offering_dental? : true
     end
 
     def renew_enrollment(enrollment: nil, waiver: false, coverage_kind:)
@@ -101,7 +109,7 @@ module Factories
 
     def renewal_plan_offered_by_er?(enrollment)
       if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
-        benefit_group = census_employee.renewal_benefit_group_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
+        benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
         elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
       else
