@@ -16,41 +16,46 @@ module Factories
       raise FamilyEnrollmentRenewalFactoryError, 'Active plan year missing' if @active_plan_year.blank?
 
       HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
-        next unless employer_offering_coverage_kind?(coverage_kind)
-        active_enrollment = find_active_coverage(coverage_kind)
-
-        begin
-          if active_enrollment.present?
-
-            renewal_enrollments = find_renewal_enrollments(coverage_kind)
-            passive_renewals = renewal_enrollments.renewing
-
-            if renewal_enrollments.enrolled_and_waived.present?
-              passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
-            else
-              if passive_renewals.blank?
-                if active_enrollment.present? && active_enrollment.inactive?
-                  renew_enrollment(enrollment: active_enrollment, waiver: true, coverage_kind: coverage_kind)
-                  trigger_notice { "employee_open_enrollment_unenrolled" }
-                elsif renewal_plan_offered_by_er?(active_enrollment)
-                  renew_enrollment(enrollment: active_enrollment, coverage_kind: coverage_kind)
-                  trigger_notice { "employee_open_enrollment_auto_renewal" }
-                else
-                  renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
-                  trigger_notice { "employee_open_enrollment_no_auto_renewal" }
-                end
-              end
-            end
-          elsif find_renewal_enrollments(coverage_kind).blank?
-            renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
-            trigger_notice { "employee_open_enrollment_unenrolled" }
-          end
-        rescue Exception => e
-          puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+        if employer_offering_coverage_kind?(coverage_kind)
+          process_renewals_for(coverage_kind)
         end
       end
 
       family
+    end
+
+    def process_renewals_for(coverage_kind)
+      active_enrollment = find_active_coverage(coverage_kind)
+
+      begin
+        if active_enrollment.present?
+
+          renewal_enrollments = find_renewal_enrollments(coverage_kind)
+          passive_renewals = renewal_enrollments.renewing
+
+          if renewal_enrollments.enrolled_and_waived.present?
+            passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
+          else
+            if passive_renewals.blank?
+              if active_enrollment.present? && active_enrollment.inactive?
+                renew_enrollment(enrollment: active_enrollment, waiver: true, coverage_kind: coverage_kind)
+                trigger_notice { "employee_open_enrollment_unenrolled" }
+              elsif renewal_plan_offered_by_er?(active_enrollment)
+                renew_enrollment(enrollment: active_enrollment, coverage_kind: coverage_kind)
+                trigger_notice { "employee_open_enrollment_auto_renewal" }
+              else
+                renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
+                trigger_notice { "employee_open_enrollment_no_auto_renewal" }
+              end
+            end
+          end
+        elsif find_renewal_enrollments(coverage_kind).blank?
+          renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
+          trigger_notice { "employee_open_enrollment_unenrolled" }
+        end
+      rescue Exception => e
+        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+      end
     end
 
     def find_active_coverage(coverage_kind)
