@@ -76,5 +76,10 @@ module Insured
         return active_enrollment
       end
     end
+
+    def benefit_group_assignment_by_employee_role(employee_role, benefit_group, change_plan, enrollment_kind)
+      benefit_group.plan_year.is_renewing? ?
+      employee_role.census_employee.renewal_benefit_group_assignment : (benefit_group.plan_year.aasm_state == "expired" && (change_plan == 'change_by_qle' or enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : employee_role.census_employee.active_benefit_group_assignment
+    end
   end
 end
