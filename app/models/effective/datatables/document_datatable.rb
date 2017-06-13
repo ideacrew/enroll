@@ -2,17 +2,16 @@ module Effective
   module Datatables
     class DocumentDatatable < Effective::MongoidDatatable
       datatable do
-
+        
         bulk_actions_column do
           bulk_action 'Download'
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
-        table_column :Status, :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i> status' }, :filter => false, :sortable => false
-        table_column :Name, :proc => Proc.new { |row| link_to row.title,"Document", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
-        table_column :Type, :proc => Proc.new { |row| "Employer Attestation" }, :filter => false, :sortable => false
-        table_column :Size, :proc => Proc.new { |row| "3MB" }, :filter => false, :sortable => false
-        table_column :Date, :proc => Proc.new { |row| "05/26/2017" }, :filter => false, :sortable => false
-        table_column :Owner, :proc => Proc.new { |row| "D Thomas" }, :filter => false, :sortable => false
+        table_column :status, :proc => Proc.new { |row| "status" }, :filter => false, :sortable => false
+        table_column :employer, :proc => Proc.new { |row| link_to row.legal_name,"", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
+        table_column :doc_type, :proc => Proc.new { |row| link_to "type","" }, :filter => false, :sortable => false
+        table_column :effective_date, :proc => Proc.new { |row| "effective date" }, :filter => false, :sortable => false
+        table_column :submitted_date, :proc => Proc.new { |row| "submitted date" }, :filter => false, :sortable => false
       end
 
       def generate_invoice_link_type(row)
@@ -40,6 +39,20 @@ module Effective
 
       end
 
+    def nested_filter_definition
+
+      status_tab =  [
+          {label: 'Submitted'},
+          { label: 'Approved'},
+          { label: 'Rejected'},
+          { label: 'All'}     
+           ]
+
+      {
+          status: status_tab,
+          top_scope: :status
+      }
+      end
     end
   end
 end

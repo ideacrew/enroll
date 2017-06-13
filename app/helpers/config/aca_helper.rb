@@ -18,4 +18,8 @@ module Config::AcaHelper
   def individual_market_is_enabled?
     Settings.aca.market_kinds.include?("individual")
   end
+
+  def carrier_special_plan_identifier_namespace
+    @carrier_special_plan_identifier_namespace ||= Settings.aca.carrier_special_plan_identifier_namespace
+  end
 end

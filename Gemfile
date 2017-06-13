@@ -106,6 +106,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+gem 'chosen-rails'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
@@ -114,6 +115,11 @@ group :development do
 end
 
 group :development, :test do
+  # YARD documentation generation tool: http://yardoc.org/
+  gem 'yard', '~> 0.9.5'
+  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'railroady', '~> 1.5.2'
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'pry'
   gem 'pry-rails'
@@ -167,3 +173,5 @@ end
 gem 'aws-sdk', '2.2.4'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'combine_pdf'
+gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'

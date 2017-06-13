@@ -425,16 +425,20 @@ $(function() {
   $('div[name=employee_family_tabs] > ').children().each( function() {
     $(this).change(function(){
       filter = $(this).val();
-      search = $("#census_employee_search input#employee_name").val();
+      search = $("#census_employee_search input#employee_search").val();
       $('#employees_' + filter).siblings().hide();
       $('#employees_' + filter).show();
       $.ajax({
         url: $('span[name=employee_families_url]').text() + '.js',
         type: "GET",
-        data : { 'status': filter, 'employee_name': search },
+        data : { 'status': filter, 'employee_search': search },
         crossDomain: true,
         xhrFields: {
           withCredentials: true
+        },
+        success: function (data) {
+          $("#status").val(filter);
+          $("#filter-span").text(filter);
         }
       });
     })
@@ -541,7 +545,7 @@ function setProgressBar(){
 }
 
 $(document).on('click', '#census_employee_search_clear', function() {
-  $('form#census_employee_search input#employee_name').val('');
+  $('form#census_employee_search input#employee_search').val('');
   $("form#census_employee_search").submit();
 })
 
@@ -554,6 +558,12 @@ $(document).on('change', '#address_info .office_kind_select select', function() 
     $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', true);
     $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
   };
+  if ($(this).val() == 'primary') {
+    $(this).parents('fieldset').find(".county-select").addClass('primary-office-location');
+  }
+  else {
+    $(this).parents('fieldset').find(".county-select").removeClass('primary-office-location');
+  }
 })
 
 function checkPhone(textbox) {
@@ -569,16 +579,53 @@ function checkPhone(textbox) {
 }
 
 function checkZip(textbox) {
-  var phoneRegex = /^\d{5}$/;
+  var zipRegex = /^\d{5}$/;
   if (textbox.value == '') {
     textbox.setCustomValidity('Please fill out this zipcode field.');
-  } else if(!phoneRegex.test(textbox.value)){
+  } else if(!zipRegex.test(textbox.value)){
     textbox.setCustomValidity('please enter a valid zipcode.');
   } else {
     textbox.setCustomValidity('');
+    if ($('.county-select').length > 0) {
+      var child_index = $(textbox).data('child-index');
+      $.ajax({
+        type: 'get',
+        datatype: 'js',
+        url: '/employers/employer_profiles/counties_for_zip_code',
+        data: { zip_code: textbox.value },
+        success: function (response) {
+          $('#county-select-' + child_index + " select").html(response);
+          $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+          if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() &&
+                  $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
+          {
+              $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+          }
+        }
+      });
+    }
   }
   return true;
 }
+
+function validateCounty(selectField) {
+    if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
+    {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+    } else {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+    }
+}
+
+$(document).on('submit', '#new_organization', function() {
+  var retVal = true;
+  if ($("#organization_sic_code").length && !$("#organization_sic_code option:selected").val())
+  {
+    $("#sic_warning").html('Please fill Standard Indusry Code');
+    retVal = false;
+  }
+  return retVal;
+});
 
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;

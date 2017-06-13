@@ -4,7 +4,7 @@ module Forms
     attr_accessor :id
     attr_accessor :person_id
     attr_accessor :person
-    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein
+    attr_accessor :legal_name, :dba, :entity_kind, :fein, :is_fake_fein, :sic_code
     attr_reader :dob
     attr_accessor :office_locations
 
@@ -23,8 +23,6 @@ module Forms
 
     validate :office_location_validations
     validate :office_location_kinds
-    validate :has_broker_agency, :if => Proc.new { |m| Organization
-                                                         .broker_agency_profile_by_fein(m.fein).present? }
 
     class PersonAlreadyMatched < StandardError; end
     class TooManyMatchingPeople < StandardError; end
@@ -120,10 +118,6 @@ module Forms
       end
     end
 
-    def has_broker_agency
-      self.errors.add(:base, "fein is already in use.")
-    end
-
     def office_locations_attributes
       @office_locations.map do |office_location|
         office_location.attributes
@@ -142,7 +136,7 @@ module Forms
     def dob=(val)
       @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
     end
-    
+
     # Strip non-numeric characters
     def fein=(new_fein)
       @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
