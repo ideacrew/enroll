@@ -710,7 +710,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
     it "should cancel the shop enrollment" do
       enrollment_two.propogate_waiver
-      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+      expect(enrollment_two.aasm_state).to eq "coverage_termination_pending"
     end
   end
 end

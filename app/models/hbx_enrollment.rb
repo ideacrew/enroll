@@ -506,7 +506,7 @@ class HbxEnrollment
     id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
-      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+      enrollment.schedule_coverage_termination! if enrollment.may_waive_coverage?
     end
     if coverage_kind == 'health' && benefit_group_assignment.present?
       benefit_group_assignment.waive_coverage! if benefit_group_assignment.may_waive_coverage?
