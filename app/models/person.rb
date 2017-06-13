@@ -737,6 +737,7 @@ class Person
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
       employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.approve! if !employer_staff_roles.present?
       employer_staff_role.save
       return true, person.first
     end
@@ -882,8 +883,6 @@ class Person
   def is_primary_poc
     if active_employer_staff_roles.present?
       active_employer_staff_roles.first.primary_poc
-    else
-      employer_staff_roles.first.primary_poc
     end
   end
 

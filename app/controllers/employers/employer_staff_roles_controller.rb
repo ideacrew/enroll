@@ -20,7 +20,7 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
     person = Person.find(params[:staff_id])
     role = person.employer_staff_roles.detect{|role| role.is_applicant? &&
       role.employer_profile_id.to_s == params[:id]}
-    if role && role.approve && role.save!
+    if role && role.approve!
       flash[:notice] = 'Role is approved'
     else
       flash[:error] = 'Please contact HBX Admin to report this error'

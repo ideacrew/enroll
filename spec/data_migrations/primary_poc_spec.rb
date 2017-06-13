@@ -22,14 +22,14 @@ describe PrimaryPOC do
       
       it "expects primary poc count to be zero and staff count to be 1" do
         employer_staff_role = EmployerStaffRole.create(person: person, employer_profile_id: employer_profile._id)
-        employer_staff_role.save
+        employer_staff_role.approve!
         expect(Person.staff_for_employer(employer_profile).size).to eq 1
         expect(person.active_employer_staff_roles.first.primary_poc).to eq false
       end
     
       it "expects primary poc count to be true" do
         employer_staff_role = EmployerStaffRole.create(person: person, employer_profile_id: employer_profile._id)
-        employer_staff_role.save
+        employer_staff_role.approve!
         person.make_primary(true)
         expect(person.active_employer_staff_roles.first.primary_poc).to eq true
       end
