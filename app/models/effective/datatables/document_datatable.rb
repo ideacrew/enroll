@@ -1,10 +1,8 @@
-
 module Effective
   module Datatables
     class DocumentDatatable < Effective::MongoidDatatable
       datatable do
-
-
+        
         bulk_actions_column do
           bulk_action 'Download'
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
@@ -21,10 +19,7 @@ module Effective
       end
 
       def collection
-        employers = Organization.all_employer_profiles
-
-        @employer_collection = employers
-
+        Document.all
       end
 
       def global_search?

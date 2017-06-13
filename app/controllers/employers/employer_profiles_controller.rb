@@ -110,6 +110,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def show
+     @datatable = Effective::Datatables::DocumentDatatable.new
     @tab = params['tab']
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
