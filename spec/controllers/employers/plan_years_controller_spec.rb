@@ -632,6 +632,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+      allow(benefit_group).to receive(:employee_cost_for_plan).and_return(1)
       sign_in
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 

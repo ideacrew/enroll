@@ -22,7 +22,7 @@ def people
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112",
-      sic: "0111",
+      sic_code: "0111",
       mlegal_name: "Cogswell Cogs, Inc",
       mdba: "Cogswell Cogs, Inc",
       mfein: "211141467"
@@ -82,7 +82,7 @@ def people
       legal_name: "Acmega LLC",
       dba: "Acmega LLC",
       fein: "890112233",
-      sic: "0111",
+      sic_code: "0111",
       email: 'johb.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -120,7 +120,7 @@ def people
       legal_name: "Legal LLC",
       dba: "Legal LLC",
       fein: "890000223",
-      sic: "0111",
+      sic_code: "0111",
       email: 'tim.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -316,10 +316,10 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
   plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, 
-    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, 
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
+    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
     fte_count: 2, aasm_state: :published, is_conversion: (kind.downcase == 'conversion' ? true : false)
-    
+
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
@@ -955,4 +955,3 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
   employer_profile = FactoryGirl.create :employer_profile, organization: org2
 end
-

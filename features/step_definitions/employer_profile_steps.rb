@@ -27,7 +27,7 @@ end
 
 Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   SicCode.where(sic_code: '0111').first || FactoryGirl.create(:sic_code, sic_code: "0111")
-  
+
   email = Forgery('email').address
   visit '/'
   portal_class = '.interaction-click-control-employer-portal'
@@ -107,6 +107,7 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   visit '/'
   portal_class = 'interaction-click-control-employer-portal'
   find("a.#{portal_class}").click
+  find("a.interaction-click-control-sign-in-existing-account").click
   step "#{name} signs in to portal"
 end
 
@@ -173,6 +174,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   visit '/'
   portal_class = '.interaction-click-control-hbx-portal'
   find(portal_class).click
+  find('a.interaction-click-control-sign-in-existing-account').click
   step "Admin signs in to portal"
   tab_class = '.interaction-click-control-employers'
   find(tab_class, wait: 10).click
