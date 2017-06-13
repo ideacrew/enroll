@@ -2,6 +2,7 @@ class PlanCostDecorator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
   include ShopPolicyCalculations
+  include Config::AcaModelConcern
 
   def initialize(plan, member_provider, benefit_group, reference_plan, max_cont_cache = {})
     super(plan)
@@ -10,6 +11,7 @@ class PlanCostDecorator < SimpleDelegator
     @reference_plan = reference_plan
     @max_contribution_cache = max_cont_cache
     @plan = plan
+    @use_simple_calculations = use_simple_employer_calculation_model?
   end
 
   def plan_year_start_on
@@ -79,21 +81,30 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def reference_plan_member_premium(member)
-    Caches::PlanDetails.lookup_rate(reference_plan.id, plan_year_start_on, age_of(member))
+    rate_lookup(reference_plan, plan_year_start_on, age_of(member), member, benefit_group)
   end
 
   def reference_premium_for(member)
     # FIXME: I've just fixed this to use the plan rate cache - it seems there
     #        multiple areas where this isn't being used - we need to correct this.
-    (reference_plan_member_premium(member) * large_family_factor(member)).round(2)
+    reference_plan_member_premium(member) 
   rescue
     0.00
   end
 
+  def rate_lookup(the_plan, start_on_date, age, member, benefit_group)
+    rate_value = if @use_simple_calculations
+      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) 
+    else
+      Caches::PlanDetails.lookup_rate_with_area(the_plan.id, start_on_date, age, benefit_group.rating_area)
+    end
+    (rate_value * large_family_factor(member) * benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f).round(2)
+  end
+
   def premium_for(member)
     relationship_benefit = relationship_benefit_for(member)
-    if relationship_benefit && relationship_benefit.offered?
-      value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member))
+    if relationship_benefit && relationship_benefit.offered? && benefit_group
+      value = rate_lookup(__getobj__, plan_year_start_on, age_of(member), member, benefit_group)
       BigDecimal.new("#{value}").round(2).to_f
     else
       0.00

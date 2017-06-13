@@ -135,6 +135,17 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def new
+    @document = Document.new
+      respond_to do |format|
+        format.js { render "documents/new" }
+      end
+  end
+
+  def create
+    Document.create(:title=>"Doc1",:creator=>"dchl",:publisher=>"dchl",:type=>"text",:format=>"application/octet-stream",:source=>"enroll_system",:language=>"en",:rights=>"public")
+  end
+
   private
   def updateable?
     authorize Family, :updateable?

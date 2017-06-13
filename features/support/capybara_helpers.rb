@@ -1,4 +1,14 @@
 module CapybaraHelpers
+
+  def select_from_chosen(val, from:)
+    chosen_input = find 'a.chosen-single'
+    chosen_input.click
+    chosen_results = find 'ul.chosen-results'
+    within(chosen_results) do
+      find('li', text: val).click
+    end
+  end
+
   def wait_for_ajax(delta=2, time_to_sleep=0.2)
     start_time = Time.now
     Capybara.default_max_wait_time = delta

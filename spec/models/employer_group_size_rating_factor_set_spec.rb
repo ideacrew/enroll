@@ -17,6 +17,10 @@ describe EmployerGroupSizeRatingFactorSet do
   it "requires an active year" do
     expect(validation_errors.has_key?(:active_year)).to be_truthy  
   end
+
+  it "requires a max_integer_factor_key" do
+    expect(validation_errors.has_key?(:max_integer_factor_key)).to be_truthy  
+  end
 end
 
 describe EmployerGroupSizeRatingFactorSet, "given
@@ -24,6 +28,7 @@ describe EmployerGroupSizeRatingFactorSet, "given
 - an active year
 - a default factor value
 - no rating factor entries
+- a max_integer_factor_key
 " do
 
   let(:default_factor_value) { 1.234567 }
@@ -34,7 +39,8 @@ describe EmployerGroupSizeRatingFactorSet, "given
     EmployerGroupSizeRatingFactorSet.new({
       :default_factor_value => default_factor_value,
       :active_year => active_year,
-      :carrier_profile_id => carrier_profile_id
+      :carrier_profile_id => carrier_profile_id,
+      :max_integer_factor_key => 3
     })
   end
 
@@ -43,13 +49,14 @@ describe EmployerGroupSizeRatingFactorSet, "given
   end
 
   it "returns the default factor on all lookups" do
-    expect(subject.lookup(:bdklajdlfs)).to eq default_factor_value
+    expect(subject.lookup(2)).to eq default_factor_value
   end
 
 end
 
 describe EmployerGroupSizeRatingFactorSet, "given
 - a rating factor entry with key '23' and value '1.345'
+- a max_integer_factor_key of '30'
 " do
 
   subject do
@@ -59,11 +66,35 @@ describe EmployerGroupSizeRatingFactorSet, "given
           :factor_key => '23',
           :factor_value => 1.345
         })
-      ]
+      ],
+      :max_integer_factor_key => 30
     })
   end
 
   it "returns the '1.345' for a lookup of 23" do
+    expect(subject.lookup(23)).to eq 1.345
+  end
+
+end
+
+describe EmployerGroupSizeRatingFactorSet, "given
+- a rating factor entry with key '23' and value '1.345'
+- a max_integer_factor_key of '23'
+" do
+
+  subject do
+    EmployerGroupSizeRatingFactorSet.new({
+      :rating_factor_entries => [
+        RatingFactorEntry.new({
+          :factor_key => '23',
+          :factor_value => 1.345
+        })
+      ],
+      :max_integer_factor_key => 30
+    })
+  end
+
+  it "returns the '1.345' for a lookup of 24" do
     expect(subject.lookup(23)).to eq 1.345
   end
 

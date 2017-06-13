@@ -808,6 +808,8 @@ class HbxEnrollment
     if self.is_shop?
       if benefit_group.is_congress
         PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
+      elsif self.composite_rated?
+        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier)
       else
         reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
         PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
@@ -1320,6 +1322,8 @@ class HbxEnrollment
     if plan.present? && benefit_group.present?
       if benefit_group.is_congress #is_a? BenefitGroupCongress
         @cost_decorator = PlanCostDecoratorCongress.new(plan, self, benefit_group)
+      elsif self.composite_rated?
+        @cost_decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, self.composite_rating_tier)
       else
         reference_plan = (coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
         @cost_decorator = PlanCostDecorator.new(plan, self, benefit_group, reference_plan)
@@ -1341,7 +1345,7 @@ class HbxEnrollment
       end
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
-    return "open_enrollment" if !is_shop?
+    return "open_enrollment" unless is_shop?
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
   end
 
@@ -1407,6 +1411,20 @@ class HbxEnrollment
 
   def event_submission_date
     submitted_at.blank? ? Time.now : submitted_at
+  end
+
+  def dental?
+    coverage_kind == "dental"
+  end
+
+  # TODO: Implement behaviour by 16219.
+  def composite_rating_tier
+  end
+
+  def composite_rated?
+    return false if dental?
+    return false if benefit_group_id.blank?
+    benefit_group.sole_source?
   end
 
   private

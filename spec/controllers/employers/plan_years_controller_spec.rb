@@ -632,6 +632,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+      allow(benefit_group).to receive(:employee_cost_for_plan).and_return(1)
       sign_in
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 
@@ -741,11 +742,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
-    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let!(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
     let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
 
     context 'when same plan year' do
       before do

@@ -22,6 +22,7 @@ def people
       legal_name: "Acme Inc.",
       dba: "Acme Inc.",
       fein: "764141112",
+      sic_code: "0111",
       mlegal_name: "Cogswell Cogs, Inc",
       mdba: "Cogswell Cogs, Inc",
       mfein: "211141467"
@@ -81,6 +82,7 @@ def people
       legal_name: "Acmega LLC",
       dba: "Acmega LLC",
       fein: "890112233",
+      sic_code: "0111",
       email: 'johb.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -118,6 +120,7 @@ def people
       legal_name: "Legal LLC",
       dba: "Legal LLC",
       fein: "890000223",
+      sic_code: "0111",
       email: 'tim.wood@example.com',
       password: 'aA1!aA1!aA1!'
     },
@@ -313,10 +316,10 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
   plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
-  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year, 
-    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days, 
+  plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
+    open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
     fte_count: 2, aasm_state: :published, is_conversion: (kind.downcase == 'conversion' ? true : false)
-    
+
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, reference_plan_id: plan.id
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
 
@@ -417,7 +420,7 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[legal_name]', :with => employer[:legal_name]
   fill_in 'organization[dba]', :with => employer[:dba]
   fill_in 'organization[fein]', :with => employer[:fein]
-
+  select_from_chosen '0111', from: 'Select Industry Code'
 
   find('.selectric-interaction-choice-control-organization-entity-kind').click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'C Corporation')]").click
@@ -486,6 +489,7 @@ When(/^.* visit the Employer portal$/) do
 end
 
 Then(/^(?:.+) should see a successful sign up message$/) do
+  FactoryGirl.create(:sic_code, sic_code: "0111")
   expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
   screenshot("employer_sign_up_welcome")
 end
@@ -951,4 +955,3 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
   employer_profile = FactoryGirl.create :employer_profile, organization: org2
 end
-

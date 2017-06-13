@@ -126,6 +126,9 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+  use_simple_employer_calculation_model: false
+  carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
+
 
 paper_notice: 'paper-notices'
 

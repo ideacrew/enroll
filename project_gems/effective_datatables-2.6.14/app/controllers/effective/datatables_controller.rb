@@ -6,7 +6,6 @@ module Effective
     def show
       attributes = (params[:attributes].presence || {}).merge(referer: request.referer)
       scopes = (params[:scopes].presence || {})
-
       @datatable = find_datatable(params[:id]).try(:new, attributes.merge(scopes))
       @datatable.view = view_context if !@datatable.nil?
 
