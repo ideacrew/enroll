@@ -5,8 +5,11 @@ class RemoveOneCeFromEr < MongoidMigrationTask
     fein = ENV['fein']
     ce_id = ENV['ce_id']
     organizations = Organization.where(fein:fein)
-    if organizations.size !=1
+    if organizations.size < 1
       puts 'no organization found with given fein #{fein} ' unless Rails.env.test?
+      return
+    elsif organizations.size > 1
+      puts 'more than one organizations were found with given fein #{fein} ' unless Rails.env.test?
       return
     end
     employer_profile = organizations.first.employer_profile
