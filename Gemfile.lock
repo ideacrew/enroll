@@ -22,7 +22,7 @@ GIT
 
 GIT
   remote: https://github.com/dchbx/acapi.git
-  revision: d41e5fab75a77abca64f33278150735438acfff6
+  revision: abe34027bcd7f9de675dc40f76035518a028d694
   branch: development
   specs:
     acapi (0.0.1)
@@ -191,6 +191,10 @@ GEM
       timers (>= 4.1.1)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
+    chosen-rails (1.5.2)
+      coffee-rails (>= 3.2)
+      railties (>= 3.0)
+      sass-rails (>= 3.2)
     cliver (0.3.2)
     coderay (1.1.1)
     coercible (1.0.0)
@@ -231,7 +235,7 @@ GEM
     deep_merge (1.0.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (3.4.1)
+    devise (3.5.10)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
       railties (>= 3.2.6, < 5)
@@ -422,6 +426,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
+    railroady (1.5.2)
     rails (4.2.3)
       actionmailer (= 4.2.3)
       actionpack (= 4.2.3)
@@ -475,7 +480,7 @@ GEM
     redis-store (1.1.7)
       redis (>= 2.2)
     ref (2.0.0)
-    responders (2.2.0)
+    responders (2.3.0)
       railties (>= 4.2.0, < 5.1)
     resque (1.26.0)
       mono_logger (~> 1.0)
@@ -607,6 +612,9 @@ GEM
     wkhtmltopdf-binary-edge (0.12.3.0)
     xpath (2.0.0)
       nokogiri (~> 1.3)
+    yard (0.9.5)
+    yard-mongoid (0.1.0)
+      yard (>= 0.8.4)
 
 PLATFORMS
   ruby
@@ -627,12 +635,13 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+  chosen-rails
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
   cucumber-rails (~> 1.4.2)
   database_cleaner (= 1.5.3)
-  devise (~> 3.4.1)
+  devise (>= 3.5.4)
   effective_datatables!
   email_spec (= 2.0.0)
   eye
@@ -676,6 +685,7 @@ DEPENDENCIES
   pry-remote
   pry-stack_explorer
   pundit (~> 1.0.1)
+  railroady (~> 1.5.2)
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
   recaptcha (= 1.1.0)
@@ -705,6 +715,8 @@ DEPENDENCIES
   web-console (= 2.3.0)
   wicked_pdf (= 1.0.6)
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
+  yard (~> 0.9.5)
+  yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
    1.14.6

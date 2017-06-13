@@ -330,6 +330,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :market_kind, 'individual'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
+      assign :effective_on_date, TimeKeeper.date_of_record.beginning_of_month
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
@@ -396,6 +397,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "shouldn't see marketplace options" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to_not have_selector('h3', text: 'Marketplace')
+    end
+
+    it "should display effective on date" do
+      render file: "insured/group_selection/new.html.erb"
+      expect(rendered).to match(/EFFECTIVE DATE/)
     end
 
   end

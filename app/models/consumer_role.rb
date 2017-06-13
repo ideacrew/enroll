@@ -60,6 +60,7 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
+  field :is_applying_coverage, type: Boolean, default: true
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
@@ -74,6 +75,7 @@ class ConsumerRole
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
+  field :is_applying_coverage, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -563,12 +565,12 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = TimeKeeper.datetime_of_record
+    self.residency_determined_at = Time.now
     self.is_state_resident = false
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = TimeKeeper.datetime_of_record
+    self.residency_determined_at = Time.now
     self.is_state_resident = true
   end
 
@@ -711,7 +713,7 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > TimeKeeper.datetime_of_record
+    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
   end
 
   def record_transition(*args)
@@ -723,7 +725,7 @@ class ConsumerRole
 
   def verification_attr(*authority)
     authority = authority.first == "curam" ? "curam" : "hbx"
-    OpenStruct.new({:determined_at => TimeKeeper.datetime_of_record,
+    OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => authority
                    })
   end

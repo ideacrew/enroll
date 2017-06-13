@@ -7,7 +7,7 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
   let(:employee_role) { FactoryGirl.build(:employee_role, census_employee: census_employee) }
   let(:benefit_group_assignment) { employee_role.census_employee.benefit_group_assignments.first }
   let(:benefit_group) { benefit_group_assignment.benefit_group }
-  let(:hbx_enrollment) {  HbxEnrollment.new(plan:plan, employee_role: employee_role, created_at: TimeKeeper.datetime_of_record) }
+  let(:hbx_enrollment) {  HbxEnrollment.new(plan:plan, employee_role: employee_role, created_at: Time.now) }
 
   before :each do
     allow(hbx_enrollment).to receive(:broker_agency_account).and_return(nil)
@@ -22,5 +22,14 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
     expect(rendered).to include("<plan>")
     expect(rendered).to include("<premium_total_amount>")
     expect(rendered).to include("<total_responsible_amount>")
+  end
+
+  it "includes the special carrier id" do
+    special_plan_id_prefix = Settings.aca.carrier_special_plan_identifier_namespace
+    special_plan_id = "abcdefg"
+    expected_special_plan_id = special_plan_id_prefix + special_plan_id
+    allow(plan).to receive(:carrier_special_plan_identifier).and_return(special_plan_id)
+    render :template=>"events/hbx_enrollment/policy", :locals=>{hbx_enrollment: hbx_enrollment}
+    expect(rendered).to have_selector("plan id alias_ids alias_id id", :text => expected_special_plan_id)
   end
 end

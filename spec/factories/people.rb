@@ -9,7 +9,9 @@ FactoryGirl.define do
     is_incarcerated false
     is_active true
     gender "male"
-
+    # us_citizen "true"
+    # indian_tribe_member "false"
+    # naturalized_citizen "false"
     #association :employee_role, strategy: :build
 
     after(:create) do |p, evaluator|
@@ -81,7 +83,7 @@ FactoryGirl.define do
 
     trait :with_consumer_role do
       after(:create) do |p, evaluator|
-        create_list(:consumer_role, 1, person: p)
+        create_list(:consumer_role, 1, person: p, dob: p.dob)
       end
     end
 

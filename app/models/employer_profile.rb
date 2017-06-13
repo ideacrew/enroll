@@ -8,6 +8,7 @@ class EmployerProfile
   extend Acapi::Notifiers
   include StateTransitionPublisher
   include ScheduledEventService
+  include Config::AcaModelConcern
 
   embedded_in :organization
   attr_accessor :broker_role_id
@@ -66,6 +67,7 @@ class EmployerProfile
   accepts_nested_attributes_for :plan_years, :inbox, :employer_profile_account, :broker_agency_accounts, :general_agency_accounts
 
   validates_presence_of :entity_kind
+  validates_presence_of :sic_code
 
   validates :profile_source,
     inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
@@ -252,7 +254,7 @@ class EmployerProfile
   end
 
   def published_plan_year
-    plan_years.published.first
+    plan_years.published.last
   end
 
   def show_plan_year
@@ -263,8 +265,12 @@ class EmployerProfile
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
   end
 
-  def is_coversion_employer?
-    profile_source.to_s == 'conversion'
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
+  end
+
+  def is_converting?
+    self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
   def find_plan_year_by_effective_date(target_date)
@@ -272,12 +278,17 @@ class EmployerProfile
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
-    if plan_year.present?
-      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.try(:first) : plan_year
-    else
-      plan_year
-    end
+    (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
   end
+
+  def earliest_plan_year_start_on_date
+   plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+   plan_years.reject!{|py| py.can_be_migrated? }
+   plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+   if !plan_year.blank?
+     plan_year.start_on
+   end
+ end
 
   def billing_plan_year(billing_date = nil)
     billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
@@ -842,13 +853,16 @@ class EmployerProfile
     org.first.employer_profile
   end
 
-  def is_conversion?
-    self.profile_source == "conversion"
-  end
-
-
   def trigger_notices(event)
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+  end
+
+  def rating_area
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    RateReference.rating_area_for(primary_office_location)
   end
 
 private

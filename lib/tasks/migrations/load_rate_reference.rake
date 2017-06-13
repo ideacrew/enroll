@@ -8,8 +8,8 @@ namespace :load_rate_reference do
       (2..sheet.last_row).each do |i|
         RateReference.find_or_create_by!(
             zip_code: sheet.cell(i,1),
-            county: sheet.cell(i,2),
-            multiple_counties: to_boolean(sheet.cell(i,3)),
+            county_name: sheet.cell(i,2),
+            zip_code_in_multiple_counties: to_boolean(sheet.cell(i,3)),
             rating_region: sheet.cell(i,4)
             )
       end
@@ -24,5 +24,4 @@ namespace :load_rate_reference do
     return false  if value == false  || value =~ (/(false|f|no|n|0)$/i)
     raise ArgumentError.new("invalid value for Boolean: \"#{value}\"")
   end
-
 end
