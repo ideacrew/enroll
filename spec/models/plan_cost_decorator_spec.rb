@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe PlanCostDecorator, dbclean: :after_each do
   let!(:plan_year)               { double("PlanYear", start_on: Date.today.beginning_of_year) }
-  let!(:default_benefit_group)   { double("BenefitGroup", plan_year: plan_year) }  
+  let!(:default_benefit_group)   { instance_double(BenefitGroup, plan_year: plan_year) }  
   let!(:benefit_group)   {default_benefit_group}
   let!(:member_provider) {double("member_provider", class: HbxEnrollment, hbx_enrollment_members: [father, mother, one, two, three, four, five])}
   let!(:father)          {double("father", dob: 55.years.ago, age_on: 55, employee_relationship: "self")}
@@ -31,6 +31,10 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       before do
         allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
+        allow(benefit_group).to receive(:sic_factor_for).with(plan).and_return(1.0)
+        allow(benefit_group).to receive(:sic_factor_for).with(reference_plan).and_return(1.0)
+        allow(benefit_group).to receive(:group_size_factor_for).with(plan).and_return(1.0)
+        allow(benefit_group).to receive(:group_size_factor_for).with(reference_plan).and_return(1.0)
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
       end
 
@@ -86,6 +90,11 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       before do
         allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:dental_relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
+        allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
+        allow(benefit_group).to receive(:sic_factor_for).with(plan).and_return(1.0)
+        allow(benefit_group).to receive(:sic_factor_for).with(reference_plan).and_return(1.0)
+        allow(benefit_group).to receive(:group_size_factor_for).with(plan).and_return(1.0)
+        allow(benefit_group).to receive(:group_size_factor_for).with(reference_plan).and_return(1.0)
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
       end
 
