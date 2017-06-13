@@ -188,3 +188,18 @@ describe FamilyMember, "given a relationship to update" do
     expect(subject.primary_relationship).to eq relationship
   end
 end
+
+describe "for families with financial assistance application" do
+    let(:person) { FactoryGirl.create(:person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
+
+    context "family_member added when application is in progress" do
+      it "should create an applicant with the family_member_id of the added member" do
+        family.applications.create!
+        expect(family.application_in_progress.applicants.count).to eq 0
+        fm = family.family_members.create!({person_id: person.id, is_primary_applicant: false, is_coverage_applicant: true})
+        expect(family.application_in_progress.applicants.count).to eq 1
+        expect(family.application_in_progress.applicants.first.family_member_id).to eq fm.id
+      end
+    end
+  end
