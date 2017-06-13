@@ -65,4 +65,7 @@ RSpec.configure do |config|
 
   config.include Capybara::DSL
 
+  # Relooading settings/test.yml file
+  Settings.reload!
+
 end
