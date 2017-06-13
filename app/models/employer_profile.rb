@@ -579,21 +579,8 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
-        employer_enroll_factory = Factories::EmployerEnrollFactory.new
-        employer_enroll_factory.date = new_date
-
-        organizations_for_plan_year_begin(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.begin
-        end
-
-        organizations_for_plan_year_end(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.end
-        end
-
         # Reminder notices to renewing employers to publish thier plan years.
-        start_on = (new_date+1.month).beginning_of_month
+        start_on = new_date.next_month.beginning_of_month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
           renewal_employers_reminder_to_publish(start_on).each do |organization|
             begin
@@ -618,6 +605,19 @@ class EmployerProfile
               puts "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
             end
           end
+        end
+
+        employer_enroll_factory = Factories::EmployerEnrollFactory.new
+        employer_enroll_factory.date = new_date
+
+        organizations_for_plan_year_begin(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.begin
+        end
+
+        organizations_for_plan_year_end(new_date).each do |organization|
+          employer_enroll_factory.employer_profile = organization.employer_profile
+          employer_enroll_factory.end
         end
 
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
