@@ -13,6 +13,8 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
     plan_year = employer_profile.plan_years.first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
+          :open_enrollment_start_on => plan_year.open_enrollment_start_on,
+          :open_enrollment_end_on => plan_year.open_enrollment_end_on
         })
     #binder payment deadline
     notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
