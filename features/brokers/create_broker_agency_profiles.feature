@@ -15,6 +15,7 @@ Feature: Create Primary Broker and Broker Agency
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information
+    Then Primary Broker practice area should be small business market only
     And Primary Broker enters broker agency information
     And Primary Broker enters office location for default_office_location
     And Primary Broker clicks on Create Broker Agency

@@ -19,6 +19,10 @@ When(/^.+ enters personal information$/) do
   fill_in 'organization[npn]', with: '109109109'
 end
 
+Then(/^Primary Broker practice area should be small business market only$/) do
+  find('select#organization_market_kind').value.should eq 'shop'
+end
+
 And(/^.+ enters broker agency information$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
@@ -29,8 +33,8 @@ And(/^.+ enters broker agency information$/) do
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  # find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
   find('button.multiselect').click
   find(:xpath, '//label[input[@value="bn"]]').click
