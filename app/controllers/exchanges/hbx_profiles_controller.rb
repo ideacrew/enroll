@@ -202,6 +202,10 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
