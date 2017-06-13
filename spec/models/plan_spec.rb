@@ -532,6 +532,26 @@ RSpec.describe Plan, dbclean: :after_each do
         allow(application).to receive(:applicants).and_return nil
         expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids:nil).to_a).to eq plans
       end
+
+      context "individual_plans" do
+        let(:family_member2) { FactoryGirl.create(:family_member, family: family) }
+        let(:family_member3) { FactoryGirl.create(:family_member, family: family) }
+        let(:family_member4) { FactoryGirl.create(:family_member, family: family) }
+        let(:tax_household1) { FactoryGirl.create(:tax_household, application: application) }
+        let(:eligibility_determination1) { FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_87", tax_household_id: tax_household2.id) }
+        let(:tax_household2) { FactoryGirl.create(:tax_household, application: application) }
+        let(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_94", tax_household_id: tax_household2.id) }
+        let(:applicant1) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: primary_family_member.id) }
+        let(:applicant2) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_medicaid_chip_eligible: true) }
+        let(:applicant3) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member3.id) }
+        let(:applicant4) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member4.id, is_uqhp_eligible: true) }
+        let(:family_member_ids) { [primary_family_member.id.to_s, family_member4.id.to_s] }
+
+        it "should return health plans without silver" do
+          plans = [plan1, plan3]
+          expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household1, tax_household2], family_member_ids: family_member_ids).to_a).to eq plans
+        end
+      end
     end
   end
 

@@ -461,9 +461,11 @@ class Plan
         csr_kind = nil
 
         if tax_households.present?
-          tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant| 
-            if applicant.is_medicaid_chip_eligible == true || applicant.is_uqhp_eligible == true
-              csr_kinds << "csr_100"
+          if family_member_ids.present?
+            tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+              if applicant.is_medicaid_chip_eligible == true || applicant.is_uqhp_eligible == true
+                csr_kinds << "csr_100"
+              end
             end
           end
           tax_households.each do |tax_household|
@@ -478,7 +480,6 @@ class Plan
         csr_kind = "csr_87" if csr_kinds.include? "csr_87"
         csr_kind = "csr_94" if csr_kinds.include? "csr_94"
         csr_kind = "csr_100" if csr_kinds.include? "csr_100"
-
 
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
