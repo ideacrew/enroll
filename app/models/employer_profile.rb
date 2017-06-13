@@ -611,13 +611,21 @@ class EmployerProfile
         employer_enroll_factory.date = new_date
 
         organizations_for_plan_year_begin(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.begin
+          begin
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.begin
+          rescue Exception => e
+            puts "Error found for employer - #{organization.legal_name} during plan year begin"
+          end
         end
 
         organizations_for_plan_year_end(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.end
+          begin
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.end
+          rescue Exception => e
+            puts "Error found for employer - #{organization.legal_name} during plan year end"
+          end
         end
 
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
