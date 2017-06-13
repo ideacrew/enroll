@@ -10,7 +10,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
-    render 'workflow/step'
+    render 'workflow/step', layout: 'financial_assistance'
   end
 
   def step
@@ -40,7 +40,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
 
     else
-      render 'workflow/step'
+      render 'workflow/step', layout: 'financial_assistance'
     end
 
   end

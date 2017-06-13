@@ -10,7 +10,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     @model = @applicant.benefits.build
     load_steps
     current_step
-    render 'workflow/step'
+    render 'workflow/step', layout: 'financial_assistance'
   end
 
   def step
@@ -36,7 +36,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
       flash[:notice] = 'Benefit Info Added.'
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
     else
-      render 'workflow/step'
+      render 'workflow/step', layout: 'financial_assistance'
     end
   end
 

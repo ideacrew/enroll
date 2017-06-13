@@ -39,7 +39,11 @@
         <%= yield :horizontal_status %>
 
       </div>
-        <%= yield %>
+        <% if content_for? :content %>
+          <%= yield :content %>
+        <% else %>
+          <%= yield %>
+        <% end %>
     </div>
 
     <%= render 'layouts/footer' %>
