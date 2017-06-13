@@ -165,6 +165,8 @@ class Person
 
   # PersonRelationship child model indexes
   # index({"person_relationship.relative_id" =>  1}) #old_code
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
