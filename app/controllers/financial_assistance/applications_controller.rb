@@ -15,10 +15,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     #@family = Family.find(params[:family_id])
     #@family_member = @family.family_members.find(params[:family_member_id])
     @application = FinancialAssistance::Application.new
-    @model = @application
-    load_steps
-    current_step
-    render 'workflow/step'
   end
 
   def create
