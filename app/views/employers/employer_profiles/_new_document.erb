@@ -4,7 +4,7 @@
   <div class="upload-preview">
 
   </div>
-  <%= form_tag upload_document_employers_employer_profile_path(@employer_profile), multipart: true , method: 'post' do %>
+  <%= form_tag upload_document_employers_employer_profile_path(@employer_profile), multipart: true , class: "upload_document", method: 'post' do %>
       <%= file_field_tag :file, :accept => 'application/pdf' %>
       <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
 

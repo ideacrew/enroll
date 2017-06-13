@@ -8,7 +8,8 @@ module Effective
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
-        table_column :Status, :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i> status' }, :filter => false, :sortable => false
+        table_column '', :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i>' }, :filter => false, :sortable => false
+        table_column :Status, :proc => Proc.new { |row| 'Submitted' }, :filter => false, :sortable => false
         table_column :Name, :proc => Proc.new { |row| link_to row.title,"Dcoument", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}" }, :filter => false, :sortable => false
         table_column :Type, :proc => Proc.new { |row| row.subject }, :filter => false, :sortable => false
         table_column :Size, :proc => Proc.new { |row| row.size_bytes_to_megabytes }, :filter => false, :sortable => false
