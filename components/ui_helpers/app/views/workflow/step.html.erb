@@ -1,5 +1,5 @@
 <%= render 'workflow/step_partials/progress'%>
-
+<%= workflow_form_for @model do %>
 <div class="row">
   <%= render 'workflow/step_partials/left_nav'%>
   <div class="col-md-7">
@@ -12,20 +12,10 @@
       <% end %>
 
       <div class="focus_effect module">
-        <%= workflow_form_for @model do %>
-          <% @current_step.sections.each do |section| %>
-            <div class="margin-bottom-30">
-              <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
-            </div>
-          <% end %>
-          <% if  @steps.last_step?(@current_step) %>
-            <%= submit_tag 'Finish' %>
-          <% else %>
-            <% if !@steps.first_step?(@current_step) %>
-              <%= link_to 'Previous Step', previous_step_for%>
-            <% end %>
-            <%= submit_tag 'Next step' %>
-          <% end %>
+        <% @current_step.sections.each do |section| %>
+          <div class="margin-bottom-30">
+            <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+          </div>
         <% end %>
       </div>
       <br>
@@ -34,3 +24,4 @@
   </div>
   <%= render 'workflow/step_partials/right_nav'%>
 </div>
+<% end %>

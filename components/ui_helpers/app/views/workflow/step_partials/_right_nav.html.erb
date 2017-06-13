@@ -1,10 +1,15 @@
 <div class="col-md-2">
   <nav class="top-border-30">
-    <input type="submit" name="commit" value="CONTINUE" class="interaction-click-control-next-step btn btn-danger">
+    <% if  @steps.last_step?(@current_step) %>
+      <%= submit_tag 'Finish', :class => "btn btn-lg btn-primary"  %>
+    <% else %>
+       <%= submit_tag 'Next step', :class => "btn btn-lg btn-primary" %>
+    <% end %>
   </nav>
-  
   <% unless @current_step.to_i == 1 %>
-    <p class="small-left-margin very-small-margin-top faded"><%= link_to 'Previous', previous_step_for %></p>
+    <p class="small-left-margin very-small-margin-top faded">
+      <%= link_to 'Previous', previous_step_for %>
+    </p>
   <% end %>
 
   <p class="small-left-margin very-small-margin-top faded">Save & Exit</p>
