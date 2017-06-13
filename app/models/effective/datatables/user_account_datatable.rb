@@ -1,7 +1,6 @@
 module Effective
   module Datatables
     class UserAccountDatatable < Effective::MongoidDatatable
-      include Config::AcaModelConcern
       datatable do
 
       	bulk_actions_column do
@@ -13,7 +12,7 @@ module Effective
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| format_date(row.person.dob) if row.person.present?}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.person.hbx_id if row.person.present?}, :filter => false, :sortable => false
         table_column :email, :label => 'EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
-        table_column :status, :label => 'EMAIL', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
+        table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
         table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| row_role(row) if row.person.present? }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
