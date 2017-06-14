@@ -3,6 +3,17 @@ require File.join(Rails.root, "app", "data_migrations", "change_enrollment_detai
 
 describe ChangeEnrollmentDetails do
 
+  def actual_result(term_enrollment, val)
+    case val
+    when "aasm_state"
+      term_enrollment.aasm_state
+    when "terminated_on"
+      term_enrollment.terminated_on
+    when "termination_submitted_on"
+      term_enrollment.termination_submitted_on
+    end
+  end
+
   let(:given_task_name) { "change_enrollment_details" }
   subject { ChangeEnrollmentDetails.new(given_task_name, double(:current_scope => nil)) }
 
@@ -31,6 +42,14 @@ describe ChangeEnrollmentDetails do
       expect(hbx_enrollment.effective_on).to eq effective_on + 1.month
     end
 
+    it "should move enrollment to enrolled status from canceled status" do
+      allow(ENV).to receive(:[]).with("action").and_return "revert_cancel"
+      hbx_enrollment.cancel_coverage!
+      subject.migrate
+      hbx_enrollment.reload
+      expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"
+    end
+
     context "revert enrollment termination" do
 
       before do
@@ -38,17 +57,6 @@ describe ChangeEnrollmentDetails do
         allow(ENV).to receive(:[]).with("action").and_return "revert_termination"
         subject.migrate
         term_enrollment.reload
-      end
-
-      def actual_result(term_enrollment, val)
-        case val
-        when "aasm_state"
-          term_enrollment.aasm_state
-        when "terminated_on"
-          term_enrollment.terminated_on
-        when "termination_submitted_on"
-          term_enrollment.termination_submitted_on
-        end
       end
 
       shared_examples_for "revert termination" do |val, result|
@@ -70,17 +78,6 @@ describe ChangeEnrollmentDetails do
         allow(ENV).to receive(:[]).with("terminated_on").and_return "01/01/2016"
         subject.migrate
         hbx_enrollment.reload
-      end
-
-      def actual_result(term_enrollment, val)
-        case val
-          when "aasm_state"
-            term_enrollment.aasm_state
-          when "terminated_on"
-            term_enrollment.terminated_on
-          when "termination_submitted_on"
-            term_enrollment.termination_submitted_on
-        end
       end
 
       shared_examples_for "termination" do |val, result|

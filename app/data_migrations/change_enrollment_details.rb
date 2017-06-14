@@ -13,6 +13,9 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       revert_termination(enrollment)
     when "terminate"
       terminate_enrollment(enrollment)
+    when "revert_cancel"
+      # When Enrollment with given policy ID is active in Glue & canceled in Enroll(Mostly you will see this with passive enrollments)
+      revert_cancel(enrollment)
     end
   end
 
@@ -43,5 +46,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     terminated_on = Date.strptime(ENV['terminated_on'].to_s, "%m/%d/%Y")
     enrollment.update_attributes!(terminated_on: terminated_on, aasm_state: "coverage_terminated")
     puts "terminate enrollment on #{terminated_on}" unless Rails.env.test?
+  end
+
+  def revert_cancel(enrollment)
+    enrollment.update_attributes(aasm_state: "coverage_enrolled")
+    puts "Moved enrollment to Enrolled status from canceled state" unless Rails.env.test?
   end
 end
