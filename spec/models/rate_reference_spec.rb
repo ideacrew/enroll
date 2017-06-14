@@ -37,20 +37,20 @@ RSpec.describe RateReference, type: :model do
       RateReference.destroy_all
     end
 
-    describe "::find_rating_region" do
+    describe "::find_rating_area" do
       context "with a valid search param" do
         let!(:first_county_region) { create(:rate_reference, county_name: "County", zip_code: "10010") }
         let!(:same_county_second_region) { create(:rate_reference, county_name: "County", zip_code: "10020") }
 
         it "returns the rate reference area" do
-          expect(subject.find_rating_region(zip_code: '10010', county_name: 'County')).to match_array([first_county_region])
-          expect(subject.find_rating_region(zip_code: '10020', county_name: 'County')).to match_array([same_county_second_region])
+          expect(subject.find_rating_area(zip_code: '10010', county_name: 'County')).to match_array([first_county_region])
+          expect(subject.find_rating_area(zip_code: '10020', county_name: 'County')).to match_array([same_county_second_region])
         end
       end
 
       context "with an invalid search" do
         it "returns nil" do
-          expect(subject.find_rating_region(zip_code: '00000', county_name: 'County')).to be_nil
+          expect(subject.find_rating_area(zip_code: '00000', county_name: 'County')).to be_nil
         end
       end
     end
@@ -77,21 +77,5 @@ RSpec.describe RateReference, type: :model do
         expect(subject.find_counties_for(zip_code: "10011")).to match_array(['County', 'County Two'])
       end
     end
-  end
-end
-
-describe RateReference, "given a rating_region value" do
-  Settings.aca.rating_areas.each do |mra|
-    it "is valid for a rating_area of #{mra}" do
-      subject.rating_region = mra
-      subject.valid?
-      expect(subject.errors.keys).not_to include(:rating_region)
-    end
-  end
-
-  it "is invalid for a made up rating_area" do
-    subject.rating_region = "LDJFKLDJKLEFJLKDJSFKLDF"
-    subject.valid?
-    expect(subject.errors.keys).to include(:rating_region)
   end
 end
