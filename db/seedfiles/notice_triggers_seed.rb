@@ -443,6 +443,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP10066',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
+    resource_name: 'employee_role',
+    event_name: 'notify_employee_of_renewing_employer_ineligibility',
+    notice_triggers: [
+      {
+        name: 'Notify Employees of their employer termination due to ineligibility',
+        notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
+        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
+        mpi_indicator: 'MPI_SHOP10066',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

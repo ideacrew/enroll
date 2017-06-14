@@ -1,4 +1,4 @@
-class ShopEmployeeNotices::NotifyEmployeeDueToInitialEmployerIneligibility < ShopEmployeeNotice
+class ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility < ShopEmployeeNotice
 
   attr_accessor :census_employee
 
