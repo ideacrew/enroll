@@ -410,6 +410,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       plan_year_with_benefit_group.update_attributes(:aasm_state => 'renewing_draft')
+      employer_profile.update_attributes(sic_code: '3211')
     end
 
     after :all do
@@ -439,12 +440,22 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it "and plan year should be in publish pending state" do
         expect(plan_year_with_benefit_group.aasm_state).to eq "renewing_draft"
       end
+
+      it 'plan year in draft state will update the plan year sic code' do
+        employer_profile.update_attributes!(sic_code: '3229')
+        expect(plan_year_with_benefit_group.sic_code).to eq '3229'
+      end
     end
 
     context "and plan year is published before publish due date" do
       before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_with_benefit_group.due_date_for_publish.beginning_of_day)
         plan_year_with_benefit_group.publish!
+      end
+      
+      it 'plan year in enrolling state will not update plan year sic code' do
+        employer_profile.update_attributes!(sic_code: '3229')
+        expect(plan_year_with_benefit_group.sic_code).to eq '3211'
       end
 
       it "application should be valid" do

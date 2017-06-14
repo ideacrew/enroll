@@ -831,7 +831,7 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
@@ -892,7 +892,7 @@ class PlanYear
     end
 
     event :renew_publish, :after => :record_transition do
-      transitions from: :renewing_draft, to: :renewing_published
+      transitions from: :renewing_draft, to: :renewing_published, :after => :record_sic_and_rating_area
     end
 
     # Admin ability to reset plan year application
