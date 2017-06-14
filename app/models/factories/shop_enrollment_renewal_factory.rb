@@ -93,8 +93,10 @@ module Factories
     end
 
     def renewal_assignment
-      renewing_plan_year.active? ? census_employee.active_benefit_group_assignment 
+      assignment = renewing_plan_year.active? ? census_employee.active_benefit_group_assignment 
            : census_employee.renewal_benefit_group_assignment
+
+      (assignment.present? && renewing_plan_year.benefit_groups.pluck(:_id).include?(assignment.benefit_group_id)) ? assignment : nil
     end
 
     def verify_and_populate_benefit_group_assignment
