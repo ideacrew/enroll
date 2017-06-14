@@ -192,6 +192,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP6',
+    title: 'Action Needed – Add all Eligible Employees to your Roster',
+    description: 'This notice goes to all the employers with zero employees on roster when published',
+    resource_name: 'employer',
+    event_name: 'zero_employees_on_roster',
+    notice_triggers: [
+      {
+        name: 'Zero Employees on Rotser',
+        notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
+        notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
+        mpi_indicator: 'MPI_SHOP6',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP8A',
     title: 'Your Health Plan Open Enrollment Period has Begun',
     description: 'All the employees that are active in coverage and have an auto-renewal plan option available.',
@@ -311,6 +332,111 @@ shop_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP19',
+    title: 'Group Ineligible to Obtain Coverage',
+    description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Renewal Group Ineligible to Obtain Coverage',
+        notice_template: 'notices/shop_employer_notices/19_renewal_employer_ineligibility_notice',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerIneligibilityNotice',
+        mpi_indicator: 'MPI_SHOP19',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP20',
+    title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
+    description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_invoice_available',
+    notice_triggers: [
+      {
+        name: 'Initial Employer first invoice available in the account',
+        notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+        mpi_indicator: 'MPI_SHOP20',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP26',
+    title: 'First Reminder to publish Application',
+    description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_first_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Initial Employer Application - Reminder to publish',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+        mpi_indicator: 'MPI_SHOP26',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP27',
+    title: 'Final Reminder to publish Application',
+    description: 'All the initial employers with draft plan years will be notified to publish their plan year on 3rd of the month.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_final_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+        mpi_indicator: 'MPI_SHOP27',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP28',
+    title: 'Second Reminder to publish Application',
+    description: 'All the initial employers with draft plan years will be notified to publish their plan year 1 day prior to soft deadline of 1st.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_second_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
+        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
+        mpi_indicator: 'MPI_SHOP28',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -622,7 +748,6 @@ ivl_notice_triggers = [
   },
 ]
 
-
 shop_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
@@ -630,6 +755,3 @@ end
 ivl_notice_triggers.each do |trigger_params|
   ApplicationEventKind.create(trigger_params)
 end
-
-
-

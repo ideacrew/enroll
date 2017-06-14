@@ -925,7 +925,6 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
-
   #Used for RelationshipMatrix
   def build_relationship_matrix
     family_id = self.id
@@ -1069,7 +1068,7 @@ class Family
         spouse_relation = Person.find(parent_rel1.successor_id).person_relationships.where(family_id: family_id, predecessor_id: parent_rel1.successor_id, successor_id: parent_rel2.successor_id, kind: "spouse").first
         if spouse_relation.present?
           members = Person.where(:id.in => rel.to_a.flatten)
-          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling") 
+          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling")
           members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
         end
@@ -1077,6 +1076,14 @@ class Family
     end
 
     return matrix
+  end
+
+  def create_dep_consumer_role
+    if dependents.any?
+      dependents.each do |member|
+        build_consumer_role(member)
+      end
+    end
   end
 
 private
@@ -1202,5 +1209,4 @@ private
       unset("e_case_id")
     end
   end
-
 end

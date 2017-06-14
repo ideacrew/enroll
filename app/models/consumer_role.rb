@@ -74,6 +74,7 @@ class ConsumerRole
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
+  field :is_applying_coverage, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -468,7 +469,9 @@ class ConsumerRole
     person.addresses = []
     person.phones = []
     person.emails = []
-    person.update_attributes(*args)
+    person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
+    args[0].delete("is_applying_coverage")
+    person.update_attributes(args[0])
   end
 
   def build_nested_models_for_person
