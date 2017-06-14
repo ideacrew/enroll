@@ -26,12 +26,16 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET new" do
+    let(:address) { double(:address, zip: '10001') }
+    let(:office_location) { double(:office_location, address: address)}
+    let(:organization) { double(:organization, primary_office_location: office_location) }
+    let(:employer_profile) { double(:employer_profile, organization: organization) }
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
+    #  allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       get :new, :employer_profile_id => employer_profile_id
     end
 

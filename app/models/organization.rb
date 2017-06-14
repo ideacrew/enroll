@@ -222,11 +222,17 @@ class Organization
   end
 
   def self.valid_carrier_names(filters = { single_choice_included: false, primary_office_location: nil })
-    Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+    cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    if (filters[:primary_office_location].present?)
+      office_location = filters[:primary_office_location]
+      cache_string = "#{office_location.address.zip}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    end
+
+    Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
-        # unless (filters[:primary_office_location].nil?)
-        #   next carrier_names unless ServiceAreaReference.valid_for?(office_location: filters[:primary_office_location], carrier_profile: org.carrier_profile)
-        # end
+        unless (filters[:primary_office_location].nil?)
+          next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+        end
         unless (filters[:single_choice_included])
           next carrier_names if org.carrier_profile.restricted_to_single_choice?
         end

@@ -869,7 +869,7 @@ class EmployerProfile
       return nil
     end
     primary_office_location = organization.primary_office_location
-    ServiceAreaReference.service_areas_for(primary_office_location)
+    CarrierServiceArea.service_areas_for(primary_office_location)
   end
 
   def service_area_carriers
