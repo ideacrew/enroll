@@ -18,27 +18,43 @@
     model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
     model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
 
-    @model.update_attributes!(permit_params(model_params)) if model_params.present?
-    update_employer_contact(@model, params)
-
-    if params.key?(:step)
-      @model.workflow = { current_step: @current_step.to_i }
-    else
+    # TODO: Fix the issue of incrementing current_step even when there is only one step. 
+    # We cant check params.key?(model_name) and expect to got to 2nd step.
+    if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i + 1 }
-      @current_step = @current_step.next_step
+      @current_step = @current_step.next_step if @current_step.next_step.present?
+    else
+      @model.workflow = { current_step: @current_step.to_i }
     end
 
-    @model.save!
+    #@model.save!
 
-    if params[:commit] == "Finish"
-      flash[:notice] = 'Income Info Added.'
-      redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
-    else
+    begin
+      @model.update_attributes!(permit_params(model_params)) if model_params.present?
+      update_employer_contact(@model, params)
+
+      if params[:commit] == "Finish"
+        flash[:notice] = 'Income Info Added.'
+        redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+      else
+        render 'workflow/step'
+      end
+    rescue
+      flash[:error] = build_error_messages(@model)
       render 'workflow/step'
     end
+    
   end
 
   private
+
+  def build_error_messages(model)
+    all_errors = ""
+    all_errors = all_errors + @model.errors.full_messages.join(', ') if @model.errors.messages.present?
+    all_errors = all_errors + @model.employer_address.errors.full_messages.join(', ') if @model.employer_address.errors.messages.present?
+    all_errors = all_errors + @model.employer_phone.errors.full_messages.join(', ') if @model.employer_phone.errors.messages.present?
+    return all_errors
+  end
 
   def update_employer_contact model, params
     if params[:employer_phone].present?

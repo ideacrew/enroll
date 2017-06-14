@@ -1,3 +1,115 @@
+
+- step:
+    heading: Your Preferences
+    heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time.<br>"
+            - cells:
+                  - gutter: 2
+                    type: label_radio
+                    label: I Agree *
+                    classNames: 'span-text'
+                  - gutter: 2
+                    type: label_radio
+                    classNames: 'span-text'
+                    label: I disagree *
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: How long would you like your eligibility for help paying for cost saving to be renewed? *
+                  - gutter: 12
+                    type: label_radio
+                    label: 5 years
+                    classNames: 'span-text'
+                    model: application
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 4 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 3 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 2 years
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: 1 year
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label_radio
+                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                  - gutter: 12
+                    type: label
+                    label: "None "
+                    classNames: 'span-text btn btn-danger'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+      - section:
+          heading: Voter Registration
+          heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+          lines:
+            - cells:
+                  - gutter: 8
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: Would you like to have an application to register to vote mailed to you?
+                  - gutter: 2
+                    type: label_radio
+                    label: "Yes"
+                    classNames: 'span-text'
+                  - gutter: 2
+                    type: label_radio
+                    label: "No"
+                    classNames: 'span-text' 
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to register to vote at this time.<br>
+                    You may file a complaint if you believe that someone has interfered with: <br><br>
+                    * Your right to register or not register to vote <br>
+                    * Your right to privacy in deciding whether or not to register to vote <br>
+                    * Your right to choose your own political party or other political choice <br><br>
+
+                    <b>To file a complaint, contact:</b><br>
+                    D.C. Board of Elections<br>
+                    441 4th Street, N.W.<br>
+                    Suite 250-North<br>
+                    Washington, DC 20001<br>
+                    Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Application
     heading_text: Please complete all tax info for  <family-member-name-placeholder>. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
@@ -105,125 +217,53 @@
                     model: application
                     attribute: submission_terms
 - step:
-    heading: Your Preferences
-    heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+    heading: Eligibility Results
+    heading_text: We have your results!
     sections:
       - section:
           lines:
             - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years.DC Health Link will send me a notice, let me make any changes, and I can opt out at any time.<br>"
+                - gutter: 12
+                  type: raw_html
+                  text: <strong> Medicaid </strong>
             - cells:
-                  - gutter: 2
-                    type: label_radio
-                    label: I Agree *
-                    classNames: 'span-text'
-                    # model: application
-                    # name: medicaid_terms
-                    # attribute: medicaid_terms
-                  - gutter: 2
-                    type: label_radio
-                    classNames: 'span-text'
-                    label: I disagree *
-                    # model: application
-                    # name: medicaid_terms
-                    # attribute: medicaid_terms
+                - gutter: 12
+                  type: raw_html
+                  text: 'These people <strong> appear to be eligible </strong> for medicaid:'
             - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.
-            - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: How long would you like your eligibility for help paying for cost saving to be renewed? *
-                  - gutter: 12
-                    type: label_radio
-                    label: 5 years
-                    classNames: 'span-text'
-                    model: application
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label_radio
-                    label: 4 years
-                    classNames: 'span-text'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label_radio
-                    label: 3 years
-                    classNames: 'span-text'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label_radio
-                    label: 2 years
-                    classNames: 'span-text'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label_radio
-                    label: 1 year
-                    classNames: 'span-text'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label_radio
-                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
-                    classNames: 'span-text'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label
-                    label: "None "
-                    classNames: 'span-text btn btn-danger'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                - gutter: 12
+                  type: raw_html
+                  text: '<strong> NEXT STEP: The DC Department of Human Services(DHS) will make a final determination of Medicaid eligibility. </strong> We have forwarded your application to them. If you havnt heard from DHS after 2 weeks, you may need to check on the status of the final determination by calling us at (855) 532-5465'
       - section:
-          heading: Voter Registration
-          heading_text: Tell us your preferences. When you're finished, select CONTINUE.
           lines:
             - cells:
-                  - gutter: 8
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: Would you like to have an application to register to vote mailed to you?
-                  - gutter: 2
-                    type: label_radio
-                    label: "Yes"
-                    classNames: 'span-text'
-                    model: application
-                    name: 
-                    attribute: 
-                  - gutter: 2
-                    type: label_radio
-                    label: "No"
-                    classNames: 'span-text'
-                    model: application
-                    name: 
-                    attribute:  
+                - gutter: 12
+                  type: raw_html
+                  text: <strong> Help Paying for Private Health Insurance </strong>
             - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to register to vote at this time.<br>
-                    You may file a complaint if you believe that someone has interfered with: <br><br>
-                    * Your right to register or not register to vote <br>
-                    * Your right to privacy in deciding whether or not to register to vote <br>
-                    * Your right to choose your own political party or other political choice <br><br>
-
-                    <b>To file a complaint, contact:</b><br>
-                    D.C. Board of Elections<br>
-                    441 4th Street, N.W.<br>
-                    Suite 250-North<br>
-                    Washington, DC 20001<br>
-                    Phone: (202) 727-2525 <br>"
+                - gutter: 12
+                  type: raw_html
+                  text: 'These people <strong> are eligible for savings of $137 per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance.
+                         <br>
+                         <br>
+                         <br>
+                         They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit'
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: "<strong> NEXT STEP: </strong> Pick a health insurance plan."
+      - section:
+          lines:
+            - cells:
+                - gutter: 6
+                  type: raw_html
+                  text: Download Application
+                - gutter: 6
+                  type: raw_html
+                  text: View Eligibility History
+                - gutter: 12
+                  type: raw_html
+                  text: '<br>If you do not agree with this determination, you have the right to appeal.
+                         <br>
+                         Find out more about the appeal process or get assistance by contacting us directly.
+                         Your application reference number is <strong> 190009446 </strong>'

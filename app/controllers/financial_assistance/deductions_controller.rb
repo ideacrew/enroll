@@ -19,11 +19,11 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
 
-    if params.key?(:step)
-      @model.workflow = { current_step: @current_step.to_i }
-    else
+    if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i + 1 }
       @current_step = @current_step.next_step
+    else
+      @model.workflow = { current_step: @current_step.to_i }
     end
 
     @model.save!

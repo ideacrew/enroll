@@ -64,10 +64,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     attributes.permit!
   end
 
-  def update_params(model_key, params_instance, params)
-    @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 }) # Add workflow params
-    params_instance.first.last.merge!(family_member_id: params[:member_id]) if model_key == "applicants_attributes" # Add foreign key reference to appplicant
-  end
+  # def update_params(model_key, params_instance, params)
+  #   @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 }) # Add workflow params
+  #   params_instance.first.last.merge!(family_member_id: params[:member_id]) if model_key == "applicants_attributes" # Add foreign key reference to appplicant
+  # end
 
   def find
     # TODO:Find the latest application in-progress

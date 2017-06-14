@@ -16,7 +16,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
     if params.key?(model_name)
 		  @model.workflow = { current_step: @current_step.to_i + 1 }
-		  @current_step = @current_step.next_step
+		  @current_step = @current_step.next_step if @current_step.next_step.present?
     else
 		  @model.workflow = { current_step: @current_step.to_i }
     end
