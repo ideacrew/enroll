@@ -27,5 +27,5 @@ describe CensusEmployee, "given a combination of dependents" do
   it_behaves_like "a census employee determining its composite rating tier", ["disabled_child_26_and_over"], CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
   it_behaves_like "a census employee determining its composite rating tier", ["child_26_and_over", "child_under_26"], CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
   it_behaves_like "a census employee determining its composite rating tier", ["disabled_child_26_and_over", "child_under_26"], CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
-  it_behaves_like "a census employee determining its composite rating tier", ["disabled_child_26_and_over", "child_under_26"], CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+  it_behaves_like "a census employee determining its composite rating tier", ["child_26_and_over", "child_under_26"], CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
 end
