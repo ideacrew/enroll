@@ -27,6 +27,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
+  field :expected_selection, type: String, default: "Enroll"
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId

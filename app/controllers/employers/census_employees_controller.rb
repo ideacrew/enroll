@@ -263,6 +263,14 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
+  def change_expected_selection
+    census_employees = CensusEmployee.find(params[:ids])
+    census_employees.each do |census_employee|
+      census_employee.update_attributes(:expected_selection=>params[:expected_selection])
+    end
+    render :json => true
+  end
+
   private
 
   def updateable?

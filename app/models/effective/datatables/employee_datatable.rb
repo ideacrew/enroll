@@ -6,9 +6,9 @@ module Effective
 
         # TODO: Implement Filters here
         bulk_actions_column do
-          bulk_action 'Employee will enroll', generate_invoice_exchanges_hbx_profiles_path, data: {confirm: 'Generate Invoices?', no_turbolink: true}
-          bulk_action 'Employee will not enroll with valid waiver', binder_paid_exchanges_hbx_profiles_path, data: {confirm: 'Mark Binder Paid?', no_turbolink: true}
-          bulk_action 'Employee will not enroll with invalid waiver', generate_invoice_exchanges_hbx_profiles_path, data: {confirm: 'Generate Invoices?', no_turbolink: true}
+          bulk_action 'Employee will enroll',  change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"enroll"), data: {confirm: 'Are you sure? Do you want to make enroll?', no_turbolink: true}
+          bulk_action 'Employee will not enroll with valid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"waive"), data: {confirm: 'Are you sure? Do you want to make Waive?', no_turbolink: true}
+          bulk_action 'Employee will not enroll with invalid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"will_not_participate"), data: {confirm: 'Are you sure? Do you want to make will not participate?', no_turbolink: true}
         end
 
         table_column :EmployeeName, :width => '50px', :proc => Proc.new { |row|
@@ -45,7 +45,11 @@ module Effective
         end
 
         table_column :EnrollmentStatus, :proc => Proc.new { |row|
-          enrollment_state(row)
+            enrollment_state(row)
+        }, :sortable => false, :filter => false
+
+        table_column :Est_Participation, :proc => Proc.new { |row|
+           row.expected_selection.titleize if row.expected_selection
         }, :sortable => false, :filter => false
 
         if attributes["renewal_status"]

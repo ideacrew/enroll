@@ -291,6 +291,7 @@ Rails.application.routes.draw do
         collection do
           get :show_employee
           get :rehire_employee
+          post :change_expected_selection
         end
         get :cobra_reinstate
         get :benefit_group, on: :member
@@ -495,7 +496,7 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
 
-  resources :documents, only: [:update, :destroy, :update] do
+  resources :documents, only: [ :new, :create, :destroy, :update] do
     collection do
       put :change_person_aasm_state
       get :show_docs
