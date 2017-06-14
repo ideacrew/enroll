@@ -4,6 +4,8 @@ class FamilyMember
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
 
+  after_create :create_financial_assistance_applicant
+
   embedded_in :family
 
   # Person responsible for this family
@@ -133,5 +135,12 @@ class FamilyMember
     return [] if family_member_id.nil?
     family = Family.where("family_members._id" => BSON::ObjectId.from_string(family_member_id)).first
     family.family_members.detect { |member| member._id.to_s == family_member_id.to_s } unless family.blank?
+  end
+
+  def create_financial_assistance_applicant
+    # If there is an application in progress create an applicant for the added family member.
+    if family.application_in_progress.present?
+      family.application_in_progress.applicants.create!({family_member_id: self.id})
+    end
   end
 end
