@@ -13,6 +13,11 @@ FactoryGirl.define do
     # before(:create) do |broker_agency|
     #   FactoryGirl.create(:organization, broker_agency_profile: broker_agency)
     # end
+    trait :shop_agency do
+      market_kind "shop"
+    end
+     trait :ivl_agency do
+      market_kind "individual"
+    end
   end
 end
-

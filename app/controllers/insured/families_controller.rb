@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
@@ -88,11 +89,10 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
-
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -160,23 +160,12 @@ class Insured::FamiliesController < FamiliesController
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
 
     if @enrollment.present?
-      plan = @enrollment.try(:plan)
-      if @enrollment.is_shop?
-        @benefit_group = @enrollment.benefit_group
-        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-        if @benefit_group.is_congress
-          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
-        else
-          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
-        end
-      else
-        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
-      end
+      @enrollment.reset_dates_on_previously_covered_members
+      @plan = @enrollment.build_plan_premium
 
       begin
         @plan.name
@@ -293,13 +282,13 @@ class Insured::FamiliesController < FamiliesController
     else
       if @person.active_employee_roles.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.shop_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
         else
           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
         end
       else @person.consumer_role.present?
         if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
         else
           @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         end
@@ -348,7 +337,7 @@ class Insured::FamiliesController < FamiliesController
   def notice_upload_email
     if (@person.consumer_role.present? && @person.consumer_role.can_receive_electronic_communication?) ||
       (@person.employee_roles.present? && (@person.employee_roles.map(&:contact_method) & ["Only Electronic communications", "Paper and Electronic communications"]).any?)
-      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from DC Health Link", @person.work_email_or_best).deliver_now
+      UserMailer.generic_notice_alert(@person.first_name, "You have a new message from #{site_short_name}", @person.work_email_or_best).deliver_now
     end
   end
 
@@ -356,7 +345,7 @@ class Insured::FamiliesController < FamiliesController
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{authorized_document_download_path('Person', @person.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + subject + "</a>"
 
-    @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
+    @person.inbox.messages << Message.new(subject: subject, body: body, from: site_short_name)
     @person.save!
   end
 
@@ -366,7 +355,7 @@ class Insured::FamiliesController < FamiliesController
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
-    @qle_date_calc = @qle_date - Settings.aca.qle.with_in_sixty_days.days
+    @qle_date_calc = @qle_date - aca_qle_period.days
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id

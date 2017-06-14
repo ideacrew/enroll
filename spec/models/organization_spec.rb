@@ -120,14 +120,14 @@ RSpec.describe Organization, dbclean: :after_each do
 
   describe "class method", dbclean: :after_each do
     let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
+    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
+    let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
-      carrier_profile_1
-      carrier_profile_2
       Rails.cache.clear
     end
 
@@ -137,17 +137,30 @@ RSpec.describe Organization, dbclean: :after_each do
         carrier_names = {}
         carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
         carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        expect(Organization.valid_carrier_names).to eq carrier_names
+        expect(Organization.valid_carrier_names).to match_array carrier_names
       end
 
       it "valid_carrier_names_for_options" do
         carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options).to eq carriers
+        expect(Organization.valid_carrier_names_for_options).to match_array carriers
+      end
+
+      it "valid_carrier_names_for_options passes arguments" do
+        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s], [single_choice_carrier.legal_name, single_choice_carrier.id.to_s]]
+        expect(Organization.valid_carrier_names_for_options(single_choice_included: true)).to match_array carriers
+      end
+
+      it "can filter out single choice only options" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+        carrier_names[single_choice_carrier.id.to_s] = single_choice_carrier.legal_name
+        expect(Organization.valid_carrier_names(single_choice_included: true)).to match_array carrier_names
       end
     end
 
     context "binder_paid" do
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location) { OfficeLocation.new(
           is_primary: true,
@@ -165,7 +178,8 @@ RSpec.describe Organization, dbclean: :after_each do
       let(:valid_params) do
         {
           organization: organization,
-          entity_kind: "partnership"
+          entity_kind: "partnership",
+          sic_code: '1111'
         }
       end
       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
@@ -185,36 +199,52 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
   describe "Broker Agency Search" do
+    let(:agency_1) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "Health Brokers Inc") }
+    let(:agency_2) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "DC Health Inc") }
 
-    before do
-      @agency1 = FactoryGirl.create(:broker_agency, legal_name: "Health Brokers Inc")
-      @agency2 = FactoryGirl.create(:broker_agency, legal_name: "DC Health Inc")
-    end
+    context ".scopes" do
+      context 'approved_broker_agencies' do
 
-    context ".scopes" do 
-      context 'approved_broker_agencies' do 
-
-        before do 
-          @agency1.broker_agency_profile.approve!
+        before do
+          agency_1.broker_agency_profile.approve!
         end
 
         it 'should return apporved broker agencies' do
           expect(Organization.approved_broker_agencies.count).to eq(1)
-          expect(Organization.approved_broker_agencies[0]).to eq(@agency1)
-        end 
-      end
-   
-      context 'broker_agencies_by_market_kind' do 
-        it 'should return individual market agencies' do
-          expect(Organization.broker_agencies_by_market_kind(['individual', 'both']).count).to eq(2)
+          expect(Organization.approved_broker_agencies[0]).to eq(agency_1)
         end
-
-        it 'should return shop market agencies' do
-          expect(Organization.broker_agencies_by_market_kind(['shop', 'both']).count).to eq(2)
-        end 
       end
 
-      context 'by_broker_agency_profile' do  
+      context 'broker_agencies_by_market_kind' do
+        context "when individual market is enabled" do
+          let(:agency_1) { FactoryGirl.create(:broker_agency, :ivl_only, legal_name: "IVL Health Brokers Inc") }
+          let(:agency_2) { FactoryGirl.create(:broker_agency, :both_ivl_and_shop, legal_name: "IVL Health Brokers Inc") }
+
+          before do
+            stub_const("BrokerAgencyProfile::MARKET_KINDS", %W[individual shop both])
+            agency_1.reload
+            agency_2.reload
+          end
+          it 'should return individual market agencies' do
+            expect(Organization.broker_agencies_by_market_kind(['individual', 'both']).count).to eq(2)
+          end
+        end
+        context "when individual market is disabled" do
+          let(:agency_1) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc") }
+          let(:agency_2) { FactoryGirl.create(:broker_agency, :shop_only, legal_name: "SHOP Health Brokers Inc 2") }
+
+          before do
+            stub_const("BrokerAgencyProfile::MARKET_KINDS", %W[shop])
+            agency_1.reload
+            agency_2.reload
+          end
+          it 'should return shop market agencies' do
+            expect(Organization.broker_agencies_by_market_kind(['shop', 'both']).count).to eq(2)
+          end
+        end
+      end
+
+      context 'by_broker_agency_profile' do
         let(:organization6)  {FactoryGirl.create(:organization, fein: "024897585")}
         let(:broker_agency_profile)  {organization6.create_broker_agency_profile(market_kind: "both", primary_broker_role_id: "8754985")}
         let(:organization7)  {FactoryGirl.create(:organization, fein: "724897585")}
@@ -222,13 +252,13 @@ RSpec.describe Organization, dbclean: :after_each do
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
-          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
         end
 
         it 'broker agency_profile match does not count unless active account' do
-          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
           employer = Organization.find(employer.organization.id).employer_profile
@@ -237,85 +267,85 @@ RSpec.describe Organization, dbclean: :after_each do
           employer = Organization.find(employer.organization.id).employer_profile
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(0)
-        end 
+        end
       end
     end
 
-    context 'with advanced options' do 
+    context 'with advanced options' do
 
-      before do 
-        @agency1.broker_agency_profile.approve!
-        @agency2.broker_agency_profile.approve!
-        @agency1.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency1.broker_agency_profile.id)
-        @agency1.broker_agency_profile.update_attributes(languages_spoken: ['en', 'fr', 'de'])
-        @agency1.broker_agency_profile.primary_broker_role.approve!
-        @agent1 = @agency1.broker_agency_profile.primary_broker_role.person
+      before do
+        agency_1.broker_agency_profile.approve!
+        agency_2.broker_agency_profile.approve!
+        agency_1.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: agency_1.broker_agency_profile.id)
+        agency_1.broker_agency_profile.update_attributes(languages_spoken: ['en', 'fr', 'de'])
+        agency_1.broker_agency_profile.primary_broker_role.approve!
+        @agent1 = agency_1.broker_agency_profile.primary_broker_role.person
 
-        @agency2.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: @agency2.broker_agency_profile.id)
-        @agency2.broker_agency_profile.update_attributes({languages_spoken: ['bn', 'hi'], working_hours: true}) 
-        @agency2.broker_agency_profile.primary_broker_role.approve!
-        @agent2 = @agency2.broker_agency_profile.primary_broker_role.person
+        agency_2.broker_agency_profile.primary_broker_role.update_attributes(broker_agency_profile_id: agency_2.broker_agency_profile.id)
+        agency_2.broker_agency_profile.update_attributes({languages_spoken: ['bn', 'hi'], working_hours: true})
+        agency_2.broker_agency_profile.primary_broker_role.approve!
+        @agent2 = agency_2.broker_agency_profile.primary_broker_role.person
       end
 
       context ".search_agencies_by_criteria" do
-        context 'when searched with legal name' do 
+        context 'when searched with legal name' do
           it 'should return matching agency' do
             agencies = Organization.search_agencies_by_criteria({q: 'DC'})
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_2.legal_name)
           end
         end
 
-        context 'when searched with multiple languages' do 
+        context 'when searched with multiple languages' do
           it 'should return matching agency' do
             agencies = Organization.search_agencies_by_criteria({languages: ['de', 'en']})
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
 
             agencies = Organization.search_agencies_by_criteria({languages: ['bn', 'de']})
             expect(agencies.count).to eq(2)
-            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+            expect(agencies.map(&:legal_name)).to eq([agency_2.legal_name, agency_1.legal_name])
           end
         end
 
-        context 'when searched with weekend hours' do 
+        context 'when searched with weekend hours' do
           it 'should return matching agency' do
             agencies = Organization.search_agencies_by_criteria({working_hours: 'true'})
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_2.legal_name)
           end
         end
 
-        context 'when searched by name, languages, weekend hours' do 
+        context 'when searched by name, languages, weekend hours' do
           it 'should return matching agency' do
             agencies = Organization.search_agencies_by_criteria({ q: 'Brokers', working_hours: 'true' })
             expect(agencies.count).to eq(0)
 
             agencies = Organization.search_agencies_by_criteria({ q: 'Brokers', working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
 
             agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn'], working_hours: 'true' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_2.legal_name)
 
             agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn', 'en'] })
             expect(agencies.count).to eq(2)
-            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+            expect(agencies.map(&:legal_name)).to eq([agency_2.legal_name, agency_1.legal_name])
 
             agencies = Organization.search_agencies_by_criteria({ q: 'Health', languages: ['bn', 'en'], working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
 
             agencies = Organization.search_agencies_by_criteria({ languages: ['bn', 'en'], working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
           end
         end
       end
 
       context ".broker_agencies_with_matching_agency_or_broker" do
-        context 'when searching by broker name and npn' do 
+        context 'when searching by broker name and npn' do
           it 'should return matching broker instead of agency' do
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent2.last_name})
             expect(agencies.count).to eq(1)
@@ -327,7 +357,7 @@ RSpec.describe Organization, dbclean: :after_each do
           end
         end
 
-        context 'when searching by broker name and agency languages' do 
+        context 'when searching by broker name and agency languages' do
           it 'should return matching broker with matching agency criteria' do
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({q: @agent1.first_name})
             expect(agencies.count).to eq(2)
@@ -347,27 +377,27 @@ RSpec.describe Organization, dbclean: :after_each do
           end
         end
 
-        context 'when searching by broker agency name, languages, hours' do 
+        context 'when searching by broker agency name, languages, hours' do
           it 'should return matching agencies' do
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Brokers', working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
 
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn'], working_hours: 'true' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency2.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_2.legal_name)
 
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn', 'en'] })
             expect(agencies.count).to eq(2)
-            expect(agencies.map(&:legal_name)).to eq([@agency2.legal_name, @agency1.legal_name])
+            expect(agencies.map(&:legal_name)).to eq([agency_2.legal_name, agency_1.legal_name])
 
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({ q: 'Health', languages: ['bn', 'en'], working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
 
             agencies = Organization.broker_agencies_with_matching_agency_or_broker({ languages: ['bn', 'en'], working_hours: 'false' })
             expect(agencies.count).to eq(1)
-            expect(agencies.first.legal_name).to eq(@agency1.legal_name)
+            expect(agencies.first.legal_name).to eq(agency_1.legal_name)
           end
         end
       end
@@ -424,7 +454,7 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
-  context "invoice_date" do 
+  context "invoice_date" do
     context "with valid date in the file name" do
       it "should parse the date" do
         valid_file_names.each do | file_name |

@@ -1,3 +1,4 @@
+@individual_enabled
 Feature: Create Primary Broker and Broker Agency
   In order for Brokers to help individuals and SHOP employees
   The Primary Broker must create and manage an account on the HBX for their organization.
@@ -15,8 +16,7 @@ Feature: Create Primary Broker and Broker Agency
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information
-    Then Primary Broker practice area should be small business market only
-    And Primary Broker enters broker agency information
+    And Primary Broker enters broker agency information for individual markets
     And Primary Broker enters office location for default_office_location
     And Primary Broker clicks on Create Broker Agency
     Then Primary Broker should see broker registration successful message

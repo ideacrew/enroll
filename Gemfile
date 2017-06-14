@@ -72,7 +72,7 @@ gem 'roo', '~> 2.1.0'
 # configuration support
 gem "config", '~> 1.0.0'
 
-gem 'devise', '~> 3.4.1'
+gem 'devise', '>= 3.5.4'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem "pundit", '~> 1.0.1'
 
@@ -106,6 +106,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+gem 'chosen-rails'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
@@ -114,6 +115,11 @@ group :development do
 end
 
 group :development, :test do
+  # YARD documentation generation tool: http://yardoc.org/
+  gem 'yard', '~> 0.9.5'
+  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'railroady', '~> 1.5.2'
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'pry'
   gem 'pry-rails'
@@ -151,6 +157,7 @@ group :test do
   gem 'capybara', '2.6.2'
   gem 'warden'
   gem 'fakeredis', :require => 'fakeredis/rspec'
+  gem 'rspec-instafail'
 end
 
 group :production do

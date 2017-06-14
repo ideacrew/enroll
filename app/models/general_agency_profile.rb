@@ -4,7 +4,7 @@ class GeneralAgencyProfile
   include Mongoid::Timestamps
   include AASM
   include AgencyProfile
-  include IndividualMarketBehaviors
+  include Config::AcaModelConcern
 
   # for market_kind
   MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
@@ -47,7 +47,7 @@ class GeneralAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true

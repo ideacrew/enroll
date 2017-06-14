@@ -198,7 +198,7 @@ And(/I click on back to my account button$/) do
 end
 
 Then(/I should land on home page$/) do
-  expect(page).to have_content 'My DC Health Link'
+  expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
 And(/I click on log out link$/) do
@@ -528,7 +528,7 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
     household.tax_households.create(is_eligibility_determined: TimeKeeper.date_of_record, allocated_aptc: 100, effective_starting_on: start_on, submitted_at: TimeKeeper.date_of_record)
     fm_id = person.primary_family.family_members.last.id
     household.tax_households.last.tax_household_members.create(applicant_id: fm_id, is_ia_eligible: true, is_medicaid_chip_eligible: true, is_subscriber: true)
-    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: TimeKeeper.datetime_of_record, csr_percent_as_integer: 40)
+    household.tax_households.last.eligibility_determinations.create(max_aptc: 80, determined_on: Time.now, csr_percent_as_integer: 40)
   end
 
   screenshot("aptc_householdinfo")

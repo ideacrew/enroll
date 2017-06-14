@@ -1,5 +1,7 @@
 class HbxProfile
-
+  include Config::AcaModelConcern
+  include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -93,7 +95,7 @@ class HbxProfile
     end
 
     def current_hbx
-      find_by_state_abbreviation("DC")
+      find_by_state_abbreviation(aca_state_abbreviation)
     end
 
     def transmit_group_xml(employer_profile_ids)
@@ -101,7 +103,7 @@ class HbxProfile
       employer_profile_ids.each do |empr_id|
         empr = EmployerProfile.find(empr_id)
         hbx_ids << empr.hbx_id
-        empr.update_attribute(:xml_transmitted_timestamp, TimeKeeper.datetime_of_record.utc)
+        empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
       end
       notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
     end
@@ -123,11 +125,11 @@ class HbxProfile
   ## Application-level caching
 
   ## HBX general settings
-  StateName = "District of Columbia"
-  StateAbbreviation = "DC"
-  CallCenterName = "DC Health Link's Customer Care Center"
-  CallCenterPhoneNumber = "1-855-532-5465"
-  ShortName = "DC Health Link"
+  StateName = aca_state_name
+  StateAbbreviation = aca_state_abbreviation
+  CallCenterName = contact_center_name
+  CallCenterPhoneNumber = contact_center_phone_number
+  ShortName = site_short_name
 
   # IndividualEnrollmentDueDayOfMonth = 15
   # Temporary change for Dec 2015 extension
@@ -229,8 +231,8 @@ class HbxProfile
   end
 
   def save_inbox
-    welcome_subject = "Welcome to #{Settings.site.short_name}"
-    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{site_short_name}"
+    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     @inbox.save
     @inbox.messages.create(subject: welcome_subject, body: welcome_body)
   end

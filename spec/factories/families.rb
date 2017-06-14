@@ -3,7 +3,7 @@ FactoryGirl.define do
     association :person
     sequence(:e_case_id) {|n| "abc#{n}12xyz#{n}"}
     renewal_consent_through_year  2017
-    submitted_at TimeKeeper.datetime_of_record
+    submitted_at Time.now
     updated_at "user"
 
     transient do
@@ -28,10 +28,15 @@ FactoryGirl.define do
       family_members {
         [
           FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
-          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "John", last_name: "Doe"))
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "John", last_name: "Doe")),
+          FactoryGirl.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: Person.new(first_name: "Alex", last_name: "Doe"))
         ]
       }
-    end
+      before(:create)  do |family, evaluator|
+        dep_person = family.dependents.first.person
+        family.relate_new_member(dep_person, "child")
+      end
+   end
   end
 end
 
@@ -47,7 +52,7 @@ FactoryGirl.define do
     end
 
     family_members { [
-        FactoryGirl.create(:family_member, family: self, is_primary_applicant: true, is_active: true,
+        FactoryGirl.build(:family_member, family: self, is_primary_applicant: true, is_active: true,
             person: primary_person)
       ] }
 

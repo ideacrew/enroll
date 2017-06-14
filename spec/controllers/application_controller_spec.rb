@@ -13,7 +13,7 @@ RSpec.describe ApplicationController do
       get :index
     end
 
-    it "redirect to the sign in page" do
+    it "redirect to the sign up page" do
       expect(response).to redirect_to(new_user_registration_path)
     end
 

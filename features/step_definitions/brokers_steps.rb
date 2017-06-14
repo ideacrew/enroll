@@ -19,11 +19,28 @@ When(/^.+ enters personal information$/) do
   fill_in 'organization[npn]', with: '109109109'
 end
 
-Then(/^Primary Broker practice area should be small business market only$/) do
-  find('select#organization_market_kind').value.should eq 'shop'
+And(/^.+ enters broker agency information for individual markets$/) do
+  fill_in 'organization[legal_name]', with: "Logistics Inc"
+  fill_in 'organization[dba]', with: "Logistics Inc"
+  # Auto-Generates FEIN
+  # fill_in 'organization[fein]', with: "890890891"
+
+  # this field was hidden 4/13/2016
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
+  # find(:xpath, "//li[contains(., 'C Corporation')]").click
+
+  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  find(:xpath, "//li[contains(., 'Both - Individual & Family AND Small Business Marketplaces')]").click
+
+  find('button.multiselect').click
+  find(:xpath, '//label[input[@value="bn"]]').click
+  find(:xpath, '//label[input[@value="fr"]]').click
+
+  find(:xpath, "//label[input[@name='organization[accept_new_clients]']]").trigger('click')
+  find(:xpath, "//label[input[@name='organization[working_hours]']]").trigger('click')
 end
 
-And(/^.+ enters broker agency information$/) do
+And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'organization[legal_name]', with: "Logistics Inc"
   fill_in 'organization[dba]', with: "Logistics Inc"
   # Auto-Generates FEIN
@@ -49,6 +66,7 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
+  wait_for_ajax
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
@@ -71,7 +89,7 @@ Then(/^.+ should see the broker successfully approved message$/) do
 end
 
 And(/^.+ should receive an invitation email$/) do
-  open_email("ricky.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name} ")
+  open_email("ricky.martin@example.com", :with_subject => "Invitation to create your Broker account on #{Settings.site.short_name}")
   expect(current_email.to).to eq(["ricky.martin@example.com"])
   #current_email.should have_subject("Invitation from your Employer to Sign up for Health Insurance at #{Settings.site.short_name} ")
 end
@@ -251,4 +269,28 @@ end
 Then(/^.+ continues to the consumer home page$/) do
   wait_and_confirm_text(/Continue/)
   @browser.a(text: /Continue/).click
+end
+
+Given(/^zip code for county exists as rate reference$/) do
+ FactoryGirl.create(:rate_reference, zip_code: '01010', county_name: 'Test County', rating_region: "Test Region",
+    zip_code_in_multiple_counties: true)
+end
+#
+Given(/^enters the existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'
+end
+
+Then(/^the county should be autopopulated appropriately$/) do
+  wait_for_ajax
+  select 'Test County', :from => "organization[office_locations_attributes][0][address_attributes][county]"
+  expect(page).to have_select("organization[office_locations_attributes][0][address_attributes][county]", :selected => 'Test County')
+end
+
+Given(/^enters a non existing zip code$/) do
+  fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '11011'
+end
+
+Then(/^the county should not be autopopulated appropriately$/) do
+  wait_for_ajax
+  expect(page).not_to have_select("organization[office_locations_attributes][0][address_attributes][county]", :options => ['Test County'])
 end

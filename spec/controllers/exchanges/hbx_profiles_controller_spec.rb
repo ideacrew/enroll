@@ -434,7 +434,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:hbx_profile) { FactoryGirl.create(:hbx_profile)}
     let(:permission_yes) { FactoryGirl.create(:permission, :can_update_ssn => true)}
     let(:permission_no) { FactoryGirl.create(:permission, :can_update_ssn => false)}
-    
+
     it "should return authorization error for Non-Admin users" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       sign_in(user)
@@ -473,7 +473,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       @params = {:person=>{:pid => person.id, :ssn => invalid_ssn, :dob => valid_dob},:jq_datepicker_ignore_person=>{:dob=> valid_dob}, :format => 'js'}
       xhr :get, :update_dob_ssn, @params
       expect(response).to render_template('edit_enrollment')
-    end 
+    end
 
     it "should render update_enrollment if the save is successful" do
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
@@ -509,15 +509,30 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       sign_in user
     end
 
-    it "should returns http success" do
-      xhr :get, :general_agency_index, format: :js
-      expect(response).to have_http_status(:success)
+    context "when GA is enabled in settings" do
+      before do
+        Settings.aca.general_agency_enabled = true
+        Enroll::Application.reload_routes!
+      end
+      it "should returns http success" do
+        xhr :get, :general_agency_index, format: :js
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should get general_agencies" do
+        xhr :get, :general_agency_index, format: :js
+        expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
+      end
     end
 
-    it "should get general_agencies" do
-      xhr :get, :general_agency_index, format: :js
-      expect(assigns(:general_agency_profiles)).to eq Kaminari.paginate_array(GeneralAgencyProfile.filter_by())
+    context "when GA is disabled in settings" do
+      before do
+        Settings.aca.general_agency_enabled = false
+        Enroll::Application.reload_routes!
+      end
+      it "should returns http success" do
+        expect(:get => :general_agency_index).not_to be_routable
+      end
     end
   end
 end
-

@@ -3,7 +3,7 @@ class BrokerAgencyProfile
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
-  include IndividualMarketBehaviors
+  include Config::AcaModelConcern
 
   embedded_in :organization
 
@@ -52,7 +52,7 @@ class BrokerAgencyProfile
     allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid practice area" },
+    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
   validates :entity_kind,

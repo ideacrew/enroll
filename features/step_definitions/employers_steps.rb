@@ -375,25 +375,26 @@ When(/^.+ clicks? on publish plan year$/) do
 end
 
 Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
-  expect(find('.modal-body')).to have_content('Primary office must be located in District of Columbia')
+  expect(find('.modal-body')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
-  expect(find('.modal-body')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+  expect(find('.modal-body')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
+  screenshot("havent clicked cancel yet")
   find(".modal-dialog .interaction-click-control-cancel").click
 end
 
 Then(/^.+ should be on the business info page with warnings$/) do
   expect(page).to have_content 'Primary Office Location'
-  expect(find('.alert-error')).to have_content('Primary office must be located in District of Columbia')
+  expect(find('.alert-error')).to have_content("Primary office must be located in #{Settings.aca.state_name}")
 end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
-  expect(find('.alert-plan-year')).to have_content('Number of full time equivalents (FTEs) exceeds maximum allowed')
+  expect(find('.alert-plan-year')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
 end
 
 Then(/^.+ updates the address location with correct address$/) do
@@ -411,7 +412,7 @@ Then(/^.+ should see a plan year successfully saved message$/) do
 end
 
 When(/^.+ clicks? on employer my account link$/) do
-  click_link 'My DC Health Link'
+  click_link "My #{Settings.site.short_name}"
 end
 
 Then(/^.+ should see employee cost modal for current plan year$/) do
@@ -454,6 +455,7 @@ end
 
 Given /^the employer has employees$/ do
   employees employer_profile: employer.employer_profile
+  employees.last.update_attributes(aasm_state: "employment_terminated", employment_terminated_on: TimeKeeper.date_of_record - 5.days)
 end
 
 Given /^the employer is logged in$/ do
@@ -493,6 +495,41 @@ And /^employer clicks on linked employee with address$/ do
   expect(page).to have_content "Eddie Vedder"
   find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
 end
+
+Then /^ER should land on (.*) EE tab$/ do |val|
+  expect(page).to have_content val.upcase
+end
+
+And /^ER enters (.*) EE name on search bar$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  search_item = val == "active" ? employees.first.last_name : ter
+  page.fill_in('employee_search', :with => search_item)
+end
+
+And /^ER clicks on search button$/ do
+  find(".interaction-click-control-search").trigger('click')
+end
+
+Then /^ER should see the (.*) searched EE on the roster page$/ do |val|
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}
+  search_item = val == "active" ? employees.first.full_name : ter.full_name
+  page.should have_selector(:link_or_button, search_item)
+end
+
+And /^ER should see no results$/ do
+  expect(page).to have_content /No results found/
+end
+
+Then /^ER clears the search value in the search box$/ do
+  page.fill_in('employee_search', :with => nil)
+end
+
+Then /^ER should see all the terminated employees$/ do
+  ter = employees.detect { |ee| ee.aasm_state == 'employment_terminated'}.last_name
+  expect(page).to have_content ter
+  expect(page).not_to have_content employees.first.last_name
+end
+
 
 Then /^employer should not see the address on the roster$/ do
   expect(page).not_to have_content /Address/

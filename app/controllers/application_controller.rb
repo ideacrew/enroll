@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   include Pundit
+  include Config::SiteConcern
+  include Config::AcaConcern
+  include Config::ContactCenterConcern
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
@@ -15,6 +18,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   ## Devise filters
+  ##before_filter :require_login, unless: :authentication_not_required?
+  ##before_filter :authenticate_user_from_token!
+  ##before_filter :authenticate_me!
   before_filter :require_login, unless: :authentication_not_required?
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
@@ -45,13 +51,6 @@ class ApplicationController < ActionController::Base
 
   def access_denied
     render file: 'public/403.html', status: 403
-  end
-
-  def individual_market_is_active
-    if !(Settings.aca.individual_market.is_active)
-      flash[:error] = "unauthorized"
-      redirect_to root_path
-    end
   end
 
   def user_not_authorized(exception)

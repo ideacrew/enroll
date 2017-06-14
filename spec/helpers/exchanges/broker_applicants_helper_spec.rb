@@ -8,9 +8,9 @@ RSpec.describe Exchanges::BrokerApplicantsHelper, :type => :helper do
     let(:people) {[person1, person2, person3]}
 
     before do
-      allow(person1.broker_role).to receive(:latest_transition_time).and_return(TimeKeeper.datetime_of_record)
-      allow(person2.broker_role).to receive(:latest_transition_time).and_return(TimeKeeper.datetime_of_record - 5.days)
-      allow(person3.broker_role).to receive(:latest_transition_time).and_return(TimeKeeper.datetime_of_record - 2.days)
+      allow(person1.broker_role).to receive(:latest_transition_time).and_return(Time.now)
+      allow(person2.broker_role).to receive(:latest_transition_time).and_return(Time.now - 5.days)
+      allow(person3.broker_role).to receive(:latest_transition_time).and_return(Time.now - 2.days)
     end
 
     it "returns people array sorted by broker_role.latest_transition_time" do

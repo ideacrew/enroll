@@ -1,7 +1,5 @@
 require 'rails_helper'
-Settings.reload_from_files(
-  Rails.root.join("config", "settings", "config_with_individual_enabled.yml").to_s,
-)
+
 RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should validate_presence_of :market_kind }
   it { should delegate_method(:hbx_id).to :organization }
@@ -11,13 +9,12 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   it { should delegate_method(:is_active).to :organization }
 
   let(:organization) {FactoryGirl.create(:organization)}
-  let(:market_kind) {"both"}
+  let(:market_kind) {"shop"}
   let(:bad_market_kind) {"commodities"}
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
 
-  it "assigns MARKET_KINDS and MARKET_KINDS_OPTIONS correctly" do
-    expect(subject.class::MARKET_KINDS).to match_array(%W(shop individual both))
-    expect(subject.class::MARKET_KINDS_OPTIONS.count).to eq(3)
+  before :each do
+    stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop', 'individual', 'both'])
   end
 
   describe ".new" do
@@ -25,7 +22,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       {
         organization: organization,
         market_kind: market_kind,
-        entity_kind: "s_corporation",
+        entity_kind: "s_corporation"
       }
     end
 
@@ -34,6 +31,18 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
 
       it "should not save" do
         expect(GeneralAgencyProfile.new(**params).save).to be_falsey
+      end
+    end
+
+    context "with individual disabled" do
+      let(:bad_market_kind) { "individual" }
+      before do
+        stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop'])
+      end
+      it "returns an error if individual is market kind" do
+        expect(
+          GeneralAgencyProfile.create(**valid_params.merge(market_kind: bad_market_kind)).errors[:market_kind]
+        ).to eq [market_kind_error_message]
       end
     end
 

@@ -7,6 +7,11 @@
       <div class="col-xs-8">
         <h1 class="darkblue">Choose Coverage for your Household</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
+        <div style="font-size :24px">
+        <%if @effective_on_date.present? %>
+          EFFECTIVE DATE: <span style="color: red;"><%= @effective_on_date %></span>
+        <%end%>
+        </div>
         <h3>Who Needs Coverage?</h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:employee_role_id, @employee_role.id) if @employee_role %>
@@ -30,8 +35,8 @@
               <% end %>
             </div>
           <% end %>
-        
-          <% if can_shop_individual?(@person) %>
+
+          <% if can_shop_individual?(@person) && !can_shop_resident?(@person) %>
             <div id="ivl-coverage-household" class="<%= 'dn' if can_shop_shop?(@person) && @market_kind != 'individual' %>">
               <div class="module group-selection-table">
                 <div class="table-responsive table-border health">
@@ -68,7 +73,7 @@
             </div>
           <% elsif can_shop_shop?(@person) %>
 	           <%= hidden_field_tag 'market_kind', 'shop' %>
-	        <% elsif can_shop_individual?(@person) %>
+	        <% elsif can_shop_individual?(@person) && !can_shop_resident?(@person) %>
 	           <%= hidden_field_tag 'market_kind', 'individual' %>
           <% elsif can_shop_resident?(@person) %>
              <%= hidden_field_tag 'market_kind', 'coverall' %>
@@ -130,7 +135,7 @@
           <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
+              <p>Since <%= @person.full_name %> is not a resident of the <%= aca_state_name %> she/he is not eligible to purchase a plan through <%= site_short_name %>. Other members may still be eligible to enroll. Please call us at <%= contact_center_phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
             </div>
           </div>
           <% end %>
@@ -144,6 +149,7 @@
             <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+
               <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
               class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>

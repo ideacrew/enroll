@@ -203,7 +203,8 @@ class PeopleController < ApplicationController
 
 
     respond_to do |format|
-      if @person.update_attributes(person_params)
+      if @person.update_attributes(person_params.except(:is_applying_coverage))
+        @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present?
         format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
         format.json { head :no_content }
       else
@@ -374,7 +375,8 @@ private
       :tribal_id,
       :no_dc_address,
       :no_dc_address_reason,
-      :id
+      :id,
+      :is_applying_coverage
     ]
   end
 
