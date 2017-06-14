@@ -60,7 +60,6 @@ class ConsumerRole
   field :birth_location, type: String
   field :marital_status, type: String
   field :is_active, type: Boolean, default: true
-  field :is_applying_coverage, type: Boolean, default: true
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
@@ -470,7 +469,9 @@ class ConsumerRole
     person.addresses = []
     person.phones = []
     person.emails = []
-    person.update_attributes(*args)
+    person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
+    args[0].delete("is_applying_coverage")
+    person.update_attributes(args[0])
   end
 
   def build_nested_models_for_person
