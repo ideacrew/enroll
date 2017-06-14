@@ -2396,3 +2396,19 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     end
   end
 end
+
+describe PlanYear, "given a recored rating area value" do
+  Settings.aca.rating_areas.each do |mra|
+    it "is valid for a rating_area of #{mra}" do
+      subject.recorded_rating_area = mra
+      subject.valid?
+      expect(subject.errors.keys).not_to include(:recorded_rating_area)
+    end
+  end
+
+  it "is invalid for a made up rating_area" do
+    subject.recorded_rating_area = "LDJFKLDJKLEFJLKDJSFKLDF"
+    subject.valid?
+    expect(subject.errors.keys).to include(:recorded_rating_area)
+  end
+end

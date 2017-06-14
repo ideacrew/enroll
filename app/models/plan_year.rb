@@ -5,6 +5,7 @@ class PlanYear
   include AASM
   include Acapi::Notifiers
   include ScheduledEventService
+  include Config::AcaModelConcern
 
   embedded_in :employer_profile
 
@@ -52,6 +53,8 @@ class PlanYear
   # otherwise comes from employer_profile
   field :recorded_sic_code, type: String
   field :recorded_rating_area, type: String
+
+  validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
 
   embeds_many :benefit_groups, cascade_callbacks: true
   embeds_many :workflow_state_transitions, as: :transitional
