@@ -6,7 +6,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
     month = ENV['calender_month']
     @passive_renewals = []
     start_on = Date.new(TimeKeeper.date_of_record.year, month.to_i, 1)
-    puts "Processing Groups for #{start_on.strftime('%m/%d/%Y')}"
+    puts "Processing Groups for #{start_on.strftime('%m/%d/%Y')}" unless Rails.env.test?
 
     organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => prev_year_query(start_on)})
     organizations.each do |org|
@@ -35,7 +35,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
       end
     end
 
-    puts @passive_renewals.inspect
+    puts @passive_renewals.inspect unless Rails.env.test?
   end
 
   def add_dental_offerings(target_plan_year, source_plan_year)
@@ -50,7 +50,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
       
       employer = source_plan_year.employer_profile
       if target_benefit_group.save
-        puts "Employer: #{employer.legal_name}(#{employer.fein}) updated with dental offerings."
+        puts "Employer: #{employer.legal_name}(#{employer.fein}) updated with dental offerings." unless Rails.env.test?
       else
         raise "FAILED: Unable to update Employer: #{employer.legal_name}(#{employer.fein}) with Dental Offerings."
       end
@@ -60,7 +60,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
   def trigger_dental_passive_renewals(renewing_plan_year, active_plan_year)
     employer = renewing_plan_year.employer_profile
 
-    if %w(renewing_enrolling renewing_enrolled active).include?(renewing_plan_year.aasm_state)
+    if %w(renewing_enrolling renewing_enrolled active).include?(renewing_plan_year.aasm_state.to_s)
       employer.census_employees.non_terminated.each do |ce|
         person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
 
@@ -100,7 +100,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
             end
           end
 
-          puts "Passively renewed #{ce.full_name}"
+          puts "Passively renewed #{ce.full_name}" unless Rails.env.test?
         else
           puts "Family missing for #{ce.full_name}"
         end
