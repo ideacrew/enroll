@@ -304,7 +304,7 @@ RSpec.describe TaxHousehold, type: :model do
 
       it "should return 1.0 ratio for first family member in both tax households" do
         applicant2.update_attributes(:is_medicaid_chip_eligible => true)
-        applicant4.update_attributes(:is_uqhp_eligible => true)
+        applicant4.update_attributes(:is_without_assistance => true)
         expect(tax_household1.aptc_ratio_by_member.class).to eq Hash
         result1 = {family_member1.id.to_s =>1.0}
         expect(tax_household1.aptc_ratio_by_member).to eq result1

@@ -65,7 +65,7 @@ class TaxHousehold
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false && thm.is_uqhp_eligible == false && thm.is_totally_ineligible == false}.each do |member|
+    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false && thm.is_without_assistance == false && thm.is_totally_ineligible == false}.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.family_member.id.to_s] = premium
