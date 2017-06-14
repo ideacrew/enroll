@@ -17,7 +17,7 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
 
         census_employee.benefit_group_assignments.each do |assignment|
           next if assignment.valid?
-          puts assignment.errors.messages.to_s +  " -- #{census_employee.id}" unless Rails.env.test?
+          puts assignment.errors.messages.to_s +  " -- #{census_employee.full_name}" unless Rails.env.test?
 
           if assignment.errors.messages[:hbx_enrollment].present?
             if assignment.errors.messages[:hbx_enrollment].include?("hbx_enrollment required")
@@ -65,7 +65,7 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
   def fix_enrollment_benefit_group_assignments(enrollment)
     benefit_group = enrollment.benefit_group
     family = enrollment.family
-    
+
     # Fix enrollments with mismatching benefit group, benefit group assignment
     family.active_household.hbx_enrollments.shop_market.each do |enrollment|
       if enrollment.benefit_group_id != enrollment.benefit_group_assignment.benefit_group_id
