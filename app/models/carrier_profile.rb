@@ -29,7 +29,7 @@ class CarrierProfile
   delegate :fein, :fein=, to: :organization, allow_nil: false
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
-  
+
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
       raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
@@ -61,7 +61,7 @@ class CarrierProfile
     end
 
     def carriers_for(employer_profile)
-      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.hios_id }.uniq
+      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
       where(issuer_hios_id: servicing_hios_ids)
     end
 

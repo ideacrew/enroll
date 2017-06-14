@@ -120,13 +120,13 @@ RSpec.describe Organization, dbclean: :after_each do
 
   describe "class method", dbclean: :after_each do
     let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1, hbx_carrier_id: '11111')}
+    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1, issuer_hios_ids: ['11111'])}
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2, hbx_carrier_id: '22222')}
+    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2, issuer_hios_ids: ['22222'])}
     let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
     let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
 
-    let!(:carrier_one_service_area) { create(:service_area_reference, service_area_zipcode: '10001', hios_id: carrier_profile_1.hbx_carrier_id) }
+    let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001')}
     let(:office_location) { double(address: address)}
 

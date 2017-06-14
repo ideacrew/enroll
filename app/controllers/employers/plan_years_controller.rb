@@ -36,15 +36,15 @@ class Employers::PlanYearsController < ApplicationController
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "single_plan"
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
 
     @carriers_cache = CarrierProfile.carriers_for(@employer_profile).inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
@@ -426,7 +426,6 @@ class Employers::PlanYearsController < ApplicationController
     id_params = params.permit(:id, :employer_profile_id, :active_year, :plan_year_id)
     id = id_params[:employer_profile_id] || id_params[:id]
     @employer_profile = EmployerProfile.find(id)
-
   end
 
   def generate_carriers_and_plans

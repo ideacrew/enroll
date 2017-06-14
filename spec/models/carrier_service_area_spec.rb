@@ -22,9 +22,13 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
 
   describe "class methods" do
     subject { CarrierServiceArea }
-    let!(:full_state_service_area) { create(:carrier_service_area) }
+    let!(:full_state_service_area) { create(:carrier_service_area, issuer_hios_id: '11111') }
     let!(:matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: '01225') }
     let!(:non_matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: "01001") }
+    let(:carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['11111','22222']) }
+    let(:invalid_carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['33333']) }
+    let(:address) { double(:address, zip: "01225") }
+    let(:office_location) { double(:office_location, address: address) }
 
     context "scopes" do
       describe "::serving_entire_state" do
@@ -32,12 +36,36 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
           expect(subject.serving_entire_state).to match([full_state_service_area])
         end
       end
+
+      describe "::for_issuer" do
+        it "returns only the matching service area" do
+          expect(subject.for_issuer(['11111'])).to match([full_state_service_area])
+        end
+      end
     end
 
-    context "::areas_valid_for_zip_code" do
-      ## Note this requires a previously validated Mass. Zip Code
-      it "returns the matching service areas" do
-        expect(subject.areas_valid_for_zip_code(zip_code: '01225')).to match_array([full_state_service_area, matching_service_area])
+    context "class methods" do
+      describe "::areas_valid_for_zip_code" do
+        ## Note this requires a previously validated Mass. Zip Code
+        it "returns the matching service areas" do
+          expect(subject.areas_valid_for_zip_code(zip_code: '01225')).to match_array([full_state_service_area, matching_service_area])
+        end
+      end
+
+      describe "::valid_for?" do
+        it "returns true if matching service areas" do
+          expect(subject.valid_for?(office_location: office_location, carrier_profile: carrier_profile)).to be(true)
+        end
+
+        it "returns false if no matches" do
+          expect(subject.valid_for?(office_location: office_location, carrier_profile: invalid_carrier_profile)).to be(false)
+        end
+      end
+
+      describe "::service_areas_for" do
+        it "returns matching services areas" do
+          expect(subject.service_areas_for(office_location: office_location)).to match_array([full_state_service_area, matching_service_area])
+        end
       end
     end
   end ## End class method tests
