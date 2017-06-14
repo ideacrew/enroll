@@ -827,7 +827,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_publish_pending
+      transitions from: :renewing_draft, to: :renewing_publish_pending, :after => :notify_employee_of_renewing_employer_ineligibility
     end
 
     # Returns plan to draft state (or) renewing draft for edit
@@ -1061,6 +1061,12 @@ class PlanYear
     else
       self.employer_profile.trigger_notices("group_renewal_5")
     end
+  end
+
+  #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
+  def notify_employee_of_renewing_employer_ineligibility
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.trigger_notices("notify_employee_of_renewing_employer_ineligibility") if application_eligibility_warnings.include?(:primary_office_location)
   end
 
   def initial_employer_denial_notice
