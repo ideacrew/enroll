@@ -7,6 +7,7 @@ class EmployerProfile
   include Acapi::Notifiers
   extend Acapi::Notifiers
   include StateTransitionPublisher
+  include ScheduledEventService
   include Config::AcaModelConcern
 
   embedded_in :organization
@@ -585,7 +586,7 @@ class EmployerProfile
           employer_enroll_factory.end
         end
 
-        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
+        if new_date.day == EmployerProfile.shop_market_renewal_application_force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
             plan_year.force_publish!
@@ -907,7 +908,7 @@ private
   def initialize_account
     if employer_profile_account.blank?
       self.build_employer_profile_account
-      employer_profile_account.next_premium_due_on = (published_plan_year.start_on.last_month) + (Settings.aca.shop_market.binder_payment_due_on).days
+      employer_profile_account.next_premium_due_on = (published_plan_year.start_on.last_month) + (EmployerProfile.shop_market_binder_payment_due_on).days
       employer_profile_account.next_premium_amount = 100
       # census_employees.covered
       save

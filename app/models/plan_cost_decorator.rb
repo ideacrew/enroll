@@ -11,7 +11,7 @@ class PlanCostDecorator < SimpleDelegator
     @reference_plan = reference_plan
     @max_contribution_cache = max_cont_cache
     @plan = plan
-    @use_simple_calculations = use_simple_employer_calculation_model?
+    @multiple_rating_areas = multiple_market_rating_areas?
   end
 
   def plan_year_start_on
@@ -93,10 +93,10 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def rate_lookup(the_plan, start_on_date, age, member, benefit_group)
-    rate_value = if @use_simple_calculations
-      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) 
-    else
+    rate_value = if @multiple_rating_areas
       Caches::PlanDetails.lookup_rate_with_area(the_plan.id, start_on_date, age, benefit_group.rating_area)
+    else
+      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) 
     end
     (rate_value * large_family_factor(member) * benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f).round(2)
   end

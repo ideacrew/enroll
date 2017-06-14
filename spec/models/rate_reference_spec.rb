@@ -79,3 +79,19 @@ RSpec.describe RateReference, type: :model do
     end
   end
 end
+
+describe RateReference, "given a rating_region value" do
+  Settings.aca.rating_areas.each do |mra|
+    it "is valid for a rating_area of #{mra}" do
+      subject.rating_region = mra
+      subject.valid?
+      expect(subject.errors.keys).not_to include(:rating_region)
+    end
+  end
+
+  it "is invalid for a made up rating_area" do
+    subject.rating_region = "LDJFKLDJKLEFJLKDJSFKLDF"
+    subject.valid?
+    expect(subject.errors.keys).to include(:rating_region)
+  end
+end
