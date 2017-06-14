@@ -6,7 +6,7 @@ class Document
   ACCESS_RIGHTS = %w(public pii_restricted)
 
   # Enable polymorphic associations
-  #embedded_in :documentable, polymorphic: true
+  embedded_in :documentable, polymorphic: true
 
   # Dublin Core metadata elements
   field :title, type: String, default: "untitled"

@@ -8,6 +8,8 @@ module Config::AcaModelConcern
     delegate :individual_market_is_enabled?, to: :class
     delegate :general_agency_enabled?, to: :class
     delegate :use_simple_employer_calculation_model?, to: :class
+    delegate :market_rating_areas, to: :class
+    delegate :multiple_market_rating_areas?, to: :class
   end
 
   class_methods do
@@ -33,6 +35,14 @@ module Config::AcaModelConcern
 
     def use_simple_employer_calculation_model?
       @@use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
+    end
+
+    def market_rating_areas
+      @@market_rating_areas ||= Settings.aca.rating_areas
+    end
+
+    def multiple_market_rating_areas?
+      @@multiple_market_rating_areas ||= Settings.aca.rating_areas.many?
     end
   end
 end
