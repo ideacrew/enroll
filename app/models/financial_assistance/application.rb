@@ -41,6 +41,9 @@ class FinancialAssistance::Application
   field :benchmark_plan_id, type: BSON::ObjectId
 
   field :medicaid_terms, type: Boolean
+  field :medicaid_insurance_collection_terms, type: Boolean
+  field :report_change_terms, type: Boolean
+  field :parent_living_out_of_home_terms, type: Boolean
   field :attestation_terms, type: Boolean
   field :submission_terms, type: Boolean
 
