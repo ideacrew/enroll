@@ -4,6 +4,7 @@ class PlanYear
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include ScheduledEventService
 
   embedded_in :employer_profile
 
@@ -330,9 +331,9 @@ class PlanYear
 
   def due_date_for_publish
     if employer_profile.plan_years.renewing.any?
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.publish_due_day_of_month)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, PlanYear.shop_market_renewal_application_publish_due_day_of_month)
     else
-      Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
+      Date.new(start_on.prev_month.year, start_on.prev_month.month, PlanYear.shop_market_initial_application_publish_due_day_of_month)
     end
   end
 
@@ -346,10 +347,10 @@ class PlanYear
 
     if is_renewing?
       minimum_length = Settings.aca.shop_market.renewal_application.open_enrollment.minimum_length.days
-      enrollment_end = Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on
+      enrollment_end = PlanYear.shop_market_renewal_application_monthly_open_enrollment_end_on
     else
       minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
-      enrollment_end = Settings.aca.shop_market.open_enrollment.monthly_end_on
+      enrollment_end = PlanYear.shop_market_open_enrollment_monthly_end_on
     end
 
     if (open_enrollment_end_on - (open_enrollment_start_on - 1.day)).to_i < minimum_length
@@ -611,8 +612,8 @@ class PlanYear
       employer_initial_application_latest_submit_on   = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopPlanYearPublishedDueDayOfMonth}").to_date
       open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
       open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-      open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
-      binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}")
+      open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_open_enrollment_monthly_end_on}").to_date
+      binder_payment_due_date               = first_banking_date_prior ("#{prior_month.year}-#{prior_month.month}-#{PlanYear.shop_market_binder_payment_due_on}")
 
 
       timetable = {

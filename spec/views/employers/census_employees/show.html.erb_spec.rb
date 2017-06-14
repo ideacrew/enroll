@@ -57,6 +57,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(hbx_enrollment).to receive(:total_employee_cost).and_return(hbx_enrollment)
     allow(benefit_group_assignment).to receive(:active_and_waived_enrollments).and_return([hbx_enrollment])
     allow(view).to receive(:policy_helper).and_return(double('EmployerProfile', updateable?: true, list_enrollments?: true))
+    allow(SicCodeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
+    allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
   end
 
   it "should show the address of census employee" do

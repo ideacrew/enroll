@@ -1345,7 +1345,7 @@ class HbxEnrollment
       end
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
-    return "open_enrollment" if !is_shop?
+    return "open_enrollment" unless is_shop?
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
   end
 
