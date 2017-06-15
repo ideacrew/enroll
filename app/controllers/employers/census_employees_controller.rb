@@ -57,6 +57,18 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
+  # path helper for employeeroster datatatble
+  def show_employee
+    @employee_id = params[:census_employee_id]
+    @census_employee = CensusEmployee.find(params[:census_employee])
+  end
+
+  # path helper for employeeroster datatable
+  def rehire_employee
+    @employee_id = params[:census_employee_id]
+    @census_employee = CensusEmployee.find(params[:census_employee])
+  end
+
   def update
     authorize EmployerProfile, :updateable?
     @status = params[:status]
@@ -252,11 +264,17 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def change_expected_selection
-    census_employees = CensusEmployee.find(params[:ids])
-    census_employees.each do |census_employee|
-      census_employee.update_attributes(:expected_selection=>params[:expected_selection])
+    if params[:ids]
+      begin
+        census_employees = CensusEmployee.find(params[:ids])
+        census_employees.each do |census_employee|
+          census_employee.update_attributes(:expected_selection=>params[:expected_selection])
+        end
+        render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
+      rescue => e
+        render json: { status: 500, message: 'An error occured while submitting employees participation status' }
+      end
     end
-    render :json => true
   end
 
   private
