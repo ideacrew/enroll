@@ -90,5 +90,25 @@ describe ChangeEnrollmentDetails do
       it_behaves_like "termination", "terminated_on", Date.strptime("01/01/2016", "%m/%d/%Y")
 
     end
+
+    context "cancel enrollment" do 
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "cancel_enrollment"
+        allow(ENV).to receive(:[]).with("terminated_on").and_return(hbx_enrollment.effective_on.strftime("%m/%d/%Y"))
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      shared_examples_for "cancellation" do |val, result|
+        it "should equal #{result}" do 
+          puts "val: #{val}, result: #{result}"
+          expect(actual_result(hbx_enrollment, val)).to eq result
+        end
+      end
+
+      it_behaves_like "cancellation", "aasm_state", "coverage_canceled"
+      # it_behaves_like "cancellation", "terminated_on", (hbx_enrollment.effective_on)
+    end
   end
 end
