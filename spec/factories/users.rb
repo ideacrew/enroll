@@ -120,5 +120,11 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_nuclear_family do
+    after :create do |user|
+      FactoryGirl.create :person, :with_family, :user => user
+    end
+  end
+
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]
 end

@@ -1,5 +1,5 @@
 Given(/^a consumer, with a family, exists$/) do
-  consumer :with_family
+  consumer :with_nuclear_family
 end
 
 Given(/^is logged in$/) do
@@ -21,19 +21,21 @@ Then(/^they should see a new finanical assistance application$/) do
 end
 
 Then(/^they should see each of their dependents listed$/) do
-  binding.pry
+  consumer.person.families.last.family_members.each do |family_member|
+    expect(page).to have_content(family_member.first_name)
+  end
 end
 
 Given(/^the consumer has started a financial assistance application$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  application
 end
 
 When(/^they view the financial assistance application$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  visit edit_financial_assistance_application_path(application)
 end
 
 When(/^they click edit for an applicant$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  click_link 'Add Info'
 end
 
 When(/^they complete and submit the tax infomration$/) do
@@ -49,11 +51,11 @@ Then(/^see some of the tax information on the applicant's detail page$/) do
 end
 
 Given(/^has added tax information for an applicant$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  # right now this step is unnecessary but not always be
 end
 
 When(/^they view the applicant's details page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
 end
 
 When(/^they click on the 'Add Income' button$/) do
