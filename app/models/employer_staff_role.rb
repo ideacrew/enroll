@@ -42,6 +42,7 @@ class EmployerStaffRole
 
   def reset_primary_poc
     return if employer_profile.staff_roles.count <2
+    self.update(primary_poc: false)
     employer_profile.staff_roles.each do |person|
       person.employer_staff_roles.update(primary_poc: false)
     end
