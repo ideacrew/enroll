@@ -21,7 +21,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       invoke_task
     end
 
-    context "it creates SicCodeRatingFactorSet correctly" do
+    pending "it creates SicCodeRatingFactorSet correctly" do
       subject { SicCodeRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -41,7 +41,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    context "it creates EmployerGroupSizeRatingFactorSet correctly" do
+    pending "it creates EmployerGroupSizeRatingFactorSet correctly" do
       subject { EmployerGroupSizeRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -60,7 +60,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    context "it creates EmployerParticipationRateRatingFactorSet correctly" do
+    pending "it creates EmployerParticipationRateRatingFactorSet correctly" do
       subject { EmployerParticipationRateRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -79,7 +79,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    context "it creates CompositeRatingTierFactorSet correctly" do
+    pending "it creates CompositeRatingTierFactorSet correctly" do
       subject { CompositeRatingTierFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
