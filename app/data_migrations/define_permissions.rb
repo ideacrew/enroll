@@ -51,10 +51,16 @@ class DefinePermissions < MigrationTask
     HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
     HbxStaffRole.create!( person: p6, permission_id: Permission.hbx_csr_tier2.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
   end
+
   def hbx_admin_can_update_ssn
     Permission.hbx_staff.update_attributes(can_update_ssn: true)
   end
+
   def hbx_admin_can_complete_resident_application
     Permission.hbx_staff.update_attributes(can_complete_resident_application: true)
+  end
+
+  def hbx_admin_can_lock_unlock
+    Permission.hbx_staff.update_attributes(can_lock_unlock: true)
   end
 end

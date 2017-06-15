@@ -7,8 +7,9 @@ FactoryGirl.define do
     send_broker_agency_message true
     approve_broker true
     approve_ga true
-    modify_admin_tabs true
-    view_admin_tabs  true
+  	modify_admin_tabs true
+  	view_admin_tabs  true
+    can_lock_unlock false
 
     trait :hbx_staff do
       can_complete_resident_application true

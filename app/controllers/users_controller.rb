@@ -1,0 +1,11 @@
+class UsersController < ApplicationController
+
+  def lockable
+    user = User.find(params[:id])
+    authorize user
+    user.update_lockable
+    redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User #{user.person.full_name} is successfully #{user.lockable_notice}."
+  rescue Exception => e
+    redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "You are not authorized for this action."
+  end
+end
