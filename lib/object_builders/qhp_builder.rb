@@ -3,8 +3,8 @@ class QhpBuilder
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
 
   def initialize(qhp_hash)
-    log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
-    @logger = Logger.new(log_path)
+    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
+    @logger = Logger.new(@log_path)
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?
@@ -119,7 +119,7 @@ class QhpBuilder
     puts "*"*80
     puts "Total Number of Plans imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Plans Saved to database: #{@success_plan_counter}."
-    puts "Check the log file #{LOG_PATH}"
+    puts "Check the log file #{@log_path}"
     puts "*"*80
     @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
     @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
@@ -132,7 +132,7 @@ class QhpBuilder
       @success_plan_counter += 1
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
-      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
     end
   end
 
@@ -170,7 +170,8 @@ class QhpBuilder
       @qhp.plan = plan
     else
       puts "Plan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
-      @qhp.plan = nil
+      @qhp.plan_id = nil
+      # @qhp.plan = nil
     end
   end
 
@@ -192,6 +193,9 @@ class QhpBuilder
             hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
             csr_variant_id: csr_variant_id).to_a
           next if plan.present?
+          issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+          carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+          carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
           new_plan = Plan.new(
             name: cost_share_variance.plan_marketing_name.squish!,
             hios_id: cost_share_variance.hios_plan_and_variant_id,
@@ -202,12 +206,14 @@ class QhpBuilder
             market: parse_market,
             ehb: @qhp.ehb_percent_premium,
             # carrier_profile_id: "53e67210eb899a460300000d",
-            carrier_profile_id: get_carrier_id(@carrier_name),
+            carrier_profile_id: carrier_profile_id,
             coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
             dental_level: @dental_metal_level
             )
           if new_plan.valid?
             new_plan.save!
+          else
+            @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
           end
         end
       end
