@@ -112,6 +112,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
+    return true if @role.is_a?(ResidentRole)
     return false if @role.citizen_status.blank?
     !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
