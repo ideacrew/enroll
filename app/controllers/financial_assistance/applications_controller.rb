@@ -23,9 +23,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     # like applications from existing families
     # redirects to the edit (or show) view
     @application = current_user.person.primary_family.applications.new
-    @application.applicants = @current_user.person.primary_family.family_members.map do |family_member|
-      FinancialAssistance::Applicant.new family_member_id: family_member.id
-    end
+    @application.populate_applicants_for(@current_user.person.primary_family)
     @application.save!
     redirect_to edit_financial_assistance_application_path(@application)
   end

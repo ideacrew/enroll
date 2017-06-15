@@ -283,6 +283,13 @@ class FinancialAssistance::Application
     tax_households.uniq
   end
 
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
+  end
+
+
 private
   def set_submission_date
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record)
