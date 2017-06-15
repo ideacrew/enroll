@@ -193,6 +193,9 @@ class QhpBuilder
             hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
             csr_variant_id: csr_variant_id).to_a
           next if plan.present?
+          issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+          carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+          carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
           new_plan = Plan.new(
             name: cost_share_variance.plan_marketing_name.squish!,
             hios_id: cost_share_variance.hios_plan_and_variant_id,
@@ -203,7 +206,7 @@ class QhpBuilder
             market: parse_market,
             ehb: @qhp.ehb_percent_premium,
             # carrier_profile_id: "53e67210eb899a460300000d",
-            carrier_profile_id: get_carrier_id(@carrier_name),
+            carrier_profile_id: carrier_profile_id,
             coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
             dental_level: @dental_metal_level
             )
