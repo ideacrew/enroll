@@ -287,11 +287,7 @@ class Insured::FamiliesController < FamiliesController
           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
         end
       else @person.consumer_role.present?
-        if current_user.has_hbx_staff_role?
-          @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
-        else
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-        end
+        @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
       end
     end
   end
