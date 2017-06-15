@@ -649,7 +649,7 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
-  def load_captcha_widget
-    Rails.env.test? ? '' : 'loadCaptchaWidget'
+  def load_captcha_widget?
+    return false if Rails.env.test? 
   end
 end

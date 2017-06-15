@@ -1,4 +1,6 @@
-<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=<%= load_captcha_widget %>&render=explicit"></script>
+<% load_captcha_widget? %>
+  <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
+<% end %>
 <div class="container top-pd module" id='signup'>
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div id="registration-form-container" class="col-md-6 col-sm-8 col-xs-12">
