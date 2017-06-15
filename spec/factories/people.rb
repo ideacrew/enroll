@@ -117,7 +117,7 @@ FactoryGirl.define do
 
     trait :with_nuclear_family do
       after :create do |person|
-        family = FactoryGirl.create :family, :with_primary_family_member, person: person
+        family = FactoryGirl.create :family, :with_primary_family_member_and_dependent, person: person
       end
     end
 
