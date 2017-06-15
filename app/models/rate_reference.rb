@@ -14,6 +14,7 @@ class RateReference
 
   # TODO: Lookup of rating area string for a given address
   def self.rating_area_for(address)
+    self.find_rating_region(zip_code: address.zip, county_name: address.county).first.rating_region
   end
 
   class << self
