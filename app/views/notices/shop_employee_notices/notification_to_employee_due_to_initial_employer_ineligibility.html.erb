@@ -12,12 +12,12 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This letter is notification that your employer, <Legal Name>, is not offering health coverage to employees through #{Settings.site.short_name}."} %>
+  { content: "This letter is notification that your employer, #{notice.employer_name}, is not offering health coverage to employees through #{Settings.site.short_name}."} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Health coverage for you, and any of your enrolled family members, will not go into effect on <Coverage Start Date> as planned.</h3></td>
+      <td><h3>Health coverage for you, and any of your enrolled family members, will not go into effect on <%= notice.plan_year.start_on %> as planned.</h3></td>
     </tr>
   </tbody>
 </table>
