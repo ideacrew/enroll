@@ -165,12 +165,12 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @family_member_ids = params[:family_member_ids]
     
-    shopping_tax_household = get_tax_household_from_family_members(@person, @family_member_ids)
+    shopping_tax_households = get_tax_household_from_family_members(@person, @family_member_ids)
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
 
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = total_aptc_on_tax_households(shopping_tax_household, @hbx_enrollment)
+    if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
+      @tax_household = shopping_tax_households
+      @max_aptc = total_aptc_on_tax_households(shopping_tax_households, @hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else

@@ -258,14 +258,14 @@ class Person
   def is_aqhp?
     family = self.primary_family if self.primary_family
     if family
-      check_households(family) && check_tax_households(family)
+      check_applications(family) && check_tax_households(family)
     else
       false
     end
   end
 
-  def check_households family
-    family.households.present? ? true : false
+  def check_applications family
+    family.applications.present? ? true : false
   end
 
   def check_tax_households family
