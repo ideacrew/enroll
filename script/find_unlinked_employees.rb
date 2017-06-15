@@ -14,7 +14,7 @@ end
 
 all_employee_persons_combined.uniq!
 
-timestamp = TimeKeeper.datetime_of_record.strftime('%Y%m%d%H%M')
+timestamp = Time.now.strftime('%Y%m%d%H%M')
 
 error_log = File.new("find_unlinked_employees_script_errors_#{timestamp}.txt", "w")
 

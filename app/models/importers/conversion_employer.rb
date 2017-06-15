@@ -16,6 +16,7 @@ module Importers
       :primary_location_address_2,
       :primary_location_city,
       :primary_location_state,
+      :primary_location_county,
       :mailing_location_address_1,
       :mailing_location_address_2,
       :mailing_location_city,
@@ -115,6 +116,7 @@ module Importers
         :address_2 => primary_location_address_2,
         :city =>  primary_location_city,
         :state => primary_location_state,
+        :county => primary_location_county,
         :zip => primary_location_zip
       )
       mailing_address = Address.new(
@@ -168,7 +170,7 @@ module Importers
         br = BrokerRole.by_npn(broker_npn).first
         if !br.nil?
           broker_agency_accounts << BrokerAgencyAccount.new({
-            start_on: TimeKeeper.datetime_of_record,
+            start_on: Time.now,
             writing_agent_id: br.id,
             broker_agency_profile_id: br.broker_agency_profile_id
           })
@@ -243,7 +245,7 @@ module Importers
       if broker
         if general_agency
            general_agency_accounts << GeneralAgencyAccount.new(
-             :start_on => TimeKeeper.datetime_of_record,
+             :start_on => Time.now,
              :general_agency_profile_id => general_agency.id,
              :broker_role_id => broker.id
            )

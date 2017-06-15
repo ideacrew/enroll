@@ -41,6 +41,14 @@ Rails.application.routes.draw do
       get :find_sep, on: :collection
     end
 
+    resources :scheduled_events do
+      collection do
+        get 'current_events'
+        get 'delete_current_event'
+        get 'list'
+      end
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -80,6 +88,8 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :calender_index
+        get :user_account_index
       end
 
       member do
@@ -261,6 +271,8 @@ Rails.application.routes.draw do
         get 'search'
         post 'match'
         get 'inbox'
+        get 'counties_for_zip_code'
+        get 'generate_sic_tree'
       end
       resources :plan_years do
         get 'reference_plans'
@@ -376,6 +388,8 @@ Rails.application.routes.draw do
           get :download_pdf
           get :dental_plans_data
           get :my_quotes
+          get :employees_list
+          get :employee_type
         end
         member do
           get :upload_employee_roster

@@ -1,6 +1,6 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-before_filter :configure_sign_up_params, only: [:create]
-# before_filter :configure_account_update_params, only: [:update]
+  before_filter :configure_sign_up_params, only: [:create]
+  # before_filter :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
   # def new
@@ -16,7 +16,7 @@ before_filter :configure_sign_up_params, only: [:create]
       render :new and return
     end
 
-    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present? 
+    if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
       flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
       render :new and return
     end
@@ -26,14 +26,9 @@ before_filter :configure_sign_up_params, only: [:create]
     if headless.present? && !headless.person.present?
       headless.destroy
     end
-    
+
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
-
-    headless = User.where(oim_id: /^#{Regexp.quote(resource.oim_id)}$/i).first
-
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+    resource.handle_headless_records
 
     resource_saved = resource.save
     yield resource if block_given?

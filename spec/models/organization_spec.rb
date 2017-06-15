@@ -160,7 +160,7 @@ RSpec.describe Organization, dbclean: :after_each do
     end
 
     context "binder_paid" do
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location) { OfficeLocation.new(
           is_primary: true,
@@ -178,7 +178,8 @@ RSpec.describe Organization, dbclean: :after_each do
       let(:valid_params) do
         {
           organization: organization,
-          entity_kind: "partnership"
+          entity_kind: "partnership",
+          sic_code: '1111'
         }
       end
       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
@@ -251,13 +252,13 @@ RSpec.describe Organization, dbclean: :after_each do
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
-          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
         end
 
         it 'broker agency_profile match does not count unless active account' do
-          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
           employer = Organization.find(employer.organization.id).employer_profile

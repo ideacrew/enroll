@@ -48,6 +48,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     npn: "8422323232",
     legal_name: 'useragency',
     fein: "223232323",
+    sic_code: '0111',
     entity_kind: "c_corporation",
     market_kind: market_kind,
     working_hours: "0",
@@ -70,6 +71,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
       address_1: "99 N ST",
       city: "washignton",
       state: Settings.aca.state_abbreviation,
+      county: "County",
       zip: "20006"
     }
   }
@@ -118,7 +120,7 @@ describe Forms::BrokerAgencyProfile, ".save", :dbclean => :after_each do
     end
 
     it 'should raise an error' do
-      expect(subject.errors.to_hash[:base]).to include("fein is already in use.")
+      expect(subject.errors.to_hash[:base]).to include("organization has already been created.")    
     end
   end
 
@@ -341,6 +343,7 @@ describe Forms::BrokerAgencyProfile, '.update_attributes' do
      address_1: "99 N ST",
      city: "washignton",
      state: "dc",
+     county: "County",
      zip: "20006"
    }
  }

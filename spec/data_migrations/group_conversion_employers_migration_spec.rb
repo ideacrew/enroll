@@ -26,6 +26,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
       hbx_enrollment.update_attribute(:benefit_group_id, organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first.id)
       allow(Time).to receive(:now).and_return(Time.parse("2016-10-1 00:00:00"))
+      organization.employer_profile.plan_years.where(:aasm_state => "expired").first.update(is_conversion: true)
     end
 
     context "giving a new state", dbclean: :after_each do
@@ -38,6 +39,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
 
       it "should migrate the 2015 plan year" do
         expired_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "expired").first
+        expired_plan_year.update(is_conversion: true)
         subject.migrate
         expired_plan_year.reload
         expect(expired_plan_year.aasm_state).to eq "conversion_expired"
