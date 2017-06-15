@@ -57,18 +57,6 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
-  # path helper for employeeroster datatatble
-  def show_employee
-    @employee_id = params[:census_employee_id]
-    @census_employee = CensusEmployee.find(params[:census_employee])
-  end
-
-  # path helper for employeeroster datatable
-  def rehire_employee
-    @employee_id = params[:census_employee_id]
-    @census_employee = CensusEmployee.find(params[:census_employee])
-  end
-
   def update
     authorize EmployerProfile, :updateable?
     @status = params[:status]
