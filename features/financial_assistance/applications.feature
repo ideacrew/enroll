@@ -4,7 +4,8 @@ Feature: Start a new Financial Assistance Application
     And is logged in
 
   Scenario: A consumer wants to start a new financial assistance application
-    When they click 'New Financial Assistance Application' button
+    When the consumer views their applications
+    And they click 'New Financial Assistance Application' button
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
 
