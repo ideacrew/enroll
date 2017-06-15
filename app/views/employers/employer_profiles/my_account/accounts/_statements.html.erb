@@ -35,15 +35,17 @@
       <tr>
         <th>Download</th>
         <th>View</th>
+        <th>Statement Date</th>
         <th>Coverage Period</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <% @invoices.each do |invoice|%>
-        <td><%= link_to "#{invoice_formated_date(invoice.date)} <i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-        <td><%= link_to "#{invoice_formated_date(invoice.date)} <i class='glyphicon glyphicon-open-file' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank"%></td>
-        <td><%=invoice_coverage_date(invoice.date)%></td>
+        <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
+        <td><%= link_to "<i class='glyphicon glyphicon-open-file' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank"%></td>
+        <td><%= invoice_formated_date(invoice.date) %></td>
+        <td><%= invoice_coverage_date(invoice.date) %></td>
       <tr/>
       <%end%>
     </tbody>
