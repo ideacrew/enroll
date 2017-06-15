@@ -218,6 +218,11 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def get_user_info
+    @person = Person.find(params[:person_id])
+    @element_to_replace_id = params[:family_actions_id]
+  end
+
   def update_effective_date
     @qle = QualifyingLifeEventKind.find(params[:id])
     respond_to do |format|
