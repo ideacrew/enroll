@@ -19,15 +19,16 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
             raise "missing renewal plan year."
           end
 
-          if current_plan_year.benefit_groups.any?{|bg| bg.is_offering_dental? }
-            raise "already have Dental Offerings."
-          end
-
           if plan_year.benefit_groups.any?{|bg| matching_benefit_group(current_plan_year, bg).blank?}
             raise "non matching benefit groups."
           end
 
-          add_dental_offerings(current_plan_year, plan_year)
+          if current_plan_year.benefit_groups.any?{|bg| bg.is_offering_dental? }
+            puts "Employer: #{org.legal_name}(#{org.fein}) already have Dental Offerings."
+          else
+            add_dental_offerings(current_plan_year, plan_year)
+          end
+
           trigger_dental_passive_renewals(current_plan_year, plan_year)
         rescue Exception => e
           puts "Employer: #{org.legal_name}(#{org.fein}) #{e.to_s}"
@@ -70,7 +71,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
             last_name: ce.last_name,
             ssn: ce.ssn, 
             dob: ce.dob,
-            employer_profile: @employer_profile,
+            employer_profile: employer,
             gender: ce.gender,
             hired_on: ce.hired_on
             })
@@ -79,7 +80,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
           family = person.primary_family
         end
 
-        if family.present?
+        if family.present? && dental_renewals(family, renewing_plan_year).blank?
           factory = Factories::FamilyEnrollmentRenewalFactory.new
           factory.family = family
           factory.census_employee = ce
@@ -102,12 +103,21 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
 
           puts "Passively renewed #{ce.full_name}" unless Rails.env.test?
         else
-          puts "Family missing for #{ce.full_name}"
+          puts "Family missing for #{ce.full_name}" if family.blank?
         end
       end
     else
       puts "Employer: #{employer.legal_name}(#{employer.fein}) is under #{renewing_plan_year.aasm_state} state."
     end
+  end
+
+  def dental_renewals(family, renewing_plan_year)
+    family.active_household.hbx_enrollments.where({
+      :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id),
+      :aasm_state.in => ['auto_renewing', 'renewing_waived', 'inactive', 'coverage_selected', 'coverage_enrolled', 'coverage_terminated'],
+      :coverage_kind => 'dental',
+      :effective_on => renewing_plan_year.start_on
+    })
   end
 
   private
