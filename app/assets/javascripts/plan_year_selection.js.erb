@@ -409,9 +409,16 @@ ready = function() {
           $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
         } else {
           $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
+        }
+      }
+      else if ($(this).attr('value') == 'sole_source') {
+        if ( nav == '.health' ) {
+          $(this).closest('.benefit-group-fields').find(nav+' .sole-source-plan-tab').show();
+          $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
+        } else {
+          $(this).closest('.benefit-group-fields').find(nav+' .sole-source-plan-tab').show();
 
         }
-
       }
     });
 

@@ -437,6 +437,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = PlanYear.new
     plan_year.benefit_groups.build
     plan_year.benefit_groups.first.build_relationship_benefits
+    plan_year.benefit_groups.first.build_composite_tier_contributions
     plan_year.benefit_groups.first.build_dental_relationship_benefits
     ::Forms::PlanYearForm.new(plan_year)
   end
