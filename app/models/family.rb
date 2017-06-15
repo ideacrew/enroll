@@ -952,7 +952,7 @@ class Family
 
   def find_missing_relationships(matrix)
     id_map = {}
-    family_members_id = family_members.map(&:person_id)
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
     family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
     missing_relationships = []
     matrix.each_with_index do |x, xi|
@@ -1068,7 +1068,7 @@ class Family
         spouse_relation = Person.find(parent_rel1.successor_id).person_relationships.where(family_id: family_id, predecessor_id: parent_rel1.successor_id, successor_id: parent_rel2.successor_id, kind: "spouse").first
         if spouse_relation.present?
           members = Person.where(:id.in => rel.to_a.flatten)
-          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling")
+          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling") 
           members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
           missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
         end
