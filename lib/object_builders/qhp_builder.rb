@@ -132,7 +132,7 @@ class QhpBuilder
       @success_plan_counter += 1
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
-      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n ******************** \n"
+      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
     end
   end
 
@@ -170,7 +170,8 @@ class QhpBuilder
       @qhp.plan = plan
     else
       puts "Plan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Plan Name: #{@qhp.plan_marketing_name}"
-      @qhp.plan = nil
+      @qhp.plan_id = nil
+      # @qhp.plan = nil
     end
   end
 
@@ -208,6 +209,8 @@ class QhpBuilder
             )
           if new_plan.valid?
             new_plan.save!
+          else
+            @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
           end
         end
       end
