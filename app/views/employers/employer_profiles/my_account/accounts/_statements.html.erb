@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     <tr data-toggle="collapse" data-target="#collapse2">
-      <td>2017</td>
+      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2017</td>
       <td>14 Mb</td>
       <td>Open Me</td>
       <tr class="collapse" id="collapse2">
@@ -21,8 +21,13 @@
         </tr>
       </tr>
     </tr>
-    <tr>
-      <td>2016</td>
+    <tr data-toggle="collapse" data-target="#collapse2">
+      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2016</td>
+      <td>14 Mb</td>
+      <td>Open Me</td>
+    </tr>
+    <tr data-toggle="collapse" data-target="#collapse2">
+      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2015</td>
       <td>14 Mb</td>
       <td>Open Me</td>
     </tr>
@@ -53,3 +58,13 @@
 <% else %>
   <h4>You don't have any invoices. When you do, they will be displayed here.</h4>
 <% end %>
+
+<script>
+  $(document).ready(function() {
+    $('tr').click(function() {
+    $('td').toggle('1000');
+    $("i", this).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+  });
+  console.log("Hiiiiiii");
+});
+</script>
