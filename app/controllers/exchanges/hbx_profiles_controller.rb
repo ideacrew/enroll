@@ -202,6 +202,10 @@ def employer_poc
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
 
+  def user_account_index
+    @datatable = Effective::Datatables::UserAccountDatatable.new
+  end
+
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -260,7 +264,7 @@ def employer_poc
           hbx.cancel_coverage! if hbx.may_cancel_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -275,7 +279,7 @@ def employer_poc
   end
 
   def terminate_enrollment
-    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
+    @hbxs = Family.find(params[:family]).all_enrollments.can_terminate
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
@@ -295,7 +299,7 @@ def employer_poc
           hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -344,6 +348,7 @@ def employer_poc
 
   def verification_index
     @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
+    @datatable = Effective::Datatables::DocumentDatatable.new
     respond_to do |format|
       format.html { render partial: "index_verification" }
       format.js {}
@@ -604,19 +609,16 @@ private
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
       body =
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
-        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "Please contact #{insured.first_name} #{insured.last_name}. <br> " +
+        "Plan shopping help has been requested by #{insured_email}<br>" +
         "<a href='" + root+"phone'>Assist Customer</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
-      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+      body =  "Please contact #{first_name} #{last_name}. <br>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
-      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
-      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
     end
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {

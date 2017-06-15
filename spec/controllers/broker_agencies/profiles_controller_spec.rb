@@ -92,7 +92,9 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
 
     it "should update record" do
-      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates"}
+      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
+      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
       broker_agency_profile.primary_broker_role.person.reload
       expect(broker_agency_profile.primary_broker_role.person.first_name).to eq "updated name"
     end
@@ -247,7 +249,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
       end
       context "individual market user" do
-        let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
         let(:user) {FactoryGirl.create(:user, person: person, roles: ['consumer'])}
 
         it "selects only 'individual' and 'both' market brokers" do
@@ -259,7 +261,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
           end
         end
         context "SHOP market user" do
-          let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+          let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
           let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
 
           it "selects only 'shop' and 'both' market brokers" do
@@ -275,7 +277,10 @@ RSpec.describe BrokerAgencies::ProfilesController do
       end
     end
 
-    context "when only shop is enabled" do
+
+    context "SHOP market user" do
+      let(:person) {FactoryGirl.build(:person, is_consumer_role:true)}
+      let(:user) {FactoryGirl.build(:user, person: person, roles: ['employer'])}
 
       before :each do
         DatabaseCleaner.clean
@@ -286,7 +291,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
         FactoryGirl.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
       end
       context "SHOP market user" do
-        let(:person) {FactoryGirl.create(:person, is_consumer_role:true)}
+        let(:person) {FactoryGirl.create(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
         let(:user) {FactoryGirl.create(:user, person: person, roles: ['employer'])}
 
         it "selects only 'shop' market brokers" do

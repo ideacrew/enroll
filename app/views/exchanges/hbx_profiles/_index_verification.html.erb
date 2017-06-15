@@ -1,32 +1,57 @@
-<div class="module">
-  <table class="table table-striped" id="verification-dataTable">
-    <thead>
-    <tr>
-      <th>HBX ID</th>
-      <th>First name</th>
-      <th>Last name</th>
-      <th>Documents</th>
-      <th>Due date</th>
-      <th>Status</th>
-      <th>Review</th>
-      <th>FedHub</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+<div class="container">
+  <button class="btn btn-default" style="float: right"><span class="glyphicons glyphicons-cloud-upload"></span> Upload</button>
 </div>
+<%= render_datatable(@datatable) %>
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div style="margin:1em; border: 1px solid;padding: 1em;">
+        <h4>MA DOR FORM-X</h4>
+        <p>
+          There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.
+        </p>
+        <p style="text-align: right">
+          <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button>
+          <button class="btn btn-default" >Print</button>
+        </p>
+        <hr/>
+        <p class="row">
+          <span class="col-md-6">Employer Name: ACME Widgets</span>
+          <span class="col-md-6" style="text-align: right">Effective date: July 1, 2007</span>
+        </p>
+        <form>
+          <div class="row">
+            <div class="col-md-4">
+              <label><input type="radio" name="approve" checked="true"> Approve</label><br/>
+              <label><input type="radio" name="reject"> Reject</label>
+            </div>
+            <div class="col-md-4">
+              <select class="form-control">
+                <option>Reason for rejection</option>
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+              </select>
+              <div class="form-group">
+                <input type="text" name="other-reason" placeholder="Other reason for rejection">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <button class = "btn btn-default">Submit</button>
+              <button class = "btn btn-default" >Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
 
+  </div>
+</div>
+</div>
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    $('#verification-dataTable').DataTable( {
-      "processing": true,
-      "serverSide": true,
-      "ordering" : false,
-      "ajax": {
-        url: "<%= verifications_index_datatable_exchanges_hbx_profiles_path(:format => :json) %>",
-        type: "GET"
-      }
-    });
-  });
+    initializeDataTables();
+    jQuery('.buttons-csv').hide()
+    jQuery('.buttons-excel').hide()
 </script>
+
+

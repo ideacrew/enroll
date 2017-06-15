@@ -2,8 +2,8 @@ puts "*"*80
 puts "::: Generating Carriers:::"
 
 hbx_office = OfficeLocation.new(
-    is_primary: true, 
-    address: {kind: "work", address_1: "address_placeholder", address_2: "609 H St, Room 415", city: "Washington", state: "DC", zip: "20002" }, 
+    is_primary: true,
+    address: {kind: "work", address_1: "address_placeholder", address_2: "609 H St, Room 415", city: "Washington", state: "DC", zip: "20002" },
     phone: {kind: "main", area_code: "202", number: "555-1212"}
   )
 
@@ -26,16 +26,16 @@ org = Organization.new(office_locations: [hbx_office], fein: "060000000", legal_
 cp = org.create_carrier_profile(id: "53e67210eb899a460300001d", abbrev: "META", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false)
 
 org = Organization.new(office_locations: [hbx_office], fein: "070000000", legal_name: "CareFirst")
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI", hbx_carrier_id: "116036", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false)
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI", hbx_carrier_id: "116036", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['82569'])
 
 org = Organization.new(office_locations: [hbx_office], fein: "080000000", legal_name: "Aetna")
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000007", abbrev: "AHI", hbx_carrier_id: "116163", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false)
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000007", abbrev: "AHI", hbx_carrier_id: "116163", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['88806','22222'])
 
 org = Organization.new(office_locations: [hbx_office], fein: "090000000", legal_name: "United Health Care")
-cp = org.create_carrier_profile(id: "53e67210eb899a460300000a", abbrev: "UHIC", hbx_carrier_id: "116034", ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false)
-
+cp = org.create_carrier_profile(id: "53e67210eb899a460300000a", abbrev: "UHIC", hbx_carrier_id: "116034", ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['33333','34484'])
+                                                              
 org = Organization.new(office_locations: [hbx_office], fein: "001000000", legal_name: "Kaiser")
-cp = org.create_carrier_profile(id: "53e67210eb899a460300000d", abbrev: "KFMASI", hbx_carrier_id: "116028", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false)
+cp = org.create_carrier_profile(id: "53e67210eb899a460300000d", abbrev: "KFMASI", hbx_carrier_id: "116028", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ['73331'])
 
 
 puts "::: Carriers Complete :::"

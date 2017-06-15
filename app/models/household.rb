@@ -4,7 +4,7 @@ class Household
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild}
+  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner}
 
   embedded_in :family
 
@@ -55,7 +55,7 @@ class Household
   end
 
   def add_household_coverage_member(family_member)
-    if ImmediateFamily.include?(family_member.primary_relationship)
+    if Family::IMMEDIATE_FAMILY.include?(family_member.primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
       extended_family_coverage_household.remove_family_member(family_member)
     else
@@ -263,7 +263,7 @@ class Household
       consumer_role: consumer_role,
       benefit_package: benefit_package,
       qle: qle,
-      submitted_at: TimeKeeper.datetime_of_record,
+      submitted_at: Time.now,
       external_enrollment: external_enrollment,
       coverage_start: coverage_start
     )
@@ -277,7 +277,7 @@ class Household
       benefit_group_assignment: benefit_group_assignment,
       consumer_role: consumer_role,
       benefit_package: benefit_package,
-      submitted_at: TimeKeeper.datetime_of_record
+      submitted_at: Time.now
     )
     enrollment.save
     enrollment

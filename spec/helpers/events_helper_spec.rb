@@ -67,7 +67,7 @@ describe EventsHelper, "given an address_kind" do
   end
 
   describe "is_new_conversion_employer?" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active", is_conversion: true) }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
     let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
@@ -128,7 +128,8 @@ describe EventsHelper, "given an address_kind" do
   end
 
   describe "employer_plan_years" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.at_beginning_of_month, aasm_state: "active") }
+    let(:is_conversion) { false }
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.at_beginning_of_month, aasm_state: "active", is_conversion: is_conversion) }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.at_beginning_of_month.next_month,aasm_state: "renewing_enrolling") }
     let(:employer_profile2){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
@@ -235,6 +236,8 @@ describe EventsHelper, "given an address_kind" do
 
       context "day is on or before 15th of this month" do
 
+        let(:is_conversion) { true }
+
         before do
           allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)
         end
@@ -324,6 +327,32 @@ describe EventsHelper, "given an address_kind" do
       it "should return false " do
         expect(subject.is_office_location_phone_valid?(office_location1)).to eq false
       end
+    end
+  end
+
+end
+
+describe EventsHelper, "transforming a qualifying event kind for external xml" do
+
+  RESULT_PAIR = {
+    "relocate" => "location_change",
+    "eligibility_change_immigration_status" => "citizen_status_change",
+    "lost_hardship_exemption" => "eligibility_change_assistance",
+    "eligibility_change_income" => "eligibility_change_assistance",
+    "court_order" => "medical_coverage_order",
+    "domestic_partnership" => "entering_domestic_partnership",
+    "new_eligibility_member" => "drop_family_member_due_to_new_eligibility",
+    "new_eligibility_family" => "drop_family_member_due_to_new_eligibility",
+    "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
+    "divorce" => "divorce"
+  }
+
+  subject { EventsHelperSlug.new }
+
+  RESULT_PAIR.each_pair do |k,v|
+    it "maps \"#{k}\" to \"#{v}\"" do
+      eligibility_event = instance_double(HbxEnrollment, :eligibility_event_kind => k)
+      expect(subject.xml_eligibility_event_uri(eligibility_event)).to eq "urn:dc0:terms:v1:qualifying_life_event##{v}"
     end
   end
 

@@ -17,7 +17,8 @@ RSpec.describe CarrierProfile, :type => :model do
     let(:valid_params) do
       {
         organization: organization,
-        abbrev: abbrev
+        abbrev: abbrev,
+        issuer_hios_ids: ['11111', '22222']
       }
     end
 
@@ -40,7 +41,7 @@ RSpec.describe CarrierProfile, :type => :model do
       it "should not be restricted to single choice" do
         expect(carrier_profile.restricted_to_single_choice?).to be_falsey
       end
-      
+
       context "and it is saved" do
         before do
           carrier_profile.save

@@ -22,7 +22,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
       {
         organization: organization,
         market_kind: market_kind,
-        entity_kind: "s_corporation",
+        entity_kind: "s_corporation"
       }
     end
 

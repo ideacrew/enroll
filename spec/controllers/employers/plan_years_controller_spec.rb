@@ -5,7 +5,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:plan_year_proxy) { double(id: "id") }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
 
-  let(:user) { FactoryGirl.create(:user) } 
+  let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.create(:person, user: user) }
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
 
@@ -632,6 +632,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+      allow(benefit_group).to receive(:employee_cost_for_plan).and_return(1)
       sign_in
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 
@@ -645,7 +646,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:bad_entity_kind) { "fraternity" }
       let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+      let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "SomeCounty") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -712,7 +713,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:bad_entity_kind) { "fraternity" }
     let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address)  { Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: Settings.aca.state_abbreviation, zip: "20002", county: "Bucks") }
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
 
@@ -741,11 +742,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
-    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let!(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
     let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
 
     context 'when same plan year' do
       before do

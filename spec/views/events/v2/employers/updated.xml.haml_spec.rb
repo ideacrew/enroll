@@ -6,7 +6,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
-  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "CountyName") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
@@ -49,7 +49,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
     let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
-
+    let(:broker_agency_profile) { BrokerAgencyProfile.create(market_kind: "both") }
+    let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone)}
+    let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active',person:person_broker)}
     include AcapiVocabularySpecHelpers
 
     before(:all) do
@@ -61,6 +63,9 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     before :each do
       allow(employer).to receive(:staff_roles).and_return([staff])
+      allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+      allow(broker_agency_profile).to receive(:brokers).and_return([broker])
+      allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker)
       render :template => "events/v2/employers/updated", :locals => { :employer => employer }
       @doc = Nokogiri::XML(rendered)
     end
@@ -85,8 +90,16 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       expect(@doc.xpath("//x:office_location[2]/x:phone", "x"=>"http://openhbx.org/api/terms/1.0").to_a).to eq []
     end
 
+    it "should have one broker_agency_profile" do
+      expect(@doc.xpath("//x:broker_agency_profile", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+    end
+
+    it "should have brokers in broker_agency_profile" do
+      expect(@doc.xpath("//x:broker_agency_profile/x:brokers", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+    end
+
     it "should have contact email" do
-      expect(@doc.xpath("//x:emails/x:email/x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
+      expect(@doc.xpath("//x:contacts/x:contact//x:emails//x:email//x:email_address", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq staff.work_email_or_best
     end
 
     it "should not have shop_transfer" do
