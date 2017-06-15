@@ -12,12 +12,12 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
 
   context "rate_reference:load_rating_factors" do
     before :all do
-      require File.join(Rails.root, "db/seedfiles/carriers_seed")
+      ['82569','88806','34484','73331'].each do |hios_id|
+        carrier_profile = FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
+      end
       Rake.application.rake_require "tasks/migrations/load_rating_factors"
       Rake::Task.define_task(:environment)
-    end
 
-    before :context do
       invoke_task
     end
 
