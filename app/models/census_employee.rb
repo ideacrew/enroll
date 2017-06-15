@@ -323,6 +323,10 @@ class CensusEmployee < CensusMember
     EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
   end
 
+  def is_terminated?
+    (self.coverage_terminated_on.present? && !(self.is_eligible? || self.employee_role_linked?))
+  end
+
   def employee_relationship
     "employee"
   end

@@ -289,8 +289,6 @@ Rails.application.routes.draw do
         get :rehire
         get :cobra
         collection do
-          get :show_employee
-          get :rehire_employee
           post :change_expected_selection
         end
         get :cobra_reinstate
