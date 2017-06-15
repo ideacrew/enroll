@@ -50,9 +50,9 @@
 
   def build_error_messages(model)
     all_errors = ""
-    all_errors = all_errors + @model.errors.full_messages.join(', ') if @model.errors.messages.present?
-    all_errors = all_errors + @model.employer_address.errors.full_messages.join(', ') if @model.employer_address.errors.messages.present?
-    all_errors = all_errors + @model.employer_phone.errors.full_messages.join(', ') if @model.employer_phone.errors.messages.present?
+    all_errors = all_errors + model.errors.full_messages.join(', ') if model.errors.messages.present?
+    all_errors = all_errors + model.employer_address.errors.full_messages.join(', ') if model.employer_address.present? && model.employer_address.errors.messages.present?
+    all_errors = all_errors + model.employer_phone.errors.full_messages.join(', ') if model.employer_phone.present? && model.employer_phone.errors.messages.present?
     return all_errors
   end
 

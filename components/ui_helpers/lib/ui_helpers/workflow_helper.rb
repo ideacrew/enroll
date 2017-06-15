@@ -7,7 +7,7 @@ module UIHelpers
       else
         [controller.request.path.sub('new', "#{model.id}/step"), :put]
       end
-      path.gsub!(/\/\d$/, '')
+      #path.gsub!(/\/\d$/, '')
       form_tag path, method: method do
         yield
       end
