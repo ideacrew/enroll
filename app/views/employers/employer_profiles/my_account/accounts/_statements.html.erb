@@ -21,12 +21,12 @@
         </tr>
       </tr>
     </tr>
-    <tr data-toggle="collapse" data-target="#collapse2">
+    <tr data-toggle="collapse">
       <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2016</td>
       <td>14 Mb</td>
       <td>Open Me</td>
     </tr>
-    <tr data-toggle="collapse" data-target="#collapse2">
+    <tr data-toggle="collapse">
       <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2015</td>
       <td>14 Mb</td>
       <td>Open Me</td>
@@ -60,11 +60,13 @@
 <% end %>
 
 <script>
-  $(document).ready(function() {
-    $('tr').click(function() {
-    $('td').toggle('1000');
-    $("i", this).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+  $('td i').click(function() {
+    if ($(this).hasClass('glyphicon-plus')) {
+      $(this).removeClass('glyphicon-plus');
+      $(this).addClass('glyphicon-minus');
+    } else if ($(this).hasClass('glyphicon-minus')) {
+      $(this).removeClass('glyphicon-minus');
+      $(this).addClass('glyphicon-plus');
+    }
   });
-  console.log("Hiiiiiii");
-});
 </script>
