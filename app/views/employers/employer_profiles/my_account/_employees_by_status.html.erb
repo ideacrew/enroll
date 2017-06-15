@@ -67,7 +67,11 @@
               </a>
             </td>
           <% elsif census_employee.may_terminate_employee_role? %>
+          <% if census_employee.aasm_state != 'employee_termination_pending' %>
             <td class="table-functions">
+            <% else %>
+              <td class="table-functions-terminate-pending">
+            <% end %>
               <%= link_to raw('<i class="fa fa-pencil fa-lg pull-right" data-toggle="tooltip" title="Edit"></i>'), edit_employers_employer_profile_census_employee_path(@employer_profile, census_employee.id) %>
               <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="Terminate"></i>
             </td>
@@ -128,7 +132,7 @@
           </td>
         </tr>
             <tr></tr>
-          <% elsif census_employee.may_terminate_employee_role? %>
+          <% elsif census_employee.may_terminate_employee_role? && census_employee.aasm_state != 'employee_termination_pending' %>
             <tr class="unbrd  remove_<%= census_employee.id %> dn">
               <td class="confirm-terminate-wrapper show_confirm_<%= census_employee.id %>"  colspan="10"  id="enter-date">
                 <div class="confirm-terminate <%=pundit_class EmployerProfile, :updateable?%>">
@@ -137,7 +141,6 @@
                     <span class="lg fourteen">(termination date must be within the past 60 days)</span>
                   </h5>
                   <div class="pull-right" style="margin-top: 2px;">
-                  <!--<h5>Enter termination date to remove this employee:</h5>-->
                   <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 > -60 ? (census_employee.hired_on - TimeKeeper.date_of_record).to_i + 1 : -60 %>d" placeholder="MM/DD/YYYY" type="text">
                   <a class="delete_confirm terminate" data-link="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="remove_<%= census_employee.id %>">
                   Terminate Employee
