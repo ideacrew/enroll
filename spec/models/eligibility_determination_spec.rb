@@ -6,8 +6,8 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :csr_percent_as_integer }
 
   let(:family)                        { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:household)                     { family.households.first }
-  let(:tax_household)                 { FactoryGirl.create(:tax_household, household: household) }
+  let(:application)                   { FactoryGirl.create(:application, family: family) }
+  let(:tax_household)                 { FactoryGirl.create(:tax_household, application: application) }
   let(:determined_on)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }
@@ -21,12 +21,13 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:valid_params){
       {
-        tax_household: tax_household,
+        application: application,
         determined_on: determined_on,
         max_aptc: max_aptc,
         csr_percent_as_integer: csr_percent_as_integer,
         e_pdc_id: e_pdc_id,
         premium_credit_strategy_kind: premium_credit_strategy_kind,
+        source: "Curam"
       }
     }
 
@@ -81,8 +82,8 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       context "and it is saved" do
         before { eligibility_determination.save }
 
-        it "should be findable by ID" do
-          expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
+        it "should exist for the family" do
+          expect(family.active_approved_application.eligibility_determinations.first).to eq eligibility_determination
         end
       end
     end

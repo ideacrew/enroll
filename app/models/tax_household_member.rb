@@ -14,32 +14,35 @@ class TaxHouseholdMember
 
   validate :strictly_boolean
 
+  #Not moved to Applicant, need testing
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
   end
 
-  def family
-    return nil unless tax_household
-    tax_household.family
-  end
+  # def family
+  #   return nil unless tax_household
+  #   tax_household.family
+  # end
 
-  def is_ia_eligible?
-    is_ia_eligible
-  end
+  # def is_ia_eligible?
+  #   is_ia_eligible
+  # end
 
-  def is_medicaid_chip_eligible?
-    is_medicaid_chip_eligible
-  end
+  # def is_medicaid_chip_eligible?
+  #   is_medicaid_chip_eligible
+  # end
 
+  #Not moved to Applicant, need testing
   def is_subscriber?
     is_subscriber
   end
 
-  def is_primary_applicant?
-    family_member.is_primary_applicant
-  end
+  # def is_primary_applicant?
+  #   family_member.is_primary_applicant
+  # end
 
+  #Not moved to Applicant, need testing
   def strictly_boolean
     unless is_ia_eligible.is_a? Boolean
       self.errors.add(:base, "is_ia_eligible should be a boolean")
@@ -54,25 +57,25 @@ class TaxHouseholdMember
     end
   end
 
-  def person
-    return @person unless @person.blank?
-    @person = family_member.person
-  end
+  # def person
+  #   return @person unless @person.blank?
+  #   @person = family_member.person
+  # end
 
-  def age_on_effective_date
-    return @age_on_effective_date unless @age_on_effective_date.blank?
-    dob = person.dob
-    coverage_start_on = Forms::TimeKeeper.new.date_of_record
-    return unless coverage_start_on.present?
-    age = coverage_start_on.year - dob.year
+#   def age_on_effective_date
+#     return @age_on_effective_date unless @age_on_effective_date.blank?
+#     dob = person.dob
+#     coverage_start_on = Forms::TimeKeeper.new.date_of_record
+#     return unless coverage_start_on.present?
+#     age = coverage_start_on.year - dob.year
 
-    # Shave off one year if coverage starts before birthday
-    if coverage_start_on.month == dob.month
-      age -= 1 if coverage_start_on.day < dob.day
-    else
-      age -= 1 if coverage_start_on.month < dob.month
-    end
+#     # Shave off one year if coverage starts before birthday
+#     if coverage_start_on.month == dob.month
+#       age -= 1 if coverage_start_on.day < dob.day
+#     else
+#       age -= 1 if coverage_start_on.month < dob.month
+#     end
 
-    @age_on_effective_date = age
-  end
+#     @age_on_effective_date = age
+#   end
 end

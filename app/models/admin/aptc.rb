@@ -124,7 +124,7 @@ class Admin::Aptc < ApplicationController
     def build_max_aptc_values(year, family, max_aptc=nil, hbxs=nil)
       max_aptc_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-      eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
+      eligibility_determinations = family.active_approved_application.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|
@@ -165,7 +165,7 @@ class Admin::Aptc < ApplicationController
     def build_csr_percentage_values(year, family, csr_percentage=nil)
       csr_percentage_hash = Hash.new
       #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
-      eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
+      eligibility_determinations = family.active_approved_application.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
       $months_array.each_with_index do |month, ind|

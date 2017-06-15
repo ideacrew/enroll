@@ -53,9 +53,9 @@ class FinancialAssistance::Application
 
   field :workflow, type: Hash, default: { }
 
-  #embeds_many :tax_households, class_name: "::TaxHousehold"
+  embeds_many :tax_households, class_name: "::TaxHousehold"
   embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
-  embeds_many :eligibility_determination, class_name: "::EligibilityDetermination"
+  embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :applicants, :workflow_state_transitions
@@ -156,11 +156,6 @@ class FinancialAssistance::Application
       transitions from: :draft, to: :verifying_income, :after => :submit_application
     end
 
-  end
-
-  def family
-    return nil unless tax_household_member
-    tax_household_member.family
   end
 
   def applicant
@@ -281,6 +276,33 @@ class FinancialAssistance::Application
        tax_households << applicant.tax_household
     end
     tax_households.uniq
+  end
+
+  def current_csr_eligibility_kind(tax_household_id)
+    eligibility_determination = eligibility_determination_for_tax_household(tax_household_id)
+    eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
+  end
+
+  def eligibility_determination_for_tax_household(tax_household_id)
+    eligibility_determinations.where(tax_household_id: tax_household_id).first
+  end
+
+  def tax_household_for_family_member(family_member_id)
+    tax_households.select {|th| th if th.applicants.where(family_member_id: family_member_id).present? }.first
+  end
+
+  # TODO: Move to Aplication model and refactor accordingly.
+  def latest_active_tax_households_with_year(year)
+    tax_households = self.tax_households.tax_household_with_year(year)
+    if TimeKeeper.date_of_record.year == year
+      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
+    end
+    tax_households
+  end
+
+  def eligibility_determinations_for_year(year)
+    return nil unless self.assistance_year == year
+    self.eligibility_determinations
   end
 
 private
