@@ -12,7 +12,7 @@ namespace :load_rating_factors do
     }
     RATING_FACTOR_DEFAULT = 1.0
     begin
-      file_path = File.join(Rails.root, 'lib', 'xls_templates', args[:file_name])
+      file_path = File.join(File.dirname(__FILE__),'../..', 'xls_templates', args[:file_name])
       xlsx = Roo::Spreadsheet.open(file_path)
       RATING_FACTOR_PAGES.each do |rating_factor_class, sheet_info|
         rating_factor_set = Object.const_get(rating_factor_class)
