@@ -339,6 +339,12 @@ class FinancialAssistance::Application
     self.aasm_state == "draft" ? true : false
   end
 
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
+  end
+
 private
   def set_hbx_id
     #TODO: Use hbx_id generator for Application
