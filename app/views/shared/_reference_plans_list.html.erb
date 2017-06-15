@@ -125,7 +125,7 @@
       <br><br>
       <h4>Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</h4>
       <br/>
-      <% @carrier_names.each_pair do |ck, cv| %>
+      <% @carrier_names_with_single_plans_also.each_pair do |ck, cv| %>
       <div class="col-xs-3 carriers">
         <div class="col-xs-12 row">
           <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, carrier_for_elected_plan: "#{cv}", carrier_id: "#{ck}", plan_option_kind: "single_plan", benefit_group:f.object.id ), remote: true do %>
