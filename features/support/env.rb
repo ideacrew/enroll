@@ -68,12 +68,14 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 Capybara.default_driver = :poltergeist
 Capybara.javascript_driver = :poltergeist
+phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-images=no']
+phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
 Capybara.register_driver :poltergeist do |app|
   options = {
       :js_errors => true,
       :timeout => 120,
       :debug => false,
-      :phantomjs_options => ['--load-images=no', '--disk-cache=false'],
+      :phantomjs_options => phantomjs_options,
       :inspector => true,
       :window_size => [1280,720],
       :phantomjs_logger => File.open("log/phantomjs_test.log", "a"),
