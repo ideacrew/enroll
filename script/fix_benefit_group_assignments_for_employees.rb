@@ -36,9 +36,10 @@ end
 
 census_employee = CensusEmployee.where(first_name: "Michael", middle_name: nil, last_name: "Mercier").first
 # Only one benefit group assignment has this issue.
-invalid_bga = census_employee.benefit_group_assignments.detect {|bga| !bga.valid? }
+bga = census_employee.benefit_group_assignments.detect {|bga| !bga.valid? }
 enrollment_ids = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.select { |enr| enr.benefit_group_assignment_id == bga.id }
 
+census_employee.benefit_group_assignments.detect {|bga| !bga.valid? }.unset(:hbx_enrollment_id)
 enrollment_ids.each do |hbx_id|
   enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
   next if enrollment.benefit_group_assignment.benefit_group == enrollment.benefit_group
