@@ -20,6 +20,7 @@ describe RemoveTerminationDateFromEnrollment do
       subject.migrate
       hbx_enrollment.reload
       expect(hbx_enrollment.terminated_on).to eq nil
+      expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
     end
   end
 end
