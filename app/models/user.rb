@@ -24,6 +24,9 @@ class User
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
 
+  scope :locked,   ->{ where(unlock_token: nil) }
+  scope :unlocked, ->{ where(unlock_token: nil) }
+
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
       errors.add :oim_id, "cannot contain special charcters ; # % = | + , \" > < \\ \/"
@@ -187,9 +190,9 @@ class User
   # field :unconfirmed_email,    type: String # Only if using reconfirmable
 
   ## Lockable
-  # field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
-  # field :unlock_token,    type: String # Only if unlock strategy is :email or :both
-  # field :locked_at,       type: Time
+  field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
+  field :unlock_token,    type: String # Only if unlock strategy is :email or :both
+  field :locked_at,       type: Time
 
   before_save :ensure_authentication_token
 
