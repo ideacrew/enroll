@@ -40,19 +40,19 @@ module Factories
             if passive_renewals.blank?
               if active_enrollment.present? && active_enrollment.inactive?
                 renew_enrollment(enrollment: active_enrollment, waiver: true, coverage_kind: coverage_kind)
-                trigger_notice { "employee_open_enrollment_unenrolled" }
+                trigger_notice { "employee_open_enrollment_unenrolled" } if coverage_kind == 'health'
               elsif renewal_plan_offered_by_er?(active_enrollment)
                 renew_enrollment(enrollment: active_enrollment, coverage_kind: coverage_kind)
-                trigger_notice { "employee_open_enrollment_auto_renewal" }
+                trigger_notice { "employee_open_enrollment_auto_renewal" } if coverage_kind == 'health'
               else
                 renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
-                trigger_notice { "employee_open_enrollment_no_auto_renewal" }
+                trigger_notice { "employee_open_enrollment_no_auto_renewal" } if coverage_kind == 'health'
               end
             end
           end
         elsif find_renewal_enrollments(coverage_kind).blank?
           renew_enrollment(enrollment: nil, waiver: true, coverage_kind: coverage_kind)
-          trigger_notice { "employee_open_enrollment_unenrolled" }
+          trigger_notice { "employee_open_enrollment_unenrolled" } if coverage_kind == 'health'
         end
       rescue Exception => e
         puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
@@ -73,7 +73,8 @@ module Factories
       renewal_enrollments = family.active_household.hbx_enrollments.shop_market.by_coverage_kind(coverage_kind)
       renewal_enrollments.where({
         :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id), 
-        :effective_on => renewing_plan_year.start_on
+        :effective_on => renewing_plan_year.start_on,
+        :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived']
         })
     end
 
