@@ -25,6 +25,7 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
     let!(:full_state_service_area) { create(:carrier_service_area, issuer_hios_id: '11111') }
     let!(:matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: '01225') }
     let!(:non_matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: "01001") }
+
     let(:carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['11111','22222']) }
     let(:invalid_carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['33333']) }
     let(:address) { double(:address, zip: "01225") }
@@ -43,6 +44,7 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
         end
       end
     end
+
 
     context "class methods" do
       describe "::areas_valid_for_zip_code" do

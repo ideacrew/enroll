@@ -667,6 +667,21 @@ function calcEmployerContributions(url, location, coverage_type) {
     });
 }
 
+function attachEmployerHealthContributionShowHide() {
+	$(document).on("click", "div.health li:has(label.elected_plan)", function() {
+		var offering_id = $(this).attr("data-offering-id");
+		var option_kind = $(this).attr("data-offering-kind");
+		if (option_kind == "sole_source") {
+			$("div[data-offering-target='" + offering_id + "']").hide();
+		} else {
+
+			$("div[data-offering-target='" + offering_id + "']").removeClass("hidden");
+			$("div[data-offering-target='" + offering_id + "']").show();
+		}
+	});
+}
+
 
 $(document).ready(ready);
 $(document).on('page:load', plan_year_selection_loader);
+$(document).on('ready', attachEmployerHealthContributionShowHide);

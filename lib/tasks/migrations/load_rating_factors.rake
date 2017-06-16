@@ -12,7 +12,7 @@ namespace :load_rating_factors do
     }
     RATING_FACTOR_DEFAULT = 1.0
     begin
-      file_path = File.join(Rails.root, 'lib', 'xls_templates', args[:file_name])
+      file_path = File.join(File.dirname(__FILE__),'../..', 'xls_templates', args[:file_name])
       xlsx = Roo::Spreadsheet.open(file_path)
       RATING_FACTOR_PAGES.each do |rating_factor_class, sheet_info|
         rating_factor_set = Object.const_get(rating_factor_class)
@@ -24,15 +24,12 @@ namespace :load_rating_factors do
           ## Need to Import Carriers First to associate with CarrierProfile
           begin
             carrier_profile = Organization.where("carrier_profile.issuer_hios_ids" => issuer_hios_id).first.carrier_profile
-          rescue Mongoid::Errors::DocumentNotFound
-            puts "Error: There was no matching Carrier Profile for this column"
-            puts "Import Carrier Profiles before running this script"
-          end
-          rating_factor_set.new(active_year: CURRENT_ACTIVE_YEAR,
-                                carrier_profile: carrier_profile,
-                                default_factor_value: RATING_FACTOR_DEFAULT,
-                                max_integer_factor_key: max_integer_factor_key
-                                ).tap do |factor_set|
+
+            rating_factor_set.new(active_year: CURRENT_ACTIVE_YEAR,
+                                  carrier_profile: carrier_profile,
+                                  default_factor_value: RATING_FACTOR_DEFAULT,
+                                  max_integer_factor_key: max_integer_factor_key
+                                ).tap do |factor_set|                 ## initialized factor set, now iterate through the column
                                   (ROW_DATA_BEGINS_ON..sheet.last_row).each do |i|
                                     factor_key = sheet.cell(i,1)
                                     factor_value = sheet.cell(i,carrier_column) || 1.0
@@ -40,12 +37,14 @@ namespace :load_rating_factors do
                                                                           factor_key: factor_key,
                                                                           factor_value: factor_value
                                                                         )
-                                  end
+                                  end  ## finished the sheet
                                   factor_set.save!
                                 end
+          rescue Mongoid::Errors::DocumentNotFound
+            puts "Error: There was no matching Carrier Profile for this column"
+            puts "Import Carrier Profiles before running this script"
+          end
         end
-
-
       end
 
     rescue => e

@@ -30,6 +30,10 @@ class CarrierProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  def self.for_issuer_hios_id(issuer_id)
+    Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
+
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
       raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
