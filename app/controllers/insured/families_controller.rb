@@ -287,7 +287,7 @@ class Insured::FamiliesController < FamiliesController
           @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
         end
       else @person.consumer_role.present?
-        @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
+        @qualifying_life_events += QualifyingLifeEventKind.shop_market_events
       end
     end
   end
