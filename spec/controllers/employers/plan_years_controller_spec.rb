@@ -43,6 +43,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
+
       get :new, :employer_profile_id => employer_profile_id
     end
 
@@ -56,6 +58,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
     it "should generate carriers" do
       expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
+      expect(assigns(:carrier_names_with_sole_source)).to eq({'id' => "sole_source_legal_name"})
       expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
     end
 
@@ -100,6 +103,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
         allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
         allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
       end
 
       context "when draft state" do
@@ -117,6 +121,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
         it "should generate carriers" do
           expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
+          expect(assigns(:carrier_names_with_sole_source)).to eq({"id"=> "sole_source_legal_name"})
           expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
         end
       end

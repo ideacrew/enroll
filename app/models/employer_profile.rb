@@ -862,7 +862,7 @@ class EmployerProfile
       return nil
     end
     primary_office_location = organization.primary_office_location
-    RateReference.rating_area_for(primary_office_location.address)
+    RatingArea.rating_area_for(primary_office_location.address)
   end
 
   def service_areas
