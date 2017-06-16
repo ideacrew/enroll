@@ -6,9 +6,9 @@ module Effective
 
         # TODO: Implement Filters here
         bulk_actions_column do
-          bulk_action 'Employee will enroll', generate_invoice_exchanges_hbx_profiles_path, data: {confirm: 'Generate Invoices?', no_turbolink: true}
-          bulk_action 'Employee will not enroll with valid waiver', binder_paid_exchanges_hbx_profiles_path, data: {confirm: 'Mark Binder Paid?', no_turbolink: true}
-          bulk_action 'Employee will not enroll with invalid waiver', generate_invoice_exchanges_hbx_profiles_path, data: {confirm: 'Generate Invoices?', no_turbolink: true}
+          bulk_action 'Employee will enroll',  change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
+          bulk_action 'Employee will not enroll with valid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
+          bulk_action 'Employee will not enroll with invalid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"will_not_participate"), data: {confirm: 'Remember, your participation rate can affect your group premium rates', no_turbolink: true}
         end
 
         table_column :employee_name, :width => '50px', :proc => Proc.new { |row|
@@ -45,7 +45,11 @@ module Effective
         end
 
         table_column :enrollment_status, :proc => Proc.new { |row|
-          enrollment_state(row)
+            enrollment_state(row)
+        }, :sortable => false, :filter => false
+
+        table_column :est_participation, :proc => Proc.new { |row|
+           row.expected_selection.titleize if row.expected_selection
         }, :sortable => false, :filter => false
 
         if attributes["renewal_status"]

@@ -288,6 +288,9 @@ Rails.application.routes.draw do
         get :terminate
         get :rehire
         get :cobra
+        collection do
+          post :change_expected_selection
+        end
         get :cobra_reinstate
         get :benefit_group, on: :member
       end
@@ -489,7 +492,6 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
-
 
   resources :documents, only: [:update, :destroy, :update] do
     collection do

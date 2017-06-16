@@ -251,6 +251,20 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
   end
 
+  def change_expected_selection
+    if params[:ids]
+      begin
+        census_employees = CensusEmployee.find(params[:ids])
+        census_employees.each do |census_employee|
+          census_employee.update_attributes(:expected_selection=>params[:expected_selection])
+        end
+        render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
+      rescue => e
+        render json: { status: 500, message: 'An error occured while submitting employees participation status' }
+      end
+    end
+  end
+
   private
 
   def updateable?
