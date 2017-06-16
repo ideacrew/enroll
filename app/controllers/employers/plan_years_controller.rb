@@ -39,7 +39,7 @@ class Employers::PlanYearsController < ApplicationController
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
       Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
-    elsif params[:plan_option_kind] == "single_plan"
+    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
