@@ -430,7 +430,7 @@ class Employers::PlanYearsController < ApplicationController
 
   def generate_carriers_and_plans
     @carrier_names = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location)
-    @carrier_names_with_single_plans_also = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location, single_choice_included: true)
+    @carrier_names_with_sole_source = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location, sole_source_only: true)
     @carriers_array = Organization.valid_carrier_names_for_options(primary_office_location: @employer_profile.organization.primary_office_location)
   end
 

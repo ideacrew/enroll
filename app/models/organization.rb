@@ -221,7 +221,7 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
-  def self.valid_carrier_names(filters = { single_choice_included: false, primary_office_location: nil })
+  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
     cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
     if (filters[:primary_office_location].present?)
       office_location = filters[:primary_office_location]
@@ -233,8 +233,10 @@ class Organization
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
         end
-        unless (filters[:single_choice_included])
-          next carrier_names if org.carrier_profile.restricted_to_single_choice?
+        if (filters[:sole_source_only]) ## Only sole source carriers requested
+          next carrier_names unless org.carrier_profile.restricted_to_single_choice?  # skip carrier unless it is a sole source provider
+        else
+          next carrier_names if org.carrier_profile.restricted_to_single_choice?  ## default behavior is to skip sole source
         end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
         carrier_names
