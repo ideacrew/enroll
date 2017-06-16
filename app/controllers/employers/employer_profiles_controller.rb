@@ -270,14 +270,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def show_invoice
     options={}
-    #options[:content_type] = @invoice.type
     options[:filename] = @invoice.title
-    #options[:type] = @invoice.format
     options[:type] = 'application/pdf'
     options[:disposition] = 'inline'
-    #binding.pry
     send_data Aws::S3Storage.find(@invoice.identifier) , options
-    #render text: Aws::S3Storage.find(@invoice.identifier), content_type=>'application/pdf'
   end
 
   def bulk_employee_upload
