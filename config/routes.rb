@@ -259,6 +259,7 @@ Rails.application.routes.draw do
       member do
         get "download_invoice"
         post 'generate_checkbook_urls'
+        get "show_invoice"
       end
       collection do
         get 'welcome'
