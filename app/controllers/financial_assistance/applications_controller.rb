@@ -26,6 +26,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application.applicants = @current_user.person.primary_family.family_members.map do |family_member|
       FinancialAssistance::Applicant.new family_member_id: family_member.id
     end
+    @application.family.update_attributes(is_applying_for_assistance: true) unless @application.family.is_applying_for_assistance
     @application.save!
     redirect_to edit_financial_assistance_application_path(@application)
   end
