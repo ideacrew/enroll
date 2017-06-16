@@ -50,8 +50,8 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   # find(:xpath, "//p[@class='label'][contains(., 'Select Entity Kind')]").click
   # find(:xpath, "//li[contains(., 'C Corporation')]").click
 
-  find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
-  find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
+  # find(:xpath, "//p[@class='label'][contains(., 'Select Practice Area')]").click
+  # find(:xpath, "//li[contains(., 'Small Business Marketplace ONLY')]").click
 
   find('button.multiselect').click
   find(:xpath, '//label[input[@value="bn"]]').click
@@ -272,7 +272,7 @@ Then(/^.+ continues to the consumer home page$/) do
 end
 
 Given(/^zip code for county exists as rate reference$/) do
- FactoryGirl.create(:rate_reference, zip_code: '01010', county_name: 'Test County', rating_region: "Test Region", 
+ FactoryGirl.create(:rate_reference, zip_code: '01010', county_name: 'Test County', rating_region: Settings.aca.rating_areas.first,
     zip_code_in_multiple_counties: true)
 end
 #
