@@ -32,9 +32,9 @@ module Factories
         if active_enrollment.present?
 
           renewal_enrollments = find_renewal_enrollments(coverage_kind)
-          passive_renewals = renewal_enrollments.renewing
+          passive_renewals = renewal_enrollments.where(:aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'])
 
-          if renewal_enrollments.enrolled_and_waived.present?
+          if renewal_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['inactive']).present?
             passive_renewals.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
           else
             if passive_renewals.blank?
@@ -74,7 +74,7 @@ module Factories
       renewal_enrollments.where({
         :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id), 
         :effective_on => renewing_plan_year.start_on,
-        :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived']
+        :aasm_state.nin => ['shopping', 'coverage_canceled']
         })
     end
 
