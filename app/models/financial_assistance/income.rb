@@ -32,6 +32,8 @@ class FinancialAssistance::Income
     income_from_irs
   )
 
+  JOB_INCOME_TYPE_KIND = "wages_and_salaries"
+
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
 
   #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
