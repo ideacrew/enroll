@@ -6,9 +6,19 @@ class FinancialAssistance::PreWorkflowController < ApplicationController
   end
 
   def application_checklist
-    family = current_user.person.primary_family
-    family.is_applying_for_asistance = params["is_applying_for_assistance"]
+    @person = current_user.person
+    family = @person.primary_family
+    family.is_applying_for_assistance = params["is_applying_for_assistance"]
     family.save!
-    @transaction_id = params[:id]
+    if family.is_applying_for_assistance
+      application = family.applications.build(aasm_state: "inprogress")
+      application.applicants.build(has_fixed_address: false, tax_filer_kind: "single", family_member_id: family.primary_applicant.id)
+      @transaction_id = application.id
+      family.save!
+    else
+      #TODO redirect the user to household info page
+      @transaction_id = params[:id]
+      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    end
   end
 end
