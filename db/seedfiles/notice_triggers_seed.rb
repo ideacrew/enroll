@@ -453,7 +453,7 @@ shop_notice_triggers = [
       {
         name: 'Notification to employees regarding their Employer’s ineligibility.',
         notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
-        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility',
+        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
         mpi_indicator: 'MPI_SHOP10047',
         notice_trigger_element_group: {
           market_places: ['shop'],

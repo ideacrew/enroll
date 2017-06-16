@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility, :dbclean => :after_each do
+RSpec.describe ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility, :dbclean => :after_each do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -11,7 +11,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Notification to employees regarding their Employer’s ineligibility.',
                             :notice_template => 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
-                            :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility',
+                            :notice_builder => 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
                             :event_name => 'notify_employee_of_initial_employer_ineligibility',
                             :mpi_indicator => 'MPI_SHOP10047',
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
@@ -26,11 +26,11 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility
 
   describe "New" do
     before do
-      @employee_notice = ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility.new(census_employee, valid_parmas)}.not_to raise_error
+        expect{ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility.new(census_employee, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -46,7 +46,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility
 
   describe "Build" do
     before do
-      @employee_notice = ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)
     end
     it "should build notice with all necessory info" do
 
@@ -58,7 +58,7 @@ RSpec.describe ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility
 
   describe "append data" do
     before do
-      @employee_notice = ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility.new(census_employee, valid_parmas)
     end
     it "should append data" do
       @employee_notice.append_data

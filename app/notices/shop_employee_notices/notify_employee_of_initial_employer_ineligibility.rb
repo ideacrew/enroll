@@ -1,4 +1,4 @@
-class ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility < ShopEmployeeNotice
+class ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility < ShopEmployeeNotice
 
   attr_accessor :census_employee
 
@@ -16,6 +16,12 @@ class ShopEmployeeNotices::NotifyEmployeeofInitialEmployerIneligibility < ShopEm
     active_plan_year = census_employee.employer_profile.plan_years.first
     notice.plan_year = PdfTemplates::PlanYear.new({
                       :start_on => active_plan_year.start_on
+      })
+    hbx = HbxProfile.current_hbx
+    dc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    notice.individual = PdfTemplates::Individual.new({
+                      :open_enrollment_start_on => bc_period.open_enrollment_start_on,
+                      :open_enrollment_end_on => bc_period.open_enrollment_end_on
       })
   end
 
