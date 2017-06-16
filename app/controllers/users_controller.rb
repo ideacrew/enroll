@@ -1,5 +1,11 @@
 class UsersController < ApplicationController
 
+  def confirm_lock
+    params.permit!
+    @user = User.find(params[:id])
+    @user_id  = params[:user_action_id]
+  end
+
   def lockable
     user = User.find(params[:id])
     authorize user

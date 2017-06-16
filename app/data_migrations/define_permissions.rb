@@ -6,25 +6,25 @@ class DefinePermissions < MigrationTask
 
   def initial_hbx
     Permission.where(name: /^hbx/).delete_all
-  	Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-  	  send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-  	  modify_admin_tabs: true, view_admin_tabs: true)
+    Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+      modify_admin_tabs: true, view_admin_tabs: true)
     Permission.create(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
-  	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: true)
-  	Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-  	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: false)
-  	Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
-  	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: false)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: true)
+    Permission.create(name: 'hbx_csr_supervisor', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
+    Permission.create(name: 'hbx_csr_tier2', modify_family: true, modify_employer: true, revert_application: false, list_enrollments: false,
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
     Permission.create(name: 'hbx_csr_tier1', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: false,
-  	  send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-  	  modify_admin_tabs: false, view_admin_tabs: false)
+      send_broker_agency_message: false, approve_broker: false, approve_ga: false,
+      modify_admin_tabs: false, view_admin_tabs: false)
     Permission.create(name: 'developer', modify_family: false, modify_employer: false, revert_application: false, list_enrollments: true,
       send_broker_agency_message: false, approve_broker: false, approve_ga: false,
       modify_admin_tabs: false, view_admin_tabs: true)
-  	permission = Permission.hbx_staff
+    permission = Permission.hbx_staff
     Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
   end
   def build_test_roles

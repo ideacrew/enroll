@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     member do
       post :unlock
       get :lockable
+      get :confirm_lock
     end
   end
 

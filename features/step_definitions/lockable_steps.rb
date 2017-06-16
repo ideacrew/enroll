@@ -9,15 +9,18 @@ Then(/^Hbx Admin should see Unlock\/Lock Account link$/) do
   find_link('Unlock / Lock Account').visible?
 end
 
-Then(/^Hbx Admin clicks on Unlock\/Lock Account link$/) do
+When(/^Hbx Admin clicks on Unlock\/Lock Account link$/) do
   click_link('Unlock / Lock Account')
+  wait_for_ajax
 end
 
-When 'Admin confirm the popup' do
-  sleep 1
-  page.driver.browser.accept_confirm
+Then(/^there is a confirm link on in the list$/) do
+  find_link('Confirm').visible?
+end
+
+When(/^I click on the confirm link$/) do
+  page.all('.child-row').last.should(have_content('Confirm'))
   wait_for_ajax
-  sleep 1
 end
 
 Then(/^the locked user should be in the list$/) do

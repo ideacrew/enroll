@@ -8,6 +8,10 @@ module ApplicationHelper
     end
   end
 
+  def load_captcha_widget
+   Rails.env.test? ? '' : 'loadCaptchaWidget'
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true

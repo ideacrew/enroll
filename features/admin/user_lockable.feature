@@ -10,6 +10,7 @@ Feature: Lock and Unlock user account
     Then Hbx Admin should see the list of primary applicants and an Action button
     When Hbx Admin clicks on the Action button
     Then Hbx Admin should see Unlock/Lock Account link
-    And Hbx Admin clicks on Unlock/Lock Account link
-    When Admin confirm the popup
+    When Hbx Admin clicks on Unlock/Lock Account link
+    Then there is a confirm link on in the list
+    When I click on the confirm link
     Then the locked user should be in the list
