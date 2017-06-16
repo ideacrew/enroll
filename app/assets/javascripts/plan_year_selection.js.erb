@@ -680,8 +680,11 @@ function attachEmployerHealthContributionShowHide() {
 		var option_kind = $(this).attr("data-offering-kind");
 		if (option_kind == "sole_source") {
 			$("div[data-offering-target='" + offering_id + "']").hide();
+			$("div[data-offering-target='composite_" + offering_id + "']").removeClass("hidden");
+			$("div[data-offering-target='composite_" + offering_id + "']").show();
 		} else {
 
+			$("div[data-offering-target='composite_" + offering_id + "']").hide();
 			$("div[data-offering-target='" + offering_id + "']").removeClass("hidden");
 			$("div[data-offering-target='" + offering_id + "']").show();
 		}

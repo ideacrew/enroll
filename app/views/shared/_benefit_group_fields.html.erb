@@ -86,7 +86,7 @@
 		  <% end %>
 	  </div>
   </div>
-  <div class="col-xs-12 offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? "" : " hidden" %>" data-offering-target="<%= f.object.id %>">
+  <div class="col-xs-12 offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? "" : " hidden" %>" data-offering-target="composite_<%= f.object.id %>">
     <div class="row row-form-wrapper no-buffer heading">
       <div class="col-xs-12" id="offering_slider_header">
         <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>
