@@ -39,6 +39,8 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
+  let!(:rate_reference) { create(:rate_reference, county_name: address.county, zip_code: address.zip)}
+
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
@@ -1021,7 +1023,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
     FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status, profile_source: source, registered_on: start_date - 3.months, is_conversion: true)
   }
 
-  describe "conversion employer" do  
+  describe "conversion employer" do
 
     context "when under converting period" do
       it "should return true" do
@@ -1033,7 +1035,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month.prev_year }
       let(:plan_year_status) { 'active' }
 
-      before do 
+      before do
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         plan_year_renewal_factory.employer_profile = renewing_employer
         plan_year_renewal_factory.is_congress = false
@@ -1046,7 +1048,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
     end
   end
 
-  describe "non conversion employer" do 
+  describe "non conversion employer" do
     let(:source) { 'self_serve' }
 
     context "under renewal cycle" do
