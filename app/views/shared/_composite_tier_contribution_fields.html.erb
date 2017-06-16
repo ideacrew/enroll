@@ -3,12 +3,6 @@
     <div class="col-xs-6 form-group form-group-lg">
       <div class="checkbox">
         <label>
-          <%= f.check_box :offered, {class: "contribution_handler", disabled: (f.object.composite_rating_tier == 'employee_only' ? true:false)}, "true", "false" %>
-          <%= f.label :offered do %>
-            <i class="fa fa-check-square-o fa-2x"></i>
-            <i class="fa fa-square-o fa-2x"></i>
-          <% end %>
-
           <span>
             <%= f.hidden_field :composite_rating_tier, value: f.object.composite_rating_tier %>
             <p><%= f.object.composite_rating_tier.try(:humanize) %></p>
@@ -29,7 +23,6 @@
           <span class="slide-label pull-right">0%</span>
           <!--<i class="fa fa-question-circle fa-lg"></i>-->
         </div>
-
       </div>
     </div>
   </fieldset>
