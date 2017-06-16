@@ -99,18 +99,20 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 gem 'wicked_pdf', '1.0.6'
 
 # provide recaptcha services
-gem "recaptcha", '1.1.0'
+gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
 
 gem 'jquery-datatables-rails', '3.4.0'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+gem 'chosen-rails'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
   gem "parallel_tests"
+  gem "certified"
 end
 
 group :development, :test do
@@ -172,3 +174,5 @@ end
 gem 'aws-sdk', '2.2.4'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'combine_pdf'
+gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'

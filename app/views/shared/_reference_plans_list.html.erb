@@ -29,7 +29,7 @@
 
   <div class="health">
     <ul class="nav nav-tabs row">
-      <li role="presentation" class="col-xs-4">
+	<li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
         <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
         <i class="fa fa-circle-o"></i>
@@ -37,7 +37,7 @@
         By carrier
         <% end %>
       </li>
-      <li role="presentation" class="col-xs-4 <%= f.object.id %>">
+      <li role="presentation" class="col-xs-4 <%= f.object.id %>" data-offering-id="<%= f.object.id %>">
         <%= f.radio_button :plan_option_kind, "metal_level" %>
         <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
         <i class="fa fa-circle-o"></i>
@@ -45,7 +45,17 @@
         By metal level
       </li>
       <% end %>
-      <li role="presentation" class="col-xs-4">
+      <% if offer_sole_source? %>
+      <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>" data-offering-kind="sole_source">
+        <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
+        <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
+        <i class="fa fa-circle-o"></i>
+        <i class="fa fa-dot-circle-o"></i>
+        Sole Source
+        <% end %>
+      </li>
+      <% else %>
+      <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
         <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
         <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
         <i class="fa fa-circle-o"></i>
@@ -53,6 +63,7 @@
         Single plan
         <% end %>
       </li>
+      <% end %>
     </ul>
 
   <div class="col-xs-12 plan-options" style="display: none;">

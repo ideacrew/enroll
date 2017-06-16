@@ -1,5 +1,6 @@
 class RateReference
   include Mongoid::Document
+  include Config::AcaModelConcern
 
   field :zip_code, type: String
   field :county_name, type: String
@@ -9,9 +10,11 @@ class RateReference
   validates_presence_of :zip_code, :county_name, :rating_region, :zip_code_in_multiple_counties
   validates_uniqueness_of :zip_code, :scope => :county_name
   validates_uniqueness_of :county_name, :scope => :zip_code
+  validates_inclusion_of :rating_region, :in => market_rating_areas, :allow_blank => false
 
   # TODO: Lookup of rating area string for a given address
   def self.rating_area_for(address)
+    self.find_rating_region(zip_code: address.zip, county_name: address.county).first.rating_region
   end
 
   class << self

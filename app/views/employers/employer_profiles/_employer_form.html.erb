@@ -112,11 +112,10 @@
           <br/><br><br>
           <div class="">
             <h4> Employer Information</h4>
-            <div class="row no-buffer row-form-wrapper">
-              <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
-                <%= render "shared/employer_profile_fields", f: emp %><br>
-              <% end %>
-            </div><br>
+            <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+              <%= render "shared/employer_profile_fields", f: emp %><br>
+            <% end %>
+            <br>
             <h2> Office Locations </h2>
             <% @row = false %>
             <%= f.fields_for :office_locations, errors: {}, fieldset: false do |office_location,block| %>

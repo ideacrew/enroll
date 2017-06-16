@@ -7,6 +7,10 @@ module Config::AcaHelper
     Settings.aca.state_name
   end
 
+  def aca_primary_market
+    Settings.aca.market_kinds.first
+  end
+
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
   # @return { True } if Settings.aca.general_agency_enabled
@@ -17,6 +21,10 @@ module Config::AcaHelper
 
   def individual_market_is_enabled?
     Settings.aca.market_kinds.include?("individual")
+  end
+
+  def offer_sole_source?
+    !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
   end
 
   def carrier_special_plan_identifier_namespace

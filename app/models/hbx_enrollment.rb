@@ -1345,7 +1345,7 @@ class HbxEnrollment
       end
       return special_enrollment_period.qualifying_life_event_kind.reason
     end
-    return "open_enrollment" if !is_shop?
+    return "open_enrollment" unless is_shop?
     new_hire_enrollment_for_shop? ? "new_hire" : check_for_renewal_event_kind
   end
 
@@ -1419,6 +1419,20 @@ class HbxEnrollment
 
   # TODO: Implement behaviour by 16219.
   def composite_rating_tier
+    @composite_rating_tier ||= cached_composite_rating_tier
+  end
+
+  def cached_composite_rating_tier
+    return nil unless is_shop?
+    return CompositeRatingTier::EMPLOYEE_ONLY unless hbx_enrollment_members.many?
+    relationships = hbx_enrollment_members.reject(&:is_subscriber?).map do |mem|
+      PlanCostDecorator.benefit_relationship(mem.primary_relationship)
+    end
+    if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+      relationships.many? ? CompositeRatingTier::FAMILY : CompositeRatingTier::EMPLOYEE_AND_SPOUSE
+    else
+      CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+    end
   end
 
   def composite_rated?

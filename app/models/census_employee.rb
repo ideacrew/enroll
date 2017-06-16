@@ -761,6 +761,13 @@ class CensusEmployee < CensusMember
 
   # TODO: Implement for 16219
   def composite_rating_tier
+    return CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?
+    relationships = self.census_dependents.map(&:employee_relationship)
+    if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+      relationships.many? ? CompositeRatingTier::FAMILY : CompositeRatingTier::EMPLOYEE_AND_SPOUSE
+    else
+      CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+    end
   end
 
   private

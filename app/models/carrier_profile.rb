@@ -17,7 +17,7 @@ class CarrierProfile
   field :shop_dental, type: Boolean
   field :restricted_to_single_choice, type: Boolean, default: false
 
-  field :issuer_hios_id, type: String
+  field :issuer_hios_ids, type: Array, default: []
   field :issuer_state, type: String, default: "DC"
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
@@ -30,7 +30,10 @@ class CarrierProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-
+  def self.for_issuer_hios_id(issuer_id)
+    Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
+  
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
       raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
