@@ -454,6 +454,9 @@ class Employers::PlanYearsController < ApplicationController
                                       ],
                                       :dental_relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ],
+                                      :composite_tier_contributions_attributes => [
+                                        :id, :composite_rating_tier, :employer_contribution_percent
                                       ]
     ]
     )
