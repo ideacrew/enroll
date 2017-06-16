@@ -34,18 +34,10 @@ end
 
 # 16512
 
-enrollment_ids = Family.collection.aggregate([{"$unwind" => '$households'},
-                                                {"$unwind" => '$households.hbx_enrollments'},
-                                                {"$match" =>
-                                                        {'households.hbx_enrollments.kind' =>"employer_sponsored",
-                                                         'households.hbx_enrollments.benefit_group_assignment_id'=> BSON::ObjectId("56fdf24bf1244e4dba00018f")
-                                                        }
-                                                },
-                                                {"$group" => { "_id" => "$households.hbx_enrollments.hbx_id" }}]).collect{|result|result['_id']}
-
 census_employee = CensusEmployee.where(first_name: "Michael", middle_name: nil, last_name: "Mercier").first
 # Only one benefit group assignment has this issue.
-census_employee.benefit_group_assignments.detect {|bga| !bga.valid? }.unset(:hbx_enrollment_id)
+invalid_bga = census_employee.benefit_group_assignments.detect {|bga| !bga.valid? }
+enrollment_ids = census_employee.employee_role.person.primary_family.active_household.hbx_enrollments.select { |enr| enr.benefit_group_assignment_id == bga.id }
 
 enrollment_ids.each do |hbx_id|
   enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
