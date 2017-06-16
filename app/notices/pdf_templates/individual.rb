@@ -17,8 +17,6 @@ module PdfTemplates
     attribute :residency_verified, Boolean, :default => false
     attribute :indian_conflict, Boolean, :default => false
     attribute :incarcerated, Boolean, :default => false
-    attribute :open_enrollment_start_on, Date
-    attribute :open_enrollment_end_on, Date
     
     # attribute :ineligible_members, Array[String]
     # attribute :ineligible_members_due_to_residency, Array[String]

@@ -2,7 +2,7 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-
+<br>
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -26,7 +26,7 @@
   { contents: ["If you are enrolled in #{notice.employer_name}’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members  through #{Settings.site.short_name}’s individual marketplace.  You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance."], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Your Special Enrollment Period is open for 60 days, beginning #{notice.plan_year.end_on} until #{notice.plan_year.end_on+60.days}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period from #{notice.individual.open_enrollment_start_on} through #{notice.individual.open_enrollment_end_on}. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
+  { content: "Your Special Enrollment Period is open for 60 days, beginning #{notice.plan_year.end_on} until #{notice.plan_year.end_on+60.days}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period from #{notice.enrollment.ivl_open_enrollment_start_on} through #{notice.enrollment.ivl_open_enrollment_end_on}. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs.  To find the Health Insurance Marketplace in your state, go to <a href='www.healthcare.gov'>www.healthcare.gov</a>."} %>

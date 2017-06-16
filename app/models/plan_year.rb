@@ -1065,8 +1065,10 @@ class PlanYear
 
   #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
   def notify_employee_of_renewing_employer_ineligibility
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.trigger_notices("notify_employee_of_renewing_employer_ineligibility") if application_eligibility_warnings.include?(:primary_office_location)
+    return true if (benefit_groups.any?{|bg| bg.is_congress?} && !application_eligibility_warnings.include?(:primary_office_location))
+    self.employer_profile.census_employees.each do |ce|
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+    end
   end
 
   def initial_employer_denial_notice
