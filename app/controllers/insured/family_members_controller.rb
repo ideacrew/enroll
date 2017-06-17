@@ -47,7 +47,7 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @source = params[:source]
   end
 
   def new
