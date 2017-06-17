@@ -2,6 +2,8 @@ FactoryGirl.define do
   factory :plan_year do
     employer_profile
 
+    recorded_rating_area { Settings.aca.rating_areas.first }
+    recorded_sic_code { employer_profile.sic_code }
     start_on { (TimeKeeper.date_of_record).beginning_of_month }
 
     end_on { start_on + 1.year - 1.day }
