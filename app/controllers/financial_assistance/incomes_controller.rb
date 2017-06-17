@@ -46,6 +46,13 @@
     
   end
 
+  def destroy
+    income = @applicant.incomes.find(params[:id])
+    income.destroy!
+    flash[:success] = "Income deleted - (#{income.kind})"
+    redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+  end
+
   private
 
   def job_income_type

@@ -38,6 +38,12 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   end
 
+  def destroy
+    deduction = @applicant.deductions.find(params[:id])
+    deduction.destroy!
+    flash[:success] = "Deduction deleted - (#{deduction.kind})"
+    redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+  end
 
   private
   def find_application_and_applicant

@@ -35,6 +35,13 @@ class FinancialAssistance::BenefitsController < ApplicationController
     end
   end
 
+  def destroy
+    benefit = @applicant.benefits.find(params[:id])
+    benefit.destroy!
+    flash[:success] = "Benefit deleted - (#{benefit.kind})"
+    redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+  end
+
   private
   
   def update_employer_contact model, params
