@@ -264,6 +264,7 @@ end
 
 Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -272,7 +273,6 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
     last_name: person[:last_name],
     ssn: person[:ssn],
     dob: person[:dob_date]
-
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
@@ -282,6 +282,7 @@ end
 
 Given(/^Employer for (.*) exists with a published plan year offering health and dental$/) do |named_person|
   person = people[named_person]
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -299,6 +300,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -337,6 +339,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
   organization = FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
@@ -358,6 +361,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
   organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile

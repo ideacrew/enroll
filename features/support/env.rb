@@ -72,7 +72,7 @@ phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-im
 phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
 Capybara.register_driver :poltergeist do |app|
   options = {
-      :js_errors => true,
+      :js_errors => false,
       :timeout => 120,
       :debug => false,
       :phantomjs_options => phantomjs_options,
