@@ -14,6 +14,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     PlanYear.find(py.id)
   end
   let(:employer_profile) { plan_year.employer_profile }
+  let!(:rate_reference) { FactoryGirl.create(:rate_reference)  }
 
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
