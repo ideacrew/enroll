@@ -322,7 +322,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |kind, named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
