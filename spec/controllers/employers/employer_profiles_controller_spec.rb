@@ -61,8 +61,8 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:person) { double("person")}
     let(:zip_code) { '21208' }
     before do
-      RateReference.destroy_all
-      FactoryGirl.create(:rate_reference, county_name: "Baltimore", zip_code:"21208")
+      RatingArea.destroy_all
+      FactoryGirl.create(:rating_area, county_name: "Baltimore", zip_code:"21208")
       sign_in(user)
       get :counties_for_zip_code, { zip_code: zip_code }
     end

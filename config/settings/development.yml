@@ -18,12 +18,12 @@ site:
   aca_market_kinds: ["shop"]  # deprecated.  use aca:market_kinds
 
 contact_center:
-  name: "DC Health Link's Customer Care Center"
-  alt_name: "DC Health Link Customer Service"
+  name: "Health Connector's Customer Care Center"
+  alt_name: "Health Connector Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
-  email_address: "info@dchealthlink.com"
+  email_address: "info@example.com"
 
   mailing_address:
     name: "Massachusetts Health Connector"
@@ -68,9 +68,9 @@ aca:
   shop_market:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
-    employee_participation_ratio_minimum: <%= 2 / 3.0 %>
+    employee_participation_ratio_minimum: <%= 3 / 4.0 %>
     non_owner_participation_count_minimum: 1
-    binder_payment_due_on: 12
+    binder_payment_due_on: 23
 
     earliest_enroll_prior_to_effective_on:
       days: -30
@@ -83,9 +83,9 @@ aca:
       days: -60
 
     initial_application:
-      publish_due_day_of_month: 5
+      publish_due_day_of_month: 15
       earliest_start_prior_to_effective_on:
-        months: -3
+        months: -2
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
@@ -94,13 +94,13 @@ aca:
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -3
-      monthly_open_enrollment_end_on: 13
-      publish_due_day_of_month: 10
-      force_publish_day_of_month: 11
+        months: -2
+      monthly_open_enrollment_end_on: 20
+      publish_due_day_of_month: 15
+      force_publish_day_of_month: 16
       open_enrollment:
         minimum_length:
-          days: 3
+          days: 5
 
     benefit_period:
       length_minimum:
@@ -110,7 +110,7 @@ aca:
 
     open_enrollment:
       monthly_start_on: 1
-      monthly_end_on: 10
+      monthly_end_on: 20
 
       minimum_length:
         days: 5
