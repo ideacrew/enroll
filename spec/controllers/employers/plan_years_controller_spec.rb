@@ -3,7 +3,12 @@ require 'rails_helper'
 RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:employer_profile_id) { EmployerProfile.new.id}
   let(:plan_year_proxy) { double(id: "id") }
-  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test") }
+  let(:service_area_one) { double(issuer_hios_id: '1', service_area_zipcode: '11111') }
+  let(:service_area_two) { double(issuer_hios_id: '2') }
+  let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+  let(:organization) { double(:organization, primary_office_location: office_location) }
+  let(:address) { double(:address, zip: '11111') }
+  let(:office_location) { double(:office_location, address: address) }
 
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.create(:person, user: user) }
@@ -11,6 +16,10 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET reference_plan_summary" do
     let(:qhp_cost_share_variance){ Products::QhpCostShareVariance.new }
+
+    before do
+      allow(EmployerProfile).to receive(:find).with('1111').and_return(employer_profile)
+    end
     it 'should return qhp cost share variance for the plan' do
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return([qhp_cost_share_variance])
       sign_in
@@ -24,12 +33,18 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET new" do
+    let(:address) { double(:address, zip: '10001') }
+    let(:office_location) { double(:office_location, address: address)}
+    let(:organization) { double(:organization, primary_office_location: office_location) }
+    let(:employer_profile) { double(:employer_profile, organization: organization) }
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
-      allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location).and_return({'id' => "legal_name"})
+      allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
+
       get :new, :employer_profile_id => employer_profile_id
     end
 
@@ -43,6 +58,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
     it "should generate carriers" do
       expect(assigns(:carrier_names)).to eq({'id' => "legal_name"})
+      expect(assigns(:carrier_names_with_sole_source)).to eq({'id' => "sole_source_legal_name"})
       expect(assigns(:carriers_array)).to eq [['legal_name', 'id']]
     end
 
@@ -53,9 +69,10 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   end
 
   describe "GET calc_employer_contributions" do
-    let(:employer_profile){ double("EmployerProfile") }
+    let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
     let(:reference_plan){ double("ReferencePlan", id: "id") }
     let(:plan_years){ [double("PlanYear")] }
+
     let(:benefit_groups){ [
       double(
         "BenefitGroup",
@@ -86,6 +103,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
         allow(employer_profile).to receive(:find_plan_year).and_return(plan_year)
         allow(Organization).to receive(:valid_carrier_names).and_return({"id"=> "legal_name"})
+        allow(Organization).to receive(:valid_carrier_names).with(primary_office_location: office_location, sole_source_only: true).and_return({'id' => "sole_source_legal_name"})
       end
 
       context "when draft state" do
@@ -103,6 +121,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
         it "should generate carriers" do
           expect(assigns(:carrier_names)).to eq({"id"=> "legal_name"})
+          expect(assigns(:carrier_names_with_sole_source)).to eq({"id"=> "sole_source_legal_name"})
           expect(assigns(:carriers_array)).to eq [["legal_name", "id"]]
         end
       end
@@ -594,8 +613,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET search_reference_plan" do
     let(:plan) {FactoryGirl.create(:plan)}
+    let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+
     before :each do
       sign_in
+      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       xhr :get, :search_reference_plan, employer_profile_id: employer_profile_id, location_id: "test", reference_plan_id: plan.id, start_on: "2015-10-01", format: :js
     end
 
@@ -632,6 +654,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
       allow(plan_year).to receive(:employer_profile).and_return(@employer_profile)
+      allow(benefit_group).to receive(:employee_cost_for_plan).and_return(1)
       sign_in
       xhr :get, :employee_costs, employer_profile_id: @employer_profile.id, reference_plan_id: @reference_plan.id, coverage_type: '.health'
 
@@ -741,11 +764,11 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
-    let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+    let!(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
     let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
 
     context 'when same plan year' do
       before do

@@ -22,10 +22,18 @@ describe HbxEnrollment do
       BenefitGroupAssignment.new(benefit_group: white_collar_benefit_group, start_on: plan_year_start_on )
     end
 
+    before do
+      allow(Settings).to receive(:aca).and_call_original
+      allow(Settings).to receive_message_chain(:aca, :use_simple_employer_calculation_model).and_return(true)
+
+      allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+    end
+
     let(:all_benefit_group_assignments)           { [blue_collar_census_employees, white_collar_census_employees].flat_map do |census_employees|
                                                       census_employees.flat_map(&:benefit_group_assignments)
                                                     end
                                                     }
+
     let!(:plan_year)                               { py = FactoryGirl.create(:plan_year,
                                                                              start_on: plan_year_start_on,
                                                                              end_on: plan_year_end_on,
@@ -35,6 +43,7 @@ describe HbxEnrollment do
                                                                              )
                                                      blue = FactoryGirl.build(:benefit_group, title: "blue collar", plan_year: py)
                                                      white = FactoryGirl.build(:benefit_group, title: "white collar", plan_year: py)
+
                                                      py.benefit_groups = [blue, white]
                                                      py.save
                                                      py.publish!
@@ -1955,7 +1964,7 @@ context "for cobra", :dbclean => :after_each do
     end
 
     it "should return true" do
-      enrollment.kind = 'employer_sponsored_cobra' 
+      enrollment.kind = 'employer_sponsored_cobra'
       expect(enrollment.is_cobra_status?).to be_truthy
     end
   end
@@ -1997,7 +2006,7 @@ context "for cobra", :dbclean => :after_each do
   end
 
   it "can_select_coverage?" do
-    enrollment.kind = 'employer_sponsored_cobra' 
+    enrollment.kind = 'employer_sponsored_cobra'
     expect(enrollment.can_select_coverage?).to be_truthy
   end
 
@@ -2295,8 +2304,8 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
         let(:sep){
           FactoryGirl.create(:special_enrollment_period, family: family)
         }
- 
-        it 'should cancel passive renewal and create new passive' do 
+
+        it 'should cancel passive renewal and create new passive' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
@@ -2304,22 +2313,22 @@ describe HbxEnrollment, 'Updating Existing Coverage', type: :model, dbclean: :af
           family.reload
           passive_renewal.reload
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
+          expect(passive_renewal.coverage_canceled?).to be_truthy
           new_passive = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(new_passive.plan).to eq new_renewal_plan
         end
       end
 
-      context 'when EE terminates current coverage' do 
+      context 'when EE terminates current coverage' do
 
-        it 'should cancel passive renewal and generate a waiver' do 
+        it 'should cancel passive renewal and generate a waiver' do
           passive_renewal = family.enrollments.where(:aasm_state => 'auto_renewing').first
           expect(passive_renewal).not_to be_nil
 
           enrollment.terminate_coverage!
           enrollment.update_renewal_coverage
 
-          expect(passive_renewal.coverage_canceled?).to be_truthy 
+          expect(passive_renewal.coverage_canceled?).to be_truthy
           passive_waiver = family.enrollments.where(:aasm_state => 'renewing_waived').first
           expect(passive_waiver.present?).to be_truthy
         end
@@ -2494,7 +2503,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored', effective_on: effective_on) }
     let(:employee_role) { double(is_cobra_status?: true, census_employee: census_employee)}
     let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: true, coverage_terminated_on: cobra_begin_date - 1.day)}
-    
+
     before do
       allow(hbx_enrollment).to receive(:employee_role).and_return(employee_role)
     end
@@ -2520,7 +2529,7 @@ describe HbxEnrollment, 'validate_for_cobra_eligiblity' do
     context 'When employee not elgibile for cobra' do
       let(:census_employee) { double(cobra_begin_date: cobra_begin_date, have_valid_date_for_cobra?: false, coverage_terminated_on: cobra_begin_date - 1.day) }
 
-      it 'should raise error' do 
+      it 'should raise error' do
         expect{hbx_enrollment.validate_for_cobra_eligiblity(employee_role)}.to raise_error("You may not enroll for cobra after #{Settings.aca.shop_market.cobra_enrollment_period.months} months later of coverage terminated.")
       end
     end
@@ -2566,23 +2575,23 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
        plan_id: plan.id
        )
     }
-    
+
     context 'for congression employer' do
       before do
         allow(enrollment).to receive_message_chain("benefit_group.is_congress") { true }
       end
-   
+
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecoratorCongress)
       end
     end
 
-    context 'for non congression employer' do 
+    context 'for non congression employer' do
       it "should build premiums" do
         plan = enrollment.build_plan_premium(qhp_plan: plan)
         expect(plan).to be_kind_of(PlanCostDecorator)
-      end 
+      end
     end
   end
 

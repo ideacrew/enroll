@@ -32,21 +32,23 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
     @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
+
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "single_plan"
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
+    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
 
-    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    @carriers_cache = CarrierProfile.carriers_for(@employer_profile).inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     respond_to do |format|
       format.js
     end
@@ -425,18 +427,19 @@ class Employers::PlanYearsController < ApplicationController
     id_params = params.permit(:id, :employer_profile_id, :active_year, :plan_year_id)
     id = id_params[:employer_profile_id] || id_params[:id]
     @employer_profile = EmployerProfile.find(id)
-
   end
 
   def generate_carriers_and_plans
-    @carrier_names = Organization.valid_carrier_names
-    @carriers_array = Organization.valid_carrier_names_for_options
+    @carrier_names = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location)
+    @carrier_names_with_sole_source = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location, sole_source_only: true)
+    @carriers_array = Organization.valid_carrier_names_for_options(primary_office_location: @employer_profile.organization.primary_office_location)
   end
 
   def build_plan_year
     plan_year = PlanYear.new
     plan_year.benefit_groups.build
     plan_year.benefit_groups.first.build_relationship_benefits
+    plan_year.benefit_groups.first.build_composite_tier_contributions
     plan_year.benefit_groups.first.build_dental_relationship_benefits
     ::Forms::PlanYearForm.new(plan_year)
   end
@@ -453,6 +456,9 @@ class Employers::PlanYearsController < ApplicationController
                                       ],
                                       :dental_relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ],
+                                      :composite_tier_contributions_attributes => [
+                                        :id, :composite_rating_tier, :employer_contribution_percent
                                       ]
     ]
     )

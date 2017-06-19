@@ -6,7 +6,7 @@
     <% end -%>
 
     <%- if devise_mapping.registerable? && controller_name != 'registrations' && can_register_new_account %>
-	    <%= link_to "Create account", new_registration_path(resource_name, :invitation_id => params[:invitation_id]), class: "btn btn-default btn-lg sm_full_width" %>
+      <%= link_to "Create account", new_registration_path(resource_name, :invitation_id => params[:invitation_id]), class: "btn btn-default btn-lg sm_full_width", data: { no_turbolink: true } %>
     <% end -%>
 
     <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>

@@ -45,7 +45,10 @@
 //= require freebies
 //= require responsive
 //= require effective_datatables
+//= require recurring_select
 //= require jquery.steps
+//= require chosen-jquery
+//= require bootstrap-treeview
 //= require_tree .
 
 var disableSelectric = false;
@@ -761,6 +764,10 @@ $(document).on('click', '#address_info + span.form-action', function(){
       }
     });
   });
+
+var submitInvisibleRecaptchaForm = function () {
+    document.getElementById("invisible-recaptcha-form").submit();
+};
 
   $(document).ready(function(){
     $("#person_first_name").change(function() {

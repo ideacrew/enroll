@@ -93,10 +93,15 @@ var EmployerProfile = ( function( window, undefined ) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
           } else {
+	    if ($(this).closest('.composite-offerings').is(":visible")) { 
+              editvalidatedbgemployeepremiums = true
+              editvalidated = true;
+	    } else {
             $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
             editvalidatedbgemployeepremiums = false;
             editvalidated = false;
             return false;
+	    }
           }
         }
       });
@@ -113,10 +118,15 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
-          editvalidatedbgemployeepremiums = false;
-          editvalidated = false;
-          return false;
+	  if ($(this).closest('.composite-offerings').is(":visible")) { 
+            editvalidatedbgemployeepremiums = true
+            editvalidated = true;
+	  } else {
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
+            editvalidatedbgemployeepremiums = false;
+            editvalidated = false;
+            return false;
+	  }
         }
       }
       });
@@ -248,10 +258,15 @@ var EmployerProfile = ( function( window, undefined ) {
           validatedbgemployeepremiums = true;
           validated = true;
         } else {
+          if ($(this).closest('.composite-offerings').is(":visible")) {
+              validatedbgemployeepremiums = true;
+              validated = true;
+          } else {
           $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           validatedbgemployeepremiums = false;
           validated = false;
           return false;
+          }
         }
       });
     }
@@ -586,25 +601,28 @@ function checkZip(textbox) {
     textbox.setCustomValidity('please enter a valid zipcode.');
   } else {
     textbox.setCustomValidity('');
-    var child_index = $(textbox).data('child-index');
-    $.ajax({
-      type: 'get',
-      datatype: 'js',
-      url: '/employers/employer_profiles/counties_for_zip_code',
-      data: { zip_code: textbox.value },
-      success: function (response) {
-        $('#county-select-' + child_index + " select").html(response);
-        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
-        if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() && 
-                $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
-        {
-            $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+    if ($('.county-select').length > 0) {
+      var child_index = $(textbox).data('child-index');
+      $.ajax({
+        type: 'get',
+        datatype: 'js',
+        url: '/employers/employer_profiles/counties_for_zip_code',
+        data: { zip_code: textbox.value },
+        success: function (response) {
+          $('#county-select-' + child_index + " select").html(response);
+          $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+          if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() &&
+                  $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
+          {
+              $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+          }
         }
-      }
-    });
+      });
+    }
   }
   return true;
 }
+
 function validateCounty(selectField) {
     if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
     {
@@ -613,6 +631,17 @@ function validateCounty(selectField) {
         $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
     }
 }
+
+$(document).on('submit', '#new_organization', function() {
+  var retVal = true;
+  if ($("#organization_sic_code").length && !$("#organization_sic_code option:selected").val())
+  {
+    $("#sic_warning").html('Please fill Standard Indusry Code');
+    retVal = false;
+  }
+  return retVal;
+});
+
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;
   if (textbox.value == '') {

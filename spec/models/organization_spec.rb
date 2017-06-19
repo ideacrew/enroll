@@ -120,11 +120,15 @@ RSpec.describe Organization, dbclean: :after_each do
 
   describe "class method", dbclean: :after_each do
     let(:organization1) {FactoryGirl.create(:organization, legal_name: "Acme Inc")}
-    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1)}
+    let!(:carrier_profile_1) {FactoryGirl.create(:carrier_profile, organization: organization1, issuer_hios_ids: ['11111'])}
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
-    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2)}
+    let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2, issuer_hios_ids: ['22222'])}
     let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
     let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
+
+    let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
+    let(:address) { double(zip: '10001')}
+    let(:office_location) { double(address: address)}
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
@@ -146,16 +150,22 @@ RSpec.describe Organization, dbclean: :after_each do
       end
 
       it "valid_carrier_names_for_options passes arguments" do
-        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s], [single_choice_carrier.legal_name, single_choice_carrier.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options(single_choice_included: true)).to match_array carriers
+        carriers = [[single_choice_carrier.legal_name, single_choice_carrier.id.to_s]]
+        expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
       end
 
       it "can filter out single choice only options" do
         carrier_names = {}
         carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
         carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        carrier_names[single_choice_carrier.id.to_s] = single_choice_carrier.legal_name
-        expect(Organization.valid_carrier_names(single_choice_included: true)).to match_array carrier_names
+        expect(Organization.valid_carrier_names(sole_source_only: false)).to match_array carrier_names
+      end
+
+      it "can filter out by service area" do
+        carrier_names = {}
+        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+
+        expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
       end
     end
 
@@ -178,7 +188,8 @@ RSpec.describe Organization, dbclean: :after_each do
       let(:valid_params) do
         {
           organization: organization,
-          entity_kind: "partnership"
+          entity_kind: "partnership",
+          sic_code: '1111'
         }
       end
       let(:renewing_plan_year)    { FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year, end_on: TimeKeeper.date_of_record.end_of_month, aasm_state: 'renewing_enrolling') }
@@ -251,13 +262,13 @@ RSpec.describe Organization, dbclean: :after_each do
         let(:organization3)  {FactoryGirl.create(:organization, fein: "034267123")}
 
         it 'should match employers with active broker agency_profile' do
-          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
         end
 
         it 'broker agency_profile match does not count unless active account' do
-          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile);
+          employer = organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111');
           employers = Organization.by_broker_agency_profile(broker_agency_profile.id)
           expect(employers.size).to eq(1)
           employer = Organization.find(employer.organization.id).employer_profile

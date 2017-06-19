@@ -14,6 +14,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     PlanYear.find(py.id)
   end
   let(:employer_profile) { plan_year.employer_profile }
+  let!(:rate_reference) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
 
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
@@ -456,7 +457,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:terminated_employee_count)      { er1_terminated_employee_count + er2_terminated_employee_count }
       let(:termed_status_employee_count)   { terminated_employee_count + er1_rehired_employee_count }
 
-      let(:employer_count)                 { 2 }
+      let(:employer_count)                 { 3 }
       let(:employer_profile_1)             { FactoryGirl.create(:employer_profile) }
       let(:employer_profile_2)             { FactoryGirl.create(:employer_profile) }
 
