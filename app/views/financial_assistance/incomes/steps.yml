@@ -108,7 +108,7 @@
                 - gutter: 6
                   type: input
                   name: employer_phone
-                  placeholder: EMPLOYER PHONE
+                  placeholder: EMPLOYER PHONE *
                   model: employer_phone
                   accessor:
                     - employer_phone
@@ -117,7 +117,7 @@
                 - gutter: 6
                   type: input
                   name: employer_address_line_1
-                  placeholder: EMP ADD LINE 1
+                  placeholder: EMP ADD LINE 1 *
                   #required: true
                   model: employer_address
                   accessor:
@@ -126,7 +126,7 @@
                 - gutter: 6
                   type: input
                   name: employer_address_line_2
-                  placeholder: EMP ADD LINE 2 *
+                  placeholder: EMP ADD LINE 2
                   model: employer_address
                   accessor:
                     - employer_address
