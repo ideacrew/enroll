@@ -222,6 +222,7 @@ var PersonValidations = (function(window, undefined) {
       $.each(checking_fields, function(key, value){
           if ($("#"+key.split('[').pop().split("]").shift()+"_container").is(':visible') && ($("input[name='"+key+"']").length > 1)) {
               if (($("input[name='"+key+"']")).not(":checked").length == 2) {
+                  DependentsValidationFields.disable_continue();
                   alert('Please provide an answer for question:' + value );
                   PersonValidations.restoreRequiredAttributes(e);
               }
