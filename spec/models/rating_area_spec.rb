@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe RatingArea, type: :model do
+RSpec.describe RatingArea, type: :model, dbclean: :after_each do
   subject { RatingArea.new }
 
   it "has a valid factory" do
@@ -37,20 +37,24 @@ RSpec.describe RatingArea, type: :model do
       RatingArea.destroy_all
     end
 
-    describe "::find_rating_area" do
+    describe "::rating_area_for" do
       context "with a valid search param" do
-        let!(:first_county_region) { create(:rating_area, county_name: "County", zip_code: "10010") }
-        let!(:same_county_second_region) { create(:rating_area, county_name: "County", zip_code: "10020") }
+        let(:first_address) { build(:address, county: "County One", zip: "10001") }
+        let(:second_address) { build(:address, county: "County One", zip: "10002") }
+        let!(:first_county_region) { create(:rating_area, county_name: first_address.county, zip_code: first_address.zip, rating_area: "R-MA001") }
+        let!(:same_county_second_region) { create(:rating_area, county_name: second_address.county, zip_code: second_address.zip, rating_area: "R-MA002") }
 
-        it "returns the rate reference area" do
-          expect(subject.find_rating_area(zip_code: '10010', county_name: 'County')).to match_array([first_county_region])
-          expect(subject.find_rating_area(zip_code: '10020', county_name: 'County')).to match_array([same_county_second_region])
+        it "returns the rating area" do
+          expect(subject.rating_area_for(first_address)).to eq("R-MA001")
+          expect(subject.rating_area_for(second_address)).to eq("R-MA002")
         end
       end
 
       context "with an invalid search" do
+        let(:invalid_address) { build(:address, county: "Baltimore", zip: "21208") }
+
         it "returns nil" do
-          expect(subject.find_rating_area(zip_code: '00000', county_name: 'County')).to be_nil
+          expect(subject.rating_area_for(invalid_address)).to be_nil
         end
       end
     end
@@ -59,13 +63,14 @@ RSpec.describe RatingArea, type: :model do
       context "with a valid county" do
         let!(:first_county_region) { create(:rating_area, county_name: "County", zip_code: "10010") }
         let!(:same_county_second_zip) { create(:rating_area, county_name: "County", zip_code: "10020") }
-      end
-      it "returns an array of zip codes" do
-        expect(subject.find_zip_codes_for(county_name: 'County')).to match_array(%w(10010 10020))
-      end
 
-      it "returns an empty array if nothing found" do
-        expect(subject.find_zip_codes_for(county_name: "Potato")).to match_array([])
+        it "returns an array of zip codes" do
+          expect(subject.find_zip_codes_for(county_name: 'County')).to match_array(%w(10010 10020))
+        end
+
+        it "returns an empty array if nothing found" do
+          expect(subject.find_zip_codes_for(county_name: "Potato")).to match_array([])
+        end
       end
     end
 
