@@ -64,7 +64,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
     if %w(renewing_enrolling renewing_enrolled active).include?(renewing_plan_year.aasm_state.to_s)
       employer.census_employees.non_terminated.each do |ce|
         person = Person.where(encrypted_ssn: Person.encrypt_ssn(ce.ssn)).first
-
+        
         if person.blank?
           employee_role, family = Factories::EnrollmentFactory.add_employee_role({
             first_name: ce.first_name,
@@ -87,6 +87,7 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
           factory.employer = employer
           factory.renewing_plan_year = renewing_plan_year
           factory.active_plan_year = active_plan_year
+          factory.disable_notifications = true
           factory.process_renewals_for('dental')
 
           family.reload
