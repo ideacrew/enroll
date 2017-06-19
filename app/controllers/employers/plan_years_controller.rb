@@ -39,8 +39,9 @@ class Employers::PlanYearsController < ApplicationController
       Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "single_plan"
+      Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
+    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
@@ -438,6 +439,7 @@ class Employers::PlanYearsController < ApplicationController
     plan_year = PlanYear.new
     plan_year.benefit_groups.build
     plan_year.benefit_groups.first.build_relationship_benefits
+    plan_year.benefit_groups.first.build_composite_tier_contributions
     plan_year.benefit_groups.first.build_dental_relationship_benefits
     ::Forms::PlanYearForm.new(plan_year)
   end
@@ -454,6 +456,9 @@ class Employers::PlanYearsController < ApplicationController
                                       ],
                                       :dental_relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ],
+                                      :composite_tier_contributions_attributes => [
+                                        :id, :composite_rating_tier, :employer_contribution_percent
                                       ]
     ]
     )
