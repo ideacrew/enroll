@@ -93,7 +93,7 @@ var EmployerProfile = ( function( window, undefined ) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
           } else {
-	    if ($('.composite-offerings').is(":visible")) { 
+	    if ($('.composite-offerings').is(":visible")) {
               editvalidatedbgemployeepremiums = true
               editvalidated = true;
 	    } else {
@@ -118,7 +118,7 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-	  if ($('.composite-offerings').is(":visible")) { 
+	  if ($('.composite-offerings').is(":visible")) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
 	  } else {
@@ -259,7 +259,6 @@ var EmployerProfile = ( function( window, undefined ) {
           validated = true;
         } else {
           if ($('.composite-offerings').is(":visible")) {
-              alert("Percent is valid!");
               validatedbgemployeepremiums = true;
               validated = true;
           } else {
