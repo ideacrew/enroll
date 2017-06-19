@@ -49,10 +49,11 @@ class PlanYear
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
 
-  # SIC code, frozen when the plan year is published, 
+  # SIC code, frozen when the plan year is published,
   # otherwise comes from employer_profile
   field :recorded_sic_code, type: String
   field :recorded_rating_area, type: String
+  field :recorded_service_areas, type: Array
 
   validates_inclusion_of :recorded_rating_area, :in => market_rating_areas, :allow_nil => true
 
@@ -1017,6 +1018,10 @@ class PlanYear
     recorded_rating_area.blank? ? employer_profile.rating_area : recorded_rating_area
   end
 
+  def service_area
+    recorded_service_area.blank? ? employer_profile.service_area : recorded_service_area
+  end
+
   private
 
   def log_message(errors)
@@ -1067,6 +1072,7 @@ class PlanYear
   def record_sic_and_rating_area
     self.recorded_sic_code = employer_profile.sic_code
     self.recorded_rating_area = employer_profile.rating_area
+    self.recorded_service_areas = employer_profile.service_areas
     self.benefit_groups.each do |bg|
       bg.estimate_composite_rates
     end

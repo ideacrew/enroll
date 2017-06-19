@@ -1,10 +1,13 @@
 class QhpBuilder
   INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
+  LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
 
   def initialize(qhp_hash)
-    @log_path = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.strftime("%Y_%m_%d_%H%M%S")}.log"
-    @logger = Logger.new(@log_path)
+    log_path = LOG_PATH
+    FileUtils.mkdir_p(File.dirname(log_path)) unless File.directory?(File.dirname(log_path))
+    @logger = Logger.new(log_path)
+
     @qhp_hash = qhp_hash
     @qhp_array = []
     if qhp_hash[:packages_list].present?

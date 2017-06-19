@@ -1,16 +1,16 @@
 namespace :load_rate_reference do
   desc "load rating regions from xlsx file"
-  task :update_rating_regions => :environment do
+  task :update_rating_areas => :environment do
     begin
       file_path = File.join(Rails.root, 'lib', 'xls_templates', "SHOP_ZipCode_CY2017_FINAL.xlsx")
       xlsx = Roo::Spreadsheet.open(file_path)
       sheet = xlsx.sheet(0)
       (2..sheet.last_row).each do |i|
-        RateReference.find_or_create_by!(
+        RatingArea.find_or_create_by!(
             zip_code: sheet.cell(i,1),
             county_name: sheet.cell(i,2),
             zip_code_in_multiple_counties: to_boolean(sheet.cell(i,3)),
-            rating_region: sheet.cell(i,4)
+            rating_area: sheet.cell(i,4)
             )
       end
     rescue => e

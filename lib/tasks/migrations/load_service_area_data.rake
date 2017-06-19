@@ -46,7 +46,7 @@ namespace :load_service_reference do
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
-            RateReference.find_zip_codes_for(county_name: county_name).each do |zip|
+            RatingArea.find_zip_codes_for(county_name: county_name).each do |zip|
               CarrierServiceArea.create!(
               active_year: ACTIVE_YEAR,
               issuer_hios_id: hios_id,
