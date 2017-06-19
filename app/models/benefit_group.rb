@@ -110,7 +110,7 @@ class BenefitGroup
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
 
-  before_save :set_congress_defaults
+  before_save :set_congress_defaults, :update_dependent_composite_tiers
   before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
@@ -337,8 +337,8 @@ class BenefitGroup
     ]
   end
 
-  def visible_composite_tiers
-    self.composite_tier_contributions
+  def dependent_composite_tier_contributions
+    self.composite_tier_contributions.where(:composite_rating_tier.nin => CompositeRatingTier::VISIBLE_NAMES)
   end
 
   def self.find(id)
@@ -629,6 +629,16 @@ class BenefitGroup
     self.employee_max_amt = 480.29 if employee_max_amt == 0
     self.first_dependent_max_amt = 1030.88 if first_dependent_max_amt == 0
     self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
+  end
+
+  def update_dependent_composite_tiers
+    family_tier = self.composite_tier_contributions.where(composite_rating_tier: 'family')
+    return unless family_tier.present?
+
+    contribution = family_tier.first.employer_contribution_percent
+    dependent_composite_tier_contributions.each do |tier|
+      tier.employer_contribution_percent = contribution
+    end
   end
 
   def dollars_to_cents(amount_in_dollars)
