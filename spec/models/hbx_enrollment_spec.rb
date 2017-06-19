@@ -2399,67 +2399,6 @@ describe HbxEnrollment, 'Voiding enrollments', type: :model, dbclean: :after_all
   end
 end
 
-describe "enrollment_composite_rating_tier" do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:family_member_spouse) {FactoryGirl.create(:family_member,is_primary_applicant:'false',family:family)}
-  let(:family_member_child) {FactoryGirl.create(:family_member,is_primary_applicant:'false',family:family)}
-  let(:census_employee) { FactoryGirl.create(:census_employee)}
-  let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-  let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-  let(:hbx_enrollment_member_employee){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id) }
-  let(:hbx_enrollment_member_spouse){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family_member_spouse.id) }
-  let(:hbx_enrollment_member_child){ FactoryGirl.build(:hbx_enrollment_member, applicant_id: family_member_child.id) }
-  let(:enrollment) { FactoryGirl.build(:hbx_enrollment, :shop, household: family.active_household,hbx_enrollment_members: [hbx_enrollment_member_employee])}
-
-  context "enrollment with only employee" do
-
-    it "should return employee_only composite_rating_tier" do
-      expect(enrollment.enrollment_composite_rating_tier).to eq "employee_only"
-    end
-  end
-
-
-  context "enrollment with employee & spouse" do
-
-    before do
-      enrollment.hbx_enrollment_members=[hbx_enrollment_member_employee,hbx_enrollment_member_spouse]
-      enrollment.save
-      allow(family_member_spouse).to receive(:relationship).and_return 'spouse'
-    end
-
-    it "should return employee_and_spouse composite_rating_tier" do
-      expect(enrollment.enrollment_composite_rating_tier).to eq "employee_and_spouse"
-    end
-  end
-
-  context "enrollment with employee & child" do
-
-    before do
-      enrollment.hbx_enrollment_members=[hbx_enrollment_member_employee,hbx_enrollment_member_child]
-      enrollment.save
-      allow(family_member_child).to receive(:relationship).and_return 'child'
-    end
-
-    it "should return employee_and_one_or_dependents composite_rating_tier" do
-      expect(enrollment.enrollment_composite_rating_tier).to eq "employee_and_one_or_dependents"
-    end
-  end
-
-  context "enrollment with employee,spouse & child" do
-
-    before do
-      enrollment.hbx_enrollment_members=[hbx_enrollment_member_employee,hbx_enrollment_member_spouse,hbx_enrollment_member_child]
-      enrollment.save
-      allow(family_member_spouse).to receive(:relationship).and_return 'spouse'
-      allow(family_member_child).to receive(:relationship).and_return 'child'
-    end
-
-    it "should return family composite_rating_tier" do
-      expect(enrollment.enrollment_composite_rating_tier).to eq "family"
-    end
-  end
-end
-
 describe HbxEnrollment, 'state machine' do
   let(:family) { FactoryGirl.build(:individual_market_family) }
   subject { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household ) }
