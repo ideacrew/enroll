@@ -19,8 +19,8 @@
 	</tr>
 </table>
 
-<%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
-<br />
+  <%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
+  <br />
 
 <div>
 	<% if @applicant.incomes.present? %>
@@ -39,8 +39,9 @@
 		</table>
 	<%end%>
 </ div>
-<%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %><br>
+<%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
 
+<br>
 <hr />
 
 <div>
