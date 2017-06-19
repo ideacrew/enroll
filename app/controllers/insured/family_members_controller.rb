@@ -47,7 +47,7 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-    @source = params[:source]
+    @source = session[:source_fa] = params[:source]
   end
 
   def new
@@ -71,12 +71,16 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
-
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
-        format.html { render 'show' }
-        format.js { render 'show' }
+        if session[:source_fa].present?
+          session[:source_fa] = nil
+          format.js { render js: "window.location = '#{insured_family_members_path}'"}
+        else
+          format.html { render 'show' }
+          format.js { render 'show' }
+        end
       end
     else
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@dependent.family_member.try(:person).try(:consumer_role))
