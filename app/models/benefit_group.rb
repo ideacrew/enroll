@@ -337,6 +337,10 @@ class BenefitGroup
     ]
   end
 
+  def visible_composite_tiers
+    self.composite_tier_contributions
+  end
+
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
       organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
