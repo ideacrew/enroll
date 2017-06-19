@@ -95,8 +95,8 @@ module Effective
           {
             employers:
                 [
-                    {scope: 'eligible', label: 'Active & COBRA'},
-                    {scope: 'active', label: 'Active only'},
+                    {scope: 'active', label: 'Active & COBRA'},
+                    {scope: 'active_alone', label: 'Active only'},
                     {scope: 'by_cobra', label: 'COBRA only'},
                     {scope: 'terminated', label: 'Terminated'},
                     {scope: 'all', label: 'All'}

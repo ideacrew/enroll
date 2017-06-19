@@ -13,6 +13,7 @@ class CensusEmployee < CensusMember
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
@@ -89,6 +90,7 @@ class CensusEmployee < CensusMember
   scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
   scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
 
   # scope :emplyee_profiles_active_cobra,        ->{ where(aasm_state: "eligible") }
   scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}

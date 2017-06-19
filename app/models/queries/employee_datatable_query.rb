@@ -14,7 +14,18 @@ module Queries
     end
 
     def build_scope()
-      @employer_profile.census_employees
+      case @custom_attributes[:employers]
+        when "active"
+          @employer_profile.census_employees.active
+        when "active_alone"
+          @employer_profile.census_employees.active_alone
+        when "by_cobra"
+          @employer_profile.census_employees.by_cobra
+        when "terminated"
+          @employer_profile.census_employees.terminated
+        else
+          @employer_profile.census_employees
+      end
     end
 
     def skip(num)
