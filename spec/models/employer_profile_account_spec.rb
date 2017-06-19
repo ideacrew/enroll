@@ -3,6 +3,7 @@ require 'rails_helper'
 describe EmployerProfileAccount, type: :model, dbclean: :after_each do
 
   let(:employer_profile)        { FactoryGirl.create(:employer_profile) }
+  let!(:rate_reference) { create(:rate_reference, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
 
   def persisted_employer_profile

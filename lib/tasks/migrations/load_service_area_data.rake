@@ -3,8 +3,10 @@ namespace :load_service_reference do
   task :update_service_areas, [:file_name] => :environment do |t,args|
     ROW_DATA_BEGINS_ON = 13
     ACTIVE_YEAR = 2017
+    count = 0
     begin
       file_path = File.join(Rails.root, 'lib', 'xls_templates', args[:file_name])
+
       xlsx = Roo::Spreadsheet.open(file_path)
       sheet = xlsx.sheet(0)
       hios_id = sheet.cell(6,2).to_i
@@ -58,13 +60,16 @@ namespace :load_service_reference do
               partial_county_justification: nil
             )
           end
+          count = count + 1
         end
       end
     rescue => e
       puts e.inspect
+      puts " --------- "
+      puts e.backtrace
     end
 
-    puts "created #{CarrierServiceArea.count} service areas"
+    puts "created #{count} service areas"
   end
 
 
@@ -81,9 +86,14 @@ namespace :load_service_reference do
   end
 
   def extract_county_name_state_and_county_codes(county_field)
-    county_name, state_and_county_code = county_field.split(' - ')
-
-    [county_name, state_and_county_code[0..1], state_and_county_code[2..state_and_county_code.length]]
+    begin
+      county_name, state_and_county_code = county_field.split(' - ')
+      [county_name, state_and_county_code[0..1], state_and_county_code[2..state_and_county_code.length]]
+    rescue => e
+      puts county_field
+      puts e.inspect
+      return ['undefined',nil,nil]
+    end
   end
 
 end

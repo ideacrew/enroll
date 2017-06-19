@@ -7,6 +7,10 @@ module Config::AcaHelper
     Settings.aca.state_name
   end
 
+  def aca_primary_market
+    Settings.aca.market_kinds.first
+  end
+
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
   # @return { True } if Settings.aca.general_agency_enabled

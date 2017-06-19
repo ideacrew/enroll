@@ -22,6 +22,7 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
 
   describe "class methods" do
     subject { CarrierServiceArea }
+
     let!(:full_state_service_area) { create(:carrier_service_area, issuer_hios_id: '11111') }
     let!(:matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: '01225') }
     let!(:non_matching_service_area) { create(:carrier_service_area, :for_partial_state, service_area_zipcode: "01001") }
