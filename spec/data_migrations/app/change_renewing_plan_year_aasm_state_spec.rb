@@ -20,6 +20,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending") }
     let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
+    let!(:rate_reference) { create(:rate_reference, county_name: organization.primary_office_location.address.county, zip_code: organization.primary_office_location.address.zip)}
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let!(:renewal_benefit_group){ FactoryGirl.build(:benefit_group, plan_year: plan_year) }
     let(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: renewal_benefit_group)}

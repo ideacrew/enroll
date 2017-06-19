@@ -86,6 +86,20 @@
 		  <% end %>
 	  </div>
   </div>
+  <br class="clear"/>
+  <br/>
+  <div class="col-xs-12 composite-offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? "" : " hidden" %>" data-offering-target="composite_<%= f.object.id %>">
+	  <div class="row row-form-wrapper no-buffer heading">
+		  <div class="col-xs-12 composite_offering_slider_header">
+			  <div class="col-xs-12">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
+		  </div>
+	  </div>
+	  <div class="col-xs-12 benefits-fields">
+		  <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
+			  <%= render "shared/composite_tier_contribution_fields", f: rb %>
+		  <% end %>
+	  </div>
+  </div>
   <div class="col-xs-12">
 	  <div class="health selected-plan row" style="display: none;">
 	  </div>
