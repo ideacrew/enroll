@@ -27,8 +27,10 @@ module Effective
         table_column :conversion, :proc => Proc.new { |row| boolean_to_glyph(@employer_profile.is_conversion?)}, :filter => {include_blank: false, :as => :select, :collection => ['All','Yes', 'No'], :selected => 'All'}
 
         table_column :plan_year_state, :proc => Proc.new { |row|
-          @latest_plan_year = @employer_profile.try(:latest_plan_year)
-          @latest_plan_year.try(:aasm_state).try(:titleize)}, :filter => false
+          if @employer_profile.present?
+            @latest_plan_year = @employer_profile.dt_display_plan_year
+            @latest_plan_year.aasm_state.titleize if @latest_plan_year.present?
+          end }, :filter => false
         table_column :effective_date, :proc => Proc.new { |row|
           @latest_plan_year.try(:start_on)
           }, :filter => false
