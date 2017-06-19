@@ -300,7 +300,7 @@ Rails.application.routes.draw do
         get :rehire
         get :cobra
         collection do
-          get :can_terminate
+          get :confirm_effective_date
           post :change_expected_selection
         end
         get :cobra_reinstate

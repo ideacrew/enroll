@@ -29,7 +29,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
-  field :expected_selection, type: String, default: "Enroll"
+  field :expected_selection, type: String, default: "enroll"
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -59,7 +59,7 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
-  validates :expected_selection, 
+  validates :expected_selection,
     inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
