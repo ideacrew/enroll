@@ -34,6 +34,7 @@
                 - gutter: 6
                   type: 'dropdown'
                   name: 'income_kind'
+                  id: 'income_kind_dropdown'
                   required: true
                   values:
                     - wages_and_salaries

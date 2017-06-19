@@ -38,16 +38,27 @@ When(/^they click edit for an applicant$/) do
   click_link 'Add Info'
 end
 
-When(/^they complete and submit the tax infomration$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+When(/^they complete and submit the tax information$/) do
+  choose("is_required_to_file_taxes_yes")
+  choose("is_claimed_as_tax_dependent_yes")
+  click_button 'Next step'
+  choose("is_ssn_applied_yes")
+  choose("is_pregnant_yes")
+  choose("is_self_attested_blind_yes")
+  choose("has_daily_living_help_yes")
+  choose("need_help_paying_bills_yes")
+  choose("is_former_foster_care_yes")
+  click_button 'Finish'
 end
 
 Then(/^they should be taken to the applicant's details page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+   visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
 end
 
 Then(/^see some of the tax information on the applicant's detail page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+    expect(page).to have_content(application.primary_applicant.family_member.person.full_name)
+    expect(page).to have_content(application.primary_applicant.is_claimed_as_tax_dependent)
+    expect(page).to have_content(application.primary_applicant.claimed_as_tax_dependent_by)
 end
 
 Given(/^has added tax information for an applicant$/) do
@@ -59,11 +70,25 @@ When(/^they view the applicant's details page$/) do
 end
 
 When(/^they click on the 'Add Income' button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  click_link 'Add Income'
 end
 
 When(/^they complete the form for the income$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  choose("yes2")
+  fill_in 'income[amount]', with: '23.3'
+  find_all(".interaction-choice-control-employer-address-state")[1].click
+  find_all(".interaction-choice-control-income-frequency-kind-1")[1].click
+  fill_in 'income[start_on]', with: "11/11/2016"
+  fill_in 'income[end_on]', with: "11/11/2017"
+  fill_in 'income[employer_name]', with: "Sample Employer 1"
+  fill_in 'employer_phone[full_phone_number]', with: "2036548484"
+  fill_in 'employer_address[address_1]', with: "12 main st"
+  fill_in 'employer_address[address_2]', with: "beside starbucks"
+  fill_in 'employer_address[city]', with: "washington"
+  find_all(".label")[2].click
+  find_all(".interaction-choice-control-employer-address-state-2")[1].click
+  fill_in 'employer_address[zip]', with: "22046"
+  click_button 'Finish'
 end
 
 When(/^they click on 'Remove Income' button$/) do

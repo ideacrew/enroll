@@ -12,7 +12,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
+                  id: 'is_required_to_file_taxes_yes'
                   #checked: true
                   label: 'Yes'
                   model: applicant
@@ -21,7 +21,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
+                  id: 'is_required_to_file_taxes_no'
                   #checked: false
                   label: 'No'
                   model: applicant
@@ -37,8 +37,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_claimed_as_tax_dependent_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
@@ -46,8 +45,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'is_claimed_as_tax_dependent_no'
                   label: 'No'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
@@ -84,7 +82,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
+                  id: 'is_ssn_applied_yes'
                   #checked: true
                   label: 'Yes'
                   model: applicant
@@ -93,7 +91,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
+                  id: 'is_ssn_applied_no'
                   #checked: false
                   label: 'No'
                   model: applicant
@@ -106,8 +104,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_pregnant_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_pregnant
@@ -115,7 +112,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
+                  id: 'is_pregnant_no'
                   #checked: false
                   label: 'No'
                   model: applicant
@@ -128,8 +125,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_self_attested_blind_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -137,8 +133,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'is_self_attested_blind_no'
                   label: 'No'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -150,8 +145,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'has_daily_living_help_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: has_daily_living_help
@@ -159,8 +153,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'has_daily_living_help_no'
                   label: 'No'
                   model: applicant
                   attribute: has_daily_living_help
@@ -172,8 +165,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'need_help_paying_bills_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: need_help_paying_bills
@@ -181,8 +173,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'need_help_paying_bills_no'
                   label: 'No'
                   model: applicant
                   attribute: need_help_paying_bills
@@ -194,8 +185,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_former_foster_care_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_former_foster_care
@@ -203,8 +193,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'is_former_foster_care_no'
                   label: 'No'
                   model: applicant
                   attribute: is_former_foster_care
