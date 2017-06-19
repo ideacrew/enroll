@@ -39,7 +39,7 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
-  let!(:rate_reference) { create(:rate_reference, county_name: address.county, zip_code: address.zip)}
+  let!(:rate_reference) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
 
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
