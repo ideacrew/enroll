@@ -9,7 +9,7 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:organization) { employer_profile.organization }
   let(:start_on) { "01012017" }
-  let!(:rate_reference) { FactoryGirl.create(:rate_reference)  }
+  let!(:rate_reference) { FactoryGirl.create(:rating_area)  }
 
   describe "create_initial_plan_year" do
     it "creates a new plan year" do

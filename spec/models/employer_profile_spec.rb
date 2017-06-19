@@ -3,7 +3,7 @@ require 'rails_helper'
 describe EmployerProfile, dbclean: :after_each do
 
   let(:entity_kind)     { "partnership" }
-  let!(:rate_reference) { FactoryGirl.create(:rate_reference)  }
+  let!(:rate_reference) { FactoryGirl.create(:rating_area)  }
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
