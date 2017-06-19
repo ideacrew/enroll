@@ -7,7 +7,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let!(:rate_reference) { FactoryGirl.create(:rating_area)  }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
