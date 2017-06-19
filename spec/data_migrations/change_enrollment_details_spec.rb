@@ -24,7 +24,7 @@ describe ChangeEnrollmentDetails do
   end
 
   describe "changing enrollment attributes" do
-    
+
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
@@ -91,7 +91,7 @@ describe ChangeEnrollmentDetails do
 
     end
 
-    context "cancel enrollment" do 
+    context "cancel enrollment" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
         allow(ENV).to receive(:[]).with("action").and_return "cancel_enrollment"
@@ -101,8 +101,7 @@ describe ChangeEnrollmentDetails do
       end
 
       shared_examples_for "cancellation" do |val, result|
-        it "should equal #{result}" do 
-          puts "val: #{val}, result: #{result}"
+        it "should equal #{result}" do
           expect(actual_result(hbx_enrollment, val)).to eq result
         end
       end
