@@ -1,6 +1,6 @@
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :can_terminate]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
   layout "two_column"
   def new
@@ -201,8 +201,10 @@ class Employers::CensusEmployeesController < ApplicationController
     end
   end
 
-  def can_terminate
-    
+  def confirm_effective_date
+    confirmation_type = params[:type]
+    pp confirmation_type
+    render "#{confirmation_type}_effective_date"
   end
 
   def cobra_reinstate
@@ -260,7 +262,7 @@ class Employers::CensusEmployeesController < ApplicationController
       begin
         census_employees = CensusEmployee.find(params[:ids])
         census_employees.each do |census_employee|
-          census_employee.update_attributes(:expected_selection=>params[:expected_selection])
+          census_employee.update_attributes(:expected_selection=>params[:expected_selection].downcase)
         end
         render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
       rescue => e
