@@ -32,6 +32,7 @@
                 - gutter: 6
                   type: 'dropdown'
                   name: 'income_kind'
+                  id: 'income_kind_dropdown'
                   required: true
                   id: 'income_kind'
                   values:
