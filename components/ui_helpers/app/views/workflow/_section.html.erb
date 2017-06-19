@@ -16,7 +16,7 @@
   <div class="row row-form-wrapper no-buffer row-height">
   <% line.cells.each do |cell| %>
 
-  <div class='col-md-<%= cell.gutter %>'>
+  <div class='col-md-<%= cell.gutter %> form-spacer'>
     <% case cell.type %>
     <% when 'radio' %>
       <%= render 'workflow/radio', cell: cell %>
