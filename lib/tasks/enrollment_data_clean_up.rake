@@ -24,44 +24,43 @@ namespace :reports do
       families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
       families.each do |family|
         enrollments=family.active_household.hbx_enrollments
+        break unless enrollments.size >= 2
         canceled_enrollments=enrollments.where(aasm_state:"coverage_canceled")
+        break unless canceled_enrollments.size >= 1
+        other_enrollments = enrollments - canceled_enrollments
+        break unless other_enrollments.size > 0
         canceled_enrollments.each do |canceled_enrollment|
-          enrollments.each do |enrollment|
-            if canceled_enrollment.kind == enrollment.kind
-              cancel_member=canceled_enrollment.subscriber
-              reference_member=enrollment.subscriber
-              if cancel_member && reference_member && cancel_member.person.id == reference_member.person.id
-                cancel_effective=canceled_enrollment.effective_on
-                reference_effective=enrollment.effective_on
-                reference_submitted=enrollment.submitted_at
-                if reference_submitted && cancel_effective && reference_effective && cancel_effective > reference_submitted && cancel_effective < reference_effective
-                  if canceled_enrollment.kind == "individual"
-                    if canceled_enrollment.effective_on.year == enrollment.effective_on.year
-                      csv << [cancel_member.person.hbx_id,
-                              canceled_enrollment.hbx_id,
-                              canceled_enrollment.effective_on,
-                              canceled_enrollment.kind,
-                              enrollment.hbx_id
-                              ]
-                    end
-                  elsif canceled_enrollment.kind == "employer_sponsored"
-                     if canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
-                       csv << [cancel_member.person.hbx_id,
-                               canceled_enrollment.hbx_id,
-                               canceled_enrollment.effective_on,
-                               canceled_enrollment.kind,
-                               enrollment.hbx_id
-                              ]
-                     end
-                  end
-                 end
-               end
+            kind = canceled_enrollment.kind
+            next unless canceled_enrollment.subscriber
+            person_id = canceled_enrollment.subscriber.person.id
+            effective = canceled_enrollment.effective_on
+
+            other_enrollments = other_enrollments.select{|a| a.subscriber  && a.effective_on  && a.submitted_at  }
+            other_enrollments = other_enrollments.select{|a| a.kind == kind && a.subscriber.person.id == person_id  && effective > a.submitted_at && effective < a.effective_on }
+
+            next unless other_enrollments.size > 0
+            other_enrollments.each do |enrollment|
+              if kind == "individual" && effective.year == enrollment.effective_on.year
+                csv << [canceled_enrollment.subscriber.person.hbx_id,
+                      canceled_enrollment.hbx_id,
+                      canceled_enrollment.effective_on,
+                      canceled_enrollment.kind,
+                      enrollment.hbx_id
+                      ]
+
+              elsif kind == "employer_sponsored" && canceled_enrollment.benefit_group.plan_year == enrollment.benefit_group.plan_year
+                csv << [canceled_enrollment.subscriber.person.hbx_id,
+                      canceled_enrollment.hbx_id,
+                      canceled_enrollment.effective_on,
+                      canceled_enrollment.kind,
+                      enrollment.hbx_id
+                      ]
+              end
             end
-          end
         end
       end
-      end
     end
+  end
 end
 
 
