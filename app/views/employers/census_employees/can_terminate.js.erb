@@ -1,5 +1,5 @@
 // Trouble shoot here
-var containing_row = $("#<%= @employee_id %>").closest('TR');
+var containing_row = $("#census_employeeid_<%= @census_employee.id %>").closest('TR');
 var $parent_row = containing_row;
 //var $parent_row = $(".table:first > tbody > tr:not(tr.child-row)").eq(<%= @row %>);
 if ( $('tr.child-row:visible').length > 0 ) {

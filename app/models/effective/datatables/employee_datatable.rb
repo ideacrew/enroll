@@ -64,7 +64,7 @@ module Effective
           dropdown = [
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
               ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
-              ['Terminate', employers_employer_profile_census_employee_terminate_path(@employer_profile, census_employee_id: row.id, termination_date: TimeKeeper.date_of_record), terminate_possible?(row)],
+              ['Terminate', can_terminate_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id), 'ajax'],
               ['Rehire', employers_employer_profile_census_employee_rehire_path(@employer_profile, census_employee_id: row.id, rehiring_date: TimeKeeper.date_of_record), rehire_possible?(row)],
               ['Initiate Cobra', employers_employer_profile_census_employee_cobra_path(@employer_profile, census_employee_id: row.id), cobra_possible?(row)]
           ]

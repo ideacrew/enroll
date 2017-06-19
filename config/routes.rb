@@ -300,6 +300,7 @@ Rails.application.routes.draw do
         get :rehire
         get :cobra
         collection do
+          get :can_terminate
           post :change_expected_selection
         end
         get :cobra_reinstate
