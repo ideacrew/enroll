@@ -27,8 +27,7 @@ module Effective
 
       def collection
         return @user_collection if defined? @user_collection
-        users = User.all
-        @user_collection = users
+        @user_collection = User.all
       end
 
       def status(row)

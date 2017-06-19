@@ -26,6 +26,7 @@ class User
 
   scope :locked,   ->{ where(unlock_token: nil) }
   scope :unlocked, ->{ where(unlock_token: nil) }
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"oim_id" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
