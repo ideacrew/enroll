@@ -420,11 +420,7 @@ end
 
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
-<<<<<<< HEAD
   RatingArea.where(zip_code: "01001").first || FactoryGirl.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
-=======
-  RateReference.where(zip_code: "01001").first || FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
->>>>>>> rating factors
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => location[:city]
