@@ -285,10 +285,8 @@ ready = function() {
 
     if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
       EmployerProfile.validateEditPlanYear();
-
     } else {
       EmployerProfile.validatePlanYear();
-
     }
 
   });
@@ -409,9 +407,16 @@ ready = function() {
           $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
         } else {
           $(this).closest('.benefit-group-fields').find(nav+' .single-plan-tab').show();
+        }
+      }
+      else if ($(this).attr('value') == 'sole_source') {
+        if ( nav == '.health' ) {
+          $(this).closest('.benefit-group-fields').find(nav+' .sole-source-plan-tab').show();
+          $(this).closest('.benefit-group-fields').find(nav+' .plan-options').slideDown();
+        } else {
+          $(this).closest('.benefit-group-fields').find(nav+' .sole-source-plan-tab').show();
 
         }
-
       }
     });
 
@@ -673,8 +678,11 @@ function attachEmployerHealthContributionShowHide() {
 		var option_kind = $(this).attr("data-offering-kind");
 		if (option_kind == "sole_source") {
 			$("div[data-offering-target='" + offering_id + "']").hide();
+			$("div[data-offering-target='composite_" + offering_id + "']").removeClass("hidden");
+			$("div[data-offering-target='composite_" + offering_id + "']").show();
 		} else {
 
+			$("div[data-offering-target='composite_" + offering_id + "']").hide();
 			$("div[data-offering-target='" + offering_id + "']").removeClass("hidden");
 			$("div[data-offering-target='" + offering_id + "']").show();
 		}
