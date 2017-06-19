@@ -16,7 +16,7 @@ class Family
   # include Mongoid::Versioning
   include Sortable
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild)
+  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -186,6 +186,9 @@ class Family
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
 
+  def active_broker_agency_account
+    broker_agency_accounts.detect { |baa| baa.is_active? }
+  end
 
   def coverage_waived?
     latest_household.hbx_enrollments.any? and latest_household.hbx_enrollments.waived.any?
@@ -213,6 +216,17 @@ class Family
   end
 
   def renewal_benefits
+  end
+
+  def currently_enrolled_plans(enrollment)
+    enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+
+    if enrollment.is_shop?
+      bg_ids = enrollment.benefit_group.plan_year.benefit_groups.map(&:id)
+      enrolled_plans = enrolled_plans.where(:benefit_group_id.in => bg_ids)
+    end
+
+    enrolled_plans.collect(&:plan_id)
   end
 
   def enrollments
@@ -913,6 +927,14 @@ class Family
     ::MapReduce::FamilySearchForFamily.populate_for(self)
   end
 
+  def create_dep_consumer_role
+    if dependents.any?
+      dependents.each do |member|
+        build_consumer_role(member)
+      end
+    end
+  end
+
 private
   def build_household
     if households.size == 0
@@ -1023,5 +1045,4 @@ private
       unset("e_case_id")
     end
   end
-
 end
