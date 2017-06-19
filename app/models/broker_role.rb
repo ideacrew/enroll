@@ -342,4 +342,13 @@ class BrokerRole
   def current_state
     aasm_state.gsub(/\_/,' ').camelcase
   end
+  
+  def remove_from_employer_profile
+    @orgs = Organization.by_broker_role(self.id)
+    @employers = @orgs.map(&:employer_profile)
+
+    @employers.each do |e|
+      e.fire_broker_agency
+    end
+  end
 end
