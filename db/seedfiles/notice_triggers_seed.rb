@@ -464,6 +464,69 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP29',
+    title: 'Group Renewal – Final Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer publishing deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_final_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP29',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP30',
+    title: 'Group Renewal – Second Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 1 day prior to the renewal employer soft deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_second_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP30',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP31',
+    title: 'Group Renewal – First Reminder to Publish',
+    description: 'Notification to renewing employers with draft plan years to publish their plan year 2 days prior to the renewal employer soft deadline.',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_first_reminder_to_publish_plan_year',
+    notice_triggers: [
+      {
+        name: 'Renewal Employer reminder to publish plan year.',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_reminder_to_publish_plan_year',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerReminderToPublishPlanyear',
+        mpi_indicator: 'MPI_SHOP31',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
