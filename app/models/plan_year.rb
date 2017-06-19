@@ -1045,7 +1045,7 @@ class PlanYear
 
   def notify_employee_of_initial_employer_ineligibility
     return true if benefit_groups.any?{|bg| bg.is_congress?}
-    self.employer_profile.census_employees.each do |ce|
+    self.employer_profile.census_employees.non_terminated.each do |ce|
       ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
     end
   end
