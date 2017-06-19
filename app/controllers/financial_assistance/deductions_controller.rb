@@ -1,16 +1,23 @@
 class FinancialAssistance::DeductionsController < ApplicationController
   include UIHelpers::WorkflowController
+  include NavigationHelper
 
   before_filter :find_application_and_applicant
 
   def new
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
-    render 'workflow/step'
+    render 'workflow/step', layout: 'financial_assistance'
   end
 
   def step
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
 
@@ -33,7 +40,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
 
     else
-      render 'workflow/step'
+      render 'workflow/step', layout: 'financial_assistance'
     end
 
   end

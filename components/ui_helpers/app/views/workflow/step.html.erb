@@ -1,7 +1,4 @@
-<%= render 'workflow/step_partials/progress'%>
 <%= workflow_form_for @model do %>
-<div class="row">
-  <%= render 'workflow/step_partials/left_nav'%>
   <div class="col-md-7">
     <div class="">
       <% if !@current_step.heading.nil? %>
@@ -18,10 +15,10 @@
           </div>
         <% end %>
       </div>
-      <br>
-      <%= link_to "Back to All Applicants", edit_financial_assistance_application_path(@application)%> (Go back and work on another person)
     </div>
   </div>
-  <%= render 'workflow/step_partials/right_nav'%>
-</div>
+  <div class="col-md-3">
+    <%#= render 'workflow/step_partials/right_nav'%>
+    <%= render '/financial_assistance/shared/right_nav'%>
+  </div>
 <% end %>

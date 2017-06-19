@@ -3,6 +3,10 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :set_current_person, :set_family
   def index
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 

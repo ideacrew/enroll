@@ -5,46 +5,48 @@
   <div class="container">
     <div id="new_person_wrapper">
       <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          <%= render :partial => 'shared/left_nav.html.erb' %>
+        </div>
         <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
-        <div class="col-lg-10 col-md-10 col-sm-8 col-xs-12 bottom-pd">
-          <!-- add html here -->
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 bottom-pd">
           <div class="col-lg-10 col-md-10 col-sm-8 col-xs-12 bottom-pd">
-    <h1 class="darkblue">Help for Paying Coverage</h1>
-    <p>To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.</p>
-    <p class="memo">* = required field</p>
+            <h1 class="darkblue">Help for Paying Coverage</h1>
+            <p>To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.</p>
+            <p class="memo">* = required field</p>
 
-    <div id="help_paying_coverage" class="focus_effect module">
+            <div id="help_paying_coverage" class="focus_effect module">
 
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 10px">
-          <span class="span-text">Do you want to apply for <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>,savings and <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan's metal level." class= "dottedline test">cost-sharing reductions</span>?*</span>
-        </div>
+              <div class="row row-form-wrapper no-buffer">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 10px">
+                  <span class="span-text">Do you want to apply for <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>,savings and <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan's metal level." class= "dottedline test">cost-sharing reductions</span>?*</span>
+                </div>
 
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 10px">
-          <input class=" " id="radio1" required="true" type="radio" value="true" name="is_applying_for_assistance">
-          <label class="radio-label" for="radio1"><span>Yes</span></label>
-        </div>
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 10px">
-          <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance">
-          <label class="radio-label" for="radio2"><span>No</span></label>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="margin-top: 10px">
-          | &nbsp <a href=""> Not Sure? </a>
-        </div>
-      </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 10px">
+                  <input class=" " id="radio1" required="true" type="radio" value="true" name="is_applying_for_assistance">
+                  <label class="radio-label" for="radio1"><span>Yes</span></label>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 10px">
+                  <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance">
+                  <label class="radio-label" for="radio2"><span>No</span></label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="margin-top: 10px">
+                  | &nbsp <a href=""> Not Sure? </a>
+                </div>
+              </div>
 
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 10px">
-          <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-          <span class = "span-text">
-            Use our Plan match Tool to see if you qualify. 
-          </span>
-        </div>
-      </div>
+              <div class="row row-form-wrapper no-buffer">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="margin-top: 10px">
+                  <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                  <span class = "span-text">
+                    Use our Plan match Tool to see if you qualify.
+                  </span>
+                </div>
+              </div>
 
-    </div>
-        
-</div>
+            </div>
+
+          </div>
         </div>
 
 

@@ -1,5 +1,6 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
+  include NavigationHelper
   #skip_before_filter :verify_authenticity_token, :only => :step
 
   def index
@@ -51,7 +52,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
      if params[:commit] == "Finish"
        redirect_to edit_financial_assistance_application_path(@application)
      else
-       render 'workflow/step'
+      render 'workflow/step', layout: 'financial_assistance'
     end
   end
 

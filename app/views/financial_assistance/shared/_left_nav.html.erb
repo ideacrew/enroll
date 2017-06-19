@@ -1,0 +1,35 @@
+<nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
+  <ul class="nav nav-stacked" id="leftNavigation">
+    <% @allTabs.each do |value| %>
+      <li id="<%= value['id'] %>" class="list-box step-tabs">
+        <a  href="#" id="<%= value['id']%>_link" data-link="<%= value['link']%>" ><%= value["title"] %></a>
+      </li>
+    <%end%>
+  </ul>
+</nav>
+
+<script>
+  $(document).ready( function() {
+      $('.step-tabs').removeClass( 'activer' );
+      $('li#' + '<%= @selectedTab %>').prevAll().addClass( 'activer' );
+      $('li#' + '<%= @selectedTab %>').addClass( 'activer' );
+    } );
+</script>
+<script>
+  $(document).ready( function() {
+       <% @allTabs.each do |value| %>
+        var linkArr = window.location.href.split("/");
+        if($('#<%= value['id']%>_link').attr("data-link") != "") {
+          linkArr = linkArr.slice(0,linkArr.length-2).join('/') + $('#<%= value['id']%>_link').attr("data-link");
+          $('#<%= value['id']%>_link').attr("href", linkArr);
+        }
+       <% end %>
+  });
+</script>
+
+
+
+
+
+
+

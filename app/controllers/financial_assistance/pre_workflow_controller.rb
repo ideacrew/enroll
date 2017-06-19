@@ -1,11 +1,15 @@
 class FinancialAssistance::PreWorkflowController < ApplicationController
-  # include NavigationHelper
+  include NavigationHelper
 
   def help_paying_coverage
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
     @transaction_id = params[:id]
   end
 
   def application_checklist
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
     @person = current_user.person
     family = @person.primary_family
     family.is_applying_for_assistance = params["is_applying_for_assistance"]

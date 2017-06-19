@@ -1,17 +1,22 @@
  class FinancialAssistance::IncomesController < ApplicationController
 
   include UIHelpers::WorkflowController
+  include NavigationHelper
 
   before_filter :find_application_and_applicant
 
   def new
+    @selectedTab = "jobIncome"
+    @allTabs = NavigationHelper::getAllYmlTabs
     @model = @applicant.incomes.build
     load_steps
     current_step
-    render 'workflow/step'
+    render 'workflow/step', layout: 'financial_assistance'
   end
 
   def step
+    @selectedTab = "jobIncome"
+    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     format_date_params model_params
@@ -32,13 +37,12 @@
         flash[:notice] = 'Income Info Added.'
         redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
       else
-        render 'workflow/step'
+        render 'workflow/step', layout: 'financial_assistance'
       end
     rescue
       flash[:error] = build_error_messages(@model)
-      render 'workflow/step'
+      render 'workflow/step', layout: 'financial_assistance'
     end
-    
   end
 
   def destroy

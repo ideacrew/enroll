@@ -1,8 +1,11 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
+    include NavigationHelper
     before_action :set_current_person
 
     def new
+      @selectedTab = "moreAboutYou"
+      @allTabs = NavigationHelper::getAllTabs
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
