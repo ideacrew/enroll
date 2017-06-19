@@ -34,9 +34,12 @@ describe EmployerProfile, dbclean: :after_each do
   let(:valid_params) do
     {
       organization: organization,
-      entity_kind: entity_kind
+      entity_kind: entity_kind,
+      sic_code: '1111'
     }
   end
+
+  let!(:rate_reference) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
 
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -385,9 +388,9 @@ end
 describe EmployerProfile, "given multiple existing employer profiles", :dbclean => :after_all do
   before(:all) do
     home_office = FactoryGirl.build(:office_location, :primary)
-    @er0 = EmployerProfile.new(entity_kind: "partnership")
-    @er1 =  EmployerProfile.new(entity_kind: "partnership")
-    @er2 = EmployerProfile.new(entity_kind: "partnership")
+    @er0 = EmployerProfile.new(entity_kind: "partnership", sic_code: '1111')
+    @er1 =  EmployerProfile.new(entity_kind: "partnership", sic_code: '1111')
+    @er2 = EmployerProfile.new(entity_kind: "partnership", sic_code: '1111')
     @er0.create_organization(legal_name: "huey",  fein: "687654321", office_locations: [home_office])
     @er1.create_organization(legal_name: "dewey", fein: "587654321", office_locations: [home_office])
     @er2.create_organization(legal_name: "louie", fein: "487654321", office_locations: [home_office])
@@ -483,9 +486,9 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     let(:organization4)  {FactoryGirl.create(:organization, fein: "027636010")}
     let(:organization5)  {FactoryGirl.create(:organization, fein: "076747654")}
 
-    def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile); end
-    def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile); end
-    def er5; organization5.create_employer_profile(entity_kind: "partnership"); end
+    def er3; organization3.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
+    def er4; organization4.create_employer_profile(entity_kind: "partnership", broker_agency_profile: broker_agency_profile, sic_code: '1111'); end
+    def er5; organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111'); end
     before { broker_agency_profile; er3; er4; er5 }
 
     it 'returns employers represented by the specified broker agency' do
@@ -504,7 +507,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
     end
 
     it 'shows one employer moving to another broker agency' do
-      employer =  organization5.create_employer_profile(entity_kind: "partnership");
+      employer =  organization5.create_employer_profile(entity_kind: "partnership", sic_code: '1111');
       employer.hire_broker_agency(broker_agency_profile7)
       employer.save
       employers_with_broker7 = EmployerProfile.find_by_broker_agency_profile(broker_agency_profile7)
@@ -649,15 +652,15 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
   describe ".find_all_by_person" do
     let(:black_and_decker) do
       org = FactoryGirl.create(:organization, legal_name: "Black and Decker, Inc.", dba: "Black Decker")
-      er = org.create_employer_profile(entity_kind: "c_corporation")
+      er = org.create_employer_profile(entity_kind: "c_corporation", sic_code: '1111')
     end
     let(:atari) do
       org = FactoryGirl.create(:organization, legal_name: "Atari Corporation", dba: "Atari Games")
-      er = org.create_employer_profile(entity_kind: "s_corporation")
+      er = org.create_employer_profile(entity_kind: "s_corporation", sic_code: '1111')
     end
     let(:google) do
       org = FactoryGirl.create(:organization, legal_name: "Google Inc.", dba: "Google")
-      er = org.create_employer_profile(entity_kind: "partnership")
+      er = org.create_employer_profile(entity_kind: "partnership", sic_code: '1111')
     end
     def bob_params; {first_name: "Uncle", last_name: "Bob", ssn: "999441111", dob: 35.years.ago.to_date}; end
     let!(:black_and_decker_bob) do
@@ -1020,7 +1023,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
     FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status, profile_source: source, registered_on: start_date - 3.months, is_conversion: true)
   }
 
-  describe "conversion employer" do  
+  describe "conversion employer" do
 
     context "when under converting period" do
       it "should return true" do
@@ -1032,7 +1035,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month.prev_year }
       let(:plan_year_status) { 'active' }
 
-      before do 
+      before do
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         plan_year_renewal_factory.employer_profile = renewing_employer
         plan_year_renewal_factory.is_congress = false
@@ -1045,7 +1048,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
     end
   end
 
-  describe "non conversion employer" do 
+  describe "non conversion employer" do
     let(:source) { 'self_serve' }
 
     context "under renewal cycle" do

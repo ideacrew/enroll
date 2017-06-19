@@ -248,6 +248,7 @@ module Factories
 
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
+      return true if renewal_enrollment.composite_rated?
       relationship = PlanCostDecorator.benefit_relationship(member.primary_relationship)
       relationship = "child_over_26" if relationship == "child_under_26" && member.person.age_on(@plan_year_start_on) >= 26
       (renewal_relationship_benefits(renewal_enrollment).include?(relationship) && member.is_covered_on?(@plan_year_start_on - 1.day))

@@ -110,6 +110,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def show
+     @datatable = Effective::Datatables::DocumentDatatable.new
     @tab = params['tab']
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
@@ -158,10 +159,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def new
     @organization = Forms::EmployerProfile.new
+    get_sic_codes
   end
 
   def edit
     @organization = Organization.find(params[:id])
+    get_sic_codes
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
     @add_staff = params[:add_staff]
@@ -169,7 +172,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def create
-
     params.permit!
     @organization = Forms::EmployerProfile.new(params[:organization])
     organization_saved = false
@@ -177,6 +179,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       organization_saved, pending = @organization.save(current_user, params[:employer_id])
     rescue Exception => e
       flash[:error] = e.message
+      get_sic_codes
       render action: "new"
       return
     end
@@ -191,11 +194,17 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         end
       end
     else
+      get_sic_codes
       render action: "new"
     end
   end
 
   def show_pending
+  end
+
+  def generate_sic_tree
+    sic_tree = SicCode.generate_sic_array
+    render :json => sic_tree
   end
 
   def update
@@ -292,7 +301,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def counties_for_zip_code
       params.permit([:zip_code])
-      @counties = RateReference.find_counties_for(zip_code: params[:zip_code])
+      @counties = RatingArea.find_counties_for(zip_code: params[:zip_code])
       @single_option = true
 
       if @counties.count > 1
@@ -429,13 +438,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def organization_profile_params
     params.require(:organization).permit(
       :id,
-      :employer_profile_attributes => [:legal_name, :entity_kind, :dba]
+      :employer_profile_attributes => [:legal_name, :entity_kind, :dba, :sic_code]
     )
   end
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name],
+      :employer_profile_attributes => [ :entity_kind, :dba, :legal_name, :sic_code],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
@@ -462,6 +471,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def build_employer_profile_params
+    debugger
     build_organization
     build_office_location
   end
@@ -490,5 +500,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def check_origin?
     request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
+  end
+
+  def get_sic_codes
+   @grouped_options = {}
+   SicCode.all.group_by(&:industry_group_label).each do |industry_group_label, sic_codes|
+    @grouped_options[industry_group_label] = sic_codes.collect{|sc| ["#{sc.sic_label} - #{sc.sic_code}", sc.sic_code]}
+   end
   end
 end

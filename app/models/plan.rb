@@ -17,6 +17,7 @@ class Plan
   field :coverage_kind, type: String
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
+  field :service_area_id, type: String
 
   field :hios_id, type: String
   field :hios_base_id, type: String
@@ -58,6 +59,7 @@ class Plan
 
   # for dental plans only, metal level -> high/low values
   field :dental_level, type: String
+  field :carrier_special_plan_identifier, type: String
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
@@ -134,6 +136,8 @@ class Plan
     in: 2014..(TimeKeeper.date_of_record.year + 3),
     message: "%{value} is an invalid active year"
 
+  validates_length_of :carrier_special_plan_identifier, minimum: 1, allow_nil: true
+
   ## Scopes
   default_scope -> {order("name ASC")}
 
@@ -170,7 +174,7 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-
+  scope :for_service_areas,         ->(service_areas) { where(service_area_id: { "$in" => service_areas }) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }

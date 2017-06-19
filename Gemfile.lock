@@ -10,6 +10,17 @@ GIT
       mongoid-compatibility
 
 GIT
+  remote: https://github.com/brianweiner/recurring_select
+  revision: 68cb143d47bcb167f7bd3d9907014020a5514f73
+  specs:
+    recurring_select (2.0.0)
+      coffee-rails (>= 3.1)
+      ice_cube (>= 0.11)
+      jquery-rails (>= 3.0)
+      rails (>= 3.2)
+      sass-rails (>= 4.0)
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: abe34027bcd7f9de675dc40f76035518a028d694
   branch: development
@@ -26,6 +37,13 @@ GIT
     openhbx_cv2 (0.0.1)
       activesupport (>= 3.2)
       nokogiri-happymapper (~> 0.5)
+
+GIT
+  remote: https://github.com/harshared/simple_calendar
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  specs:
+    simple_calendar (2.2.5)
+      rails (>= 3.0)
 
 GIT
   remote: https://github.com/prawnpdf/prawn.git
@@ -174,6 +192,10 @@ GEM
     certified (1.0.0)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
+    chosen-rails (1.5.2)
+      coffee-rails (>= 3.2)
+      railties (>= 3.0)
+      sass-rails (>= 3.2)
     cliver (0.3.2)
     coderay (1.1.1)
     coercible (1.0.0)
@@ -268,6 +290,7 @@ GEM
       ruby_parser (~> 3.5)
     htmlentities (4.3.4)
     i18n (0.7.0)
+    ice_cube (0.16.1)
     ice_nine (0.11.2)
     interactor (3.1.0)
     interactor-rails (2.0.2)
@@ -614,6 +637,7 @@ DEPENDENCIES
   capybara-screenshot
   carrierwave-mongoid
   certified
+  chosen-rails
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)
@@ -667,6 +691,7 @@ DEPENDENCIES
   rails (= 4.2.3)
   rails-i18n (= 4.0.8)
   recaptcha (= 4.3.1)
+  recurring_select!
   redis-rails
   resque
   roo (~> 2.1.0)
@@ -678,6 +703,7 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
+  simple_calendar!
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)

@@ -68,7 +68,7 @@ Then(/^the broker enters the quote effective date$/) do
 end
 
 When(/^the broker selects employer type$/) do
- find('.interaction-choice-control-quote-employer-type').click()
+ #find('.interaction-choice-control-quote-employer-type').click()
  select "Prospect", :from => "quote_employer_type"
  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end

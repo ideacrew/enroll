@@ -2,6 +2,7 @@ class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
   include ::Eligibility::BenefitGroup
+  include Config::AcaModelConcern
 
   embedded_in :plan_year
 
@@ -60,6 +61,10 @@ class BenefitGroup
   # accepts_nested_attributes_for :plan_year
 
   delegate :employer_profile, to: :plan_year, allow_nil: true
+
+  embeds_many :composite_tier_contributions, cascade_callbacks: true
+  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
+
 
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
@@ -257,6 +262,8 @@ class BenefitGroup
   def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
+    elsif self.sole_source? && (!plan.dental?)
+      CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier)
     else
       PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
@@ -293,6 +300,12 @@ class BenefitGroup
   def build_relationship_benefits
     self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.relationship_benefits.build(relationship: relationship, offered: true)
+    end
+  end
+
+  def build_composite_tier_contributions
+    self.composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
+      self.composite_tier_contributions.build(composite_rating_tier: rating_tier)
     end
   end
 
@@ -447,30 +460,157 @@ class BenefitGroup
 
   # Provide the sic factor for this benefit group.
   def sic_factor_for(plan)
+    if use_simple_employer_calculation_model?
+      return 1.0
+    end
+    factor_carrier_id = plan.carrier_profile_id
+    @scff_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_scf_for(k)
+    end
+    @scff_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_scf_for(carrier_id)
+    year = plan_year.start_on.year
+    SicCodeRatingFactorSet.value_for(carrier_id, year, plan_year.sic_code)
   end
 
   # Provide the base factor for this composite rating tier.
-  def composite_rating_tier_factor_for(composite_rating_tier)
+  def composite_rating_tier_factor_for(composite_rating_tier, plan)
+    factor_carrier_id = plan.carrier_profile_id
+    lookup_key = [factor_carrier_id, composite_rating_tier]
+    @crtbf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_crtbf_for(k)
+    end
+    @crtbf_cache[lookup_key]
+  end
+
+  def lookup_cached_crtbf_for(carrier_tier_pair)
+    year = plan_year.start_on.year
+    CompositeRatingTierFactorSet.value_for(carrier_tier_pair.first, year, carrier_tier_pair.last)
   end
 
   # Provide the rating area value for this benefit group.
   def rating_area
+    @rating_area ||= plan_year.rating_area
   end
 
   # Provide the participation rate factor for this group.
   def composite_participation_rate_factor_for(plan)
+    factor_carrier_id = plan.carrier_profile_id
+    @cprf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_cprf_for(k)
+    end
+    @cprf_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_cprf_for(carrier_id)
+    year = plan_year.start_on.year
+    waived_and_active_count = if plan_year.estimate_group_size?
+                                census_employees.select { |ce| ce.expected_to_enroll? }.length
+                              else
+                                all_active_and_waived_health_enrollments.length
+                              end
+    total_employees = census_employees.count
+    part_rate = waived_and_active_count/(total_employees * 1.0)
+    EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, part_rate)
   end
 
   # Provide the group size factor for this benefit group.
   def group_size_factor_for(plan)
+    if use_simple_employer_calculation_model?
+      return 1.0
+    end
+    factor_carrier_id = plan.carrier_profile_id
+    @gsf_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_gsf_for(k)
+    end
+    @gsf_cache[factor_carrier_id]
+  end
+
+  def lookup_cached_gsf_for(carrier_id)
+    year = plan_year.start_on.year
+    if plan_option_kind == "sole_source"
+      EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, group_size_count)
+    else
+      EmployerGroupSizeRatingFactorSet.value_for(carrier_id, year, 1)
+    end
   end
 
   # Provide the premium for a given composite rating tier.
   def composite_rating_tier_premium_for(composite_rating_tier)
+    @crtp_cache ||= Hash.new do |h, k|
+      h[k] = lookup_cached_crtp_for(k)
+    end
+    @crtp_cache[composite_rating_tier]
+  end
+
+  def lookup_cached_crtp_for(composite_rating_tier)
+    ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+    plan_year.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
   end
 
   # Provide the contribution factor for a given composite rating tier.
   def composite_employer_contribution_factor_for(composite_rating_tier)
+    @cecf_cache ||= Hash.new do |h, k|
+       h[k] = lookup_cached_eccf_for(k)
+    end
+    @cecf_cache[composite_rating_tier]
+  end
+
+  def lookup_cached_eccf_for(composite_rating_tier)
+    ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+    ct_contribution.contribution_factor
+  end
+
+  # Count of enrolled employees - either estimated or actual depending on plan
+  # year status
+  def group_size_count
+    if plan_year.estimate_group_size?
+      census_employees.select { |ce| ce.expected_to_enroll? }.length
+    else
+      all_active_health_enrollments.length
+    end
+  end
+
+  def composite_rating_enrollment_objects
+    if plan_year.estimate_group_size?
+      census_employees.select { |ce| ce.expected_to_enroll? }
+    else
+      all_active_health_enrollments
+    end
+  end
+
+  def all_active_and_waived_health_enrollments
+    benefit_group_assignments.flat_map do |bga|
+      bga.active_and_waived_enrollments.reject do |en|
+        en.dental?
+      end
+    end
+  end
+
+  def all_active_health_enrollments
+    benefit_group_assignments.flat_map do |bga|
+      bga.active_enrollments.reject do |en|
+        en.dental?
+      end
+    end
+  end
+
+  def sole_source?
+    plan_option_kind == "sole_source"
+  end
+
+  def estimate_composite_rates
+    return(nil) unless sole_source?
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first)
+    rate_calc.assign_estimated_premiums
+  end
+
+  def finalize_composite_rates
+    return(nil) unless sole_source?
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first)
+    rate_calc.assign_final_premiums
   end
 
   private
