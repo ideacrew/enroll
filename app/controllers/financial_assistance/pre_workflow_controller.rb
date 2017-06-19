@@ -8,6 +8,8 @@ class FinancialAssistance::PreWorkflowController < ApplicationController
   end
 
   def application_checklist
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
     @person = current_user.person
     family = @person.primary_family
     family.is_applying_for_assistance = params["is_applying_for_assistance"]
