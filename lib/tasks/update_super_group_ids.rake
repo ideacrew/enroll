@@ -5,6 +5,7 @@ namespace :supergroup do
     if files.present?
       sheet_data = Roo::Spreadsheet.open(files.first)
       2.upto(sheet_data.last_row) do |row_number|
+
         begin
           row_data = sheet_data.row(row_number)
           fetch_record = Plan.where(hios_id: row_data[1], active_year: row_data[0]).first
