@@ -1,8 +1,8 @@
 <%if @family.is_applying_for_assistance?%>
-<%application = @family.applications.order_by(:created_at => 'desc').first%>
-  <%if application.applicants.find_by(family_member_id: family_member_id).workflow.present?%>
-    <%= link_to "Edit Info", edit_financial_assistance_application_applicant_path(application, application.applicants.find_by(family_member_id: family_member_id)), class: "btn btn-info"  %>
+<% application = @family.applications.where(aasm_state: "draft").last %>
+  <%if application.applicants.where(family_member_id: family_member_id).first.workflow.present?%>
+    <%= link_to "Edit Info", edit_financial_assistance_application_applicant_path(application, application.applicants.where(family_member_id: family_member_id).first), class: "btn btn-info"  %>
   <%else%>
-    <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(application, application.applicants.find_by(family_member_id: family_member_id), 1), class: "btn btn-info"  %>
+    <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(application, application.applicants.where(family_member_id: family_member_id).first, 1), class: "btn btn-info"  %>
   <%end%>
 <%end%>

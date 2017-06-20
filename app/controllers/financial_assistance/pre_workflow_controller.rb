@@ -15,7 +15,7 @@ class FinancialAssistance::PreWorkflowController < ApplicationController
     family.is_applying_for_assistance = params["is_applying_for_assistance"]
     family.save!
     if family.is_applying_for_assistance
-      application = family.applications.build(aasm_state: "inprogress")
+      application = family.applications.build(aasm_state: "draft")
       application.applicants.build(has_fixed_address: false, tax_filer_kind: "single", family_member_id: family.primary_applicant.id)
       @transaction_id = application.id
       family.save!
