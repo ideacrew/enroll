@@ -15,7 +15,7 @@ class CarrierProfile
   field :ivl_dental, type: Boolean
   field :shop_health, type: Boolean
   field :shop_dental, type: Boolean
-  field :restricted_to_single_choice, type: Boolean, default: false
+  field :offers_sole_source, type: Boolean, default: false
 
   field :issuer_hios_ids, type: Array, default: []
   field :issuer_state, type: String, default: "DC"
