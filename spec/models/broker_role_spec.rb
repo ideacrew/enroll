@@ -73,6 +73,27 @@ describe BrokerRole, dbclean: :after_each do
         end
       end
     end
+    
+    context "assign to employer" do
+      let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: "active") }
+      let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, aasm_state: "is_approved", primary_broker_role: broker_role)}
+      let(:employer_profile) { FactoryGirl.create(:employer_profile, aasm_state: "registered") }
+      let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer_profile) }
+      
+      before :each do 
+        employer_profile.broker_agency_accounts.create(broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
+      end
+      
+      it "should have employer" do
+        expect(employer_profile.active_broker.id).to eq broker_role.person.id
+      end
+      
+      it "should remove broker from employer when decertified" do
+        expect(employer_profile.active_broker.id).to eq broker_role.person.id
+        broker_role.decertify!
+        expect(EmployerProfile.find(employer_profile.id).active_broker).to eq nil
+      end
+    end
 
     context "with duplicate npn number" do
       let(:params) {valid_params}
