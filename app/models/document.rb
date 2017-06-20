@@ -55,10 +55,17 @@ class Document
 
   field :tags, type: Array, default: []
 
+  field :size, type: String
+
   validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 
   validates :rights,
     allow_blank: true,
     inclusion: { in: ACCESS_RIGHTS, message: "%{value} is not a valid access right" }
+
+
+  def size_bytes_to_megabytes
+    (sprintf "%.2f", (self.size.to_i/(1024.00))) + 'KB'
+  end
 
 end

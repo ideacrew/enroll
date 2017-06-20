@@ -11,6 +11,10 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
+  def download_employer_document
+    send_file params[:path]
+  end
+
   def authorized_download
     begin
       model = params[:model].camelize
@@ -133,17 +137,6 @@ class DocumentsController < ApplicationController
       format.html {redirect_to verification_insured_families_path, notice: "Document Status Updated"}
       format.js
     end
-  end
-
-  def new
-    @document = Document.new
-      respond_to do |format|
-        format.js { render "documents/new" }
-      end
-  end
-
-  def create
-    Document.create(:title=>"Doc1",:creator=>"dchl",:publisher=>"dchl",:type=>"text",:format=>"application/octet-stream",:source=>"enroll_system",:language=>"en",:rights=>"public")
   end
 
   private
