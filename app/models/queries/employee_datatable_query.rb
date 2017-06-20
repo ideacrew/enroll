@@ -9,7 +9,6 @@ module Queries
 
     def initialize(attributes)
       @custom_attributes = attributes
-      pp attributes
       @employer_profile = EmployerProfile.find(@custom_attributes[:id])
     end
 
