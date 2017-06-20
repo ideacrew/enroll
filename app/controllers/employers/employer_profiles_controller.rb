@@ -112,6 +112,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def show
      @datatable = Effective::Datatables::DocumentDatatable.new
     @tab = params['tab']
+
+    # Conditional based columns has to display so we are passing arguments
+    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
     else

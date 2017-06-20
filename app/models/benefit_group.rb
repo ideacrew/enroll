@@ -411,9 +411,9 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     end
   end
 

@@ -234,9 +234,7 @@ class Organization
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
         end
         if (filters[:sole_source_only]) ## Only sole source carriers requested
-          next carrier_names unless org.carrier_profile.restricted_to_single_choice?  # skip carrier unless it is a sole source provider
-        else
-          next carrier_names if org.carrier_profile.restricted_to_single_choice?  ## default behavior is to skip sole source
+          next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
         end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
         carrier_names

@@ -445,6 +445,14 @@ class Plan
       end
     end
 
+    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, service_area_ids=[])
+      service_area_ids.inject([]) do |plans, service_area_id|
+        plans << Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health-#{service_area_id}", expires_in: 5.hour) do
+          Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).for_service_areas([service_area_id]).to_a
+        end
+      end
+    end
+
     def valid_for_carrier(active_year)
       # carrier_ids = Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile_id).uniq
       # carrier_ids.map{|c| org= Organization.where(:'carrier_profile._id' => c).first;org}
