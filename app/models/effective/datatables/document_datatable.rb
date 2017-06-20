@@ -2,13 +2,12 @@ module Effective
   module Datatables
     class DocumentDatatable < Effective::MongoidDatatable
       datatable do
-        
+
         bulk_actions_column do
           bulk_action 'Download'
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
         table_column :status, :proc => Proc.new { |row| "status" }, :filter => false, :sortable => false
-        table_column :employer, :proc => Proc.new { |row| link_to row.legal_name,"", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
         table_column :doc_type, :proc => Proc.new { |row| link_to "type","" }, :filter => false, :sortable => false
         table_column :effective_date, :proc => Proc.new { |row| "effective date" }, :filter => false, :sortable => false
         table_column :submitted_date, :proc => Proc.new { |row| "submitted date" }, :filter => false, :sortable => false
@@ -45,7 +44,7 @@ module Effective
           {label: 'Submitted'},
           { label: 'Approved'},
           { label: 'Rejected'},
-          { label: 'All'}     
+          { label: 'All'}
            ]
 
       {
