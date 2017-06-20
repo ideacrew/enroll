@@ -69,6 +69,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       end
     end
 
+    context "validates expected_selection" do
+      let(:params_expected_selection) {valid_params.merge(expected_selection: "enroll")}
+      let(:params_in_valid) {valid_params.merge(expected_selection: "rspec-mock")}
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_expected_selection).valid?).to be_truthy
+      end
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_in_valid).valid?).to be_falsey
+      end
+    end
+
     context "with no dob" do
       let(:params) {valid_params.except(:dob)}
 
