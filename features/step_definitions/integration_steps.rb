@@ -264,6 +264,7 @@ end
 
 Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -272,9 +273,19 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
     last_name: person[:last_name],
     ssn: person[:ssn],
     dob: person[:dob_date]
-
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
+  carrier_profile = benefit_group.reference_plan.carrier_profile
+  sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
+  end
+  sic_factors.save!
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    [0..5].each do |size|
+      factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+    end
+  end
+  group_size_factors.save!
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
@@ -282,6 +293,7 @@ end
 
 Given(/^Employer for (.*) exists with a published plan year offering health and dental$/) do |named_person|
   person = people[named_person]
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -293,12 +305,24 @@ Given(/^Employer for (.*) exists with a published plan year offering health and 
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
+  carrier_profile = benefit_group.reference_plan.carrier_profile
+  sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
+  end
+  sic_factors.save!
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    [0..5].each do |size|
+      factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+    end
+  end
+  group_size_factors.save!
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   Caches::PlanDetails.load_record_cache!
 end
 
 Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -315,6 +339,21 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
 
   renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
   plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
+
+  [renewal_plan, plan].each do |plan|
+    sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: plan.carrier_profile).tap do |factor_set|
+      factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
+    end
+    sic_factors.save!
+
+    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: plan.carrier_profile).tap do |factor_set|
+      [0..5].each do |size|
+        factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+      end
+    end
+    group_size_factors.save!
+  end
+
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
     open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
@@ -337,6 +376,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
@@ -358,6 +398,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
   person = people[named_person]
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
