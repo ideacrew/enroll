@@ -3,6 +3,7 @@ require 'rails_helper'
 describe EmployerProfile, dbclean: :after_each do
 
   let(:entity_kind)     { "partnership" }
+  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
@@ -39,7 +40,7 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
-  let!(:rate_reference) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
+  let!(:rating_area) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
 
   after :all do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)

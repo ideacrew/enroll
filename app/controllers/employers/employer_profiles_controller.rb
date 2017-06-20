@@ -475,7 +475,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def build_employer_profile_params
-    debugger
     build_organization
     build_office_location
   end
