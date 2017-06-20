@@ -3,13 +3,14 @@ class ShopNoticesNotifierJob < ActiveJob::Base
 
   def perform(id, event)
     Resque.logger.level = Logger::DEBUG
+    id = "594937a07a367203c400023f"
     profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
-    event_kind = ApplicationEventKind.where(:event_name => event).first
+    event_kind = ApplicationEventKind.where(:event_name => "notify_employer_when_employee_terminate_coverage").first
     notice_trigger = event_kind.notice_triggers.first
     builder = notice_trigger.notice_builder.camelize.constantize.new(profile, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
-              event_name: event,
+              event_name: "notify_employer_when_employee_terminate_coverage",
               mpi_indicator: notice_trigger.mpi_indicator,
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
