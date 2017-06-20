@@ -299,10 +299,14 @@ class PlanYear
   def minimum_employer_contribution
     unless benefit_groups.size == 0
       benefit_groups.map do |benefit_group|
-        benefit_group.relationship_benefits.select do |relationship_benefit|
-          relationship_benefit.relationship == "employee"
-        end.min_by do |relationship_benefit|
-          relationship_benefit.premium_pct
+        if benefit_group.sole_source?
+          OpenStruct.new(:premium_pct => 100)
+        else
+          benefit_group.relationship_benefits.select do |relationship_benefit|
+            relationship_benefit.relationship == "employee"
+          end.min_by do |relationship_benefit|
+            relationship_benefit.premium_pct
+          end
         end
       end.map(&:premium_pct).first
     end
@@ -483,32 +487,32 @@ class PlanYear
   # Any employee who selected or waived coverage
   def enrolled
     calc_active_health_assignments_for(eligible_to_enroll)
-#    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
+    #    eligible_to_enroll.select{ |ce| ce.has_active_health_coverage?(self) }
   end
 
   def enrolled_by_bga
-     candidate_benefit_group_assignments = eligible_to_enroll.map{|ce| enrolled_bga_for_ce(ce)}.compact
-     enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
-     bgas = candidate_benefit_group_assignments.select do |bga|
-       enrolled_benefit_group_assignment_ids.include?(bga.id)
-     end
+    candidate_benefit_group_assignments = eligible_to_enroll.map{|ce| enrolled_bga_for_ce(ce)}.compact
+    enrolled_benefit_group_assignment_ids = HbxEnrollment.enrolled_shop_health_benefit_group_ids(candidate_benefit_group_assignments.map(&:id).uniq)
+    bgas = candidate_benefit_group_assignments.select do |bga|
+      enrolled_benefit_group_assignment_ids.include?(bga.id)
+    end
   end
 
   def enrolled_bga_for_ce ce
-     if is_renewing?
-       ce.renewal_benefit_group_assignment
-     else
-       ce.active_benefit_group_assignment
-     end
+    if is_renewing?
+      ce.renewal_benefit_group_assignment
+    else
+      ce.active_benefit_group_assignment
+    end
   end
 
   def calc_active_health_assignments_for(employee_pool)
     benefit_group_ids = self.benefit_groups.map(&:id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
-        bg_assignment = nil
-        bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
-        bg_assignment = ce.renewal_benefit_group_assignment if benefit_group_ids.include?(ce.renewal_benefit_group_assignment.try(:benefit_group_id))
-        bg_assignment ? [ce, bg_assignment] : nil
+      bg_assignment = nil
+      bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
+      bg_assignment = ce.renewal_benefit_group_assignment if benefit_group_ids.include?(ce.renewal_benefit_group_assignment.try(:benefit_group_id))
+      bg_assignment ? [ce, bg_assignment] : nil
     end
     benefit_group_assignment_pairs = candidate_benefit_group_assignments.compact
     benefit_group_assignment_ids = benefit_group_assignment_pairs.map do |bgap|
@@ -745,9 +749,9 @@ class PlanYear
         "2018-11-01" => '2018,10,12',
         "2018-12-01" => '2018,11,13',
         "2019-01-01" => '2018,12,12',
-        }.each_pair do |k, v|
-          dates_map[k] = Date.strptime(v, '%Y,%m,%d')
-        end
+      }.each_pair do |k, v|
+        dates_map[k] = Date.strptime(v, '%Y,%m,%d')
+      end
 
       dates_map[start_on.strftime('%Y-%m-%d')] || shop_enrollment_timetable(start_on)[:binder_payment_due_date]
     end
@@ -779,7 +783,7 @@ class PlanYear
 
     state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
-                                                                      #   but effective date is in future
+    #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
@@ -901,10 +905,10 @@ class PlanYear
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
       transitions from: [
-                            :enrolled, :enrolling, :active, :application_ineligible,
-                            :renewing_application_ineligible, :published_invalid,
-                            :eligibility_review, :published, :publish_pending
-                          ], to: :draft
+        :enrolled, :enrolling, :active, :application_ineligible,
+        :renewing_application_ineligible, :published_invalid,
+        :eligibility_review, :published, :publish_pending
+      ], to: :draft
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -915,7 +919,7 @@ class PlanYear
     # Admin ability to reset renewing plan year application
     event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling,
-        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
+                         :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
     end
 
     event :cancel_renewal, :after => :record_transition do
@@ -966,13 +970,13 @@ class PlanYear
 
   def is_eligible_to_match_census_employees?
     (benefit_groups.size > 0) and
-    (published? or enrolling? or enrolled? or active?)
+      (published? or enrolling? or enrolled? or active?)
   end
 
   def is_within_review_period?
     published_invalid? and
-    (latest_workflow_state_transition.transition_at >
-      (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days))
+      (latest_workflow_state_transition.transition_at >
+       (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.appeal_period_after_application_denial.days))
   end
 
   def latest_workflow_state_transition
@@ -992,20 +996,20 @@ class PlanYear
 
   def estimate_group_size?
     [
-     "draft",
-     "publish_pending",
-     "eligibility_review",
-     "published",
-     "published_invalid",
-     "enrolling",
-     "application_ineligible",
-     "canceled",
-     "renewing_draft",
-     "renewing_published",
-     "renewing_publish_pending",
-     "renewing_enrolling",
-     "renewing_application_ineligible",
-     "renewing_canceled"
+      "draft",
+      "publish_pending",
+      "eligibility_review",
+      "published",
+      "published_invalid",
+      "enrolling",
+      "application_ineligible",
+      "canceled",
+      "renewing_draft",
+      "renewing_published",
+      "renewing_publish_pending",
+      "renewing_enrolling",
+      "renewing_application_ineligible",
+      "renewing_canceled"
     ].include?(aasm_state)
   end
 
@@ -1047,17 +1051,17 @@ class PlanYear
   def is_event_date_valid?
     today = TimeKeeper.date_of_record
     valid = case aasm_state
-    when "published", "draft", "renewing_published", "renewing_draft"
-      today >= open_enrollment_start_on
-    when "enrolling", "renewing_enrolling"
-      today > open_enrollment_end_on
-    when "enrolled", "renewing_enrolled"
-      today >= start_on
-    when "active"
-      today > end_on
-    else
-      false
-    end
+            when "published", "draft", "renewing_published", "renewing_draft"
+              today >= open_enrollment_start_on
+            when "enrolling", "renewing_enrolling"
+              today > open_enrollment_end_on
+            when "enrolled", "renewing_enrolled"
+              today >= start_on
+            when "active"
+              today > end_on
+            else
+              false
+            end
 
     valid
   end
@@ -1208,7 +1212,7 @@ class PlanYear
 
     if (start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months) > TimeKeeper.date_of_record
       errors.add(:start_on, "may not start application before " \
-        "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
+                 "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
