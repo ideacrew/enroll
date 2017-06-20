@@ -20,7 +20,7 @@ Then /^they should see the new general agency form$/ do
 end
 
 When /^they complete the new general agency form and hit the 'Submit' button$/ do
-  FactoryGirl.create(:rate_reference, zip_code: "01002", county: "Hampshire", rating_region: "R-MA001")
+  FactoryGirl.create(:rating_area, zip_code: "01002", county: "Franklin", rating_area: Settings.aca.rating_areas.first)
   fill_in 'organization[first_name]', with: Forgery(:name).first_name
   fill_in 'organization[last_name]', with: Forgery(:name).last_name
   fill_in 'jq_datepicker_ignore_organization[dob]', with: (Time.now - rand(20..50).years).strftime('%m/%d/%Y')

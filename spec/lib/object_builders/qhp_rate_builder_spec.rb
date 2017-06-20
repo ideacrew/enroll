@@ -4,7 +4,7 @@ require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder')
 describe QhpRateBuilder do
 
   let(:plan){ FactoryGirl.create(:plan) }
-  let!(:rate_reference) { FactoryGirl.create(:rate_reference)  }
+  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
 
   it "should return qhp builder object" do
     @rates_hash = {

@@ -264,7 +264,7 @@ end
 
 Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -293,7 +293,7 @@ end
 
 Given(/^Employer for (.*) exists with a published plan year offering health and dental$/) do |named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -322,7 +322,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |kind, named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: Settings.aca.rating_areas.first)
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization, profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
@@ -376,7 +376,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kind, named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_expired_and_active_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
@@ -398,7 +398,7 @@ end
 
 Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
   person = people[named_person]
-  FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   organization.employer_profile.update_attributes(profile_source: (kind.downcase == 'conversion' ? kind.downcase : 'self_serve'), registered_on: TimeKeeper.date_of_record)
   owner = FactoryGirl.create :census_employee, :owner, employer_profile: organization.employer_profile
@@ -420,7 +420,7 @@ end
 
 When(/(^.+) enters? office location for (.+)$/) do |role, location|
   location = eval(location) if location.class == String
-  RateReference.where(zip_code: "01001").first || FactoryGirl.create(:rate_reference, zip_code: "01001", county_name: "Hampden", rating_region: "R-MA001")
+  RatingArea.where(zip_code: "01001").first || FactoryGirl.create(:rating_area, zip_code: "01001", county_name: "Hampden", rating_area: Settings.aca.rating_areas.first)
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_1]', :with => location[:address1]
   fill_in 'organization[office_locations_attributes][0][address_attributes][address_2]', :with => location[:address2]
   fill_in 'organization[office_locations_attributes][0][address_attributes][city]', :with => location[:city]

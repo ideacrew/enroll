@@ -7,7 +7,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let!(:rate_reference) { FactoryGirl.create(:rate_reference)  }
+  let!(:rating_area)                    { FactoryGirl.create(:rating_area)  }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
@@ -453,7 +453,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_with_benefit_group.due_date_for_publish.beginning_of_day)
         plan_year_with_benefit_group.publish!
       end
-      
+
       it 'plan year in enrolling state will not update plan year sic code' do
         employer_profile.update_attributes!(sic_code: '3229')
         expect(plan_year_with_benefit_group.sic_code).to eq '3211'

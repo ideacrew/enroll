@@ -33,7 +33,7 @@ class CarrierProfile
   def self.for_issuer_hios_id(issuer_id)
     Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
   end
-  
+
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
       raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
@@ -62,6 +62,11 @@ class CarrierProfile
     # TODO; return as chainable Mongoid::Criteria
     def all
       list_embedded Organization.exists(carrier_profile: true).order_by([:legal_name]).to_a
+    end
+
+    def carriers_for(employer_profile)
+      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
+      where(issuer_hios_id: servicing_hios_ids)
     end
 
     def first

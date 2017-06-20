@@ -8,16 +8,17 @@ hbx_office = OfficeLocation.new(
   )
 
 org = Organization.new(fein: "043373331", legal_name: "Boston Medical Center HealthNet Plan", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000029", abbrev: "BMCHP", hbx_carrier_id: 20003, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['82569'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000029", abbrev: "BMCHP", hbx_carrier_id: 20003, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['82569'], offers_sole_source: true)
 
 org = Organization.new(fein: "237442369", legal_name: "Fallon Community Health Plan, Inc.", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000037", abbrev: "FCHP", hbx_carrier_id: 20005, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['88806'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000037", abbrev: "FCHP", hbx_carrier_id: 20005, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['88806'], offers_sole_source: true)
 
 org = Organization.new(fein: "042864973", legal_name: "Health New England, Inc.", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000045", abbrev: "HNE", hbx_carrier_id: 20007, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['34484'])
 
 org = Organization.new(fein: "453596033", legal_name: "Minuteman Health, Inc.", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000053", abbrev: "MHI", hbx_carrier_id: 20009, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['73331'])
+
 
 puts "::: Generated MA Carriers :::"
 puts "*"*80

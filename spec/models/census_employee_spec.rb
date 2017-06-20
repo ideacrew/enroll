@@ -15,7 +15,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
   let(:employer_profile) { plan_year.employer_profile }
 
-  let!(:rate_reference) { create(:rate_reference, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
+  let!(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
 
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
