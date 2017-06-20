@@ -11,7 +11,8 @@
           <%= form_tag employers_employer_profile_path(@employer_profile), method: :get, remote: true, class: 'input-no-pd', id: 'census_employee_search' do %>
           <%= hidden_field_tag(:status, 'active') %>
           <%= hidden_field_tag(:search, true) %>
-          <div class="input-group">
+          <!--  TODO: FIX SEARCH -->
+          <!-- <div class="input-group">
             <%= text_field_tag(:employee_search, params[:employee_search], placeholder: 'Employee Name, SSN', class: 'form-control') %>
             <div class="input-group-btn">
               <div class="btn btn-default" id='census_employee_search_clear'>
@@ -19,7 +20,7 @@
               </div>
               <%= submit_tag "Search", class: 'btn btn-default' %>
             </div>
-          </div>
+          </div> -->
           <% end %>
         </div>
       </div>
