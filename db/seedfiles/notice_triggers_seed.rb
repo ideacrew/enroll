@@ -529,6 +529,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP10023',
+    title: 'Employee Terminating coverage',
+    description: 'Employee Terminating coverage after QLE',
+    resource_name: 'employer',
+    event_name: 'notify_employer_when_employee_terminate_coverage',
+    notice_triggers: [
+      {
+        name: 'Notice to employer when employee terminates coverage',
+        notice_template: 'notices/employee_terminating_coverage',
+        notice_builder: 'EmployeeTerminatingCoverage',
+        mpi_indicator: 'MPI_SHOP10023',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP30',
     title: 'Group Renewal – Second Reminder to Publish',
     description: 'Notification to renewing employers with draft plan years to publish their plan year 1 day prior to the renewal employer soft deadline.',
@@ -696,8 +717,9 @@ shop_notice_triggers = [
       }
     ]
   },
+=======
+>>>>>>> Refs #15212 Employee Terminating coverage- MEDIUM Priority(NOTICE ID 10023)
 ]
-
 
 ivl_notice_triggers = [
   {

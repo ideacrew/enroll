@@ -7,6 +7,7 @@ module PdfTemplates
     attribute :employee_cost, String
     attribute :phone, String
     attribute :effective_on, Date
+    attribute :terminated_on, Date
     attribute :selected_on, Date
     attribute :aptc_amount, String
     attribute :responsible_amount, String
@@ -16,5 +17,6 @@ module PdfTemplates
     attribute :plan_year, Date
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
+    attribute :dependents, String
   end
 end
