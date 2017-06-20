@@ -1,13 +1,12 @@
 
 
 Then(/^Hbx Admin should see the list of primary applicants and an Action button$/) do
-  #expect(page).to have_content('Families')
-  page.all('.dropdown-toggle').count.should > 0
+	#expect(page).to have_content('Families')
+  find_button('Actions').visible?
 end
 
 When(/^Hbx Admin clicks on the Action button$/) do
-  page.all('.dropdown-toggle')[1].click
-  # click_button('Actions')
+	click_button('Actions')
 end
 
 Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
