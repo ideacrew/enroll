@@ -1,39 +1,30 @@
 require 'rails_helper'
-
-RSpec.shared_examples "updating carrier_specific_id attribute for Plan model" do |attributes|
-  attributes.each do |attribute, value|
-    it "should return #{value} from ##{attribute}" do
-      expect(subject.send(attribute)).to eq(value)
-    end
-  end
-end
+Rake.application.rake_require "tasks/update_super_group_ids"
+Rake::Task.define_task(:environment)
 
 RSpec.describe 'Migrating carrier specific super group Id', :type => :task do
-  context "Invoking rake task" do
-    before :all do
-      Rake.application.rake_require "tasks/update_super_group_ids"
-      Rake::Task.define_task(:environment)
-    end
-    before :context do
-      invoke_task
-    end
+  let(:plan) { FactoryGirl.build(:plan, hios_id: "88806MA0030001-01") }
+  let(:default_plan) { FactoryGirl.build(:plan) }
+  let(:plan_non_super_group) { FactoryGirl.create(:plan, hios_id: "22222MA0030001-01") }
 
-    context "it should update the carrier_specific_plan_id" do
-      let(:plan) { FactoryGirl.create(:plan, hios_id: "88806MA0030001-01")}
+  before do
+    allow(Plan).to receive(:where).and_return([default_plan])
+    allow(Plan).to receive(:where).with(hios_id: plan.hios_id, active_year: plan.active_year).and_return([plan])
+    Rake::Task["supergroup:update_plan_id"].invoke
 
-      it "should update the carrier_specific_field_value" do
-        expect(plan.carrier_special_plan_identifier).to eq "X226"
-      end
+  end
 
-      it "should not upate the carrier_specific_field_value" do
-        expect(plan.carrier_special_plan_identifier).to be nil
-      end
-    end
-
-    private
-
-    def invoke_task
-      Rake::Task["supergroup:update_plan_id"].invoke
+  context "for matching plans" do
+    it "should update the carrier_specific_field_value" do
+      plan.reload
+      expect(plan.carrier_special_plan_identifier).to eq "X226"
     end
   end
+
+  context "for non matching plans" do
+    it "should not update the carrier_specific_field_value" do
+      expect(plan_non_super_group.carrier_special_plan_identifier).to be nil
+    end
+  end
+
 end
