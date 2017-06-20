@@ -39,6 +39,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
+     @selectedTab = "householdInfo"
+     @allTabs = NavigationHelper::getAllTabs
      model_name = @model.class.to_s.split('::').last.downcase
      model_params = params[model_name]
      @model.update_attributes!(permit_params(model_params)) if model_params.present?
