@@ -57,7 +57,7 @@
               </div>
               <% if controller_name == 'employer_profiles' %>
                 <div id="county-select-<%= f.index %>" class="county-select col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd <%= 'primary-office-location' if primary_office_location %>">
-                   <% @counties = RateReference.find_counties_for(zip_code: address.object.try(:zip)) %>
+                   <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
                    <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                    <% @counties = [@empty_message] if @counties.empty? %>
                  <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{}, required: true, onchange: 'validateCounty(this)')%>

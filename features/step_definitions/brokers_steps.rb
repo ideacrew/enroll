@@ -272,7 +272,7 @@ Then(/^.+ continues to the consumer home page$/) do
 end
 
 Given(/^zip code for county exists as rate reference$/) do
- FactoryGirl.create(:rate_reference, zip_code: '01010', county_name: 'Test County', rating_region: Settings.aca.rating_areas.first,
+ FactoryGirl.create(:rating_area, zip_code: '01010', county_name: 'Test County', rating_area: Settings.aca.rating_areas.first, 
     zip_code_in_multiple_counties: true)
 end
 #

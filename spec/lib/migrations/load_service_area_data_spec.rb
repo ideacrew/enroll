@@ -16,7 +16,7 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
       DatabaseCleaner.clean
       Rake.application.rake_require 'tasks/migrations/load_service_area_data'
       Rake::Task.define_task(:environment)
-      create(:rate_reference, county_name: 'Suffolk', zip_code: '10010')
+      create(:rating_area, county_name: 'Suffolk', zip_code: '10010')
       invoke_task
     end
     after :all do

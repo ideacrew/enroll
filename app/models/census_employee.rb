@@ -762,7 +762,7 @@ class CensusEmployee < CensusMember
 
   # TODO: Implement for 16019 and children
   def expected_to_enroll?
-    raise NotImplementedError.new("Implement when employers can specify who they expect to enroll.")
+    true
   end
 
   # TODO: Implement for 16219

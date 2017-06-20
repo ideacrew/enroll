@@ -49,7 +49,7 @@ class PlanYear
   # Workflow attributes
   field :aasm_state, type: String, default: :draft
 
-  # SIC code, frozen when the plan year is published, 
+  # SIC code, frozen when the plan year is published,
   # otherwise comes from employer_profile
   field :recorded_sic_code, type: String
   field :recorded_rating_area, type: String
@@ -1015,6 +1015,10 @@ class PlanYear
 
   def rating_area
     recorded_rating_area.blank? ? employer_profile.rating_area : recorded_rating_area
+  end
+
+  def service_area
+    recorded_service_area.blank? ? employer_profile.service_area : recorded_service_area
   end
 
   private

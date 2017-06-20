@@ -93,10 +93,15 @@ var EmployerProfile = ( function( window, undefined ) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
           } else {
+	    if ($('.composite-offerings').is(":visible")) {
+              editvalidatedbgemployeepremiums = true
+              editvalidated = true;
+	    } else {
             $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
             editvalidatedbgemployeepremiums = false;
             editvalidated = false;
             return false;
+	    }
           }
         }
       });
@@ -113,10 +118,15 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
-          editvalidatedbgemployeepremiums = false;
-          editvalidated = false;
-          return false;
+	  if ($('.composite-offerings').is(":visible")) {
+            editvalidatedbgemployeepremiums = true
+            editvalidated = true;
+	  } else {
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
+            editvalidatedbgemployeepremiums = false;
+            editvalidated = false;
+            return false;
+	  }
         }
       }
       });
@@ -248,10 +258,15 @@ var EmployerProfile = ( function( window, undefined ) {
           validatedbgemployeepremiums = true;
           validated = true;
         } else {
+          if ($('.composite-offerings').is(":visible")) {
+              validatedbgemployeepremiums = true;
+              validated = true;
+          } else {
           $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
           validatedbgemployeepremiums = false;
           validated = false;
           return false;
+          }
         }
       });
     }

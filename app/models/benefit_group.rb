@@ -62,6 +62,10 @@ class BenefitGroup
 
   delegate :employer_profile, to: :plan_year, allow_nil: true
 
+  embeds_many :composite_tier_contributions, cascade_callbacks: true
+  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
+
+
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
@@ -299,6 +303,12 @@ class BenefitGroup
     end
   end
 
+  def build_composite_tier_contributions
+    self.composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
+      self.composite_tier_contributions.build(composite_rating_tier: rating_tier)
+    end
+  end
+
   def build_dental_relationship_benefits
     self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
        self.dental_relationship_benefits.build(relationship: relationship, offered: true)
@@ -401,9 +411,9 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     end
   end
 
@@ -500,7 +510,7 @@ class BenefitGroup
                                 census_employees.select { |ce| ce.expected_to_enroll? }.length
                               else
                                 all_active_and_waived_health_enrollments.length
-                              end 
+                              end
     total_employees = census_employees.count
     part_rate = waived_and_active_count/(total_employees * 1.0)
     EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, part_rate)
@@ -560,7 +570,7 @@ class BenefitGroup
       census_employees.select { |ce| ce.expected_to_enroll? }.length
     else
       all_active_health_enrollments.length
-    end 
+    end
   end
 
   def composite_rating_enrollment_objects
@@ -568,7 +578,7 @@ class BenefitGroup
       census_employees.select { |ce| ce.expected_to_enroll? }
     else
       all_active_health_enrollments
-    end 
+    end
   end
 
   def all_active_and_waived_health_enrollments
