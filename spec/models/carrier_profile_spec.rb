@@ -38,8 +38,8 @@ RSpec.describe CarrierProfile, :type => :model do
         expect(carrier_profile.save).to be_truthy
       end
 
-      it "should not be restricted to single choice" do
-        expect(carrier_profile.restricted_to_single_choice?).to be_falsey
+      it "should not offer sole source" do
+        expect(carrier_profile.offers_sole_source?).to be_falsey
       end
 
       context "and it is saved" do
