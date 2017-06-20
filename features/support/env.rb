@@ -70,6 +70,7 @@ Capybara.default_driver = :poltergeist
 Capybara.javascript_driver = :poltergeist
 phantomjs_options = ['--ignore-ssl-errors=yes', '--ssl-protocol=any', '--load-images=no']
 phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails.env.production? || Rails.env.development?
+
 Capybara.register_driver :poltergeist do |app|
   options = {
       :js_errors => false,

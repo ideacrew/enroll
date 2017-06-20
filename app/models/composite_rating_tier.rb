@@ -10,4 +10,9 @@ class CompositeRatingTier
     EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS,
     FAMILY
   ]
+
+  VISIBLE_NAMES = [
+    EMPLOYEE_ONLY,
+    FAMILY
+  ]
 end
