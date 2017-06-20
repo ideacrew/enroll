@@ -43,6 +43,19 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
 end
 
 When(/(.*) proceed with continue on the group selection page/) do |named_person|
+  employer_profile = EmployerProfile.all.first
+  plan_year = EmployerProfile.all.first.plan_years.first.start_on.year
+  carrier_profile = EmployerProfile.all.first.plan_years.first.benefit_groups.first.reference_plan.carrier_profile
+  sic_factors = SicCodeRatingFactorSet.new(active_year: plan_year, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+    factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
+  end
+  sic_factors.save!
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: plan_year, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+    [0..5].each do |size|
+      factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+    end
+  end
+  group_size_factors.save!
   sleep(1)
   
   if find_all('.interaction-click-control-continue').any?

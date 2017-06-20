@@ -29,13 +29,15 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 
       before do
-        allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
         allow(benefit_group).to receive(:sic_factor_for).with(plan).and_return(1.0)
         allow(benefit_group).to receive(:sic_factor_for).with(reference_plan).and_return(1.0)
         allow(benefit_group).to receive(:group_size_factor_for).with(plan).and_return(1.0)
         allow(benefit_group).to receive(:group_size_factor_for).with(reference_plan).and_return(1.0)
+        # allow for both multi and single rating area cases
+        allow(benefit_group).to receive(:rating_area).and_return(double)
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+        allow(Caches::PlanDetails).to receive(:lookup_rate_with_area) {|id, start, age, rating_area| age * 1.0}
       end
 
       it "should be possible to construct a new plan cost decorator" do
@@ -88,14 +90,16 @@ RSpec.describe PlanCostDecorator, dbclean: :after_each do
       let(:plan_cost_decorator)     { PlanCostDecorator.new(plan, member_provider, benefit_group, reference_plan) }
 
       before do
-        allow(Settings).to receive(:aca).and_return(double(use_simple_employer_calculation_model: true))
         allow(benefit_group).to receive(:dental_relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
         allow(benefit_group).to receive(:relationship_benefit_for) {|rel|relationship_benefit_for[rel]}
         allow(benefit_group).to receive(:sic_factor_for).with(plan).and_return(1.0)
         allow(benefit_group).to receive(:sic_factor_for).with(reference_plan).and_return(1.0)
         allow(benefit_group).to receive(:group_size_factor_for).with(plan).and_return(1.0)
         allow(benefit_group).to receive(:group_size_factor_for).with(reference_plan).and_return(1.0)
+        # allow for both multi and single rating area cases
+        allow(benefit_group).to receive(:rating_area).and_return(double)
         allow(Caches::PlanDetails).to receive(:lookup_rate) {|id, start, age| age * 1.0}
+        allow(Caches::PlanDetails).to receive(:lookup_rate_with_area) {|id, start, age, rating_area| age * 1.0}
       end
 
       it "should be possible to construct a new plan cost decorator" do

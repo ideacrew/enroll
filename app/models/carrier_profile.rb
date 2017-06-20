@@ -15,9 +15,9 @@ class CarrierProfile
   field :ivl_dental, type: Boolean
   field :shop_health, type: Boolean
   field :shop_dental, type: Boolean
-  field :restricted_to_single_choice, type: Boolean, default: false
+  field :offers_sole_source, type: Boolean, default: false
 
-  field :issuer_hios_id, type: String
+  field :issuer_hios_ids, type: Array, default: []
   field :issuer_state, type: String, default: "DC"
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
@@ -30,6 +30,9 @@ class CarrierProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
+  def self.for_issuer_hios_id(issuer_id)
+    Organization.where("carrier_profile.issuer_hios_ids" => issuer_id).map(&:carrier_profile)
+  end
 
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
@@ -59,6 +62,11 @@ class CarrierProfile
     # TODO; return as chainable Mongoid::Criteria
     def all
       list_embedded Organization.exists(carrier_profile: true).order_by([:legal_name]).to_a
+    end
+
+    def carriers_for(employer_profile)
+      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
+      where(issuer_hios_id: servicing_hios_ids)
     end
 
     def first

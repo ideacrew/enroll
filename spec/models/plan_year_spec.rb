@@ -7,6 +7,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+  let!(:rating_area)                    { FactoryGirl.create(:rating_area)  }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
@@ -410,6 +411,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     before do
       plan_year_with_benefit_group.update_attributes(:aasm_state => 'renewing_draft')
+      employer_profile.update_attributes(sic_code: '3211')
     end
 
     after :all do
@@ -439,12 +441,22 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       it "and plan year should be in publish pending state" do
         expect(plan_year_with_benefit_group.aasm_state).to eq "renewing_draft"
       end
+
+      it 'plan year in draft state will update the plan year sic code' do
+        employer_profile.update_attributes!(sic_code: '3229')
+        expect(plan_year_with_benefit_group.sic_code).to eq '3229'
+      end
     end
 
     context "and plan year is published before publish due date" do
       before do
         TimeKeeper.set_date_of_record_unprotected!(plan_year_with_benefit_group.due_date_for_publish.beginning_of_day)
         plan_year_with_benefit_group.publish!
+      end
+
+      it 'plan year in enrolling state will not update plan year sic code' do
+        employer_profile.update_attributes!(sic_code: '3229')
+        expect(plan_year_with_benefit_group.sic_code).to eq '3211'
       end
 
       it "application should be valid" do
@@ -2394,5 +2406,21 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
+  end
+end
+
+describe PlanYear, "given a recored rating area value" do
+  Settings.aca.rating_areas.each do |mra|
+    it "is valid for a rating_area of #{mra}" do
+      subject.recorded_rating_area = mra
+      subject.valid?
+      expect(subject.errors.keys).not_to include(:recorded_rating_area)
+    end
+  end
+
+  it "is invalid for a made up rating_area" do
+    subject.recorded_rating_area = "LDJFKLDJKLEFJLKDJSFKLDF"
+    subject.valid?
+    expect(subject.errors.keys).to include(:recorded_rating_area)
   end
 end

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Exchanges::ScheduledEventsController do
 
   let(:user){ double(:save => double("user")) }
-  let(:person) { FactoryGirl.create(:person) }  
+  let(:person) { FactoryGirl.create(:person) }
   let(:event_params) { {
       type: 'holiday',
       event_name: 'Christmas',
@@ -17,7 +17,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
   before do
     sign_in(user)
   end
-  
+
   describe "GET new" do
 	it "should render the new template" do
 	  get :new
@@ -27,14 +27,14 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
   describe "Create Post" do
     let(:scheduled_event) { ScheduledEvent.new(event_params) }
-  	
+
   	it "returns http status" do
-  	  scheduled_event.stub(:save).and_return true
+  	  allow(scheduled_event).to receive(:save).and_return true
       post :create, scheduled_event: event_params
       expect(response).to redirect_to exchanges_scheduled_events_path
     end
     it "should render new template when invalid params" do
-      scheduled_event.stub(:save).and_return false
+      allow(scheduled_event).to receive(:save).and_return false
       post :create, scheduled_event: event_params
       expect(response).to redirect_to exchanges_scheduled_events_path
     end
@@ -76,7 +76,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
     let(:scheduled_events) { [scheduled_event] }
     it 'assigns scheduled_events' do
       get :index, scheduled_event: event_params
-      assigns[:scheduled_events].should_not be_nil
+      expect(assigns[:scheduled_events]).to_not be_nil
     end
   end
 

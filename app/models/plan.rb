@@ -17,6 +17,7 @@ class Plan
   field :coverage_kind, type: String
   field :carrier_profile_id, type: BSON::ObjectId
   field :metal_level, type: String
+  field :service_area_id, type: String
 
   field :hios_id, type: String
   field :hios_base_id, type: String
@@ -173,7 +174,7 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-
+  scope :for_service_areas,         ->(service_areas) { where(service_area_id: { "$in" => service_areas }) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -441,6 +442,14 @@ class Plan
     def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
       Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
         Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
+      end
+    end
+
+    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, service_area_ids=[])
+      service_area_ids.inject([]) do |plans, service_area_id|
+        plans << Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health-#{service_area_id}", expires_in: 5.hour) do
+          Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).for_service_areas([service_area_id]).to_a
+        end
       end
     end
 

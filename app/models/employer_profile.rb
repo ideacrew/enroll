@@ -862,7 +862,22 @@ class EmployerProfile
       return nil
     end
     primary_office_location = organization.primary_office_location
-    RateReference.rating_area_for(primary_office_location)
+    RatingArea.rating_area_for(primary_office_location.address)
+  end
+
+  def service_areas
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    CarrierServiceArea.service_areas_for(office_location: primary_office_location)
+  end
+
+  def service_area_ids
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    service_areas.collect { |service_area| service_area.service_area_id }.uniq
   end
 
 private

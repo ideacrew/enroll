@@ -32,7 +32,7 @@ FactoryGirl.define do
       after(:create) do |plan, evaluator|
         start_on = Date.new(plan.active_year,1,1)
         end_on = start_on + 1.year - 1.day
-        create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on)
+        create_list(:premium_table, evaluator.premium_tables_count, plan: plan, start_on: start_on, end_on: end_on, rating_area: Settings.aca.rating_areas.first)
       end
     end
 

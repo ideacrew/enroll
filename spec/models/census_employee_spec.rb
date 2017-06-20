@@ -15,6 +15,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
   end
   let(:employer_profile) { plan_year.employer_profile }
 
+  let!(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
+
   let(:first_name){ "Lynyrd" }
   let(:middle_name){ "Rattlesnake" }
   let(:last_name){ "Skynyrd" }
@@ -65,6 +67,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
       it "should fail validation" do
         expect(CensusEmployee.create(**params).errors[:ssn].any?).to be_truthy
+      end
+    end
+
+    context "validates expected_selection" do
+      let(:params_expected_selection) {valid_params.merge(expected_selection: "enroll")}
+      let(:params_in_valid) {valid_params.merge(expected_selection: "rspec-mock")}
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_expected_selection).valid?).to be_truthy
+      end
+
+      it "should have a valid value" do
+        expect(CensusEmployee.create(**params_in_valid).valid?).to be_falsey
       end
     end
 
@@ -456,7 +471,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
       let(:terminated_employee_count)      { er1_terminated_employee_count + er2_terminated_employee_count }
       let(:termed_status_employee_count)   { terminated_employee_count + er1_rehired_employee_count }
 
-      let(:employer_count)                 { 2 }
+      let(:employer_count)                 { 3 }
       let(:employer_profile_1)             { FactoryGirl.create(:employer_profile) }
       let(:employer_profile_2)             { FactoryGirl.create(:employer_profile) }
 

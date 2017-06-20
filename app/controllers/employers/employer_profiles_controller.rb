@@ -112,6 +112,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def show
      @datatable = Effective::Datatables::DocumentDatatable.new
     @tab = params['tab']
+
+    # Conditional based columns has to display so we are passing arguments
+    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
     else
@@ -301,7 +305,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def counties_for_zip_code
       params.permit([:zip_code])
-      @counties = RateReference.find_counties_for(zip_code: params[:zip_code])
+      @counties = RatingArea.find_counties_for(zip_code: params[:zip_code])
       @single_option = true
 
       if @counties.count > 1
@@ -471,7 +475,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def build_employer_profile_params
-    debugger
     build_organization
     build_office_location
   end
