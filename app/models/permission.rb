@@ -16,7 +16,6 @@ class Permission
   field :view_admin_tabs, type: Boolean, default: false
   field :can_update_ssn, type: Boolean, default: false
   field :can_complete_resident_application, type: Boolean, default: false
-  field :can_lock_unlock, type: Boolean, default: false
 
   class << self
     def hbx_staff

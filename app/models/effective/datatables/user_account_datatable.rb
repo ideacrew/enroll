@@ -3,7 +3,7 @@ module Effective
     class UserAccountDatatable < Effective::MongoidDatatable
       datatable do
 
-        bulk_actions_column do
+      	bulk_actions_column do
           bulk_action 'action 1', nil, data: { confirm: 'Generate Invoices?', no_turbolink: true }
           bulk_action 'action 2', nil, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
@@ -18,16 +18,17 @@ module Effective
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
            ['Reset Password', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-           ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
+           ['Unlock / Lock Account',show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
            ['View Login History',show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax']
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "family_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
       def collection
         return @user_collection if defined? @user_collection
-        @user_collection = User.all
+        users = User.all
+        @user_collection = users
       end
 
       def status(row)
@@ -36,12 +37,12 @@ module Effective
       end
 
       def row_role(row)
-        return "Employer staff role" if row.has_employer_staff_role?
-        return "Employee" if row.has_employee_role?
-        return "Broker" if row.has_broker_role?
-        return "Broker Agency Staff" if row.has_broker_agency_staff_role?
-        return "General Agency Staff" if row.has_general_agency_staff_role?
-        return "Hbx Staff" if row.has_hbx_staff_role?
+      	return "Employer staff role" if row.has_employer_staff_role?
+      	return "Employee" if row.has_employee_role?
+      	return "Broker" if row.has_broker_role?
+      	return "Broker Agency Staff" if row.has_broker_agency_staff_role?
+      	return "General Agency Staff" if row.has_general_agency_staff_role?
+      	return "Hbx Staff" if row.has_hbx_staff_role?
       end
 
       def global_search?
