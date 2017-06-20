@@ -11,7 +11,7 @@ class User
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable, :lockable,
+  devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
   validates_presence_of :oim_id
@@ -26,7 +26,6 @@ class User
 
   scope :locked,   ->{ where(unlock_token: nil) }
   scope :unlocked, ->{ where(unlock_token: nil) }
-  scope :datatable_search, ->(query) { self.where({"$or" => ([{"oim_id" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -151,11 +150,6 @@ class User
   field :last_portal_visited, type: String
   field :idp_verified, type: Boolean, default: false
 
-  ## Lockable
-  field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
-  field :unlock_token,    type: String # Only if unlock strategy is :email or :both
-  field :locked_at,       type: Time
-
   index({preferred_language: 1})
   index({approved: 1})
   index({roles: 1},  {sparse: true}) # MongoDB multikey index
@@ -243,18 +237,6 @@ class User
     self.password = passwd
     self.password_confirmation = passwd
     self.save
-  end
-
-  def update_lockable
-    if locked_at.nil?
-      self.lock_access!
-    else
-      self.unlock_access!
-    end
-  end
-
-  def lockable_notice
-    self.locked_at.nil? ? 'unlocked' : 'locked'
   end
 
   def has_role?(role_sym)
@@ -396,14 +378,6 @@ class User
 
     def current_user
       Thread.current[:current_user]
-    end
-
-    def logins_before_captcha
-      4
-    end
-
-    def login_captcha_required?(login)
-      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
     end
 
   end
