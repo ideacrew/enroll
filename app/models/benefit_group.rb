@@ -688,7 +688,9 @@ class BenefitGroup
     if start_on.month == 1 && start_on.day == 1
     else
       if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
-        self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+        unless self.sole_source?
+          self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+        end
       end
     end
   end
