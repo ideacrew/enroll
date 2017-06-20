@@ -11,9 +11,9 @@ class CensusEmployee < CensusMember
 
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
-  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
-  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending rehired)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated)
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked rehired)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
@@ -330,6 +330,10 @@ class CensusEmployee < CensusMember
 
   def is_terminated?
     (self.coverage_terminated_on.present? && !(self.is_eligible? || self.employee_role_linked?))
+  end
+
+  def active_termination?
+    (self.coverage_terminated_on.present? && !(self.is_eligible? || self.employee_role_linked?)) && !self.rehired?
   end
 
   def employee_relationship
