@@ -616,6 +616,19 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
+        organizations_for_low_enrollment_notice(new_date).each do |organization|
+          begin
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+            #exclude congressional employees
+            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
+            end
+          rescue Exception => e
+            puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
+          end
+        end
+
         # Reminder notices to renewing employers to publish thier plan years.
         start_on = new_date.next_month.beginning_of_month
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
@@ -704,19 +717,6 @@ class EmployerProfile
           end
         end
 
-      end
-
-      organizations_for_low_enrollment_notice(new_date).each do |organization|
-        begin
-          plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
-          #exclude congressional employees
-          next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
-          if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-            organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
-          end
-        rescue Exception => e
-          puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
-        end
       end
 
       # Employer activities that take place monthly - on first of month
