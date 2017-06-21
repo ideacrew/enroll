@@ -203,7 +203,6 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def confirm_effective_date
     confirmation_type = params[:type]
-    pp confirmation_type
     render "#{confirmation_type}_effective_date"
   end
 
