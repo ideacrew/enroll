@@ -179,6 +179,24 @@ class DocumentsController < ApplicationController
 
   end
 
+  def delete_documents
+    begin
+      Document.any_in(:_id =>params[:ids]).destroy_all
+      render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
+    rescue => e
+      render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
+    end
+  end
+
+  def update_document
+    @document = EmployerProfile.find(params[:document_id]).employer_attestation
+    @reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
+    @document.employer_attestation_documents.find(params[:attestation_doc_id]).update_attributes(aasm_state: params[:status],reason_for_rejection: @reason)
+    @document.update_attributes(aasm_state: params[:status])
+
+    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+  end
+
   private
   def updateable?
     authorize Family, :updateable?

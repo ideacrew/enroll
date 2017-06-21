@@ -7,6 +7,8 @@ class EmployerAttestationDocument < Document
   field :aasm_state, type: String, default: "submitted"
   embedded_in :employer_attestation
 
+  field :reason_for_rejection, type: String
+
   aasm do
     state :submitted, initial: true
     state :accepted
