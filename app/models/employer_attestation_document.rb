@@ -1,13 +1,10 @@
-class EmployerAttestationDocument
+class EmployerAttestationDocument < Document
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   include AASM
 
   embedded_in :employer_attestation
-  embeds_one :document, as: :documentable
-
-  field :aasm_state, type: String
 
   aasm do
     state :submitted, initial: true
@@ -48,7 +45,7 @@ class EmployerAttestationDocument
       document.publisher = "test"
       document.type = "EmployeeProfile"
       document.format = 'pdf',
-          document.source = 'test'
+      document.source = 'test'
       document.language = 'English'
       #document.size =  size
       document.date = Date.today
