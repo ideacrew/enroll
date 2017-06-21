@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include Pundit
   include SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
@@ -207,12 +208,18 @@ def employer_poc
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
 
   def show_sep_history
     getActionParams
+    @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def get_user_info
+    @person = Person.find(params[:person_id])
     @element_to_replace_id = params[:family_actions_id]
   end
 

@@ -17,9 +17,9 @@ class ChangeInitialPlanYearAasmState< MongoidMigrationTask
             )
             plan_year.update_attributes!(aasm_state:'draft')
           end
+          plan_year.revert_application! if ['application_ineligible','published_invalid','eligibility_review'].include?(plan_year.aasm_state)
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?  # for plan year in publish_pending state
           plan_year.force_publish! if plan_year.may_force_publish?
-
           puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
         end
       else
