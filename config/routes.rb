@@ -29,6 +29,9 @@ Rails.application.routes.draw do
       put ':step/:step', on: :member, action: 'step'
       post :step, on: :collection
       get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+      get 'help_paying_coverage',on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
+      get 'application_checklist',on: :collection, action: 'application_checklist', as: 'application_checklist'
+      get 'get_help_paying_coverage_response',on: :collection, action: 'get_help_paying_coverage_response', as: 'get_help_paying_coverage_response'
 
       resources :applicants do
         put :step, on: :member
@@ -54,10 +57,6 @@ Rails.application.routes.draw do
           get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
         end
       end
-    end
-    resources :pre_workflow, controller: 'pre_workflow' do
-      get 'help_paying_coverage/:id',on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
-      get 'application_checklist/:id',on: :collection, action: 'application_checklist', as: 'application_checklist'
     end
   end
 

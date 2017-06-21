@@ -1,7 +1,7 @@
 <% content_for :horizontal_status do %>
   <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
-<%= form_tag(application_checklist_financial_assistance_pre_workflow_index_path(id: @transaction_id), method: :get) do %>
+<%= form_tag(get_help_paying_coverage_response_financial_assistance_applications_path, method: :get) do %>
   <div class="container">
     <div id="new_person_wrapper">
       <div class="row">
@@ -27,7 +27,7 @@
                   <label class="radio-label" for="radio1"><span>Yes</span></label>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 10px">
-                  <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance">
+                  <input class=" " id="radio2"  required="true" type="radio" value="false" name="is_applying_for_assistance">
                   <label class="radio-label" for="radio2"><span>No</span></label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="margin-top: 10px">
@@ -51,7 +51,7 @@
 
 
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
+          <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
           <%= render partial: 'shared/help_me_sign_up' %>
         </div>
       </div>
