@@ -15,6 +15,14 @@ Rails.application.routes.draw do
     resources :orphans, only: [:index, :show, :destroy]
   end
 
+  resources :users do
+    member do
+      post :unlock
+      get :lockable
+      get :confirm_lock
+    end
+  end
+
   resources :saml, only: [] do
     collection do
       post :login
