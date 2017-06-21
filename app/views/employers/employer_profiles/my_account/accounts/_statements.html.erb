@@ -11,24 +11,25 @@
     </tr>
   </thead>
   <tbody>
-    <tr data-toggle="collapse" data-target="#collapse2">
-      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2017</td>
+    <% @invoice_years.each do |invoice_year| %>
+    <tr data-toggle="collapse" data-target="#collapse2" id="<%= invoice_year %>" class="invoice_years">
+      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> <%= invoice_year %></td>
       <td></td>
       <td></td>
       <td></td>
       <td></td>
-      <% invoices_2 = get_invoices_for_year(@invoices, 2017) %>
+      <% invoices_2 = get_invoices_for_year(@invoices, invoice_year) %>
       <% if invoices_2.empty? %>
-        <tr class="collapse" id="collapse2">
-          <td>You have no invoices for this year</td>
+        <tr class="inovices <%= invoice_year %>">
           <td></td>
+          <td>You have no invoices for this year</td>
           <td></td>
           <td></td>
           <td></td>
         </tr>
       <% else %>
         <% invoices_2.each do |invoice| %>
-          <tr class="collapse" id="collapse2">
+          <tr class="invoices <%= invoice_year %>">
             <td></td>
             <td><%= invoice_formated_date(invoice.date) %></td>
             <td><%= invoice_coverage_date(invoice.date) %></td>
@@ -38,65 +39,23 @@
         <% end %>
       <% end %>
     </tr>
-    <tr data-toggle="collapse" data-target="#collapse3">
-      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2016</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <% invoices_3 = get_invoices_for_year(@invoices, 2016) %>
-      <% if invoices_3.empty? %>
-        <tr class="collapse" id="collapse3">
-          <td>You have no invoices for this year</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      <% else %>
-        <% invoices_3.each do |invoice| %>
-          <tr class="collapse" id="collapse3">
-            <td></td>
-            <td><%= invoice_formated_date(invoice.date) %></td>
-            <td><%= invoice_coverage_date(invoices.date) %></td>
-            <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-            <td><%= link_to "<i class='glyphicon glyphicon-open-file' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank"%></td>
-          </tr>
-        <% end %>
-      <% end %>
-    </tr>
-    <tr data-toggle="collapse" data-target="#collapse4">
-      <td><i class='glyphicon glyphicon-plus' data-toggle='tooltip'></i> 2015</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <% invoices_4 = get_invoices_for_year(@invoices, 2015) %>
-      <% if invoices_4.empty? %>
-        <tr class="collapse" id="collapse4">
-          <td>You have no invoices for this year</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      <% else %>
-        <% invoices_4.each do |invoice| %>
-          <tr class="collapse" id="collapse4">
-            <td></td>
-            <td><%= invoice_formated_date(invoice.date) %></td>
-            <td><%= invoice_coverage_date(invoices.date) %></td>
-            <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='true' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-            <td><%= link_to "<i class='glyphicon glyphicon-open-file' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_employers_employer_profile_path(@employer_profile, :invoice_id => invoice.id), :target => "_blank"%></td>
-          </tr>
-        <% end %>
-      <% end %>
-    </tr>
+    <% end %>
   </tbody>
 </table>
 
 <script>
   $('td i').click(function() {
     $(this).toggleClass("glyphicon glyphicon-plus glyphicon glyphicon-minus");
+  });
+
+  $(document).ready(function() {
+    $('tr.invoices').hide();
+
+    $('.invoice_years').each(function() {
+      $(this).click(function() {
+        $('tr.' + $(this).attr('id')).toggle();
+      })
+    });
+
   });
 </script>

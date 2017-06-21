@@ -320,6 +320,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
+    @invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
