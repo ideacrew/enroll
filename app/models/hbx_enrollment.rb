@@ -1441,6 +1441,12 @@ class HbxEnrollment
     benefit_group.sole_source?
   end
 
+  def rating_area
+    return nil unless is_shop?
+    return nil if benefit_group_id.blank?
+    benefit_group.rating_area
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
