@@ -234,6 +234,9 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
         expired_bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
         expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, "sep")).to eq expired_bga
+      end
+    end
+  end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
 
