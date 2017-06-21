@@ -86,8 +86,6 @@
 		  <% end %>
 	  </div>
   </div>
-  <br class="clear"/>
-  <br/>
   <div class="col-xs-12 composite-offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? "" : " hidden" %>" data-offering-target="composite_<%= f.object.id %>">
 	  <div class="row row-form-wrapper no-buffer heading">
 		  <div class="col-xs-12 composite_offering_slider_header">
@@ -100,6 +98,8 @@
 		  <% end %>
 	  </div>
   </div>
+  <br class="clear"/>
+  <br/>
   <div class="col-xs-12">
 	  <div class="health selected-plan row" style="display: none;">
 	  </div>
