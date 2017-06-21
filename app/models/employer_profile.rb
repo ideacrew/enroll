@@ -918,7 +918,7 @@ class EmployerProfile
   end
 
   def has_valid_attestation?
-    self.employer_attestation && self.employer_attestation.status == 'Approved'
+    self.employer_attestation && self.employer_attestation.aasm_state == 'approved'
   end
   
   private

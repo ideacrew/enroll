@@ -7,6 +7,8 @@ class EmployerAttestation
   embedded_in :employer_profile
   embeds_many :employer_attestation_documents
 
+  field :aasm_state, type: String
+
   aasm do
     state :unsubmitted, initial: true
     state :submitted

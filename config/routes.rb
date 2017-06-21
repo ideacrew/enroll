@@ -513,7 +513,9 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
   resources :documents, only: [ :new, :create, :destroy, :update] do
-
+      get :document_reader,on: :member
+      get :autocomplete_organization_legal_name, :on => :collection
+      put 'update_document'
     collection do
       put :change_person_aasm_state
       get :show_docs
@@ -522,6 +524,8 @@ Rails.application.routes.draw do
       put :enrollment_docs_state
       put :extend_due_date
       get :fed_hub_request
+      post 'download_documents'
+      post 'delete_documents'
     end
 
     member do

@@ -4,6 +4,8 @@ class DocumentsController < ApplicationController
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
 
+  autocomplete :organization, :legal_name, :full => true, :scopes => [:all_employer_profiles]
+
   def download
     bucket = params[:bucket]
     key = params[:key]
@@ -139,6 +141,44 @@ class DocumentsController < ApplicationController
     end
   end
 
+  def new
+    @document = Document.new
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def create
+    @employer_profile = Organization.all_employer_profiles.where(legal_name: params[:document][:creator]).last.employer_profile
+    @employer_profile.employer_attestation= EmployerAttestation.new() unless @employer_profile.employer_attestation
+    #@employer_profile.employer_attestation.employer_attestation_doccument = EmployerAttestationDocument.new() unless @employer_profile.employer_attestation.employer_attestation_doccument
+    document = @employer_profile.employer_attestation.employer_attestation_documents.new().upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
+    if document.save!
+      @employer_profile.employer_attestation.update_attributes(aasm_state: "submitted")
+    end
+    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+  end
+
+  def document_reader
+    content = @document.source.read
+    if stale?(etag: content, last_modified: @user.updated_at.utc, public: true)
+      send_data content, type: @document.source.file.content_type, disposition: "inline"
+      expires_in 0, public: true
+    end
+  end
+
+  def download_employer_document
+    send_file params[:path]
+  end
+
+  def download_documents
+    docs = Document.find(params[:ids])
+    docs.each do |doc|
+      send_file "#{Rails.root}"+"/tmp" + doc.source.url, file_name: doc.title, :type=>"application/pdf"
+    end
+
+  end
+
   private
   def updateable?
     authorize Family, :updateable?
@@ -170,6 +210,14 @@ class DocumentsController < ApplicationController
     OpenStruct.new({:determined_at => Time.now,
                     :authority => "hbx"
                    })
+  end
+
+  def file_path(file)
+    file.tempfile.path
+  end
+
+  def file_name(file)
+    file.original_filename
   end
 
 end

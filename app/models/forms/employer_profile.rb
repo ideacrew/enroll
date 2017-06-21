@@ -72,7 +72,7 @@ module Forms
         :employer_profile => ::EmployerProfile.new({
           :entity_kind => entity_kind,
           :sic_code => sic_code,
-          :employer_attestation => ::EmployerAttestation.new(:status=>"Unsubmitted")
+          :employer_attestation => ::EmployerAttestation.new()
         }),
         :office_locations => office_locations
       )

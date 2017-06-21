@@ -7,9 +7,14 @@ module Effective
           bulk_action 'Download'
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
-        table_column :status, :proc => Proc.new { |row| "status" }, :filter => false, :sortable => false
-        table_column :employer, :proc => Proc.new { |row| link_to row.legal_name,"", "data-toggle" => "modal", 'data-target' => '#employeeModal' }, :filter => false, :sortable => false
-        table_column :doc_type, :proc => Proc.new { |row| link_to "type","" }, :filter => false, :sortable => false
+        table_column :status, :proc => Proc.new { |row|
+          row.employer_profile.employer_attestation.try(:aasm_state)
+        }, :filter => false, :sortable => false
+        table_column :employer, :proc => Proc.new { |row|
+          @employer_profile = row.employer_profile
+          (link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home'))
+        }, :sortable => false, :filter => false
+        table_column :doc_type, :proc => Proc.new { |row| link_to "Employer Attestation","", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}"  }, :filter => false, :sortable => false
         table_column :effective_date, :proc => Proc.new { |row| "effective date" }, :filter => false, :sortable => false
         table_column :submitted_date, :proc => Proc.new { |row| "submitted date" }, :filter => false, :sortable => false
       end
@@ -19,7 +24,9 @@ module Effective
       end
 
       def collection
-        Document.all
+        employers = Organization.all_employer_profiles
+        employers = employers.send(attributes[:status]) if attributes[:status].present?
+        employers
       end
 
       def global_search?
