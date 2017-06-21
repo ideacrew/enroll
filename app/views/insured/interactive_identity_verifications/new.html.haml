@@ -2,6 +2,8 @@
   = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
 .container
   .row
+    .col-lg-3.col-md-3.col-sm-3.col-xs-12
+      = render  partial: 'shared/left_nav.html.erb'
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
       %h1.darkblue Verify Identity
       %h4 Please answer the following security questions. When you're finished click SUBMIT.
@@ -26,6 +28,6 @@
             %br
         %br
         = f.submit "Submit", class: 'btn btn-lg btn-primary ' + pundit_class(Family, :updateable?)
-    .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+    .col-lg-2.col-md-2.col-sm-2.col-xs-12
       = render  partial: 'shared/individual_progress', locals: {step: '2'}
 

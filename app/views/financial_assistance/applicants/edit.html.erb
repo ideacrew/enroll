@@ -19,8 +19,8 @@
 	</tr>
 </table>
 
-<%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
-<br />
+  <%= link_to "Edit Tax Information", go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) %>
+  <br />
 
 <div>
 	<% if @applicant.incomes.present? %>
@@ -28,17 +28,20 @@
 		<table class="table">
 			<th>Income Type</th>
 			<th></th>
+			<th></th>
 			<% @applicant.incomes.each do |income| %>
 			<tr>
 				<td><%=income.kind%></td>
-				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_income_path(@application, @applicant, income, 1) %></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_income_path(@application, @applicant, income, 1), class: "btn btn-small btn-success" %></td>
+				<td><%= link_to "Delete", financial_assistance_application_applicant_income_path(@application, @applicant, income), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
 			</tr>
 			<% end %>
 		</table>
 	<%end%>
 </ div>
-<%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %><br>
+<%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
 
+<br>
 <hr />
 
 <div>
@@ -47,10 +50,12 @@
 		<table class="table">
 			<th>Benefit Type</th>
 			<th></th>
+			<th></th>
 			<% @applicant.benefits.each do |benefit| %>
 			<tr>
 				<td><%=benefit.kind%></td>
-				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1) %></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-small btn-success" %></td>
+				<td><%= link_to "Delete", financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
 			</tr>
 			<% end %>
 		</table>
@@ -65,10 +70,12 @@
 		<table class="table">
 			<th>Deduction Income Type</th>
 			<th></th>
+			<th></th>
 			<% @applicant.deductions.each do |deduction| %>
 			<tr>
 				<td><%= deduction.kind %></td>
-				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1)  %></td>
+				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
+				<td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
 			</tr>
 			<% end %>
 		</table>
@@ -79,4 +86,4 @@
 <br> <br>
 <hr />
 
-<%= link_to "BACK TO ALL HOUSEHOLD MEMBERS", edit_financial_assistance_application_path(@application) %> (Go back and work on another person.)
+<%= link_to "Back to All Applicants", edit_financial_assistance_application_path(@application)%> (Go back and work on another person)

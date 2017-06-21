@@ -1,6 +1,7 @@
 = pundit_span Family, :updateable?
 - step = (defined? step) ? step.to_i : 1
 - ridp = (defined? ridp) ? ridp : false
+- application_checklist = (defined? application_checklist) ? application_checklist : false
 - search_page = (defined? search_page ) ? search_page : false
 
 - percent_complete = 0
@@ -40,6 +41,8 @@
     CONTINUE
 - elsif ridp == true && step == 2
   = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
+- elsif step == 2 && application_checklist == true
+  = link_to 'Continue', insured_family_members_path(consumer_role_id: @person.consumer_role.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 2
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'

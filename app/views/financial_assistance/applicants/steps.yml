@@ -78,7 +78,7 @@
                 - gutter: 8
                   type: text
                   text: Has this person applied for an SSN *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true

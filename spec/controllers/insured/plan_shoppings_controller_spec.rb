@@ -6,6 +6,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       context "width standard plan present" do
         let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
         let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+        let(:application) { FactoryGirl.create(:application, family: family) }
         let(:person) { FactoryGirl.build_stubbed(:person) }
         let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
         let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -14,7 +15,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         before :each do
           sign_in user
           allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-          allow(person.primary_family).to receive(:active_household).and_return(household)
+          allow(person.primary_family).to receive(:active_approved_application).and_return(application)
         end
 
         @controller = Insured::PlanShoppingsController.new
@@ -33,6 +34,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
 
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:application) { FactoryGirl.create(:application, family: family) }
     let(:person) { FactoryGirl.build_stubbed(:person) }
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -41,11 +43,11 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before :each do
         sign_in user
         allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-        allow(person.primary_family).to receive(:active_household).and_return(household)
+        allow(person.primary_family).to receive(:active_approved_application).and_return(application)
       end
 
       it "returns http success" do
-        xhr :get, :plans, id: "hbx_id", format: :js
+        xhr :get, :plans, id: "hbx_id", family_member_ids: [], format: :js
         expect(response).to have_http_status(:success)
       end
     end
@@ -401,6 +403,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:household).and_return(household)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
+      allow(controller).to receive(:get_tax_household_from_family_members).and_return []
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -418,7 +421,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       before :each do
         allow(plan3).to receive(:total_employee_cost).and_return(3333)
         allow(plan3).to receive(:deductible).and_return("$998")
-        get :show, id: "hbx_id"
+        get :show, family_member_ids: [], id: "hbx_id"
       end
 
       it "should be success" do
@@ -450,7 +453,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         allow(person).to receive(:primary_family).and_return(family)
         allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
-        get :show, id: "hbx_id"
+        get :show, family_member_ids: [], id: "hbx_id"
       end
 
       it "should not be waivable" do
@@ -467,7 +470,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(person).to receive(:primary_family).and_return(family)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         end
-        get :show, id: "hbx_id"
+        get :show, family_member_ids: [], id: "hbx_id"
       end
 
       it "should get max_total_employee_cost and return 0" do
@@ -493,7 +496,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
-          get :show, id: "hbx_id"
+          allow(controller).to receive(:get_tax_household_from_family_members).and_return [tax_household]
+          get :show, family_member_ids: [], id: "hbx_id"
         end
 
         it "should get max_aptc" do
@@ -510,7 +514,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
-          get :show, id: "hbx_id"
+          get :show, family_member_ids: [], id: "hbx_id"
         end
 
         it "should get max_aptc" do
@@ -529,7 +533,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(person).to receive(:active_employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
-          get :show, id: "hbx_id"
+          get :show, family_member_ids: [], id: "hbx_id"
         end
 
         it "should get max_aptc" do
@@ -549,7 +553,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
           allow(person).to receive(:active_employee_roles).and_return []
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
           allow(hbx_enrollment).to receive(:kind).and_return 'shop'
-          get :show, id: "hbx_id"
+          get :show, family_member_ids: [], id: "hbx_id"
         end
 
         it "should get max_aptc" do

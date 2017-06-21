@@ -38,7 +38,7 @@ class Family
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
 
-  field :is_applying_for_asistance, type: Boolean, default: true
+  field :is_applying_for_assistance, type: Boolean, default: false
 
   belongs_to  :person
 

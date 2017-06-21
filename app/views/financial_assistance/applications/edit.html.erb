@@ -22,7 +22,7 @@
 		<p>You must include all members of your household in the application, even if they're not enrolling in coverage.</p>
 		<i class="fa fa-question-circle"><small><a href="" data-toggle="modal" data-target="#help-me-decide"> Help me decide who is in my household</a></small></i>
 		<br /> <br />
-		<div> <%= button_to "Add a Household Member", "", :id => "", :class => "btn btn-secondary", :method => :get %></div>
+		<div> <%= link_to "Add a Household Member", insured_family_members_path(source: 'fa_application_edit_add_member'), class: "btn btn-small btn-default", :method => :get %></div>
 	</div>
 	<div>
 		<h4>OR</h4>

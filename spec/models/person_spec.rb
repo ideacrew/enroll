@@ -995,12 +995,14 @@ describe Person do
       let(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:family1)  {FactoryGirl.create(:family, :with_primary_family_member)}
-      let(:household) {FactoryGirl.create(:household, family: family1)}
-      let(:tax_household) {FactoryGirl.create(:tax_household, household: household) }
-      let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
+      # let(:household) {FactoryGirl.create(:household, family: family1)}
+      let(:application) { FactoryGirl.create(:application, family: family1) }
+      let(:tax_household) {FactoryGirl.create(:tax_household, application: application) }
+      let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, csr_percent_as_integer: 10)}
 
       before :each do
-        family1.households.first.tax_households<<tax_household
+        family1.applications<<application
+        family1.applications.first.tax_households<<tax_household
         family1.save
         @person_aqhp = family1.primary_applicant.person
       end
@@ -1019,11 +1021,11 @@ describe Person do
       end
 
       it "creates family with households and tax_households" do
-        expect(family1.households.first.tax_households).not_to be_empty
+        expect(family1.applications.first.tax_households).not_to be_empty
       end
 
       it "true if person family households present" do
-        expect(@person_aqhp.check_households(family1)).to eq true
+        expect(@person_aqhp.check_applications(family1)).to eq true
       end
 
       it "true if person family households tax_households present" do

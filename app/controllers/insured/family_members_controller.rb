@@ -3,6 +3,10 @@ class Insured::FamilyMembersController < ApplicationController
 
   before_action :set_current_person, :set_family
   def index
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
 
@@ -47,7 +51,7 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @source = session[:source_fa] = params[:source]
   end
 
   def new
@@ -71,12 +75,16 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
-
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
-        format.html { render 'show' }
-        format.js { render 'show' }
+        if session[:source_fa].present?
+          session[:source_fa] = nil
+          format.js { render js: "window.location = '#{insured_family_members_path}'"}
+        else
+          format.html { render 'show' }
+          format.js { render 'show' }
+        end
       end
     else
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@dependent.family_member.try(:person).try(:consumer_role))

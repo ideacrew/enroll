@@ -1,6 +1,9 @@
 <div class="container">
   <div id="new_person_wrapper">
     <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+        <%= render :partial => 'shared/left_nav.html.erb' %>
+      </div>
       <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
         <h1 class="darkblue">Personal Information</h1>
@@ -24,7 +27,7 @@
       </div>
 
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
         <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
         <%= render partial: 'shared/help_me_sign_up' %>
       </div>

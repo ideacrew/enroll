@@ -16,8 +16,6 @@ class Household
   field :is_active, type: Boolean, default: true
 
   embeds_many :hbx_enrollments
-  embeds_many :tax_households
-  #embeds_many :applications, class_name: "FinancialAssistance::Application"
   embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :coverage_households
@@ -185,7 +183,7 @@ class Household
   # also return all active tax_households in the 'active' Application
   # as part of handeling multiple TaxHousehold.
 
-  # def latest_active_tax_household
+  # def latest_active_tax_households
   #   return tax_households.first if tax_households.length == 1
   #   tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
   # end
@@ -196,20 +194,6 @@ class Household
 
   def last_application_with_determination_by_year(year)
     applications.where(aasm_state: 'submitted', :eligibility_determination_id.ne => nil, :assistance_year => year).order_by(:submitted_at => 'desc').first
-  end
-
-  # TODO: Move to Aplication model and refactor accordingly.
-  def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
-    if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
-    end
-
-    if tax_households.empty?
-      nil
-    else
-      tax_households.entries.last
-    end
   end
 
   # TODO: Move to Aplication model and refactor accordingly.
@@ -342,13 +326,13 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
-  def eligibility_determinations_for_year(year)
-    eds = []
-    applications.where(assistance_year: year).each do |app|
-      app.eligibility_determinations.each do |ed|
-        eds << ed
-      end
-    end
-    eds
-  end
+  # def eligibility_determinations_for_year(year)
+  #   eds = []
+  #   applications.where(assistance_year: year).each do |app|
+  #     app.eligibility_determinations.each do |ed|
+  #       eds << ed
+  #     end
+  #   end
+  #   eds
+  # end
 end
