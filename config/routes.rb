@@ -247,7 +247,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :employer_attestations
+    resources :employer_attestations do 
+       put 'update_document'
+    end
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
       get 'new'
@@ -517,7 +519,6 @@ Rails.application.routes.draw do
   resources :documents, only: [ :new, :create, :destroy, :update] do
       get :document_reader,on: :member
       get :autocomplete_organization_legal_name, :on => :collection
-      put 'update_document'
     collection do
       put :change_person_aasm_state
       get :show_docs

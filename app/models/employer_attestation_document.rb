@@ -22,4 +22,10 @@ class EmployerAttestationDocument < Document
       transitions from: :submitted, to: :rejected
     end
   end
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
 end

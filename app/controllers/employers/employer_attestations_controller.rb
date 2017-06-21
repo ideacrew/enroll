@@ -43,8 +43,23 @@ class Employers::EmployerAttestationsController < ApplicationController
   end
 
   def update
+    @document = @employer_profile.employer_attestation
+    reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
+    attestation_doc = @document.employer_attestation_documents.find(params[:attestation_doc_id])
 
+    if params[:status] == 'rejected'
+    attestation_doc.reject! if attestation_doc.may_reject?
+    attestation_doc.update(reason_for_rejection: reason)
+    @document.make_pending!
+  elsif params[:status] == 'accepted'
+    attestation_doc.accept! if attestation_doc.may_accept?
+    @document.approve!
   end
+
+
+    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+  end
+
 
   private
 
@@ -62,4 +77,6 @@ class Employers::EmployerAttestationsController < ApplicationController
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
     end
   end
+
+
 end
