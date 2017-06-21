@@ -9,6 +9,8 @@ class EmployerAttestationDocument
 
   field :aasm_state, type: String
 
+  field :reason_for_rejection, type: String
+
   aasm do
     state :submitted, initial: true
     state :accepted

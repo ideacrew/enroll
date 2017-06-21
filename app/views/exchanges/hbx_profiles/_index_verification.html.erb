@@ -17,7 +17,7 @@
 </div>
 <%= render_datatable(@datatable) %>
 <% @documents.each do |doc| %>
-  <% if doc.employer_profile.employer_attestation.nil? && doc.employer_profile.employer_attestation.employer_attestation_documents %>
+  <% if doc.employer_profile && doc.employer_profile.employer_attestation && doc.employer_profile.employer_attestation.has_documents? %>
   <% @document = doc.employer_profile.employer_attestation.employer_attestation_documents.last.document %>
 
   <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -44,11 +44,12 @@
             <span class="col-md-6">Employer Name: Admin</span>
             <span class="col-md-6" style="text-align: right">Effective date: <%= @document.created_at %></span>
           </p>
-          <%= form_tag document_update_document_path(doc.id), :method => :put do |f| %>
+          <%= form_tag document_update_document_path(doc.employer_profile), :method => :put do |f| %>
+            <input type="hidden" name="attestation_doc_id" value="<%= doc.employer_profile.employer_attestation.employer_attestation_documents.last.id %>" />
             <div class="row">
               <div class="col-md-4">
-                <label><input type="radio" name="status" checked="true" value="Approved"> Approve</label><br/>
-                <label><input type="radio" name="status" value="Rejected"> Reject</label>
+                <label><input type="radio" name="status" checked="true" value="accepted"> Approve</label><br/>
+                <label><input type="radio" name="status" value="rejected"> Reject</label>
               </div>
               <div class="col-md-4">
                 <select class="form-control" name="reason_for_rejection">

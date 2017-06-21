@@ -25,7 +25,17 @@ module Effective
 
       def collection
         employers = Organization.all_employer_profiles
-        employers = employers.send(attributes[:status]) if attributes[:status].present?
+        if attributes[:aasm_state].present?
+          ids = []
+          employers.each do |e|
+            if e.employer_profile.employer_attestation && e.employer_profile.employer_attestation.has_documents?
+                if e.employer_profile.employer_attestation.aasm_state == attributes[:aasm_state]
+                  ids << e
+                end
+            end
+          end
+          employers =  Organization.where(:_id.in => ids)
+        end
         employers
       end
 
@@ -48,16 +58,14 @@ module Effective
 
     def nested_filter_definition
 
-      status_tab =  [
-          {label: 'Submitted'},
-          { label: 'Approved'},
-          { label: 'Rejected'},
-          { label: 'All'}     
-           ]
-
       {
-          status: status_tab,
-          top_scope: :status
+          top_scope:  :aasm_state,
+          aasm_state: [
+              {scope: "submitted",label: 'submitted'},
+              {scope: "accepted",label: 'accepted'},
+              {scope: "rejected",label: 'rejected'},
+              {label: 'all'}
+          ],
       }
       end
     end

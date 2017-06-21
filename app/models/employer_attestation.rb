@@ -14,6 +14,7 @@ class EmployerAttestation
     state :submitted
     state :pending
     state :approved
+    state :rejected
     state :denied
 
     event :submit do 
@@ -32,4 +33,9 @@ class EmployerAttestation
       transitions from: [:submitted, :pending], to: :denied
     end
   end
+
+  def has_documents?
+    self.employer_attestation_documents
+  end
+
 end
