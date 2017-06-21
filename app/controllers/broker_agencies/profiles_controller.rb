@@ -268,7 +268,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @records_filtered = is_search ? @orgs.count : total_records
     @total_records = total_records
     broker_role = current_user.person.broker_role || nil
-    if general_agency_is_enabled
+    if general_agency_is_enabled?
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
     end
     @draw = dt_query.draw
