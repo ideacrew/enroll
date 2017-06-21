@@ -15,7 +15,7 @@ class DelinkBroker < MongoidMigrationTask
       phone: {kind: "main", area_code: "202", number: "555-1212"}
       )
 
-      org = Organization.create(office_locations: [hbx_office], fein: "999109000", legal_name: legal_name)
+      org = Organization.create(office_locations: [hbx_office], fein: fein, legal_name: legal_name)
       broker_agency_profile = BrokerAgencyProfile.create(market_kind: "both",
                                                       entity_kind: "s_corporation",
                                                       organization: org)
