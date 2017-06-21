@@ -1311,7 +1311,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-  context "and a published plan year application is reset to unpublished state", :dbclean => :after_all do
+  context "and a published plan year application is reset to unpublished state", :dbclean => :after_each do
     let(:coverage_effective_date)   { TimeKeeper.date_of_record.end_of_month + 1.day }
     let(:renewal_health_plan)       { FactoryGirl.create(:plan, :with_premium_tables,
                                                           coverage_kind: "health",
