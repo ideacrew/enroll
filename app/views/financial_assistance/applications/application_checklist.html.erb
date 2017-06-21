@@ -1,7 +1,6 @@
 <% content_for :horizontal_status do %>
   <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
-<%#= form_tag(insured_interactive_identity_verification_path(id: @transaction_id), :enctype =>"multipart/form-data", html: { multipart: true }, method: :put) do %>
   <div class="container">
     <div id="new_person_wrapper">
       <div class="row">
@@ -36,7 +35,6 @@
           </div>
         </div>
 
-
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
           <%= render  partial: 'shared/individual_progress', locals: {step: '2', application_checklist: true} %>
           <%= render partial: 'shared/help_me_sign_up' %>
@@ -45,4 +43,3 @@
     </div>
     <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
   </div>
-<%# end %>

@@ -64,11 +64,6 @@
   end
 
   def build_error_messages(model)
-    # all_errors = ""
-    # all_errors = all_errors + model.errors.full_messages.join(', ') if model.errors.messages.present?
-    # all_errors = all_errors + model.employer_address.errors.full_messages.join(', ') if model.employer_address.present? && model.employer_address.errors.messages.present?
-    # all_errors = all_errors + model.employer_phone.errors.full_messages.join(', ') if model.employer_phone.present? && model.employer_phone.errors.messages.present?
-    # return all_errors
     model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
   end
 
@@ -94,9 +89,6 @@
     @application = FinancialAssistance::Application.find(params[:application_id])
     @applicant = @application.applicants.find(params[:applicant_id])
     @model = @applicant.incomes.build
-    # @model.build_employer_phone
-    # @model.build_employer_address
-    # @model
   end
 
   def permit_params(attributes)
