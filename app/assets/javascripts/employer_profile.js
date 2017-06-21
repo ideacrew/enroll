@@ -460,6 +460,11 @@ $(function() {
   })
 })
 
+$(document).on('click', "a.terminate.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
   console.log('hey')
