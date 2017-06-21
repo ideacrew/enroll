@@ -65,7 +65,7 @@ module Insured
       end
     end
 
-    def self.selected_enrollment(family, employee_role)
+    def selected_enrollment(family, employee_role)
       py = employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.effective_on)}
       id_list = py.benefit_groups.map(&:id) if py.present?
       enrollments = family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list, :aasm_state.ne => 'shopping')
@@ -76,6 +76,11 @@ module Insured
       else
         return active_enrollment
       end
+    end
+
+    def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan, enrollment_kind)
+      benefit_group.plan_year.is_renewing? ?
+      employee_role.census_employee.renewal_benefit_group_assignment : (benefit_group.plan_year.aasm_state == "expired" && (change_plan == 'change_by_qle' or enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first : employee_role.census_employee.active_benefit_group_assignment
     end
 
     def is_market_kind_disabled?(kind)

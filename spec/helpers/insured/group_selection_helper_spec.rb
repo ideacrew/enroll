@@ -176,13 +176,13 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
 
       it "should return active enrollment if the coverage effective on covers active plan year" do
-        expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq active_enrollment
+        expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
       end
 
       it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
         renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
         sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
-        expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq renewal_enrollment
+        expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
       end
 
       context 'it should not return any enrollment' do
@@ -193,14 +193,47 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         end
 
         it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
-          expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq nil
+          expect(subject.selected_enrollment(family, employee_role)).to eq nil
         end
 
         it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
           renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
           sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
-          expect(Insured::GroupSelectionHelper.selected_enrollment(family, employee_role)).to eq nil
+          expect(subject.selected_enrollment(family, employee_role)).to eq nil
         end
+      end
+    end
+  end
+
+  describe "#benefit_group_assignment_by_plan_year", dbclean: :after_each do
+    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: organization.employer_profile)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)}
+
+    before do
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+    end
+
+    it "should return active benefit group assignment when the benefit group belongs to active plan year" do
+      benefit_group = organization.employer_profile.active_plan_year.benefit_groups.first
+      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.active_benefit_group_assignment
+    end
+
+    it "should return renewal benefit group assignment when benefit_group belongs to renewing plan year" do
+      benefit_group = organization.employer_profile.show_plan_year.benefit_groups.first
+      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.renewal_benefit_group_assignment
+    end
+
+    # EE should have the ability to buy coverage from expired plan year if had an eligible SEP which falls in that period
+
+    context "when EE has an eligible SEP which falls in expired plan year period" do
+
+      let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+
+      it "should return benefit group assignment belongs to expired py when benefit_group belongs to expired plan year" do
+        benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+        expired_bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
+        expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, "sep")).to eq expired_bga
       end
     end
   end
