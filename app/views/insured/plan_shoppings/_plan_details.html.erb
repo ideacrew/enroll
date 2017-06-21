@@ -62,7 +62,7 @@
                   <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %>
                 </span>
               </td>
-              <td><%= plan.nationwide ? "Nationwide" : "DC-Metro" %></td>
+              <td><%= plan.nationwide ? "Nationwide" : plan.service_area_id %></td>
               <td> <%= deductible_display(@hbx_enrollment, plan) %> </td>
             </tr>
           </tbody>

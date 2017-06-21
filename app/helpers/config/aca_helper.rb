@@ -27,6 +27,10 @@ module Config::AcaHelper
     !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
   end
 
+  def offers_nationwide_plans?
+    Settings.aca.nationwide_markets
+  end
+
   def carrier_special_plan_identifier_namespace
     @carrier_special_plan_identifier_namespace ||= Settings.aca.carrier_special_plan_identifier_namespace
   end
