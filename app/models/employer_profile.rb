@@ -57,6 +57,7 @@ class EmployerProfile
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_one  :employer_profile_account
+  embeds_one  :employer_attestation
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
   embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
@@ -857,46 +858,6 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
-  def upload_document(file_path,file_name,subject,size)
-    #doc_uri = Aws::S3Storage.save(file_path,'id-verification')
-    #file = File.open(file_path, "r:ISO-8859-1")
-
-    tmp_file = "#{Rails.root}/tmp/#{file_name}"
-    id = 0
-    while File.exists?(tmp_file) do
-      tmp_file = "#{Rails.root}/tmp/#{id}_#{file_name}"
-      id += 1
-    end
-    # Save to temp file
-    File.open(tmp_file, 'wb') do |f|
-        f.write File.open(file_path).read
-    end
-    if(file_path)
-      document = self.documents.new
-      document.identifier = tmp_file
-      document.format = 'application/pdf'
-      document.subject = subject
-      document.title =file_name
-      document.creator = self.legal_name
-      document.publisher = "test"
-      document.type = "EmployeeProfile"
-      document.format = 'pdf',
-      document.source = 'test'
-      document.language = 'English'
-      document.size =  size
-      document.date = Date.today
-      document.save!
-
-      #self.documents << document
-      logger.debug "associated file #{file_path} with the Employer Profile"
-      return document
-    end
-  end
-
-  def has_document?
-    !self.documents.blank?
-  end
-
   def rating_area
     if use_simple_employer_calculation_model?
       return nil
@@ -920,7 +881,43 @@ class EmployerProfile
     service_areas.collect { |service_area| service_area.service_area_id }.uniq
   end
 
-private
+  def upload_document(file_path,file_name,subject,size)
+    #doc_uri = Aws::S3Storage.save(file_path,'id-verification')
+    #file = File.open(file_path, "r:ISO-8859-1")
+
+    tmp_file = "#{Rails.root}/tmp/#{file_name}"
+    id = 0
+    while File.exists?(tmp_file) do
+      tmp_file = "#{Rails.root}/tmp/#{id}_#{file_name}"
+      id += 1
+    end
+    # Save to temp file
+    File.open(tmp_file, 'wb') do |f|
+      f.write File.open(file_path).read
+    end
+    if(file_path)
+      document = self.documents.new
+      document.identifier = tmp_file
+      document.format = 'application/pdf'
+      document.subject = subject
+      document.title =file_name
+      document.creator = self.legal_name
+      document.publisher = "test"
+      document.type = "EmployeeProfile"
+      document.format = 'pdf',
+      document.source = 'test'
+      document.language = 'English'
+      #document.size =  size
+      document.date = Date.today
+      document.save!
+
+      #self.documents << document
+      logger.debug "associated file #{file_path} with the Employer Profile"
+      return document
+    end
+  end
+
+  private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end
@@ -976,6 +973,4 @@ private
   def plan_year_publishable?
     !published_plan_year.is_application_unpublishable?
   end
-
-
 end

@@ -1,54 +1,37 @@
+<div class="col-xs-10">
+    <%if @employer_profile.employer_attestation %>
+      <button class = "btn btn-danger" ><%= @employer_profile.employer_attestation.status %></button>
+    <%end%>
+</div>
+
 <div class="col-xs-10" style="text-align: right;top: 40px;margin-left: 35px;">
   <div class="row">
-    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn btn-default " %>
+    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, '/documents/new', remote: 'true', class: "btn btn-default " %>
   </div>
 </div>
 
 
 <div style="width:90%">
   <%= render_datatable(@datatable) %>
-  <% @documents.each do |doc| %>
-      <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div style="margin:1em; border: 1px solid;padding: 1em;">
-              <h4>MA DOR FORM-X</h4>
-              <p id="print_<%=doc.id%>">
-                <%begin%>
-                <% reader = PDF::Reader.new(doc.identifier) %>
-                <% reader.pages.each do |page| %>
-                    <%= page.text %>
-                <% end %>
-                <%rescue%>
-                    <b> Only we supports PDF</b>
-                <%end%>
-              </p>
-              <p style="text-align: right">
-                <button class = "btn btn-default" data-dismiss="modal" >Cancel</button>
-                <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>">Download</a></button>
-                <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
-              </p>
-            </div>
-          </div>
-
+  <div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div style="margin:1em; border: 1px solid;padding: 1em;">
+          <h4>MA DOR FORM-X</h4>
+          <p> There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>
+          <p style="text-align: right">
+            <button class = "btn btn-default" data-dismiss="modal" >Cancel</button>
+            <button class = "btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button>
+            <button class = "btn btn-default" >Print</button></p>
         </div>
       </div>
-      </div>
-  <% end %>>
+    </div>
   </div>
 </div>
 <script type="text/javascript" charset="utf-8">
     initializeDataTables();
     jQuery('.buttons-csv').hide()
     jQuery('.buttons-excel').hide()
-
-    function printDoc(id){
-        var window_obj=window.open();
-        window_obj.document.write($('#print_'+id).html());
-        window_obj.print();
-        window_obj.close();
-    }
-
 </script>
 
 <style>
