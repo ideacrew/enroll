@@ -9,7 +9,6 @@ class Insured::FamilyMembersController < ApplicationController
 
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
-
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
@@ -59,6 +58,26 @@ class Insured::FamilyMembersController < ApplicationController
     respond_to do |format|
       format.html
       format.js
+    end
+  end
+
+  def review_and_submit
+    @selectedTab = "reviewAndSubmit"
+    @allTabs = NavigationHelper::getAllTabs
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+    @income_and_adjustments = []
+    @applicants = []
+    @application_id = @family.applications[0].id.to_s
+    if @family.applications.count >= 1
+      @family.applications[0].applicants.each do |applicant|
+        applicant_person = applicant.person
+        applicant.incomes.each do |income|
+          obj = {:applicant_id=> applicant.id.to_s,:income_id=> income.id.to_s, :person_name => applicant_person.first_name + " " + applicant_person.last_name, :type => income.kind, :frequency => income.frequency_kind, :amount => income.amount,:dates => "#{income.start_on}-#{income.end_on}"}
+          @income_and_adjustments << obj
+        end
+
+        @applicants << applicant
+      end
     end
   end
 
