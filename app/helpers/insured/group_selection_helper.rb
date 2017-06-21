@@ -76,5 +76,53 @@ module Insured
         return active_enrollment
       end
     end
+
+    def is_market_kind_disabled?(kind)
+      if @mc_market_kind.present?
+        @mc_market_kind != kind
+      else
+        @disable_market_kind == kind
+      end
+    end
+
+    def is_market_kind_checked?(kind)
+      if @mc_market_kind.present?
+        @mc_market_kind == kind
+      else
+        @market_kind == kind
+      end
+    end
+
+    def is_employer_disabled?(employee_role)
+      if @mc_market_kind.present?
+        @mc_market_kind == "individual" || @hbx_enrollment.employee_role.id != employee_role.id
+      else
+        false
+      end
+    end
+
+    def is_employer_checked?(employee_role)
+      if @mc_market_kind.present?
+        !(is_employer_disabled?(employee_role))
+      else
+        employee_role.id == @employee_role.id
+      end
+    end
+
+    def is_coverage_kind_checked?(coverage_kind)
+      if @mc_coverage_kind.present?
+        @mc_coverage_kind == coverage_kind
+      else
+        coverage_kind == "health" ? true : false
+      end
+    end
+
+    def is_coverage_kind_disabled?(coverage_kind)
+      if @mc_coverage_kind.present?
+        @mc_coverage_kind != coverage_kind
+      else
+        false
+      end
+    end
   end
 end
