@@ -152,7 +152,7 @@ class DocumentsController < ApplicationController
     @employer_profile = Organization.all_employer_profiles.where(legal_name: params[:document][:creator]).last.employer_profile
     @employer_profile.employer_attestation= EmployerAttestation.new() unless @employer_profile.employer_attestation
     #@employer_profile.employer_attestation.employer_attestation_doccument = EmployerAttestationDocument.new() unless @employer_profile.employer_attestation.employer_attestation_doccument
-    document = @employer_profile.employer_attestation.employer_attestation_documents.new().upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
+    document = @employer_profile.employer_attestation.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
     if document.save!
       @employer_profile.employer_attestation.update_attributes(aasm_state: "submitted")
     end
