@@ -2,10 +2,9 @@ module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
     include NavigationHelper
     before_action :set_current_person
+    before_action :setup_navigation
 
     def new
-      @selectedTab = "moreAboutYou"
-      @allTabs = NavigationHelper::getAllTabs
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
@@ -97,6 +96,11 @@ module Insured
 
     def render_verification_override(transaction_id)
       render_to_string "events/identity_verification/interactive_verification_override", :formats => ["xml"], :locals => { :transaction_id => transaction_id }
+    end
+
+    def setup_navigation
+      @selectedTab = "moreAboutYou"
+      @allTabs = NavigationHelper::getAllTabs
     end
   end
 end
