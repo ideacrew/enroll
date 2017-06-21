@@ -2,16 +2,32 @@ class EmployerAttestation
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
+  include AASM
 
   embedded_in :employer_profile
+  embeds_many :employer_attestation_documents
 
-  STATUS = %w(Unsubmitted Submitted Pending Approved Denied)
+  aasm do
+    state :unsubmitted, initial: true
+    state :submitted
+    state :pending
+    state :approved
+    state :denied
 
-  field :status, type: String
+    event :submit do 
+      transitions from: :unsubmitted, to: :submitted
+    end
 
+    event :make_pending do
+      transitions from: :submitted, to: :pending
+    end
 
-  #embeds_one  :employer_profile
-  #embeds_many :employer_attestation_document
+    event :approve do
+      transitions from: [:submitted, :pending], to: :approved
+    end
 
-  validates_presence_of :status
+    event :deny do
+      transitions from: [:submitted, :pending], to: :denied
+    end
+  end
 end
