@@ -305,6 +305,11 @@ class FinancialAssistance::Application
     self.eligibility_determinations
   end
 
+  def financial_application_complete?
+    # iterate over all applicant and see if applicatin info is complete for each + mandatory fields in applications level.
+    true
+  end
+
 private
   def set_submission_date
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record)
