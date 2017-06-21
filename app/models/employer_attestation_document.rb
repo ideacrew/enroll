@@ -4,6 +4,7 @@ class EmployerAttestationDocument < Document
   include Mongoid::Timestamps
   include AASM
 
+  field :aasm_state, type: String, default: "submitted"
   embedded_in :employer_attestation
 
   aasm do
