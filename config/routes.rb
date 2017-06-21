@@ -246,6 +246,8 @@ Rails.application.routes.draw do
         post 'match'
       end
     end
+
+    resources :employer_attestations
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
       get 'new'
