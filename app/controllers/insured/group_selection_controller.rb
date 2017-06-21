@@ -41,6 +41,11 @@ class Insured::GroupSelectionController < ApplicationController
       @disable_market_kind = "individual" if @market_kind == "shop"
     end
 
+    if @hbx_enrollment.present? && @change_plan == "change_plan"
+      @mc_market_kind = @hbx_enrollment.kind == "employer_sponsored" ? "shop" : "individual"
+      @mc_coverage_kind = @hbx_enrollment.coverage_kind
+    end
+
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 

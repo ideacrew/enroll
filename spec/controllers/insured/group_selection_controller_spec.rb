@@ -132,6 +132,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(assigns(:disable_market_kind)).to eq "individual"
     end
 
+    context "it should set the instance variables" do
+
+      before do
+        controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
+        allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+        allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        sign_in user
+        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
+      end
+
+      it "should set market kind when user select to make changes in open enrollment" do
+        expect(assigns(:mc_market_kind)).to eq hbx_enrollment.kind
+      end
+
+      it "should set the coverage kind when user click on make changes in open enrollment" do
+        expect(assigns(:mc_coverage_kind)).to eq hbx_enrollment.coverage_kind
+      end
+    end
+
     context "individual" do
       let(:hbx_profile) {double(benefit_sponsorship: benefit_sponsorship)}
       let(:benefit_sponsorship) {double(benefit_coverage_periods: [benefit_coverage_period])}
