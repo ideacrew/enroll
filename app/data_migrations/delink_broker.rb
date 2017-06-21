@@ -35,6 +35,3 @@ class DelinkBroker < MongoidMigrationTask
     end
   end
 end
-
-
-# organization_ids_to_move = ENV['57c78189faca1428a100399c','57c780fefaca1428a1000fbd']
