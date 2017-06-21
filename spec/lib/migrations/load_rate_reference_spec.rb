@@ -10,9 +10,9 @@
 #
 # RSpec.describe 'Load Rating Regions Task', :type => :task do
 #
-#   context "rate_reference:update_rating_areas" do
+#   context "rating_area:update_rating_areas" do
 #     before :all do
-#       Rake.application.rake_require "tasks/migrations/load_rate_reference"
+#       Rake.application.rake_require "tasks/migrations/load_rating_area"
 #       Rake::Task.define_task(:environment)
 #     end
 #
@@ -44,7 +44,7 @@
 #     context "it handles the case where multiple counties exist in the same Zip Code" do
 #       let(:rating_areas_by_zip) { RatingArea.where(zip_code: "01002") }
 #       context "first rate reference for zip code" do
-#         subject { rate_references_by_zip.first }
+#         subject { rating_areas_by_zip.first }
 #         it_should_behave_like "a rate reference", { zip_code: "01002",
 #                                                     county_name: "Hampshire",
 #                                                     zip_code_in_multiple_counties: true,
@@ -53,7 +53,7 @@
 #       end
 #
 #       context "second rate reference for zip code" do
-#         subject { rate_references_by_zip.second }
+#         subject { rating_areas_by_zip.second }
 #         it_should_behave_like "a rate reference", { zip_code: "01002",
 #                                                     county_name: "Franklin",
 #                                                     zip_code_in_multiple_counties: true,
@@ -65,7 +65,7 @@
 #     private
 #
 #     def invoke_task
-#       Rake::Task["load_rate_reference:update_rating_areas"].invoke
+#       Rake::Task["load_rating_area:update_rating_areas"].invoke
 #     end
 #   end
 # end

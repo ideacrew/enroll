@@ -39,7 +39,6 @@ class Employers::PlanYearsController < ApplicationController
       Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-    elsif params[:plan_option_kind] == "single_plan"
       Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
@@ -48,7 +47,7 @@ class Employers::PlanYearsController < ApplicationController
       Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     end
 
-    @carriers_cache = CarrierProfile.carriers_for(@employer_profile).inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     respond_to do |format|
       format.js
     end

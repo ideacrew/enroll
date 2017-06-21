@@ -3,7 +3,7 @@ var EmployerProfile = ( function( window, undefined ) {
   function changeCensusEmployeeStatus($thisObj) {
     $('.injected-edit-status').html('<br/><h3 class="no-buffer">'+$thisObj.text()+'</h3><div class="module change-employee-status hbx-panel panel panel-default"><div class="panel-body"><div class="vertically-aligned-row"><div><label class="enroll-label">Enter Date of '+$thisObj.text()+':</label><input title="&#xf073; &nbsp;" placeholder="&#xf073; &nbsp;'+$thisObj.text()+' Date" type="text" class="date-picker date-field form-control"/></div><div class="text-center"><span class="btn btn-primary btn-sm disabled">'+$thisObj.text()+'</span></div></div></div></div>');
     if ( $thisObj.text() == 'Terminate' ) {
-      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+        $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
       $('.injected-edit-status .change-employee-status .date-picker').attr('placeholder', $('.injected-edit-status .change-employee-status .date-picker').attr('title')+'Termination Date (must be within the past 60 days)');
       $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
     }
@@ -93,7 +93,7 @@ var EmployerProfile = ( function( window, undefined ) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
           } else {
-	    if ($(this).closest('.composite-offerings').is(":visible")) { 
+	    if ($('.composite-offerings').is(":visible")) {
               editvalidatedbgemployeepremiums = true
               editvalidated = true;
 	    } else {
@@ -118,7 +118,7 @@ var EmployerProfile = ( function( window, undefined ) {
           editvalidatedbgemployeepremiums = true
           editvalidated = true;
         } else {
-	  if ($(this).closest('.composite-offerings').is(":visible")) { 
+	  if ($('.composite-offerings').is(":visible")) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
 	  } else {
@@ -258,7 +258,7 @@ var EmployerProfile = ( function( window, undefined ) {
           validatedbgemployeepremiums = true;
           validated = true;
         } else {
-          if ($(this).closest('.composite-offerings').is(":visible")) {
+          if ($('.composite-offerings').is(":visible")) {
               validatedbgemployeepremiums = true;
               validated = true;
           } else {
@@ -459,6 +459,18 @@ $(function() {
     })
   })
 })
+
+$(document).on('click', "a.terminate.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', "a.interaction-click-control-terminate", function(){
+  event.preventDefault();
+  console.log('hey')
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
 
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();

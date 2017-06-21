@@ -26,7 +26,7 @@ organization = Organization.new(
     )
 
 hbx_profile = organization.build_hbx_profile(
-    cms_id: "DC0",
+    cms_id: "#{aca_state_abbreviation}0",
     us_state_abbreviation: aca_state_abbreviation,
     benefit_sponsorship: BenefitSponsorship.new(
         geographic_rating_areas: [geographic_rating_area],
@@ -71,29 +71,21 @@ def create_staff member
 end
 
 assisters = [
-  {email: 'ddavis@cohdc.org',first_name:  'Dakia', last_name: 'Davis', organization: 'Community of Hope', role: 'assister'},
-  {email: 'mvalente@cohdc.org', first_name: 'Matthew', last_name: 'Valente', organization: 'Community of Hope', role: 'assister'},
-  {email: 'knicol@whitman-walker.org', first_name: 'Katie', last_name: 'Nichol', organization: 'Whitman-Walker Health', role: 'assister'},
+  {email: 'test@test.org',first_name:  'test', last_name: 'test', organization: 'test', role: 'assister'}
 ]
 
 csr =[
- {last_name: "Bell",first_name: "Valerie",shift: "10:00AM-6:30PM",organization: "ASHLIN",email: "valerie.bell5@dc.gov", cac: false, role: 'csr'},
- {last_name: "Bradica",first_name: "Catherine",shift: "07:45AM-04:15PM",organization: "KIDD",email: "catherine.bradica@dc.gov", cac: false, role: 'csr'},
- {last_name: "Brown",first_name: "Steven",shift: "08:00AM-04:30PM",organization: "VANTIX",email: "steven.brown2@dc.gov", cac: false, role: 'csr'},
- {last_name: "Buckner", first_name: "Sherry",shift: "08:30AM-05:00PM", organization: "ASHLIN",email: "sherry.buckner@dc.gov", cac: false, role: 'csr'},
- {last_name: "Curtis",first_name: "Antonio",shift: "09:00AM-5:30PM",organization: "VANTIX",email: "antonio.curtis@dc.gov", cac: false, role: 'csr'},
- {last_name: "Franklin,",first_name: "Nikia",shift: "11:30AM-8:00PM",organization: "ASHLIN",email: "nikia.franklin@dc.gov", cac: false, role: 'csr'}
+ {last_name: "LAST",first_name: "FIRST",shift: "10:00AM-6:30PM",organization: "ASHLIN",email: "example.email@someplace.gov", cac: false, role: 'csr'},
+ {last_name: "EXAMPLE",first_name: "EXAMPLE",shift: "07:45AM-04:15PM",organization: "KIDD",email: "test.email@someplace.gov", cac: false, role: 'csr'}
 ]
 
 cac = [
-  {first_name:"Akwasi",last_name:"Acheampong", email: "acheampong@decorm.com", organization: "DECO", cac: true, role: 'csr'},
-  {first_name:"Maria",last_name:"Amaya",email: "mgranillo@decorm.com", organization: "DECO", cac: true, role: 'csr'},
-  {first_name:"Sandra",last_name:"Bolognesis",email: "bolognesi@decorm.com", organization: "DECO", cac: true, role: 'csr'},
-  {first_name:"German", last_name:"Chavez",email: "gchavez@decorm.com", organization: "DECO", cac: true, role: 'csr'},
+  {first_name:"SAMPLE",last_name:"SAMPLE", email: "sample@example.com", organization: "SAMPL", cac: true, role: 'csr'}
 ]
 
 
 staff = assisters + csr + cac
-staff.each{|member| create_staff member}
+# This would create staff members for HBX
+#staff.each{|member| create_staff member}
 
 puts "::: HBX Admins including CSR, CAC and Assisters Complete :::"

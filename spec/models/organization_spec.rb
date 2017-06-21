@@ -124,7 +124,7 @@ RSpec.describe Organization, dbclean: :after_each do
     let(:organization2) {FactoryGirl.create(:organization, legal_name: "Turner Inc")}
     let!(:carrier_profile_2) {FactoryGirl.create(:carrier_profile, organization: organization2, issuer_hios_ids: ['22222'])}
     let(:single_choice_organization) {FactoryGirl.create(:organization, legal_name: "Restricted Options")}
-    let!(:single_choice_carrier) { create(:carrier_profile, organization: single_choice_organization, restricted_to_single_choice: true) }
+    let!(:sole_source_participater) { create(:carrier_profile, organization: single_choice_organization, offers_sole_source: true) }
 
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001')}
@@ -141,29 +141,24 @@ RSpec.describe Organization, dbclean: :after_each do
         carrier_names = {}
         carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
         carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
         expect(Organization.valid_carrier_names).to match_array carrier_names
       end
 
       it "valid_carrier_names_for_options" do
-        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s]]
+        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
         expect(Organization.valid_carrier_names_for_options).to match_array carriers
       end
 
-      it "valid_carrier_names_for_options passes arguments" do
-        carriers = [[single_choice_carrier.legal_name, single_choice_carrier.id.to_s]]
+      it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
+        carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
         expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
-      end
-
-      it "can filter out single choice only options" do
-        carrier_names = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        expect(Organization.valid_carrier_names(sole_source_only: false)).to match_array carrier_names
       end
 
       it "can filter out by service area" do
         carrier_names = {}
         carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
 
         expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
       end

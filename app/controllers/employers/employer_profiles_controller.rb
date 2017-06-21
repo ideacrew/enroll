@@ -110,8 +110,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def show
-     @datatable = Effective::Datatables::DocumentDatatable.new
-    @tab = params['tab']
+    @tab = params['tab'] || 'home'
+
+    # Conditional based columns has to display so we are passing arguments
+    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
     else
@@ -120,6 +123,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
+        @datatable = Effective::Datatables::DocumentDatatable.new
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -471,7 +475,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def build_employer_profile_params
-    debugger
     build_organization
     build_office_location
   end

@@ -1,5 +1,6 @@
 class CarrierProfile
   include Mongoid::Document
+  include Config::AcaModelConcern
   include SetCurrentUser
   include Mongoid::Timestamps
 
@@ -15,10 +16,10 @@ class CarrierProfile
   field :ivl_dental, type: Boolean
   field :shop_health, type: Boolean
   field :shop_dental, type: Boolean
-  field :restricted_to_single_choice, type: Boolean, default: false
+  field :offers_sole_source, type: Boolean, default: false
 
   field :issuer_hios_ids, type: Array, default: []
-  field :issuer_state, type: String, default: "DC"
+  field :issuer_state, type: String, default: aca_state_abbreviation
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
 

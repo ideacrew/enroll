@@ -110,7 +110,7 @@ class BenefitGroup
   validate :check_employer_contribution_for_employee
   validate :check_offered_for_employee
 
-  before_save :set_congress_defaults
+  before_save :set_congress_defaults, :update_dependent_composite_tiers
   before_destroy :delete_benefit_group_assignments_and_enrollments
 
   # def plan_option_kind=(new_plan_option_kind)
@@ -337,6 +337,10 @@ class BenefitGroup
     ]
   end
 
+  def dependent_composite_tier_contributions
+    self.composite_tier_contributions.where(:composite_rating_tier.nin => CompositeRatingTier::VISIBLE_NAMES)
+  end
+
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
       organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
@@ -411,9 +415,9 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     when "metal_level"
-      Plan.valid_shop_health_plans("metal_level", metal_level_for_elected_plan, start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, employer_profile.service_area_ids)
     end
   end
 
@@ -627,6 +631,16 @@ class BenefitGroup
     self.over_one_dependents_max_amt = 1094.64 if over_one_dependents_max_amt == 0
   end
 
+  def update_dependent_composite_tiers
+    family_tier = self.composite_tier_contributions.where(composite_rating_tier: 'family')
+    return unless family_tier.present?
+
+    contribution = family_tier.first.employer_contribution_percent
+    dependent_composite_tier_contributions.each do |tier|
+      tier.employer_contribution_percent = contribution
+    end
+  end
+
   def dollars_to_cents(amount_in_dollars)
     Rational(amount_in_dollars) * Rational(100) if amount_in_dollars
   end
@@ -688,7 +702,9 @@ class BenefitGroup
     if start_on.month == 1 && start_on.day == 1
     else
       if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
-        self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+        unless self.sole_source?
+          self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+        end
       end
     end
   end

@@ -6,6 +6,14 @@ class CompositeRatedPlanCostDecorator < SimpleDelegator
     @composite_rating_tier = composite_rating_tier
   end
 
+  def employer_contribution_for(member)
+    0.00
+  end
+
+  def employee_cost_for(member)
+    0.00
+  end
+
   def total_premium
     @benefit_group.composite_rating_tier_premium_for(@composite_rating_tier)
   end
