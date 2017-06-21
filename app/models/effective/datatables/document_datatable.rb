@@ -24,7 +24,7 @@ module Effective
       end
 
       def collection
-        employers = Organization.all_employer_profiles
+        employers = Organization.all_employer_profiles.pending_attestation
         if attributes[:aasm_state].present?
           ids = []
           employers.each do |e|

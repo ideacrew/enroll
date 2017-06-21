@@ -14,11 +14,11 @@ class EmployerAttestationDocument < Document
     state :accepted
     state :rejected
 
-    event :accept do
+    event :accept, :after => :record_transition do
       transitions from: :submitted, to: :accepted
     end
 
-    event :reject do
+    event :reject, :after => :record_transition do
       transitions from: :submitted, to: :rejected
     end
   end

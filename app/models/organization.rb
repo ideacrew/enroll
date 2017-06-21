@@ -169,7 +169,7 @@ class Organization
       })
   }
 
-  scope :pending_attestation, -> { where(:"employer_profile.employer_attestation" => {:$elemMatch => {:aasm_state.in => ['submitted', 'pending']}})}
+  scope :pending_attestation, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending']) }
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def self.generate_fein

@@ -8,6 +8,7 @@ class EmployerAttestation
 
   embedded_in :employer_profile
   embeds_many :employer_attestation_documents, as: :documentable
+  embeds_many :workflow_state_transitions, as: :transitional
 
   aasm do
     state :unsubmitted, initial: true
@@ -17,19 +18,19 @@ class EmployerAttestation
     state :rejected
     state :denied
 
-    event :submit do 
+    event :submit, :after => :record_transition do 
       transitions from: :unsubmitted, to: :submitted
     end
 
-    event :make_pending do
+    event :make_pending, :after => :record_transition do
       transitions from: :submitted, to: :pending
     end
 
-    event :approve do
+    event :approve, :after => :record_transition do
       transitions from: [:submitted, :pending], to: :approved
     end
 
-    event :deny do
+    event :deny, :after => :record_transition do
       transitions from: [:submitted, :pending], to: :denied
     end
   end
