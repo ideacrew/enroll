@@ -510,4 +510,95 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
     end
   end
+
+  describe "#is_eligible_for_dental?" do
+
+    let(:active_bg) { double("ActiveBenefitGroup", plan_year: double("ActivePlanYear")) }
+    let(:renewal_bg) { double("RenewalBenefitGroup", plan_year: double("RenewingPlanYear")) }
+    let!(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryGirl.create(:employee_role)}
+    let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: employee_role.person)}
+
+    before do
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+    end
+
+    context "when ER is an initial ER" do
+
+      before do
+        allow(census_employee).to receive(:renewal_published_benefit_group).and_return nil
+      end
+
+      it "should return true if active benefit group offers dental" do
+        allow(active_bg).to receive(:is_offering_dental?).and_return true
+        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+      end
+
+      it "should return false if active benefit group not offers dental" do
+        allow(active_bg).to receive(:is_offering_dental?).and_return false
+        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+      end
+    end
+
+    context "when ER is in renewing period" do
+
+      before do
+        allow(census_employee).to receive(:renewal_published_benefit_group).and_return renewal_bg
+      end
+
+      context "when EE is in renewal open enrollment & clicked on shop for plans" do
+
+        it "should return true if renewal benefit group offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+        end
+
+        it "should return false if renewal benefit group not offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+        end
+      end
+
+      context "when EE selects SEP & effective_on covers under active plan year period", db_clean: :after_each do
+
+        before do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          allow(sep).to receive(:is_eligible?).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
+          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return true
+        end
+
+        it "should return true if active benefit group offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+        end
+
+        it "should return false if active benefit group not offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+        end
+      end
+
+      context "when EE selects SEP & effective_on covers under renewal plan year period", db_clean: :after_each do
+
+        before do
+          allow(active_bg).to receive(:is_offering_dental?).and_return true
+          allow(sep).to receive(:is_eligible?).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return false
+        end
+
+        it "should return true if renewal benefit group offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+        end
+
+        it "should return false if renewal benefit group not offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+        end
+      end
+    end
+  end
 end
