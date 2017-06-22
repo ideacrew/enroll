@@ -19,7 +19,7 @@
       <%= render partial: 'qle_detail_for_existing_sep' if @active_admin_sep.present?%>
       <%= render partial: "enrollment", :collection => @hbx_enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <%= render partial: 'shop_for_plans_widget' %>
-      <% unless @current_user.has_employee_role? %>
+      <% if individual_market_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
       <% end %>
     </div>
