@@ -71,8 +71,33 @@ class Employers::EmployerAttestationsController < ApplicationController
     redirect_to exchanges_hbx_profiles_path+'?tab=documents'
   end
 
+  def authorized_download
+    begin
+      documents = @employer_profile.employer_attestation.employer_attestation_documents
+      if authorized_to_download?
+        uri = documents.find(relation_id).identifier
+        send_data Aws::S3Storage.find(uri), get_options(params)
+      else
+       raise "Sorry! You are not authorized to download this document."
+      end
+    rescue => e
+      redirect_to(:back, :flash => {error: e.message})
+    end
+  end
 
   private
+
+  def authorized_to_download?
+    true
+  end
+
+  def get_options(params)
+    options = {}
+    options[:content_type] = params[:content_type] if params[:content_type]
+    options[:filename] = params[:filename] if params[:filename]
+    options[:disposition] = params[:disposition] if params[:disposition]
+    options
+  end
 
   def find_employer
     if params[:id].present?
