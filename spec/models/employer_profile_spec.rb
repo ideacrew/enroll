@@ -1012,6 +1012,50 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       end
     end
   end
+
+  describe "has_documents? check before publish plan" do
+    context "has_document" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+
+      it "should return false" do
+        expect(employer_profile.has_document?).to eq(false)
+      end
+
+      it "should retun true" do
+        employer_profile.documents << Document.new()
+        expect(employer_profile.has_document?).to eq(true)
+      end
+    end
+  end
+
+  context "Document Upload" do
+    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
+    let(:file_path){ "test/JavaScript.pdf" }
+    let(:file_name){ "JavaScript.pdf" }
+    let(:subject){ "Employer Attestation" }
+    let(:size){ 1024*1024 }
+
+    context "with valid arguments" do
+
+      before do
+        employer_profile.upload_document(file_path,file_name,subject,size)
+      end
+
+      it "should upload document to the employer profile" do
+        expect(employer_profile.documents.size).to eq 1
+      end
+
+      it "should have valid document inputs" do
+        expect(employer_profile.documents.first.title).to eq file_name
+        expect(employer_profile.documents.first.subject).to eq subject
+        expect(employer_profile.documents.first.size.to_i).to eq size
+        expect(employer_profile.documents.first.date).to eq Date.today
+      end
+
+    end
+
+  end
+
 end
 
 describe EmployerProfile, ".is_converting?", dbclean: :after_each do

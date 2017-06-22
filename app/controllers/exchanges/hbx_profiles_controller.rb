@@ -346,8 +346,10 @@ def employer_poc
   end
 
   def verification_index
-    @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
+    #@families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").page(params[:page]).per(15)
     @datatable = Effective::Datatables::DocumentDatatable.new
+    @documents = Organization.all_employer_profiles.employer_profiles_with_attestation_document
+
     respond_to do |format|
       format.html { render partial: "index_verification" }
       format.js {}
