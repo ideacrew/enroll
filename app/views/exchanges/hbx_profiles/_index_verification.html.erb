@@ -17,8 +17,8 @@
 </div>
 <%= render_datatable(@datatable) %>
 <% @documents.each do |doc| %>
-  <% if doc.employer_profile && doc.employer_profile.employer_attestation && doc.employer_profile.employer_attestation.has_documents? %>
-  <% @document = doc.employer_profile.employer_attestation.employer_attestation_documents.last %>
+  <%# if doc.employer_profile && doc.employer_profile.employer_attestation && doc.employer_profile.employer_attestation.has_documents? %>
+ <% @document = doc.employer_profile.employer_attestation.employer_attestation_documents.last %>
 
   <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -41,8 +41,8 @@
           </p>
           <hr/>
           <p class="row">
-            <span class="col-md-6">Employer Name: Admin</span>
-            <span class="col-md-6" style="text-align: right">Effective date: <%= @document.created_at %></span>
+            <span class="col-md-6">Employer Name: <%= doc.legal_name %></span>
+            <span class="col-md-6" style="text-align: right">Effective date: <%#= @document.created_at %></span>
           </p>
           <%= form_tag employers_employer_attestation_path(doc.employer_profile), :method => :put do |f| %>
             <input type="hidden" name="attestation_doc_id" value="<%= doc.employer_profile.employer_attestation.employer_attestation_documents.last.id %>" />
@@ -74,7 +74,7 @@
     </div>
   </div>
   </div>
-<% end %>
+<%# end %>
 <% end %>
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();

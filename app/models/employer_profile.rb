@@ -918,10 +918,11 @@ class EmployerProfile
   end
 
   def has_valid_attestation?
-    self.employer_attestation && self.employer_attestation.aasm_state == 'approved'
+    self.employer_attestation.present? && self.employer_attestation.approved?
   end
   
   private
+  
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end

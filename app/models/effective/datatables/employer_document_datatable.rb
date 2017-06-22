@@ -9,11 +9,11 @@ module Effective
         end
 
         table_column '', :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i>' }, :filter => false, :sortable => false
-        table_column :status, :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i> status' }, :filter => false, :sortable => false
+        table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
         table_column :name, :proc => Proc.new { |row| link_to row.title,"Dcoument", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}" }, :filter => false, :sortable => false
         table_column :type, :proc => Proc.new { |row| row.subject }, :filter => false, :sortable => false
         table_column :size, :proc => Proc.new { |row| row.size_bytes_to_megabytes }, :filter => false, :sortable => false
-        table_column :date, :proc => Proc.new { |row| row.date }, :filter => false, :sortable => false
+        table_column :date, :proc => Proc.new { |row| row.created_at.strftime('%m/%d/%Y') }, :filter => false, :sortable => false
         table_column :owner, :proc => Proc.new { |row| row.creator }, :filter => false, :sortable => false
       end
 
@@ -23,7 +23,11 @@ module Effective
 
       def collection
         @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
-        @employer_profile.documents.all
+        documents = []
+        if @employer_profile.employer_attestation.present?
+          documents = @employer_profile.employer_attestation.employer_attestation_documents
+        end
+        documents
       end
 
       def global_search?

@@ -123,8 +123,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
-          @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})
-          @documents = @employer_profile.documents.all
+        @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})
+        @documents = []
+        if @employer_profile.employer_attestation.present?
+          @documents = @employer_profile.employer_attestation.employer_attestation_documents
+        end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees

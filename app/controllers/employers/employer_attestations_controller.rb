@@ -23,7 +23,7 @@ class Employers::EmployerAttestationsController < ApplicationController
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
       if doc_uri.present?
         attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
-        success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename})
+        success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size})
         errors = attestation_document.errors.full_messages unless success
 
         if errors.blank? && @employer_profile.save
@@ -51,9 +51,11 @@ class Employers::EmployerAttestationsController < ApplicationController
       reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
       attestation_doc.update(reason_for_rejection: reason)
       attestation.make_pending! if attestation.may_make_pending?
+      flash[:notice] = "Employer attestation document is rejected."
     elsif params[:status] == 'accepted'
       attestation_doc.accept! if attestation_doc.may_accept?
       attestation.approve! if attestation.may_approve?
+      flash[:notice] = "Employer attestation document is approved."
     end
 
     redirect_to exchanges_hbx_profiles_path+'?tab=documents'

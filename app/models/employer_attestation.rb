@@ -15,7 +15,6 @@ class EmployerAttestation
     state :submitted
     state :pending
     state :approved
-    state :rejected
     state :denied
 
     event :submit, :after => :record_transition do 
