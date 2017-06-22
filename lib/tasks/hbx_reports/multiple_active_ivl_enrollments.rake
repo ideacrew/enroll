@@ -17,13 +17,13 @@ namespace :reports do
         DEPENDENT_FIRST_NAMES
         DEPENDENT_LAST_NAMES
         ENROLLMENT_HBX_ID
-        ENROLLMENT_ID
         MARKET_KIND
         STATE
         ENROLLMENT_HIOS
         COVERAGE_START_DATE
         COVERAGE_END_DATE
       )
+
       processed_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_path = "#{Rails.root}/hbx_report/multiple_active_ivl_enrollments.csv"
@@ -38,6 +38,7 @@ namespace :reports do
             ivl_dental_enrollments, shop_dental_enrollments = dental_enrollments.partition {|enr| enr.kind == "individual"}
             active_ivl_health_enrollments = ivl_health_enrollments.select { |enr| (HbxEnrollment::ENROLLED_STATUSES).include? enr.aasm_state }
             active_ivl_dental_enrollments = ivl_dental_enrollments.select { |enr| (HbxEnrollment::ENROLLED_STATUSES).include? enr.aasm_state }
+            
             if (active_ivl_health_enrollments.size > 1)
               active_ivl_health_enrollments.each do |enr|
                 dep = enr.hbx_enrollment_members.reject(&:is_subscriber).flat_map(&:person)
@@ -51,7 +52,6 @@ namespace :reports do
                         dep_first_names,
                         dep_last_names,
                         enr.hbx_id,
-                        enr.id,
                         enr.coverage_kind,
                         enr.aasm_state,
                         enr.plan.hios_id,
@@ -61,6 +61,7 @@ namespace :reports do
                 processed_count +=1
               end
             end
+            
             if (active_ivl_dental_enrollments.size > 1)
               active_ivl_dental_enrollments.each do |enr|
                 dep = enr.hbx_enrollment_members.reject(&:is_subscriber).flat_map(&:person)
@@ -74,7 +75,6 @@ namespace :reports do
                         dep_first_names,
                         dep_last_names,
                         enr.hbx_id,
-                        enr.id,
                         enr.coverage_kind,
                         enr.aasm_state,
                         enr.plan.hios_id,
