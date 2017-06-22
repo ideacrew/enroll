@@ -354,10 +354,14 @@ class BenefitGroup
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      if plan.coverage_kind == 'dental'
-        pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(plan, self, ce.composite_rating_tier)
       else
-        pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+        if plan.coverage_kind == 'dental'
+          pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
+        else
+          pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
+        end
       end
       pcd.total_employer_contribution
     end.sum
@@ -366,10 +370,14 @@ class BenefitGroup
   def monthly_min_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      if coverage_kind == 'dental'
-        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
       else
-        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+        if coverage_kind == 'dental'
+          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+        else
+          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+        end
       end
       pcd.total_employee_cost
     end.min
@@ -378,10 +386,14 @@ class BenefitGroup
   def monthly_max_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      if coverage_kind == 'dental'
-        pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+      if plan_option_kind == 'sole_source'
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
       else
-        pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+        if coverage_kind == 'dental'
+          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
+        else
+          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
+        end
       end
       pcd.total_employee_cost
     end.max
@@ -511,11 +523,11 @@ class BenefitGroup
   def lookup_cached_cprf_for(carrier_id)
     year = plan_year.start_on.year
     waived_and_active_count = if plan_year.estimate_group_size?
-                                census_employees.select { |ce| ce.expected_to_enroll? }.length
+                                targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
                               else
                                 all_active_and_waived_health_enrollments.length
                               end
-    total_employees = census_employees.count
+    total_employees = targeted_census_employees.count
     part_rate = waived_and_active_count/(total_employees * 1.0)
     EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, part_rate)
   end
@@ -571,7 +583,7 @@ class BenefitGroup
   # year status
   def group_size_count
     if plan_year.estimate_group_size?
-      census_employees.select { |ce| ce.expected_to_enroll? }.length
+      targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
     else
       all_active_health_enrollments.length
     end
@@ -579,7 +591,7 @@ class BenefitGroup
 
   def composite_rating_enrollment_objects
     if plan_year.estimate_group_size?
-      census_employees.select { |ce| ce.expected_to_enroll? }
+      targeted_census_employees.select { |ce| ce.expected_to_enroll? }
     else
       all_active_health_enrollments
     end
@@ -605,9 +617,14 @@ class BenefitGroup
     plan_option_kind == "sole_source"
   end
 
+  def build_estimated_composite_rates
+    return(nil) unless sole_source?
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first || reference_plan)
+    rate_calc.build_estimated_premiums
+  end
   def estimate_composite_rates
     return(nil) unless sole_source?
-    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first)
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first || reference_plan)
     rate_calc.assign_estimated_premiums
   end
 

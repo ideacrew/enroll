@@ -1649,6 +1649,27 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "expected to enroll" do
+    let!(:valid_waived_employee) { create(:census_employee, expected_selection: 'waive') }
+    let!(:enrolling_employee) { create(:census_employee, expected_selection: 'enroll') }
+    let!(:invalid_waive) { create(:census_employee, expected_selection: 'will_not_participate' )}
+
+    it "returns true for enrolling employees" do
+      expect(enrolling_employee.expected_to_enroll?).to be_truthy
+    end
+
+    it "returns false for non enrolling employees" do
+      expect(valid_waived_employee.expected_to_enroll?).to be_falsey
+      expect(invalid_waive.expected_to_enroll?).to be_falsey
+    end
+
+    it "counts waived and enrollees when considering group size" do
+      expect(valid_waived_employee.expected_to_enroll_or_valid_waive?).to be_truthy
+      expect(enrolling_employee.expected_to_enroll_or_valid_waive?).to be_truthy
+      expect(invalid_waive.expected_to_enroll_or_valid_waive?).to be_falsey
+    end
+  end
+
   context '.renewal_benefit_group_assignment' do
     let(:census_employee) { CensusEmployee.new(**valid_params) }
     let(:benefit_group_assignment_one)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }

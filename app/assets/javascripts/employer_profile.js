@@ -97,7 +97,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true
               editvalidated = true;
 	    } else {
-            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least 50%');
             editvalidatedbgemployeepremiums = false;
             editvalidated = false;
             return false;
@@ -106,7 +106,6 @@ var EmployerProfile = ( function( window, undefined ) {
         }
       });
     }
-
     if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
       editvalidatedreferenceplanselections = true
       editvalidated = true;
@@ -122,7 +121,7 @@ var EmployerProfile = ( function( window, undefined ) {
             editvalidatedbgemployeepremiums = true
             editvalidated = true;
 	  } else {
-            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
+            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be at least 50%');
             editvalidatedbgemployeepremiums = false;
             editvalidated = false;
             return false;
@@ -222,7 +221,6 @@ var EmployerProfile = ( function( window, undefined ) {
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
-
     bgtitles.each(function() {
       plantitle = $(this).val();
       if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"plantitle\"" + ']').size() < 2 ) {
@@ -284,9 +282,9 @@ var EmployerProfile = ( function( window, undefined ) {
     });
 
     dental_bgs = $('.select-dental-plan:visible').length
-    health_bgs = $('.benefit-group-fields > .health:visible').length
+    health_bgs = $('.benefit-group-fields > .health.offerings-slider:visible').length
     selected_reference_plans = dental_bgs + health_bgs;
-
+    validatedreferenceplanselections = false;
     if ( referenceplanselections.length != selected_reference_plans ) {
       validatedreferenceplanselections = false;
       validated = false;
@@ -467,7 +465,6 @@ $(document).on('click', "a.terminate.cancel", function(){
 
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
-  console.log('hey')
     $('tr.child-row:visible').remove();
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
