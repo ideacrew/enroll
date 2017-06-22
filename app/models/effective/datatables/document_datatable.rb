@@ -8,7 +8,9 @@ module Effective
           bulk_action 'Delete', data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
         table_column :status, :proc => Proc.new { |row|
-          row.employer_profile.employer_attestation.try(:aasm_state)
+          attestation = row.employer_profile.employer_attestation
+          attestation_doc = attestation.employer_attestation_documents.last if attestation.present?
+          attestation_doc.present? ? attestation_doc.aasm_state.camelcase : nil
         }, :filter => false, :sortable => false
         table_column :employer, :proc => Proc.new { |row|
           @employer_profile = row.employer_profile

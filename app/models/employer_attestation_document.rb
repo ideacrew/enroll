@@ -5,9 +5,10 @@ class EmployerAttestationDocument < Document
   include AASM
 
   field :aasm_state, type: String, default: "submitted"
-  embedded_in :employer_attestation
-
   field :reason_for_rejection, type: String
+
+  embedded_in :employer_attestation
+  embeds_many :workflow_state_transitions, as: :transitional
 
   aasm do
     state :submitted, initial: true
@@ -22,6 +23,9 @@ class EmployerAttestationDocument < Document
       transitions from: :submitted, to: :rejected
     end
   end
+
+  private 
+  
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
