@@ -69,6 +69,7 @@
       </div>
     </div>
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
+    <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">
       <% next if bg.reference_plan_id.blank? %>
       <% if bg.default == true %>
@@ -223,7 +224,7 @@
 
             <!--Health plan contribution: start-->
             <div class="col-xs-11 package-offering">
-              <% if bg.composite_tier_contributions.any? { |tier| tier.employer_contribution_percent > 0 } %>
+              <% if bg.sole_source? %>
                 <div class="col-xs-12">
                   <table>
                     <tr>

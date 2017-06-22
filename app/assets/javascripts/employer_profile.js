@@ -467,7 +467,6 @@ $(document).on('click', "a.terminate.cancel", function(){
 
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
-  console.log('hey')
     $('tr.child-row:visible').remove();
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
