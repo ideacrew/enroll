@@ -736,6 +736,7 @@ class Person
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
       employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+      employer_staff_role.approve! if !employer_staff_role.present?
       employer_staff_role.save
       return true, person.first
     end
@@ -873,6 +874,16 @@ class Person
       user.ridp_by_paper_application
     end
   end
+  # Makes user the primary poc
+  def make_primary(role)
+    self.active_employer_staff_roles.update(primary_poc: role)
+  end
+  
+  def is_primary_poc
+    if active_employer_staff_roles.present?
+      active_employer_staff_roles.first.primary_poc
+    end
+  end
 
   private
   def is_ssn_composition_correct?
@@ -917,7 +928,7 @@ class Person
       end
     end
   end
-
+  
   # Verify basic date rules
   def date_functional_validations
     date_of_birth_is_past

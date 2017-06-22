@@ -29,7 +29,7 @@ module Forms
       else
         pending = existing_company && Person.staff_for_employer(employer_profile).detect{|person|person.user_id}
         role_state = pending ? 'is_applicant' : 'is_active' 
-        person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: role_state)
+        person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: role_state, primary_poc: true)
       end
       current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
       current_user.save!
