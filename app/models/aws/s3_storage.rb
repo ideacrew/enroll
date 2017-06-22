@@ -1,6 +1,6 @@
 module Aws
   class S3Storage
-    ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat']
+    ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat', 'qa']
 
     def initialize
       setup
