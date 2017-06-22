@@ -46,9 +46,8 @@
   listings: ["Person 1            Age: 35",
              "Person 2            Age: 56"]} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-   heading: 'Advance Premium Tax Credit Savings:</strong> $0/month', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Advance Premium Tax Credit Savings:</strong> $0/month<br> This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. To get these savings, you must select a silver plan. "} %>
@@ -117,12 +116,16 @@ content: "You asked us to send your application to the DC Department of Human Se
    heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: " The deadline to request an appeal is #{TimeKeeper.date_of_record+95.days}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days. "} %>
+content: "  "} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>The deadline to request an appeal is</strong> #{TimeKeeper.date_of_record+95.days}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The DC Health Link Team <br></br> ________________________________________________________________________________"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
 content: "<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br><i>Exchange Regulations</i><br>General Eligibility Standards for Exchange Participation and Affordability Programs: 45 CFR § 155.305 <br> Premium Tax Credit Calculations:  26 CFR § 1.36B-3
 <br>Eligibility Appeals: 45 CFR §§ 155.505(b) & 520(b)(1) <br>Annual open enrollment period: 45 CFR § 155.155.410(e) <br>Special enrollment periods: 45 CFR § 155.420 <br>Requirement to report changes: 45 CFR § 155.3330(b) <br> <i>Medicaid Regulations</i> <br> State Residence: 42 CFR § 435.403<br>
 Citizenship and Non-Citizenship Eligibility: 42 CFR § 435.406 <br>
