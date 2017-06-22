@@ -4,7 +4,7 @@ module Effective
       datatable do
 
         bulk_actions_column do
-          bulk_action 'Download', download_documents_employers_employer_profile_path, data: {  confirm: 'Do you want to Download?', no_turbolink: true }
+          #bulk_action 'Download', download_documents_employers_employer_profile_path, data: {  confirm: 'Do you want to Download?', no_turbolink: true }
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
