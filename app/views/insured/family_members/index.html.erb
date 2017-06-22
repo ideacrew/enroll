@@ -31,12 +31,7 @@
               <label class="static_label label-floatlabel" for="relation">RELATION</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
             </div>
-            <div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
-            <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
-            </div>
-            <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd">
-            <%= render "financial_assistance_add_info_button", family_id: @family.id, family_member_id: @family.primary_applicant.id.to_s %>
-            </div>
+            <%= render "financial_assistance_row", family_id: @family.id, family_member_id: @family.primary_applicant.id.to_s %>
           </div>
         </div>
 
@@ -59,12 +54,8 @@
           <ul class="" id="dependent_ul">
             <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
               <%= render "dependent", dependent: dependent, person: @person %>
-              <div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
-              <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
-              </div>
-              <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd">
-              <%= render "financial_assistance_add_info_button", family_id: @family.id, family_member_id: dependent.id.to_s %>
-              </div>
+              
+                <%= render "financial_assistance_row", family_id: @family.id, family_member_id: dependent.id.to_s %>
               
             <% end %>
           </ul>
@@ -100,7 +91,7 @@
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: (@reviewAndSubmit) ? review_and_submit_insured_family_members_path : find_sep_url,
+           url: (@reviewAndSubmit) ? review_and_submit_insured_family_members_path : find_sep_url,
             enabled: @continueEnabled
           } %>
         <% end %>

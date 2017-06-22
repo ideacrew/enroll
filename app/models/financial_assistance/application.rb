@@ -308,7 +308,7 @@ class FinancialAssistance::Application
   def financial_application_complete?
     # iterate over all applicant and see if applicatin info is complete for each + mandatory fields in applications level.
     true
-  end
+ end
 
 private
   def set_submission_date
