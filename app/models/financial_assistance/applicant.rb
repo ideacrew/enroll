@@ -48,6 +48,7 @@ class FinancialAssistance::Applicant
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
+  field :has_health_coverage_benefit, type: Boolean
 
   field :is_required_to_file_taxes, type: Boolean, default: true
   field :tax_filer_kind, type: String, default: "tax_filer"

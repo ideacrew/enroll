@@ -35,16 +35,19 @@ class FinancialAssistance::Benefit
     )
 
   field :title, type: String
+  field :t_kind, type: String
   field :kind, type: String
 
   field :is_employer_sponsored, type: Boolean
   field :is_eligible, type: Boolean
   field :is_enrolled, type: Boolean
-  field :employee_cost, type: String
+  field :employee_cost, type: Money
   field :employee_cost_frequency, type: String
 
-  field :start_on, type: Date
-  field :end_on, type: Date
+  field :enrolled_start_on, type: Date
+  field :enrolled_end_on, type: Date
+  field :eligible_start_on, type: Date
+  field :eligible_end_on, type: Date
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
@@ -67,7 +70,7 @@ class FinancialAssistance::Benefit
   #                       message: "%{value} is not a valid alternative benefit type" 
   #                     }
 
-  validate :start_on_must_precede_end_on
+  validate :presence_of_dates_if_enrolled, :presence_of_kind_if_eligible, :presence_of_esi_details_if_eligible_and_esi, :presence_of_dates_if_eligible
 
   before_create :set_submission_timestamp
 
@@ -83,12 +86,46 @@ class FinancialAssistance::Benefit
 private
 
   def set_submission_timestamp
-    write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank?
+    write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank? 
   end
 
-  def start_on_must_precede_end_on
+  def start_on_must_precede_end_on(start_on, end_on)
     return unless start_on.present? && end_on.present?
-    # errors.add(:end_on, "can't occur before start on date") if end_on < start_on
+    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
   end
 
+  def presence_of_dates_if_enrolled
+    if is_enrolled
+      errors.add(:enrolled_start_on, "If enrolled, must have start and end dates") if enrolled_start_on.blank? #&& enrolled_end_on.blank? End on not mandatory??
+      start_on_must_precede_end_on(enrolled_start_on, enrolled_end_on)
+    end
+  end
+
+  def presence_of_dates_if_eligible
+    if is_eligible
+      errors.add(:eligible_start_on, "If enrolled, must have start and end dates") if eligible_start_on.blank? #&& enrolled_end_on.blank? End on not mandatory??
+      start_on_must_precede_end_on(eligible_start_on, eligible_end_on)
+    end
+  end
+
+  def presence_of_kind_if_eligible
+    if is_eligible
+      errors.add(:kind, "If enrolled, must have a kind of health coverage") if kind.blank?
+    end
+  end
+
+  def presence_of_esi_details_if_eligible_and_esi
+    if is_eligible && kind == "employer_sponsored_insurance"
+      errors.add(:employer_name, " can't be blank ") if employer_name.blank?
+      errors.add(:t_kind, " can't be blank ") if t_kind.blank?
+      errors.add(:eligible_start_on, " date can't be blank ") if eligible_start_on.blank?
+      errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
+      errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?
+      errors.add(:employee_cost, " can't be blank ") if employee_cost.blank?
+
+      if eligible_start_on.present? && eligible_end_on.present?
+        start_on_must_precede_end_on(eligible_start_on, eligible_end_on)
+      end
+    end
+  end
 end
