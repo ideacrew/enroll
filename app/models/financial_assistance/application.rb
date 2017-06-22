@@ -30,6 +30,7 @@ class FinancialAssistance::Application
 
   field :aasm_state, type: String, default: :draft
   field :submitted_at, type: DateTime
+  field :effective_date, type: DateTime # Date they want coverage
 
   field :assistance_year, type: Integer
 
