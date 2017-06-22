@@ -11,21 +11,38 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
-                  value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_required_to_file_taxes_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_required_to_file_taxes
                 - gutter: 1
                   type: label_radio
                   name: row2
-                  value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'is_required_to_file_taxes_no'
                   label: 'No'
                   model: applicant
                   attribute: is_required_to_file_taxes
+                - gutter: 4
+                  type: raw_html
+                  text: '| &nbsp <a href=""> Not Sure? </a>'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Will this person be filling jointly? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  id: 'is_joint_tax_filing_yes'
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_joint_tax_filing
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  id: 'is_joint_tax_filing_no'
+                  label: 'No'
+                  model: applicant
+                  attribute: is_joint_tax_filing
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -36,18 +53,14 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
-                  value: true
-                  id: 'yes2'
-                  #checked: true
+                  id: 'is_claimed_as_tax_dependent_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
                 - gutter: 1
                   type: label_radio
                   name: row2
-                  value: false
-                  id: 'no2'
-                  #checked: false
+                  id: 'is_claimed_as_tax_dependent_no'
                   label: 'No'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent

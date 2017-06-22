@@ -2,6 +2,7 @@
   <div class="col-md-7">
     <div class="">
       <% if !@current_step.heading.nil? %>
+      <p class="alert alert-error hide"></p>
         <h1 class="darkblue"><%= @current_step.heading %></h1>
         <% if !@current_step.heading_text.nil? %>
           <p ><%= personalize_heading_text(@current_step.heading_text) %></p>
