@@ -1140,10 +1140,6 @@ class PlanYear
       errors.add(:start_on, "must be first day of the month")
     end
 
-    if end_on != end_on.end_of_month
-      errors.add(:end_on, "must be last day of the month")
-    end
-
     if end_on > start_on.years_since(Settings.aca.shop_market.benefit_period.length_maximum.year)
       errors.add(:end_on, "benefit period may not exceed #{Settings.aca.shop_market.benefit_period.length_maximum.year} year")
     end
@@ -1170,6 +1166,11 @@ class PlanYear
     end
 
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+
+      if end_on != end_on.end_of_month
+        errors.add(:end_on, "must be last day of the month")
+      end
+
       if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
