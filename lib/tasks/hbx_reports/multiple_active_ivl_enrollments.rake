@@ -11,15 +11,15 @@ namespace :reports do
 
       field_names = %w(
         HBX_ID
-        FIRST_NAME
-        LAST_NAME
-        DEPENDENT_HBX_IDS
-        DEPENDENT_FIRST_NAMES
-        DEPENDENT_LAST_NAMES
+        PRIMARY_FIRST_NAME
+        PRIMARY_LAST_NAME
+        DEPENDENT_HBX_ID
+        DEPENDENT_FIRST_NAME
+        DEPENDENT_LAST_NAME
         ENROLLMENT_HBX_ID
         MARKET_KIND
         STATE
-        ENROLLMENT_HIOS
+        PLAN_HIOS
         COVERAGE_START_DATE
         COVERAGE_END_DATE
       )
@@ -30,7 +30,7 @@ namespace :reports do
       CSV.open(file_path, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        families = Family.where(:"households.hbx_enrollments.kind" => "individual", :"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES, :"households.hbx_enrollments.terminated_on" => nil)
+        families = Family.where(:"households.hbx_enrollments.kind" => "individual", :"households.hbx_enrollments.aasm_state".in => HbxEnrollment::ENROLLED_STATUSES)
         families.each do |family|
           begin
             health_enrollments, dental_enrollments = family.households.flat_map(&:hbx_enrollments).partition { |enr| enr.coverage_kind == "health"} 
@@ -41,47 +41,45 @@ namespace :reports do
             
             if (active_ivl_health_enrollments.size > 1)
               active_ivl_health_enrollments.each do |enr|
-                dep = enr.hbx_enrollment_members.reject(&:is_subscriber).flat_map(&:person)
-                dep_hbx_ids = dep.map(&:hbx_id)
-                dep_first_names = dep.map(&:first_name)
-                dep_last_names = dep.map(&:last_name)
-                csv << [enr.subscriber.person.hbx_id,
-                        enr.subscriber.person.first_name, 
-                        enr.subscriber.person.last_name,
-                        dep_hbx_ids,
-                        dep_first_names,
-                        dep_last_names,
-                        enr.hbx_id,
-                        enr.coverage_kind,
-                        enr.aasm_state,
-                        enr.plan.hios_id,
-                        enr.effective_on,
-                        enr.terminated_on
-                       ]
-                processed_count +=1
+                enr.hbx_enrollment_members.reject(&:is_subscriber).each do |dep|
+                  dependent = dep.person
+                  csv << [enr.subscriber.person.hbx_id,
+                          enr.subscriber.person.first_name, 
+                          enr.subscriber.person.last_name,
+                          dependent.hbx_id,
+                          dependent.first_name,
+                          dependent.last_name,
+                          enr.hbx_id,
+                          enr.coverage_kind,
+                          enr.aasm_state,
+                          enr.plan.hios_id,
+                          enr.effective_on,
+                          enr.terminated_on
+                         ]
+                  processed_count +=1
+                end
               end
             end
             
             if (active_ivl_dental_enrollments.size > 1)
               active_ivl_dental_enrollments.each do |enr|
-                dep = enr.hbx_enrollment_members.reject(&:is_subscriber).flat_map(&:person)
-                dep_hbx_ids = dep.map(&:hbx_id)
-                dep_first_names = dep.map(&:first_name).to_s
-                dep_last_names = dep.map(&:last_name).to_s
-                csv << [enr.subscriber.person.hbx_id, 
-                        enr.subscriber.person.first_name, 
-                        enr.subscriber.person.last_name,
-                        dep_hbx_ids,
-                        dep_first_names,
-                        dep_last_names,
-                        enr.hbx_id,
-                        enr.coverage_kind,
-                        enr.aasm_state,
-                        enr.plan.hios_id,
-                        enr.effective_on,
-                        enr.terminated_on
-                       ]
-                processed_count +=1
+                enr.hbx_enrollment_members.reject(&:is_subscriber).each do |dep|
+                  dependent = dep.person
+                  csv << [enr.subscriber.person.hbx_id,
+                          enr.subscriber.person.first_name, 
+                          enr.subscriber.person.last_name,
+                          dependent.hbx_id,
+                          dependent.first_name,
+                          dependent.last_name,
+                          enr.hbx_id,
+                          enr.coverage_kind,
+                          enr.aasm_state,
+                          enr.plan.hios_id,
+                          enr.effective_on,
+                          enr.terminated_on
+                         ]
+                  processed_count +=1
+                end
               end
             end
           rescue Exception => e
