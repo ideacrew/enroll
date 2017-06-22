@@ -12,7 +12,7 @@ class CensusEmployee < CensusMember
   require 'roo'
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending rehired)
-  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
   EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked rehired)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
@@ -759,6 +759,10 @@ class CensusEmployee < CensusMember
   # TODO: Implement for 16019 and children
   def expected_to_enroll?
     expected_selection == 'enroll'
+  end
+
+  def expected_to_enroll_or_valid_waive?
+    %w(enroll waive).include?  expected_selection
   end
 
   # TODO: Implement for 16219

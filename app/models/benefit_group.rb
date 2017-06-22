@@ -523,7 +523,7 @@ class BenefitGroup
   def lookup_cached_cprf_for(carrier_id)
     year = plan_year.start_on.year
     waived_and_active_count = if plan_year.estimate_group_size?
-                                targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
+                                targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
                               else
                                 all_active_and_waived_health_enrollments.length
                               end
