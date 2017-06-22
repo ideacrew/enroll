@@ -89,7 +89,7 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
