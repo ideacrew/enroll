@@ -640,6 +640,7 @@ module ApplicationHelper
   end
 
   def load_captcha_widget?
-    return false if Rails.env.test? 
+    return false if Rails.env.test?
+    true
   end
 end
