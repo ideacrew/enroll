@@ -805,7 +805,8 @@ class HbxEnrollment
       benefit_coverage_period = benefit_sponsorship.current_benefit_period
     end
 
-    tax_households =family.active_approved_application.latest_active_tax_households_with_year(effective_on.year)
+    application = family.active_approved_application
+    tax_households = application.latest_active_tax_households_with_year(effective_on.year) if application.present?
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households, family_member_ids)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
