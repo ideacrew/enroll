@@ -6,7 +6,8 @@ class Insured::FamilyMembersController < ApplicationController
     @selectedTab = "householdInfo"
     @allTabs = NavigationHelper::getAllTabs
     @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
-
+    @continueEnabled = (@family.applications.length > 0) ? @family.applications[0].financial_application_complete? : true 
+    @reviewAndSubmit = (@family.applications.length > 0) ? true : false
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
     if (params[:resident_role_id].present? && params[:resident_role_id])
@@ -65,6 +66,7 @@ class Insured::FamilyMembersController < ApplicationController
     @selectedTab = "reviewAndSubmit"
     @allTabs = NavigationHelper::getAllTabs
     @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+    @consumer_role = @person.consumer_role
     @income_and_adjustments = []
     @applicants = []
     @application_id = @family.applications[0].id.to_s

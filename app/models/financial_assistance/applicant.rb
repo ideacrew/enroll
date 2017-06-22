@@ -172,7 +172,11 @@ class FinancialAssistance::Applicant
 
   def immigration_date?
   end
-
+  
+  def financial_application_for_applicant_complete?
+   true
+  end
+  
   #### Collect insurance from Benefit model
   def has_insurance?
   end

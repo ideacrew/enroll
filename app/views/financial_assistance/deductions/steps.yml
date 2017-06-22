@@ -24,14 +24,14 @@
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: '<strong>Check all that apply</strong>'
+                # - gutter: 12
+                #   type: raw_html
+                #   text: '<strong>Check all that apply</strong>'
             # - cells:
             #     - gutter: 12
             #       type: checkbox
             #       label: Alimony Paid
-            - cells:
+            # - cells:
                 - gutter: 6
                   type: text
                   text: What Kind of adjustments to income is ?*

@@ -61,7 +61,7 @@
                   required: true
                 - gutter: 6
                   type: 'dropdown'
-                  name: 'check'
+                  name: ''
                   required: true
                   values:
                     - Select who will claim this person

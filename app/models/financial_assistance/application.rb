@@ -304,6 +304,11 @@ class FinancialAssistance::Application
     return nil unless self.assistance_year == year
     self.eligibility_determinations
   end
+  
+  def financial_application_complete?
+    # iterate over all applicant and see if applicatin info is complete for each + mandatory fields in applications level.
+    true
+  end
 
 private
   def set_submission_date

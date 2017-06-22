@@ -137,7 +137,11 @@
 
 
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
+          <% find_sep_url = go_to_step_financial_assistance_application_path(@application_id, 1)%>
+          <%= render  partial: 'shared/individual_progress', locals: {step: 3,
+            url: find_sep_url,
+            enabled: true
+            } %>
           <%= render partial: 'shared/help_me_sign_up' %>
         </div>
       </div>
