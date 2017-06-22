@@ -124,6 +124,7 @@ Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   screenshot('add_existing_person_as_staff')
   find('.interaction-click-control-save').click
   step 'Point of Contact count is 2'
+  click_link "approve"
 end
 
 Then /Point of Contact count is (\d+)/ do |count|
