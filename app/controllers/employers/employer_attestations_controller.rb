@@ -1,11 +1,21 @@
 class Employers::EmployerAttestationsController < ApplicationController
 
   before_action :find_employer, except: [:autocomplete_organization_legal_name, :index, :new]
-  before_action :check_hbx_staff_role, only: [:update]
+  before_action :check_hbx_staff_role, only: [:update, :edit, :accept, :reject]
 
   autocomplete :organization, :legal_name, :full => true, :scopes => [:all_employer_profiles]
 
   def show
+  end
+
+  def edit
+    # @datatable = Effective::Datatables::DocumentDatatable.new({employer_profile_id: params[:id]})
+    @documents = @employer_profile.employer_attestation.employer_attestation_documents
+    @element_to_replace_id = params[:employer_actions_id]
+
+    respond_to do |format|
+      format.js { render "edit" }
+    end
   end
 
   def new

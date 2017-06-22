@@ -169,7 +169,12 @@ class Organization
       })
   }
 
-  scope :pending_attestation, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending']) }
+  scope :employer_attestations, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending', 'approved', 'denied']) }
+  scope :employer_attestations_submitted, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'submitted') }
+  scope :employer_attestations_pending, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'pending') }
+  scope :employer_attestations_approved, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'approved') }
+  scope :employer_attestations_denied, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'denied') }
+
   scope :employer_profiles_with_attestation_document, -> { exists(:"employer_profile.employer_attestation.employer_attestation_documents" => true) }
 
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
