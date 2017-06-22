@@ -70,6 +70,7 @@
         </li>
         <% if current_user.has_hbx_staff_role? %>
         <% else %>
+          <% if individual_market_is_enabled? %>
           <li role="presentation" class="multi-line">
             <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
               First Time Applications for Medicaid
@@ -77,6 +78,7 @@
               and Premium Tax Credits
           </li>
             <% end %>
+          <% end %>  
         <% end %>
       </ul>
     </div>
