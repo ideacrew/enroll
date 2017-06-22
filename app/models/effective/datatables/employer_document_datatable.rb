@@ -23,11 +23,8 @@ module Effective
 
       def collection
         @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
-        documents = []
+        documents = EmployerAttestationDocument.none
         if @employer_profile.employer_attestation.present?
-          documents = @employer_profile.employer_attestation.employer_attestation_documents
-        else
-          @employer_profile.build_employer_attestation
           documents = @employer_profile.employer_attestation.employer_attestation_documents
         end
         documents
