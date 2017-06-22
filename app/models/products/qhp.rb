@@ -169,7 +169,7 @@ class Products::Qhp
             qhp.plan.carrier_profile.organization.legal_name,
             qhp.plan.name,
             "$#{qhp[:total_employee_cost].round(2)} / month",
-            qhp.plan.nationwide ? "Nationwide" : "DC-Metro",
+            qhp.plan.nationwide ? "Nationwide" : qhp.service_area_id,
             "Co-Pay"
           ]
           arry2 = [

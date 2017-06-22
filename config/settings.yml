@@ -46,6 +46,7 @@ aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
   market_kinds: ["shop"]
+  nationwide_markets: false
   general_agency_enabled: false
 
 #

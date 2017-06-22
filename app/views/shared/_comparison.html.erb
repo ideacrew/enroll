@@ -41,7 +41,7 @@
       <tr>
         <th>Provider Network</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : "DC-Metro" %></th>
+          <th colspan="2"><%= qhp.plan.nationwide ? "Nationwide" : qhp.plan.service_area_id %></th>
         <% end %>
       </tr>
 

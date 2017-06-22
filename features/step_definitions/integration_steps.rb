@@ -971,6 +971,14 @@ And(/I should not see any plan which premium is 0/) do
   end
 end
 
+And(/^.+ clicks on the link of New Employee Paper Application$/) do
+  find('.new_employee_paper_application').click
+end
+
+Then (/HBX admin start new employee enrollment/) do
+  expect(page).to have_content("Personal Information")
+end
+
 Then(/Devops can verify session logs/) do
   log_entries = `tail -n 15 log/test.log`.split("\n")
   #log with a logged out session

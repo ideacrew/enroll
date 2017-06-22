@@ -63,7 +63,7 @@
                  <% end %>
 
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
-            <% end %>  
+            <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
                   <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
@@ -74,6 +74,7 @@
       </div>
     </div>
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
+    <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">
       <% next if bg.reference_plan_id.blank? %>
       <% if bg.default == true %>
@@ -228,24 +229,46 @@
 
             <!--Health plan contribution: start-->
             <div class="col-xs-11 package-offering">
-              <div class="col-xs-12">
-                <table>
-                  <tr>
-                    <th>Offered</th>
-                    <th>Employer
-                      <% if bg.is_offering_dental? %>Health
-                      <% end %>Contribution</th>
-                  </tr>
-                  <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                  <tr>
-                    <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                    <td id="pct">
-                      <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
-                    </td>
-                  </tr>
-                  <% end %>
-                </table>
-              </div>
+              <% if bg.sole_source? %>
+                <div class="col-xs-12">
+                  <table>
+                    <tr>
+                      <th>Member Type</th>
+                      <th>Employer
+                        <% if bg.is_offering_dental? %>Health
+                        <% end %>Contribution</th>
+                    </tr>
+                    <% bg.composite_tier_contributions.each_with_index do |ct, i| %>
+                    <tr>
+                      <td><%= ct.composite_rating_tier.try(:humanize) %></td>
+                      <td id="pct">
+                        <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
+                      </td>
+                    </tr>
+                    <% end %>
+                    <tr></tr>
+                  </table>
+                </div>
+              <% else %>
+                <div class="col-xs-12">
+                  <table>
+                    <tr>
+                      <th>Offered</th>
+                      <th>Employer
+                        <% if bg.is_offering_dental? %>Health
+                        <% end %>Contribution</th>
+                    </tr>
+                    <% bg.relationship_benefits.each_with_index do |rb, i| %>
+                    <tr>
+                      <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
+                      <td id="pct">
+                        <strong><%= number_to_percentage rb.premium_pct.ceil, precision: 0 %></strong>
+                      </td>
+                    </tr>
+                    <% end %>
+                  </table>
+                </div>
+              <% end %>
             </div>
             <!--Health plan contribution: end -->
 

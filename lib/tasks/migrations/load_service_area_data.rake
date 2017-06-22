@@ -28,6 +28,7 @@ namespace :load_service_reference do
             service_area_zipcode: nil,
             partial_county_justification: nil
           )
+          count = count + 1
         elsif serves_partial_county
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
           extracted_zip_codes(sheet.cell(i,6)).each do |zip|
@@ -43,6 +44,7 @@ namespace :load_service_reference do
               service_area_zipcode: zip,
               partial_county_justification: sheet.cell(i,7)
             )
+            count = count + 1
           end
         else
           county_name, state_code, county_code = extract_county_name_state_and_county_codes(sheet.cell(i,4))
@@ -59,8 +61,8 @@ namespace :load_service_reference do
               service_area_zipcode: zip,
               partial_county_justification: nil
             )
+            count = count + 1
           end
-          count = count + 1
         end
       end
     rescue => e

@@ -110,7 +110,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def show
-    @tab = params['tab']
+    @tab = params['tab'] || 'home'
 
     # Conditional based columns has to display so we are passing arguments
     @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})

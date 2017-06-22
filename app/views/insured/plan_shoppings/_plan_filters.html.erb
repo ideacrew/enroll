@@ -98,28 +98,30 @@
           </li>
         </ul>
       </div>
-      <div class="checkbox-filter-wrapper">
-        <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
+      <% if offers_nationwide_plans? %>
+        <div class="checkbox-filter-wrapper">
+          <h5><strong>Network</strong> <a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members."><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
 
-        <ul class="list-unstyled">
-          <li>
-            <div class="checkbox">
-              <label>
-                <input id="checkbox-13" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-13" type="checkbox" data-plan-metal-network-filter="nationwide">
-                <label for="checkbox-13" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">Nationwide</span></label>
-              </label>
-            </div>
-          </li>
-          <li>
-            <div class="checkbox">
-              <label>
-                <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc metro">
-                <label for="checkbox-14" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">DC-Metro</span></label>
-              </label>
-            </div>
-          </li>
-        </ul>
-      </div>
+          <ul class="list-unstyled">
+            <li>
+              <div class="checkbox">
+                <label>
+                  <input id="checkbox-13" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-13" type="checkbox" data-plan-metal-network-filter="nationwide">
+                  <label for="checkbox-13" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">Nationwide</span></label>
+                </label>
+              </div>
+            </li>
+            <li>
+              <div class="checkbox">
+                <label>
+                  <input id="checkbox-14" class="plan-metal-network-selection-filter checkbox-custom" name="checkbox-14" type="checkbox" data-plan-metal-network-filter="dc metro">
+                  <label for="checkbox-14" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access.">DC-Metro</span></label>
+                </label>
+              </div>
+            </li>
+          </ul>
+        </div>
+      <% end %>
       <div class="checkbox-filter-wrapper">
         <h5><strong>Carrier</strong> <a href="#" data-toggle="tooltip" data-placement="right" title="filter by the carrier"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></a></h5>
         <ul class="list-unstyled">
