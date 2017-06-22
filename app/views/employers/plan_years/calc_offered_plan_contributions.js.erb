@@ -34,7 +34,7 @@ $(document).on('click', "#<%= @location_id %> .fa.fa-trash-o", function () {
   $("#<%= @location_id %> .edit-add-dental").fadeIn();
   $("#<%= @location_id %> .dental-plan-offering, #<%= @location_id %> .reference-steps .dental:first").show();
   $("#<%= @location_id %> .select-dental-plan").prev().show();
-  validateEditPlanYear();
+  //validateEditPlanYear();
   $("#<%= @location_id %> .edit-add-dental, #<%= @location_id %> .dental .nav-tabs").show();
 
 });
@@ -73,9 +73,16 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
+      var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
+      $('html, body').animate({
+                          scrollTop: position
+                      }, 500);
+      $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
+      $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
-      validateEditPlanYear();
+
+      //validateEditPlanYear();
     });
 
   }

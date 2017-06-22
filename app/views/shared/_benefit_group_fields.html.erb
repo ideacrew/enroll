@@ -73,7 +73,7 @@
   <%= render "shared/reference_plans_list", f: f, p: p %>
   <br class="clear"/>
   <br/>
-  <div class="health">
+  <div class="health offerings-slider">
     <div class="col-xs-12 offerings<%= (f.object.sole_source? || f.object.plan_option_kind.blank?) ? " hidden" : " enabled" %>" data-offering-target="<%= f.object.id %>">
   	  <div class="row row-form-wrapper no-buffer heading">
   		  <div class="col-xs-12" id="offering_slider_header">
