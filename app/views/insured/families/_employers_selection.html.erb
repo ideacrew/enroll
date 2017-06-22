@@ -1,6 +1,6 @@
 <%= form_tag family_account_path, method: :get do %>
   <div id="employers" class='row no-buffer'>
-    <h3>Employers</h3>
+    <h3><%= l10n("employers") %></h3>
     <div class="n-radio-group">
       <% @person.active_census_employees.each do |census_employee| %>
         <div class="n-radio-row">
@@ -18,7 +18,7 @@
       <% end %>
     </div>
   </div>
-  <%= submit_tag 'Submit', class: "btn btn-default pull-right" %>
+  <%= submit_tag l10n("submit"), class: "btn btn-default pull-right" %>
 <% end %>
 
 <hr />

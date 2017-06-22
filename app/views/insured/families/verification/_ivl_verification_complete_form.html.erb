@@ -1,8 +1,8 @@
 <div class="popover-markup" style="display: inline;">
-      <%= link_to "Verify <i class='fa fa-check-circle-o' aria-hidden='true'></i>".html_safe, "#", class:"btn btn-success btn-xs trigger " %>
+      <%= link_to "#{l10n("verify")} <i class='fa fa-check-circle-o' aria-hidden='true'></i>".html_safe, "#", class:"btn btn-success btn-xs trigger " %>
 
     <!-- Admin comment form -->
-      <div class="head hide">Provide Verification Reason:</div>
+      <div class="head hide"><%=l10n("insured.families.verification.provide_verification_reason") %>:</div>
       <div class="content hide ">
         <%= form_tag update_verification_type_documents_path, multipart: true, method: :put do %>
             <ul id="verification-reason">
@@ -14,7 +14,7 @@
                     <%= radio_button_tag "verification_reason", 'document_in_Enroll_app', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_Enroll_app_#{person.id}" %>
                     <span class="n-radio">
                     </span>
-                    Document in EnrollApp
+                    <%=l10n("insured.families.verification.document_in_enroll_app") %>                    
                   </label>
                 </div>
                 <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
@@ -22,7 +22,7 @@
                     <%= radio_button_tag "verification_reason", 'document_in_DIMS', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_document_in_DIMS_#{person.id}" %>
                     <span class="n-radio">
                     </span>
-                    Document in DIMS
+                    <%=l10n("insured.families.verification.document_in_DIMS") %>                    
                   </label>
                 </div>
                 <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
@@ -30,7 +30,7 @@
                     <%= radio_button_tag "verification_reason", 'SAVE system', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_SAVE_system_#{person.id}" %>
                     <span class="n-radio">
                     </span>
-                    SAVE system
+                    <%= l10n("insured.families.verification.save_system") %>                    
                   </label>
                 </div>
                 <div class="n-radio-row <%=pundit_class Family, :updateable?%>">
@@ -38,12 +38,12 @@
                     <%= radio_button_tag "verification_reason", 'e-verified_in_Curam', false, required: true, class: 'n-radio', id: "#{v_type.parameterize.underscore}_e-verified_in_Curam_#{person.id}" %>
                     <span class="n-radio">
                     </span>
-                    E-Verified in Curam
+                    <%= l10n("insured.families.verification.e-verified_in_Curam") %>                    
                   </label>
                 </div>
               </div>
               <div class="text-center <%=pundit_class Family, :updateable?%>">
-                <%= submit_tag "Complete", class: "btn btn-primary btn-small " %>
+                <%= submit_tag l10n("complete"), class: "btn btn-primary btn-small " %>
               </div>
             </ul>
         <% end %>
