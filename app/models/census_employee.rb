@@ -758,7 +758,7 @@ class CensusEmployee < CensusMember
 
   # TODO: Implement for 16019 and children
   def expected_to_enroll?
-    true
+    expected_selection == 'enroll'
   end
 
   # TODO: Implement for 16219
