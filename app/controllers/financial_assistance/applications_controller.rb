@@ -1,7 +1,8 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
   include NavigationHelper
-  #skip_before_filter :verify_authenticity_token, :only => :step
+
+  before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit]
 
   def index
     @applications = current_user.person.primary_family.applications
@@ -39,8 +40,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-     @selectedTab = "householdInfo"
-     @allTabs = NavigationHelper::getAllTabs
      model_name = @model.class.to_s.split('::').last.downcase
      model_params = params[model_name]
      @model.update_attributes!(permit_params(model_params)) if model_params.present?
@@ -59,8 +58,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def help_paying_coverage
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
     @transaction_id = params[:id]
   end
 
@@ -85,6 +82,15 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @allTabs = NavigationHelper::getAllTabs
   end
 
+  def review_and_submit
+    @selectedTab = "reviewAndSubmit"
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+    @person = current_user.person
+    @consumer_role = @person.consumer_role
+    @application = @person.primary_family.application_in_progress
+    @applicants = @application.applicants
+  end
+
   private
 
   def hash_to_param param_hash
@@ -99,6 +105,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   #   @model.attributes.merge!("workflow" => {"current_step" => @current_step.to_i + 1 }) # Add workflow params
   #   params_instance.first.last.merge!(family_member_id: params[:member_id]) if model_key == "applicants_attributes" # Add foreign key reference to appplicant
   # end
+
+  def setup_navigation
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
+  end
 
   def find
     # TODO:Find the latest application in-progress
