@@ -34,6 +34,8 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def build
+    notice.notification_type = self.event_name
+    notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
