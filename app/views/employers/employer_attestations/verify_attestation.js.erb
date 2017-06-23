@@ -1,1 +1,5 @@
 $('.attestation_form').html("<%= escape_javascript(render "verify_attestation") %>");
+$('.attestation_form').show();
+$('#reviewClose').click(function() {
+  $('.attestation_form').hide();
+});
