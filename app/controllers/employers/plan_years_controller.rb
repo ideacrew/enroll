@@ -39,8 +39,7 @@ class Employers::PlanYearsController < ApplicationController
       Plan.by_active_year(params[:start_on]).for_service_areas(@employer_profile.service_area_ids).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      @available_carrier_ids = CarrierProfile.carriers_for(@employer_profile)
-      Plan.by_active_year(params[:start_on]).for_service_areas_and_carriers(@employer_profile.service_area_ids, @available_carrier_ids).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
+      Plan.by_active_year(params[:start_on]).for_service_areas_and_carriers(CarrierProfile.carrier_profile_service_area_pairs_for(@employer_profile), TimeKeeper.date_of_record.year).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
     elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
@@ -266,6 +265,7 @@ class Employers::PlanYearsController < ApplicationController
         benefit_group.elected_dental_plans_by_option_kind
       end
       benefit_group.elected_dental_plans = ax if ax
+      benefit_group.build_estimated_composite_rates
     end
 
     if @plan_year.save
