@@ -7,6 +7,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
    def new
     @model = @applicant.benefits.build
+    @model.update_attributes(family_member_id: @applicant.family_member.id)
     load_steps
     current_step
     render 'workflow/step', layout: 'financial_assistance'
@@ -17,6 +18,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
+    @model.update_attributes(family_member_id: @applicant.family_member.id)
 
     format_date_params_enrolled model_params if params[:benefit].present? && params[:benefit][:is_enrolled] == "true"
     format_date_params_eligible model_params if model_params.present? && params[:benefit][:is_eligible] == "true" #&& model_params["kind"] == "employer_sponsored_insurance"

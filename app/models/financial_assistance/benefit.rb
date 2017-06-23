@@ -37,6 +37,7 @@ class FinancialAssistance::Benefit
   field :title, type: String
   field :t_kind, type: String
   field :kind, type: String
+  field :family_member_id, type: BSON::ObjectId
 
   field :is_employer_sponsored, type: Boolean
   field :is_eligible, type: Boolean
@@ -81,7 +82,13 @@ class FinancialAssistance::Benefit
   # Eligibility through public employee
   def is_state_health_benefit?
   end
+  def family_member
+    @family_member ||= FamilyMember.find(family_member_id)
+  end
 
+  def person
+    @person ||= family_member.person
+  end
 
 private
 

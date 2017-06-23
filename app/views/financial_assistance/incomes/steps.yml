@@ -1,6 +1,6 @@
 - step:
-    heading: Income
-    heading_text: Please complete all tax info for  <family-member-name-placeholder>. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
+    heading: Other Income for <family-member-name-placeholder>
+    heading_text: Tell us about this person's other income. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
