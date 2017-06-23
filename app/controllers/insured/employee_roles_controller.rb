@@ -35,7 +35,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { render 'no_match' }
         end
         # Sends an external email to EE when the EE match fails
-        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now
+        UserMailer.send_employee_ineligibility_notice(current_user.email, first_name).deliver_now unless current_user.email.blank?
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|
