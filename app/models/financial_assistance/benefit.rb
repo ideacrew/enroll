@@ -3,6 +3,7 @@ class FinancialAssistance::Benefit
   include Mongoid::Timestamps
 
   embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
+  after_save :set_has_health_covergae_benefit
 
   TITLE_SIZE_RANGE = 3..30
   STATE_HEALTH_BENEFITS = %w(medicaid)
@@ -84,6 +85,9 @@ class FinancialAssistance::Benefit
 
 
 private
+  def set_has_health_covergae_benefit
+    self.applicant.update_attributes!(has_insurance: true)
+  end
 
   def set_submission_timestamp
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank? 

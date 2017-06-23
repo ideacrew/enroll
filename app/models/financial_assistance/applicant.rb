@@ -48,7 +48,7 @@ class FinancialAssistance::Applicant
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
-  field :has_health_coverage_benefit, type: Boolean
+  field :has_insurance, type: Boolean # not eligible and not enrolled in any other Health Coverage / Benefits
 
   field :is_required_to_file_taxes, type: Boolean, default: true
   field :tax_filer_kind, type: String, default: "tax_filer"
@@ -58,10 +58,13 @@ class FinancialAssistance::Applicant
 
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
+  field :is_non_magi_medicaid_eligible, type: Boolean, default: false
+  field :is_totally_ineligible, type: Boolean, default: false
+  field :is_without_assistance, type: Boolean, default: false
+
+  # We may not need the following two fields
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
-  field :is_without_assistance, type: Boolean, default: false
-  field :is_totally_ineligible, type: Boolean, default: false
 
   field :is_student, type: Boolean, default: false
   field :student_kind, type: String
@@ -112,9 +115,9 @@ class FinancialAssistance::Applicant
 
   field :workflow, type: Hash, default: { }
   
-  embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
-  embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
-  embeds_many :benefits,    inverse_of: :benefit,    class_name: "::FinancialAssistance::Benefit"
+  embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
+  embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
+  embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 

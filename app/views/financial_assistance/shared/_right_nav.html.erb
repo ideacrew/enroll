@@ -1,6 +1,6 @@
   <nav class="top-border-30">
     <% if  @steps.last_step?(@current_step) %>
-      <%= submit_tag 'Finish', :class => "btn btn-lg btn-primary"  %>
+      <%= submit_tag 'Finish', :class => "btn btn-lg btn-primary", :id => "submit-btn" %>
     <% else %>
        <%= submit_tag 'Next step', :class => "btn btn-lg btn-primary" %>
     <% end %>
