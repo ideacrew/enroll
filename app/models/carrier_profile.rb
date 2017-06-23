@@ -67,7 +67,7 @@ class CarrierProfile
 
     def carriers_for(employer_profile)
       servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
-      where(issuer_hios_id: servicing_hios_ids)
+      self.all.reject { |cp| (cp.issuer_hios_ids & servicing_hios_ids).empty? }
     end
 
     def first
