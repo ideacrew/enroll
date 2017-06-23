@@ -457,7 +457,7 @@ class CensusEmployee < CensusMember
       return unless TimeKeeper.date_of_record.mday == 1
       CensusEmployee.all.each do |census_employee|
         if census_employee.employee_role.present?
-          plan_year = census_employee.employee_role.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+          plan_year = census_employee.employee_role.employer_profile.plan_years.where(:aasm_state.nin => PlanYear::INELIGIBLE_FOR_EXPORT_STATES).first
           next if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
           census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
             if PlanCostDecorator.benefit_relationship(dependent.primary_relationship).include? "child_under_26"
@@ -465,9 +465,9 @@ class CensusEmployee < CensusMember
               now = TimeKeeper.date_of_record
               age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
               if age >= 25
-                # if (now.month == 12 && now.day == 1) || (now.month == dep.dob.month && now.day == 19)
+                if (now.month == 12 && now.day == 1) || (now.month == dep.dob.month && now.day == 1)
                   ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "employee_dependent_age_off_termination")
-                # end
+                end
               end
             end
           end
