@@ -25,6 +25,11 @@ class Employers::EmployerAttestationsController < ApplicationController
     end
   end
 
+  def verify_attestation
+    attestation = @employer_profile.employer_attestation
+    @document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
+  end
+
   def create
     @errors = []
     if params[:file]
@@ -54,7 +59,7 @@ class Employers::EmployerAttestationsController < ApplicationController
 
   def update
     attestation = @employer_profile.employer_attestation
-    attestation_doc = attestation.employer_attestation_documents.find(params[:attestation_doc_id])
+    attestation_doc = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
 
     if params[:status] == 'rejected'
       attestation_doc.reject! if attestation_doc.may_reject?
@@ -100,7 +105,10 @@ class Employers::EmployerAttestationsController < ApplicationController
   end
 
   def find_employer
-    if params[:id].present?
+    if params[:employer_attestation_id].present?
+      org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(params[:employer_attestation_id])).first
+      @employer_profile = org.employer_profile
+    elsif params[:id].present?
       @employer_profile = EmployerProfile.find(params[:id])
     else
       @employer_profile = Organization.where(:legal_name => params["document"]["creator"]).first.try(:employer_profile)

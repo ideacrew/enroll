@@ -24,6 +24,11 @@ class EmployerAttestationDocument < Document
     end
   end
 
+  def employer_profile
+    org = Organization.where(:"employer_profile.employer_attestation.employer_attestation_documents._id" => BSON::ObjectId.from_string(self.id)).first
+    org.employer_profile
+  end
+
   private 
   
   def record_transition

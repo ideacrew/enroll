@@ -9,14 +9,10 @@
     position: absolute;
     margin-left: 75em;
   }
-  #attestation_documents_table .dataTables_paginate, #attestation_documents_table .dataTables_info, #attestation_documents_table .dataTables_length{
-    display: none;
-  }
+
   .attestation_form{
     text-align: left !important;
   }
-
-
 </style>
 
 <div class="container">
@@ -43,29 +39,30 @@
        <th>Doc Type</th>
        <th>Effective Date</th>
        <th>Submitted Date</th>
+       <th></th>
       </tr>
     </thead>
-
     <tbody>
       <% @documents.each do |doc| %>
-
         <tr>
           <td><%= doc.aasm_state.camelcase %></td>
           <td><%= link_to @employer_profile.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home') %></td>
           <td><%= link_to "Employer Attestation","", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{doc.id}" %></td>
           <td></td>
           <td><%= doc.created_at.strftime('%m/%d/%Y') %></td>
+          <td>
+            <%= button_to "Verify Attestation", employers_employer_attestation_verify_attestation_path(doc.id), remote: true, method: :get %>
+          </td>
         </tr>
         <% end %>
     </tbody>
   </table>
 </div>
+
+<div class="attestation_form"></div>
 </div>
 
 <% @documents.each do |doc| %>
-
- <% @document = doc %>
-
   <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -73,7 +70,7 @@
           <h4>MA DOR FORM-X</h4>
           <p id="print_<%=doc.id%>">
             <%begin%>
-              <% reader = PDF::Reader.new(@document.identifier) %>
+              <% reader = PDF::Reader.new(doc.identifier) %>
               <% reader.pages.each do |page| %>
                 <%= page.text %>
               <% end %>
@@ -82,47 +79,15 @@
             <%end%>
           </p>
           <p style="text-align: right">
-            <a href="<%=download_employer_document_document_path(doc) + "?path=#{@document.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+            <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
             <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
           </p>
-          <hr/>
-          <p class="row">
-            <span class="col-md-6">Employer Name: <%= @employer_profile.legal_name %></span>
-<!--             <span class="col-md-6" style="text-align: right">Effective date: <%#= @document.created_at %></span>
- -->          </p>
-          <%= form_tag employers_employer_attestation_path(@employer_profile), :method => :put do |f| %>
-            <input type="hidden" name="attestation_doc_id" value="<%= doc.id %>" />
-            <div class="row">
-              <div class="col-md-4">
-                <label><input type="radio" name="status" checked="true" value="accepted"> Approve</label><br/>
-                <label><input type="radio" name="status" value="rejected"> Reject</label>
-              </div>
-              <div class="col-md-4">
-                <select class="form-control" name="reason_for_rejection">
-                  <option value="nil">Reason for rejection</option>
-                  <option value="A">Unable To Open Document</option>
-                  <option value="B">Document Not Required DOR-1 Form</option>
-                  <option value="C">DOR-1 Form DoesNot Match Bussiness</option>
-                </select>
-                <div class="form-group">
-                  <input type="text" name="other_reason" placeholder="Other reason for rejection">
-                </div>
-              </div>
-              <%#= f.hidden_field :employer_actions_id, :value => "family_actions_#{@employer_profile.id.to_s}" %>
-              <div class="col-md-4">
-                <button class="btn btn-default" type="submit">Submit</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              </div>
-            </div>
-          <% end %>
-        </div>
       </div>
-
     </div>
   </div>
   </div>
-<%# end %>
 <% end %>
+
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();
   jQuery('.buttons-csv').hide()
