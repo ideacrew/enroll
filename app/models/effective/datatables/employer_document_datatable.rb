@@ -10,11 +10,12 @@ module Effective
 
         table_column '', :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i>' }, :filter => false, :sortable => false
         table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
-        table_column :type, :proc => Proc.new { |row|
-          @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
-          link_to(row.title, employers_employer_attestation_authorized_download_path(row.id) + "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") 
+        table_column :name, :proc => Proc.new { |row| 
+          link_to row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
         }, :filter => false, :sortable => false
-        table_column :name, :proc => Proc.new { |row| link_to 'Employer Attestation', "Document", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}" }, :filter => false, :sortable => false
+        table_column :type, :proc => Proc.new { |row|
+           'Employer Attestation'
+        }, :filter => false, :sortable => false
         table_column :size, :proc => Proc.new { |row| row.size_bytes_to_megabytes }, :filter => false, :sortable => false
         table_column :date, :proc => Proc.new { |row| row.created_at.strftime('%m/%d/%Y') }, :filter => false, :sortable => false
         table_column :owner, :proc => Proc.new { |row| row.creator }, :filter => false, :sortable => false

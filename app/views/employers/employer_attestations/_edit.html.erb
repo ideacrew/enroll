@@ -47,7 +47,8 @@
         <tr>
           <td><%= doc.aasm_state.camelcase %></td>
           <td><%= link_to @employer_profile.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home') %></td>
-          <td><%= link_to "Employer Attestation","", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{doc.id}" %></td>
+          <td><%= "Employer Attestation" %>
+          </td>
           <td></td>
           <td><%= doc.created_at.strftime('%m/%d/%Y') %></td>
           <td>
@@ -61,32 +62,6 @@
 
 <div class="attestation_form"></div>
 </div>
-
-<% @documents.each do |doc| %>
-  <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div style="margin:1em; border: 1px solid;padding: 1em;">
-          <h4>MA DOR FORM-X</h4>
-          <p id="print_<%=doc.id%>">
-            <%begin%>
-              <% reader = PDF::Reader.new(doc.identifier) %>
-              <% reader.pages.each do |page| %>
-                <%= page.text %>
-              <% end %>
-            <%rescue%>
-              <b> Only we supports PDF</b>
-            <%end%>
-          </p>
-          <p style="text-align: right">
-            <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
-            <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
-          </p>
-      </div>
-    </div>
-  </div>
-  </div>
-<% end %>
 
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();

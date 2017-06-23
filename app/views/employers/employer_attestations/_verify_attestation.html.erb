@@ -4,55 +4,72 @@
   }
 </style>
 
-<div class="employer_attestation_fields row">
-<div class="col-md-offset-4 col-md-4 panel panel-default">
-  <div class="panel-body">
+<div class="row">
+  <div class="col-md-offset-1 col-md-10">
+    <div class="panel panel-default">
+      <div class="panel-body">
 
-<%= form_tag employers_employer_attestation_path(@employer_profile), :method => :put do |f| %>
+        <p id="print_<%=@document.id%>">
+          <iframe src="<%= employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" style="border: 0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+        </p>
+        <p style="text-align: right">
+          <a href="<%=download_employer_document_document_path(@document) + "?path=#{@document.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+          <button class="btn btn-default" onclick='printDoc("<%=@document.id%>")'>Print</button>
+        </p>
+        <hr/>
 
-  <%= hidden_field_tag :employer_attestation_id, @document.id %>
+        <div class="employer_attestation_fields row">
+          <div class="col-md-offset-3 col-md-6 panel panel-default">
+            <div class="panel-body">
 
-  <div class="form-group">
-    <label for="exampleInputEmail1">Employer Name: <%= @employer_profile.legal_name %></label>
-  </div><br>
+            <%= form_tag employers_employer_attestation_path(@employer_profile), :method => :put do |f| %>
+              <%= hidden_field_tag :employer_attestation_id, @document.id %>
 
-  <div class="form-group">
-    <label for="exampleInputPassword1">Document Name: <%= @document.title %></label>
-  </div><br>
+              <div class="form-group">
+                <label for="exampleInputEmail1">Employer Name: <%= @employer_profile.legal_name %></label>
+              </div><br>
 
-  <fieldset class="form-group">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="radio" name="status" value="accepted" checked>
-        Approve
-      </label>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Document Name: <%= @document.title %></label>
+              </div><br>
+
+              <fieldset class="form-group">
+                <div class="form-check">
+                  <label class="form-check-label">
+                    <input type="radio" name="status" value="accepted" checked>
+                    Approve
+                  </label>
+                </div>
+                <div class="form-check">
+                  <label class="form-check-label">
+                    <input type="radio" name="status" value="rejected">
+                    Reject
+                  </label>
+                </div>
+              </fieldset><br>
+
+              <div class="form-group" style="padding: 2em 0 1em 3em">
+                <select class="form-control" name="reason_for_rejection">
+                  <option value="nil">Reason for rejection</option>
+                  <option value="A">Unable To Open Document</option>
+                  <option value="B">Document Not Required DOR-1 Form</option>
+                  <option value="C">DOR-1 Form DoesNot Match Bussiness</option>
+                </select>
+              </div><br>
+
+              <div class="form-group" style="padding: 0 0 2em 3em">
+                <input type="text" name="other_reason" placeholder="Other reason for rejection" class="form-control">
+              </div><br>
+
+              <div class="form-group" style="padding-left: 8em">
+                <button type="submit" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>">Submit</button>
+                <button type="button" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>" data-dismiss="modal">Cancel</button>
+              </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-check">
-    <label class="form-check-label">
-        <input type="radio" name="status" value="rejected">
-        Reject
-      </label>
-    </div>
-  </fieldset><br>
-
-  <div class="form-group" style="padding: 2em 0 1em 3em">
-    <select class="form-control" name="reason_for_rejection">
-      <option value="nil">Reason for rejection</option>
-      <option value="A">Unable To Open Document</option>
-      <option value="B">Document Not Required DOR-1 Form</option>
-      <option value="C">DOR-1 Form DoesNot Match Bussiness</option>
-    </select>
-  </div><br>
-
-  <div class="form-group" style="padding: 0 0 2em 3em">
-    <input type="text" name="other_reason" placeholder="Other reason for rejection" class="form-control">
-  </div><br>
-
-  <div class="form-group" style="padding-left: 8em">
-    <button type="submit" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>">Submit</button>
-    <button type="button" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>" data-dismiss="modal">Cancel</button>
   </div>
-<% end %>
-</div>
-</div>
 </div>

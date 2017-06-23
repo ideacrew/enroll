@@ -12,36 +12,26 @@
 
 <div style="width:90%">
   <%= render_datatable(@datatable) %>
-  <% @documents.each do |doc| %>
-      <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div style="margin:1em; border: 1px solid;padding: 1em;">
-              <h4>MA DOR FORM-X</h4>
-              <p id="print_<%=doc.id%>">
-                <%begin%>
-                <% reader = PDF::Reader.new(doc.identifier) %>
-                <% reader.pages.each do |page| %>
-                    <%= page.text %>
-                <% end %>
-                <%rescue%>
-                    <b> Only we supports PDF</b>
-                <%end%>
-              </p>
-              <p style="text-align: right">
-                <button class = "btn btn-default" data-dismiss="modal" >Cancel</button>
-                <button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>">Download</a></button>
-                <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
-              </p>
-            </div>
-          </div>
-
-        </div>
+<% @documents.each do |doc| %>
+  <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 900px;">
+      <div class="modal-content">
+        <div style="margin:1em; border: 1px solid;padding: 1em;">
+          <h4>MA DOR FORM-X</h4>
+          <p style="text-align: right">
+            <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+            <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
+          </p>
+          <p id="print_<%=doc.id%>">
+            <iframe src="<%= employers_employer_attestation_authorized_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" style="border: 0" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
+          </p>
       </div>
-      </div>
-  <% end %>>
+    </div>
   </div>
+  </div>
+<% end %>
 </div>
+
 <script type="text/javascript" charset="utf-8">
     initializeDataTables();
     jQuery('.buttons-csv').hide()
