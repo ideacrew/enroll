@@ -563,6 +563,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     before do
       sign_in user
       allow(Person).to receive(:find).with("#{person.id}").and_return person
+      xhr :get, :get_user_info, family_actions_id: family_id, person_id: person.id
     end
 
     it "should populate the person instance variable" do
