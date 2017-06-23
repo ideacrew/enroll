@@ -4,5 +4,5 @@
 require File.join(Rails.root, "app", "data_migrations", "update_broker_agency_profile_legal_name")
 namespace :migrations do
   desc "Update_Broker_Agency_Profile_Legal_Name"
-  UpdateBorkerAgencyProfileLegalName.define_task :update_broker_agency_profile_legal_name => :environment
+  UpdateBrokerAgencyProfileLegalName.define_task :update_broker_agency_profile_legal_name => :environment
 end
