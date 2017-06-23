@@ -84,7 +84,7 @@ class UserMailer < ApplicationMailer
 
   def send_employee_ineligibility_notice(email, first_name)
     if email.present?
-      message = mail({to: email, subject: "#{Settings.site.short_name} – Assistance Enrolling in Employer-sponsored Health Insurance", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+      message = mail({to: email, subject: "#{Settings.site.short_name} - Assistance Enrolling in Employer-sponsored Health Insurance", from: 'no-reply@individual.dchealthlink.com'}) do |format|
         format.html {render "employee_ineligibility_notice", locals: {first_name: first_name}}
       end
     end
