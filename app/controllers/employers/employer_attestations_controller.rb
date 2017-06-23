@@ -75,7 +75,7 @@ class Employers::EmployerAttestationsController < ApplicationController
     begin
       documents = @employer_profile.employer_attestation.employer_attestation_documents
       if authorized_to_download?
-        uri = documents.find(relation_id).identifier
+        uri = documents.find(params[:employer_attestation_id]).identifier
         send_data Aws::S3Storage.find(uri), get_options(params)
       else
        raise "Sorry! You are not authorized to download this document."

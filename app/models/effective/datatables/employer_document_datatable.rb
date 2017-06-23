@@ -12,7 +12,7 @@ module Effective
         table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
         table_column :type, :proc => Proc.new { |row|
           @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
-          link_to(row.title, employers_employer_attestation_authorized_download_path(row.id, id: @employer_profile.id) + "?content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") 
+          link_to(row.title, employers_employer_attestation_authorized_download_path(row.id) + "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline", class: "sbc_link", :target => "_blank") 
         }, :filter => false, :sortable => false
         table_column :name, :proc => Proc.new { |row| link_to 'Employer Attestation', "Document", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}" }, :filter => false, :sortable => false
         table_column :size, :proc => Proc.new { |row| row.size_bytes_to_megabytes }, :filter => false, :sortable => false
