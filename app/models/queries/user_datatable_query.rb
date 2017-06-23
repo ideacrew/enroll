@@ -15,15 +15,37 @@ module Queries
       user = User
       case @custom_attributes[:users]
         when "all_employer_staff_roles"
-          user.where(:'roles'.in => ["employer_staff"])
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["employer_staff"], locked_at: {:$exists => true})
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["employer_staff"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["employer_staff"])
+          end
         when "all_employee_roles"
-          user.where(:'roles'.in => ["employee"])
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["employee"], locked_at: {:$exists => true})
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["employee"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["employee"])
+          end
         when "all_broker_roles"
-          user.where(:'roles'.in => ["broker"])
-        when "locked"
-          user.locked
-        when "unlocked"
-          user.unlocked
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.where(:'roles'.in => ["broker"], locked_at: {:$exists => true})
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.where(:'roles'.in => ["broker"], locked_at: nil)
+          else
+            user.where(:'roles'.in => ["broker"])
+          end
+        when "all"
+          if @custom_attributes[:lock_unlock] == "locked"
+            user.locked
+          elsif @custom_attributes[:lock_unlock] == "unlocked"
+            user.unlocked
+          else
+            user.all
+          end
         else
           user.all
       end
