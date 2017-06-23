@@ -1561,8 +1561,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context 'Roster Enrollments Display' do
     let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: person.ssn, hired_on: TimeKeeper.date_of_record) }
+    let(:person) { FactoryGirl.create(:person, :with_ssn, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date) }
     let!(:employee_role) { person.employee_roles.create( employer_profile: employer_profile, hired_on: census_employee.hired_on, census_employee_id: census_employee.id) }
     let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
 
