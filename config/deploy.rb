@@ -46,9 +46,9 @@ set :assets_roles, [:web, :app]
 
 namespace :assets do
   desc "Kill all the assets"
-  before :refresh do
-    execute :rake, "assets:clobber"
-  end
+  # before :refresh do
+  #   execute :rake, "assets:clobber"
+  # end
 
   task :refresh do
     on roles(:web) do
