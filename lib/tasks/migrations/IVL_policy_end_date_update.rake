@@ -12,11 +12,13 @@ namespace :migrations do
       enrollment_state = enrollment.aasm_state
       if enrollment.effective_on < terminated_on
         enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: terminated_on)
-        enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_terminated"})
+        # comment out to force silent update out of enroll
+        # enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_terminated"})
       elsif enrollment.effective_on == terminated_on
         if !enrollment.coverage_canceled?
           enrollment.update_attributes(aasm_state: "coverage_canceled")
-          enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_canceled"})
+          # comment out to force silent update out of enroll
+          # enrollment.workflow_state_transitions.create({from_state: enrollment_state, to_state: "coverage_canceled"})
         end
       else
         puts "Termination date should not be earlier than effective on date for enrollment #{hbx_id}" unless Rails.env.test?
