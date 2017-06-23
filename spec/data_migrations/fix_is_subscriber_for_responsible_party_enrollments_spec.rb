@@ -24,7 +24,7 @@ describe FixIsSubscriberForResponsiblePartyEnrollments do
       :person,
       person_relationships: family_relationships,
       dob: TimeKeeper.date_of_record - 30.years,
-      ssn: '555555550')
+      ssn: '123356779')
     }
     let(:family_members) { [subscriber, dependent_1, dependent_2] }
     let(:family) { FactoryBot.create(:family, :with_family_members, person: subscriber, people: family_members) }
