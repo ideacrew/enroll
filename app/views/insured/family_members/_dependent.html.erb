@@ -100,7 +100,11 @@
             <span class="field_value floatlabel form-control active-floatlabel"><%= address.zip %></span>
           </div>
         </div>
-      </div>
+          </div>
+          <div class="row row-form-wrapper no-buffer">
+            <%= render "financial_assistance_row", family_id: @family.id, family_member_id: dependent.id.to_s %>
+          </div>
+
     <% end %>
     <% if (@prev_url_include_intractive_identity || @prev_url_include_consumer_role_id) && !@employee_role %>
       <div class="row row-form-wrapper no-buffer">

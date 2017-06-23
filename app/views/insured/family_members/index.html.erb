@@ -54,9 +54,6 @@
           <ul class="" id="dependent_ul">
             <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
               <%= render "dependent", dependent: dependent, person: @person %>
-              
-                <%= render "financial_assistance_row", family_id: @family.id, family_member_id: dependent.id.to_s %>
-              
             <% end %>
           </ul>
         </div>
