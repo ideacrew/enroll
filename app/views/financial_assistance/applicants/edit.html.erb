@@ -53,7 +53,7 @@
 			<th></th>
 			<% @applicant.benefits.each do |benefit| %>
 			<tr>
-				<td><%=benefit.kind%></td>
+				<td><%=benefit.kind.present? ? benefit.kind : "Enrolled Benefit" %></td>
 				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-small btn-success" %></td>
 				<td><%= link_to "Delete", financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
 			</tr>
