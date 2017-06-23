@@ -13,7 +13,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
     if person.has_active_employee_role?
       'shop'
-    elsif person.has_active_consumer_role?
+    elsif person.has_active_consumer_role? && !person.has_active_resident_role?
       'individual'
     elsif person.has_active_resident_role?
       'coverall'
