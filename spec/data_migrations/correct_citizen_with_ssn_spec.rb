@@ -78,7 +78,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
               </ns6:phones>
               </ns6:person>
               <ns6:person_demographics>
-              <ns6:ssn>989898989</ns6:ssn>
+              <ns6:ssn></ns6:ssn>
               <ns6:sex>urn:openhbx:terms:v1:gender#female</ns6:sex>
               <ns6:birth_date>19700311</ns6:birth_date>
               <ns6:created_at>2015-10-11T02:01:03Z</ns6:created_at>
@@ -134,7 +134,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
               </ns6:phones>
               </ns6:person>
               <ns6:person_demographics>
-              <ns6:ssn>989898989</ns6:ssn>
+              <ns6:ssn></ns6:ssn>
               <ns6:sex>urn:openhbx:terms:v1:gender#female</ns6:sex>
               <ns6:birth_date>19700311</ns6:birth_date>
               <ns6:created_at>2015-10-11T02:01:03Z</ns6:created_at>

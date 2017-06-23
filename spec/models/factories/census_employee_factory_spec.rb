@@ -15,8 +15,8 @@ RSpec.describe Factories::CensusEmployeeFactory, type: :model, dbclean: :after_e
     let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
     let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
-    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record, employer_profile: employer_profile) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record, employer_profile: employer_profile) }
+    let!(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
     let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
     let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
     let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
