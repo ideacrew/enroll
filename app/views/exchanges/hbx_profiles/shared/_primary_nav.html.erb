@@ -53,12 +53,14 @@
        <% end %>
       </li>
 
+      <% if individual_market_is_enabled? %>
       <li role="presentation"<%= menu_tab_class(active_tab, "calender-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
        <%= link_to(exchanges_scheduled_events_path, "aria-expanded" => "true", "aria-controls" => "calender", "role" => "tab" ) do  %>
         <span class="hidden-xs">Calender</span>
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Calender"></span>
        <% end %>
       </li>
+      <% end %>
 
       <li role="presentation"<%= menu_tab_class(active_tab, "products-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
        <%= link_to(product_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "products", "role" => "tab" ) do  %>
@@ -102,12 +104,15 @@
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Inbox"></span>
         <% end %>
       </li>
+
+      <% if individual_market_is_enabled? %>
       <li role="presentation"<%= menu_tab_class(active_tab, "user-account-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
         <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users", "role" => "tab" ) do  %>
           <span class="hidden-xs">User Accounts</span>
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Accounts"></span>
         <% end %>
       </li>
+      <% end %>
       <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
        <%= link_to(binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
         <span class="hidden-xs">Binder Transition</span>
