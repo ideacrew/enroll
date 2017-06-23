@@ -1,0 +1,164 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+
+<div class="container">
+  <div id="dependents_info_wrapper">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+        <%= render :partial => 'shared/left_nav.html.erb' %>
+      </div>
+      <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+        <h1 class="darkblue">Review Your Application </h1>
+        <p><strong> You're almost done! </STRONG>Review the application summary below and make sure it's correct. Slect the pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
+
+        <br>
+        <div class="row">
+          <h1 class ="darkblue"> Income and Adjustments</h1>
+
+          <table class="table" border="1">
+            <thead>
+              <tr>
+                <th>PERSON</th>
+                <th>TYPE</th>
+                <th>FREQUENCY</th>
+                <th>AMOUNT</th>
+                <th >DATES</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            <%@application.applicants.each do |applicant|%>
+              <% applicant.incomes.each do |income| %>
+                <tr>
+                  <td><%= applicant.person.full_name%></td>
+                  <td><%= income.kind %></td>
+                  <td><%= income.frequency_kind %></td>
+                  <td>$<%= income.amount %></td>
+                  <td><%= income.start_on%> - <%=income.end_on%><a href="/financial_assistance/applications/#{@application.id}/applicants/#{applicant.id}/incomes/#{income.id}/step/1"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></td>
+                </tr>
+              <%end%>
+            <%end%>
+
+            </tbody>
+          </table>
+        </div>
+
+
+
+
+
+        
+        <% @applicants.each do |applicant| %>
+          <div class="row white-background">
+            <div class="col-md-12">
+              <div class="row padding-vertical">
+                <div class="col-md-11"><span></span><b><%= applicant.person.full_name %></b></div>
+                <div class="col-md-1"><a><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a></div>
+              </div>
+
+              <div class="row padding-vertical">
+                <table class="table" border="1">
+                  <thead>
+                    <tr>
+                      <th>AGE</th>
+                      <th>GENDER</th>
+                      <th>RELATIONSHIP</th>
+                      <th>STATUS</th>
+                      <th >INCARCERATED</th>
+                      <th>NEEDS COVERAGE?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><%= applicant.person.age_on(TimeKeeper.date_of_record)%></td>
+                      <td><%= applicant.person.gender %></td>
+                      <td><%= applicant.family_member.relationship %></td>
+                      <td>Yes</td>
+                      <td>No</td>
+                      <td>Yes</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!---->
+              <div class="row padding-vertical">
+                <div class="col-md-11"><b>Tax Info</b></div>
+                <div class="col-md-1"><%#= link_to go_to_step_financial_assistance_application_applicant_path(@application.id, applicant.id, 1) %><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Will this Person file taxes for 2017?*</div>
+                <% taxDependent = applicant.is_required_to_file_taxes ? 'Yes' : 'No'%>
+                <div class="col-md-6"><%= taxDependent%></div>
+              </div>
+              <%if applicant.is_required_to_file_taxes%>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Is the dependent of</div>
+                <div class="col-md-6"><%= applicant.claimed_as_tax_dependent_by%></div>
+              </div>
+              <%end%>
+
+              <% if applicant.benefits.count > 0 %>
+              <div class="row padding-vertical">
+                <div class="col-md-11"><b>Other Health Coverage</b></div>
+                <div class="col-md-1"><%#= link_to go_to_step_financial_assistance_application_applicant_benefit_path(@application.id, applicant.id, applicant.benefits[0].id, 1) do %><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span><%#end%></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Currently enrolled in health covergae from</div>
+                <div class="col-md-6">No</div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Qualifies for Health Coverage from</div>
+                <div class="col-md-6">No</div>
+              </div>
+              <%end%>
+
+              <div class="row padding-vertical">
+                <div class="col-md-11"><b>Other Questions</b></div>
+                <div class="col-md-1"><%#= link_to go_to_step_financial_assistance_application_applicant_path(@application.id, applicant.id, 2) do %><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Is the Person pregnant?</div>
+                <% pregnant = applicant.is_pregnant ? 'Yes' : 'No'%>
+                <div class="col-md-6"><%= pregnant %></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Is the Person blind?</div>
+                <% blind = applicant.is_self_attested_blind ? 'Yes' : 'No'%>
+                <div class="col-md-6"><%= blind %></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Does this person need help with daily life activities?</div>
+                <% daily_help = applicant.has_daily_living_help ? 'Yes' : 'No'%>
+                <div class="col-md-6"><%= daily_help %></div>
+              </div>
+              <div class="row padding-vertical">
+                <div class="col-md-6">Does this person have Disability?</div>
+                <% disability = applicant.is_former_foster_care ? 'Yes' : 'No'%>
+                <div class="col-md-6"><%= disability %></div>
+              </div>
+
+            </div>
+          </div>
+          <br>
+          <!---->
+        <%end%>
+        
+      
+
+
+
+
+      </div>
+
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <% find_sep_url = go_to_step_financial_assistance_application_path(@application.id, 1)%>
+          <%= render  partial: 'shared/individual_progress', locals: {step: 3, review_and_submit: true, url: find_sep_url, enabled: true} %>
+          <%= render partial: 'shared/help_me_sign_up' %>
+        </div>
+      </div>
+    </div>
+  </div>
+    <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+  </div>

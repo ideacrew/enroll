@@ -6,10 +6,10 @@ class Insured::FamilyMembersController < ApplicationController
     @selectedTab = "householdInfo"
     @allTabs = NavigationHelper::getAllTabs
     @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
-
+    @continueEnabled = (@family.applications.length > 0) ? @family.applications[0].financial_application_complete? : true 
+    @reviewAndSubmit = (@family.applications.length > 0) ? true : false
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
-
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
@@ -61,6 +61,11 @@ class Insured::FamilyMembersController < ApplicationController
       format.js
     end
   end
+
+  # def review_and_submit
+  #   @selectedTab = "reviewAndSubmit"
+  #   @allTabs = NavigationHelper::getAllTabs
+  # end
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
