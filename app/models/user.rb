@@ -24,7 +24,7 @@ class User
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
 
-  scope :locked, ->{ where(locked_at: {:$exists => true}) }
+  scope :locked, ->{ where(:locked_at.ne => nil) }
   scope :unlocked, ->{ where(locked_at: nil) }
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"oim_id" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
