@@ -353,6 +353,11 @@ class BenefitGroup
 
   def monthly_employer_contribution_amount(plan = reference_plan)
     return 0 if targeted_census_employees.count > 100
+
+    if self.sole_source? && self.composite_tier_contributions.empty?
+      build_composite_tier_contributions
+      estimate_composite_rates
+    end
     targeted_census_employees.active.collect do |ce|
       if plan_option_kind == 'sole_source'
         pcd = CompositeRatedPlanCostDecorator.new(plan, self, ce.composite_rating_tier)
@@ -622,6 +627,7 @@ class BenefitGroup
     rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.try(:first) || reference_plan)
     rate_calc.build_estimated_premiums
   end
+
   def estimate_composite_rates
     return(nil) unless sole_source?
     rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.try(:first) || reference_plan)
