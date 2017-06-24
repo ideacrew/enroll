@@ -126,9 +126,8 @@ class PlanYear
         if bg.composite_tier_contributions.empty?
           bg.build_composite_tier_contributions
         end
-        bg.assign_estimated_premiums
+        bg.estimate_composite_rates
       end
-
     end
     self.save!
   end
