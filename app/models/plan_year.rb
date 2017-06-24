@@ -122,7 +122,13 @@ class PlanYear
 
   def ensure_benefit_group_is_valid
     self.benefit_groups.each do |bg|
-      bg.assign_estimated_premiums
+      if bg.sole_source?
+        if bg.composite_tier_contributions.empty?
+          bg.build_composite_tier_contributions
+        end
+        bg.assign_estimated_premiums
+      end
+
     end
     self.save!
   end
