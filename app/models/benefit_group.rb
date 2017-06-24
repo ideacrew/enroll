@@ -619,12 +619,12 @@ class BenefitGroup
 
   def build_estimated_composite_rates
     return(nil) unless sole_source?
-    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first || reference_plan)
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.try(:first) || reference_plan)
     rate_calc.build_estimated_premiums
   end
   def estimate_composite_rates
     return(nil) unless sole_source?
-    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.first || reference_plan)
+    rate_calc = CompositeRatingBaseRatesCalculator.new(self, self.elected_plans.try(:first) || reference_plan)
     rate_calc.assign_estimated_premiums
   end
 
