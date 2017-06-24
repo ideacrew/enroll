@@ -120,6 +120,13 @@ class PlanYear
     end
   end
 
+  def ensure_benefit_group_is_valid
+    self.benefit_groups.each do |bg|
+      bg.assign_estimated_premiums
+    end
+    self.save!
+  end
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
