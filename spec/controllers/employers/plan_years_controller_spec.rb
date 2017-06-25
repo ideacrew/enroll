@@ -70,6 +70,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET calc_employer_contributions" do
     let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
+    let(:carrier_profile) { double(:carrier_profile, id: 'carrier_id')}
     let(:reference_plan){ double("ReferencePlan", id: "id") }
     let(:plan_years){ [double("PlanYear")] }
 
@@ -85,6 +86,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       it "should calculate employer contributions" do
         allow(EmployerProfile).to receive(:find).with("id").and_return(employer_profile)
         allow(Plan).to receive(:find).and_return(reference_plan)
+        allow(reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
         allow(Forms::PlanYearForm).to receive(:build).and_return(plan_years.first)
         allow(plan_years.first).to receive(:benefit_groups).and_return(benefit_groups)
         allow(benefit_groups.first).to receive(:reference_plan=).and_return(plan)
@@ -213,6 +215,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     allow(benefit_group).to receive(:dental_plan_option_kind).and_return("single_carrier")
     allow(benefit_group).to receive(:elected_plans_by_option_kind).and_return([])
     allow(benefit_group).to receive(:elected_dental_plans_by_option_kind).and_return([])
+    allow(benefit_group).to receive(:build_estimated_composite_rates)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
       allow(plan_year).to receive(:save).and_return(save_result)
@@ -639,7 +642,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:census_employees) { double }
-
+    let(:plan) { double }
     before do
       @employer_profile = FactoryGirl.create(:employer_profile)
       @reference_plan = benefit_group.reference_plan
@@ -650,6 +653,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     it "should calculate employer contributions" do
       allow(EmployerProfile).to receive(:find).with(@employer_profile.id).and_return(@employer_profile)
       allow(Forms::PlanYearForm).to receive(:build).and_return(plan_year)
+      allow(Plan).to receive(:find).with(@reference_plan.id).and_return(@reference_plan)
+      allow(@reference_plan).to receive(:carrier_profile_id).and_return('carrier_id')
       allow(plan_year).to receive(:benefit_groups).and_return(benefit_group.to_a)
       allow(@employer_profile).to receive(:census_employees).and_return(census_employees)
       allow(census_employees).to receive(:active).and_return(@census_employees)
