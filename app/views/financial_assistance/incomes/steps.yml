@@ -13,7 +13,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
+                  id: 'income_yes'
                   label: 'Yes'
                 - gutter: 1
                   type: label_radio

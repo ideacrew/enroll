@@ -21,6 +21,7 @@
                     id: 'eligibility_easier_yes'
                   - gutter: 2
                     type: label_radio
+                    id: 'disagree'
                     classNames: 'span-text'
                     label: I disagree *
                     value: false
@@ -97,6 +98,7 @@
                     text: Would you like to have an application to register to vote mailed to you?
                   - gutter: 2
                     type: label_radio
+                    id: 'mailed_yes'
                     label: "Yes"
                     value: true
                     classNames: 'span-text'
@@ -207,7 +209,7 @@
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
-                  
+
                 - gutter: 2
                   type: label_radio
                   name: row1
@@ -218,7 +220,7 @@
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
-                  
+
               - cells:
                   - gutter: 12
                     type: raw_html
