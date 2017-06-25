@@ -1,4 +1,8 @@
 <% if load_captcha_widget? %>
+  <script type="text/javascript">
+    site_key = '<%= Rails.application.secrets.recaptcha_site_key %>'
+    setCaptchaSiteKey(site_key);
+  </script>
   <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
 <% end %>
 <div class="container top-pd module" id='signup'>
