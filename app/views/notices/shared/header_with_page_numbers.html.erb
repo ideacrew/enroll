@@ -32,7 +32,12 @@
               continue;
             }
           }
-          y[j].textContent = "Your DC Health Link ID is: 1908458 " + new Array(2).join(' ') + "| Page "+vars[x[i]]+ " of " + vars[x[1]];// ;
+          if (<%= notice.shop? %> == true) {
+            y[j].textContent =  " Page "+vars[x[i]]+ " of " + vars[x[1]];
+          }
+          else {
+            y[j].textContent = "Your DC Health Link ID is: <%= recipient.hbx_id %>" + "| Page "+vars[x[i]]+ " of " + vars[x[1]];
+          }
         }
       }
     }
