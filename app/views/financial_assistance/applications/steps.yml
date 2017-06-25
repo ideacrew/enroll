@@ -14,9 +14,11 @@
                   - gutter: 2
                     type: label_radio
                     label: I Agree *
+                    id: 'agree'
                     classNames: 'span-text'
                   - gutter: 2
                     type: label_radio
+                    id: 'disagree'
                     classNames: 'span-text'
                     label: I disagree *
             - cells:
@@ -88,11 +90,13 @@
                     text: Would you like to have an application to register to vote mailed to you?
                   - gutter: 2
                     type: label_radio
+                    id: 'mailed_yes'
                     label: "Yes"
                     classNames: 'span-text'
                   - gutter: 2
                     type: label_radio
                     label: "No"
+                    id: 'mailed_no'
                     classNames: 'span-text' 
             - cells:
                   - gutter: 12

@@ -52,13 +52,13 @@ When(/^they complete and submit the tax information$/) do
 end
 
 Then(/^they should be taken to the applicant's details page$/) do
-   visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
+  visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
 end
 
 Then(/^see some of the tax information on the applicant's detail page$/) do
-    expect(page).to have_content(application.primary_applicant.family_member.person.full_name)
-    expect(page).to have_content(application.primary_applicant.is_claimed_as_tax_dependent)
-    expect(page).to have_content(application.primary_applicant.claimed_as_tax_dependent_by)
+  expect(page).to have_content(application.primary_applicant.family_member.person.full_name)
+  expect(page).to have_content(application.primary_applicant.is_claimed_as_tax_dependent)
+  expect(page).to have_content(application.primary_applicant.claimed_as_tax_dependent_by)
 end
 
 Given(/^has added tax information for an applicant$/) do
@@ -69,12 +69,13 @@ When(/^they view the applicant's details page$/) do
   visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
 end
 
-When(/^they click on the 'Add Income' button$/) do
+And(/^they click on the 'Add Income' button$/) do
   click_link 'Add Income'
 end
 
-When(/^they complete the form for the income$/) do
-  choose("yes2")
+And(/^they complete the form for the income$/) do
+   # choose("income_yes")
+  find('#income_yes').click
   fill_in 'income[amount]', with: '23.3'
   find_all(".interaction-choice-control-employer-address-state")[1].click
   find_all(".interaction-choice-control-income-frequency-kind-1")[1].click
@@ -85,31 +86,47 @@ When(/^they complete the form for the income$/) do
   fill_in 'employer_address[address_1]', with: "12 main st"
   fill_in 'employer_address[address_2]', with: "beside starbucks"
   fill_in 'employer_address[city]', with: "washington"
-  find_all(".label")[2].click
-  find_all(".interaction-choice-control-employer-address-state-2")[1].click
+  find('#employer_address_state').select('Massachussets')
   fill_in 'employer_address[zip]', with: "22046"
   click_button 'Finish'
 end
 
-When(/^they click on 'Remove Income' button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+And(/^they click on 'Remove Income' button$/) do
+  click_on 'Delete'
+  page.accept_alert
 end
 
-Then(/^they should be taken back to the application's details page$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+Then(/^they should be taken back to the application's details page for income$/) do
+  page.should have_content('Income deleted')
 end
 
 Then(/^the income should be no longer be shown$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
+#Starting here .........
 
-Given(/^has added an benefit$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
+# Given(/^has added an benefit$/) do
+#   click_button 'Add Benefit'
+#   choose("yes2")
+#   find_all(".interaction-choice-control-benefit-kind-4")[1].click
+#   fill_in 'benefit[start_on]', with: "11/11/2016"
+#   fill_in 'benefit[end_on]', with: "11/11/2017"
+#   click_button 'Next step'
+#   choose("yes2")
+#   fill_in 'benefit[employer_name]', with: "JOHN"
+#   fill_in 'employer_address[address_1]', with: " Test address 1"
+#   fill_in 'employer_address[city]', with: " Herdon"
+#   fill_in 'employer_address[zip]', with: " 51023"
+#   choose("yes2")
+#   choose("yes2")
+#   fill_in 'benefit[employee_cost]', with: " 2.3"
+#   click_button 'Finish'
+# end
 
-When(/^they click on 'Remove Benefit' button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
+
+# When(/^they click on 'Remove Benefit' button$/) do
+#   pending # Write code here that turns the phrase above into concrete actions
+# end
 
 Then(/^the benefit should be no longer be shown$/) do
   pending # Write code here that turns the phrase above into concrete actions
@@ -119,18 +136,42 @@ Given(/^has added an deducation$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
 
-When(/^they click on 'Remove Deducation' button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
-end
+# When(/^they click on 'Remove Deducation' button$/) do
+#   pending # Write code here that turns the phrase above into concrete actions
+# end
 
 Then(/^the deducation should be no longer be shown$/) do
   pending # Write code here that turns the phrase above into concrete actions
 end
+#Last step
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 Given(/^the consumer has completed a financial assistance application$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  visit edit_financial_assistance_application_path(application)
 end
 
+When(/^they view the financial assistance application for review$/) do
+  visit edit_financial_assistance_application_path(application)
+end
+
+And (/^click the "Review and Continue" button$/) do
+   click_button "Review and Continue"
+end
+
+And (/^they review and submit the application$/) do
+choose("agree")
+choose("application[is_renewal_authorized]")
+choose("mailed_yes")
+choose("application[medicaid_terms]")
+choose("application[report_change_terms]")
+choose("application[medicaid_insurance_collection_terms]")
+choose("application[parent_living_out_of_home_terms]")
+choose("application[attestation_terms]")
+choose("application[submission_terms]")
+end
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 When(/^click the "([^"]*)" button$/) do |arg1|
   pending # Write code here that turns the phrase above into concrete actions
 end
@@ -140,13 +181,84 @@ When(/^cthey review and submit the application$/) do
 end
 
 Then(/^they are taken back to view all applications$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  visit financial_assistance_applications_path
 end
 
 Then(/^they will see that their application has been submitted$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  page.find_button("Start new application")
 end
 
 When(/^they click on the 'Add Deducation' button$/) do
-  pending # Write code here that turns the phrase above into concrete actions
+  click_link 'Add Deduction'
+end
+
+
+Given (/^the consumer has started a financial assistance application1$/) do
+    visit edit_financial_assistance_application_applicant_path(application, application.primary_applicant)
+end
+When (/^they click on 'Add Benefit' button$/) do
+  click_link 'Add Benefit'
+end
+
+And (/^has added an benefit$/) do
+  choose("yes2")
+  find('#benefit_kind').select('medicare')
+  fill_in 'benefit[start_on]', with: "11/11/2016"
+  fill_in 'benefit[end_on]', with: "11/11/2017"
+  click_button 'Next step'
+  choose("access_to_hc_yes")
+  fill_in 'benefit[employer_name]', with: "JOHN"
+  fill_in 'employer_address[address_1]', with: " Test address 1"
+  fill_in 'employer_address[city]', with: " Herdon"
+  fill_in 'employer_address[zip]', with: " 51023"
+  choose("is_eligible_no")
+  choose("health_plan_yes")
+  fill_in 'benefit[employee_cost]', with: " 2.3"
+  click_button 'Finish'
+end
+Then(/^they should be taken back to the applicant's detail page$/) do
+
+end
+
+# When (/^they view the applicant's details page$/) do
+#   page.should have_content('Edit Applicant')
+# end
+
+Then (/^they click on 'Remove Benefit' button/) do
+  click_on 'Delete'
+  page.accept_alert
+end
+
+And (/^they should be taken back to the application's details page for benefit$/) do
+   page.should have_content('Benefit deleted')
+end
+
+# And (/^the benefit should be no longer be shown$/) do
+#   page.should have_content('Benefit deleted - (child_health_insurance_plan)')
+# end
+
+## Remove Deduction
+
+When (/^they click on 'Add Deduction' button$/) do
+  click_link 'Add Deductions'
+end
+
+And (/^has added a deduction/) do
+    choose("adjustments_yes")
+    find('#deduction_kind').select('alimony_paid')
+    find('#deduction_frequency_kind').select('quarterly')
+    fill_in 'deduction[amount]', with: "2.2"
+    find_all(".interaction-choice-control-deduction-frequency-kind")[2].click
+    fill_in 'deduction[start_on]', with: "11/11/2016"
+    fill_in 'deduction[end_on]', with: "11/18/2016"
+    click_button 'Finish'
+end
+
+Then (/^they click on 'Remove Deducation' button/) do
+  page.find('.interaction-click-control-delete').click
+  page.accept_alert
+end
+
+And (/^they should be taken back to the application's details page for deduction$/) do
+  page.should have_content('Deduction deleted')
 end

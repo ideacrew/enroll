@@ -44,37 +44,47 @@ Feature: Start a new Financial Assistance Application
     Then they should be taken back to the applicant's detail page
     And they should see the newly added deducation
 
+  Scenario: A consumer removes an deducation for an application's applicant
+    Given the consumer has started a financial assistance application1
+    And has added tax information for an applicant1
+    And they should be taken back to the application's details page1
+
   Scenario: A consumer removes an income for an application's applicant
     Given the consumer has started a financial assistance application
     And has added tax information for an applicant
-    And has added an income
+    When they view the applicant's details page
+    And they click on the 'Add Income' button
+    And they complete the form for the income
     When they view the applicant's details page
     And they click on 'Remove Income' button
-    Then they should be taken back to the application's details page
+    Then they should be taken back to the application's details page for income
     And the income should be no longer be shown
-
+# Implemented
   Scenario: A consumer removes an benefit for an application's applicant
-    Given the consumer has started a financial assistance application
+    Given the consumer has started a financial assistance application1
     And has added tax information for an applicant
+    When they click on 'Add Benefit' button
     And has added an benefit
     When they view the applicant's details page
-    And they click on 'Remove Benefit' button
-    Then they should be taken back to the application's details page
-    And the benefit should be no longer be shown
+    Then they click on 'Remove Benefit' button
+    And they should be taken back to the application's details page
+#    And the benefit should be no longer be shown
 
   Scenario: A consumer removes an deducation for an application's applicant
-    Given the consumer has started a financial assistance application
+    Given the consumer has started a financial assistance application1
     And has added tax information for an applicant
-    And has added an deducation
+#    And has added an deducation
+    When they click on 'Add Deduction' button
+    And has added a deduction
     When they view the applicant's details page
     And they click on 'Remove Deducation' button
-    Then they should be taken back to the application's details page
-    And the deducation should be no longer be shown
+    And they should be taken back to the application's details page for deduction
+#    And the deducation should be no longer be shown
 
   Scenario: A consumer reviews and submits an application
     Given the consumer has completed a financial assistance application
-    When they view the financial assistance application
-    And click the "Review and Submit" button
-    And cthey review and submit the application
+    When they view the financial assistance application for review
+    And click the 'Review and Continue' button
+    And they review and submit the application
     Then they are taken back to view all applications
     And they will see that their application has been submitted

@@ -78,7 +78,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
+                  id: 'access_to_hc_yes'
                   # checked: true
                   label: 'Yes'
                 - gutter: 1
@@ -202,6 +202,7 @@
                 - gutter: 1
                   type: label_radio
                   name: is_eligible
+                  id: 'is_eligible_yes'
                   value: true
                   id: 'yes2'
                   label: 'Yes'
@@ -212,7 +213,7 @@
                   type: label_radio
                   name: is_eligible
                   value: false
-                  id: 'no2'
+                  id: 'is_eligible_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: benefit
@@ -230,7 +231,7 @@
                   type: label_radio
                   name: employer_sponsored
                   value: true
-                  id: 'yes2'
+                  id: 'health_plan_yes'
                   model: benefit
                   attribute: is_employer_sponsored
                   label: 'Yes'
