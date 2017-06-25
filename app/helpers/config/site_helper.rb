@@ -30,8 +30,4 @@ module Config::SiteHelper
   def site_short_name
     Settings.site.short_name
   end
-
-  def site_s3_prefix
-    Settings.site.subdomain
-  end
 end

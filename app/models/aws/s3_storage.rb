@@ -79,7 +79,7 @@ module Aws
     end
 
     def env_bucket_name(bucket_name)
-      "#{site_s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
+      "mhc-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup
