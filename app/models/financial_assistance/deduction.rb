@@ -33,7 +33,6 @@ class FinancialAssistance::Deduction
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
-  field :family_member_id, type: BSON::ObjectId
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
@@ -51,13 +50,6 @@ class FinancialAssistance::Deduction
 
   before_create :set_submission_timestamp
 
-  def family_member
-    @family_member ||= FamilyMember.find(family_member_id)
-  end
-
-  def person
-    @person ||= family_member.person
-  end
 
 
 private

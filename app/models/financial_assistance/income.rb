@@ -42,7 +42,6 @@ class FinancialAssistance::Income
 
   field :title, type: String
   field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
-  field :family_member_id, type: BSON::ObjectId
   field :wage_type, type: String
   field :hours_per_week, type: Integer, default: 0
   field :amount, type: Integer, default: 0
@@ -128,13 +127,6 @@ class FinancialAssistance::Income
   def hours_worked_per_week
   end
 
-  def family_member
-    @family_member ||= FamilyMember.find(family_member_id)
-  end
-
-  def person
-    @person ||= family_member.person
-  end
 
 private
 

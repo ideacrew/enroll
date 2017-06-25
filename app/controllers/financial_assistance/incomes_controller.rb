@@ -9,7 +9,6 @@
     @selectedTab = "jobIncome"
     @allTabs = NavigationHelper::getAllYmlTabs
     @model = @applicant.incomes.build
-    @model.update_attributes(family_member_id: @applicant.family_member.id)
     load_steps
     current_step
     render 'workflow/step', layout: 'financial_assistance'
@@ -21,7 +20,6 @@
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     format_date_params model_params
-    @model.update_attributes(family_member_id: @applicant.family_member.id)
 
     if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i + 1 }
