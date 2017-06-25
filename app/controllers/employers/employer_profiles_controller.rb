@@ -121,6 +121,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
+        @current_plan_year.ensure_benefit_group_is_valid if @current_plan_year 
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
         @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})

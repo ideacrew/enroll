@@ -1,0 +1,130 @@
+<style>
+ /*#effective_datatable_wrapper .employer_attestation_fields .selectric-wrapper{
+    width: 25em;
+  }
+
+  #effective_datatable_wrapper .employer_attestation_fields .selectric{
+    border: solid 1px #b7b7b7;
+    border-radius: 4px;
+  }*/
+
+
+</style>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h2>Document Name: <%= truncate(@document.title, length: 50) %></h2>
+      </div>
+
+      <div class="panel-body">
+        <p id="print_<%=@document.id%>">
+          <iframe src="<%= employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" style="border: 0" width="100%" height="500" frameborder="1" scrolling="no"></iframe>
+
+        </p>
+        <p class="text-right">
+          <a href="<%=download_employer_document_document_path(@document) + "?path=#{@document.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+          <button class="btn btn-default" onclick='printDoc("<%=@document.id%>")'>Print</button>
+        </p>
+      </div>
+
+      <div class="panel-footer">
+
+        <div class="row employer_attestation_fields">
+          <div class="col-md-12">
+
+            <%= form_tag employers_employer_attestation_path(@employer_profile), :method => :put do |f| %>
+              <%= hidden_field_tag :employer_attestation_id, @document.id %>
+             
+              <div class='row'>
+                <div class="col-sm-8">
+                  <div class="form-group">
+                    <h3>Employer Name: <%= @employer_profile.legal_name %></h3>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <h3>Effective Date: <%= TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y') %></h3>
+                  </div>
+                </div>
+              </div>
+
+              <div class='row'>
+                <div class="col-sm-2">
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="radio">
+                          <label><input type="radio" name="status" value="accepted" checked><span>  Approve<%#= l10n('.approve') %></span></label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="radio">
+                          <label><input type="radio" name="status" value="rejected"><span>  Reject<%#= l10n('.reject') %></span></label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+               <!--    <fieldset class="form-group">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="radio" name="status" value="accepted" checked>
+                        Approve
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="radio" name="status" value="rejected">
+                        Reject
+                      </label>
+                    </div>
+                  </fieldset> -->
+                </div>
+
+                <div class="col-sm-7">
+                   <div class="row">
+                      <div class="col-sm-12">
+                        <div class="form-group">
+                          <select class="custom-select" name="reason_for_rejection">
+                            <option selected>Reason for rejection</option>
+                            <option value="A">Unable To Open Document</option>
+                            <option value="B">Document Not Required DOR-1 Form</option>
+                            <option value="C">DOR-1 Form DoesNot Match Bussiness</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+
+                        <div class="form-group">
+                          <label class="control-label" for="other_reason">Other Reason</label>
+                          <input name="other_reason" type="text" value="" placeholder="Other reason for rejection" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                   <div class="form-group pull-right">
+                    <button type="submit" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>">Submit</button>
+                    <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                  </div>
+                </div>
+              </div>
+              <% end %>
+            </div> 
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

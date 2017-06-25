@@ -8,13 +8,15 @@ module Effective
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
-        table_column '', :proc => Proc.new { |row| '<i class="fa fa-file-text-o" style="margin-right:20px;"></i>' }, :filter => false, :sortable => false
         table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
-        table_column :name, :proc => Proc.new { |row| link_to row.title,"Dcoument", "data-toggle" => "modal", 'data-target' => "#employeeModal_#{row.id}" }, :filter => false, :sortable => false
-        table_column :type, :proc => Proc.new { |row| row.subject }, :filter => false, :sortable => false
-        table_column :size, :proc => Proc.new { |row| row.size_bytes_to_megabytes }, :filter => false, :sortable => false
-        table_column :date, :proc => Proc.new { |row| row.created_at.strftime('%m/%d/%Y') }, :filter => false, :sortable => false
-        table_column :owner, :proc => Proc.new { |row| row.creator }, :filter => false, :sortable => false
+        table_column :name, :label => 'Doc Name', :proc => Proc.new { |row| 
+          link_to (raw('<i class="fa fa-file-text-o" style="margin-right:20px;"></i>') + row.title), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
+        }, :filter => false, :sortable => false
+        table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
+           'Employer Attestation'
+        }, :filter => false, :sortable => false
+        table_column :size, :proc => Proc.new { |row| number_to_human_size(row.size, precision: 2) }, :filter => false, :sortable => false
+        table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| row.created_at.strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
       end
 
       def generate_invoice_link_type(row)
