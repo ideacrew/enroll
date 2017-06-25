@@ -16,7 +16,7 @@ module Queries
       case @custom_attributes[:users]
         when "all_employer_staff_roles"
           if @custom_attributes[:lock_unlock] == "locked"
-            user.where(:'roles'.in => ["employer_staff"], locked_at: {:$exists => true})
+            user.where(:'roles'.in => ["employer_staff"], :locked_at.ne => nil)
           elsif @custom_attributes[:lock_unlock] == "unlocked"
             user.where(:'roles'.in => ["employer_staff"], locked_at: nil)
           else
@@ -24,7 +24,7 @@ module Queries
           end
         when "all_employee_roles"
           if @custom_attributes[:lock_unlock] == "locked"
-            user.where(:'roles'.in => ["employee"], locked_at: {:$exists => true})
+            user.where(:'roles'.in => ["employee"], :locked_at.ne => nil)
           elsif @custom_attributes[:lock_unlock] == "unlocked"
             user.where(:'roles'.in => ["employee"], locked_at: nil)
           else
@@ -32,7 +32,7 @@ module Queries
           end
         when "all_broker_roles"
           if @custom_attributes[:lock_unlock] == "locked"
-            user.where(:'roles'.in => ["broker"], locked_at: {:$exists => true})
+            user.where(:'roles'.in => ["broker"], :locked_at.ne => nil)
           elsif @custom_attributes[:lock_unlock] == "unlocked"
             user.where(:'roles'.in => ["broker"], locked_at: nil)
           else
