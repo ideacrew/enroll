@@ -4,8 +4,6 @@ class DocumentsController < ApplicationController
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
   respond_to :html, :js
 
-  autocomplete :organization, :legal_name, :full => true, :scopes => [:all_employer_profiles]
-
   def download
     bucket = params[:bucket]
     key = params[:key]

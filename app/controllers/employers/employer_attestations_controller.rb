@@ -3,8 +3,6 @@ class Employers::EmployerAttestationsController < ApplicationController
   before_action :find_employer, except: [:autocomplete_organization_legal_name, :index, :new]
   before_action :check_hbx_staff_role, only: [:update, :edit, :accept, :reject]
 
-  autocomplete :organization, :legal_name, :full => true, :scopes => [:all_employer_profiles]
-
   def show
   end
 
