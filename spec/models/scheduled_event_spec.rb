@@ -58,7 +58,7 @@ RSpec.describe ScheduledEvent, type: :model do
   	end
   end
   
-  context "Calender Event" do
+  context "Calendar Event" do
     let(:schedule_event_with_empty_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, offset_rule: 3)}
     let(:scheduled_event_recurring_rules) { FactoryGirl.create(:scheduled_event, :empty_recurring_rules, offset_rule: 3)}
     let(:friday_offset_1) { FactoryGirl.create(:scheduled_event, :start_on_friday, offset_rule: 1)}

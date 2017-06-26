@@ -12,7 +12,7 @@
       <%= link_to 'List Of Events' , list_exchanges_scheduled_events_path , class: "btn btn-default" %>
     </div>
   	<div class="row">
-  		<h3 class="title-inline">Calender</h3>
+  		<h3 class="title-inline">Calendar</h3>
   	</div>	
     <%= month_calendar events: @calendar_events do |day, events| %>
       <div><strong><%= day.to_s(:long) %></strong></div>

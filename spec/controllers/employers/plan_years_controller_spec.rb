@@ -36,7 +36,9 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:address) { double(:address, zip: '10001') }
     let(:office_location) { double(:office_location, address: address)}
     let(:organization) { double(:organization, primary_office_location: office_location) }
-    let(:employer_profile) { double(:employer_profile, organization: organization) }
+    let(:employer_profile) { double(:employer_profile, organization: organization, service_areas: service_areas) }
+    let(:service_areas) { [service_area] }
+    let(:service_area) { double }
 
     before :each do
       allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
@@ -100,6 +102,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       let(:plan_year) {FactoryGirl.build(:plan_year)}
 
       before :each do
+        allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in user
         allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
@@ -351,6 +354,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   allow(benefit_group).to receive(:default=)
       #allow(benefit_group).to receive(:reference_plan_id).and_return(FactoryGirl.create(:plan).id)
       allow(benefit_group).to receive(:reference_plan_id).and_return(nil)
+      allow(benefit_group).to receive(:sole_source?).and_return(false)
       allow(plan_year).to receive(:save).and_return(save_result)
       allow(Organization).to receive(:valid_carrier_names).and_return({'id' => "legal_name"})
       post :create, :employer_profile_id => employer_profile_id, :plan_year => plan_year_request_params
@@ -644,6 +648,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:census_employees) { double }
     let(:plan) { double }
     before do
+      allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
       @employer_profile = FactoryGirl.create(:employer_profile)
       @reference_plan = benefit_group.reference_plan
       Caches::PlanDetails.load_record_cache!
@@ -706,13 +711,16 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         py.open_enrollment_end_on = py.open_enrollment_start_on - 1.day
         py
       end
-      let!(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
+      let(:employer_profile)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
 
       let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
       let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-      let!(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
+      let(:employer_profile1)  { EmployerProfile.new(**valid_params, plan_years: [plan_year, new_plan_year]) }
 
       before do
+        allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
+        allow(employer_profile).to receive(:service_areas).and_return([double])
+        allow(employer_profile).to receive(:service_areas_available_on).with(plan_year.start_on).and_return([double])
         employer_profile.save(:validate => false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
         sign_in user
@@ -752,7 +760,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
         )
     end
 
-    let(:organization) { Organization.create(
+    let!(:organization) { Organization.create(
       legal_name: "Sail Adventures, Inc",
       dba: "Sail Away",
       fein: "001223333",
@@ -769,11 +777,15 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     let(:default_benefit_group)     { FactoryGirl.build(:benefit_group, default: true)}
     let(:benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [default_benefit_group, benefit_group]) }
-    let!(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
+    let(:employer_profile)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year]) }
 
     let(:new_benefit_group)     { FactoryGirl.build(:benefit_group)}
     let(:new_plan_year)         { FactoryGirl.build(:plan_year, benefit_groups: [new_benefit_group]) }
-    let!(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
+    let(:employer_profile1)  { EmployerProfile.new(**valid_params, sic_code: '1111', plan_years: [plan_year, new_plan_year]) }
+
+    before :each do
+      allow(PlanYear).to receive(:constrain_service_areas?).and_return(false)
+    end
 
     context 'when same plan year' do
       before do

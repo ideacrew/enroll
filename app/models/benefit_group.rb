@@ -410,7 +410,13 @@ class BenefitGroup
   end
 
   def employee_cost_for_plan(ce, plan = reference_plan)
-    pcd = @is_congress ? decorated_plan(plan, ce) : PlanCostDecorator.new(plan, ce, self, reference_plan)
+    pcd = if @is_congress
+      decorated_plan(plan, ce)
+    elsif(plan_option_kind == 'sole_source')
+      CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+    else
+      PlanCostDecorator.new(plan, ce, self, reference_plan)
+    end
     pcd.total_employee_cost
   end
 
@@ -434,9 +440,10 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_for_elected_plan || @carrier_for_elected_plan })
+      carrier_profile_id = reference_plan.carrier_profile_id
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile_id }).to_a
     when "metal_level"
-      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, @profile_and_service_area_pairs)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).and(:metal_level => reference_plan.metal_level).to_a
     end
   end
 
