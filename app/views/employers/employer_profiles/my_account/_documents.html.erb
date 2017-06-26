@@ -19,7 +19,7 @@
           <div style="margin:1em; border: 1px solid;padding: 1em;">
             <h4>MA DOR FORM-X</h4>
             <p style="text-align: right">
-              <a href="<%=download_employer_document_document_path(doc) + "?path=#{doc.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+              <a href="<%= employers_employer_attestation_authorized_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" target="_blank"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
               <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
             </p>
             <p id="print_<%=doc.id%>">
@@ -44,6 +44,7 @@
         window_obj.close();
     }
 
+    $(".icon_info").tooltip();
 </script>
 
 <style>

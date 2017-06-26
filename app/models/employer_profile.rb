@@ -926,7 +926,7 @@ class EmployerProfile
   end
 
   def has_valid_attestation?
-    self.employer_attestation.present? && self.employer_attestation.approved?
+    self.employer_attestation.present? && (self.employer_attestation.submitted? || self.employer_attestation.approved? || self.employer_attestation.pending?)
   end
   
   private

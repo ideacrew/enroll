@@ -1,14 +1,11 @@
 class Employers::EmployerAttestationsController < ApplicationController
 
-  before_action :find_employer, except: [:autocomplete_organization_legal_name, :index, :new]
+  before_action :find_employer, except: [:new]
   before_action :check_hbx_staff_role, only: [:update, :edit, :accept, :reject]
 
-  def show
-  end
-
   def edit
-    # @datatable = Effective::Datatables::DocumentDatatable.new({employer_profile_id: params[:id]})
-    @documents = @employer_profile.employer_attestation.employer_attestation_documents
+    @documents = []
+    @documents = @employer_profile.employer_attestation.employer_attestation_documents if @employer_profile.employer_attestation.present?
     @element_to_replace_id = params[:employer_actions_id]
 
     respond_to do |format|
@@ -52,26 +49,21 @@ class Employers::EmployerAttestationsController < ApplicationController
       flash[:error] = "Please upload file"
     end
 
-    redirect_to(:back)
+    redirect_to "/employers/employer_profiles/#{@employer_profile.id}"+'?tab=documents'
   end
 
   def update
     attestation = @employer_profile.employer_attestation
-    attestation_doc = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
+    document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
 
-    if params[:status] == 'rejected'
-      attestation_doc.reject! if attestation_doc.may_reject?
-      reason = params[:reason_for_rejection] == "nil"? params[:other_reason] : params[:reason_for_rejection]
-      attestation_doc.update(reason_for_rejection: reason)
-      attestation.make_pending! if attestation.may_make_pending?
-      flash[:notice] = "Employer attestation document is rejected."
-    elsif params[:status] == 'accepted'
-      attestation_doc.accept! if attestation_doc.may_accept?
-      attestation.approve! if attestation.may_approve?
-      flash[:notice] = "Employer attestation document is approved."
+    if document.present?
+      document.submit_review(params)
+      flash[:notice] = "Employer attestation updated successfully"
+    else
+      flash[:error] = "Failed: Unable to find attestation document."
     end
 
-    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+    redirect_to exchanges_hbx_profiles_path
   end
 
   def authorized_download
@@ -115,10 +107,8 @@ class Employers::EmployerAttestationsController < ApplicationController
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
+    if !current_user.has_hbx_staff_role?
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
     end
   end
-
-
 end
