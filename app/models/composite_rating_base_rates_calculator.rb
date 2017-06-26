@@ -7,7 +7,9 @@ class CompositeRatingBaseRatesCalculator
   end
 
   def base_rate
-    @base_rate ||= (create_numerator/create_denominator).round(2)
+    @denominator ||= create_denominator
+    return 0 if create_denominator == 0
+    @base_rate ||= (create_numerator/@denominator).round(2)
   end
 
   def tier_rates

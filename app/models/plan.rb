@@ -174,7 +174,8 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-  scope :for_service_areas,         ->(service_areas) { where(service_area_id: { "$in" => service_areas }) }
+  #scope :for_service_areas_and_carriers,->(service_areas, carrier_profile_ids) { where(service_area_id: { "$in" => service_areas }, carrier_profile_id: { "$in" => carrier_profile_ids}) }
+  scope :for_service_areas,             ->(service_areas) { where(service_area_id: { "$in" => service_areas }) }
 
   # Marketplace
   scope :shop_market,           ->{ where(market: "shop") }
@@ -291,6 +292,17 @@ class Plan
   # Carriers: use class method (which may be chained)
   def self.find_by_carrier_profile(carrier_profile)
     where(carrier_profile_id: carrier_profile._id)
+  end
+
+  def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year)
+    plan_criteria_set = service_area_carrier_pairs.map do |sap|
+    	{
+    		:carrier_profile_id => sap.first,
+    		:service_area_id => sap.last,
+    		:active_year => active_year
+    	}
+    end
+    self.where("$or" => plan_criteria_set)
   end
 
   def metal_level=(new_metal_level)
