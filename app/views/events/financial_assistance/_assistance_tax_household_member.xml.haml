@@ -20,12 +20,12 @@
     / %aptc_csr_annual_household_income
     / %aptc_annual_income_limit
     / %csr_annual_income_limit
-    - unless hbx_enrollment_member.person.is_disabled.blank? && hbx_enrollment_member.person.is_tobacco_user.blank?
+    - unless assistance_tax_household_member.person.is_disabled.blank? && assistance_tax_household_member.person.is_tobacco_user.blank?
       %person_health
-        - unless hbx_enrollment_member.person.is_tobacco_user.blank?
-          %is_tobacco_user= hbx_enrollment_member.person.is_tobacco_user
-        - unless hbx_enrollment_member.person.is_disabled.blank?
-          %is_disabled= hbx_enrollment_member.person.is_disabled
+        - unless assistance_tax_household_member.person.is_tobacco_user.blank?
+          %is_tobacco_user= assistance_tax_household_member.person.is_tobacco_user
+        - unless assistance_tax_household_member.person.is_disabled.blank?
+          %is_disabled= assistance_tax_household_member.person.is_disabled
   - unless person.consumer_role.blank?
     = render :partial => "events/lawful_presence/immigration_information", :object => person
     = render :partial => "events/financial_assistance/applicant_information", :object => assistance_tax_household_member, as: :applicant

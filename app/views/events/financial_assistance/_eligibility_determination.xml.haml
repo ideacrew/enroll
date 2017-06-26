@@ -2,6 +2,7 @@
   %id
     %id= eligibility_determination.e_pdc_id
   %eligibility_determination_applicants
+    = render :partial => "events/financial_assistance/eligibility_determination_applicant", :collection => eligibility_determination.family_members, as: :eligibility_determination_applicant
   %total_incomes_by_year
   - if eligibility_determination.aasm_state
     %household_state= "urn:openhbx:terms:v1:household_state##{eligibility_determination.aasm_state}"
