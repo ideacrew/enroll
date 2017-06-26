@@ -917,8 +917,8 @@ class EmployerProfile
     end
   end
 
-  def has_valid_attestation?
-    self.employer_attestation.present? && (self.employer_attestation.submitted? || self.employer_attestation.approved? || self.employer_attestation.pending?)
+  def is_attestation_eligible?
+    employer_attestation.present? && employer_attestation.is_eligible?
   end
   
   private

@@ -425,6 +425,17 @@ class PlanYear
   def application_eligibility_warnings
     warnings = {}
 
+    unless employer_profile.is_attestation_eligible?
+      if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+        link = ActionController::Base.helpers.link_to("Documents", "/employers/employer_profiles/#{employer_profile.id}"+'?tab=documents')
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select #{link.html_safe} on the blue menu to the left and follow the instructions to upload your documents."})
+      elsif employer_profile.employer_attestation.denied?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+      else
+        warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+      end
+    end
+
     unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
     end

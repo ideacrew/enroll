@@ -34,6 +34,14 @@ class EmployerAttestation
     end
   end
 
+  def under_review?
+    submitted? || pending?
+  end
+
+  def is_eligible?
+   under_review? || approved?
+  end
+
   def has_documents?
     self.employer_attestation_documents
   end
