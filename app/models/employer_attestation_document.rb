@@ -40,6 +40,16 @@ class EmployerAttestationDocument < Document
     employer_profile.employer_attestation
   end
 
+  def submit_review(params)
+    if [:info_needed, :pending].include?(params[:status].to_sym)
+      self.reject! if self.may_reject?
+      employer_attestation.set_pending! if params[:status].to_sym == :info_needed && employer_attestation.may_set_pending?
+      add_reason_for_rejection(params)
+    elsif params[:status].to_sym == :accepted
+      self.accept! if self.may_accept?
+    end
+  end
+
   def add_reason_for_rejection(params)
     if params[:reason_for_rejection].present?
       reason_for_reject = (params[:reason_for_rejection] == "Other Reason") ? params[:other_reason] : params[:reason_for_rejection]
@@ -47,7 +57,6 @@ class EmployerAttestationDocument < Document
     end
   end
 
- 
   private
 
   def approve_attestation

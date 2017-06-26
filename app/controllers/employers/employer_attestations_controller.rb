@@ -3,11 +3,9 @@ class Employers::EmployerAttestationsController < ApplicationController
   before_action :find_employer, except: [:new]
   before_action :check_hbx_staff_role, only: [:update, :edit, :accept, :reject]
 
-  def show
-  end
-
   def edit
-    @documents = @employer_profile.employer_attestation.employer_attestation_documents
+    @documents = []
+    @documents = @employer_profile.employer_attestation.employer_attestation_documents if @employer_profile.employer_attestation.present?
     @element_to_replace_id = params[:employer_actions_id]
 
     respond_to do |format|
@@ -51,7 +49,7 @@ class Employers::EmployerAttestationsController < ApplicationController
       flash[:error] = "Please upload file"
     end
 
-    redirect_to(:back)
+    redirect_to "/employers/employer_profiles/#{@employer_profile.id}"+'?tab=documents'
   end
 
   def update
@@ -59,20 +57,13 @@ class Employers::EmployerAttestationsController < ApplicationController
     document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
 
     if document.present?
-      if [:info_needed, :pending].include?(params[:status].to_sym)
-        document.reject! if document.may_reject?
-        attestation.set_pending! if params[:status].to_sym == :info_needed && attestation.may_set_pending?
-        document.add_reason_for_rejection(params)
-      elsif params[:status].to_sym == :accepted
-        document.accept! if document.may_accept?
-      end
-
+      document.submit_review(params)
       flash[:notice] = "Employer attestation updated successfully"
     else
       flash[:error] = "Failed: Unable to find attestation document."
     end
 
-    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+    redirect_to exchanges_hbx_profiles_path
   end
 
   def authorized_download

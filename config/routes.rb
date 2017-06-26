@@ -252,7 +252,6 @@ Rails.application.routes.draw do
     end
 
     resources :employer_attestations do 
-       put 'update_document'
        get 'authorized_download'
        get 'verify_attestation'
     end
