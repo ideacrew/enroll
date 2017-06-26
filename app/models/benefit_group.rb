@@ -423,6 +423,8 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
+    @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile)
+
     case plan_option_kind
     when "sole_source"
       Plan.where(id: reference_plan_id).first
@@ -432,9 +434,9 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, employer_profile.service_area_ids)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_for_elected_plan || @carrier_for_elected_plan })
     when "metal_level"
-      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, employer_profile.service_area_ids)
+      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, @profile_and_service_area_pairs)
     end
   end
 
