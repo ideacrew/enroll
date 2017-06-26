@@ -15,7 +15,7 @@ module Effective
            icon = " <span class='glyphicon glyphicon-exclamation-sign text-danger' aria-hidden='true' title='#{row.reason_for_rejection}'></span>"
           end
 
-          link_to raw('<i class="fa fa-file-text-o" style="margin-right:20px;"></i>') + row.title + raw(icon), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
+          link_to raw('<i class="fa fa-file-text-o pull-left" style="margin-right:20px;"></i>') + row.title + raw(icon), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", 'class' => 'pull-left'
         }, :filter => false, :sortable => false
         table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
            'Employer Attestation'
