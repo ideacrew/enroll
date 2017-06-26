@@ -410,7 +410,13 @@ class BenefitGroup
   end
 
   def employee_cost_for_plan(ce, plan = reference_plan)
-    pcd = @is_congress ? decorated_plan(plan, ce) : PlanCostDecorator.new(plan, ce, self, reference_plan)
+    pcd = if @is_congress
+      decorated_plan(plan, ce)
+    elsif(plan_option_kind == 'sole_source')
+      CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+    else
+      PlanCostDecorator.new(plan, ce, self, reference_plan)
+    end
     pcd.total_employee_cost
   end
 
