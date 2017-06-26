@@ -61,7 +61,6 @@
                     <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, '#', class: "btn btn-default pull-right",:onClick=>"EmployerProfile.showActionNeeded()" %>
                   <% end %>
                 <% end %>
-
                 <%= link_to "Edit Plan Year &nbsp;<i class='fa fa-pencil' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
             <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>

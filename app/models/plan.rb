@@ -174,7 +174,6 @@ class Plan
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }
   scope :by_plan_type_for_bqt,          ->(plan_type) { where(:plan_type.in => plan_type) }
-  #scope :for_service_areas_and_carriers,->(service_areas, carrier_profile_ids) { where(service_area_id: { "$in" => service_areas }, carrier_profile_id: { "$in" => carrier_profile_ids}) }
   scope :for_service_areas,             ->(service_areas) { where(service_area_id: { "$in" => service_areas }) }
 
   # Marketplace
@@ -294,13 +293,18 @@ class Plan
     where(carrier_profile_id: carrier_profile._id)
   end
 
-  def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year)
+  def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year, metal_level = nil, coverage_kind = 'health')
     plan_criteria_set = service_area_carrier_pairs.map do |sap|
-    	{
+    	criteria = {
     		:carrier_profile_id => sap.first,
     		:service_area_id => sap.last,
-    		:active_year => active_year
+    		:active_year => active_year,
+        :coverage_kind => coverage_kind
     	}
+      if metal_level.present?
+        criteria.merge(metal_level: metal_level)
+      end
+      criteria
     end
     self.where("$or" => plan_criteria_set)
   end
@@ -457,10 +461,15 @@ class Plan
       end
     end
 
-    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, service_area_ids=[])
-      service_area_ids.inject([]) do |plans, service_area_id|
-        plans + Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health-#{service_area_id}", expires_in: 5.hour) do
-          Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).for_service_areas([service_area_id]).to_a
+    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, carrier_service_area_pairs=[])
+      carrier_service_area_pairs.inject([]) do |plans, carriers_and_service_areas|
+        cache_string =  carriers_and_service_areas.first + '-' + carriers_and_service_areas.second.join('-')
+        plans + Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health-#{cache_string}", expires_in: 5.hour) do
+          if type == 'metal_level'
+            Plan.public_send("for_service_areas_and_carriers", carriers_and_service_areas, year_of_plans, key.to_s).to_a
+          else
+            Plan.public_send("for_service_areas_and_carriers", carriers_and_service_areas, year_of_plans).to_a
+          end
         end
       end
     end
