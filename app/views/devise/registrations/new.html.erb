@@ -20,7 +20,7 @@
 
           <div class="form-group">
             <%= f.label :email_or_username %>
-            <%= f.text_field :oim_id, class: "form-control", required: true , onblur: "Register.toggleEmail(this)" %>
+            <%= f.text_field :oim_id, class: "form-control", required: true %>
           </div>
           <div class="tooltip_box username_tooltip" style="display: none;">
             <p style="margin-bottom:0;">You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.</p>
@@ -84,5 +84,6 @@
 <script type="text/javascript">
   $(document).on('ready page:load', function () {
     Register.initialize();
+    Register.toggleEmail($("#user_oim_id"))
   });
 </script>
