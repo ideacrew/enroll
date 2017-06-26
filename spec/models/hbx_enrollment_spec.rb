@@ -964,17 +964,17 @@ describe HbxEnrollment, dbclean: :after_each do
 
   let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
 
-  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
 
-  let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+  let(:middle_of_prev_year) { Date.new(calendar_year - 1, 6, 10) }
   let(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', created_at: middle_of_prev_year, updated_at: middle_of_prev_year, hired_on: middle_of_prev_year) }
   let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
   let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
-  let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-  let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
-  let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+  let(:plan_year_start_on) { Date.new(calendar_year, 1, 1) }
+  let(:plan_year_end_on) { Date.new(calendar_year, 12, 31) }
+  let(:open_enrollment_start_on) { Date.new(calendar_year - 1, 12, 1) }
+  let(:open_enrollment_end_on) { Date.new(calendar_year - 1, 12, 10) }
   let(:effective_date)         { plan_year_start_on }
 
 
@@ -1113,16 +1113,16 @@ describe HbxEnrollment, dbclean: :after_each do
   context ".can_select_coverage?" do
     let(:employer_profile)          { FactoryGirl.create(:employer_profile) }
 
-    let(:calender_year) { TimeKeeper.date_of_record.year }
+    let(:calendar_year) { TimeKeeper.date_of_record.year }
 
-    let(:middle_of_prev_year) { Date.new(calender_year - 1, 6, 10) }
+    let(:middle_of_prev_year) { Date.new(calendar_year - 1, 6, 10) }
     let(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
 
     let(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member) }
-    let(:plan_year_start_on) { Date.new(calender_year, 1, 1) }
-    let(:plan_year_end_on) { Date.new(calender_year, 12, 31) }
-    let(:open_enrollment_start_on) { Date.new(calender_year - 1, 12, 1) }
-    let(:open_enrollment_end_on) { Date.new(calender_year - 1, 12, 10) }
+    let(:plan_year_start_on) { Date.new(calendar_year, 1, 1) }
+    let(:plan_year_end_on) { Date.new(calendar_year, 12, 31) }
+    let(:open_enrollment_start_on) { Date.new(calendar_year - 1, 12, 1) }
+    let(:open_enrollment_end_on) { Date.new(calendar_year - 1, 12, 10) }
     let(:effective_date)         { plan_year_start_on }
 
 
@@ -1191,12 +1191,12 @@ describe HbxEnrollment, dbclean: :after_each do
     end
 
     context 'when its a new hire' do
-      let(:hired_on) { Date.new(calender_year, 3, 1) }
-      let(:created_at) { Date.new(calender_year, 2, 1) }
-      let(:updated_at) { Date.new(calender_year, 2, 1) }
+      let(:hired_on) { Date.new(calendar_year, 3, 1) }
+      let(:created_at) { Date.new(calendar_year, 2, 1) }
+      let(:updated_at) { Date.new(calendar_year, 2, 1) }
 
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calendar_year, 3, 15))
       end
 
       it "should allow" do
@@ -1206,7 +1206,7 @@ describe HbxEnrollment, dbclean: :after_each do
 
     context 'when not a new hire' do
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 3, 15))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calendar_year, 3, 15))
       end
 
       it "should not allow" do
@@ -1222,11 +1222,11 @@ describe HbxEnrollment, dbclean: :after_each do
 
     context 'when roster create present' do
       let(:hired_on) { middle_of_prev_year }
-      let(:created_at) { Date.new(calender_year, 5, 10) }
-      let(:updated_at) { Date.new(calender_year, 5, 10) }
+      let(:created_at) { Date.new(calendar_year, 5, 10) }
+      let(:updated_at) { Date.new(calendar_year, 5, 10) }
 
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 15))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calendar_year, 5, 15))
       end
 
       it "should allow" do
@@ -1237,10 +1237,10 @@ describe HbxEnrollment, dbclean: :after_each do
     context 'when roster update not present' do
       let(:hired_on) { middle_of_prev_year }
       let(:created_at) { middle_of_prev_year }
-      let(:updated_at) { Date.new(calender_year, 5, 10) }
+      let(:updated_at) { Date.new(calendar_year, 5, 10) }
 
       before do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(calender_year, 5, 9))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(calendar_year, 5, 9))
       end
 
       it "should not allow" do
@@ -1266,7 +1266,7 @@ describe HbxEnrollment, dbclean: :after_each do
       let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
       let(:employee_role_id) { employee_role.id }
-      let(:new_census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calender_year, 5, 10), updated_at: Date.new(calender_year, 5, 10)) }
+      let(:new_census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: middle_of_prev_year, created_at: Date.new(calendar_year, 5, 10), updated_at: Date.new(calendar_year, 5, 10)) }
 
 
       let(:special_enrollment_period) {

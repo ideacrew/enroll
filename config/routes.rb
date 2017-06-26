@@ -92,7 +92,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
-        get :calender_index
+        get :calendar_index
         get :user_account_index
       end
 
