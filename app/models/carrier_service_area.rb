@@ -20,6 +20,17 @@ class CarrierServiceArea
   scope :serving_entire_state, -> { where(serves_entire_state: true) }
   scope :for_issuer, -> (hios_ids) { where(issuer_hios_id: { "$in" => hios_ids }) }
 
+  def self.service_areas_available_on(address, year)
+    return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
+    where({
+      :active_year => year,
+      "$or" => [
+        {:serves_entire_state => true},
+        {:service_area_zipcode => address.zip, county_name: Regexp.compile(Regexp.escape(address.county).downcase, true)}
+      ]
+    })
+  end
+
   class << self
 
     def valid_for?(office_location:, carrier_profile:)

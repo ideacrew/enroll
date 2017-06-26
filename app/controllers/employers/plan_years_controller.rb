@@ -236,6 +236,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
+    unless plan_year.products_offered_in_service_area
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => "No products are offered for your location."}
+      return
+    end
     if params[:publish]
       @just_a_warning = !plan_year.is_application_eligible? ? true : false
       plan_year.application_warnings
