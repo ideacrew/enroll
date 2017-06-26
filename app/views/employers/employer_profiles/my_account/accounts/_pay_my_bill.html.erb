@@ -12,22 +12,29 @@
 <h3><%= Settings.site.short_name %> offers multiple payment options including:</h3>
 <h4>
   <ol>
-    <li>Pay Online -
-      <%= link_to 'How to Pay Online', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%></li>
-    <br/>
+    <li>
+      <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, wells_fargo_sso_employers_employer_profile_path %>
+      <div class="row col-md-offset-1">
+        <%= link_to 'How to Pay Online - Instructions', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%>
+      </div>
+    </li>
     <li>Pay by Phone
       <div class="row col-md-offset-1">
-        855-532-LINK, select "Small Business Employer" then "Make a Payment"</li>
-      <br/>
-      <li>Pay by Mail
-        <div class="row col-md-offset-1">
-          <%= Settings.site.short_name %></div>
-        <div class="row col-md-offset-1">
-          PO Box 97022</div>
-        <div class="row col-md-offset-1">
-          Washington, DC 20090</div>
-      </li>
-    </ol>
-  </h4>
-  <h4>**Please include your account number on your check.</h4>
-  <h4>Check that your mailing address is up to date - click on Update Business Info.</h4>
+        855-532-LINK, select "Small Business Employer" then "Make a Payment"
+      </div>
+    </li>
+    <li>Pay by Mail
+      <div class="row col-md-offset-1">
+        <%= Settings.site.short_name %>
+      </div>
+      <div class="row col-md-offset-1">
+        PO Box 97022
+      </div>
+      <div class="row col-md-offset-1">
+        Washington, DC 20090
+      </div>
+    </li>
+  </ol>
+</h4>
+<h4>**Please include your account number on your check.</h4>
+<h4>Check that your mailing address is up to date - click on Update Business Info.</h4>

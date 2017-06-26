@@ -249,6 +249,7 @@ Rails.application.routes.draw do
       member do
         get "download_invoice"
         get "show_invoice"
+        get "wells_fargo_sso"
       end
       collection do
         get 'welcome'
