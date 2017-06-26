@@ -820,39 +820,39 @@ describe EmployerProfile, "Renewal Queries" do
     org
   }
 
-  let(:calender_year) { TimeKeeper.date_of_record.year }
+  let(:calendar_year) { TimeKeeper.date_of_record.year }
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.today+1.month) if TimeKeeper.date_of_record.month == 1
 
     plan_years = organization1.employer_profile.plan_years.to_a
     plan_years.first.update_attributes({ aasm_state: :renewing_published,
-      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 13)
+      :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 13)
       })
     plan_years.last.update_attributes({ aasm_state: :active,
-      :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year-1, 4, 1), :open_enrollment_end_on => Date.new(calender_year-1, 4, 10)
+      :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year-1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year-1, 4, 10)
       })
 
     organization2.employer_profile.plan_years.first.update_attributes({ aasm_state: :published,
-      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10)
+      :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10)
       })
 
     plan_years = organization3.employer_profile.plan_years.to_a
     plan_years.first.update_attributes({ aasm_state: :renewing_draft,
-      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 13)
+      :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 13)
       })
     plan_years.last.update_attributes({ aasm_state: :active,
-      :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year-1, 4, 1), :open_enrollment_end_on => Date.new(calender_year-1, 4, 10)
+      :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year-1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year-1, 4, 10)
       })
 
     organization4.employer_profile.plan_years.first.update_attributes({ aasm_state: :draft,
-      :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30),
-      :open_enrollment_start_on => Date.new(calender_year, 4, 1), :open_enrollment_end_on => Date.new(calender_year, 4, 10)
+      :start_on => Date.new(calendar_year, 5, 1), :end_on => Date.new(calendar_year+1, 4, 30),
+      :open_enrollment_start_on => Date.new(calendar_year, 4, 1), :open_enrollment_end_on => Date.new(calendar_year, 4, 10)
       })
   end
 
@@ -862,36 +862,36 @@ describe EmployerProfile, "Renewal Queries" do
 
   context '.organizations_for_open_enrollment_begin', dbclean: :after_each do
     it 'should return organizations elgible for open enrollment' do
-      expect(EmployerProfile.organizations_for_open_enrollment_begin(Date.new(calender_year, 4, 1)).to_a).to eq [organization1, organization2]
+      expect(EmployerProfile.organizations_for_open_enrollment_begin(Date.new(calendar_year, 4, 1)).to_a).to eq [organization1, organization2]
     end
   end
 
   context '.organizations_for_open_enrollment_end', dbclean: :after_each do
     it 'should return organizations for whom open enrollment ended' do
-      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 10)).to_a).to be_blank
-      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 11)).to_a).to eq [organization2]
-      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calender_year, 4, 14)).to_a).to eq [organization1, organization2]
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calendar_year, 4, 10)).to_a).to be_blank
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calendar_year, 4, 11)).to_a).to eq [organization2]
+      expect(EmployerProfile.organizations_for_open_enrollment_end(Date.new(calendar_year, 4, 14)).to_a).to eq [organization1, organization2]
     end
   end
 
   context '.organizations_for_plan_year_begin', dbclean: :after_each do
     it 'should return organizations eligible to begin plan year' do
-      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calender_year, 4, 30)).to_a).to be_blank
-      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calender_year, 5, 1)).to_a).to eq [organization1, organization2]
+      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calendar_year, 4, 30)).to_a).to be_blank
+      expect(EmployerProfile.organizations_for_plan_year_begin(Date.new(calendar_year, 5, 1)).to_a).to eq [organization1, organization2]
     end
   end
 
   context '.organizations_for_plan_year_end', dbclean: :after_each do
     it 'should return organizations for whom plan year ended' do
-      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calender_year+1, 4, 30)).to_a).to eq [organization1, organization3]
-      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calender_year+1, 5, 1)).to_a).to eq [organization1, organization2, organization3]
+      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calendar_year+1, 4, 30)).to_a).to eq [organization1, organization3]
+      expect(EmployerProfile.organizations_for_plan_year_end(Date.new(calendar_year+1, 5, 1)).to_a).to eq [organization1, organization2, organization3]
     end
   end
 
   context '.organizations_eligible_for_renewal', dbclean: :after_each do
     it 'should return organizations for renewal' do
       months_prior = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
-      expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calender_year+1, 2, 1)).to_a).to eq [organization2]
+      expect(EmployerProfile.organizations_eligible_for_renewal(Date.new(calendar_year+1, 2, 1)).to_a).to eq [organization2]
     end
   end
 end
