@@ -376,6 +376,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @benefit_group = @plan_year.benefit_groups[0]
+    @benefit_group.build_estimated_composite_rates if @plan_option_kind == 'sole_source'
 
     if @coverage_type == '.dental'
       @plan_year.benefit_groups[0].dental_reference_plan = @plan
