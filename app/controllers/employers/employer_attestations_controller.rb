@@ -60,7 +60,7 @@ class Employers::EmployerAttestationsController < ApplicationController
 
     if document.present?
       if [:info_needed, :pending].include?(params[:status].to_sym)
-        document.reject! if params[:status].to_sym == :rejected && document.may_reject?
+        document.reject! if document.may_reject?
         attestation.set_pending! if params[:status].to_sym == :info_needed && attestation.may_set_pending?
         document.add_reason_for_rejection(params)
       elsif params[:status].to_sym == :accepted

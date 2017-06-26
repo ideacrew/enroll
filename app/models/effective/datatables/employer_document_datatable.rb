@@ -9,8 +9,13 @@ module Effective
         end
 
         table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
-        table_column :name, :label => 'Doc Name', :proc => Proc.new { |row| 
-          link_to (raw('<i class="fa fa-file-text-o" style="margin-right:20px;"></i>') + row.title), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
+        table_column :name, :label => 'Doc Name', :proc => Proc.new { |row|
+          icon = ""
+          if row.reason_for_rejection.present?
+           icon = " <span class='glyphicon glyphicon-exclamation-sign text-danger' aria-hidden='true' title='#{row.reason_for_rejection}'></span>"
+          end
+
+          link_to raw('<i class="fa fa-file-text-o" style="margin-right:20px;"></i>') + row.title + raw(icon), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
         }, :filter => false, :sortable => false
         table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
            'Employer Attestation'
