@@ -1,15 +1,8 @@
-<% if load_captcha_widget? %>
-  <script type="text/javascript">
-    site_key = '<%= Rails.application.secrets.recaptcha_site_key %>'
-    setCaptchaSiteKey(site_key);
-  </script>
-  <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
-<% end %>
 <div class="container top-pd module" id='signup'>
   <div class="col-md-3 col-sm-2 col-xs-12"></div>
     <div id="registration-form-container" class="col-md-6 col-sm-8 col-xs-12">
       <h1 class="darkblue no-top-margin text-center">Create Account</h1>
-        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'input-no-pd', id: 'invisible-recaptcha-form' }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'input-no-pd'}) do |f| %>
           <%= devise_error_messages! %>
           <div class="row error-block" style='display: none;'>
             <div class="col-xs-12">
@@ -67,8 +60,6 @@
 
           <%= f.hidden_field :invitation_id %>
           <br/>
-          <div class="recaptcha-error"></div>
-          <div class="recaptcha" id="captcha-widget"></div>
           <div class="actions text-center">
               <%= f.submit "Create account", class: "btn btn-primary btn-lg" %>
               <br/>
