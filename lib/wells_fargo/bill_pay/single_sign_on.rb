@@ -18,7 +18,7 @@ module WellsFargo
       EMAIL = "antonio.schaffert@dc.gov"
       SECRET = "dchbx 2017"
       API_VERSION = "3000"
-      PRIVATE_KEY_LOCATION = "/Users/antonioschaffert/workspace/wfpk.pem"
+      PRIVATE_KEY_LOCATION = "/var/www/deployments/enroll/current/config/ssl/wfpk.pem" #TEMP 
 
       def initialize(reference_number, external_id)
          @reference_number = reference_number
