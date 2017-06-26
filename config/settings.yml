@@ -102,6 +102,9 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    employer_profiles:
+      minimum_invoice_display_year: 2015  
+
 
 paper_notice: 'paper-notices'
 

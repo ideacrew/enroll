@@ -317,7 +317,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
-    @invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
+    #@invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
+    @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
