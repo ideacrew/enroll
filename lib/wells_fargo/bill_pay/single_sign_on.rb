@@ -18,7 +18,7 @@ module WellsFargo
       EMAIL = "antonio.schaffert@dc.gov"
       SECRET = "dchbx 2017"
       API_VERSION = "3000"
-      PRIVATE_KEY_LOCATION = "/var/www/deployments/enroll/current/config/ssl/wfpk.pem" #TEMP 
+      PRIVATE_KEY_LOCATION = "/wfpk.pem" #TEMP
 
       def initialize(reference_number, external_id)
          @reference_number = reference_number
@@ -30,7 +30,7 @@ module WellsFargo
         return @token if defined? @token
 
         @creation_date = Time.now.strftime("%Y-%m-%dT%H:%M:%S.0000000%z")
-        private_key = OpenSSL::PKey::RSA.new(File.read(PRIVATE_KEY_LOCATION))
+        private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION)
 
         message = SECRET + @creation_date
 
