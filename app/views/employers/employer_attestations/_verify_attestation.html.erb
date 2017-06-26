@@ -58,7 +58,7 @@
                   </div>
                 </div>
                 <div class="col-sm-9">
-                  <div class="form-group">
+                  <div class="form-group rejection_reason hidden">
                     <%= select_tag "reason_for_rejection", options_for_select(EmployerAttestationDocument::REASON_KINDS), prompt: "Reason for rejection" %>
                   </div>
                 </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div class="col-sm-9">
                   <div class="form-group">
-                    <input name="other_reason" type="text" value="" placeholder="Other reason for rejection" class="form-control">
+                    <input name="other_reason" type="text" value="" placeholder="Other reason for rejection" class="form-control hidden">
                   </div>
                 </div>
               </div>
