@@ -425,11 +425,9 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
-
     unless employer_profile.is_attestation_eligible?
       if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
-        link = ActionController::Base.helpers.link_to("Documents", "/employers/employer_profiles/#{employer_profile.id}"+'?tab=documents')
-        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select #{link.html_safe} on the blue menu to the left and follow the instructions to upload your documents."})
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
       elsif employer_profile.employer_attestation.denied?
         warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
       else
