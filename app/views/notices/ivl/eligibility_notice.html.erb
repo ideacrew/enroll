@@ -16,11 +16,10 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_fullname %>:  </td>
     </tr>
   </tbody>
 </table>
-<br>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You recently applied for help paying for health coverage through #{Settings.site.short_name} on #{TimeKeeper.date_of_record}. This letter will tell you:",
@@ -29,12 +28,12 @@
              "How we made our decision",
              "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["Based on the information you told us about who needs health coverage, your results are as follows:"],
    heading: 'Your Eligibility Results', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Likely Qualify for Medicaid:",
+  previous: "<b>Likely Qualify for Medicaid:</b>",
   listings: ["Person 1            Age: 35",
              "Person 2            Age: 56"]} %>
 
@@ -46,8 +45,9 @@
   listings: ["Person 1            Age: 35",
              "Person 2            Age: 56"]} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Advance Premium Tax Credit Savings:</strong> $0/month<br> This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."} %>
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
+   heading: '', sub_heading: 'Advance Premium Tax Credit Savings:'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. To get these savings, you must select a silver plan. "} %>
@@ -67,12 +67,12 @@ listing: "<strong>What you need to do next:</strong> Login to your account at dc
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Does Not Qualify for Coverage:",
   listings: ["Person 1            Age: 35",
-             "Person 2            Age: 56"]} %>
+             "Person 2            Age: 56"], top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>What you need to do next:</strong> Review the section, ‘How We Made Our Decision’, to find out why, and learn about options for those listed."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["Don’t miss the deadline! Open enrollment for #{TimeKeeper.date_of_record.next_year.year} private health plans began on #{Date.new(2017,11,1)}, and ends on #{Date.new(2018,1,31)}."],
    heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
 
@@ -84,16 +84,13 @@ listing: "<strong>What you need to do next:</strong> Review the section, ‘How 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If someone in your household had a recent life change, they may still be able to enroll for #{TimeKeeper.date_of_record.year}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at dchealthlink.com or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert."],
-   heading: 'Get Help Choosing a Plan', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."],
+   heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '12px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."} %>
-
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["We reviewed what you told us on your application about your household, and each person who needs health coverage. We checked to see who qualifies for coverage, and if they qualify for savings. The results below tell you how we made our decision."],
-   heading: 'How We Made Our Decision', sub_heading: ''} %>
+   heading: 'How We Made Our Decision', sub_heading: '', top_margin: '12px'} %>
 
   <%= render partial: 'notices/shared/info_table', locals: {
                              rows: [['Household Member:', "Person 1          Age: 35"],
@@ -104,14 +101,14 @@ content: "You can also use our Plan Match tool to compare plans on your own. Wit
     col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You did not ask to have the DC Department of Human Services (DHS) do a full review for Medicaid eligibility.  If you want to change your mind, call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}."} %>
+content: "You did not ask to have the DC Department of Human Services (DHS) do a full review for Medicaid eligibility.  If you want to change your mind, call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}.", top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You asked us to send your application to the DC Department of Human Services (DHS) to review Medicaid eligibility for your household.  They may ask you for more information or documents. They will make a final decision.  If you have questions, call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}"} %>
+content: "You asked us to send your application to the DC Department of Human Services (DHS) to review Medicaid eligibility for your household.  They may ask you for more information or documents. They will make a final decision.  If you have questions, call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}", top_margin: '4px'} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
-   heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
+   heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>The deadline to request an appeal is</strong> #{TimeKeeper.date_of_record+95.days}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
@@ -120,11 +117,5 @@ listing: "<strong>The deadline to request an appeal is</strong> #{TimeKeeper.dat
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
-content: "<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br><i>Exchange Regulations</i><br>General Eligibility Standards for Exchange Participation and Affordability Programs: 45 CFR § 155.305 <br> Premium Tax Credit Calculations:  26 CFR § 1.36B-3
-<br>Eligibility Appeals: 45 CFR §§ 155.505(b) & 520(b)(1) <br>Annual open enrollment period: 45 CFR § 155.155.410(e) <br>Special enrollment periods: 45 CFR § 155.420 <br>Requirement to report changes: 45 CFR § 155.3330(b) <br> <i>Medicaid Regulations</i> <br> State Residence: 42 CFR § 435.403<br>
-Citizenship and Non-Citizenship Eligibility: 42 CFR § 435.406 <br>
-Medicaid Use of Modified Adjusted Gross Income:  42 CFR § 435.603 <br>
-Medicaid Determination of Eligibility: 42 CFR § 435.911 <br>
-Eligibility for Medical Assistance Programs: 42 C.F.R. § 435.945(a) and (b) <br>
-Verification of Other Non-Financial Information: 42 CFR § 435.956 <br>
-Non-Citizen Eligibility for Federal Benefits: 8 USCS 1 § 1611, § 1612, and § 1613"} %>
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
+  "<i>Exchange Regulations</i>","General Eligibility Standards for Exchange Participation and Affordability Programs: 45 CFR § 155.305","Premium Tax Credit Calculations:  26 CFR § 1.36B-3","Eligibility Appeals: 45 CFR §§ 155.505(b) & 520(b)(1)","Annual open enrollment period: 45 CFR § 155.155.410(e)","Special enrollment periods: 45 CFR § 155.420","Requirement to report changes: 45 CFR § 155.3330(b)","<i>Medicaid Regulations</i>","State Residence: 42 CFR § 435.403","Citizenship and Non-Citizenship Eligibility: 42 CFR § 435.406","Medicaid Use of Modified Adjusted Gross Income:  42 CFR § 435.603","Medicaid Determination of Eligibility: 42 CFR § 435.911","Eligibility for Medical Assistance Programs: 42 C.F.R. § 435.945(a) and (b)","Verification of Other Non-Financial Information: 42 CFR § 435.956","Non-Citizen Eligibility for Federal Benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
