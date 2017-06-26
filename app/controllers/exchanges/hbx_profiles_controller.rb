@@ -1,5 +1,6 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSearch
   include Pundit
   include SepAll
 
@@ -397,32 +398,18 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = []
     all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
+
+    families = search_families(dt_query.search_string, all_families)
+
+    sorted_by, order = input_sort_request
+
+    families = sorted_families(sorted_by, order, families)
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
-    if params[:order].present? && params[:order]["0"][:column] == "4"
-      sort_by_due_date, order = true, params[:order]["0"][:dir]
-    elsif params[:order].present? && params[:order]["0"][:column] == "6"
-      sort_by_review_status, order = true, params[:order]["0"][:dir]
-    end
-    if sort_by_due_date
-      @families = order == "asc" ? @families.sort_by(&:verification_due_date) : @families.sort_by(&:verification_due_date).reverse
-    end
-
-    if sort_by_review_status
-      @families = order == "asc" ? @families.sort_by(&:review_status) : @families.sort_by(&:review_status).reverse
-    end
+    @families = families[dt_query.skip, dt_query.take]
     render
   end
 
