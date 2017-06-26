@@ -64,7 +64,6 @@ class PlanYear
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :message => "is invalid"
 
   validate :open_enrollment_date_checks
-  validate :products_offered_in_service_area
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
 
@@ -1039,6 +1038,7 @@ class PlanYear
   end
 
   def products_offered_in_service_area
+    return(true) unless constrain_service_areas?
     return(true) if employer_profile.nil?
     return(true) if start_on.blank?
     if employer_profile.service_areas_available_on(start_on).empty?
