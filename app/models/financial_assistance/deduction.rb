@@ -33,7 +33,6 @@ class FinancialAssistance::Deduction
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
-
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,

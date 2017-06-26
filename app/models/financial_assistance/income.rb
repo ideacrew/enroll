@@ -127,6 +127,7 @@ class FinancialAssistance::Income
   def hours_worked_per_week
   end
 
+
 private
 
   def set_submission_timestamp

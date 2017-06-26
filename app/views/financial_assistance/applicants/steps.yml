@@ -1,6 +1,6 @@
 - step:
-    heading: Tax Info
-    heading_text: Please complete all tax info for <family-member-name-placeholder>. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
+    heading: Tax Info for <family-member-name-placeholder>
+    heading_text: Tell us about this person's tax info. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
@@ -11,6 +11,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_required_to_file_taxes_yes'
                   label: 'Yes'
                   model: applicant
@@ -18,6 +19,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_required_to_file_taxes_no'
                   label: 'No'
                   model: applicant
@@ -32,6 +34,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_joint_tax_filing_yes'
                   label: 'Yes'
                   model: applicant
@@ -39,6 +42,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_joint_tax_filing_no'
                   label: 'No'
                   model: applicant
@@ -53,6 +57,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_claimed_as_tax_dependent_yes'
                   label: 'Yes'
                   model: applicant
@@ -60,6 +65,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_claimed_as_tax_dependent_no'
                   label: 'No'
                   model: applicant
@@ -84,8 +90,8 @@
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
 - step:
-    heading: Other Questions
-    heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
+    heading: Other Questions for <family-member-name-placeholder>
+    heading_text: Tell us about this person's other questions. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
@@ -97,6 +103,7 @@
                   type: label_radio
                   name: row2
                   value: true
+                  required: true
                   id: 'yes2'
                   #checked: true
                   label: 'Yes'
@@ -106,6 +113,7 @@
                   type: label_radio
                   name: row2
                   value: false
+                  required: true
                   id: 'no2'
                   #checked: false
                   label: 'No'
@@ -119,6 +127,7 @@
                   type: label_radio
                   name: row2
                   value: true
+                  required: true
                   id: 'yes2'
                   #checked: true
                   label: 'Yes'
@@ -128,11 +137,302 @@
                   type: label_radio
                   name: row2
                   value: false
+                  required: true
                   id: 'no2'
                   #checked: false
                   label: 'No'
                   model: applicant
                   attribute: is_pregnant
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Pregnency Due date
+                - gutter: 3
+                  type: input_date
+                  placeholder: Due date
+                  # required: true
+                  id: 'yes2'
+                  model: applicant
+                  attribute: pregnancy_due_on
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  How many children is this person expecting?
+                  # required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  # required: true
+                  values:
+                    - 1
+                    - 2
+                    - 3
+                  id: 'kind'
+                  model: applicant
+                  attribute: children_expected_count
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Was this person pregnant in the last 60 days?
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  # name: is_post_partum_period
+                  value: true
+                  id: 'yes2'
+                  label: 'Yes'
+                  classNames: 'span-text'
+                  model: applicant
+                  attribute: is_post_partum_period
+                - gutter: 1
+                  type: label_radio
+                  # name: is_post_partum_period
+                  value: false
+                  id: 'no2'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: applicant
+                  attribute: is_post_partum_period
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Pregnency End on date
+                - gutter: 3
+                  type: input_date
+                  placeholder: End on date
+                  # required: true
+                  id: 'yes2'
+                  model: applicant
+                  attribute: pregnancy_end_on
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Was this person on Medicaid during pregnency?
+                  classNames: 'span-text'
+                - gutter: 1
+                  type: label_radio
+                  # name: is_post_partum_period
+                  value: true
+                  id: 'yes2'
+                  label: 'Yes'
+                  classNames: 'span-text'
+                  model: applicant
+                  attribute: is_enrolled_on_medicaid
+                - gutter: 1
+                  type: label_radio
+                  # name: is_post_partum_period
+                  value: false
+                  id: 'no2'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: applicant
+                  attribute: is_enrolled_on_medicaid
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Was this person in foster care at age 18 or older? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  required: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_former_foster_care
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  required: true
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_former_foster_care
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  Where was this person in foster care?
+                  # required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  # required: true
+                  values:
+                    - Choose State
+                    - AL
+                    - AK
+                    - AZ
+                    - AR
+                    - CA
+                    - CO
+                    - CT
+                    - DE
+                    - DC
+                    - FL
+                    - GA
+                    - HI
+                    - ID
+                    - IL
+                    - IN
+                    - IA
+                    - KS
+                    - KY
+                    - LA
+                    - ME
+                    - MD
+                    - MA
+                    - MI
+                    - MN
+                    - MS
+                    - MO
+                    - MT
+                    - NE
+                    - NV
+                    - NH
+                    - NJ
+                    - NY
+                    - NC
+                    - ND
+                    - OH
+                    - OK
+                    - OR
+                    - PA
+                    - PR
+                    - RI
+                    - SC
+                    - SD
+                    - TN
+                    - TX
+                    - UT
+                    - VT
+                    - WA
+                    - WV
+                    - WI
+                    - WY
+                  id: 'kind'
+                  model: applicant
+                  attribute: foster_care_us_state
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  How old was this person when they left foster care?
+                  # required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  # required: true
+                  values:
+                    - xx
+                    - yy
+                    - zz
+                  id: 'kind'
+                  model: applicant
+                  attribute: age_left_foster_care
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Was this person enrolled in Medicaid when they left foster care?
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: had_medicaid_during_foster_care
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: had_medicaid_during_foster_care
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Is this person a student? *
+                - gutter: 1
+                  type: label_radio
+                  name: row2
+                  value: true
+                  required: true
+                  id: 'yes2'
+                  #checked: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_student
+                - gutter: 3
+                  type: label_radio
+                  name: row2
+                  value: false
+                  required: true
+                  id: 'no2'
+                  #checked: false
+                  label: 'No'
+                  model: applicant
+                  attribute: is_student
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  What is the type of student?
+                  # required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  # required: true
+                  values:
+                    - Dropout
+                    - Full Time
+                    - Graduated
+                    - Half Time
+                    - Part Time
+                    - Not In School
+                  id: 'kind'
+                  model: applicant
+                  attribute: student_kind
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: Student status end on date?
+                - gutter: 3
+                  type: input_date
+                  placeholder: End on
+                  # required: true
+                  id: 'yes2'
+                  model: applicant
+                  attribute: student_status_end_on
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  What type of school do you go to?
+                  # required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  # required: true
+                  values:
+                    - Pre School
+                    - Graduate School
+                    - English Language Institute
+                    - Open University
+                    - Primary
+                    - Elementary
+                    - GED
+                    - Junior School
+                    - Secondary (High School)
+                    - Equivalent Vocational/Tech
+                    - Vocational
+                    - Technical
+                    - Undergraduate
+                  id: 'kind'
+                  model: applicant
+                  attribute: student_kind
             - cells:
                 - gutter: 8
                   type: text
@@ -141,6 +441,7 @@
                   type: label_radio
                   name: row2
                   value: true
+                  required: true
                   id: 'yes2'
                   #checked: true
                   label: 'Yes'
@@ -150,6 +451,7 @@
                   type: label_radio
                   name: row2
                   value: false
+                  required: true
                   id: 'no2'
                   #checked: false
                   label: 'No'
@@ -158,11 +460,12 @@
             - cells:
                 - gutter: 8
                   type: text
-                  text: Does this person need help with daily life activities, such as dressing or bathing?  #has_daily_living_help
+                  text: Does this person need help with daily life activities, such as dressing or bathing? * #has_daily_living_help
                 - gutter: 1
                   type: label_radio
                   name: row2
                   value: true
+                  required: true
                   id: 'yes2'
                   #checked: true
                   label: 'Yes'
@@ -172,6 +475,7 @@
                   type: label_radio
                   name: row2
                   value: false
+                  required: true
                   id: 'no2'
                   #checked: false
                   label: 'No'
@@ -180,11 +484,12 @@
             - cells:
                 - gutter: 8
                   type: text
-                  text: Does this person need help paying for any medical bills from the last 3 months? #need_help_paying_bills
+                  text: Does this person need help paying for any medical bills from the last 3 months? * #need_help_paying_bills
                 - gutter: 1
                   type: label_radio
                   name: row2
                   value: true
+                  required: true
                   id: 'yes2'
                   #checked: true
                   label: 'Yes'
@@ -194,35 +499,13 @@
                   type: label_radio
                   name: row2
                   value: false
+                  required: true
                   id: 'no2'
                   #checked: false
                   label: 'No'
                   model: applicant
                   attribute: need_help_paying_bills
-            - cells:
-                - gutter: 8
-                  type: text
-                  text: Was this person in foster care at age 18 or older? #
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: true
-                  id: 'yes2'
-                  #checked: true
-                  label: 'Yes'
-                  model: applicant
-                  attribute: is_former_foster_care
-                - gutter: 3
-                  type: label_radio
-                  name: row2
-                  value: false
-                  id: 'no2'
-                  #checked: false
-                  label: 'No'
-                  model: applicant
-                  attribute: is_former_foster_care
             - cells:
                 - gutter: 12
                   type: raw_html
                   text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'
-

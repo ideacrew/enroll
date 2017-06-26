@@ -1,8 +1,8 @@
 - step:
+    heading: Other Health Coverage for <family-member-name-placeholder>
+    heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
     sections:
       - section:
-          heading: Other Health Coverage for Mary
-          heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
           lines:
             - cells:
                 - gutter: 6

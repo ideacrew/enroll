@@ -3,10 +3,9 @@ class FinancialAssistance::DeductionsController < ApplicationController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
+  before_action :setup_navigation
 
   def new
-    @selectedTab = "incomeAdjustments"
-    @allTabs = NavigationHelper::getAllYmlTabs
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
@@ -14,10 +13,6 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def step
-    @selectedTab = "incomeAdjustments"
-    @allTabs = NavigationHelper::getAllYmlTabs
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     format_date_params model_params
@@ -77,6 +72,11 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   def permit_params(attributes)
     attributes.permit!
+  end
+
+  def setup_navigation
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
   end
 
   def find
