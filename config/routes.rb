@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
-  mount PdfjsViewer::Rails::Engine => "/pdfjs", as: 'pdfjs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -253,7 +252,6 @@ Rails.application.routes.draw do
     end
 
     resources :employer_attestations do 
-       put 'update_document'
        get 'authorized_download'
        get 'verify_attestation'
     end
