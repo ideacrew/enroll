@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'aasm/rspec'
 
 RSpec.describe FinancialAssistance::Application, type: :model do
 
@@ -110,6 +111,46 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       it "should return the right eligibility_determination based on the tax_household_id" do
         ed = application.eligibility_determinations.where(tax_household_id: tax_household1.id).first
         expect(ed).to eq eligibility_determination1
+      end
+    end
+
+    context "check the validity of an application" do
+      let!(:valid_application) { FactoryGirl.create(:application, family: family, hbx_id: "345332", applicant_kind: "user and/or family", request_kind: "request-kind",
+                                                    motivation_kind: "motivation-kind", us_state: "DC", is_ridp_verified: true, assistance_year: 2017, aasm_state: "draft",
+                                                    medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
+                                                    report_change_terms: true, parent_living_out_of_home_terms: true) }
+      let!(:invalid_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft") }
+
+      it "should allow a sucessful state transition if the application is valid" do
+        expect(valid_application.submit).to eq true
+        expect(valid_application.aasm_state).to eq "verifying_income"
+      end
+
+      it "should invoke submit_application on a sucessful state transition on submit" do
+        expect(valid_application).to receive(:submit_application)
+        valid_application.submit!
+      end
+
+      it "should not invoke submit_application on a submit of an invalid application" do
+        expect(invalid_application).to_not receive(:submit_application)
+        valid_application.submit!
+      end
+
+      it "should prevent the state transition to happen and report invalid if the application is invalid" do
+        invalid_application.update_attributes!(hbx_id: nil)
+        expect(invalid_application).to receive(:report_invalid)
+        invalid_application.submit!
+        expect(invalid_application.aasm_state).to eq "draft"
+      end
+
+      it "should record transition on a valid application submit" do
+        expect(valid_application).to receive(:record_transition)
+        valid_application.submit!
+      end
+
+      it "should record transition on an invalid application submit" do
+        expect(invalid_application).to receive(:record_transition)
+        invalid_application.submit!
       end
     end
   end

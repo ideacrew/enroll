@@ -24,4 +24,17 @@ module Insured::FamilyMembersHelper
   rescue
     []
   end
+
+  # Returns [url, enabled_indicator]
+  def build_button_url consumer_role, family
+    if family.application_in_progress.present?
+      if family.application_in_progress.financial_application_ready_for_attestation?
+        [review_and_submit_financial_assistance_applications_path, true]
+      else
+        [review_and_submit_financial_assistance_applications_path, false]
+      end
+    else
+      [(consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url), true]
+    end
+  end
 end
