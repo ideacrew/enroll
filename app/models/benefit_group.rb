@@ -337,10 +337,6 @@ class BenefitGroup
     ]
   end
 
-  def dependent_composite_tier_contributions
-    self.composite_tier_contributions.where(:composite_rating_tier.nin => CompositeRatingTier::VISIBLE_NAMES)
-  end
-
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
       organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
@@ -668,7 +664,12 @@ class BenefitGroup
     return unless family_tier.present?
 
     contribution = family_tier.first.employer_contribution_percent
-    dependent_composite_tier_contributions.each do |tier|
+    estimated_tier_premium = family_tier.first.estimated_tier_premium
+
+    (CompositeRatingTier::NAMES - CompositeRatingTier::VISIBLE_NAMES).each do |crt|
+      tier = self.composite_tier_contributions.find_or_initialize_by(
+        composite_rating_tier: crt
+      )
       tier.employer_contribution_percent = contribution
     end
   end
