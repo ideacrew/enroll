@@ -8,6 +8,7 @@ class FinancialAssistance::Application
 
   before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified
   validates :application_submission_validity, presence: true, on: :submission
+  validates :before_attestation_validity, presence: true, on: :before_attestation
 
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
@@ -320,7 +321,11 @@ class FinancialAssistance::Application
   end
 
   def financial_application_complete?
-    is_application_valid?
+    is_application_valid? # && check for the validity of applicants too.
+  end
+
+  def financial_application_ready_for_attestation?
+    is_application_ready_for_attestation? # && check for the validity of applicants too.
   end
 
 private
@@ -371,13 +376,21 @@ private
   def application_submission_validity
     # Mandatory Fields before submission
     validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
-    # User must agree with terms of service check boxes
-    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, :parent_living_out_of_home_terms, accept: true
+    # User must agree with terms of service check boxes before submission
+    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+  end
+
+  def before_attestation_validity
+    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
   end
 
   def is_application_valid?
     #self.save!(context: :submission)
     self.valid?(:submission) ? true : false
+  end
+
+  def is_application_ready_for_attestation?
+    self.valid?(:before_attestation) ? true : false
   end
 
   def report_invalid

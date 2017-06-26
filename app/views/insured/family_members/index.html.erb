@@ -88,8 +88,8 @@
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: (@reviewAndSubmit) ? review_and_submit_financial_assistance_applications_path : ( (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url) ),
-            enabled: true #always enable here. this is not the final step to submit application!
+            url: build_button_url(@consumer_role, @family).first,
+            enabled: build_button_url(@consumer_role, @family).second
           } %>
         <% end %>
       </div>

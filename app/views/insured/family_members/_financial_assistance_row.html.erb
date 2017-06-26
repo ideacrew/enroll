@@ -3,7 +3,7 @@
 <%if @family.is_applying_for_assistance?%>
 
 <div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
-  <%if application.financial_application_complete?%>
+  <%if application.financial_application_ready_for_attestation?%>
     <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
   <%else%>
     <span class="glyphicon glyphicon-refresh" style="color:green"></span>&nbsp;<span style="color:green">In Progress</span>
