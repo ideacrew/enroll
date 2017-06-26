@@ -53,11 +53,18 @@
        <% end %>
       </li>
 
+<<<<<<< HEAD
       <% if individual_market_is_enabled? %>
       <li role="presentation"<%= menu_tab_class(active_tab, "calender-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
        <%= link_to(exchanges_scheduled_events_path, "aria-expanded" => "true", "aria-controls" => "calender", "role" => "tab" ) do  %>
         <span class="hidden-xs">Calender</span>
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Calender"></span>
+=======
+      <li role="presentation"<%= menu_tab_class(active_tab, "calendar-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
+       <%= link_to(exchanges_scheduled_events_path, "aria-expanded" => "true", "aria-controls" => "calendar", "role" => "tab" ) do  %>
+        <span class="hidden-xs">Calendar</span>
+        <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Calendar"></span>
+>>>>>>> development
        <% end %>
       </li>
       <% end %>

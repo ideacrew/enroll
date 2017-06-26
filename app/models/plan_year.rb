@@ -64,7 +64,6 @@ class PlanYear
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, :message => "is invalid"
 
   validate :open_enrollment_date_checks
-  validate :products_offered_in_service_area
 
   # scope :not_yet_active, ->{ any_in(aasm_state: %w(published enrolling enrolled)) }
 
@@ -425,6 +424,15 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
+    unless employer_profile.is_attestation_eligible?
+      if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+      elsif employer_profile.employer_attestation.denied?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+      else
+        warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+      end
+    end
 
     unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
@@ -1041,6 +1049,7 @@ class PlanYear
   end
 
   def products_offered_in_service_area
+    return(true) unless constrain_service_areas?
     return(true) if employer_profile.nil?
     return(true) if start_on.blank?
     if employer_profile.service_areas_available_on(start_on).empty?

@@ -462,16 +462,7 @@ class Plan
     end
 
     def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, carrier_service_area_pairs=[])
-      carrier_service_area_pairs.inject([]) do |plans, carriers_and_service_areas|
-        cache_string =  carriers_and_service_areas.first + '-' + carriers_and_service_areas.second.join('-')
-        plans + Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health-#{cache_string}", expires_in: 5.hour) do
-          if type == 'metal_level'
-            Plan.public_send("for_service_areas_and_carriers", carriers_and_service_areas, year_of_plans, key.to_s).to_a
-          else
-            Plan.public_send("for_service_areas_and_carriers", carriers_and_service_areas, year_of_plans).to_a
-          end
-        end
-      end
+      Plan.for_service_areas_and_carriers(carrier_service_area_pairs, year_of_plans)
     end
 
     def valid_for_carrier(active_year)

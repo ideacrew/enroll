@@ -1,4 +1,4 @@
 <% @plan_year.application_eligibility_warnings.each_value do |warning| %>
-  $(".application-warnings").append("<li><%= warning %></li>");
+  $(".application-warnings").append("<li><%=h warning.to_json %></li>");
 <% end %>
 $("#publishPlanYear").modal('show');
