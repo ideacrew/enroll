@@ -152,7 +152,7 @@
                   values:
                     - employee and spouse
                   model: benefit
-                  attribute: t_kind
+                  attribute: esi_covered
             - cells:
                 - gutter: 12
                   type: raw_html
