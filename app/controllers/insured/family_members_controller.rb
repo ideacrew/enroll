@@ -6,7 +6,7 @@ class Insured::FamilyMembersController < ApplicationController
     @selectedTab = "householdInfo"
     @allTabs = NavigationHelper::getAllTabs
     @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
-    @continueEnabled = (@family.applications.length > 0) ? @family.applications[0].financial_application_complete? : true 
+    #@continueEnabled = (@family.applications.length > 0) ? @family.applications[0].financial_application_complete? : true # what? cant randomly check the first application ?? make use of application_in_progress method
     @reviewAndSubmit = (@family.applications.length > 0) ? true : false
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
@@ -61,11 +61,6 @@ class Insured::FamilyMembersController < ApplicationController
       format.js
     end
   end
-
-  # def review_and_submit
-  #   @selectedTab = "reviewAndSubmit"
-  #   @allTabs = NavigationHelper::getAllTabs
-  # end
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
