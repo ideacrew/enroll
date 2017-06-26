@@ -5,12 +5,15 @@ class Employers::PlanYearsController < ApplicationController
   layout "two_column"
 
   def new
-    @plan_year = build_plan_year
-    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    if @employer_profile.service_areas.any?
+      @plan_year = build_plan_year
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    else
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => "No products are offered for your location."}
+    end
   end
 
   def dental_reference_plans
-
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     @benefit_group = params[:benefit_group]
@@ -124,12 +127,6 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
-      if benefit_group.sole_source?
-        if benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
-        benefit_group.estimate_composite_rates
-      end
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
         if i == 0
@@ -141,6 +138,12 @@ class Employers::PlanYearsController < ApplicationController
         Plan.where(:id.in=> ids)
       else
         benefit_group.elected_dental_plans_by_option_kind
+      end
+      if benefit_group.sole_source?
+        if benefit_group.composite_tier_contributions.empty?
+          benefit_group.build_composite_tier_contributions
+        end
+        benefit_group.estimate_composite_rates
       end
     end
 
@@ -233,6 +236,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
+    unless plan_year.products_offered_in_service_area
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => "No products are offered for your location."}
+      return
+    end
     if params[:publish]
       @just_a_warning = !plan_year.is_application_eligible? ? true : false
       plan_year.application_warnings

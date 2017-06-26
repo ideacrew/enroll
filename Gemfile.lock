@@ -31,7 +31,7 @@ GIT
 
 GIT
   remote: https://github.com/dchbx/openhbx_cv2.git
-  revision: 86a115f5e8e12f506057413ff1fa6c6bfaee9013
+  revision: 74d31cd17415d3fb27de27ba4cc10d0030422754
   branch: master
   specs:
     openhbx_cv2 (0.0.1)
@@ -401,6 +401,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pdfjs_viewer-rails (0.0.9)
+      rails (> 4.2.0)
+      sass-rails (~> 5.0)
     poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -679,6 +682,7 @@ DEPENDENCIES
   nokogiri-happymapper
   openhbx_cv2!
   parallel_tests
+  pdfjs_viewer-rails
   poltergeist
   prawn!
   pry
