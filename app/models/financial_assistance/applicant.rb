@@ -66,14 +66,14 @@ class FinancialAssistance::Applicant
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
 
-  field :is_student, type: Boolean, default: false
+  field :is_student, type: Boolean#, default: false
   field :student_kind, type: String
   field :student_school_kind, type: String
   field :student_status_end_on, type: String
 
   #split this out : change XSD too.
   #field :is_self_attested_blind_or_disabled, type: Boolean, default: false
-  field :is_self_attested_blind, type: Boolean, default: false
+  field :is_self_attested_blind, type: Boolean#, default: false
   field :is_self_attested_disabled, type: Boolean, default: false
 
   field :is_self_attested_long_term_care, type: Boolean, default: false
@@ -82,12 +82,12 @@ class FinancialAssistance::Applicant
   field :is_refugee, type: Boolean, default: false
   field :is_trafficking_victim, type: Boolean, default: false
 
-  field :is_former_foster_care, type: Boolean, default: false
+  field :is_former_foster_care, type: Boolean#, default: false
   field :age_left_foster_care, type: Integer, default: 0
   field :foster_care_us_state, type: String
   field :had_medicaid_during_foster_care, type: Boolean, default: false
 
-  field :is_pregnant, type: Boolean, default: false
+  field :is_pregnant, type: Boolean#, default: false
   field :is_enrolled_on_medicaid, type: Boolean, default: false
   field :is_post_partum_period, type: Boolean, default: false
   field :children_expected_count, type: Integer, default: 0
@@ -108,8 +108,8 @@ class FinancialAssistance::Applicant
   field :is_currently_enrolled_in_health_plan, type: Boolean
 
   # Other QNs.
-  field :has_daily_living_help, type: Boolean, default: false
-  field :need_help_paying_bills, type: Boolean, default: false
+  field :has_daily_living_help, type: Boolean#, default: false
+  field :need_help_paying_bills, type: Boolean#, default: false
   field :is_resident_post_092296, type: Boolean, default: false
   field :is_vets_spouse_or_child, type: Boolean, default: false
 
@@ -121,8 +121,9 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
-  validates_presence_of :has_fixed_address
-  validate :strictly_boolean
+  validates :validate_applicant_information, presence: true, on: :submission
+
+  # validate :strictly_boolean
 
   validates :tax_filer_kind,
     inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
@@ -259,5 +260,19 @@ class FinancialAssistance::Applicant
   def preferred_eligibility_determination
     return nil unless tax_household
     tax_household.preferred_eligibility_determination
+  end
+
+  def applicant_validation_complete
+    is_applicant_valid?
+  end
+
+private
+
+  def validate_applicant_information
+    validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_joint_tax_filing, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+  end
+
+  def is_applicant_valid?
+    self.valid?(:submission) ? true : false
   end
 end
