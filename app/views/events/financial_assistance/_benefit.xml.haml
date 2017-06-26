@@ -24,10 +24,11 @@
   - if benefit.employer_phone
     %employer_phone
       = render :partial => "events/phones/phone", :object => income.employer_phone
-  / We currently do not have a way defined to do these 
-  / %is_esi_waiting_period
-  / %is_esi_mec_met
-  / %esi_covered
+  - if benefit.is_esi_waiting_period
+    %is_esi_waiting_period= benefit.is_esi_waiting_period
+  - if benefit.is_esi_mec_met
+    %is_esi_mec_met= benefit.is_esi_mec_met
+  %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_coveredt##{benefit.esi_covered}"
   - if benefit.employee_cost
     %employee_cost= benefit.employee_cost
   - if benefit.employee_cost_frequency
