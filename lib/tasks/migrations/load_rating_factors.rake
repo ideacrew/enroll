@@ -13,7 +13,7 @@ namespace :load_rating_factors do
     RATING_FACTOR_DEFAULT = 1.0
 
     COMPOSITE_TIER_TRANSLATIONS = {
-      'Employee': 'employee',
+      'Employee': 'employee_only',
       'Employee + Spouse': 'employee_and_spouse',
       'Employee + Dependent(s)': 'employee_and_one_or_more_dependents',
       'Family': 'family'
