@@ -20,7 +20,7 @@ class EmployerAttestationDocument < Document
   aasm do
     state :submitted, initial: true
     state :accepted, :after_enter => :approve_attestation
-    state :rejected, :after_enter => :deny_attestation
+    state :rejected
 
     event :accept, :after => :record_transition do
       transitions from: :submitted, to: :accepted
@@ -41,9 +41,15 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-    if [:info_needed, :pending].include?(params[:status].to_sym)
+    if [:info_needed, :rejected].include?(params[:status].to_sym)
       self.reject! if self.may_reject?
-      employer_attestation.set_pending! if params[:status].to_sym == :info_needed && employer_attestation.may_set_pending?
+
+      if params[:status].to_sym == :info_needed
+        employer_attestation.set_pending! if employer_attestation.may_set_pending?
+      else
+        employer_attestation.deny! if employer_attestation.may_deny?
+      end
+
       add_reason_for_rejection(params)
     elsif params[:status].to_sym == :accepted
       self.accept! if self.may_accept?
@@ -57,19 +63,13 @@ class EmployerAttestationDocument < Document
     end
   end
 
-  private
-
   def approve_attestation
     if self.employer_attestation.may_approve?
       self.employer_attestation.approve!
     end
   end
 
-  def deny_attestation
-    if self.employer_attestation.may_deny?
-      self.employer_attestation.deny!
-    end
-  end
+  private
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
