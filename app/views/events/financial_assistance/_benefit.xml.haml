@@ -1,0 +1,35 @@
+%benefit
+  / we need to know what benefit_id is actually - db identifier won't be schema valid. 
+  %benefit_id= benefit.id
+  - if benefit.title 
+    %title= benefit.title
+  %is_enrolled= benefit.is_enrolled
+  - if benefit.enrolled_start_on
+    %enrolled_start_on= simple_date_for(benefit.enrolled_start_on)
+  - if benefit.enrolled_end_on
+    %enrolled_end_on= simple_date_for(benefit.enrolled_end_on)
+  %is_eligible= benefit.is_eligible
+  - if benefit.eligible_start_on
+    %eligible_start_on= simple_date_for(benefit.eligible_start_on)
+  - if benefit.eligible_end_on
+    %eligible_end_on= simple_date_for(benefit.eligible_end_on)
+  %benefit_type= "urn:openhbx:terms:v1:financial_assistance_benefit##{benefit.kind}"
+  - if benefit.employer_name
+    %employer_name= benefit.employer_name
+  - if benefit.employer_id
+    %employer_id= benefit.employer_id
+  - if benefit.employer_address
+    %employer_address
+      = render :partial => "events/addresses/address", :object => benefit.employer_address
+  - if benefit.employer_phone
+    %employer_phone
+      = render :partial => "events/phones/phone", :object => income.employer_phone
+  / We currently do not have a way defined to do these 
+  / %is_esi_waiting_period
+  / %is_esi_mec_met
+  / %esi_covered
+  - if benefit.employee_cost
+    %employee_cost= benefit.employee_cost
+  - if benefit.employee_cost_frequency
+    %employee_cost_frequency= benefit.employee_cost_frequency
+  %submitted_at= benefit.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
