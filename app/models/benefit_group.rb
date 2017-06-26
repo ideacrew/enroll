@@ -671,7 +671,6 @@ class BenefitGroup
         composite_rating_tier: crt
       )
       tier.employer_contribution_percent = contribution
-      tier.estimated_tier_premium = estimated_tier_premium
     end
   end
 
