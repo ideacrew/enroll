@@ -170,4 +170,117 @@ $(document).ready(function() {
   if ($("#benefit_kind").val() == 0){
    $("#benefit_kind").val("");
   }
+
+/* Applicant's Tax Info Form Related */
+  if($('#is_required_to_file_taxes_no').is(':checked')) {
+    $('#is_required_to_file_taxes_no').parents(".row").next().addClass('hide');
+  }
+
+  if($('#is_required_to_file_taxes_yes').is(':checked')) {
+    $('#is_required_to_file_taxes_yes').parents(".row").next().removeClass('hide');
+  }
+
+  if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
+    $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
+  }
+
+  if($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
+    $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
+  }
+/* Applicant's Tax Info Form Related */
+
+
+/* Applicant's Other Questions Form Related */
+  $("body").on("change", "#pregnant_no", function(){
+    if ($('#pregnant_no').is(':checked')) {
+      $(this).parents(".row").next().addClass('hide');
+      $(this).parents(".row").next().next().addClass('hide');
+      $(this).parents(".row").next().next().next().addClass('hide');
+      $(this).parents(".row").next().next().next().next().addClass('hide');
+      $(this).parents(".row").next().next().next().next().next().addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#pregnant_yes", function(){
+    if ($('#pregnant_yes').is(':checked')) {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+      $(this).parents(".row").next().next().next().removeClass('hide');
+      $(this).parents(".row").next().next().next().next().removeClass('hide');
+      $(this).parents(".row").next().next().next().next().next().removeClass('hide');
+    };
+  });
+
+  if($('#pregnant_no').is(':checked')) {
+    $('#pregnant_no').parents(".row").next().addClass('hide');
+    $('#pregnant_no').parents(".row").next().next().addClass('hide');
+    $('#pregnant_no').parents(".row").next().next().next().addClass('hide');
+    $('#pregnant_no').parents(".row").next().next().next().next().addClass('hide');
+    $('#pregnant_no').parents(".row").next().next().next().next().next().addClass('hide');
+  }
+
+  if($('#pregnant_yes').is(':checked')) {
+    $('#pregnant_yes').parents(".row").next().removeClass('hide');
+    $('#pregnant_yes').parents(".row").next().next().removeClass('hide');
+    $('#pregnant_yes').parents(".row").next().next().next().removeClass('hide');
+    $('#pregnant_yes').parents(".row").next().next().next().next().removeClass('hide');
+    $('#pregnant_yes').parents(".row").next().next().next().next().next().removeClass('hide');
+  }
+
+  $("body").on("change", "#former_foster_care_no", function(){
+    if ($('#former_foster_care_no').is(':checked')) {
+      $(this).parents(".row").next().addClass('hide');
+      $(this).parents(".row").next().next().addClass('hide');
+      $(this).parents(".row").next().next().next().addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#former_foster_care_yes", function(){
+    if ($('#former_foster_care_yes').is(':checked')) {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+      $(this).parents(".row").next().next().next().removeClass('hide');
+    };
+  });
+
+  if($('#former_foster_care_no').is(':checked')) {
+    $('#former_foster_care_no').parents(".row").next().addClass('hide');
+    $('#former_foster_care_no').parents(".row").next().next().addClass('hide');
+    $('#former_foster_care_no').parents(".row").next().next().next().addClass('hide');
+  }
+
+  if($('#former_foster_care_yes').is(':checked')) {
+    $('#former_foster_care_yes').parents(".row").next().removeClass('hide');
+    $('#former_foster_care_yes').parents(".row").next().next().removeClass('hide');
+    $('#former_foster_care_yes').parents(".row").next().next().next().removeClass('hide');
+  }
+
+  $("body").on("change", "#student_no", function(){
+    if ($('#student_no').is(':checked')) {
+      $(this).parents(".row").next().addClass('hide');
+      $(this).parents(".row").next().next().addClass('hide');
+      $(this).parents(".row").next().next().next().addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#student_yes", function(){
+    if ($('#student_yes').is(':checked')) {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+      $(this).parents(".row").next().next().next().removeClass('hide');
+    };
+  });
+
+  if($('#student_no').is(':checked')) {
+    $('#student_no').parents(".row").next().addClass('hide');
+    $('#student_no').parents(".row").next().next().addClass('hide');
+    $('#student_no').parents(".row").next().next().next().addClass('hide');
+  }
+
+  if($('#student_yes').is(':checked')) {
+    $('#student_yes').parents(".row").next().removeClass('hide');
+    $('#student_yes').parents(".row").next().next().removeClass('hide');
+    $('#student_yes').parents(".row").next().next().next().removeClass('hide');
+  }
+/* Applicant's Other Questions Form Related */
 });

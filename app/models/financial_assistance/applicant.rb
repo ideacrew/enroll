@@ -56,6 +56,9 @@ class FinancialAssistance::Applicant
   field :is_claimed_as_tax_dependent, type: Boolean
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
+#application.applicants.first.save!(context: :submission)
+#application.applicants.first.valid?(:submission)
+
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_non_magi_medicaid_eligible, type: Boolean, default: false
@@ -123,7 +126,7 @@ class FinancialAssistance::Applicant
 
   validates :validate_applicant_information, presence: true, on: :submission
 
-  # validate :strictly_boolean
+  validate :strictly_boolean
 
   validates :tax_filer_kind,
     inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
@@ -266,7 +269,40 @@ class FinancialAssistance::Applicant
     is_applicant_valid?
   end
 
+  def clean_conditional_params(model_params)
+    clean_params(model_params)
+  end
+
 private
+  def clean_params(model_params)
+    if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
+      model_params[:is_joint_tax_filing] = ''
+    end
+
+    if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
+      model_params[:claimed_as_tax_dependent_by] = ''
+    end
+
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+      model_params[:pregnancy_due_on] = ''
+      model_params[:children_expected_count] = ''
+      model_params[:is_post_partum_period] = ''
+      model_params[:pregnancy_end_on] = ''
+      model_params[:is_enrolled_on_medicaid] = ''
+    end
+
+    if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
+      model_params[:foster_care_us_state] = ''
+      model_params[:age_left_foster_care] = ''
+      model_params[:had_medicaid_during_foster_care] = ''
+    end
+
+    if model_params[:is_student].present? && model_params[:is_student] == 'false'
+      model_params[:student_kind] = ''
+      model_params[:student_status_end_on] = ''
+      model_params[:student_kind] = ''
+    end
+  end
 
   def validate_applicant_information
     validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_joint_tax_filing, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id

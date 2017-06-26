@@ -25,6 +25,8 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
 
+    @model.clean_conditional_params(model_params) if model_params.present?
+
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
     if params.key?(model_name)
@@ -48,7 +50,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
-
 
   private
 
