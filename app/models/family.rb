@@ -933,7 +933,7 @@ class Family
     end
   end
 
-  def get_verification_due_date
+  def verification_due_date
     if active_household.hbx_enrollments.verification_needed.any?
       if active_household.hbx_enrollments.verification_needed.first.special_verification_period
         active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
@@ -942,6 +942,14 @@ class Family
       end
     else
       TimeKeeper.date_of_record.to_date + 95.days
+    end
+  end
+
+  def review_status
+    if active_household.hbx_enrollments.verification_needed.any?
+      active_household.hbx_enrollments.verification_needed.first.review_status.gsub(/\s+/, '')
+    else
+      "no enrollment"
     end
   end
 

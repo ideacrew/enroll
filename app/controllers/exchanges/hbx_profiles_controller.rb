@@ -414,14 +414,15 @@ def employer_poc
     if params[:order].present? && params[:order]["0"][:column] == "4"
       sort_by_due_date, order = true, params[:order]["0"][:dir]
     elsif params[:order].present? && params[:order]["0"][:column] == "6"
-      # sort_by_review_status, order = true, params[:order]["0"][:dir]
+      sort_by_review_status, order = true, params[:order]["0"][:dir]
     end
     if sort_by_due_date
-      @families = order == "asc" ? @families.sort_by(&:get_verification_due_date) : @families.sort_by(&:get_verification_due_date).reverse
+      @families = order == "asc" ? @families.sort_by(&:verification_due_date) : @families.sort_by(&:verification_due_date).reverse
     end
 
-    # if sort_by_review_status
-    # end
+    if sort_by_review_status
+      @families = order == "asc" ? @families.sort_by(&:review_status) : @families.sort_by(&:review_status).reverse
+    end
     render
   end
 
