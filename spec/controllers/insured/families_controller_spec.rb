@@ -41,7 +41,7 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
-  let(:family) { double("Family", active_household: household) }
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -69,13 +69,15 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET home" do
-    before :each do
-      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+    let(:family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
 
+    before :each do
+      allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
+      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
-      allow(family).to receive(:active_admin_seps).and_return([sep])
+      allow(family).to receive(:active_seps).and_return([sep])
       allow(hbx_enrollments).to receive(:active).and_return(hbx_enrollments)
       allow(hbx_enrollments).to receive(:changing).and_return([])
       allow(user).to receive(:has_employee_role?).and_return(true)
@@ -453,20 +455,26 @@ RSpec.describe Insured::FamiliesController do
 
   describe "POST record_sep" do
     before :each do
-      @qle = FactoryGirl.create(:qualifying_life_event_kind)
+      date = TimeKeeper.date_of_record - 10.days
+      @qle = FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date)
       @family = FactoryGirl.build(:family, :with_primary_family_member)
+      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: date)
+      special_enrollment_period.selected_effective_on = date.strftime('%m/%d/%Y')
+      special_enrollment_period.qualifying_life_event_kind = @qle
+      special_enrollment_period.qle_on = date.strftime('%m/%d/%Y')
+      special_enrollment_period.save
       allow(person).to receive(:primary_family).and_return(@family)
       allow(person).to receive(:hbx_staff_role).and_return(nil)
     end
-
     context 'when its initial enrollment' do
       before :each do
         post :record_sep, qle_id: @qle.id, qle_date: Date.today
       end
 
       it "should redirect" do
+        special_enrollment_period = @family.special_enrollment_periods.last
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep'}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: @qle.id}))
       end
     end
 
@@ -479,7 +487,7 @@ RSpec.describe Insured::FamiliesController do
 
       it "should redirect with change_plan parameter" do
         expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep'}))
+        expect(response).to redirect_to(new_insured_group_selection_path({person_id: person.id, consumer_role_id: person.consumer_role.try(:id), change_plan: 'change_plan', enrollment_kind: 'sep', qle_id: @qle.id}))
       end
     end
   end
@@ -821,6 +829,7 @@ RSpec.describe Insured::FamiliesController do
     before :each do
       allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
       allow(person).to receive(:primary_family).and_return(family)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       sign_in(user)
       get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
     end

@@ -32,7 +32,7 @@ Given(/Employee new hire enrollment window is closed/) do
 end
 
 And(/Employee has current hired on date/) do
-  CensusEmployee.where(:first_name => /Soren/i, 
+  CensusEmployee.where(:first_name => /Soren/i,
                        :last_name => /White/i).first.update_attributes(:hired_on => TimeKeeper.date_of_record)
 end
 
@@ -60,7 +60,7 @@ def expected_effective_on(qle: false)
 end
 
 Then(/Employee tries to complete purchase of another plan/) do
-  step "Employee clicks \"Shop for Plans\" on my account page"
+  step "I can click Shop for Plans button"
   step "Employee clicks continue on the group selection page"
   step "Employee should see the list of plans"
   step "I should not see any plan which premium is 0"
@@ -84,6 +84,10 @@ When(/(.*) clicks continue on the group selection page/) do |named_person|
   end
 end
 
+Then(/^I can click Shop for Plans button$/) do
+  click_button "Shop for Plans"
+end
+
 And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
   employer_profile = EmployerProfile.find_by_fein(people[named_person][:fein])
   employer_profile.plan_years.each do |plan_year|
@@ -91,7 +95,7 @@ And(/Employer for (.*) has (.*) rule/) do |named_person, rule|
   end
 end
 
-Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|  
+Then(/(.*) should see (.*) page with employer name and plan details/) do |named_person, page|
   employer_profile = EmployerProfile.find_by_fein(people['Soren White'][:fein])
   find('p', text: employer_profile.legal_name)
   find('.coverage_effective_date', text: expected_effective_on.strftime("%m/%d/%Y"))
@@ -108,13 +112,17 @@ end
 Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sleep 1 #wait for e-mail nonsense
   enrollments = Person.where(first_name: people[named_person][:first_name]).first.try(:primary_family).try(:active_household).try(:hbx_enrollments) if people[named_person].present?
-  sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
-  enrollment = first('.hbx-enrollment-panel')
+  sep_enr = enrollments.order_by(:'created_at'.asc).detect{|e| e.enrollment_kind == "special_enrollment"} if enrollments.present?
+  enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
-  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+
+  expect(all('.hbx-enrollment-panel').select{|panel| 
+    panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+  }.present?).to be_truthy
+
   # Timekeeper is probably UTC in this case, as we are in a test environment
   # this will cause arbitrary problems with the specs late at night.
-#  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
+  #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
 end
 
 
@@ -158,7 +166,7 @@ Then(/(.*) should see page with SelectPlanToTerminate button/) do |named_person|
   expect(page.find('.interaction-click-control-select-plan-to-terminate')).to be_truthy
 end
 
-When(/(.*) clicks SelectPlanToTerminate button/) do |named_person| 
+When(/(.*) clicks SelectPlanToTerminate button/) do |named_person|
   page.find('.interaction-click-control-select-plan-to-terminate').click
 end
 
@@ -218,3 +226,6 @@ When(/Employee clicks continue on the family members page/) do
   wait_for_ajax
 end
 
+And(/Employee has past created at date/) do
+  CensusEmployee.where(:first_name => /Soren/i, :last_name => /White/i).first.update({ :created_at => TimeKeeper.date_of_record - 1.year })
+end

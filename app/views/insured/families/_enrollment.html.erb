@@ -1,5 +1,5 @@
 <% if hbx_enrollment.is_coverage_waived? %>
-  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: true, hbx_enrollment: hbx_enrollment } %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: disable_make_changes_button?(hbx_enrollment), hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% plan = hbx_enrollment.plan %>
 <div class="module hbx-enrollment-panel panel panel-default">
@@ -43,9 +43,19 @@
         </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong>Effective Date:
+          <strong>Plan Start:
           </strong>
           <%= hbx_enrollment.effective_on %>
+          <% if read_only == true %>
+          <br>
+          <strong class="text-danger">Plan End:
+          </strong>
+          <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
+          <% end %>
+          <% end %>
         </div>
         <% end %>
       </div>
@@ -78,17 +88,6 @@
           <%= @census_employee.employee_role.try(:hired_on) %></p>
       </div>
       <% end %>
-    </div>
-    <div class="col-xs-12 vertically-aligned-row">
-      <div class="plan-end info vertical-align-top">
-        <strong class="text-danger">Plan End:
-        </strong>
-        <% if @census_employee.show_plan_end_date? %>
-          <span class="text-danger">
-            <%= @census_employee.coverage_terminated_on.end_of_month %>
-          </span>
-        <% end %>
-      </div>
     </div>
     <% if hbx_enrollment.is_coverage_waived? %>
     <div class="col-xs-12 vertically-aligned-row">
@@ -202,3 +201,4 @@
 </div>
 </div>
 <% end %>
+
