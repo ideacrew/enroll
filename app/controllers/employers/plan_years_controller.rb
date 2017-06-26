@@ -124,12 +124,6 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
-      if benefit_group.sole_source?
-        if benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
-        benefit_group.estimate_composite_rates
-      end
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
         if i == 0
@@ -141,6 +135,12 @@ class Employers::PlanYearsController < ApplicationController
         Plan.where(:id.in=> ids)
       else
         benefit_group.elected_dental_plans_by_option_kind
+      end
+      if benefit_group.sole_source?
+        if benefit_group.composite_tier_contributions.empty?
+          benefit_group.build_composite_tier_contributions
+        end
+        benefit_group.estimate_composite_rates
       end
     end
 
