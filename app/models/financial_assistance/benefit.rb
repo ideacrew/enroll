@@ -83,7 +83,6 @@ class FinancialAssistance::Benefit
   def is_state_health_benefit?
   end
 
-
 private
   def set_has_health_covergae_benefit
     self.applicant.update_attributes!(has_insurance: true)

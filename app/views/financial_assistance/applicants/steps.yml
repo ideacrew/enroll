@@ -1,6 +1,6 @@
 - step:
-    heading: Tax Info
-    heading_text: Please complete all tax info for <family-member-name-placeholder>. To go to a different person, 'Select Back to All Applciations'. When youve finished, select CONTINUE.
+    heading: Tax Info for <family-member-name-placeholder>
+    heading_text: Tell us about this person's tax info. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
@@ -11,6 +11,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_required_to_file_taxes_yes'
                   label: 'Yes'
                   model: applicant
@@ -18,6 +19,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_required_to_file_taxes_no'
                   label: 'No'
                   model: applicant
@@ -32,6 +34,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_joint_tax_filing_yes'
                   label: 'Yes'
                   model: applicant
@@ -39,6 +42,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_joint_tax_filing_no'
                   label: 'No'
                   model: applicant
@@ -53,6 +57,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: true
                   id: 'is_claimed_as_tax_dependent_yes'
                   label: 'Yes'
                   model: applicant
@@ -60,6 +65,7 @@
                 - gutter: 1
                   type: label_radio
                   name: row2
+                  value: false
                   id: 'is_claimed_as_tax_dependent_no'
                   label: 'No'
                   model: applicant
@@ -84,8 +90,8 @@
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
 - step:
-    heading: Other Questions
-    heading_text: Please answer the following questions. Tp go to a different person. select 'Back to All Applicants'. When you've finished. Select DONE WITH THIS PERSON.
+    heading: Other Questions for <family-member-name-placeholder>
+    heading_text: Tell us about this person's other questions. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
@@ -93,7 +99,7 @@
                 - gutter: 8
                   type: text
                   text: Has this person applied for an SSN *
-                - gutter: 2
+                - gutter: 1
                   type: label_radio
                   name: row2
                   value: true

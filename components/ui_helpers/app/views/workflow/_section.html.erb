@@ -1,15 +1,11 @@
-
 <% if !heading.nil? %>
   <div class="row">
-    <h2 class="darkblue"><%= heading %></h2>
+    <h2 class="darkblue"><%= personalize_heading_text(heading) %></h2>
   </div>
 <% end %>
-
-<% if !heading_text.nil? %>
-  <div class="row">
-    <p><%= heading_text %></p>
+<% if @current_step.heading_text.present? %>
+    <p><%= @current_step.heading_text%></p>
     <p class="memo">* = required field</p>
-  </div>
 <% end %>
 
 <% lines.each do |line| %>

@@ -1,8 +1,8 @@
 - step:
+    heading: Other Health Coverage for <family-member-name-placeholder>
+    heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
     sections:
       - section:
-          heading: Other Health Coverage for Mary
-          heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
           lines:
             - cells:
                 - gutter: 6
@@ -184,8 +184,56 @@
                   id: 'state'
                   values:
                     - Choose State
-                    - District of Columbia
-                    - Massachussets
+                    - AL
+                    - AK
+                    - AZ
+                    - AR
+                    - CA
+                    - CO
+                    - CT
+                    - DE
+                    - DC
+                    - FL
+                    - GA
+                    - HI
+                    - ID
+                    - IL
+                    - IN
+                    - IA
+                    - KS
+                    - KY
+                    - LA
+                    - ME
+                    - MD
+                    - MA
+                    - MI
+                    - MN
+                    - MS
+                    - MO
+                    - MT
+                    - NE
+                    - NV
+                    - NH
+                    - NJ
+                    - NY
+                    - NC
+                    - ND
+                    - OH
+                    - OK
+                    - OR
+                    - PA
+                    - PR
+                    - RI
+                    - SC
+                    - SD
+                    - TN
+                    - TX
+                    - UT
+                    - VT
+                    - WA
+                    - WV
+                    - WI
+                    - WY
                   model: employer_address
                   accessor:
                     - employer_address
