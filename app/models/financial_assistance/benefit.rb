@@ -82,7 +82,6 @@ class FinancialAssistance::Benefit
   def is_state_health_benefit?
   end
 
-
 private
 
   def set_submission_timestamp

@@ -25,9 +25,9 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     @model.save!
 
     case @current_step.heading.downcase
-      when "other questions"
+      when "other questions for <family-member-name-placeholder>"
         @selectedTab = "otherQuestions"
-      when "tax info"
+      when "tax info for <family-member-name-placeholder>"
         @selectedTab = "taxInfo"
       else
         @selectedTab = "placeholder"
