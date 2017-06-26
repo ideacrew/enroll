@@ -5,12 +5,15 @@ class Employers::PlanYearsController < ApplicationController
   layout "two_column"
 
   def new
-    @plan_year = build_plan_year
-    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    if @employer_profile.service_areas.any?
+      @plan_year = build_plan_year
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    else
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => "No products are offered for your location."}
+    end
   end
 
   def dental_reference_plans
-
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     @benefit_group = params[:benefit_group]

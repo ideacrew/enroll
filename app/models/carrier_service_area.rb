@@ -1,5 +1,6 @@
 class CarrierServiceArea
   include Mongoid::Document
+  include Config::AcaModelConcern
 
   field :active_year, type: String
   field :issuer_hios_id, type: String
@@ -30,6 +31,7 @@ class CarrierServiceArea
 
     def service_areas_for(office_location:)
       address = office_location.address
+      return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
       areas_valid_for_zip_code(zip_code: address.zip)
     end
 
