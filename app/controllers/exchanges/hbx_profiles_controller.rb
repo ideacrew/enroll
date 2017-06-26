@@ -411,6 +411,17 @@ def employer_poc
     @total_records = all_families.count
     @records_filtered = families.count
     @families = families.skip(dt_query.skip).limit(dt_query.take)
+    if params[:order].present? && params[:order]["0"][:column] == "4"
+      sort_by_due_date, order = true, params[:order]["0"][:dir]
+    elsif params[:order].present? && params[:order]["0"][:column] == "6"
+      # sort_by_review_status, order = true, params[:order]["0"][:dir]
+    end
+    if sort_by_due_date
+      @families = order == "asc" ? @families.sort_by(&:get_verification_due_date) : @families.sort_by(&:get_verification_due_date).reverse
+    end
+
+    # if sort_by_review_status
+    # end
     render
   end
 

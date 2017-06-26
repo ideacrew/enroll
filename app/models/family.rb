@@ -933,6 +933,18 @@ class Family
     end
   end
 
+  def get_verification_due_date
+    if active_household.hbx_enrollments.verification_needed.any?
+      if active_household.hbx_enrollments.verification_needed.first.special_verification_period
+        active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
+      else
+        active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+      end
+    else
+      TimeKeeper.date_of_record.to_date + 95.days
+    end
+  end
+
 private
   def build_household
     if households.size == 0
