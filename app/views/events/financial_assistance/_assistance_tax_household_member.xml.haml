@@ -29,6 +29,15 @@
   - unless person.consumer_role.blank?
     = render :partial => "events/lawful_presence/immigration_information", :object => person
     = render :partial => "events/financial_assistance/applicant_information", :object => assistance_tax_household_member, as: :applicant
+  %incomes
+    - if assistance_tax_household_member.incomes.size > 0
+      = render :partial => "events/financial_assistance/income", :collection => assistance_tax_household_member.incomes, as: :income
+  %deductions
+    - if assistance_tax_household_member.deductions.size > 0
+      = render :partial => "events/financial_assistance/deduction", :collection => assistance_tax_household_member.deductions, as: :deduction
+  %benefits
+    - if assistance_tax_household_member.benefits.size > 0
+      = render :partial => "events/financial_assistance/benefit", :collection => assistance_tax_household_member.benefits, as: :benefit
 
 
 
