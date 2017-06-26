@@ -48,9 +48,9 @@ module UIHelpers
     end
 
     # Personalize heading_text from steps.yml
-    def personalize_heading_text(heading_text)
-      if (heading_text.include? '<family-member-name-placeholder>') && (@model.class.to_s == "FinancialAssistance::Applicant")
-        heading_text.sub! '<family-member-name-placeholder>', @model.family_member.person.full_name
+    def personalize_heading_text(heading)
+      if (heading.include? '<family-member-name-placeholder>')
+        heading.sub! '<family-member-name-placeholder>', (@model.class.to_s == "FinancialAssistance::Applicant" ? @model.family_member.person.full_name : @applicant.family_member.person.full_name)
       end
     end
 

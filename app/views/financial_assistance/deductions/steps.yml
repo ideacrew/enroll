@@ -1,6 +1,6 @@
 - step:
-    heading: Income Adjustments
-    heading_text: Please complete all adjustments to income into for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
+    heading: Income Adjustments for <family-member-name-placeholder>
+    heading_text: Tell us about other income adjustments options for this person. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
