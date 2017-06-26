@@ -304,12 +304,10 @@
                   type: text
                   text:  How old was this person when they left foster care?
                 - gutter: 6
-                  type: 'dropdown'
+                  type: 'age_left_foster_care_dropdown'
                   name: ''
                   values:
-                    - xx
-                    - yy
-                    - zz
+                    # - xx
                   id: 'kind'
                   model: applicant
                   attribute: age_left_foster_care
