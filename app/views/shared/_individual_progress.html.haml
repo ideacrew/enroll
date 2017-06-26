@@ -47,7 +47,7 @@
   = link_to 'Continue', insured_family_members_path(consumer_role_id: @person.consumer_role.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: !enabled
 - elsif step == 2
 - elsif defined? url
-  = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: disable_flag
+  = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: build_button(@person.consumer_role, @person.primary_family).second
 - elsif step == 4
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{disabled: true}
     CONTINUE

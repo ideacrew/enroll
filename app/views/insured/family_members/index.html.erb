@@ -88,8 +88,7 @@
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: build_button(@consumer_role, @family).first,
-            disable_flag: build_button(@consumer_role, @family).second
+            url: build_button(@consumer_role, @family).first
           } %>
         <% end %>
       </div>
