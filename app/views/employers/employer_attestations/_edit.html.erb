@@ -35,7 +35,7 @@
       <% @documents.each do |doc| %>
         <tr>
           <td><%= doc.aasm_state.camelcase %></td>
-          <td><%= truncate doc.title %></td>
+          <td class='pull-left'><%= truncate doc.title %></td>
           <td><%= "Employer Attestation" %>
           </td>
           <td></td>

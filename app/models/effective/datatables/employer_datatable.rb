@@ -35,10 +35,7 @@ module Effective
         table_column :invoiced?, :proc => Proc.new { |row| boolean_to_glyph(row.current_month_invoice.present?)}, :filter => false
         table_column :participation, :proc => Proc.new { |row| @latest_plan_year.try(:employee_participation_percent)}, :filter => false
         table_column :enrolled_waived, :label => 'Enrolled/Waived', :proc => Proc.new { |row|
-
-          enrolled = @latest_plan_year.try(:enrolled_summary)
-          waived = @latest_plan_year.try(:waived_summary)
-          enrolled.to_s + "/" + waived.to_s
+          [@latest_plan_year.try(:enrolled_summary), @latest_plan_year.try(:waived_summary)].compact.join("/")
           }, :filter => false, :sortable => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
