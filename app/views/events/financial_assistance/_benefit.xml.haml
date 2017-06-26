@@ -30,7 +30,7 @@
     %is_esi_mec_met= benefit.is_esi_mec_met
   %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_coveredt##{benefit.esi_covered}"
   - if benefit.employee_cost
-    %employee_cost= benefit.employee_cost
+    %employee_cost= benefit.employee_cost.round(2)
   - if benefit.employee_cost_frequency
     %employee_cost_frequency= benefit.employee_cost_frequency
   %submitted_at= benefit.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
