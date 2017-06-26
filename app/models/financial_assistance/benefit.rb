@@ -41,6 +41,8 @@ class FinancialAssistance::Benefit
   field :is_employer_sponsored, type: Boolean
   field :is_eligible, type: Boolean
   field :is_enrolled, type: Boolean
+  field :is_esi_waiting_period, type: Boolean
+  field :is_esi_mec_met, type: Boolean
   field :employee_cost, type: Money
   field :employee_cost_frequency, type: String
 
