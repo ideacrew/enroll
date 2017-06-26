@@ -6,11 +6,14 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    if @employer_profile.service_areas.any?
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    else
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(@plan_year) }
+    end
   end
 
   def dental_reference_plans
-
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     @benefit_group = params[:benefit_group]
@@ -233,6 +236,10 @@ class Employers::PlanYearsController < ApplicationController
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
+    unless plan_year.products_offered_in_service_area
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(plan_year) }
+      return
+    end
     if params[:publish]
       @just_a_warning = !plan_year.is_application_eligible? ? true : false
       plan_year.application_warnings
@@ -369,6 +376,7 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @benefit_group = @plan_year.benefit_groups[0]
+    @benefit_group.build_estimated_composite_rates if @plan_option_kind == 'sole_source'
 
     if @coverage_type == '.dental'
       @plan_year.benefit_groups[0].dental_reference_plan = @plan
@@ -506,6 +514,10 @@ class Employers::PlanYearsController < ApplicationController
     else
       return { "relationship_benefits_attributes" => params[:relation_benefits] }
     end
+  end
+
+  def no_products_message(plan_year)
+    "Unable to continue application, as this employer is either ineligible to enroll on the #{Settings.site.long_name}, or no products are available for a benefit plan year starting #{plan_year.start_on}"
   end
 
 end

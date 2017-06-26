@@ -337,10 +337,6 @@ class BenefitGroup
     ]
   end
 
-  def dependent_composite_tier_contributions
-    self.composite_tier_contributions.where(:composite_rating_tier.nin => CompositeRatingTier::VISIBLE_NAMES)
-  end
-
   def self.find(id)
     ::Caches::RequestScopedCache.lookup(:employer_calculation_cache_for_benefit_groups, id) do
       organizations = Organization.unscoped.where({"employer_profile.plan_years.benefit_groups._id" => id })
@@ -410,7 +406,13 @@ class BenefitGroup
   end
 
   def employee_cost_for_plan(ce, plan = reference_plan)
-    pcd = @is_congress ? decorated_plan(plan, ce) : PlanCostDecorator.new(plan, ce, self, reference_plan)
+    pcd = if @is_congress
+      decorated_plan(plan, ce)
+    elsif(plan_option_kind == 'sole_source')
+      CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+    else
+      PlanCostDecorator.new(plan, ce, self, reference_plan)
+    end
     pcd.total_employee_cost
   end
 
@@ -423,6 +425,8 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
+    @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile)
+
     case plan_option_kind
     when "sole_source"
       Plan.where(id: reference_plan_id).first
@@ -432,9 +436,10 @@ class BenefitGroup
       if carrier_for_elected_plan.blank?
         @carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
       end
-      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, employer_profile.service_area_ids)
+      carrier_profile_id = reference_plan.carrier_profile_id
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs.select { |pair| pair.first == carrier_profile_id }).to_a
     when "metal_level"
-      Plan.valid_shop_health_plans_for_service_area("metal_level", metal_level_for_elected_plan, start_on.year, employer_profile.service_area_ids)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).and(:metal_level => reference_plan.metal_level).to_a
     end
   end
 
@@ -659,7 +664,12 @@ class BenefitGroup
     return unless family_tier.present?
 
     contribution = family_tier.first.employer_contribution_percent
-    dependent_composite_tier_contributions.each do |tier|
+    estimated_tier_premium = family_tier.first.estimated_tier_premium
+
+    (CompositeRatingTier::NAMES - CompositeRatingTier::VISIBLE_NAMES).each do |crt|
+      tier = self.composite_tier_contributions.find_or_initialize_by(
+        composite_rating_tier: crt
+      )
       tier.employer_contribution_percent = contribution
     end
   end

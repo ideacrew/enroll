@@ -8,9 +8,19 @@ module Effective
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
-        table_column :status, :proc => Proc.new { |row| row.aasm_state }, :filter => false, :sortable => false
-        table_column :name, :label => 'Doc Name', :proc => Proc.new { |row| 
-          link_to (raw('<i class="fa fa-file-text-o" style="margin-right:20px;"></i>') + row.title), "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}","data-toggle" => "modal"
+        table_column :status, :proc => Proc.new { |row| 
+          icon = ""
+
+          if row.accepted?
+            icon = "<span class='glyphicon glyphicon-ok text-success' aria-hidden='true' title='Approved'></span> "
+          elsif row.reason_for_rejection.present?
+            icon = "<span class='glyphicon glyphicon-exclamation-sign text-danger' aria-hidden='true' title='#{row.reason_for_rejection}'></span> "
+          end
+
+          raw(icon) + row.aasm_state.humanize 
+        }, :filter => false, :sortable => false
+        table_column :name, :label => 'Doc Name', :proc => Proc.new { |row|
+          link_to raw('<i class="fa fa-file-text-o pull-left"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", 'class' => 'pull-left'
         }, :filter => false, :sortable => false
         table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
            'Employer Attestation'

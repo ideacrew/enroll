@@ -11,7 +11,7 @@
               <ul>
                 <% @plan_year.errors.delete(:benefit_groups) %>
                 <% @plan_year.errors.full_messages.each do |msg| %>
-                  <li><%= msg %></li>
+                  <li><%= raw msg %></li>
                 <% end %>
 
                 <% @plan_year.benefit_groups.each do |bg| %>

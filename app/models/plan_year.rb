@@ -105,6 +105,8 @@ class PlanYear
     )
   }
 
+  scope :non_canceled, -> { not_in(aasm_state: ['canceled, renewing_canceled']) }
+
   after_update :update_employee_benefit_packages
 
   def update_employee_benefit_packages
@@ -422,6 +424,15 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
+    unless employer_profile.is_attestation_eligible?
+      if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+      elsif employer_profile.employer_attestation.denied?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+      else
+        warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+      end
+    end
 
     unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
@@ -1035,6 +1046,17 @@ class PlanYear
 
   def service_area
     recorded_service_area.blank? ? employer_profile.service_area : recorded_service_area
+  end
+
+  def products_offered_in_service_area
+    return(true) unless constrain_service_areas?
+    return(true) if employer_profile.nil?
+    return(true) if start_on.blank?
+    if employer_profile.service_areas_available_on(start_on).empty?
+      errors.add(:start_on, "No products are available in your area at this time.")
+      return(false)
+    end
+    true
   end
 
   private

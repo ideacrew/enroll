@@ -874,6 +874,14 @@ class EmployerProfile
     CarrierServiceArea.service_areas_for(office_location: primary_office_location)
   end
 
+  def service_areas_available_on(date)
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
+  end
+
   def service_area_ids
     if use_simple_employer_calculation_model?
       return nil
@@ -917,8 +925,8 @@ class EmployerProfile
     end
   end
 
-  def has_valid_attestation?
-    self.employer_attestation.present? && self.employer_attestation.approved?
+  def is_attestation_eligible?
+    employer_attestation.present? && employer_attestation.is_eligible?
   end
   
   private
