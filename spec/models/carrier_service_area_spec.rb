@@ -29,7 +29,7 @@ RSpec.describe CarrierServiceArea, type: :model, dbclean: :after_each do
 
     let(:carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['11111','22222']) }
     let(:invalid_carrier_profile) { double(:carrier_profile, issuer_hios_ids: ['33333']) }
-    let(:address) { double(:address, zip: "01225") }
+    let(:address) { double(:address, zip: "01225", "state" => Settings.aca.state_abbreviation) }
     let(:office_location) { double(:office_location, address: address) }
 
     context "scopes" do
