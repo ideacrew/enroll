@@ -613,35 +613,51 @@ describe BenefitGroup, type: :model do
   end
 
   describe BenefitGroup, dbclean: :after_each do
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
-    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
-    let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile)}
-    context "plan with hios id 34484" do
-       before do
-        allow(carrier_profile).to receive(:is_group_size?).and_return true
-       end
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: plan)}
+    let(:default_benefit_group) { FactoryGirl.create(:benefit_group, plan_option_kind: 'sole_source', reference_plan: default_carrier_plan)}
+    let(:carrier_profile_one) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111']) }
+    let(:composite_carrier_two) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['22222']) }
+    let(:number_of_employees) { 1 }
+    let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile_one)}
+    let!(:default_carrier_plan) { FactoryGirl.create(:plan, carrier_profile: composite_carrier_two)}
 
-      it "when census employees less than 5" do
-        allow(benefit_group).to receive(:census_employees).and_return [double]
-        allow(benefit_group.census_employees).to receive(:size).and_return 3
-        expect(benefit_group.group_size_factor_for(plan)).to eq 1.101
+    let(:carrier_one_size_3) { build(:rating_factor_entry, factor_key: 3, factor_value: 1.101) }
+    let(:carrier_one_size_6) { build(:rating_factor_entry, factor_key: 6, factor_value: 1.07) }
+    let(:carrier_one_size_10) { build(:rating_factor_entry, factor_key: 10, factor_value: 1.05) }
+    let!(:employer_group_size_rating_factor_set) { create(:employer_group_size_rating_factor_set, carrier_profile: carrier_profile_one, rating_factor_entries: [carrier_one_size_3, carrier_one_size_6, carrier_one_size_10], max_integer_factor_key: 10)}
+    let!(:census_employees) { (1..number_of_employees).map { |em| build(:census_employee, expected_selection: 'enroll') } }
+
+    context "group_size_factor_for" do
+      context "with small groups" do
+        let(:number_of_employees) { 3 }
+
+        it "returns a factor for group size of 3" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.101
+        end
+
+        it "still returns a default" do
+          allow(default_benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.0
+        end
       end
 
-      it "when census employees grater than 5" do
-        allow(benefit_group).to receive(:census_employees).and_return [double]
-        allow(benefit_group.census_employees).to receive(:size).and_return 10
-        expect(benefit_group.group_size_factor_for(plan)).to eq 1.07
-      end
-    end
-    context "plan with hios id not  34484" do
-       before do
-        allow(benefit_group).to receive(:census_employees).and_return [double]
-        allow(carrier_profile).to receive(:is_group_size?).and_return false
-        allow(benefit_group).to receive(:use_simple_employer_calculation_model?).and_return true
-       end
+      context "with mid range groups" do
+        let(:number_of_employees) { 6 }
 
-      it "when plan hios id is not 34484" do
-        expect(benefit_group.group_size_factor_for(plan)).to eq 1.0
+        it "when census employees greater than 5 but less than 10" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.07
+        end
+      end
+
+      context "with large groups" do
+        let(:number_of_employees) { 15 }
+
+        it "when census employees greater than max integer factor" do
+          allow(benefit_group).to receive(:census_employees).and_return census_employees
+          expect(benefit_group.group_size_factor_for(plan)).to eq 1.05
+        end
       end
     end
   end
