@@ -10,12 +10,16 @@
 %has_state_health_benefit= applicant.has_state_health_benefit?
 %is_medicare_eligible= applicant.is_medicare_eligible
 %is_student= applicant.is_student
-%student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind}"
-%school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind}"
-%student_status_end_on= simple_date_for(applicant.student_status_end_on)
+- if applicant.student_kind
+  %student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind}"
+- if applicant.student_school_kind
+  %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind}"
+- if applicant.student_status_end_on
+  %student_status_end_on= simple_date_for(applicant.student_status_end_on)
 %is_ia_eligible= applicant.is_ia_eligible
 %is_medicaid_chip_eligible= applicant.is_medicaid_chip_eligible
-%is_magi_medicaid= applicant.is_magi_medicaid
+- if applicant.is_magi_medicaid
+  %is_magi_medicaid= applicant.is_magi_medicaid
 %is_self_attested_blind= applicant.is_self_attested_blind
 %is_self_attested_disabled= applicant.is_self_attested_disabled
 %is_self_attested_long_term_care= applicant.is_self_attested_long_term_care
@@ -23,20 +27,30 @@
 %is_refugee= applicant.is_refugee
 %is_trafficking_victim= applicant.is_trafficking_victim
 %is_former_foster_care= applicant.is_former_foster_care
-%age_left_foster_care= applicant.age_left_foster_care
-%foster_care_us_state= "urn:openhbx:terms:v1:us_state##{applicant.foster_care_us_state.downcase.gsub(" ","_")}"
-%had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
+- if applicant.age_left_foster_care
+  %age_left_foster_care= applicant.age_left_foster_care
+- if applicant.foster_care_us_state
+  %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{applicant.foster_care_us_state.downcase.gsub(" ","_")}"
+- if applicant.had_medicaid_during_foster_care
+  %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
 %is_pregnant= applicant.is_pregnant
 %is_enrolled_on_medicaid= applicant.is_enrolled_on_medicaid
 %is_post_partum_period= applicant.is_post_partum_period
-%children_expected_count= applicant.children_expected_count
-%pregnancy_due_on= simple_date_for(applicant.pregnancy_due_on)
-%pregnancy_end_on= simple_date_for(applicant.pregnancy_end_on)
+- if applicant.children_expected_count
+  %children_expected_count= applicant.children_expected_count
+- if applicant.pregnancy_due_on
+  %pregnancy_due_on= simple_date_for(applicant.pregnancy_due_on)
+- if applicant.pregnancy_end_on
+  %pregnancy_end_on= simple_date_for(applicant.pregnancy_end_on)
 %is_subject_to_five_year_bar= applicant.is_subject_to_five_year_bar
-%is_five_year_bar_met= applicant.is_five_year_bar_met
-%is_forty_quarters= applicant.is_forty_quarters
-%is_ssn_applied= applicant.is_ssn_applied
-%non_ssn_apply_reason= applicant.non_ssn_apply_reason
+- if applicant.is_five_year_bar_met
+  %is_five_year_bar_met= applicant.is_five_year_bar_met
+- if applicant.is_forty_quarters
+  %is_forty_quarters= applicant.is_forty_quarters
+- if applicant.is_ssn_applied
+  %is_ssn_applied= applicant.is_ssn_applied
+- if applicant.non_ssn_apply_reason
+  %non_ssn_apply_reason= applicant.non_ssn_apply_reason
 %has_daily_living_help= applicant.has_daily_living_help
 %has_bill_pay_3_month_help= applicant.need_help_paying_bills
 %is_resident_post_092296= applicant.is_resident_post_092296

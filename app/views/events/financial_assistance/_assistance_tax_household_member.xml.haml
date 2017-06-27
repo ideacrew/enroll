@@ -1,7 +1,7 @@
 %assistance_tax_household_member
   %individual
   - person = assistance_tax_household_member.person
-  = render :partial => "events/individuals/individual", :object => person
+  = render :partial => "events/individuals/individual", :object => person, as: :individual
   %is_primary_applicant= assistance_tax_household_member.family_member.is_primary_applicant
   %is_consent_applicant= assistance_tax_household_member.family_member.is_consent_applicant
   %is_coverage_applicant= assistance_tax_household_member.family_member.is_coverage_applicant
