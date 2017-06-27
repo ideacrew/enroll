@@ -85,7 +85,51 @@ class FinancialAssistance::Benefit
   def is_state_health_benefit?
   end
 
+  def clean_conditional_params(params)
+    clean_params(params)
+  end
+
 private
+
+  def clean_params(params)
+    model_params = params[:benefit]
+    if model_params.present? && model_params[:is_enrolled] == "false"
+      model_params[:enrolled_start_on] = ''
+      model_params[:enrolled_end_on] = ''
+    end
+
+    if model_params.present? && model_params[:is_eligible] == "false"
+      model_params[:kind] = ''
+      model_params[:eligible_start_on] = ''
+      model_params[:eligible_end_on] = ''
+      clean_benefit_params_esi(model_params)
+      clean_employer_params(params)
+    end
+
+    if model_params.present? && model_params[:is_eligible] == "true" && model_params[:kind] != "employer_sponsored_insurance"
+      clean_benefit_params_esi(model_params)
+      clean_employer_params(params)
+    end
+  end
+
+  def clean_benefit_params_esi(model_params)
+    model_params[:esi_covered] = ''
+    model_params[:employer_name] = ''
+    model_params[:employer_id] = ''
+    model_params[:is_employer_sponsored] = ''
+    model_params[:employee_cost] = '0.00'
+    model_params[:employee_cost_frequency] = ''
+  end
+
+  def clean_employer_params(params)
+    params[:employer_address][:address_1] = ''
+    params[:employer_address][:address_2] = ''
+    params[:employer_address][:city] = ''
+    params[:employer_address][:state] = ''
+    params[:employer_address][:zip] = ''
+    params[:employer_phone][:full_phone_number] = ''
+  end
+
   def set_has_health_covergae_benefit
     self.applicant.update_attributes!(has_insurance: true)
   end
@@ -122,7 +166,7 @@ private
   def presence_of_esi_details_if_eligible_and_esi
     if is_eligible && kind == "employer_sponsored_insurance"
       errors.add(:employer_name, " can't be blank ") if employer_name.blank?
-      errors.add(:t_kind, " can't be blank ") if esi_covered.blank?
+      errors.add(:esi_covered, " can't be blank ") if esi_covered.blank?
       errors.add(:eligible_start_on, " date can't be blank ") if eligible_start_on.blank?
       errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
       errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?

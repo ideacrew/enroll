@@ -1,7 +1,5 @@
 $(document).ready(function() {
-  
 
-  
   $('#income_kind').on('selectric-change', function(e){
     if ($(this).val() == 'wages_and_salaries')
       toggle_employer_contact_divs('show'); 
@@ -99,6 +97,7 @@ $(document).ready(function() {
         }
         return isValid;
     });
+
   /* Benefit Form Related */
   $("body").on("change", "#is_enrolled_no2", function(){
     if ($('#is_enrolled_no2').is(':checked')) {
@@ -106,18 +105,19 @@ $(document).ready(function() {
     };
   });
 
-  $('#is_eligible_no2').click(function() {
-    if($('#is_eligible_no2').is(':checked')) { 
-      $('#is_eligible_no2').closest("form").find(':input').not("#is_eligible_no2, .commit").val('');
-      //TODO: Clear Selectric Dropdown
-    }
-  });
-
   $("body").on("change", "#is_enrolled_yes2", function(){
     if ($('#is_enrolled_yes2').is(':checked')) {
       $(this).parents(".row").next().removeClass('hide');
     };
   });
+
+  if($('#is_enrolled_no2').is(':checked')) {
+    $('#is_enrolled_no2').parents(".row").next().addClass('hide');
+  }
+
+  if($('#is_enrolled_yes2').is(':checked')) {
+    $('#is_enrolled_yes2').parents(".row").next().removeClass('hide');
+  }
 
   $("body").on("change", "#is_eligible_no2", function(){
     if ($('#is_eligible_no2').is(':checked')) {
@@ -128,22 +128,35 @@ $(document).ready(function() {
   });
 
   $("body").on("change", "#is_eligible_yes2", function(){
-    if ($('#is_eligible_yes2').is(':checked')) {
+    if ($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() != 'employer_sponsored_insurance') {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+    };
+  });
+
+  $("body").on("change", "#is_eligible_yes2", function(){
+    if ($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() == 'employer_sponsored_insurance') {
       $(this).parents(".row").next().removeClass('hide');
       $(this).parents(".row").next().next().removeClass('hide');
       toggle_employer_contact_divs_benefit('show');
     };
   });
 
-  if($('#is_enrolled_no2').is(':checked')) { 
-    $('#is_enrolled_no2').parents(".row").next().addClass('hide');
-    //TODO: Clear Selectric Dropdown
-  }
-
-  if($('#is_eligible_no2').is(':checked')) { 
+  if($('#is_eligible_no2').is(':checked')) {
     $('#is_eligible_no2').parents(".row").next().addClass('hide');
     $('#is_eligible_no2').parents(".row").next().next().addClass('hide');
-    //TODO: Clear Selectric Dropdown
+      toggle_employer_contact_divs_benefit('hide');
+  }
+
+  if($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() == 'employer_sponsored_insurance') {
+    $('#is_eligible_yes2').parents(".row").next().removeClass('hide');
+    $('#is_eligible_yes2').parents(".row").next().next().removeClass('hide');
+      toggle_employer_contact_divs_benefit('show');
+  }
+
+  if($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() != 'employer_sponsored_insurance') {
+    $('#is_eligible_yes2').parents(".row").next().removeClass('hide');
+    $('#is_eligible_yes2').parents(".row").next().next().removeClass('hide');
   }
 
   $('#benefit_kind').on('selectric-change', function(e){
@@ -153,7 +166,7 @@ $(document).ready(function() {
       toggle_employer_contact_divs_benefit('hide');
   });
 
-  if( $("#kind .label").text() == 'employer_sponsored_insurance'){
+  if($("#kind .label").text() == 'employer_sponsored_insurance'){
     toggle_employer_contact_divs_benefit('show');
   } else {
     toggle_employer_contact_divs_benefit('hide');
@@ -185,26 +198,6 @@ $(document).ready(function() {
       $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().next().addClass('hide');
     }
   }
-
-  // Clear 0 value for Benefit
-  if ($("#benefit_kind").val() == 0){
-   $("#benefit_kind").val("");
-  }
-
-  /* Clear ESI Fields on "No" selectoion of is_eligible answer*/
-  $('#is_eligible_no2').click(function() {
-    if($('#is_eligible_no2').is(':checked')) { 
-      $('#kind, #eligible_start_on, #eligible_end_on, #t_kind, #employer_name, #add1, #add2, #city, #state, #zip, #phone, #fein, #amount, #frequency').val('');
-      //TODO: Clear Selectric Dropdown
-    }
-  });
-
-  $("body").on("change", "#is_eligible_no2", function(){
-    if ($('#is_eligible_no2').is(':checked')) {
-      $('#kind, #eligible_start_on, #eligible_end_on, #t_kind, #employer_name, #add1, #add2, #city, #state, #zip, #phone, #fein, #amount, #frequency').val('');
-      //TODO: Clear Selectric Dropdown
-    };
-  });
-
   /* Benefit Form Related */
+
 });

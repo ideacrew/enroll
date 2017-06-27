@@ -126,7 +126,7 @@
                   type: 'dropdown'
                   name: who_can_be_covered?
                   # required: true
-                  id: 't_kind'
+                  id: 'esi_covered'
                   values:
                     - employee and spouse
                   model: benefit

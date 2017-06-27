@@ -18,15 +18,18 @@ class FinancialAssistance::BenefitsController < ApplicationController
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
 
-    if model_params[:is_enrolled] == "false" && model_params[:is_eligible] == "false"
+    @model.clean_conditional_params(params) if model_params.present?
+
+    if model_params.present? && model_params[:is_enrolled] == "false" && model_params[:is_eligible] == "false"
       flash[:notice] = 'No Benifit Info Added.'
       @applicant.update_attributes!(has_insurance: false)
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
     else
-      format_date_params_enrolled model_params if params[:benefit].present? && params[:benefit][:is_enrolled] == "true"
-      format_date_params_eligible model_params if model_params.present? && params[:benefit][:is_eligible] == "true" #&& model_params["kind"] == "employer_sponsored_insurance"
+      format_date_params_enrolled model_params if model_params.present? && model_params.present? && model_params[:is_enrolled] == "true"
+      format_date_params_eligible model_params if model_params.present? && model_params[:is_eligible] == "true"
 
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
+
       update_employer_contact(@model, params) if @model.is_eligible && @model.kind == "employer_sponsored_insurance"
 
       if params.key?(model_name)
