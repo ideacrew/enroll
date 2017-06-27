@@ -13,7 +13,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible expired renewing_canceled conversion_expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -215,9 +215,43 @@ class PlanYear
     end.compact
   end
 
+  def open_enrollment_completed?
+    return false if open_enrollment_end_on.blank?
+    (TimeKeeper.date_of_record > open_enrollment_end_on)
+  end
+
+  def binder_paid?
+    employer_profile.binder_paid?
+  end
+
+  def past_transmission_threshold?
+    return false if start_on.blank?
+    return true if transmit_employers_immediately?
+    t_threshold_date = (start_on - 1.month).beginning_of_month + 14.days
+    (TimeKeeper.date_of_record > t_threshold_date)
+  end
+
   def eligible_for_export?
     return false if self.aasm_state.blank?
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+    if start_on.blank?
+      return(false)
+    end
+    if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      return false
+    end
+    if (TimeKeeper.date_of_record < start_on)
+      if enrolled?
+        if open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+          return true
+        end
+      elsif renewing_enrolled?
+        if open_enrollment_completed? && past_transmission_threshold?
+          return true
+        end
+      end
+      return false
+    end
+    true
   end
 
   def overlapping_published_plan_years
