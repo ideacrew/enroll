@@ -67,7 +67,7 @@ describe EventsHelper, "given an address_kind" do
   end
 
   describe "is_new_conversion_employer?" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active", is_conversion: true) }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolling") }
     let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
@@ -128,7 +128,8 @@ describe EventsHelper, "given an address_kind" do
   end
 
   describe "employer_plan_years" do
-    let(:active_plan_year){ FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.at_beginning_of_month, aasm_state: "active") }
+    let(:is_conversion) { false }
+    let(:active_plan_year){ FactoryGirl.build(:plan_year, start_on: TimeKeeper.date_of_record.at_beginning_of_month, aasm_state: "active", is_conversion: is_conversion) }
     let(:renewing_plan_year){ FactoryGirl.build(:plan_year,start_on: TimeKeeper.date_of_record.at_beginning_of_month.next_month,aasm_state: "renewing_enrolling") }
     let(:employer_profile2){ FactoryGirl.create(:employer_profile, plan_years: [renewing_plan_year,active_plan_year]) }
 
@@ -234,6 +235,8 @@ describe EventsHelper, "given an address_kind" do
       end
 
       context "day is on or before 15th of this month" do
+
+        let(:is_conversion) { true }
 
         before do
           allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month)

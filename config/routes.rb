@@ -80,6 +80,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :get_user_info
       end
 
       member do
@@ -367,6 +368,8 @@ Rails.application.routes.draw do
           get :download_pdf
           get :dental_plans_data
           get :my_quotes
+          get :employees_list
+          get :employee_type
         end
         member do
           get :upload_employee_roster
