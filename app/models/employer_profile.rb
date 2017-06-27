@@ -15,6 +15,10 @@ class EmployerProfile
 
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+  INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_initial_application_eligible"
+  INITIAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+  RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_renewal_application_eligible"
+  RENEWAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
 
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
@@ -678,7 +682,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid,:transmit_new_employer_if_immediate]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -824,6 +828,20 @@ class EmployerProfile
 
   def notify_initial_binder_paid
     notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+  end
+
+  def transmit_new_employer_if_immediate
+    if transmit_employers_immediately?
+      transmit_initial_eligible_event
+    end
+  end
+
+  def transmit_initial_eligible_event
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
+  def transmit_renewal_eligible_event
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
   end
 
   def notify_broker_added

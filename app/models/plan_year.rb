@@ -233,6 +233,7 @@ class PlanYear
 
   def eligible_for_export?
     return false if self.aasm_state.blank?
+    return false if is_conversion?
     if start_on.blank?
       return(false)
     end
@@ -1204,6 +1205,9 @@ class PlanYear
   def renewal_successful
     benefit_groups.each do |bg|
       bg.finalize_composite_rates
+    end
+    if transmit_employers_immediately? 
+      employer_profile.transmit_renewal_eligible_event
     end
   end
 
