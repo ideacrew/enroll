@@ -26,7 +26,7 @@ module Effective
            'Employer Attestation'
         }, :filter => false, :sortable => false
         table_column :size, :proc => Proc.new { |row| number_to_human_size(row.size, precision: 2) }, :filter => false, :sortable => false
-        table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| row.created_at.in_time_zone("Eastern Time (US & Canada)").strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
+        table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| TimeKeeper.local_time(row.created_at).strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
       end
 
       def generate_invoice_link_type(row)
