@@ -26,7 +26,7 @@
       %brokers
         = render :partial => "events/v2/employers/broker_agency_account", :collection => employer.broker_agency_accounts.unscoped,
         :locals => { :employer_profile => employer }
-    - if employer_plan_years(employer).present?
+    - if employer_plan_years(employer).any?
       %plan_years
         = render :partial => "events/v2/employers/plan_year", :collection => employer_plan_years(employer)
     - if employer.is_conversion?
