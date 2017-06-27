@@ -54,13 +54,6 @@ RSpec.describe CarrierProfile, :type => :model do
     end
   end
 
-  context "with associated_carrier_profile" do
-    let(:carrier_profile) {FactoryGirl.create(:carrier_profile, issuer_hios_ids: ["34484"])}
-    it "when issuer hios ids equal to 34484" do
-      expect(carrier_profile.is_group_size?).to eq true 
-    end  
-  end
-
   describe ".associated_carrier_profile" do
     let(:organization) {FactoryGirl.create(:organization)}
     let(:abbrev) {"uhc"}
