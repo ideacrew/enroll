@@ -43,6 +43,8 @@ class FinancialAssistance::Application
   field :renewal_base_year, type: Integer
   field :years_to_renew, type: Integer
 
+  field :is_requesting_voter_registration_application_in_mail, type: Boolean
+
   field :us_state, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
 

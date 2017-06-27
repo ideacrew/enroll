@@ -38,7 +38,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
        @model.workflow = { current_step: @current_step.to_i}
      end
      @model.save!
-     if params[:commit] == "Finish"
+     if params[:commit] == "Finish" || params[:commit] == "Submit Application"
        redirect_to edit_financial_assistance_application_path(@application)
      else
       render 'workflow/step', layout: 'financial_assistance'
