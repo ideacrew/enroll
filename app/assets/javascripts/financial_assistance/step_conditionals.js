@@ -170,4 +170,54 @@ $(document).ready(function() {
   if ($("#benefit_kind").val() == 0){
    $("#benefit_kind").val("");
   }
+
+  /* Submit Application Form Related */
+  $("body").on("change", "#living_outside_no", function(){
+    if ($('#living_outside_no').is(':checked')) {
+      $(this).parents(".row").next().addClass('hide');
+      $(this).parents(".row").next().next().addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#living_outside_yes", function(){
+    if ($('#living_outside_yes').is(':checked')) {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+    };
+  });
+
+  if($('#living_outside_no').is(':checked')) {
+    $('#living_outside_no').parents(".row").next().addClass('hide');
+  }
+
+  if($('#living_outside_yes').is(':checked')) {
+    $('#living_outside_yes').parents(".row").next().removeClass('hide');
+  }
+  /* Submit Application Form Related */
+  
+
+  /* Preference Application Form Related */
+  $("body").on("change", "#eligibility_easier_yes", function(){
+    if ($('#eligibility_easier_yes').is(':checked')) {
+      $(this).parents(".row").next().addClass('hide');
+      $(this).parents(".row").next().next().addClass('hide');
+    };
+  });
+
+  $("body").on("change", "#eligibility_easier_no", function(){
+    if ($('#eligibility_easier_no').is(':checked')) {
+      $(this).parents(".row").next().removeClass('hide');
+      $(this).parents(".row").next().next().removeClass('hide');
+    };
+  });
+
+  if($('#eligibility_easier_yes').is(':checked')) {
+    $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+  }
+
+  if($('#eligibility_easier_no').is(':checked')) {
+    $('#eligibility_easier_no').parents(".row").next().removeClass('hide');
+  }
+  /* Preference Application Form Related */
+
 });

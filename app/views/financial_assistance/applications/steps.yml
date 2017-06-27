@@ -18,6 +18,7 @@
                     model: application
                     name: is_renewal_authorized
                     attribute: is_renewal_authorized
+                    id: 'eligibility_easier_yes'
                   - gutter: 2
                     type: label_radio
                     classNames: 'span-text'
@@ -26,6 +27,7 @@
                     model: application
                     name: is_renewal_authorized
                     attribute: is_renewal_authorized
+                    id: 'eligibility_easier_no'
             - cells:
                   - gutter: 12
                     type: raw_html
@@ -196,22 +198,24 @@
                   type: label_radio
                   name: row1
                   value: true
-                  id: 'yes1'
+                  id: 'living_outside_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
+                  
                 - gutter: 2
                   type: label_radio
                   name: row1
                   value: false
-                  id: 'no1'
+                  id: 'living_outside_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
+                  
               - cells:
                   - gutter: 12
                     type: raw_html
