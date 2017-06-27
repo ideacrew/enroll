@@ -1,9 +1,14 @@
 class FinancialAssistance::Application
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
 
   belongs_to :family, class_name: "::Family"
+
+  before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified
+  validates :application_submission_validity, presence: true, on: :submission
+  validates :before_attestation_validity, presence: true, on: :before_attestation
 
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
@@ -66,21 +71,21 @@ class FinancialAssistance::Application
   # User must agree with terms of service check boxes
   # validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms
 
-  # validates :renewal_base_year, allow_nil: true,
-  #                             numericality: {
-  #                               only_integer: true,
-  #                               greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
-  #                               less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
-  #                               message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
-  #                             }
+  validates :renewal_base_year, allow_nil: true,
+                              numericality: {
+                                only_integer: true,
+                                greater_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.first,
+                                less_than_or_equal_to: RENEWAL_BASE_YEAR_RANGE.last,
+                                message: "must fall within range: #{RENEWAL_BASE_YEAR_RANGE}"
+                              }
 
-  # validates :years_to_renew,    allow_nil: true,
-  #                             numericality: {
-  #                               only_integer: true,
-  #                               greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
-  #                               less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
-  #                               message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
-  #                             }
+  validates :years_to_renew,    allow_nil: true,
+                              numericality: {
+                                only_integer: true,
+                                greater_than_or_equal_to: YEARS_TO_RENEW_RANGE.first,
+                                less_than_or_equal_to: YEARS_TO_RENEW_RANGE.last,
+                                message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
+                              }
 
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
@@ -153,8 +158,17 @@ class FinancialAssistance::Application
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :draft, :guard => :is_application_valid?, :after => :report_invalid
-      transitions from: :draft, to: :verifying_income, :after => :submit_application
+      transitions from: :draft, to: :verifying_income, :after => :submit_application do
+        guard do
+          is_application_valid?
+        end
+      end
+
+      transitions from: :draft, to: :draft, :after => :report_invalid do
+        guard do
+          not is_application_valid?
+        end
+      end
     end
 
   end
@@ -305,22 +319,101 @@ class FinancialAssistance::Application
     return nil unless self.assistance_year == year
     self.eligibility_determinations
   end
-  
-  def financial_application_complete?
-    # iterate over all applicant and see if applicatin info is complete for each + mandatory fields in applications level.
-    true
- end
 
   def financial_application_complete?
-    # iterate over all applicant and see if applicatin info is complete for each + mandatory fields in applications level.
-    true
+    is_application_valid? # && check for the validity of applicants too.
+  end
+
+  def financial_application_ready_for_attestation?
+    application_valid = is_application_ready_for_attestation?
+    # && check for the validity of all applicants too.
+    self.applicants.each do |applicant|
+      return false unless applicant.applicant_validation_complete
+    end
+    application_valid
   end
 
 private
+  def set_hbx_id
+    #TODO: Use hbx_id generator for Application
+    write_attribute(:hbx_id, self.id)
+  end
+
+  def set_applicant_kind
+    #TODO: Implement logic to handle "call center rep or case worker", "authorized representative"
+    write_attribute(:applicant_kind, "user and/or family")
+  end
+
+  def set_request_kind
+    #TODO: Populate correct request kind
+    write_attribute(:request_kind, "request_kind_placeholder")
+  end
+
+  def set_motivation_kind
+    #TODO: Populate correct motivation kind
+    write_attribute(:motivation_kind, "motivation_kind_placeholder")
+  end
+
+  def set_is_ridp_verified
+    #TODO: Rewrite to populate RIDP result?
+    write_attribute(:is_ridp_verified, true)
+  end
+
+  def set_us_state
+    write_attribute(:us_state, HbxProfile::StateAbbreviation)
+  end
+
   def set_submission_date
-    write_attribute(:submitted_at, TimeKeeper.datetime_of_record)
+    update_attribute(:submitted_at, TimeKeeper.datetime_of_record)
+  end
+
+  def set_assistance_year
+    current_year = TimeKeeper.date_of_record.year
+    assistance_year = HbxProfile.try(:current_hbx).try(:under_open_enrollment?) ? current_year + 1 : current_year
+    update_attribute(:assistance_year, assistance_year)
+  end
+
+  def set_effective_date
+    effective_date = HbxProfile.try(:current_hbx).try(:benefit_sponsorship).try(:earliest_effective_date)
+    update_attribute(:effective_date, effective_date)
+  end
+
+  def application_submission_validity
+    # Mandatory Fields before submission
+    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
+    # User must agree with terms of service check boxes before submission
+    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+  end
+
+  def before_attestation_validity
+    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
   end
 
   def is_application_valid?
+    #self.save!(context: :submission)
+    self.valid?(:submission) ? true : false
+  end
+
+  def is_application_ready_for_attestation?
+    self.valid?(:before_attestation) ? true : false
+  end
+
+  def report_invalid
+    #TODO: Invalid Report here
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
+
+  def submit_application
+    # precondition: sucessful state transition after application.submit. (draft -> verifying_income)
+    set_submission_date
+    set_assistance_year
+    set_effective_date
+    # Trigger the CV generation process here.
   end
 end
