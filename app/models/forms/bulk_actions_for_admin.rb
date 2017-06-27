@@ -1,16 +1,19 @@
 module Forms
   class BulkActionsForAdmin
+    include Acapi::Notifiers
 
     attr_reader :result
     attr_reader :row
     attr_reader :family_id
     attr_reader :params
+    attr_reader :config
 
     def initialize(*arguments)
       @params = arguments.extract_options!
       @result = {success: [], failure: []}
       @row = @params[:family_actions_id]
       @family_id = @params[:family_id]
+      @config = Rails.application.config.acapi
     end
 
     def cancel_enrollments
@@ -53,11 +56,15 @@ module Forms
     def handle_edi_transmissions(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
       hbx = HbxEnrollment.find(hbx_id)
       ### Handle EDI transmission here ###
-      if transmit_flag
-
-      else
-
-      end
+      notify(
+        "acapi.info.events.hbx_enrollment.terminated",
+        {
+          "reply_to" => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+          "hbx_enrollment_id" => hbx.hbx_id,
+          "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
+          "is_trading_partner_publishable" => transmit_flag
+        }
+      )
     end
   end
 end
