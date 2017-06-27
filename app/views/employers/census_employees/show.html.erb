@@ -191,6 +191,41 @@
     </div>
   </div>
 
+<div class="row row-form-wrapper no-buffer">
+ <div class="col-md-12 form-group form-group-lg no-pd">
+     <p> Please select the member who are to be enrolled into COBRA/Continuation coverage</p></br>
+        <div class="text-left">
+          <label> Kendall Barrett</label></br>
+          <label> Caleb Barrett</label></br>
+          <label> Grace Barrett</label>
+        </div>
+      <label> Please enter the maximum number of months the enrollee is eligible for COBRA/Continution coverage, up to a maximum</p> of 36 months. You can end this coverage earlier,however coverage will automatically be terminated after this many months</label>
+ </div>
+<div class="col-md-6 col-sm-6 form-group form-group-lg no-pd cobra-label">
+            <label style="position: absolute; top: 0px; left: 8px; display: block; opacity: 1; font-size: 11px; font-weight: bold; color: rgb(131, 135, 128); transition: all 0.1s ease-in-out;">Maximum COBRA Months: </label>
+ </div>
+ <div class="input-group input-spinner">
+           <%= f.text_field :cobra_max_months, value: "1", class: "form-control"%>
+ </div>
+ <div class="input-group input-spinner">
+        <label> Cobra/Continution Effective Date </label>   
+ </div>
+</div>
+
+<div class="row row-form-wrapper no-buffer">
+ <div class="col-md-12" style="color:red;">
+     <label style="padding-left: 2cm;"> "Please contact Customer Service 361-522-1985/sarath.yerra@dc.gov for assistance processing your request to procress a child(ren) only COBRA/Continution enrollment."
+     </label>
+  </div>
+</div>
+
+<div class="row row-form-wrapper no-buffer">
+ <div class="col-md-12" style="color:red;">
+     <label style="padding-left: 2cm;"> "You have selected to enroll multiple children into COBRA without an adult Primary Subsciber</p> Please select only one child per enrollment action."
+     </label>
+  </div>
+</div>
+
   <div class="row">
     <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
     <div class="col-xs-12">
