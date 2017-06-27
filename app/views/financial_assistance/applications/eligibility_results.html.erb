@@ -1,0 +1,90 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+  <div class="container">
+    <div id="new_person_wrapper">
+      <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          <%= render :partial => 'shared/left_nav.html.erb' %>
+        </div>
+        <!--content area start-->
+        <div class="col-md-7">
+          <div class="">
+            <p class="alert alert-error hide"></p>
+            <h1 class="darkblue">Eligibility Results</h1>
+            <p ></p>
+            
+            <div class="focus_effect module">
+              
+              <div class="margin-bottom-30">
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                    <h3><strong> Medicaid </strong></h3>
+                  </div>
+                </div>
+
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                    <h3>These people <strong> appear to be eligible </strong> for medicaid:</h3>
+                  </div>
+                </div>
+
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                    <strong> NEXT STEP: The DC Department of Human Services(DHS) will make a final determination of Medicaid eligibility. </strong> We have forwarded your application to them. If you havnt heard from DHS after 2 weeks, you may need to check on the status of the final determination by calling us at (855) 532-5465
+                  </div>
+                </div>
+                <br><br>
+              </div>
+          
+              <div class="margin-bottom-30">
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                    <h3> <strong>Help Paying for Private Health Insurance </strong></h3>
+                  </div>
+                </div>
+                
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                      These people <strong> are eligible for savings of $137 per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance. <br> <br> <br> They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit
+                  </div>
+                </div>
+
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-12'>
+                      <strong> NEXT STEP: </strong> Pick a health insurance plan.
+                  </div>
+                </div>
+                <br><br>
+              </div>
+
+              <div class="margin-bottom-30">
+                <div class="row row-form-wrapper no-buffer row-height">
+                  <div class='col-md-6'>
+                      <strong>Download Application</strong>
+                  </div>
+                  <div class='col-md-6'>
+                      <strong>View Eligibility History </strong>
+                  </div>
+                  <div class='col-md-12'>
+                      <br>If you do not agree with this determination, you have the right to appeal. <br> Find out more about the appeal process or get assistance by contacting us directly. Your application reference number is <strong> 190009446 </strong>
+                  </div>
+                </div>
+                <br><br>
+              </div>
+            </div>
+            <br /><br />
+            <a href="/financial_assistance/applications/595287bfd7c2dc5669000000/edit">BACK TO ALL HOUSEHOLD MEMBERS</a> (Go back and work on another person.)
+          </div>
+        </div>
+
+        
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <%find_sep_url = find_sep_insured_families_path(consumer_role_id: @person.consumer_role.try(:id))%>
+          <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: find_sep_url, eligibility_results: true} %>
+          <%= render partial: 'shared/help_me_sign_up' %>
+        </div>
+      </div>
+    </div>
+    <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+  </div>

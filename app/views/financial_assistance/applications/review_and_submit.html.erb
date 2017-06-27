@@ -105,9 +105,9 @@
                 <div class="row padding-vertical">
                   <div class="col-md-11"><b>Other Health Coverage</b></div>
                   <div class="col-md-1">
-                    <%= link_to go_to_step_financial_assistance_application_applicant_benefit_path(@application, applicant, 1) do %>
+                    <%#= link_to go_to_step_financial_assistance_application_applicant_benefit_path(@application, applicant, benefit, 1) do %>
                         <i class="glyphicon glyphicon-pencil"></i>
-                    <% end %>
+                    <%# end %>
                   </div>
                 </div>
                 <div class="row padding-vertical">
@@ -151,8 +151,8 @@
       </div>
 
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <% find_sep_url = go_to_step_financial_assistance_application_path(@application.id, 1)%>
-          <%= render  partial: 'shared/individual_progress', locals: {step: 3, review_and_submit: true, url: find_sep_url, enabled: true} %>
+          <% url = go_to_step_financial_assistance_application_path(@application.id, 1)%>
+          <%= render  partial: 'shared/individual_progress', locals: {step: 3, review_and_submit: true, url: url, enabled: true} %>
           <%= render partial: 'shared/help_me_sign_up' %>
         </div>
       </div>

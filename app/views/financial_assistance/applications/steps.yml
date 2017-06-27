@@ -127,7 +127,7 @@
                     Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Application
-    heading_text: This is the last step.Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION.
+    heading_text: This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION.
     sections:
       - section:
           lines:

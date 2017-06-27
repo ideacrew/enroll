@@ -330,7 +330,7 @@ class FinancialAssistance::Application
     application_valid = is_application_ready_for_attestation?
     # && check for the validity of all applicants too.
     self.applicants.each do |applicant|
-      return false unless applicant.applicant_validation_complete
+      return false unless applicant.applicant_validation_complete?
     end
     application_valid
   end

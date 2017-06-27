@@ -2,7 +2,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
   include NavigationHelper
 
-  before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit]
+  before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit, :eligibility_results]
 
   def index
     @applications = current_user.person.primary_family.applications
@@ -28,19 +28,22 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-     model_name = @model.class.to_s.split('::').last.downcase
-     model_params = params[model_name]
-     @model.update_attributes!(permit_params(model_params)) if model_params.present?
-     if params.key?(model_name)
-       @model.workflow = { current_step: @current_step.to_i + 1}
-       @current_step = @current_step.next_step
-     else
-       @model.workflow = { current_step: @current_step.to_i}
-     end
-     @model.save!
-     if params[:commit] == "Finish" || params[:commit] == "Submit Application"
-       redirect_to edit_financial_assistance_application_path(@application)
-     else
+    model_name = @model.class.to_s.split('::').last.downcase
+    model_params = params[model_name]
+    @model.update_attributes!(permit_params(model_params)) if model_params.present?
+    if params.key?(model_name)
+     @model.workflow = { current_step: @current_step.to_i + 1}
+     @current_step = @current_step.next_step
+    else
+     @model.workflow = { current_step: @current_step.to_i}
+    end
+
+    @model.save!
+    if params[:commit] == "Finish"
+      redirect_to edit_financial_assistance_application_path(@application)
+    elsif params[:commit] == "Submit my Application"
+      redirect_to eligibility_results_financial_assistance_applications_path
+    else
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
@@ -77,6 +80,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.applicants
+  end
+
+  def eligibility_results
+    @person = current_user.person
   end
 
   private
