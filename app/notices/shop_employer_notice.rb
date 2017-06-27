@@ -26,6 +26,7 @@ class ShopEmployerNotice < Notice
   end
 
   def build
+    notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id
@@ -52,6 +53,10 @@ class ShopEmployerNotice < Notice
 
   def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+  end
+
+  def shop_dchl_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_dchl_rights.pdf')]
   end
 
   def non_discrimination_attachment

@@ -10,12 +10,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
                             :name =>'Initial Employer first invoice available in the account',
                             :notice_template => 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+                            :event_name => 'initial_employer_invoice_available',
                             :mpi_indicator => 'MPI_SHOP20',
                             :title => "Your Invoice for Employer Sponsored Coverage is Now Available"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
