@@ -11,6 +11,7 @@ site:
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
+  s3_prefix: "mhc"
 
 
   social_media:
