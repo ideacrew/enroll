@@ -1,4 +1,4 @@
-<!DOCTYPE html>   
+<!DOCTYPE html>
 <html>
 </head>
   <style type="text/css">
@@ -9,12 +9,11 @@
       margin:0;
       padding:0;
       color:#808080;
-      font-family: "TimesNewRoman", Times, serif;
+      font-family: "Open Sans", sans-serif;
     }
-    
     .page_numbers{
-     text-align: right; 
-     font-size: 7pt
+     text-align: right;
+     font-size: 5pt
     }
   </style>
 
@@ -32,7 +31,7 @@
               continue;
             }
           }
-        y[j].textContent =  "Page "+vars[x[i]]+ " of " + vars[x[1]];
+        y[j].textContent = "Your DC Health Link ID is: <%= recipient.hbx_id %>" + "| Page "+vars[x[i]]+ " of " + vars[x[1]];
         }
       }
     }
