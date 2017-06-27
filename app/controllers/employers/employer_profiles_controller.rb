@@ -303,7 +303,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def wells_fargo_sso
-    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,"manual_test")
+    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id)
     sso_req.token
     @redirct_url = sso_req.url
     unless @redirct_url.nil?
