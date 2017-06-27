@@ -1,4 +1,4 @@
-<% applicant = family_member.applicant %>
+<% applicant = find_applicant(family_member) %>
 <%application = @family.application_in_progress%>
 
 <%if @family.is_applying_for_assistance?%>
