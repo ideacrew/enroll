@@ -54,6 +54,10 @@ class CarrierProfile
     Plan.where(carrier_profile_id: self._id)
   end
 
+  def is_group_size?
+     issuer_hios_ids.include?("34484")
+  end 
+
   ## Class methods
   class << self
     def list_embedded(parent_list)

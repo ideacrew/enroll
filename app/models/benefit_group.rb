@@ -544,7 +544,13 @@ class BenefitGroup
 
   # Provide the group size factor for this benefit group.
   def group_size_factor_for(plan)
-    if use_simple_employer_calculation_model?
+    if plan.carrier_profile.is_group_size?
+      if census_employees.size <= 5
+        return 1.101
+      else
+        return 1.07
+      end    
+    elsif use_simple_employer_calculation_model?
       return 1.0
     end
     factor_carrier_id = plan.carrier_profile_id

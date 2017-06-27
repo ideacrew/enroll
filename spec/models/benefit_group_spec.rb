@@ -613,6 +613,41 @@ describe BenefitGroup, type: :model do
   end
 
   describe BenefitGroup, dbclean: :after_each do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:carrier_profile) { FactoryGirl.create(:carrier_profile) }
+    let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile)}
+    context "plan with hios id 34484" do
+       before do
+        allow(carrier_profile).to receive(:is_group_size?).and_return true
+       end
+
+      it "when census employees less than 5" do
+        allow(benefit_group).to receive(:census_employees).and_return [double]
+        allow(benefit_group.census_employees).to receive(:size).and_return 3
+        expect(benefit_group.group_size_factor_for(plan)).to eq 1.101
+      end
+
+      it "when census employees grater than 5" do
+        allow(benefit_group).to receive(:census_employees).and_return [double]
+        allow(benefit_group.census_employees).to receive(:size).and_return 10
+        expect(benefit_group.group_size_factor_for(plan)).to eq 1.07
+      end
+    end
+    context "plan with hios id not  34484" do
+       before do
+        allow(benefit_group).to receive(:census_employees).and_return [double]
+        allow(carrier_profile).to receive(:is_group_size?).and_return false
+        allow(benefit_group).to receive(:use_simple_employer_calculation_model?).and_return true
+       end
+
+      it "when plan hios id is not 34484" do
+        expect(benefit_group.group_size_factor_for(plan)).to eq 1.0
+      end
+    end
+  end
+
+
+  describe BenefitGroup, dbclean: :after_each do
     context "effective_title_by_offset" do
       let(:benefit_group) { BenefitGroup.new }
 
