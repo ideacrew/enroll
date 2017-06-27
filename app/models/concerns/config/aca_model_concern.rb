@@ -12,6 +12,7 @@ module Config::AcaModelConcern
     delegate :multiple_market_rating_areas?, to: :class
     delegate :constrain_service_areas?, to: :class
     delegate :transmit_employers_immediately?, to: :class
+    delegate :enforce_employer_attestation?, to: :class
   end
 
   class_methods do
@@ -53,6 +54,10 @@ module Config::AcaModelConcern
 
     def transmit_employers_immediately?
       @@transmit_employers_immediately ||= (Settings.aca.transmit_employers_immediately.to_s.downcase == "true")
+    end
+
+    def enforce_employer_attestation?
+      @@enforce_employer_attestation ||= (Settings.aca.enforce_employer_attestation.to_s.downcase == "true")
     end
   end
 end

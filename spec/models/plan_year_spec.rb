@@ -2091,6 +2091,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
     let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
 
+    before :each do
+      allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
+    end
+
     let(:valid_params) do
       {
         employer_profile: employer_profile,
@@ -2155,16 +2159,6 @@ describe PlanYear, "which has the concept of export eligibility" do
     end
   end
 
-  EXPORTABLE_STATES.each do |astate|
-    describe "in #{astate} state" do
-      let(:export_state) { astate}
-      it "is not eligible for export" do
-        expect(subject.eligible_for_export?).to eq true
-      end
-    end
-  end
-
-
   describe PlanYear, "state machine transitions -- unhappy path" do
 
     context "an initial employer publishes a valid application and begins open enrollment" do
@@ -2196,6 +2190,7 @@ describe PlanYear, "which has the concept of export eligibility" do
       let!(:non_owner) { FactoryGirl.create_list(:census_employee, 2, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile_id: employer_profile.id) }
 
       before do
+        allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
         TimeKeeper.set_date_of_record_unprotected!(valid_open_enrollment_start_on)
         plan_year.publish!
       end
@@ -2278,6 +2273,10 @@ end
 
 #11021
 describe PlanYear, "plan year schedule changes" do
+
+  before :each do
+    allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
+  end
 
   context "initial employer plan year" do
 
@@ -2364,7 +2363,6 @@ describe PlanYear, "plan year schedule changes" do
     context 'on force publish date' do
 
       before do
-        allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
       end
 

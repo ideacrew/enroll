@@ -944,6 +944,7 @@ class EmployerProfile
   end
 
   def is_attestation_eligible?
+    return true unless enforce_employer_attestation?
     employer_attestation.present? && employer_attestation.is_eligible?
   end
   

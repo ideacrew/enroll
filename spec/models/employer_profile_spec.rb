@@ -40,6 +40,10 @@ describe EmployerProfile, dbclean: :after_each do
     }
   end
 
+  before :each do
+    allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
+  end
+
   let!(:rating_area) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
 
   after :all do
@@ -900,6 +904,10 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:broker_role) { FactoryGirl.create(:broker_role) }
+
+  before :each do
+    allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
+  end
 
   context "active_general_agency_account" do
     it "should get active general_agency_account" do
