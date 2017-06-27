@@ -10,14 +10,14 @@
   <%end%>
 </div>
 
-<div class="col-xs-10" style="text-align: right;top: 40px;margin-left: 35px;">
+<div class="col-xs-10" style="text-align: right;top: 40px;margin-left: 15%;">
   <div class="row">
     <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn btn-default " %>
   </div>
 </div>
 
 
-<div style="width:90%">
+<div class= "effectivedatatable">
   <%= render_datatable(@datatable) %>
   <% @documents.each do |doc| %>
     <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -55,7 +55,7 @@
 </script>
 
 <style>
-  .container{
+  .effectivedatatable .container{
       width: 100%;
   }
 </style>
