@@ -50,13 +50,13 @@
    heading: '', sub_heading: 'Advance Premium Tax Credit Savings:'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. To get these savings, you must select a silver plan. "} %>
+content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider. You won’t pay anything for services you receive from an Indian Health Service provider."} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Qualify for Private Health Insurance without Savings:",
+  previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
   listings: ["Person 1            Age: 35",
              "Person 2            Age: 56"]} %>
 
@@ -65,7 +65,7 @@ listing: "<strong>What you need to do next:</strong> Login to your account at dc
 "} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Does Not Qualify for Coverage:",
+  previous: "<strong>Does Not Qualify for Coverage:</strong>",
   listings: ["Person 1            Age: 35",
              "Person 2            Age: 56"], top_margin: '12px'} %>
 
@@ -83,6 +83,12 @@ listing: "<strong>What you need to do next:</strong> Review the section, ‘How 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If someone in your household had a recent life change, they may still be able to enroll for #{TimeKeeper.date_of_record.year}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at dchealthlink.com or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Open enrollment for <coverage year> ended on <coverage year OE end date>.",
+  listings: ["Those who qualify must enroll before the deadline. ",
+             "Login to your account at dchealthlink.com to enroll now."],
+             after: "To find out if those who qualify can enroll now, login to your account at dchealthlink.com, or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."],
