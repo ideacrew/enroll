@@ -19,11 +19,6 @@
     $('.buttons-csv').hide()
     $('.buttons-excel').hide()
 </script>
-<style>
-  .effectivedatatable .container {
-    width: 100%;
-  }
-</style>
 
 <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
 <div class="row">
