@@ -1,16 +1,19 @@
 require 'net/http'
 require 'uri'
-require 'pry'
 require 'nokogiri'
 
 module NfpIntegration
   module SoapServices
     class Nfp
 
+      # REFACTOR NEEDED
+      # THIS CODE IS IN PLACE FOR TESTING NFP RESPONSES
+      # THIS FUNCTIONALITY NEEDS TO BE PORTED TO HBX_ENTERPRISE. MORE GUIDANCE IS NEEDED FOR THIS EFFORT
+
       # Change below to Pre Prod
       NFP_URL = "http://localhost:9000/cpbservices/PremiumBillingIntegrationServices.svc"
       NFP_USER_ID = "testuser" #TEST ONLY
-      NFP_PASS = "M0rph!us007" #TEST ONLY
+      NFP_PASS = "" #TEST ONLY
 
       def initialize(customer_id)
         @customer_id = customer_id
