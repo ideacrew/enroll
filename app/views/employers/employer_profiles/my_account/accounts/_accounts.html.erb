@@ -5,18 +5,18 @@
 <table class="table">
   <thead>
     <tr>
-      <th>Account Due</th>
-      <th>Next Payment Due</th>
-      <th>Last Statement Balance</th>
-      <th>Last Statement Date</th>
+      <th>Account Balance</th>
+      <th>Past Due</th>
+      <th></th>
+      <th>Previous Balance</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td>$4973.36</td>
-      <td>April 1, 2017</td>
-      <td>$3654.32</td>
-      <td>March 10, 2017</td>
+      <td><%= @total_due %></td>
+      <td><%= @past_due %></td>
+      <td></td>
+      <td><%= @previous_balance %></td>
     </tr>
   </tbody>
 </table>
