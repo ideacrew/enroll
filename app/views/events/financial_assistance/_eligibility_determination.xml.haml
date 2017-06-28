@@ -21,6 +21,6 @@
   - if eligibility_determination.created_at
     %created_at= eligibility_determination.created_at.strftime('%Y-%m-%dT%H:%M:%S')
   - if eligibility_determination.modified_at
-    %modified_at= eligibility_determination.modified_at.strftime('%Y-%m-%dT%H:%M:%S')
+    %modified_at= eligibility_determination.updated_at.strftime('%Y-%m-%dT%H:%M:%S')
   - if eligibility_determination.version
     %version= eligibility_determination.version

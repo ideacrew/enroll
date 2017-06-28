@@ -14,7 +14,7 @@
   - if person.created_at
     %created_at= person.created_at.strftime('%Y-%m-%dT%H:%M:%S')
   - if person.modified_at
-    %modified_at= person.modified_at.strftime('%Y-%m-%dT%H:%M:%S')
+    %modified_at= person.updated_at.strftime('%Y-%m-%dT%H:%M:%S')
   - if person.version
     %version= person.version
 
