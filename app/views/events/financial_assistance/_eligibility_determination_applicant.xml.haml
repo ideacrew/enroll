@@ -20,6 +20,6 @@
           %is_tobacco_user= eligibility_determination_applicant.person.is_tobacco_user
         - unless eligibility_determination_applicant.person.is_disabled.blank?
           %is_disabled= eligibility_determination_applicant.person.is_disabled
-  / we currently do not have the below data. implmenetation will follow at a later date. 
-  / %total_incomes_by_year
-  /   = render :partial => "events/financial_assistance/total_income_by_year", :collection => 
+  / we currently do not have the below data. implmenetation will follow at a later date. We will need to fully implement at a later date if still desired. 
+  %total_incomes_by_year
+    = render :partial => "events/financial_assistance/total_income_by_year", :collection => 
