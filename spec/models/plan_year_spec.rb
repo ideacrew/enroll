@@ -1699,6 +1699,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: white_collar_benefit_group)
       end
+      allow(PlanCostDecorator).to receive(:multiple_market_rating_areas?).and_return(false)
       allow(SicCodeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
       allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
     end
