@@ -36,7 +36,7 @@
                         <%= pundit_span Family, :updateable? %>
                       </div>
                       <div class="v-type-upload col-md-3">
-                        <% if unverified?(person) %>
+                        <% if type_unverified?(v_type, person) %>
                             <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                           <span class="btn btn-default btn-file">
                                 <i class="fa fa-upload" aria-hidden="true"></i>

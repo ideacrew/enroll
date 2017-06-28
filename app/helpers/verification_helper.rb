@@ -184,4 +184,8 @@ module VerificationHelper
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
   end
+
+  def type_unverified?(v_type, person)
+    verification_type_status(v_type, person) != "verified"
+  end
 end
