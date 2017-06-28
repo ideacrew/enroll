@@ -2,7 +2,7 @@ namespace :convert_rating_factors do
   desc "fix bad composite rating tier factor key names"
   task :run => :environment do |t|
     COMPOSITE_TIER_TRANSLATIONS = {
-      'Employee': 'employee',
+      'Employee': 'employee_only',
       'Employee + Spouse': 'employee_and_spouse',
       'Employee + Dependent(s)': 'employee_and_one_or_more_dependents',
       'Family': 'family'
