@@ -30,7 +30,7 @@ module WellsFargo
         return @token if defined? @token
 
         @creation_date = Time.now.strftime("%Y-%m-%dT%H:%M:%S.0000000%z")
-        private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION)
+        private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION))
 
         message = SECRET + @creation_date
 
