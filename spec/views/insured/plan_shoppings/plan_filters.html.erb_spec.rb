@@ -5,6 +5,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
   let(:hbx_enrollment) { FactoryGirl.build_stubbed(:hbx_enrollment) }
   context "without consumer_role" do
     let(:person) {double(has_active_consumer_role?: false)}
+    let(:offers_nationwide_plans) { true }
     before :each do
       assign(:person, person)
       assign(:carriers, Array.new)
@@ -13,6 +14,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:hbx_enrollment, hbx_enrollment)
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")
+      allow(view).to receive(:offers_nationwide_plans?).and_return(offers_nationwide_plans)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
       render :template => "insured/plan_shoppings/_plan_filters.html.erb"
     end
@@ -61,15 +63,16 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       expect(rendered).to match /Doctors, specialists, other providers, facilities and suppliers that a health insurance company contracts with to provide health care services to plan members./i
     end
 
-    it 'should have Nationwide title text' do
-      expect(rendered).to match /The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
+    context "with nationwide disabled" do
+      let(:offers_nationwide_plans) { false }
+
+      it 'should not have Nationwide title text' do
+        expect(rendered).to_not match /The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
+      end
     end
 
-    context "nationwide markets" do
-      ## TODO: Mock helper response for enabled / disabled
-      pending 'should have DC-Metro title text' do
-        expect(rendered).to match /The plan has a local network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
-      end
+    it 'should have Nationwide title text' do
+      expect(rendered).to match /The plan has a national network of doctors, specialists, other providers, facilities and suppliers that plan members can access./i
     end
 
     it 'should have HMO title text' do

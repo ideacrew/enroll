@@ -84,11 +84,11 @@ module Effective
       end
 
       def rehire_possible? census_employee
-        census_employee.active_termination? ? 'ajax' : 'disabled'
+        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
       end
 
       def terminate_possible? census_employee
-        census_employee.active_termination? ? 'disabled' : 'ajax'
+        census_employee.active_or_pending_termination? ? 'disabled' : 'ajax'
       end
 
       def nested_filter_definition

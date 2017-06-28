@@ -401,7 +401,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-   pdfjs_viewer-rails (0.0.9)		
+    pdfjs_viewer-rails (0.0.9)		
       rails (> 4.2.0)		
       sass-rails (~> 5.0)
     poltergeist (1.11.0)
@@ -682,7 +682,6 @@ DEPENDENCIES
   nokogiri-happymapper
   openhbx_cv2!
   parallel_tests
-  pdfjs_viewer-rails
   poltergeist
   prawn!
   pry

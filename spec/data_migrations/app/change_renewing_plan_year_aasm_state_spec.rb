@@ -27,6 +27,7 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment,renewal_benefit_group_assignment]) }
 
     before(:each) do
+      allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('')

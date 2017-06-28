@@ -22,8 +22,10 @@ module Queries
           @employer_profile.census_employees.by_cobra
         when "terminated"
           @employer_profile.census_employees.terminated
-        else
+        when "all"
           @employer_profile.census_employees
+        else
+          @employer_profile.census_employees.active_alone
       end
     end
 
