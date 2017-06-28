@@ -7,7 +7,9 @@ class CompositeRatingBaseRatesCalculator
   end
 
   def base_rate
-    @base_rate ||= (create_numerator/create_denominator).round(2)
+    @denominator ||= create_denominator
+    return 0 if create_denominator == 0
+    @base_rate ||= (create_numerator/@denominator).round(2)
   end
 
   def tier_rates
@@ -20,11 +22,15 @@ class CompositeRatingBaseRatesCalculator
     tier_rate_values
   end
 
-  def assign_estimated_premiums
+  def build_estimated_premiums
     rate_lookup = tier_rates
     benefit_group.composite_tier_contributions.each do |ctc|
       ctc.estimated_tier_premium = rate_lookup[ctc.composite_rating_tier]
     end
+  end
+
+  def assign_estimated_premiums
+    build_estimated_premiums
     benefit_group.save!
   end
 
@@ -36,7 +42,7 @@ class CompositeRatingBaseRatesCalculator
     benefit_group.save!
   end
 
-  protected 
+  protected
 
   def create_denominator
     grouped_denominators = selected_enrollment_objects.group_by { |eno| eno.composite_rating_tier }.map { |k, v| [k, v.size] }

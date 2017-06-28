@@ -12,6 +12,10 @@ class TimeKeeper
   def initialize
   end
 
+  def self.local_time(a_time)
+    a_time.in_time_zone("Eastern Time (US & Canada)")
+  end
+
   def self.date_according_to_exchange_at(a_time)
     a_time.in_time_zone("Eastern Time (US & Canada)").to_date
   end

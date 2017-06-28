@@ -15,6 +15,10 @@ class EmployerProfile
 
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+  INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_initial_application_eligible"
+  INITIAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+  RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_renewal_application_eligible"
+  RENEWAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
 
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
@@ -57,6 +61,7 @@ class EmployerProfile
 
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   embeds_one  :employer_profile_account
+  embeds_one  :employer_attestation
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
   embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
@@ -677,7 +682,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid,:transmit_new_employer_if_immediate]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -825,6 +830,20 @@ class EmployerProfile
     notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
   end
 
+  def transmit_new_employer_if_immediate
+    if transmit_employers_immediately?
+      transmit_initial_eligible_event
+    end
+  end
+
+  def transmit_initial_eligible_event
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
+  def transmit_renewal_eligible_event
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
   def notify_broker_added
     changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     if changed_fields.present? &&  changed_fields.include?("start_on")
@@ -873,6 +892,14 @@ class EmployerProfile
     CarrierServiceArea.service_areas_for(office_location: primary_office_location)
   end
 
+  def service_areas_available_on(date)
+    if use_simple_employer_calculation_model?
+      return nil
+    end
+    primary_office_location = organization.primary_office_location
+    CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
+  end
+
   def service_area_ids
     if use_simple_employer_calculation_model?
       return nil
@@ -880,7 +907,49 @@ class EmployerProfile
     service_areas.collect { |service_area| service_area.service_area_id }.uniq
   end
 
-private
+  def upload_document(file_path,file_name,subject,size)
+    #doc_uri = Aws::S3Storage.save(file_path,'id-verification')
+    #file = File.open(file_path, "r:ISO-8859-1")
+
+    tmp_file = "#{Rails.root}/tmp/#{file_name}"
+    id = 0
+    while File.exists?(tmp_file) do
+      tmp_file = "#{Rails.root}/tmp/#{id}_#{file_name}"
+      id += 1
+    end
+    # Save to temp file
+    File.open(tmp_file, 'wb') do |f|
+      f.write File.open(file_path).read
+    end
+    if(file_path)
+      document = self.documents.new
+      document.identifier = tmp_file
+      document.format = 'application/pdf'
+      document.subject = subject
+      document.title =file_name
+      document.creator = self.legal_name
+      document.publisher = "test"
+      document.type = "EmployeeProfile"
+      document.format = 'pdf',
+      document.source = 'test'
+      document.language = 'English'
+      #document.size =  size
+      document.date = Date.today
+      document.save!
+
+      #self.documents << document
+      logger.debug "associated file #{file_path} with the Employer Profile"
+      return document
+    end
+  end
+
+  def is_attestation_eligible?
+    return true unless enforce_employer_attestation?
+    employer_attestation.present? && employer_attestation.is_eligible?
+  end
+  
+  private
+  
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end

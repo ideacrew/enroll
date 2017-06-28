@@ -12,7 +12,7 @@ class Document
   field :title, type: String, default: "untitled"
 
   # Entity responsible for making the resource - person, organization or service
-  field :creator, type: String, default: "dchl"
+  field :creator, type: String, default: "mhc"
 
   # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
   field :subject, type: String
@@ -21,7 +21,7 @@ class Document
   field :description, type: String
 
   # Entity responsible for making the resource available - person, organization or service
-  field :publisher, type: String, default: "dchl"
+  field :publisher, type: String, default: "mhc"
 
   # Entity responsible for making contributions to the resource - person, organization or service
   field :contributor, type: String
@@ -55,10 +55,17 @@ class Document
 
   field :tags, type: Array, default: []
 
+  field :size, type: String
+
   validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 
   validates :rights,
     allow_blank: true,
     inclusion: { in: ACCESS_RIGHTS, message: "%{value} is not a valid access right" }
+
+
+  def size_bytes_to_megabytes
+    (sprintf "%.2f", (self.size.to_i/(1024.00))) + 'KB'
+  end
 
 end

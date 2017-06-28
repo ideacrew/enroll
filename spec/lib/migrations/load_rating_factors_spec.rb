@@ -21,7 +21,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       invoke_task
     end
 
-    pending "it creates SicCodeRatingFactorSet correctly" do
+    context "it creates SicCodeRatingFactorSet correctly" do
       subject { SicCodeRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -41,7 +41,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    pending "it creates EmployerGroupSizeRatingFactorSet correctly" do
+    context "it creates EmployerGroupSizeRatingFactorSet correctly" do
       subject { EmployerGroupSizeRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -60,7 +60,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    pending "it creates EmployerParticipationRateRatingFactorSet correctly" do
+    context "it creates EmployerParticipationRateRatingFactorSet correctly" do
       subject { EmployerParticipationRateRatingFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -79,7 +79,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
     end
 
-    pending "it creates CompositeRatingTierFactorSet correctly" do
+    context "it creates CompositeRatingTierFactorSet correctly" do
       subject { CompositeRatingTierFactorSet.first }
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
@@ -93,8 +93,10 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
 
       it "assigns the correct factor key and value" do
-        expect(subject.rating_factor_entries.first.factor_key).to eq('Employee')
+        expect(subject.rating_factor_entries.first.factor_key).to eq('employee_only')
         expect(subject.rating_factor_entries.first.factor_value).to be(1.0)
+        expect(subject.rating_factor_entries.second.factor_key).to eq('employee_and_spouse')
+        expect(subject.rating_factor_entries.second.factor_value).to be(2.0)
       end
     end
     private

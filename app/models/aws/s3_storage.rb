@@ -1,6 +1,6 @@
 module Aws
   class S3Storage
-    ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat']
+    ENV_LIST = ['local', 'prod', 'preprod', 'test', 'uat', 'qa']
 
     def initialize
       setup
@@ -11,6 +11,7 @@ module Aws
     def save(file_path, bucket_name, key=SecureRandom.uuid)
       bucket_name = env_bucket_name(bucket_name)
       uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{key}"
+
       begin
         object = get_object(bucket_name, key)
         if object.upload_file(file_path, :server_side_encryption => 'AES256')
@@ -78,11 +79,11 @@ module Aws
     end
 
     def env_bucket_name(bucket_name)
-      "dchbx-enroll-#{bucket_name}-#{aws_env}"
+      "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup
-      client=Aws::S3::Client.new
+      client=Aws::S3::Client.new(stub_responses: (Rails.env.development? || Rails.env.test?))
       @resource=Aws::S3::Resource.new(client: client)
     end
   end

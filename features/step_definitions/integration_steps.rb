@@ -578,6 +578,7 @@ end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
   screenshot("start")
+  find('.btn', text: 'Create Account').click
   #click_button 'Create account'
   visit '/users/sign_up'
   person = people[named_person]
@@ -968,6 +969,14 @@ And(/I should not see any plan which premium is 0/) do
   page.all("h2.plan-premium").each do |premium|
     expect(premium).not_to have_content("$0.00")
   end
+end
+
+And(/^.+ clicks on the link of New Employee Paper Application$/) do
+  find('.new_employee_paper_application').click
+end
+
+Then (/HBX admin start new employee enrollment/) do
+  expect(page).to have_content("Personal Information")
 end
 
 Then(/Devops can verify session logs/) do

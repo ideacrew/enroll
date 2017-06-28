@@ -10,7 +10,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
-  before_action :general_agency_is_enabled?, only: [:assign, :update_assign]
+  before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
 
   layout 'single_column'
 
@@ -268,7 +268,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @records_filtered = is_search ? @orgs.count : total_records
     @total_records = total_records
     broker_role = current_user.person.broker_role || nil
-    if general_agency_is_enabled
+    if general_agency_is_enabled?
       @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
     end
     @draw = dt_query.draw

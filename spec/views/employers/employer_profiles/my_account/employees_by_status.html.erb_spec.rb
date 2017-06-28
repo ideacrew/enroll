@@ -5,7 +5,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:census_employee1) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee2) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:census_employee3) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
-  let(:census_employees) { [census_employee1, census_employee2, census_employee3] }
+  let!(:census_employees) { [census_employee1, census_employee2, census_employee3] }
 
   let(:person) { FactoryGirl.create(:person) }
   let(:employee_role) { FactoryGirl.create(:employee_role, person: person) }
@@ -31,20 +31,22 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
 
   before :each do
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, revert_application?: true))
+    allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+
+    allow(census_employee1).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment1)
+
     sign_in(user)
     assign(:employer_profile, employer_profile)
+    assign(:employees, census_employees)
+    assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}))
     assign(:page_alphabets, ['a', 'b', 'c'])
     sign_in user
     stub_template "shared/alph_paginate" => ''
   end
 
   context 'when employee has active coverage' do
-    before do
-      allow(census_employee1).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment1)
-    end
-
     it "should displays enrollment state when coverage selected" do
-      assign(:census_employees, [census_employee1])
+    #  assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to match(/Coverage Selected/)
     end

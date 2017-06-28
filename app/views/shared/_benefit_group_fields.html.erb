@@ -73,33 +73,35 @@
   <%= render "shared/reference_plans_list", f: f, p: p %>
   <br class="clear"/>
   <br/>
-  <div class="col-xs-12 offerings<%= (f.object.sole_source? || f.object.plan_option_kind.blank?) ? " hidden" : "" %>" data-offering-target="<%= f.object.id %>">
-	  <div class="row row-form-wrapper no-buffer heading">
-		  <div class="col-xs-12" id="offering_slider_header">
-			  <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>
-			  <div class="col-xs-6">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
-		  </div>
-	  </div>
-	  <div class="col-xs-12 benefits-fields">
-		  <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
-			  <%= render "shared/relationship_benefit_fields", f: rb %>
-		  <% end %>
-	  </div>
+  <div class="health offerings-slider">
+    <div class="col-xs-12 offerings<%= (f.object.sole_source? || f.object.plan_option_kind.blank?) ? " hidden" : " enabled" %>" data-offering-target="<%= f.object.id %>">
+  	  <div class="row row-form-wrapper no-buffer heading">
+  		  <div class="col-xs-12" id="offering_slider_header">
+  			  <div class="col-xs-6">Offered <i class="fa fa-question-circle" data-toggle="tooltip" title="You must offer coverage to all eligible full-time employees who work on average, 30 hours a week. Employers can also offer coverage to other employees. While optional, it doesn’t cost you more to offer coverage to your employees’ families."></i></div>
+  			  <div class="col-xs-6">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
+  		  </div>
+  	  </div>
+  	  <div class="col-xs-12 benefits-fields">
+  		  <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+  			  <%= render "shared/relationship_benefit_fields", f: rb %>
+  		  <% end %>
+  	  </div>
+    </div>
+    <div class="col-xs-12 composite-offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? " enabled" : " hidden" %>" data-offering-target="composite_<%= f.object.id %>">
+  	  <div class="row row-form-wrapper no-buffer heading">
+  		  <div class="col-xs-12 composite_offering_slider_header">
+  			  <div class="col-xs-12">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
+  		  </div>
+  	  </div>
+  	  <div class="col-xs-12 benefits-fields">
+  		  <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
+  			  <%= render "shared/composite_tier_contribution_fields", f: rb %>
+  		  <% end %>
+  	  </div>
+    </div>
   </div>
   <br class="clear"/>
   <br/>
-  <div class="col-xs-12 composite-offerings<%= (f.object.sole_source? && !f.object.plan_option_kind.blank?) ? "" : " hidden" %>" data-offering-target="composite_<%= f.object.id %>">
-	  <div class="row row-form-wrapper no-buffer heading">
-		  <div class="col-xs-12 composite_offering_slider_header">
-			  <div class="col-xs-12">Employer Contribution <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers are required to contribute at least 50% of the premium costs for employees based on the reference plan selected except during the special annual enrollment period at the end of each year. Contributions towards family coverage are optional. You can still offer family coverage even if you don’t contribute."></i></div>
-		  </div>
-	  </div>
-	  <div class="col-xs-12 benefits-fields">
-		  <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
-			  <%= render "shared/composite_tier_contribution_fields", f: rb %>
-		  <% end %>
-	  </div>
-  </div>
   <div class="col-xs-12">
 	  <div class="health selected-plan row" style="display: none;">
 	  </div>
@@ -107,16 +109,18 @@
 	  <span class="dent plan-count" style="display: none;"><% if i < 50 %><% if @plan_year.benefit_groups[i].elected_dental_plan_ids.count == 13 %>All<% else %><%= @plan_year.benefit_groups[i].elected_dental_plan_ids.count %><% end %><% end %></span>
 	  <br/>
 	  <br/>
-	  <div class="row">
-		  <div class="col-xs-12 edit-add-dental b bt-n vertically-aligned-row" style="<% if (@plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).present?) || @plan_year.new_record == true %>display: none;<% else %>display: block;<% end %>">
-			  <div class="col-xs-9 text-center">
-				  <h4 class="di">Click "Add Dental Plans" to add one or more dental plans to this benefit package</h4>
-			  </div>
-			  <div class="col-xs-3 text-center">
-				  <span class="btn btn-default">Add Dental Plans</span>
-			  </div>
-		  </div>
-	  </div>
+    <% if dental_market_enabled? %>
+  	  <div class="row">
+  		  <div class="col-xs-12 edit-add-dental b bt-n vertically-aligned-row" style="<% if (@plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).present?) || @plan_year.new_record == true %>display: none;<% else %>display: block;<% end %>">
+  			  <div class="col-xs-9 text-center">
+  				  <h4 class="di">Click "Add Dental Plans" to add one or more dental plans to this benefit package</h4>
+  			  </div>
+  			  <div class="col-xs-3 text-center">
+  				  <span class="btn btn-default">Add Dental Plans</span>
+  			  </div>
+  		  </div>
+  	  </div>
+    <% end %>
 	  <div class="select-dental-plan dental row" style="display: none;">
 		  <br/>
 		  <br/>

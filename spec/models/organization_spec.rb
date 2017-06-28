@@ -127,7 +127,7 @@ RSpec.describe Organization, dbclean: :after_each do
     let!(:sole_source_participater) { create(:carrier_profile, organization: single_choice_organization, offers_sole_source: true) }
 
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
-    let(:address) { double(zip: '10001')}
+    let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
 
     before :each do

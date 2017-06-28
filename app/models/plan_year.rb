@@ -13,7 +13,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible expired renewing_canceled conversion_expired)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -105,6 +105,8 @@ class PlanYear
     )
   }
 
+  scope :non_canceled, -> { not_in(aasm_state: ['canceled, renewing_canceled']) }
+
   after_update :update_employee_benefit_packages
 
   def update_employee_benefit_packages
@@ -118,6 +120,18 @@ class PlanYear
         end
       end
     end
+  end
+
+  def ensure_benefit_group_is_valid
+    self.benefit_groups.each do |bg|
+      if bg.sole_source?
+        if bg.composite_tier_contributions.empty?
+          bg.build_composite_tier_contributions
+        end
+        bg.estimate_composite_rates
+      end
+    end
+    self.save!
   end
 
   def filter_active_enrollments_by_date(date)
@@ -201,9 +215,44 @@ class PlanYear
     end.compact
   end
 
+  def open_enrollment_completed?
+    return false if open_enrollment_end_on.blank?
+    (TimeKeeper.date_of_record > open_enrollment_end_on)
+  end
+
+  def binder_paid?
+    employer_profile.binder_paid?
+  end
+
+  def past_transmission_threshold?
+    return false if start_on.blank?
+    return true if transmit_employers_immediately?
+    t_threshold_date = (start_on - 1.month).beginning_of_month + 14.days
+    (TimeKeeper.date_of_record > t_threshold_date)
+  end
+
   def eligible_for_export?
     return false if self.aasm_state.blank?
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+    return false if is_conversion?
+    if start_on.blank?
+      return(false)
+    end
+    if INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+      return false
+    end
+    if (TimeKeeper.date_of_record < start_on)
+      if enrolled?
+        if open_enrollment_completed? && binder_paid? && past_transmission_threshold?
+          return true
+        end
+      elsif renewing_enrolled?
+        if open_enrollment_completed? && past_transmission_threshold?
+          return true
+        end
+      end
+      return false
+    end
+    true
   end
 
   def overlapping_published_plan_years
@@ -410,6 +459,15 @@ class PlanYear
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
     warnings = {}
+    unless employer_profile.is_attestation_eligible?
+      if employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation not provided. Select <a href=/employers/employer_profiles/#{employer_profile.id}?tab=documents>Documents</a> on the blue menu to the left and follow the instructions to upload your documents."})
+      elsif employer_profile.employer_attestation.denied?
+        warnings.merge!({attestation_ineligible: "Employer attestation documentation was denied. This employer not eligible to enroll on the #{Settings.site.long_name}"})
+      else
+        warnings.merge!({attestation_ineligible: "Employer attestation error occurred: #{employer_profile.employer_attestation.aasm_state.humanize}. Please contact customer service."})
+      end
+    end
 
     unless employer_profile.is_primary_office_local?
       warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
@@ -1025,6 +1083,17 @@ class PlanYear
     recorded_service_area.blank? ? employer_profile.service_area : recorded_service_area
   end
 
+  def products_offered_in_service_area
+    return(true) unless constrain_service_areas?
+    return(true) if employer_profile.nil?
+    return(true) if start_on.blank?
+    if employer_profile.service_areas_available_on(start_on).empty?
+      errors.add(:start_on, "No products are available in your area at this time.")
+      return(false)
+    end
+    true
+  end
+
   private
 
   def log_message(errors)
@@ -1136,6 +1205,9 @@ class PlanYear
   def renewal_successful
     benefit_groups.each do |bg|
       bg.finalize_composite_rates
+    end
+    if transmit_employers_immediately? 
+      employer_profile.transmit_renewal_eligible_event
     end
   end
 

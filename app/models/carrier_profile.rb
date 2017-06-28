@@ -1,5 +1,6 @@
 class CarrierProfile
   include Mongoid::Document
+  include Config::AcaModelConcern
   include SetCurrentUser
   include Mongoid::Timestamps
 
@@ -18,7 +19,7 @@ class CarrierProfile
   field :offers_sole_source, type: Boolean, default: false
 
   field :issuer_hios_ids, type: Array, default: []
-  field :issuer_state, type: String, default: "DC"
+  field :issuer_state, type: String, default: aca_state_abbreviation
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
 
@@ -66,8 +67,21 @@ class CarrierProfile
 
     def carriers_for(employer_profile)
       servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
-      where(issuer_hios_id: servicing_hios_ids)
+      self.all.reject { |cp| (cp.issuer_hios_ids & servicing_hios_ids).empty? }
     end
+
+    def carrier_profile_service_area_pairs_for(employer_profile)
+     hios_carrier_id_mapping = Organization.where("carrier_profile" => {"$exists" => true}).inject({}) do |acc, org|
+       cp = org.carrier_profile
+       cp.issuer_hios_ids.each do |ihid|
+         acc[ihid] = cp.id
+       end
+       acc
+     end
+     employer_profile.service_areas.map do |service_area|
+       [hios_carrier_id_mapping[service_area.issuer_hios_id], service_area.service_area_id]
+     end.uniq
+   end
 
     def first
       all.first
