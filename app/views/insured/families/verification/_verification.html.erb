@@ -50,7 +50,7 @@
                       </div>
                       <% if current_user.has_hbx_staff_role? %>
                           <div class="v-type-actions col-md-3">
-                            <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                            <%= select_tag :verification_actions, admin_actions(v_type, f_member.person), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
                           </div>
                       <% end %>
                     </div>
