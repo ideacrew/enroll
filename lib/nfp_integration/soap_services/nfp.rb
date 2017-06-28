@@ -181,6 +181,24 @@ XMLCODE
         @token
       end
 
+      def parse_statement_summary(response)
+        past_due = repsonse.xpath("//PastDue").text
+        previous_balance = repsonse.xpath("//PreviousBalance").text
+        new_charges = repsonse.xpath("//NewCharges").text
+        adjustments = repsonse.xpath("//Adjustments").text
+        payments = repsonse.xpath("//Payments").text
+        total_due = repsonse.xpath("//TotalDue").text
+        return past_due, previous_balance, new_charges, adjustments, payments, total_due
+      end
+
+      def get_most_recent_payment_date(response)
+        # assumes payload response lists elements in order of most recent to latest
+        # Should we write a helper to extract the latest payment date by searching through all of them??
+        date = response.xpath("//DateReceived")[0].text
+        # return in format mm/dd/yr
+        formatted_date = DateTime.parse(date).to_date.to_s
+      end
+
       private
         def token
 
