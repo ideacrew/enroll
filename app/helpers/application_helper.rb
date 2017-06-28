@@ -386,7 +386,7 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.extract_value.present?
+    return "" if !plan.carrier_profile.legal_name.extract_value.present?
     carrier_name = plan.carrier_profile.legal_name.extract_value
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
