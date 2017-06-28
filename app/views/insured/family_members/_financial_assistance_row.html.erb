@@ -1,7 +1,7 @@
 <% applicant = find_applicant(family_member) %>
 <%application = @family.application_in_progress%>
 
-<%if @family.is_applying_for_assistance?%>
+<%if @family.application_in_progress.present?%>
   <div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
     <%if applicant.applicant_validation_complete?%>
       <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
