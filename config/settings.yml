@@ -12,7 +12,7 @@ site:
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
   s3_prefix: "mhc"
-
+  broker_quoting_enabled: false
 
   social_media:
     facebook_url: ""
@@ -49,7 +49,7 @@ aca:
   market_kinds: ["shop"]
   nationwide_markets: false
   general_agency_enabled: false
-
+  dental_market_enabled: false
 #
   qle:
     with_in_sixty_days: 60
