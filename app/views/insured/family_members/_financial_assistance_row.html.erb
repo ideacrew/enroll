@@ -1,21 +1,20 @@
-<% application = @family.application_in_progress %>
+<% applicant = find_applicant(family_member) %>
+<%application = @family.application_in_progress%>
 
 <%if @family.is_applying_for_assistance?%>
+  <div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
+    <%if applicant.applicant_validation_complete?%>
+      <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
+    <%else%>
+      <span class="glyphicon glyphicon-refresh" style="color:green"></span>&nbsp;<span style="color:green">In Progress</span>
+    <%end%>
+  </div>
 
-<div class="col-md-10 col-sm-10 no-pd form-group-lg" style="padding:10px">
-  <%if application.financial_application_ready_for_attestation?%>
-    <span class="glyphicon glyphicon-ok" style="color:green"></span>&nbsp;<span style="color:green">Complete</span>
-  <%else%>
-    <span class="glyphicon glyphicon-refresh" style="color:green"></span>&nbsp;<span style="color:green">In Progress</span>
-  <%end%>
-</div>
-
-<div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd">
-  <%if application.applicants.where(family_member_id: family_member_id).first.workflow.present?%>
-    <%= link_to "Edit Info", edit_financial_assistance_application_applicant_path(application, application.applicants.where(family_member_id: family_member_id).first), class: "btn btn-info"  %>
-  <%else%>
-    <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(application, application.applicants.where(family_member_id: family_member_id).first, 1), class: "btn btn-info"  %>
-  <%end%>
-</div>
-
+  <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd">
+    <%if applicant.workflow.present?%>
+      <%= link_to "Edit Info", edit_financial_assistance_application_applicant_path(application, applicant), class: "btn btn-info"  %>
+    <%else%>
+      <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(application, applicant, 1), class: "btn btn-info"  %>
+    <%end%>
+  </div>
 <%end%>

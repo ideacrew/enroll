@@ -143,4 +143,12 @@ class FamilyMember
       family.application_in_progress.applicants.create!({family_member_id: self.id})
     end
   end
+
+  def applicant
+    application = self.family.application_in_progress
+    if application.present?
+      applicant = application.applicants.where(family_member_id: self.id).first
+      return applicant if applicant.present?
+    end
+  end
 end
