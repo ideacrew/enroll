@@ -28,7 +28,7 @@ module Insured::FamilyMembersHelper
   # Returns [url, disable_flag]
   def build_button consumer_role, family, find_sep_url
     if family.application_in_progress.present?
-      if family.application_in_progress.financial_application_ready_for_attestation?
+      if family.application_in_progress.ready_for_attestation?
         [review_and_submit_financial_assistance_applications_path, false]
       else
         [review_and_submit_financial_assistance_applications_path, true]

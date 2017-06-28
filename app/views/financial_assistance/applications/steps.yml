@@ -144,6 +144,7 @@
                     classNames: 'span-text'
                     label: I Agree *
                     value: true
+                    required: true
                     model: application
                     name: medicaid_terms
                     attribute: medicaid_terms
@@ -168,6 +169,7 @@
                     type: checkbox
                     label: I Agree *
                     value: true
+                    required: true
                     name: medicaid_terms
                     model: application
                     name: report_change_terms
@@ -184,6 +186,7 @@
                     type: checkbox
                     label: I Agree *
                     value: true
+                    required: true
                     classNames: 'span-text'
                     model: application
                     name: medicaid_insurance_collection_terms
@@ -197,7 +200,7 @@
                 - gutter: 2
                   type: label_radio
                   name: row1
-                  value: true
+                  value: false
                   id: 'living_outside_yes'
                   label: 'Yes'
                   classNames: 'span-text'
@@ -208,7 +211,7 @@
                 - gutter: 2
                   type: label_radio
                   name: row1
-                  value: false
+                  value: true
                   id: 'living_outside_no'
                   label: 'No'
                   classNames: 'span-text'
@@ -242,6 +245,7 @@
                     type: checkbox
                     label: I Agree *
                     value: true
+                    required: true
                     classNames: 'span-text'
                     model: application
                     name: submission_terms

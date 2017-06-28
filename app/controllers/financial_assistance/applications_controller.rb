@@ -5,7 +5,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit, :eligibility_results]
 
   def index
-    @applications = current_user.person.primary_family.applications
+    @family = current_user.person.primary_family
+    @applications = @family.applications
   end
 
   def new
@@ -42,6 +43,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params[:commit] == "Finish"
       redirect_to edit_financial_assistance_application_path(@application)
     elsif params[:commit] == "Submit my Application"
+      @application.submit! if @application.complete?
       redirect_to eligibility_results_financial_assistance_applications_path
     else
       render 'workflow/step', layout: 'financial_assistance'

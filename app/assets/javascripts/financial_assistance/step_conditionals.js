@@ -186,8 +186,10 @@ $(document).ready(function() {
     };
   });
 
+  // On Load, hide by default if checked no
   if($('#living_outside_no').is(':checked')) {
     $('#living_outside_no').parents(".row").next().addClass('hide');
+    $('#living_outside_no').parents(".row").next().next().addClass('hide');
   }
 
   if($('#living_outside_yes').is(':checked')) {
@@ -197,10 +199,17 @@ $(document).ready(function() {
   
 
   /* Preference Application Form Related */
+
+  // On Load, hide by default if checked
+  if ($('#eligibility_easier_yes').is(':checked')) {
+      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
+  };
+
   $("body").on("change", "#eligibility_easier_yes", function(){
     if ($('#eligibility_easier_yes').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-      $(this).parents(".row").next().next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().addClass('hide');
+      $('#eligibility_easier_yes').parents(".row").next().next().addClass('hide');
     };
   });
 

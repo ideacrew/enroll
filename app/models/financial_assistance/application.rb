@@ -22,7 +22,7 @@ class FinancialAssistance::Application
 
 
   # TODO: Need enterprise ID assignment call for Assisted Application
-  field :hbx_id, type: Integer
+  field :hbx_id, type: String
   field :external_id, type: String
   field :integrated_case_id, type: String
   field :applicant_kind, type: String
@@ -155,12 +155,12 @@ class FinancialAssistance::Application
   # TODO: define the states and transitions for Assisted Application workflow process
   aasm do
     state :draft, initial: true
-    state :verifying_income
-    state :approved
+    state :submitted
+    state :determined
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :verifying_income, :after => :submit_application do
+      transitions from: :draft, to: :submitted, :after => :submit_application do
         guard do
           is_application_valid?
         end
@@ -322,17 +322,21 @@ class FinancialAssistance::Application
     self.eligibility_determinations
   end
 
-  def financial_application_complete?
+  def complete?
     is_application_valid? # && check for the validity of applicants too.
   end
 
-  def financial_application_ready_for_attestation?
+  def ready_for_attestation?
     application_valid = is_application_ready_for_attestation?
     # && check for the validity of all applicants too.
     self.applicants.each do |applicant|
       return false unless applicant.applicant_validation_complete?
     end
     application_valid
+  end
+
+  def is_draft?
+    self.aasm_state == "draft" ? true : false
   end
 
 private
@@ -412,10 +416,12 @@ private
   end
 
   def submit_application
-    # precondition: sucessful state transition after application.submit. (draft -> verifying_income)
+    # precondition: sucessful state transition after application.submit. (draft -> submitted)
     set_submission_date
     set_assistance_year
     set_effective_date
+
     # Trigger the CV generation process here.
+
   end
 end
