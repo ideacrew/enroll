@@ -5,7 +5,7 @@
     %id= assistance_tax_household.primary_applicant.hbx_id
   %assistance_tax_household_members
     = render :partial => "events/financial_assistance/assistance_tax_household_member", :collection => financial_assistance_application.applicants, as: :assistance_tax_household_member, :locals=> {:financial_assistance_application => financial_assistance_application}
-  - if financial_assistance_application.eligibility_determinations.size > 0
-    %eligibility_determinations
-      = render :partial => "events/financial_assistance/eligibility_determination", :collection => financial_assistance_application.eligibility_determinations, as: :eligibility_determination
+  / - if financial_assistance_application.eligibility_determinations.size > 0
+  /   %eligibility_determinations
+  /     = render :partial => "events/financial_assistance/eligibility_determination", :collection => financial_assistance_application.eligibility_determinations, as: :eligibility_determination
 
