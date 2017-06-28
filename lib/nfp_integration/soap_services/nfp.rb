@@ -1,11 +1,14 @@
 require 'net/http'
 require 'uri'
-require 'pry'
 require 'nokogiri'
 
 module NfpIntegration
   module SoapServices
     class Nfp
+
+      # REFACTOR NEEDED
+      # THIS CODE IS IN PLACE FOR TESTING NFP RESPONSES
+      # THIS FUNCTIONALITY NEEDS TO BE PORTED TO HBX_ENTERPRISE. MORE GUIDANCE IS NEEDED FOR THIS EFFORT
 
       # Change below to Pre Prod
       NFP_URL = "http://localhost:9000/cpbservices/PremiumBillingIntegrationServices.svc"
