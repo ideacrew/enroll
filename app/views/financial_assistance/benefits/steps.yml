@@ -274,13 +274,12 @@
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
-                  # name: is_eligible
                   value: true
                   id: 'yes2'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: benefit
-                  # attribute: is_eligible
+                  attribute: is_esi_waiting_period
                 - gutter: 1
                   type: label_radio
                   name: is_eligible
@@ -289,7 +288,7 @@
                   label: 'No'
                   classNames: 'span-text'
                   model: benefit
-                  # attribute: is_eligible
+                  attribute: is_esi_waiting_period
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -305,7 +304,7 @@
                   value: true
                   id: 'yes2'
                   model: benefit
-                  attribute: is_employer_sponsored
+                  attribute: is_esi_mec_met
                   label: 'Yes'
                   classNames: 'span-text'
                 - gutter: 1
@@ -316,7 +315,7 @@
                   label: 'No'
                   classNames: 'span-text'
                   model: benefit
-                  attribute: is_employer_sponsored
+                  attribute: is_esi_mec_met
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'

@@ -94,14 +94,14 @@ private
   def clean_params(params)
     model_params = params[:benefit]
     if model_params.present? && model_params[:is_enrolled] == "false"
-      model_params[:enrolled_start_on] = ''
-      model_params[:enrolled_end_on] = ''
+      model_params[:enrolled_start_on] = nil
+      model_params[:enrolled_end_on] = nil
     end
 
     if model_params.present? && model_params[:is_eligible] == "false"
-      model_params[:kind] = ''
-      model_params[:eligible_start_on] = ''
-      model_params[:eligible_end_on] = ''
+      model_params[:kind] = nil
+      model_params[:eligible_start_on] = nil
+      model_params[:eligible_end_on] = nil
       clean_benefit_params_esi(model_params)
       clean_employer_params(params)
     end
@@ -113,21 +113,21 @@ private
   end
 
   def clean_benefit_params_esi(model_params)
-    model_params[:esi_covered] = ''
-    model_params[:employer_name] = ''
-    model_params[:employer_id] = ''
-    model_params[:is_employer_sponsored] = ''
-    model_params[:employee_cost] = '0.00'
-    model_params[:employee_cost_frequency] = ''
+    model_params[:esi_covered] = nil
+    model_params[:employer_name] = nil
+    model_params[:employer_id] = nil
+    # model_params[:is_employer_sponsored] = nil
+    model_params[:employee_cost] = nil
+    model_params[:employee_cost_frequency] = nil
   end
 
   def clean_employer_params(params)
-    params[:employer_address][:address_1] = ''
-    params[:employer_address][:address_2] = ''
-    params[:employer_address][:city] = ''
-    params[:employer_address][:state] = ''
-    params[:employer_address][:zip] = ''
-    params[:employer_phone][:full_phone_number] = ''
+    params[:employer_address][:address_1] = nil
+    params[:employer_address][:address_2] = nil
+    params[:employer_address][:city] = nil
+    params[:employer_address][:state] = nil
+    params[:employer_address][:zip] = nil
+    params[:employer_phone][:full_phone_number] = nil
   end
 
   def set_has_health_covergae_benefit
