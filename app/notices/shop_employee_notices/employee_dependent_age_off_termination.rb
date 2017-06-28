@@ -16,7 +16,7 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
     now = TimeKeeper.date_of_record
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    
+
     census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
       if PlanCostDecorator.benefit_relationship(dependent.primary_relationship).include? "child_under_26"
         dep = dependent.person
@@ -35,5 +35,4 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
       end
     end
   end
-
 end
