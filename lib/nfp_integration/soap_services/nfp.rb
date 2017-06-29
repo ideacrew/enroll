@@ -194,9 +194,17 @@ XMLCODE
       def get_most_recent_payment_date(response)
         # assumes payload response lists elements in order of most recent to latest
         # Should we write a helper to extract the latest payment date by searching through all of them??
-        date = response.xpath("//DateReceived")[0].text
-        # return in format mm/dd/yr
-        formatted_date = DateTime.parse(date).to_date.to_s
+
+        # wrap in begin rescue block to protect against possible error in case of
+        # new employer that has recently signed up
+
+        begin
+          date = response.xpath("//DateReceived")[0].text
+          # return in format mm/dd/yr
+          formatted_date = DateTime.parse(date).to_date.to_s
+        rescue Exception => e
+          flash[:error] = e.message
+        end
       end
 
       private
