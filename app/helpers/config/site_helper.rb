@@ -30,4 +30,8 @@ module Config::SiteHelper
   def site_short_name
     Settings.site.short_name
   end
+
+  def site_broker_quoting_enabled?
+    Settings.site.broker_quoting_enabled
+  end
 end

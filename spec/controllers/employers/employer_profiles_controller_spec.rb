@@ -121,6 +121,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(policy).to receive(:is_broker_for_employer?).and_return(false)
       allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
+      allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end

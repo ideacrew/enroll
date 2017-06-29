@@ -29,14 +29,15 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
     let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
-    
+    let(:plan){ FactoryGirl.build(:plan, carrier_profile: carrier_profile) }
+
     before do
+      allow(plan).to receive(:carrier_profile).and_return(carrier_profile)
       allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
     end
     it "should return the named logo" do
-      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Uhic\" />"
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/images/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
 
   end
