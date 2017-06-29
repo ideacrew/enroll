@@ -26,6 +26,8 @@ contact_center:
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
+  ma_email: "www.MAhealthconnector.org"
+  tty: "711"
 
   mailing_address:
     name: "Massachusetts Health Connector"
