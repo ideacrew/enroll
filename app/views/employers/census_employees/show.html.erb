@@ -63,7 +63,7 @@
           <%= format_date @census_employee.hired_on %></span>&nbsp;&nbsp;
           <% if @census_employee.coverage_terminated_on.blank? %>
           <span><strong>Added to Roster:</strong>
-            <%= format_date @census_employee.created_at %></span>&nbsp;&nbsp;
+            <%= format_date TimeKeeper.date_according_to_exchange_at(@census_employee.created_at) %></span>&nbsp;&nbsp;
             <% end %>
           <% if is_terminated(@census_employee)%>
             <span><strong>Terminated:</strong>
