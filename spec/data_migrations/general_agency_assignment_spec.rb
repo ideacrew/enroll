@@ -19,7 +19,7 @@ describe GeneralAgencyAssignment, dbclean: :around_each do
     let(:general_agency_account) { FactoryGirl.create(:general_agency_account) }
     let(:broker_agency_account) { BrokerAgencyAccount.new(broker_agency_profile_id: broker_agency_profile.id, start_on: TimeKeeper.date_of_record, is_active: true)}
     let(:employer_profile){ FactoryGirl.create(:employer_profile, broker_agency_accounts: [broker_agency_account]) }
-    let(:end_on) { TimeKeeper.date_of_record.last_month + 7.days }
+    let(:end_on) { new_plan_year.open_enrollment_end_on }
 
     before(:each) do
       allow(ENV).to receive(:[]).with("general_agency_id").and_return(general_agency_account.general_agency_profile_id.to_s)
