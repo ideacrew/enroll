@@ -1,7 +1,9 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
+                                       :bulk_employee_upload, :bulk_employee_upload_form,
+                                       :download_invoice, :show_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls, :wells_fargo_sso]
+
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -304,6 +306,16 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
   end
 
+  def wells_fargo_sso
+    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id)
+    sso_req.token
+    @redirct_url = sso_req.url
+    unless @redirct_url.nil?
+      redirect_to @redirct_url
+    else
+      redirect_to employers_employer_profile_path(tab:"home")
+    end
+  end
 
   private
 
@@ -320,7 +332,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def collect_and_sort_invoices(sort_order='ASC')
     @invoices = @employer_profile.organization.try(:documents)
-    @invoice_years = @invoices.map{|i| i.date.year}.uniq if @invoices
+    @invoice_years = (Settings.aca.shop_market.employer_profiles.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
     sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
   end
 
