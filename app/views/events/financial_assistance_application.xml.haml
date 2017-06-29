@@ -1,7 +1,7 @@
 !!! XML
 %financial_assistance_application
   %id
-  %id= financial_assistance_application.hbx_id
+    %id= financial_assistance_application.hbx_id
   - if financial_assistance_application.external_id
     %haven_app_id= financial_assistance_application.external_id
   - if financial_assistance_application.integrated_case_id
@@ -10,7 +10,7 @@
   %request_type= "urn:openhbx:terms:v1:financial_assistance_application_request##{financial_assistance_application.request_kind}"
   %motivation_type= "urn:openhbx:terms:v1:financial_assistance_application_motivation##{financial_assistance_application.motivation_kind}"
   %status= "urn:openhbx:terms:v1:financial_assistance_application_status##{financial_assistance_application.aasm_state}"
-%submitted_at= financial_assistance_application.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
+  %submitted_at= financial_assistance_application.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
   %effective_date= financial_assistance_application.effective_date.strftime('%Y-%m-%dT%H:%M:%S')
   %assistance_year= financial_assistance_application.assistance_year
   %is_renewal_authorized= financial_assistance_application.is_renewal_authorized
