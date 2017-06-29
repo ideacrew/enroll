@@ -22,7 +22,6 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
     if model_params.present? && model_params[:is_enrolled] == "false" && model_params[:is_eligible] == "false"
       flash[:notice] = 'No Benifit Info Added.'
-      @applicant.update_attributes!(has_insurance: false)
       redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
     else
       format_date_params_enrolled model_params if model_params.present? && model_params.present? && model_params[:is_enrolled] == "true"

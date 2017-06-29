@@ -3,12 +3,11 @@ class FinancialAssistance::Benefit
   include Mongoid::Timestamps
 
   embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
-  after_save :set_has_health_covergae_benefit
 
   TITLE_SIZE_RANGE = 3..30
   STATE_HEALTH_BENEFITS = %w(medicaid)
 
-  KINDS = %W(
+  INSURANCE_KINDS = %W(
       acf_refugee_medical_assistance
       americorps_health_benefits
       child_health_insurance_plan
@@ -35,22 +34,24 @@ class FinancialAssistance::Benefit
       peace_corps_health_benefits
     )
 
+  KINDS = %W(
+    is_eligible
+    is_enrolled
+  )
+
   field :title, type: String
   field :esi_covered, type: String
   field :kind, type: String
+  field :insurance_kind, type: String
 
   field :is_employer_sponsored, type: Boolean
-  field :is_eligible, type: Boolean
-  field :is_enrolled, type: Boolean
   field :is_esi_waiting_period, type: Boolean
   field :is_esi_mec_met, type: Boolean
   field :employee_cost, type: Money
   field :employee_cost_frequency, type: String
 
-  field :enrolled_start_on, type: Date
-  field :enrolled_end_on, type: Date
-  field :eligible_start_on, type: Date
-  field :eligible_end_on, type: Date
+  field :start_on, type: Date
+  field :end_on, type: Date
   field :submitted_at, type: DateTime
 
   field :workflow, type: Hash, default: { }
@@ -67,19 +68,33 @@ class FinancialAssistance::Benefit
                       allow_nil: true,
                       message: "pick a name length between #{TITLE_SIZE_RANGE}"
 
-  # validates :kind,    presence: true, 
-  #                     inclusion: { 
-  #                       in: KINDS, 
-  #                       message: "%{value} is not a valid alternative benefit type" 
-  #                     }
+  validates :kind,    presence: true,
+                      inclusion: {
+                        in: KINDS,
+                        message: "%{value} is not a valid benefit kind type"
+                      }
+
+  validates :insurance_kind,    presence: true,
+                                inclusion: {
+                                  in: INSURANCE_KINDS,
+                                  message: "%{value} is not a valid benefit insurance kind type"
+                                }
 
   validate :presence_of_dates_if_enrolled, :presence_of_kind_if_eligible, :presence_of_esi_details_if_eligible_and_esi, :presence_of_dates_if_eligible
 
   before_create :set_submission_timestamp
 
   alias_method :is_employer_sponsored?, :is_employer_sponsored
-  alias_method :is_eligible?, :is_eligible
-  alias_method :is_enrolled?, :is_enrolled
+  #alias_method :is_eligible?, :is_eligible
+  #alias_method :is_enrolled?, :is_enrolled
+
+  def is_eligible?
+    kind == "is_eligible"
+  end
+
+  def is_enrolled?
+    kind == "is_enrolled"
+  end
 
   # Eligibility through public employee
   def is_state_health_benefit?
@@ -130,9 +145,6 @@ private
     params[:employer_phone][:full_phone_number] = nil
   end
 
-  def set_has_health_covergae_benefit
-    self.applicant.update_attributes!(has_insurance: true)
-  end
 
   def set_submission_timestamp
     write_attribute(:submitted_at, TimeKeeper.datetime_of_record) if submitted_at.blank? 
