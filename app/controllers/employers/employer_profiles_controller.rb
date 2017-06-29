@@ -12,7 +12,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
-  after_action :nfp_soap_request, only: [:find_employer]
+  #before_action :nfp_soap_request, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -320,10 +320,30 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   private
 
   def nfp_soap_request
-    @employer_profile.notify_enrollment_data_request
-    @employer_profile.notify_payment_history_request
-    @employer_profile.notify_pdf_request
-    @employer_profile.notify_statement_summary_request
+    # this is for using hbx enterprise
+    # @employer_profile.notify_enrollment_data_request
+    # @employer_profile.notify_payment_history_request
+    # @employer_profile.notify_pdf_request
+    # @employer_profile.notify_statement_summary_request
+
+    # this is for making the soap request from EA
+    find_employer
+
+    # make request and store token
+    nfp_request = NfpIntegration::SoapServices::Nfp.new(@employer_profile.hbx_id)
+
+    # check to see that the request returned a token before making additional requests
+    unless nfp_request.display_token.nil?
+      nfp_payment_history = nfp_request.payment_history
+      nfp_statement_summary = nfp_request.statement_summary
+    end
+
+    # parse payload from statement_summary and store in instance variables
+    @past_due, @previous_balance, @new_charges, @adjustments, @payments, @total_due = nfp_request.parse_statement_summary(nfp_statement_summary)
+
+    # get the date for the most recent payment
+    @most_recent_payment_date = get_most_recent_payment_date(nfp_payment_history)
+
   end
 
   def updateable?
@@ -439,7 +459,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def find_employer
-    id_params = params.permit(:id, :employer_profile_id)
+    id_params = params.permit(:id, :employer_profile_id, :tab)
     id = id_params[:id] || id_params[:employer_profile_id]
     @employer_profile = EmployerProfile.find(id)
     render file: 'public/404.html', status: 404 if @employer_profile.blank?

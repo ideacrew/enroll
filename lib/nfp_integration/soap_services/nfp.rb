@@ -6,14 +6,10 @@ module NfpIntegration
   module SoapServices
     class Nfp
 
-      # REFACTOR NEEDED
-      # THIS CODE IS IN PLACE FOR TESTING NFP RESPONSES
-      # THIS FUNCTIONALITY NEEDS TO BE PORTED TO HBX_ENTERPRISE. MORE GUIDANCE IS NEEDED FOR THIS EFFORT
-
       # Change below to Pre Prod
       NFP_URL = "http://localhost:9000/cpbservices/PremiumBillingIntegrationServices.svc"
       NFP_USER_ID = "testuser" #TEST ONLY
-      NFP_PASS = "" #TEST ONLY
+      NFP_PASS = "M0rph!us007" #TEST ONLY
 
       def initialize(customer_id)
         @customer_id = customer_id
@@ -184,7 +180,33 @@ XMLCODE
         @token
       end
 
+      def parse_statement_summary(response)
+        past_due = repsonse.xpath("//PastDue").text
+        previous_balance = repsonse.xpath("//PreviousBalance").text
+        new_charges = repsonse.xpath("//NewCharges").text
+        adjustments = repsonse.xpath("//Adjustments").text
+        payments = repsonse.xpath("//Payments").text
+        total_due = repsonse.xpath("//TotalDue").text
+        return past_due, previous_balance, new_charges, adjustments, payments, total_due
+      end
+
+      def get_most_recent_payment_date(response)
+        # assumes payload response lists elements in order of most recent to latest
+        # Should we write a helper to extract the latest payment date by searching through all of them??
+
+        date = get_element_text(response.xpath("//DateReceived"))
+        unless (date.blank?)
+          formatted_date = DateTime.parse(date).to_date.to_s
+        end
+      end
+
       private
+
+        def get_element_text(value)
+          text = value.try(:first).try(:text)
+          text.nil? ? "" : text.strip
+        end
+
         def token
 
           return @token if defined? @token

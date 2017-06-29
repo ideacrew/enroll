@@ -10,24 +10,41 @@
     </tr>
   </thead>
   <tbody>
+    <!-- Starting Balancce -->
     <tr>
-      <td>3/10/2017</td>
-      <td>Invoice #345045</td>
-      <td>$4903.33</td>
-      <td>$4903.33</td>
+      <td></td>
+      <td>Starting Balance</td>
+      <td></td>
+      <td><%= @previous_balance %></td>
     </tr>
-    <tr data-toggle="collapse" data-target="#collapse">
-      <td>3/12/2017</td>
-      <td>Invoice #636045</td>
-      <td>$9903.33</td>
-      <td>$9903.33</td>
-      <tr class="collapse" id="collapse">
-        <td>3/12/2017</td>
-        <td>Mike</td>
-        <td>$1903.33</td>
-        <td>$1903.33</td>
-      </tr>
+    <!-- Payment -->
+    <tr>
+      <td><%= @most_recent_payment_date %></td>
+      <td>Payment</td>
+      <td><%= @payments %></td>
+      <td></td>
+    </tr>
+    <!-- New Charges -->
+    <tr>
+      <td></td>
+      <td>New Charges</td>
+      <td><%= @new_charges %></td>
+      <td></td>
+    </tr>
+    <!-- Adjustments -->
+    <tr>
+      <td></td>
+      <td>Adjustments</td>
+      <td><%= @adjustments %></td>
+      <td></td>
+    </tr>
+    <!-- Ending Balance -->
+    <tr>
+      <td></td>
+      <td>Ending Balance</td>
+      <td></td>
+      <td><%= @total_due %></td>
     </tr>
   </tbody>
-  
+
 </table>
