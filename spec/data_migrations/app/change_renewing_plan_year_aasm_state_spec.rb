@@ -20,14 +20,14 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     let(:plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_publish_pending") }
     let(:employer_profile){ FactoryGirl.build(:employer_profile, plan_years: [active_plan_year,plan_year]) }
     let(:organization)  {FactoryGirl.create(:organization,employer_profile:employer_profile)}
-    let!(:rating_area) { create(:rating_area, county_name: organization.primary_office_location.address.county, zip_code: organization.primary_office_location.address.zip)}
+#    Somehow this damages the loading order resulting in the census employee not being picked up correctly.
+#    let(:rating_area) { create(:rating_area, county_name: organization.primary_office_location.address.county, zip_code: organization.primary_office_location.address.zip)}
     let(:benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: benefit_group)}
     let!(:renewal_benefit_group){ FactoryGirl.build(:benefit_group, plan_year: plan_year) }
     let(:renewal_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment, benefit_group: renewal_benefit_group)}
     let(:census_employee) { FactoryGirl.create(:census_employee,employer_profile: employer_profile,:benefit_group_assignments => [benefit_group_assignment,renewal_benefit_group_assignment]) }
 
     before(:each) do
-      allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
       allow(ENV).to receive(:[]).with("fein").and_return(organization.fein)
       allow(ENV).to receive(:[]).with("plan_year_start_on").and_return(plan_year.start_on)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('')

@@ -601,7 +601,7 @@ class PlanYear
   end
 
   def minimum_enrolled_count
-    (Settings.aca.shop_market.employee_participation_ratio_minimum * eligible_to_enroll_count).ceil
+    (employee_participation_ratio_minimum * eligible_to_enroll_count).ceil
   end
 
   def additional_required_participants_count
@@ -635,16 +635,16 @@ class PlanYear
 
     # At least one employee who isn't an owner or family member of owner must enroll
     if non_business_owner_enrolled.count < eligible_to_enroll_count
-      if non_business_owner_enrolled.count < Settings.aca.shop_market.non_owner_participation_count_minimum
-        errors.merge!(non_business_owner_enrollment_count: "at least #{Settings.aca.shop_market.non_owner_participation_count_minimum} non-owner employee must enroll")
+      if non_business_owner_enrolled.count < non_owner_participation_count_minimum
+        errors.merge!(non_business_owner_enrollment_count: "at least #{non_owner_participation_count_minimum} non-owner employee must enroll")
       end
     end
 
     # January 1 effective date exemption(s)
     unless effective_date.yday == 1
       # Verify ratio for minimum number of eligible employees that must enroll is met
-      if enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
-        errors.merge!(enrollment_ratio: "number of eligible participants enrolling (#{total_enrolled_count}) is less than minimum required #{eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum}")
+      if enrollment_ratio < employee_participation_ratio_minimum
+        errors.merge!(enrollment_ratio: "number of eligible participants enrolling (#{total_enrolled_count}) is less than minimum required #{eligible_to_enroll_count * employee_participation_ratio_minimum}")
       end
     end
 
