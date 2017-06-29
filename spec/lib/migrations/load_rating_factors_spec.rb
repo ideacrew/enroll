@@ -76,8 +76,10 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
 
       it "assigns the correct factor key and value" do
-        expect(subject.rating_factor_entries.first.factor_key).to eq('0.01')
+        expect(subject.rating_factor_entries.first.factor_key).to eq('1')
         expect(subject.rating_factor_entries.first.factor_value).to be(1.0)
+        expect(subject.rating_factor_entries.last.factor_key).to eq('100')
+
       end
     end
 

@@ -49,6 +49,9 @@ namespace :load_rating_factors do
                                       factor_key = factor_key.to_i
                                     end
 
+                                    if is_participation_rate_rating_tier?(rating_factor_class)
+                                      factor_key = (factor_key * 100).to_i
+                                    end
 
                                     factor_set.rating_factor_entries.new(
                                                                           factor_key: factor_key,
@@ -75,5 +78,9 @@ namespace :load_rating_factors do
 
   def is_composite_rating_tier?(rating_factor_class)
     'CompositeRatingTierFactorSet'.eql? rating_factor_class.to_s
+  end
+
+  def is_participation_rate_rating_tier?(rating_factor_class)
+    'EmployerParticipationRateRatingFactorSet'.eql? rating_factor_class.to_s
   end
 end
