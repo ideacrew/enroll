@@ -105,6 +105,14 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
+    if email.present?
+      message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+        format.html {render "generic_notice_alert_to_broker_and_ga", locals: {first_name: first_name, employer_name: employer_name}}
+      end
+    end
+  end
+
   def employer_invoice_generation_notification(employer,subject)
     message = mail({to: employer.email, subject: subject, from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "employer_invoice_generation", locals: {first_name: employer.person.first_name}}
