@@ -45,6 +45,11 @@ namespace :load_rating_factors do
                                     end
                                     factor_value = sheet.cell(i,carrier_column) || 1.0
 
+                                    if is_group_size_rating_tier?(rating_factor_class)
+                                      factor_key = factor_key.to_i
+                                    end
+
+
                                     factor_set.rating_factor_entries.new(
                                                                           factor_key: factor_key,
                                                                           factor_value: factor_value
@@ -62,6 +67,10 @@ namespace :load_rating_factors do
     rescue => e
       puts e.inspect
     end
+  end
+
+  def is_group_size_rating_tier?(rating_factor_class)
+    'EmployerGroupSizeRatingFactorSet'.eql? rating_factor_class.to_s
   end
 
   def is_composite_rating_tier?(rating_factor_class)
