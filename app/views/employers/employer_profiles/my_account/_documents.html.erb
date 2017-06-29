@@ -10,7 +10,7 @@
   <%end%>
 </div>
 
-<div class="col-xs-10" style="text-align: right;top: 40px;margin-left: 35px;">
+<div class="col-xs-10 upload-document-location" style="text-align: right;top: 40px;margin-left: 35px;">
   <div class="row">
     <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn btn-default " %>
   </div>
@@ -52,6 +52,14 @@
     }
 
     $(".icon_info").tooltip();
+    //There is no css scope mentioned which is affecting the entire a[dat-remote=true] please use the scope like $('.upload-document a[data-remote=true]').
+    $(function(){
+        $('.upload-document-location a[data-remote=true]').click( function() {
+            var current_href = $(this).attr('href').split(/&|\?/)[0]
+            var location_id = $(this).closest('.benefit-group-fields').attr('id');
+            $(this).attr('href', current_href + "?location_id=" + location_id);
+        });
+    })
 </script>
 
 <style>
