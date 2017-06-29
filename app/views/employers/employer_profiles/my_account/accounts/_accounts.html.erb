@@ -13,10 +13,10 @@
   </thead>
   <tbody>
     <tr>
-      <td><%= @total_due %></td>
-      <td><%= @past_due %></td>
+      <td><%= number_to_currency(@total_due) %></td>
+      <td><%= number_to_currency(@past_due) %></td>
       <td></td>
-      <td><%= @previous_balance %></td>
+      <td><%= number_to_currency(@previous_balance) %></td>
     </tr>
   </tbody>
 </table>
