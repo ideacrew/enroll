@@ -7,10 +7,10 @@ module NfpIntegration
   module SoapServices
     class Nfp
 
-      # Change below to Pre Prod
-      NFP_URL = "http://localhost:9000/cpbservices/PremiumBillingIntegrationServices.svc"
-      NFP_USER_ID = "testuser" #TEST ONLY
-      NFP_PASS = "M0rph!us007" #TEST ONLY
+      # # Change below to Pre Prod 10.0.3.51
+      # NFP_URL = "http://localhost:9000/cpbservices/PremiumBillingIntegrationServices.svc"
+      # NFP_USER_ID = "testuser" #TEST ONLY
+      # NFP_PASS = "M0rph!us007" #TEST ONLY
 
       def initialize(customer_id)
         @customer_id = customer_id
@@ -92,7 +92,7 @@ XMLCODE
           doc = Nokogiri::XML(response.body)
           return doc.remove_namespaces!
         end
-        return response.code
+        return nil
       end
 
 
@@ -131,7 +131,7 @@ XMLCODE
           doc = Nokogiri::XML(response.body)
           return doc.remove_namespaces!
         end
-        return response.code
+        return nil
       end
 
       def  enrollment_data
@@ -173,7 +173,7 @@ XMLCODE
           return doc.remove_namespaces!
         end
 
-        return response.code
+        return nil
 
       end
 
@@ -182,12 +182,12 @@ XMLCODE
       end
 
       def parse_statement_summary(response)
-        past_due = repsonse.xpath("//PastDue").text
-        previous_balance = repsonse.xpath("//PreviousBalance").text
-        new_charges = repsonse.xpath("//NewCharges").text
-        adjustments = repsonse.xpath("//Adjustments").text
-        payments = repsonse.xpath("//Payments").text
-        total_due = repsonse.xpath("//TotalDue").text
+        past_due = get_element_text(response.xpath("//PastDue"))
+        previous_balance = get_element_text(response.xpath("//PreviousBalance"))
+        new_charges = get_element_text(response.xpath("//NewCharges"))
+        adjustments = get_element_text(response.xpath("//Adjustments"))
+        payments = get_element_text(response.xpath("//Payments"))
+        total_due = get_element_text(response.xpath("//TotalDue"))
         return past_due, previous_balance, new_charges, adjustments, payments, total_due
       end
 
