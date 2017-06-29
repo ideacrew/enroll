@@ -389,7 +389,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
       context "if relationship is child" do
         it "should return true if age of child < 26" do
-          allow(rule).to receive(:age_on_next_effective_date).with(consumer_role.dob).and_return 23
+          allow(rule).to receive(:age_on_next_effective_date).with(consumer_role.Date.new(1987,8,5)).and_return 28
           expect(rule.is_family_relationships_satisfied?).to eq true
         end
 
