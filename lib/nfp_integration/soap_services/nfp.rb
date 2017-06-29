@@ -196,7 +196,9 @@ XMLCODE
         # Should we write a helper to extract the latest payment date by searching through all of them??
 
         date = get_element_text(response.xpath("//DateReceived"))
-        formatted_date = DateTime.parse(date).to_date.to_s
+        unless (date.blank?)
+          formatted_date = DateTime.parse(date).to_date.to_s
+        end
       end
 
       private
