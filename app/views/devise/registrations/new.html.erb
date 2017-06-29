@@ -1,4 +1,8 @@
 <% if load_captcha_widget? %>
+  <script type="text/javascript">
+    site_key = '<%= Rails.application.secrets.recaptcha_site_key %>'
+    setCaptchaSiteKey(site_key);
+  </script>
   <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=loadCaptchaWidget&render=explicit"></script>
 <% end %>
 <div class="container top-pd module" id='signup'>
@@ -16,7 +20,7 @@
 
           <div class="form-group">
             <%= f.label :email_or_username %>
-            <%= f.text_field :oim_id, class: "form-control", required: true , onblur: "Register.toggleEmail(this)" %>
+            <%= f.text_field :oim_id, class: "form-control", required: true, onblur: "Register.toggleEmail(this)" %>
           </div>
           <div class="tooltip_box username_tooltip" style="display: none;">
             <p style="margin-bottom:0;">You can use your email address as your login. Using your email address will make it easier to recover your password if you ever forget it.</p>
@@ -54,7 +58,7 @@
             <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", required: true %>
           </div>
 
-          <div class="email_field form-group <%= 'hidden_field' if f.object.oim_id.size ==0 %>">
+          <div class="email_field form-group <%= 'hidden_field' if (f.object.oim_id.size == 0 || f.object.email.present?) %>">
             <%= f.label :email %>
             <em> (Optional)</em>
             <br/>
