@@ -26,6 +26,7 @@ class User
 
   scope :locked,   ->{ where(unlock_token: nil) }
   scope :unlocked, ->{ where(unlock_token: nil) }
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"oim_id" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -244,6 +245,18 @@ class User
     self.save
   end
 
+  def update_lockable
+    if locked_at.nil?
+      self.lock_access!
+    else
+      self.unlock_access!
+    end
+  end
+
+  def lockable_notice
+    self.locked_at.nil? ? 'unlocked' : 'locked'
+  end
+
   def has_role?(role_sym)
     return false if person_id.blank?
     roles.any? { |r| r == role_sym.to_s }
@@ -391,6 +404,14 @@ class User
 
     def current_user
       Thread.current[:current_user]
+    end
+
+    def logins_before_captcha
+      4
+    end
+
+    def login_captcha_required?(login)
+      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
     end
 
   end
