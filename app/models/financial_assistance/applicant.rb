@@ -261,7 +261,7 @@ class FinancialAssistance::Applicant
     tax_household.preferred_eligibility_determination
   end
 
-  def applicant_validation_complete
+  def applicant_validation_complete?
     is_applicant_valid?
   end
 
