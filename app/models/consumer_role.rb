@@ -670,6 +670,27 @@ class ConsumerRole
     end
   end
 
+  def admin_verification_action(admin_action, v_type, update_reason)
+    case admin_action
+      when "verify"
+        update_verification_type(v_type, update_reason)
+      when "return_for_deficiency"
+        return_doc_for_deficiency(v_type, update_reason)
+    end
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.deny!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    "#{v_type} was returned for deficiency."
+  end
+
   def update_verification_type(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)

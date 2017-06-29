@@ -56,6 +56,7 @@
                     </div>
                   </div>
                   <% if current_user.has_hbx_staff_role? %>
+                      <!-- ***** Verification reason ***** -->
                       <div class="row">
                         <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}"%>>
                           <div class="col-md-6">
@@ -64,6 +65,7 @@
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
                               <%= hidden_field_tag 'verification_type', v_type%>
+                              <%= hidden_field_tag 'admin_action', 'verify' %>
                               <div class="form-group col-md-3">
                                 <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
                               </div>
@@ -73,6 +75,29 @@
                           <%end%>
                         </div>
                       </div>
+                      <!-- ==== verification reason ==== -->
+
+                      <!-- ***** Return for Deficiency reason ***** -->
+                      <div class="row">
+                        <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
+                          <div class="col-md-6">
+                            Return for Deficiency reason:
+                          </div>
+                          <%= form_tag update_verification_type_documents_path, method: :put do %>
+                              <%= hidden_field_tag 'person_id', person.id  %>
+                              <%= hidden_field_tag 'verification_type', v_type%>
+                              <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
+                              <div class="form-group col-md-3">
+                                <%= select_tag :verification_reason, options_for_select(::VlpDocument::RETURNING_FOR_DEF_REASONS), {prompt: ' Select Reason', required: true}%>
+                              </div>
+                              <div class="col-md-3">
+                                <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
+                              </div>
+                          <%end%>
+                        </div>
+                      </div>
+                      <!-- ==== return for deficiency reason ==== -->
+
                   <% end %>
                   <div class="row">
                     <% if documents_list(person, v_type).any? %>
