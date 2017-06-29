@@ -3,10 +3,9 @@ class FinancialAssistance::DeductionsController < ApplicationController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
+  before_action :setup_navigation
 
   def new
-    @selectedTab = "incomeAdjustments"
-    @allTabs = NavigationHelper::getAllYmlTabs
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
@@ -14,35 +13,29 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def step
-    @selectedTab = "incomeAdjustments"
-    @allTabs = NavigationHelper::getAllYmlTabs
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
-
-    model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
-
-    @model.update_attributes!(permit_params(model_params)) if model_params.present?
+    format_date_params model_params
 
     if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i + 1 }
-      @current_step = @current_step.next_step
+      @current_step = @current_step.next_step if @current_step.next_step.present?
     else
       @model.workflow = { current_step: @current_step.to_i }
     end
 
-    @model.save!
-
-    if params[:commit] == "Finish"
-      flash[:notice] = 'Deductions Income Info Added.'
-      redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
-
-    else
+    begin
+      @model.update_attributes!(permit_params(model_params)) if model_params.present?
+      if params[:commit] == "Finish"
+        flash[:notice] = "Deduction Added - (#{@model.kind})"
+        redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+      else
+        render 'workflow/step', layout: 'financial_assistance'
+      end
+    rescue
+      flash[:error] = build_error_messages(@model)
       render 'workflow/step', layout: 'financial_assistance'
     end
-
   end
 
   def destroy
@@ -53,6 +46,16 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   private
+
+  def format_date_params model_params
+    model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
+    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
+  end
+
+  def build_error_messages(model)
+    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+  end
+
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
     @applicant = @application.applicants.find(params[:applicant_id])
@@ -69,6 +72,11 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   def permit_params(attributes)
     attributes.permit!
+  end
+
+  def setup_navigation
+    @selectedTab = "incomeAdjustments"
+    @allTabs = NavigationHelper::getAllYmlTabs
   end
 
   def find

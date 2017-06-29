@@ -206,7 +206,7 @@ And (/^has added an benefit$/) do
   fill_in 'benefit[start_on]', with: "11/11/2016"
   fill_in 'benefit[end_on]', with: "11/11/2017"
   click_button 'Next step'
-  choose("access_to_hc_yes")
+  choose("is_eligible_yes2")
   fill_in 'benefit[employer_name]', with: "JOHN"
   fill_in 'employer_address[address_1]', with: " Test address 1"
   fill_in 'employer_address[city]', with: " Herdon"

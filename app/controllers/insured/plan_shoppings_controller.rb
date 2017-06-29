@@ -193,7 +193,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @family_member_ids = params[:family_member_ids]
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    if @person.primary_family.active_approved_application.tax_households.present?
+    application = @person.primary_family.active_approved_application
+    if application.present? && application.tax_households.present?
       if is_eligibility_determined_and_not_csr_100?(@person, params[:family_member_ids])
         sort_for_csr(@plans)
       else

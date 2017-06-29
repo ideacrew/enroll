@@ -2,14 +2,11 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
 
   before_action :set_current_person, :set_family
-  def index
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
-    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+  before_action :setup_navigation, only: [:index]
 
+  def index
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
-
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
@@ -207,6 +204,13 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
 private
+
+  def setup_navigation
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+  end
+
   def set_family
     @family = @person.try(:primary_family)
   end

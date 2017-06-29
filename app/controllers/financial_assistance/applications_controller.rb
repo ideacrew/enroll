@@ -2,6 +2,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
   include NavigationHelper
 
+  before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit]
+
   def index
     @applications = current_user.person.primary_family.applications
   end
@@ -26,8 +28,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
-     @selectedTab = "householdInfo"
-     @allTabs = NavigationHelper::getAllTabs
      model_name = @model.class.to_s.split('::').last.downcase
      model_params = params[model_name]
      @model.update_attributes!(permit_params(model_params)) if model_params.present?
@@ -46,8 +46,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def help_paying_coverage
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
     @transaction_id = params[:id]
   end
 
@@ -72,6 +70,15 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @allTabs = NavigationHelper::getAllTabs
   end
 
+  def review_and_submit
+    @selectedTab = "reviewAndSubmit"
+    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
+    @person = current_user.person
+    @consumer_role = @person.consumer_role
+    @application = @person.primary_family.application_in_progress
+    @applicants = @application.applicants
+  end
+
   private
 
   def hash_to_param param_hash
@@ -80,6 +87,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def permit_params(attributes)
     attributes.permit!
+  end
+
+  def setup_navigation
+    @selectedTab = "householdInfo"
+    @allTabs = NavigationHelper::getAllTabs
   end
 
   def find

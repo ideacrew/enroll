@@ -11,8 +11,11 @@ module Aptc
     tax_households = []
     family_member_ids = family_member_ids.collect { |k,v| v}
     if person.present? && person.has_active_consumer_role?
-      person.primary_family.active_approved_application.tax_households.each do |th|
-        tax_households << th if th.applicants.where(:family_member_id.in => family_member_ids).present?
+      application = person.primary_family.active_approved_application
+      if application.present?
+        application.tax_households.each do |th|
+          tax_households << th if th.applicants.where(:family_member_id.in => family_member_ids).present?
+        end
       end
     end
     tax_households

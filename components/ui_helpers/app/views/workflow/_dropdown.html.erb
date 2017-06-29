@@ -1,1 +1,2 @@
+<%= label_tag cell.name.titleize.upcase%>
 <%= select_tag(cell.name_attribute, options_for_select(cell.values, selected: selected_value(@model, cell)), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>
