@@ -24,5 +24,4 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
     rescue => e
       puts "#{e}"
     end
-  end
 end
