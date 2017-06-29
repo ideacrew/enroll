@@ -80,13 +80,11 @@ class FinancialAssistance::Benefit
                                   message: "%{value} is not a valid benefit insurance kind type"
                                 }
 
-  validate :presence_of_dates_if_enrolled, :presence_of_kind_if_eligible, :presence_of_esi_details_if_eligible_and_esi, :presence_of_dates_if_eligible
+  validate :presence_of_esi_details_if_esi, :presence_of_dates_if_enrolled
 
   before_create :set_submission_timestamp
 
   alias_method :is_employer_sponsored?, :is_employer_sponsored
-  #alias_method :is_eligible?, :is_eligible
-  #alias_method :is_enrolled?, :is_enrolled
 
   def is_eligible?
     kind == "is_eligible"
@@ -105,38 +103,26 @@ class FinancialAssistance::Benefit
   end
 
 private
-
   def clean_params(params)
     model_params = params[:benefit]
-    if model_params.present? && model_params[:is_enrolled] == "false"
-      model_params[:enrolled_start_on] = nil
-      model_params[:enrolled_end_on] = nil
-    end
 
-    if model_params.present? && model_params[:is_eligible] == "false"
-      model_params[:kind] = nil
-      model_params[:eligible_start_on] = nil
-      model_params[:eligible_end_on] = nil
-      clean_benefit_params_esi(model_params)
-      clean_employer_params(params)
-    end
-
-    if model_params.present? && model_params[:is_eligible] == "true" && model_params[:kind] != "employer_sponsored_insurance"
-      clean_benefit_params_esi(model_params)
-      clean_employer_params(params)
+    if model_params.present? && model_params[:insurance_kind] != "employer_sponsored_insurance"
+      clean_benefit_params_when_not_esi(model_params)
+      clean_employer_params_when_not_esi(params)
     end
   end
 
-  def clean_benefit_params_esi(model_params)
+  def clean_benefit_params_when_not_esi(model_params)
     model_params[:esi_covered] = nil
     model_params[:employer_name] = nil
     model_params[:employer_id] = nil
-    # model_params[:is_employer_sponsored] = nil
     model_params[:employee_cost] = nil
     model_params[:employee_cost_frequency] = nil
+    model_params[:is_esi_mec_met] = nil
+    model_params[:is_esi_waiting_period] = nil
   end
 
-  def clean_employer_params(params)
+  def clean_employer_params_when_not_esi(params)
     params[:employer_address][:address_1] = nil
     params[:employer_address][:address_2] = nil
     params[:employer_address][:city] = nil
@@ -156,37 +142,19 @@ private
   end
 
   def presence_of_dates_if_enrolled
-    if is_enrolled
-      errors.add(:enrolled_start_on, "If enrolled, must have start and end dates") if enrolled_start_on.blank? #&& enrolled_end_on.blank? End on not mandatory??
-      start_on_must_precede_end_on(enrolled_start_on, enrolled_end_on)
+    if is_enrolled?
+      errors.add(:start_on, "If enrolled, must have start and end dates") if start_on.blank?
+      start_on_must_precede_end_on(start_on, end_on)
     end
   end
 
-  def presence_of_dates_if_eligible
-    if is_eligible
-      errors.add(:eligible_start_on, "If enrolled, must have start and end dates") if eligible_start_on.blank? #&& enrolled_end_on.blank? End on not mandatory??
-      start_on_must_precede_end_on(eligible_start_on, eligible_end_on)
-    end
-  end
-
-  def presence_of_kind_if_eligible
-    if is_eligible
-      errors.add(:kind, "If enrolled, must have a kind of health coverage") if kind.blank?
-    end
-  end
-
-  def presence_of_esi_details_if_eligible_and_esi
-    if is_eligible && kind == "employer_sponsored_insurance"
+  def presence_of_esi_details_if_esi
+    if insurance_kind == "employer_sponsored_insurance"
       errors.add(:employer_name, " can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, " can't be blank ") if esi_covered.blank?
-      errors.add(:eligible_start_on, " date can't be blank ") if eligible_start_on.blank?
       errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
       errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?
       errors.add(:employee_cost, " can't be blank ") if employee_cost.blank?
-
-      if eligible_start_on.present? && eligible_end_on.present?
-        start_on_must_precede_end_on(eligible_start_on, eligible_end_on)
-      end
     end
   end
 end

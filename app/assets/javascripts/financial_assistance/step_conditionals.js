@@ -99,111 +99,51 @@ $(document).ready(function() {
     });
 
   /* Benefit Form Related */
-  $("body").on("change", "#is_enrolled_no2", function(){
-    if ($('#is_enrolled_no2').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-    };
-  });
 
-  $("body").on("change", "#is_enrolled_yes2", function(){
-    if ($('#is_enrolled_yes2').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
-    };
-  });
-
-  if($('#is_enrolled_no2').is(':checked')) {
-    $('#is_enrolled_no2').parents(".row").next().addClass('hide');
-  }
-
-  if($('#is_enrolled_yes2').is(':checked')) {
-    $('#is_enrolled_yes2').parents(".row").next().removeClass('hide');
-  }
-
-  $("body").on("change", "#is_eligible_no2", function(){
-    if ($('#is_eligible_no2').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
-      $(this).parents(".row").next().next().addClass('hide');
-      toggle_employer_contact_divs_benefit('hide');
-    };
-  });
-
-  $("body").on("change", "#is_eligible_yes2", function(){
-    if ($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() != 'employer_sponsored_insurance') {
-      $(this).parents(".row").next().removeClass('hide');
-      $(this).parents(".row").next().next().removeClass('hide');
-    };
-  });
-
-  $("body").on("change", "#is_eligible_yes2", function(){
-    if ($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() == 'employer_sponsored_insurance') {
-      $(this).parents(".row").next().removeClass('hide');
-      $(this).parents(".row").next().next().removeClass('hide');
+  $('#benefit_insurance_kind').on('selectric-change', function(e){
+    if ($(this).val() == 'employer_sponsored_insurance') {
       toggle_employer_contact_divs_benefit('show');
-    };
+    }
+    else {
+      toggle_employer_contact_divs_benefit('hide');
+    }
   });
 
-  if($('#is_eligible_no2').is(':checked')) {
-    $('#is_eligible_no2').parents(".row").next().addClass('hide');
-    $('#is_eligible_no2').parents(".row").next().next().addClass('hide');
-      toggle_employer_contact_divs_benefit('hide');
-  }
-
-  if($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() == 'employer_sponsored_insurance') {
-    $('#is_eligible_yes2').parents(".row").next().removeClass('hide');
-    $('#is_eligible_yes2').parents(".row").next().next().removeClass('hide');
-      toggle_employer_contact_divs_benefit('show');
-  }
-
-  if($('#is_eligible_yes2').is(':checked') && $("#kind .label").text() != 'employer_sponsored_insurance') {
-    $('#is_eligible_yes2').parents(".row").next().removeClass('hide');
-    $('#is_eligible_yes2').parents(".row").next().next().removeClass('hide');
-  }
-
-  $('#benefit_kind').on('selectric-change', function(e){
-    if ($(this).val() == 'employer_sponsored_insurance')
-      toggle_employer_contact_divs_benefit('show');
-    else
-      toggle_employer_contact_divs_benefit('hide');
-  });
-
-  if($("#kind .label").text() == 'employer_sponsored_insurance'){
+  //TODO Update the selectric check
+  if($("#insurance_kind .label").val() == 'employer_sponsored_insurance'){
     toggle_employer_contact_divs_benefit('show');
-  } else {
+  }
+  else {
     toggle_employer_contact_divs_benefit('hide');
   };
 
   function toggle_employer_contact_divs_benefit(hide_show) {
     if (hide_show == 'show') {
-      $('#benefit_kind').parents(".row").next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().removeClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().removeClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().removeClass('hide');
     }
     else {
-      $('#benefit_kind').parents(".row").next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().addClass('hide');
-      $('#benefit_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().addClass('hide');
+      $('#benefit_insurance_kind').parents(".row").next().next().next().next().next().next().next().next().next().next().addClass('hide');
     }
   }
   /* Benefit Form Related */
-
-  // Clear 0 value for Benefit
-  if ($("#benefit_kind").val() == 0){
-   $("#benefit_kind").val("");
-  }
 
   /* Submit Application Form Related */
   $("body").on("change", "#living_outside_no", function(){
