@@ -168,4 +168,20 @@ module VerificationHelper
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
+
+  def admin_actions(v_type, f_member)
+    options_for_select(build_admin_actions_list(v_type, f_member))
+  end
+
+  def build_admin_actions_list(v_type, f_member)
+    if verification_type_status(v_type, f_member) == "outstanding"
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+    else
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def type_unverified?(v_type, person)
+    verification_type_status(v_type, person) != "verified"
+  end
 end
