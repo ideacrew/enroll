@@ -6,8 +6,11 @@ class EmployerGroupSizeRatingFactorSet < RatingFactorSet
     record.lookup(val)
   end
 
+  # Upper bound by max integer key, and lower bound by
+  # 1 - group size can't be smaller
   def lookup(val)
-    lookup_key = (val > max_integer_factor_key) ? max_integer_factor_key : val
+    max_adjusted_key = (val > max_integer_factor_key) ? max_integer_factor_key : val
+    lookup_key = (val < 1) ? 1 : max_adjusted_key
     super(lookup_key.to_s)
   end
 end
