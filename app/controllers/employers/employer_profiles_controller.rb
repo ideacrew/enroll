@@ -321,19 +321,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     unless nfp_request.display_token.nil?
       nfp_payment_history = nfp_request.payment_history
       nfp_statement_summary = nfp_request.statement_summary
-      # not using this information at the moment but retrieving it anyway
-      nfp_enrollment_data = nfp_request.enrollment_data
     end
 
     # parse payload from statement_summary and store in instance variables
-    unless npf_statement_summary.nil?
-      @past_due, @previous_balance, @new_charges, @adjustments, @payments, @total_due = nfp_request.parse_statement_summary(nfp_statement_summary)
-    end
+    @past_due, @previous_balance, @new_charges, @adjustments, @payments, @total_due = nfp_request.parse_statement_summary(nfp_statement_summary)
 
     # get the date for the most recent payment
-    unless nfp_payment_history.nil?
-      @most_recent_payment_date = get_most_recent_payment_date(nfp_payment_history)
-    end
+    @most_recent_payment_date = get_most_recent_payment_date(nfp_payment_history)
+
   end
 
   def updateable?
