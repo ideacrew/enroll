@@ -6,7 +6,7 @@ describe BenefitGroup, "being asked for a group size rating factor" do
   let(:plan_option_kind) { "sole_source" }
   let(:group_size_of_1_factor) { double }
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
-  
+
   subject { BenefitGroup.new(:plan_option_kind => plan_option_kind, :plan_year => plan_year) }
 
   describe "when the rating model is 'simple'" do
@@ -50,21 +50,23 @@ describe BenefitGroup, "being asked for a group size rating factor" do
 end
 
 describe BenefitGroup, "for a plan year which should estimate the group size" do
-  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
+  let(:employer_profile) { build(:employer_profile) }
+  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1), employer_profile: employer_profile) }
 
   let(:census_employees) do
     [
-      instance_double(CensusEmployee, :expected_to_enroll? => true),
-      instance_double(CensusEmployee, :expected_to_enroll? => true),
-      instance_double(CensusEmployee, :expected_to_enroll? => false)
+      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile),
+      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile),
+      instance_double(CensusEmployee, :expected_to_enroll? => false, employer_profile: employer_profile)
     ]
   end
-  
-  subject { BenefitGroup.new(:plan_year => plan_year) }
+
+  subject { BenefitGroup.new(plan_year: plan_year) }
 
   before :each do
     allow(plan_year).to receive(:estimate_group_size?).and_return(true)
-    allow(CensusEmployee).to receive(:find_all_by_benefit_group).with(subject).and_return(census_employees)
+    allow(employer_profile).to receive(:census_employees).and_return(census_employees)
+    #allow(CensusEmployee).to receive(:find_all_by_benefit_group).with(subject).and_return(census_employees)
   end
 
   it "provides the group_size_count based on the employees expected to enroll" do
@@ -79,7 +81,7 @@ describe BenefitGroup, "for a plan year which should NOT estimate the group size
   let(:enrollment_1) { instance_double(HbxEnrollment, :dental? => false) }
   let(:enrollment_2) { instance_double(HbxEnrollment, :dental? => true) }
   let(:enrollment_3) { instance_double(HbxEnrollment, :dental? => false) }
-  
+
   subject { BenefitGroup.new(:plan_year => plan_year) }
 
   before :each do
@@ -97,18 +99,19 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
   let(:plan) { instance_double(Plan, :carrier_profile_id => carrier_profile_id) }
   let(:plan_option_kind) { "sole_source" }
   let(:group_size_of_1_factor) { double }
-  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
+  let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1), employer_profile: employer_profile) }
   let(:benefit_group_assignment_1) { instance_double(BenefitGroupAssignment, :active_and_waived_enrollments => [enrollment_1, enrollment_2]) }
   let(:benefit_group_assignment_2) { instance_double(BenefitGroupAssignment, :active_and_waived_enrollments => [enrollment_3]) }
   let(:enrollment_1) { instance_double(HbxEnrollment, :dental? => false) }
   let(:enrollment_2) { instance_double(HbxEnrollment, :dental? => true) }
   let(:enrollment_3) { instance_double(HbxEnrollment, :dental? => false) }
-  
+  let(:employer_profile) { build(:employer_profile) }
+
   let(:census_employees) do
     [
-      instance_double(CensusEmployee, :expected_to_enroll? => true),
-      instance_double(CensusEmployee, :expected_to_enroll? => true),
-      instance_double(CensusEmployee, :expected_to_enroll? => false)
+      instance_double(CensusEmployee, :expected_to_enroll_or_valid_waive? => true),
+      instance_double(CensusEmployee, :expected_to_enroll_or_valid_waive? => true),
+      instance_double(CensusEmployee, :expected_to_enroll_or_valid_waive? => false)
     ]
   end
 
@@ -116,7 +119,7 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
 
   before :each do
     allow(plan_year).to receive(:estimate_group_size?).and_return(plan_year_should_estimate)
-    allow(CensusEmployee).to receive(:find_all_by_benefit_group).with(subject).and_return(census_employees)
+    allow(employer_profile).to receive(:census_employees).and_return(census_employees)
   end
 
   describe "for a plan year which should estimate the group size" do
@@ -189,10 +192,10 @@ describe BenefitGroup, "given a composite tier contribution with an estimated pr
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
   let(:estimated_tier_premium) { 1234.23 }
   let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
-  
+
   subject do
     BenefitGroup.new(:plan_year => plan_year, :composite_tier_contributions => [
-      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :estimated_tier_premium => estimated_tier_premium) 
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :estimated_tier_premium => estimated_tier_premium)
     ])
   end
 
@@ -209,10 +212,10 @@ describe BenefitGroup, "given a composite tier contribution with a final premium
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
   let(:final_tier_premium) { 1234.23 }
   let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
-  
+
   subject do
     BenefitGroup.new(:plan_year => plan_year, :composite_tier_contributions => [
-      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :final_tier_premium => final_tier_premium) 
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :final_tier_premium => final_tier_premium)
     ])
   end
 
@@ -221,17 +224,17 @@ describe BenefitGroup, "given a composite tier contribution with a final premium
   end
 
   it "has the final premium" do
-    expect(subject.composite_rating_tier_premium_for(composite_rating_tier)).to eq final_tier_premium 
+    expect(subject.composite_rating_tier_premium_for(composite_rating_tier)).to eq final_tier_premium
   end
 end
 
 describe BenefitGroup, "given a composite tier contribution with an employer contribution percent" do
   let(:employer_contribution_percent) { 50.00 }
   let(:composite_rating_tier) { CompositeRatingTier::NAMES.first }
-  
+
   subject do
     BenefitGroup.new(:composite_tier_contributions => [
-      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :employer_contribution_percent => employer_contribution_percent) 
+      CompositeTierContribution.new(:composite_rating_tier => composite_rating_tier, :employer_contribution_percent => employer_contribution_percent)
     ])
   end
 
@@ -246,7 +249,7 @@ describe BenefitGroup, "asked for a composite rating tier base factor for a plan
   let(:plan) { instance_double(Plan, :carrier_profile_id => carrier_profile_id) }
   let(:composite_rating_tier_base_factor) { 1.01 }
   let(:plan_year) { PlanYear.new(:start_on => Date.new(2015, 2, 1)) }
-  
+
   subject do
     BenefitGroup.new(:plan_year => plan_year)
   end
