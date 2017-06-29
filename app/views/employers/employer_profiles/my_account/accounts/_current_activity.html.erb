@@ -15,27 +15,27 @@
       <td></td>
       <td>Starting Balance</td>
       <td></td>
-      <td><%= @previous_balance %></td>
+      <td><%= number_to_currency(@previous_balance) %></td>
     </tr>
     <!-- Payment -->
     <tr>
       <td><%= @most_recent_payment_date %></td>
       <td>Payment</td>
-      <td><%= @payments %></td>
+      <td><%= number_to_currency(@payments) %></td>
       <td></td>
     </tr>
     <!-- New Charges -->
     <tr>
       <td></td>
       <td>New Charges</td>
-      <td><%= @new_charges %></td>
+      <td><%= number_to_currency(@new_charges) %></td>
       <td></td>
     </tr>
     <!-- Adjustments -->
     <tr>
       <td></td>
       <td>Adjustments</td>
-      <td><%= @adjustments %></td>
+      <td><%= number_to_currency(@adjustments) %></td>
       <td></td>
     </tr>
     <!-- Ending Balance -->
@@ -43,7 +43,7 @@
       <td></td>
       <td>Ending Balance</td>
       <td></td>
-      <td><%= @total_due %></td>
+      <td><%= number_to_currency(@total_due) %></td>
     </tr>
   </tbody>
 
