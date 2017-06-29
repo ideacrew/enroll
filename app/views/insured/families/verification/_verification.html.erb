@@ -3,10 +3,10 @@
     <h4>
       <% if enrollment_group_unverified?(@person) && verification_needed?(@person) %>
           Document Due Date:&nbsp;&nbsp;
-          <% if @family.verification_due_date <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= @person.primary_family.verification_due_date %> (Past Due)</span>
+          <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= @person.primary_family.verification_due_date %></span>
+              <span class="label label-warning"><%= verification_due_date(@person.primary_family) %></span>
           <% end %>
       <% end %>
     </h4>

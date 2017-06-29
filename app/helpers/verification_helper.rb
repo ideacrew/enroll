@@ -65,6 +65,18 @@ module VerificationHelper
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
   end
 
+  def verification_due_date(family)
+    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
+      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
+        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
+      else
+        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+      end
+    else
+      TimeKeeper.date_of_record.to_date + 95.days
+    end
+  end
+
   def documents_uploaded
     @person.primary_family.active_family_members.all? { |member| docs_uploaded_for_all_types(member) }
   end
@@ -127,6 +139,14 @@ module VerificationHelper
 
   def all_family_members_verified
     @family_members.all?{|member| member.person.consumer_role.aasm_state == "fully_verified"}
+  end
+
+  def review_status(family)
+    if family.active_household.hbx_enrollments.verification_needed.any?
+      family.active_household.hbx_enrollments.verification_needed.first.review_status
+    else
+      "no enrollment"
+    end
   end
 
   def show_doc_status(status)
