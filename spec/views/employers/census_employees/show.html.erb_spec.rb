@@ -7,7 +7,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   let(:person){ Person.new(first_name: "first name", last_name: "last_name", dob: 20.years.ago) }
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
   let(:plan_year){ FactoryGirl.create(:plan_year) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
   let(:relationship_benefit){ RelationshipBenefit.new(relationship: "employee") }
   let(:benefit_group) {BenefitGroup.new(title: "plan name", relationship_benefits: [relationship_benefit], dental_relationship_benefits: [relationship_benefit], plan_year: plan_year )}
   let(:benefit_group_assignment) { BenefitGroupAssignment.new(benefit_group: benefit_group) }
@@ -40,6 +40,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     sign_in user
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true, list_enrollments?: true))
     assign(:employer_profile, employer_profile)
+    assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}))
     assign(:census_employee, census_employee)
     assign(:benefit_group_assignment, benefit_group_assignment)
     assign(:hbx_enrollment, hbx_enrollment)
@@ -136,7 +137,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     end
     context "when both ee and er have no benefit group assignment" do
       #to make sure census_employee.benefit_group_assignments.last
-      let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+      let(:census_employee) { create(:census_employee, first_name: "xz", last_name: "yz") }
       before do
         # to make sure census_employee.active_benefit_group_assignment = nil
         allow(census_employee).to receive(:active_benefit_group_assignment).and_return(nil)
@@ -150,7 +151,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
    end
 
   context 'with no email linked with census employee' do
-    let(:census_employee) { CensusEmployee.new(first_name: "xz", last_name: "yz")}
+    let(:census_employee) { create(:census_employee, :blank_email, first_name: "xz", last_name: "yz") }
     it "should create a blank email record if there was no email for census employees" do
       expect(census_employee.email).to eq nil
       render template: "employers/census_employees/show.html.erb"
