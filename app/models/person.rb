@@ -1,5 +1,6 @@
 class Person
   include Config::AcaModelConcern
+  include Config::SiteModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -900,10 +901,10 @@ class Person
   end
 
   def create_inbox
-    welcome_subject = "Welcome to #{Settings.site.short_name}"
-    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    welcome_subject = "Welcome to #{site_short_name}"
+    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end
 
   def update_full_name
