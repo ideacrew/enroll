@@ -102,7 +102,7 @@
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer">
-        <%= render "financial_assistance_row", family_id: @family.id, family_member_id: dependent.id.to_s %>
+        <%= render "financial_assistance_row", family_member: dependent %>
       </div>
 
     <% end %>

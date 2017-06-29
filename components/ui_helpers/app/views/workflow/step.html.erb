@@ -5,7 +5,10 @@
       <p class="alert alert-error hide"></p>
         <h1 class="darkblue"><%= personalize_heading_text(@current_step.heading) %></h1>
         <% if !@current_step.heading_text.nil? %>
-          <%= personalize_heading_text(@current_step.heading_text) %>
+          <% if @current_step.heading_text.present? %>
+            <p><%= @current_step.heading_text%></p>
+            <p class="memo">* = required field</p>
+          <% end %>
         <% end %>
       <% end %>
 
