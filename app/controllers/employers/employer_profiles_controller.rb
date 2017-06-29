@@ -153,6 +153,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @current_plan_year = @employer_profile.active_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
+      @datatable ||= Effective::Datatables::EmployeeDatatable.new({id: @employer_profile.id, scopes: params[:scopes]})
       paginate_employees
     elsif @tab == 'families'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
