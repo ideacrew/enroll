@@ -8,6 +8,6 @@ class EmployerGroupSizeRatingFactorSet < RatingFactorSet
 
   def lookup(val)
     lookup_key = (val > max_integer_factor_key) ? max_integer_factor_key : val
-    super(lookup_key.to_f.to_s)
+    super(lookup_key.to_s)
   end
 end
