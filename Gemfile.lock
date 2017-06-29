@@ -401,6 +401,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pdfjs_viewer-rails (0.0.9)		
+      rails (> 4.2.0)		
+      sass-rails (~> 5.0)
     poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)

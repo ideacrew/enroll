@@ -99,3 +99,29 @@ describe EmployerGroupSizeRatingFactorSet, "given
   end
 
 end
+
+describe EmployerGroupSizeRatingFactorSet, "given
+- a rating factor entry with key '1' and value '1.345'
+" do
+
+  subject do
+    EmployerGroupSizeRatingFactorSet.new({
+      :rating_factor_entries => [
+        RatingFactorEntry.new({
+          :factor_key => '1',
+          :factor_value => 1.345
+        })
+      ],
+      :max_integer_factor_key => 30
+    })
+  end
+
+  it "returns the '1.345' for a lookup of 0" do
+    expect(subject.lookup(0)).to eq 1.345
+  end
+
+  it "returns the '1.345' for a lookup of 0.5" do
+    expect(subject.lookup(0.5)).to eq 1.345
+  end
+
+end
