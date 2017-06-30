@@ -8,6 +8,7 @@ class FinancialAssistance::Application
 
   before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified
   validates :application_submission_validity, presence: true, on: :submission
+  validates :before_attestation_validity, presence: true, on: :before_attestation
 
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
@@ -21,7 +22,7 @@ class FinancialAssistance::Application
 
 
   # TODO: Need enterprise ID assignment call for Assisted Application
-  field :hbx_id, type: Integer
+  field :hbx_id, type: String
   field :external_id, type: String
   field :integrated_case_id, type: String
   field :applicant_kind, type: String
@@ -41,6 +42,8 @@ class FinancialAssistance::Application
   field :is_renewal_authorized, type: Boolean
   field :renewal_base_year, type: Integer
   field :years_to_renew, type: Integer
+
+  field :is_requesting_voter_registration_application_in_mail, type: Boolean
 
   field :us_state, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
@@ -152,12 +155,12 @@ class FinancialAssistance::Application
   # TODO: define the states and transitions for Assisted Application workflow process
   aasm do
     state :draft, initial: true
-    state :verifying_income
-    state :approved
+    state :submitted
+    state :determined
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :verifying_income, :after => :submit_application do
+      transitions from: :draft, to: :submitted, :after => :submit_application do
         guard do
           is_application_valid?
         end
@@ -319,8 +322,21 @@ class FinancialAssistance::Application
     self.eligibility_determinations
   end
 
-  def financial_application_complete?
-    is_application_valid?
+  def complete?
+    is_application_valid? # && check for the validity of applicants too.
+  end
+
+  def ready_for_attestation?
+    application_valid = is_application_ready_for_attestation?
+    # && check for the validity of all applicants too.
+    self.applicants.each do |applicant|
+      return false unless applicant.applicant_validation_complete?
+    end
+    application_valid
+  end
+
+  def is_draft?
+    self.aasm_state == "draft" ? true : false
   end
 
 private
@@ -371,13 +387,21 @@ private
   def application_submission_validity
     # Mandatory Fields before submission
     validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
-    # User must agree with terms of service check boxes
-    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, :parent_living_out_of_home_terms, accept: true
+    # User must agree with terms of service check boxes before submission
+    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+  end
+
+  def before_attestation_validity
+    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
   end
 
   def is_application_valid?
     #self.save!(context: :submission)
     self.valid?(:submission) ? true : false
+  end
+
+  def is_application_ready_for_attestation?
+    self.valid?(:before_attestation) ? true : false
   end
 
   def report_invalid
@@ -392,10 +416,12 @@ private
   end
 
   def submit_application
-    # precondition: sucessful state transition after application.submit. (draft -> verifying_income)
+    # precondition: sucessful state transition after application.submit. (draft -> submitted)
     set_submission_date
     set_assistance_year
     set_effective_date
+
     # Trigger the CV generation process here.
+
   end
 end

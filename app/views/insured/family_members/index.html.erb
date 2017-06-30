@@ -31,7 +31,7 @@
               <label class="static_label label-floatlabel" for="relation">RELATION</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
             </div>
-            <%= render "financial_assistance_row", family_id: @family.id, family_member_id: @family.primary_applicant.id.to_s %>
+            <%= render "financial_assistance_row", family_member: @family.primary_applicant %>
           </div>
         </div>
 
@@ -88,8 +88,7 @@
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
             step: '3',
-            url: (@reviewAndSubmit) ? review_and_submit_financial_assistance_applications_path : ( (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url) ),
-            enabled: true #always enable here. this is not the final step to submit application!
+            url: build_button(@consumer_role, @family, find_sep_url).first
           } %>
         <% end %>
       </div>

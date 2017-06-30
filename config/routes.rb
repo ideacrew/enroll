@@ -33,11 +33,14 @@ Rails.application.routes.draw do
       get 'application_checklist',on: :collection, action: 'application_checklist', as: 'application_checklist'
       get 'get_help_paying_coverage_response',on: :collection, action: 'get_help_paying_coverage_response', as: 'get_help_paying_coverage_response'
       get :review_and_submit, on: :collection
+      get :eligibility_results, on: :collection
+
       resources :applicants do
         put :step, on: :member
         put ':step/:step', on: :member, action: 'step'
         post :step, on: :collection
         get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        get :age_18_to_26
 
         resources :incomes do
           put 'step(/:step)', action: 'step', on: :member

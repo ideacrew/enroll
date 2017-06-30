@@ -1,6 +1,10 @@
   <nav class="top-border-30">
     <% if  @steps.last_step?(@current_step) %>
-      <%= submit_tag 'Finish', :class => "btn btn-lg btn-primary"  %>
+      <%if @model.class.name == "FinancialAssistance::Application"%>
+        <%= submit_tag 'Submit my Application', :class => "btn btn-lg btn-primary"  %>
+      <%else%>
+        <%= submit_tag 'Finish', :class => "btn btn-lg btn-primary"  %>
+      <% end%>
     <% else %>
        <%= submit_tag 'Next step', :class => "btn btn-lg btn-primary" %>
     <% end %>

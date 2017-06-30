@@ -56,9 +56,6 @@ class FinancialAssistance::Applicant
   field :is_claimed_as_tax_dependent, type: Boolean
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
-#application.applicants.first.save!(context: :submission)
-#application.applicants.first.valid?(:submission)
-
   field :is_ia_eligible, type: Boolean, default: false
   field :is_medicaid_chip_eligible, type: Boolean, default: false
   field :is_non_magi_medicaid_eligible, type: Boolean, default: false
@@ -124,7 +121,7 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
-  validates :validate_applicant_information, presence: true, on: :submission
+  validate :presence_of_attr_step_1, :presence_of_attr_step_2
 
   validate :strictly_boolean
 
@@ -265,7 +262,7 @@ class FinancialAssistance::Applicant
     tax_household.preferred_eligibility_determination
   end
 
-  def applicant_validation_complete
+  def applicant_validation_complete?
     is_applicant_valid?
   end
 
@@ -273,39 +270,87 @@ class FinancialAssistance::Applicant
     clean_params(model_params)
   end
 
+  def age_of_the_applicant
+    age_of_applicant
+  end
+
 private
-  def clean_params(model_params)
-    if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
-      model_params[:is_joint_tax_filing] = ''
+
+  def presence_of_attr_step_1
+    if is_required_to_file_taxes && is_joint_tax_filing.nil?
+      errors.add(:is_joint_tax_filing, "can't be blank")
     end
 
-    if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
-      model_params[:claimed_as_tax_dependent_by] = ''
-    end
-
-    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
-      model_params[:pregnancy_due_on] = ''
-      model_params[:children_expected_count] = ''
-      model_params[:is_post_partum_period] = ''
-      model_params[:pregnancy_end_on] = ''
-      model_params[:is_enrolled_on_medicaid] = ''
-    end
-
-    if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
-      model_params[:foster_care_us_state] = ''
-      model_params[:age_left_foster_care] = ''
-      model_params[:had_medicaid_during_foster_care] = ''
-    end
-
-    if model_params[:is_student].present? && model_params[:is_student] == 'false'
-      model_params[:student_kind] = ''
-      model_params[:student_status_end_on] = ''
-      model_params[:student_kind] = ''
+    if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
+      errors.add(:claimed_as_tax_dependent_by, "can't be blank")
     end
   end
 
-  def validate_applicant_information
-    validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_joint_tax_filing, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+  def presence_of_attr_step_2
+    if is_pregnant
+      errors.add(:pregnancy_due_on, "should be answered if you are someone's tax dependent") if pregnancy_due_on.nil?
+      errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
+
+      if is_post_partum_period
+        errors.add(:is_enrolled_on_medicaid, "should be answered") if is_enrolled_on_medicaid.nil?
+      end
+    else
+      errors.add(:is_post_partum_period, "should be answered") if is_post_partum_period.nil?
+      errors.add(:pregnancy_end_on, "should be answered") if is_post_partum_period.nil?
+    end
+
+    if (18..26).include?(age_of_applicant)
+      if is_former_foster_care.nil?
+        errors.add(:is_former_foster_care, "should be answered")
+      end
+
+      if is_former_foster_care
+        errors.add(:foster_care_us_state, "should be answered") if foster_care_us_state.nil?
+        errors.add(:age_left_foster_care, "should be answered") if age_left_foster_care.nil?
+      end
+    end
+
+    if is_student
+      errors.add(:student_kind, "should be answered") if student_kind.nil?
+      errors.add(:student_status_end_on, "should be answered") if student_status_end_on.nil?
+      errors.add(:student_kind, "should be answered") if student_kind.nil?
+    end
+  end
+
+  def age_of_applicant
+    now = Time.now.utc.to_date
+    dob = self.family_member.person.dob
+    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
+  def clean_params(model_params)
+    if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
+      model_params[:is_joint_tax_filing] = nil
+    end
+
+    if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
+      model_params[:claimed_as_tax_dependent_by] = nil
+    end
+
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+      model_params[:pregnancy_due_on] = nil
+      model_params[:children_expected_count] = nil
+      model_params[:is_post_partum_period] = nil
+      model_params[:pregnancy_end_on] = nil
+      model_params[:is_enrolled_on_medicaid] = nil
+    end
+
+    if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
+      model_params[:foster_care_us_state] = nil
+      model_params[:age_left_foster_care] = nil
+      model_params[:had_medicaid_during_foster_care] = nil
+    end
+
+    if model_params[:is_student].present? && model_params[:is_student] == 'false'
+      model_params[:student_kind] = nil
+      model_params[:student_status_end_on] = nil
+      model_params[:student_kind] = nil
+    end
   end
 
   def is_applicant_valid?

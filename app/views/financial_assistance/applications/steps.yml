@@ -1,4 +1,3 @@
-
 - step:
     heading: Your Preferences
     heading_text: Tell us your preferences. When you're finished, select CONTINUE.
@@ -14,11 +13,21 @@
                   - gutter: 2
                     type: label_radio
                     label: I Agree *
+                    value: true
                     classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                    id: 'eligibility_easier_yes'
                   - gutter: 2
                     type: label_radio
                     classNames: 'span-text'
                     label: I disagree *
+                    value: false
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                    id: 'eligibility_easier_no'
             - cells:
                   - gutter: 12
                     type: raw_html
@@ -32,51 +41,51 @@
                   - gutter: 12
                     type: label_radio
                     label: 5 years
+                    value: 5
                     classNames: 'span-text'
                     model: application
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
                     label: 4 years
+                    value: 4
                     classNames: 'span-text'
                     model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
                     label: 3 years
+                    value: 3
                     classNames: 'span-text'
                     model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
                     label: 2 years
+                    value: 2
                     classNames: 'span-text'
                     model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
                     label: 1 year
+                    value: 1
                     classNames: 'span-text'
                     model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
                   - gutter: 12
                     type: label_radio
                     label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    value: 0
                     classNames: 'span-text'
                     model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
-                  - gutter: 12
-                    type: label
-                    label: "None "
-                    classNames: 'span-text btn btn-danger'
-                    model: application
-                    name: is_renewal_authorized
-                    attribute: is_renewal_authorized
+                    name: years_to_renew
+                    attribute: years_to_renew
       - section:
           heading: Voter Registration
           heading_text: Tell us your preferences. When you're finished, select CONTINUE.
@@ -89,11 +98,19 @@
                   - gutter: 2
                     type: label_radio
                     label: "Yes"
+                    value: true
                     classNames: 'span-text'
+                    model: application
+                    name: is_requesting_voter_registration_application_in_mail
+                    attribute: is_requesting_voter_registration_application_in_mail
                   - gutter: 2
                     type: label_radio
                     label: "No"
-                    classNames: 'span-text' 
+                    value: false
+                    classNames: 'span-text'
+                    model: application
+                    name: is_requesting_voter_registration_application_in_mail
+                    attribute:  is_requesting_voter_registration_application_in_mail
             - cells:
                   - gutter: 12
                     type: raw_html
@@ -112,7 +129,7 @@
                     Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Application
-    heading_text: Please complete all tax info for  <family-member-name-placeholder>. To go to a different person, select ‘Back to All Applicants’. When you’ve finished, select CONTINUE.
+    heading_text: This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION.
     sections:
       - section:
           lines:
@@ -126,6 +143,8 @@
                     type: checkbox
                     classNames: 'span-text'
                     label: I Agree *
+                    value: true
+                    required: true
                     model: application
                     name: medicaid_terms
                     attribute: medicaid_terms
@@ -149,8 +168,11 @@
                   - gutter: 12
                     type: checkbox
                     label: I Agree *
+                    value: true
+                    required: true
                     name: medicaid_terms
                     model: application
+                    name: report_change_terms
                     attribute: report_change_terms
       - section:
           lines:
@@ -163,8 +185,11 @@
                   - gutter: 12
                     type: checkbox
                     label: I Agree *
+                    value: true
+                    required: true
                     classNames: 'span-text'
                     model: application
+                    name: medicaid_insurance_collection_terms
                     attribute: medicaid_insurance_collection_terms
       - section:
           lines:
@@ -175,20 +200,22 @@
                 - gutter: 2
                   type: label_radio
                   name: row1
-                  value: 'yes1'
-                  id: 'yes1'
+                  value: false
+                  id: 'living_outside_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: application
+                  name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
                 - gutter: 2
                   type: label_radio
                   name: row1
-                  value: 'no1'
-                  id: 'no1'
+                  value: true
+                  id: 'living_outside_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: application
+                  name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
               - cells:
                   - gutter: 12
@@ -199,8 +226,10 @@
                   - gutter: 12
                     type: checkbox
                     label: I Agree *
+                    value: true
                     classNames: 'span-text'
                     model: application
+                    name: attestation_terms
                     attribute: attestation_terms
       - section:
           lines:
@@ -213,57 +242,9 @@
                   - gutter: 12
                     type: checkbox
                     label: I Agree *
+                    value: true
+                    required: true
                     classNames: 'span-text'
                     model: application
+                    name: submission_terms
                     attribute: submission_terms
-- step:
-    heading: Eligibility Results
-    heading_text: We have your results!
-    sections:
-      - section:
-          lines:
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: <strong> Medicaid </strong>
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: 'These people <strong> appear to be eligible </strong> for medicaid:'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: '<strong> NEXT STEP: The DC Department of Human Services(DHS) will make a final determination of Medicaid eligibility. </strong> We have forwarded your application to them. If you havnt heard from DHS after 2 weeks, you may need to check on the status of the final determination by calling us at (855) 532-5465'
-      - section:
-          lines:
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: <strong> Help Paying for Private Health Insurance </strong>
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: 'These people <strong> are eligible for savings of $137 per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance.
-                         <br>
-                         <br>
-                         <br>
-                         They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit'
-            - cells:
-                - gutter: 12
-                  type: raw_html
-                  text: "<strong> NEXT STEP: </strong> Pick a health insurance plan."
-      - section:
-          lines:
-            - cells:
-                - gutter: 6
-                  type: raw_html
-                  text: Download Application
-                - gutter: 6
-                  type: raw_html
-                  text: View Eligibility History
-                - gutter: 12
-                  type: raw_html
-                  text: '<br>If you do not agree with this determination, you have the right to appeal.
-                         <br>
-                         Find out more about the appeal process or get assistance by contacting us directly.
-                         Your application reference number is <strong> 190009446 </strong>'

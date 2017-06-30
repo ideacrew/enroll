@@ -171,7 +171,7 @@
                 - gutter: 1
                   type: label_radio
                   value: true
-                  id: 'yes2'
+                  id: 'is_post_partum_period_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: applicant
@@ -179,7 +179,7 @@
                 - gutter: 1
                   type: label_radio
                   value: false
-                  id: 'no2'
+                  id: 'is_post_partum_period_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: applicant
@@ -202,7 +202,7 @@
                 - gutter: 1
                   type: label_radio
                   value: true
-                  id: 'yes2'
+                  id: 'medicaid_pregnency_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: applicant
@@ -210,7 +210,7 @@
                 - gutter: 1
                   type: label_radio
                   value: false
-                  id: 'no2'
+                  id: 'medicaid_pregnency_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: applicant
@@ -223,7 +223,6 @@
                   type: label_radio
                   name: row2
                   value: true
-                  required: true
                   id: 'former_foster_care_yes'
                   label: 'Yes'
                   model: applicant
@@ -232,7 +231,6 @@
                   type: label_radio
                   name: row2
                   value: false
-                  required: true
                   id: 'former_foster_care_no'
                   label: 'No'
                   model: applicant
