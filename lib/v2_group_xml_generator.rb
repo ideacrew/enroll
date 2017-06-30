@@ -48,9 +48,9 @@ class V2GroupXmlGenerator
     @feins.uniq.each do |fein|
 
       begin
-        employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
+        employer_profile = Organization.where(:fein => fein).first.employer_profile
 
-        benefit_groups = employer_profile.plan_years.select(&:eligible_for_export?).select do |py|
+        benefit_groups = employer_profile.plan_years.select do |py|
           py.start_on == Date.parse(@plan_year[:start_date])
         end.flat_map(&:benefit_groups)
 

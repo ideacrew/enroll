@@ -536,12 +536,13 @@ class BenefitGroup
   end
 
   def participation_rate
+    total_employees = targeted_census_employees.count
+    return(0.0) if total_employees < 1
     waived_and_active_count = if plan_year.estimate_group_size?
                                 targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
                               else
                                 all_active_and_waived_health_enrollments.length
                               end
-    total_employees = targeted_census_employees.count
     waived_and_active_count/(total_employees * 1.0)
   end
 
