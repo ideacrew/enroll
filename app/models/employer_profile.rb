@@ -257,6 +257,10 @@ class EmployerProfile
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
+  def dt_display_plan_year
+    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
+  end
+
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
   end
