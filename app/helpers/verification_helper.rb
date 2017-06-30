@@ -78,7 +78,7 @@ module VerificationHelper
     end
   end
 
-  def max_verification_due_date_on_family(family)
+  def min_verification_due_date_on_family(family)
     due_dates = []
     contingent_enrolled_active_family_members(family).each do |family_member|
       family_member.person.verification_types.each do |v_type|
@@ -86,7 +86,7 @@ module VerificationHelper
       end
     end
     
-    due_dates.max.to_date
+    due_dates.min.to_date
   end
 
   def document_due_date(family_member, family, v_type)

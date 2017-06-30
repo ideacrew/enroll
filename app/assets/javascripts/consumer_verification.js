@@ -2,38 +2,48 @@ var Verification = (function(){
    var target_id = function(target){
        return target.replace("v-action-", "");
    };
-
-   function showUpdateType(target){
-       $('#'+target_id(target)).show();
+   function showVerifyType(target){
+       $('#'+target_id(target)).fadeIn('slow');
    }
-
-   function hideUpdateAction(target){
-       $('#'+target_id(target)).hide();
+   function showExtendType(target){
+       $('#'+target_id(target)+'-extend').fadeIn('slow');
    }
-
+   function hideAllActions(target){
+      hideVerifyAction(target);
+      hideExtendAction(target);
+   }
+   function hideVerifyAction(target){
+      $('#'+target_id(target)).hide();
+   }
+   function hideExtendAction(target){
+      $('#'+target_id(target)+'-extend').hide();
+   }
    function confirmVerificationType(){
-       $(this).closest('div').parent().fadeOut();
+      $(this).closest('div').parent().hide();
    }
-
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
 
-     if ($selected_el_val == 'Verify') {
-        showUpdateType($selected_id+"-"+$selected_el.val());
-        hideUpdateAction($selected_id+"-Extend");
-     } else if($selected_el_val == 'Extend'){
-        showUpdateType($selected_id+"-"+$selected_el.val());
-        hideUpdateAction($selected_id+"-Verify");
-     } else {
-      hideUpdateAction($selected_id+"-Verify");
-      hideUpdateAction($selected_id+"-Extend");
-     }
-   }
+    switch ($selected_el_val) {
+      case 'Verify':
+        hideAllActions($selected_id);
+        showVerifyType($selected_id);
+        break;
+
+      case 'Extend':
+        hideAllActions($selected_id);
+        showExtendType($selected_id);
+        break;
+
+      default:
+        hideAllActions($selected_id);
+    }
+    }
 
    return {
-       show_update: showUpdateType,
+       show_update: showVerifyType,
        check_selected_action: checkAction,
        confirm_v_type: confirmVerificationType
    }
