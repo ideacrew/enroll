@@ -79,8 +79,21 @@ module VerificationHelper
 
   def document_due_date(family_member, family, v_type)
     # populate special verifications on all people based on enrolled contingent enrollment special_verification_period
-    sv = family_member.person.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    sv.present? ? sv.due_date : TimeKeeper.date_of_record + 95.days
+    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    enrollment = enrolled_policy(family_member, family)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
+  end
+
+  def enrolled_policy(family_member, family)
+    family.active_household.hbx_enrollments.my_enrolled_plans.by_kind("individual").where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+  end
+
+  def verification_due_date_from_enrollment(enrollment)
+    if enrollment.special_verification_period
+      enrollment.special_verification_period.to_date
+    else
+      enrollment.submitted_at.to_date + 95.days
+    end
   end
 
   def documents_uploaded

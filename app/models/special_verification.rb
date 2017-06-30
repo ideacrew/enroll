@@ -2,7 +2,7 @@ class SpecialVerification
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :person
+  embedded_in :consumer_role
 
   field :due_date
   field :verification_type
