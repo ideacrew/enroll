@@ -7,7 +7,7 @@ Feature: Update APTC and CSR
         Given Hbx Admin exists
             When Hbx Admin logs on to the Hbx Portal
             Then Hbx Admin sees Families link
-            When Hbx Admin clicks on Families link
+            When Hbx Admin clicks on the Families tab
             Then Hbx Admin should see the list of primary applicants and an Action button
             When Hbx Admin clicks on the Action button
             Then Hbx Admin should not see an Edit APTC / CSR link
