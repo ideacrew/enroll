@@ -396,7 +396,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#ivl_enrolled_family_members", dbclean: :after_each do
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
-    let(:enrollment) { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+    let(:enrollment) { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: "enrolled_contingent")}
 
     before do
       family.family_members.each do |fm|
