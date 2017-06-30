@@ -2,7 +2,7 @@
 <h3 class="darkblue no-buffer"> Family Members </h3>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
-    <% ivl_enrolled_family_members(@family_members, @person.primary_family).each do |f_member| %>
+    <% contingent_enrolled_active_family_members(@person.primary_family).each do |f_member| %>
       <% person = f_member.person %>
       <div class="row">
         <div class="family-member col-md-12">

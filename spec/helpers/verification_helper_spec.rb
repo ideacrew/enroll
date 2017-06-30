@@ -394,7 +394,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
   end
 
-  describe "#ivl_enrolled_family_members", dbclean: :after_each do
+  describe "#contingent_enrolled_active_family_members", dbclean: :after_each do
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
     let(:enrollment) { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: "enrolled_contingent")}
 
@@ -406,21 +406,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
     it "should return the family members who had an enrolled plan" do
       result = enrollment.hbx_enrollment_members.map(&:family_member)
-      expect(helper.ivl_enrolled_family_members(family.family_members, family)).to eq result
+      expect(helper.contingent_enrolled_active_family_members(family)).to eq result
     end
 
     it "should not include the family members who are not enrolled in an ivl plan" do
       enrollment.hbx_enrollment_members.delete_if { |hem| !hem.is_subscriber}
       non_primary_family_members = family.family_members.select { |fm| !fm.is_primary_applicant}
       non_primary_family_members.each do |fm|
-        expect(helper.ivl_enrolled_family_members(family.family_members, family).include? fm).to eq false
+        expect(helper.contingent_enrolled_active_family_members(family).include? fm).to eq false
       end
     end
 
     it "should include the family members who are enrolled in an ivl plan" do
       enrollment.hbx_enrollment_members.delete_if { |hem| !hem.is_subscriber}
       primary_fm = family.family_members.select { |fm| fm.is_primary_applicant}.first
-      expect(helper.ivl_enrolled_family_members(family.family_members, family).include? primary_fm).to eq true
+      expect(helper.contingent_enrolled_active_family_members(family).include? primary_fm).to eq true
     end
   end
 end

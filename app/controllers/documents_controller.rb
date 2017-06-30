@@ -98,30 +98,12 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    # binding.pry
-    # family = Family.find(params[:family_id])
-    #   if family.any_unverified_enrollments?
-    #     if family.enrollments.verification_needed.first.special_verification_period
-    #       new_date = family.enrollments.verification_needed.first.special_verification_period += 30.days
-    #       family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => new_date)
-    #       flash[:success] = "Special verification period was extended for 30 days."
-    #     else
-    #       family.enrollments.verification_needed.first.update_attributes!(:special_verification_period => TimeKeeper.date_of_record + 30.days)
-    #       flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{family.active_household.hbx_enrollments.verification_needed.first.special_verification_period}"
-    #     end
-    #   else
-    #     flash[:danger] = "Family does not have any active Enrollment to extend verification due date."
-    #   end
-    # redirect_to :back
-
-
-
     family_member = FamilyMember.find(params[:family_member_id])
-    family = family_member.family
-    enrollment = family.active_household.hbx_enrollments.my_enrolled_plans.by_kind("individual").where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+    enrollment = family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
     if enrollment.present?
       if enrollment.special_verification_period
-        new_date = enrollment.special_verification_period += 30.days
+        sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => params[:verification_type]).order_by(:"created_at".desc).first
+        new_date = sv.present? ? (sv.due_date + 30.days) : (enrollment.special_verification_period + 30.days)
         flash[:success] = "Special verification period was extended for 30 days."
       else
         new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days

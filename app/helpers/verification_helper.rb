@@ -58,7 +58,8 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    family = person.primary_family
+    contingent_enrolled_active_family_members(family).any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
@@ -78,10 +79,8 @@ module VerificationHelper
   end
 
   def max_verification_due_date_on_family(family)
-    family.family_members.flat_map(&:person).map(&:consumer_role).map(&:special_verifications)
-
     due_dates = []
-    family.family_members.each do |family_member|
+    contingent_enrolled_active_family_members(family).each do |family_member|
       family_member.person.verification_types.each do |v_type|
         due_dates << document_due_date(family_member, family, v_type)
       end
@@ -91,7 +90,6 @@ module VerificationHelper
   end
 
   def document_due_date(family_member, family, v_type)
-    # populate special verifications on all people based on enrolled contingent enrollment special_verification_period
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
     enrollment = enrolled_policy(family_member, family)
     sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
@@ -205,10 +203,10 @@ module VerificationHelper
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
 
-  def ivl_enrolled_family_members(family_members, family)
+  def contingent_enrolled_active_family_members(family)
     enrolled_family_members = []
-    family_members.each do |family_member|
-      if family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).present?
+    family.family_members.active.each do |family_member|
+      if enrolled_policy(family_member, family).present?
         enrolled_family_members << family_member
       end
     end
