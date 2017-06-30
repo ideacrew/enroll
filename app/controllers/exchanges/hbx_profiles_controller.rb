@@ -218,6 +218,17 @@ def employer_poc
     @element_to_replace_id = params[:family_actions_id]
   end
 
+  def get_user_info
+    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    if params[:person_id].present?
+      @person = Person.find(params[:person_id])
+    else
+      @employer_actions = true
+      @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
+      @organization = Organization.find(@element_to_replace_id.split("_").last)
+    end
+  end
+
   def update_effective_date
     @qle = QualifyingLifeEventKind.find(params[:id])
     respond_to do |format|

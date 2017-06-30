@@ -334,10 +334,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
   renewal_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on, fte_count: 2, aasm_state: :renewing_draft
   renewal_benefit_group = FactoryGirl.create :benefit_group, plan_year: renewal_plan_year, reference_plan_id: renewal_plan.id
   employee.add_renew_benefit_group_assignment renewal_benefit_group
-
-  employee_role = FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)
-  employee.update_attributes(employee_role_id: employee_role.id)
-
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
