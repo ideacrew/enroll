@@ -109,12 +109,20 @@ $(document).ready(function() {
     }
   });
 
-  //TODO Update the selectric check
-  if($("#insurance_kind .label").val() == 'employer_sponsored_insurance'){
-    toggle_employer_contact_divs_benefit('show');
+  /* This is to show/hide ESI fields on Page Load. Will show ESI related
+   * fields if InsuranceKind is selected as 'employer_sponsored_insurance'
+   * when page loads (possible on a page reload due to validation error) */
+
+  var selectedVal = $('#benefit_insurance_kind').val();
+  if (selectedVal == 'employer_sponsored_insurance') {
+    setTimeout(function() {
+      toggle_employer_contact_divs_benefit('show');
+    },300);
   }
   else {
-    toggle_employer_contact_divs_benefit('hide');
+    setTimeout(function() {
+      toggle_employer_contact_divs_benefit('hide');
+    },300);
   };
 
   function toggle_employer_contact_divs_benefit(hide_show) {
