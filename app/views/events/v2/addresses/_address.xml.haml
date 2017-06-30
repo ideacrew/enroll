@@ -12,5 +12,6 @@
   %postal_code= address.zip_without_extension
   - unless address.zip_extension.blank?
     %location_postal_extension_code= address.zip_extension
+  %county_name= address.county
   %location_country_name=address.country_name
   %address_full_text=address.full_address
