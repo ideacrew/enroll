@@ -78,12 +78,12 @@ class ShopEmployerNotice < Notice
     if employer_profile.broker_agency_profile.present?
       broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
       broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
-      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name,broker_email).deliver_now
+      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
     end
     if employer_profile.general_agency_profile.present?
       ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
       ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
-      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email).deliver_now
+      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
     end
   end
 
