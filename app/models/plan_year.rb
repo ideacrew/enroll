@@ -827,7 +827,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_publish_pending, :after => :notify_employee_of_renewing_employer_ineligibility
+      transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
     # Returns plan to draft state (or) renewing draft for edit
@@ -848,7 +848,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_publish_pending
+      transitions from: :renewing_draft, to: :renewing_publish_pending, :after => :notify_employee_of_renewing_employer_ineligibility
     end
 
     # Employer requests review of invalid application determination
@@ -1065,9 +1065,11 @@ class PlanYear
 
   #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
   def notify_employee_of_renewing_employer_ineligibility
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || !application_eligibility_warnings.include?(:primary_office_location))
-    self.employer_profile.census_employees.non_terminated.each do |ce|
-      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if application_eligibility_warnings.include?(:primary_office_location)
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+      end
     end
   end
 
