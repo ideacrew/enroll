@@ -6,5 +6,5 @@ if ENV["COVERAGE"]
     end
   end
 
-  Rake::Task["parallel:specs"].enhance(["parallel:remove_coverage_files"])
+  Rake::Task["parallel:spec"].enhance(["parallel:remove_coverage_files"])
 end
