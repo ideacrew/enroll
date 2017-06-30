@@ -579,8 +579,7 @@ end
 When(/^(.*) creates an HBX account$/) do |named_person|
   screenshot("start")
   find(".btn[value='Create account']").click
-  #click_button 'Create account'
-  visit '/users/sign_up'
+
   person = people[named_person]
 
   fill_in "user[oim_id]", :with => person[:email]
