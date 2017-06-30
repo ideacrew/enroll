@@ -7,8 +7,6 @@ end
 
 When(/^Hbx Admin clicks on the Action button$/) do
   find(:xpath, '//*[@id="dropdownMenu1"]').click
-  # page.all('.dropdown-toggle').click
-  # click_button('Actions')
 end
 
 Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
