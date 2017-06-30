@@ -878,7 +878,7 @@ class PlanYear
 
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended], to: :terminated
+      transitions from: [:active, :suspended, :expired], to: :terminated
     end
 
     event :renew_plan_year, :after => :record_transition do
