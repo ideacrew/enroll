@@ -9,6 +9,8 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     @selectedTab = "taxInfo"
     @allTabs = NavigationHelper::getAllYmlTabs
     @applicant = @application.applicants.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def step

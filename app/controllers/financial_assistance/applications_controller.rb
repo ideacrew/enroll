@@ -26,6 +26,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def edit
     @family = current_user.person.primary_family
     @application = FinancialAssistance::Application.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def step
