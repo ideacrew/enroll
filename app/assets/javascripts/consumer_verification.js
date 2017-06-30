@@ -2,23 +2,33 @@ var Verification = (function(){
    var target_id = function(target){
        return target.replace("v-action-", "");
    };
+
    function showUpdateType(target){
-       $('#'+target_id(target)).fadeIn('slow');
+       $('#'+target_id(target)).show();
    }
+
    function hideUpdateAction(target){
-       $('#'+target_id(target)).fadeOut('slow');
+       $('#'+target_id(target)).hide();
    }
+
    function confirmVerificationType(){
        $(this).closest('div').parent().fadeOut();
    }
+
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
+
      if ($selected_el_val == 'Verify') {
-         showUpdateType($selected_id);
+        showUpdateType($selected_id+"-"+$selected_el.val());
+        hideUpdateAction($selected_id+"-Extend");
+     } else if($selected_el_val == 'Extend'){
+        showUpdateType($selected_id+"-"+$selected_el.val());
+        hideUpdateAction($selected_id+"-Verify");
      } else {
-         hideUpdateAction($selected_id);
+      hideUpdateAction($selected_id+"-Verify");
+      hideUpdateAction($selected_id+"-Extend");
      }
    }
 

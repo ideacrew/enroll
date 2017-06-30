@@ -77,10 +77,13 @@ class VlpDocument < Document
   ]
 
   # admin action list for verification process, dropdown for each verification type
-  ADMIN_VERIFICATION_ACTIONS = ["Verify", "Return for Deficiency", "Reject Document", "Clear Status", "View History", "Call HUB"]
+  ADMIN_VERIFICATION_ACTIONS = ["Verify", "Return for Deficiency", "Reject Document", "Clear Status", "View History", "Call HUB", "Extend"]
 
   # reasons admin can provide when verifying type
   VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+
+  # reasons admin can provide while extending due date
+  EXTENSION_REASONS = ["Reason1", "Reason2", "Reason3", "Reason4"]
 
   field :alien_number, type: String
   field :i94_number, type: String

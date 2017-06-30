@@ -77,6 +77,12 @@ module VerificationHelper
     end
   end
 
+  def document_due_date(family_member, family, v_type)
+    # populate special verifications on all people based on enrolled contingent enrollment special_verification_period
+    sv = family_member.person.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    sv.present? ? sv.due_date : TimeKeeper.date_of_record + 95.days
+  end
+
   def documents_uploaded
     @person.primary_family.active_family_members.all? { |member| docs_uploaded_for_all_types(member) }
   end
