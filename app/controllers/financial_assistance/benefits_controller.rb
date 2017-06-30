@@ -13,34 +13,30 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def step
+    flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
-
     @model.clean_conditional_params(params) if model_params.present?
-
     format_date_params model_params if model_params.present?
-
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
-
     update_employer_contact(@model, params) if @model.insurance_kind == "employer_sponsored_insurance"
 
     if params.key?(model_name)
-      @model.workflow = { current_step: @current_step.to_i + 1 }
-      @current_step = @current_step.next_step if @current_step.next_step.present?
-    else
-      @model.workflow = { current_step: @current_step.to_i }
-    end
-
-    begin
-      @model.save!
-      if params[:commit] == "Finish"
-        flash[:notice] = 'Benefit Info Added.'
-        redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+      if @model.save
+        @current_step = @current_step.next_step if @current_step.next_step.present?
+        if params[:commit] == "Finish"
+          @model.update_attributes!(workflow: { current_step: 1 })
+          flash[:notice] = 'Benefit Info Added.'
+          redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+        else
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          render 'workflow/step', layout: 'financial_assistance'
+        end
       else
+        flash[:error] = build_error_messages(@model)
         render 'workflow/step', layout: 'financial_assistance'
       end
-    rescue
-      flash[:error] = build_error_messages(@model)
+    else
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
