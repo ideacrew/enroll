@@ -61,7 +61,6 @@ class FinancialAssistance::Benefit
   
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
-  # validates :start_on, presence: true
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
@@ -143,7 +142,7 @@ private
 
   def presence_of_dates_if_enrolled
     if is_enrolled?
-      errors.add(:start_on, "If enrolled, must have start and end dates") if start_on.blank?
+      errors.add(:start_on, "must be present") if start_on.blank?
       start_on_must_precede_end_on(start_on, end_on)
     end
   end

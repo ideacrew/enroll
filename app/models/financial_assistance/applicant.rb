@@ -173,6 +173,7 @@ class FinancialAssistance::Applicant
   end
 
   def immigration_status?
+    person.citizen_status
   end
 
   def immigration_date?
@@ -180,20 +181,23 @@ class FinancialAssistance::Applicant
 
   #### Collect insurance from Benefit model
   def has_insurance?
+    benefits.present?
   end
 
   def had_prior_insurance?
   end
 
-  def prior_insurance_end_date?
+  def prior_insurance_end_date
   end
 
   def has_state_health_benefit?
+    benefits.where(insurance_kind: 'medicaid').present?
   end
 
   # Has access to employer-sponsored coverage that meets ACA minimum standard value and
   #   employee responsible premium amount is <= 9.5% of Household income
   def has_employer_sponsored_coverage?
+    benefits.where(insurance_kind: 'employer_sponsored_insurance').present?
   end
 
   def is_without_assistance?
