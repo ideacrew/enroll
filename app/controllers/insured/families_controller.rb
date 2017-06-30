@@ -7,6 +7,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
     authorize @family, :show?
@@ -75,7 +76,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -149,11 +149,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase
