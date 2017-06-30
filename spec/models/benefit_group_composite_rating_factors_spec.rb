@@ -126,7 +126,7 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
     let(:plan_year_should_estimate) { true }
 
     before(:each) do
-      allow(EmployerParticipationRateRatingFactorSet).to receive(:value_for).with(carrier_profile_id, 2015, be_within(0.01).of(0.66)).and_return(1.0)
+      allow(EmployerParticipationRateRatingFactorSet).to receive(:value_for).with(carrier_profile_id, 2015, be_within(0.01).of(66.666)).and_return(1.0)
     end
 
     it "provides a factor of 1.0" do
@@ -139,7 +139,7 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
 
     before(:each) do
     allow(BenefitGroupAssignment).to receive(:by_benefit_group_id).with(subject.id).and_return([benefit_group_assignment_1, benefit_group_assignment_2])
-      allow(EmployerParticipationRateRatingFactorSet).to receive(:value_for).with(carrier_profile_id, 2015, be_within(0.01).of(0.66)).and_return(1.0)
+      allow(EmployerParticipationRateRatingFactorSet).to receive(:value_for).with(carrier_profile_id, 2015, be_within(0.01).of(66.666)).and_return(1.0)
     end
 
     it "provides a factor of 1.0" do

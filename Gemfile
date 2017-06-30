@@ -147,6 +147,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'simplecov', '0.14.1', :require => false
   gem 'mongoid-rspec', '3.0.0'
   gem 'watir'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
