@@ -8,7 +8,19 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Payment dEADLINE: <PLAN EFFECTIVE DATE> - YOUR HEALTH PLAN</h3></td>
+      <td><h3>PAYMENT DEADLINE: <PLAN EFFECTIVE DATE> - YOUR HEALTH PLAN</h3></td>
+    </tr>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: <PLAN EFFECTIVE DATE> - YOUR HEALTH AND DENTAL PLAN</h3></td>
+    </tr>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: <PLAN EFFECTIVE DATE> - YOUR HEALTH PLAN AND COST SAVINGS</h3></td>
+    </tr>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: <PLAN EFFECTIVE DATE> - YOUR HEALTH PLAN, COST SAVINGS, AND DENTAL PLAN</h3></td>
+    </tr>
+    <tr>
+      <td><h3>PAYMENT DEADLINE: <PLAN EFFECTIVE DATE> - YOUR DENTAL PLAN</h3></td>
     </tr>
   </tbody>
 </table>
@@ -16,51 +28,30 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.primary_fullname %>:  </td>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_fullname %>:  </td>
     </tr>
   </tbody>
 </table>
-<br>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "You recently signed up for insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the <coverage year> coverage year."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "You recently signed up for insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the <coverage year> coverage year."} %>
-
+<!-- <br> -->
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by <plan effective date>. All of your premium payments must be made by the first of the month."],
    heading: 'Here’s What You Need to Do Now', sub_heading: 'Make Your First Payment'} %>
 
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 0px;">
-          Make your premium payment directly to the insurance company - not DC Health Link.
-        </li>
-        <li style="margin-top: 5px;">
-          We’ve included information in this letter on the amount you owe, and how to make your payment.
-        </li>
-        <li style="margin-top: 5px;">
-          If you don’t make your payments on time, you could lose your insurance.
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "You recently signed up for insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the <coverage year> coverage year."} %>
+ content: "Send Us Documents"} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. The deadline to return them is <Document Due Date>. You could lose your insurance or cost savings if you don’t return them by the deadline.",
   listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["On <date of plan selection>, you enrolled the people listed in the plan(s) shown below:"],
+ contents: ["On #{TimeKeeper.date_of_record}, you enrolled the people listed in the plan(s) shown below:"],
    heading: 'Your Plan', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/info_table', locals: {
@@ -106,6 +97,12 @@
     </tr>
   </table>
 
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for <coverage year> to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "How to Pay Your Monthly Premium"} %>
+
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment.",
   listings: ["You should receive a bill from your insurance company 7-10 days from now. Your bill tells you how to make your monthly payments.",
@@ -121,18 +118,16 @@
    heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "Types of cost-sharing include:"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
  content: "<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible.<br>
 <strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit).<br>
 <strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200).<br>
 <strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Likely Qualify for Medicaid:",
-  listings: ["Person 1            Age: 35",
-             "Person 2            Age: 56"]} %>
-
-<%= render partial: 'notices/shared/custom_listing', locals: {
-  listing: "<strong>What you need to do next:</strong> You don’t need to do anything right now. The DC Department of Human Services (DHS) has your application. They will make a final decision on whether those listed qualify for Medicaid. They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS by #{TimeKeeper.date_of_record+14.days}, you may want to ask for an update by calling us at #{Settings.contact_center.phone_number}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "You chose a plan with extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. [All Recipients]You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at dchealthlink.com."} %>
@@ -140,41 +135,12 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:"],
-   heading: 'Reporting Life Changes or Making Changes to Your Plan', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Reporting Life Changes or Making Changes to Your Plan"} %>
 
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li style="margin-top: 0px;">
-          You move
-        </li>
-        <li style="margin-top: 5px;">
-          Your estimated income goes up or down by $150 or more per month ($1,800 annually)
-        </li>
-        <li style="margin-top: 5px;">
-          You become eligible for Medicaid, an employer health plan, or other health insurance
-        </li>
-        <li style="margin-top: 5px;">
-          The size of your household changes (for example, marriage, divorce, having a baby, adoption)
-        </li>
-        <li style="margin-top: 5px;">
-          Your immigration status changes
-        </li>
-        <li style="margin-top: 5px;">
-          Your tax filing plans for <coverage year> change (for example, you’re married and file jointly but now plan to file separately)
-        </li>
-        <li style="margin-top: 5px;">
-          You’re going to jail or prison
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:",
+  listings: ["You move","Your estimated income goes up or down by $150 or more per month ($1,800 annually)","You become eligible for Medicaid, an employer health plan, or other health insurance","The size of your household changes (for example, marriage, divorce, having a baby, adoption)","Your immigration status changes","Your tax filing plans for <coverage year> change (for example, you’re married and file jointly but now plan to file separately)","You’re going to jail or prison"]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through DC Health Link. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
@@ -196,18 +162,30 @@ content: "If you end your plan, you also won’t be able to sign up again until 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>Remember, you must pay your monthly premium by <plan effective date> to start and keep your insurance.</strong>"} %>
 
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>  And don’t forget, the deadline to return the documents we need from you is <Document Due Date></strong>. If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
-content: "Legal Reference: The following laws, regulations and rules apply to this letter:<br>
-Eligibility standards:  45 CFR §155.305<br>
-Social Security Number requests/use:  45 CFR §155.305(f)(6)<br>
-Eligibility process:  45 CFR §155.310<br>
-Eligibility for enrollment in a qualified health plan:  45 CFR §155.315<br>
-Document requests:  45 CFR §155.315(f)(2)(ii)<br>
-Eligibility verification process for insurance affordability programs:  45 CFR §155.320<br>
-Annual open enrollment period:  45 CFR §155.410(e)<br>
-Special enrollment periods: 45 CFR §155.420<br>
-Voluntary termination of health plan: 45 CFR §155.430(b)(1)<br>
-Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)<br>"} %>
+contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+"Eligibility standards: 45 CFR §155.305",
+"Eligibility process: 45 CFR §155.310",
+"Annual open enrollment period: 45 CFR §155.410(e)",
+"Special enrollment periods: 45 CFR §155.420",
+"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)]"]} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+"Eligibility standards:  45 CFR §155.305",
+"Social Security Number requests/use:  45 CFR §155.305(f)(6)",
+"Eligibility process:  45 CFR §155.310",
+"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+"Document requests:  45 CFR §155.315(f)(2)(ii)",
+"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+"Annual open enrollment period:  45 CFR §155.410(e)",
+"Special enrollment periods: 45 CFR §155.420",
+"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
