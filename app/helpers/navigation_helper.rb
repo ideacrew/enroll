@@ -11,13 +11,16 @@ module NavigationHelper
   end
 
   def nav_for_applicants
-    classes = 'activer list-box step-tabs'
     @application.applicants.inject(raw('')) do |list, applicant|
+      if applicant.applicant_validation_complete?
+        classes = 'activer list-box step-tabs'
+      else
+        classes = 'list-box step-tabs'
+      end
+
       list += content_tag :li, class: classes do
         link_to(applicant.person.first_name, edit_financial_assistance_application_applicant_path(@application, applicant))
       end
-      classes = 'list-box step-tabs' if applicant == @applicant
-      list
     end
   end
 end
