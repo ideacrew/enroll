@@ -404,6 +404,15 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+      transitions from: :verification_period_ended, to: :verification_outstanding
+    end
+
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
@@ -688,6 +697,7 @@ class ConsumerRole
       lawful_presence_determination.deny!(verification_attr(authority.first))
       update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
     end
+    reject!(verification_attr(authority.first))
     "#{v_type} was returned for deficiency."
   end
 
