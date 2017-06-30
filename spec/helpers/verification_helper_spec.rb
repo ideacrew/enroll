@@ -194,15 +194,19 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe "#enrollment_group_verified?" do
+  describe "#enrollment_group_unverified?" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    before do
+      allow_any_instance_of(Person).to receive_message_chain("primary_family").and_return(family)
+      allow(helper).to receive(:contingent_enrolled_active_family_members).with(family).and_return family.family_members
+    end
     it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.aasm_state="verification_outstanding"
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
@@ -211,30 +215,7 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq false
-    end
-  end
-
-  describe "#verification due date" do
-    let(:family) { FactoryGirl.build(:family) }
-    let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
-    let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
-    before :each do
-      assign(:family, family)
-    end
-    context "for special verification period" do
-      it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
-        expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
-      end
-    end
-
-    context "with no special verification period" do
-      it "calls determine due date method" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
-        expect((helper.verification_due_date(family))).to eq TimeKeeper.date_of_record + 95.days
-      end
     end
   end
 
@@ -394,13 +375,59 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
   end
 
+  describe "#document_due_date", dbclean: :after_each do
+    context "when special verifications exists" do
+      let(:special_verification) { FactoryGirl.create(:special_verification)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
+      
+      it "should return the due date on the related latest special verification" do
+        expect(helper.document_due_date(family.primary_family_member, family, special_verification.verification_type)).to eq special_verification.due_date.to_date
+      end
+    end
+
+    context "when special verifications not exist" do
+
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+
+      context "when the family member had an 'enrolled_contingent' policy" do
+        
+        let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")} 
+        
+        before do
+          fm = family.primary_family_member
+          enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
+        end
+        it "should return the special_verification_period on the enrollment if it exists" do
+          enrollment.special_verification_period = TimeKeeper.date_of_record + 45.days
+          enrollment.save!
+          expect(helper.document_due_date(family.primary_family_member, family, "Citizenship")).to eq enrollment.special_verification_period.to_date
+        end
+
+        it "should return the submitted at date + 95 days if special_verification_period on the enrollment is nil" do
+          enrollment.special_verification_period = nil
+          enrollment.save
+          expect(helper.document_due_date(family.primary_family_member, family, "Citizenship")).to eq enrollment.submitted_at.to_date + 95.days
+        end
+      end
+
+      context "when the family member had no policy" do
+        it "should return the today date + 95 days" do
+          expect(helper.document_due_date(family.primary_family_member, family, "Citizenship")).to eq TimeKeeper.date_of_record.to_date + 95.days
+        end
+      end
+    end
+  end
+
   describe "#contingent_enrolled_active_family_members", dbclean: :after_each do
     let(:family) { FactoryGirl.build(:family, :with_primary_family_member_and_dependent)}
     let(:enrollment) { FactoryGirl.build(:hbx_enrollment, :individual_unassisted, household: family.active_household, aasm_state: "enrolled_contingent")}
 
     before do
       family.family_members.each do |fm|
+        fm.is_active = true
         enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
+        fm.save
       end
       enrollment.save
     end
