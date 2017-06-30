@@ -2,16 +2,6 @@
   %benefit_id= benefit.id
   - if benefit.title 
     %title= benefit.title
-  %is_enrolled= benefit.is_enrolled
-  - if benefit.enrolled_start_on
-    %enrolled_start_on= simple_date_for(benefit.enrolled_start_on)
-  - if benefit.enrolled_end_on
-    %enrolled_end_on= simple_date_for(benefit.enrolled_end_on)
-  %is_eligible= benefit.is_eligible
-  - if benefit.eligible_start_on
-    %eligible_start_on= simple_date_for(benefit.eligible_start_on)
-  - if benefit.eligible_end_on
-    %eligible_end_on= simple_date_for(benefit.eligible_end_on)
   %benefit_type= "urn:openhbx:terms:v1:financial_assistance_benefit##{benefit.kind}"
   - if benefit.employer_name
     %employer_name= benefit.employer_name
