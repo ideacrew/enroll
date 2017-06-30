@@ -208,7 +208,7 @@ module VerificationHelper
   def ivl_enrolled_family_members(family_members, family)
     enrolled_family_members = []
     family_members.each do |family_member|
-      if family.active_household.hbx_enrollments.my_enrolled_plans.by_kind("individual").where(:"hbx_enrollment_members.applicant_id" => family_member.id).present?
+      if family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).present?
         enrolled_family_members << family_member
       end
     end
