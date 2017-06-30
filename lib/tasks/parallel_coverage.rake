@@ -5,4 +5,6 @@ if ENV["COVERAGE"]
       FileUtils.remove_dir(File.expand_path(File.join(Rails.root, "coverage")), true)
     end
   end
+
+  Rake::Task["parallel:specs"].enhance(["parallel:remove_coverage_files"])
 end
