@@ -9,4 +9,15 @@ module NavigationHelper
   def self.getAllYmlTabs
     YML_TABS_WITH_TITLE.map {|tab, tabValue| {"title" => tabValue["title"], "id"=> tabValue["id"], "link"=>tabValue["link"]}}
   end
+
+  def nav_for_applicants
+    classes = 'activer list-box step-tabs'
+    @application.applicants.inject(raw('')) do |list, applicant|
+      list += content_tag :li, class: classes do
+        link_to(applicant.person.first_name, edit_financial_assistance_application_applicant_path(@application, applicant))
+      end
+      classes = 'list-box step-tabs' if applicant == @applicant
+      list
+    end
+  end
 end
