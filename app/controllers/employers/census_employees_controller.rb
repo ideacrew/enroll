@@ -1,4 +1,4 @@
-class Employers::CensusEmployeesController < ApplicationController
+  class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
@@ -249,6 +249,19 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+  end
+
+  def contact_admin
+    @inbox_provider = HbxProfile.current_hbx 
+    @inbox_provider_name = @inbox_provider.legal_name
+    @new_message = @inbox_provider.inbox.messages.build
+    @profile = @employer_profile
+
+    if params[:modal].present?
+      respond_to do |format|
+        format.js { render "employers/census_employees/contact_admin" }
+      end
+    end
   end
 
   private

@@ -32,6 +32,8 @@ class EmployerProfile
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
+  field :allow_non_ssn_employee, type: Boolean, default: false
+
 
   field :profile_source, type: String, default: "self_serve"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }

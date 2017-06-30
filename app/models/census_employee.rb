@@ -26,6 +26,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
+  field :allow_blank_ssn, type: Boolean, default: false
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId

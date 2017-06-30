@@ -119,6 +119,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
       when 'employees'
+       @inbox_provider = HbxProfile.current_hbx 
+       @inbox_provider_name = @inbox_provider.legal_name
+       @new_message = @inbox_provider.inbox.messages.build
+       @profile = @employer_profile
+
+
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
       when 'brokers'

@@ -291,6 +291,9 @@ Rails.application.routes.draw do
         get :cobra
         get :cobra_reinstate
         get :benefit_group, on: :member
+        collection do 
+          get :contact_admin
+        end
       end
     end
   end
