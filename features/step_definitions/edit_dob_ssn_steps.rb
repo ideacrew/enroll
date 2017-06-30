@@ -6,7 +6,8 @@ Then(/^Hbx Admin should see the list of primary applicants and an Action button$
 end
 
 When(/^Hbx Admin clicks on the Action button$/) do
-  page.all('.dropdown-toggle')[1].click
+  find(:xpath, '//*[@id="dropdownMenu1"]').click
+  # page.all('.dropdown-toggle').click
   # click_button('Actions')
 end
 
