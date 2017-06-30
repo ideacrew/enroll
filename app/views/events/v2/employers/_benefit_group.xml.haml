@@ -1,5 +1,10 @@
 %benefit_group
+  %id= benefit_group.id
   %name= benefit_group.title
+  %group_size= benefit_group.group_size_count
+  -binding.pry
+  - if multiple_market_rating_areas?
+    %rating_area= benefit_group.rating_area
   %elected_plans
     = render :partial => "events/v2/employers/elected_plan", :collection => elected_plans
   -#%federal_contributions= " " field not available in benefit group modal
