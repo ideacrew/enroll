@@ -4,6 +4,8 @@ class EmployerParticipationRateRatingFactorSet < RatingFactorSet
     record.lookup(val)
   end
 
+  # Expects a number out of 100, NOT a fraction.
+  # 97.1234 is OK, 0.971234 is NOT
   def lookup(val)
     rounded_value = val.respond_to?(:round) ? val.round : val
     transformed_value = (rounded_value < 1) ? 1 : rounded_value
