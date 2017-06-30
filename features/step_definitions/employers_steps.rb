@@ -469,20 +469,21 @@ end
 And /^clicks on terminate employee$/ do
   expect(page).to have_content 'Employee Roster'
   employees.first
-  first(".fa-trash-o").click
+  first(".dropdown").click
+  first("a.interaction-click-control-terminate").click
+  wait_for_ajax(2,2)
+
   terminate_date = (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y")
   page.execute_script("$('.date-picker').val(\'#{terminate_date}\')")
-  find('.interaction-click-control-terminate-employee').click
   expect(page).to have_content 'Employee Roster'
-  wait_for_ajax(2,2)
+  first("a.delete_confirm").trigger('click')
+  wait_for_ajax(3,2)
 end
 
 Then /^employer clicks on terminated filter$/ do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
-  find('.filter').click
+  find_by_id('Tab:terminated').click
   wait_for_ajax
-  page.execute_script("$('.filter-options').show();")
-  find("#terminated_yes").trigger('click')
 end
 
 Then /^employer sees termination date column$/ do
@@ -685,12 +686,11 @@ Then(/^Employer should see Action Needed under document/) do
 end
 
 And(/^the employer clicks document name/) do
-  find(:xpath,"//*[@id='effective_datatable_wrapper']/div/div/div[3]/div/table/tbody/tr[1]/td[4]/a").trigger('click')
+  find(:xpath,"//*[@id='effective_datatable_wrapper']/div/div/div[3]/div/table/tbody/tr[1]/td[3]/a").click
 end
 
 Then(/^the employer should see Download,Cancel,Print Option/) do
   wait_for_ajax
-  expect(page).to have_content('Cancel')
   expect(page).to have_content('Download')
   expect(page).to have_content('Print')
 end
