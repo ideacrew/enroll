@@ -1,20 +1,5 @@
-<div class="row">
-  <div class="col-xs-6">
-    <h4>
-      <% if enrollment_group_unverified?(@person) && verification_needed?(@person) %>
-          Document Due Date:&nbsp;&nbsp;
-          <% if verification_due_date(@family) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= verification_due_date(@person.primary_family) %> (Past Due)</span>
-          <% else %>
-              <span class="label label-warning"><%= verification_due_date(@person.primary_family) %></span>
-          <% end %>
-      <% end %>
-    </h4>
-  </div>
-</div>
-
 <!--  **** Verification Page redesign #13324  ****  -->
-
+<h3 class="darkblue no-buffer"> Family Members </h3>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% ivl_enrolled_family_members(@family_members, @person.primary_family).each do |f_member| %>

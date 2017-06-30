@@ -122,19 +122,18 @@ class DocumentsController < ApplicationController
     if enrollment.present?
       if enrollment.special_verification_period
         new_date = enrollment.special_verification_period += 30.days
-        # enrollment.verification_doc_extension << {due_date: new_date, verification_type: params[:verification_type], reason: params[:extension_reason], updated_by: current_user.id}
         flash[:success] = "Special verification period was extended for 30 days."
       else
-        new_date = TimeKeeper.date_of_record + 30.days
-        # enrollment.verification_doc_extension << {due_date: TimeKeeper.date_of_record + 30.days, verification_type: params[:verification_type], reason: params[:extension_reason], updated_by: current_user.id}
+        new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
         flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
       end
-      # we can get rid of this enrollment section completely
-      enrollment.update_attributes!(:special_verification_period => new_date)
+      # special_verification_period is the day we send notices
+      # enrollment.update_attributes!(:special_verification_period => new_date)
       sv = SpecialVerification.new(due_date: new_date, verification_type: params[:verification_type], extension_reason: params[:extension_reason], updated_by: current_user.id)
       family_member.person.consumer_role.special_verifications << sv
       family_member.person.consumer_role.save!
     else
+      # How did this get to here!!!
       flash[:danger] = "Family Member does not have any active Enrollment to extend verification due date."
     end
     redirect_to :back
