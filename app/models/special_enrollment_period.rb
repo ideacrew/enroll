@@ -8,7 +8,7 @@ class SpecialEnrollmentPeriod
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 
   # for employee gaining medicare qle
-  attr_accessor :selected_effective_on
+  attr_accessor :selected_effective_on, :change_plan_type
 
   field :qualifying_life_event_kind_id, type: BSON::ObjectId
 
@@ -233,7 +233,11 @@ private
 
   def first_of_next_month_effective_date_for_shop
     if @earliest_effective_date == @earliest_effective_date.beginning_of_month
-      @earliest_effective_date
+      if change_plan_type == 'Married'
+        @earliest_effective_date.end_of_month + 1.day
+      else
+        @earliest_effective_date
+      end
     else
       @earliest_effective_date.end_of_month + 1.day
     end
