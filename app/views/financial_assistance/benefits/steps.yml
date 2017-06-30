@@ -7,29 +7,29 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Is this person currently enrolled in health coverage ? *
+                  text: Are you adding a health coverage that you are enrolled in or eligible for ? *
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: person_enrolled
-                  value: true
+                  value: is_eligible
                   required: true
-                  id: 'is_enrolled_yes2'
+                  id: 'is_eligible'
                   model: benefit
-                  attribute: is_enrolled
+                  attribute: kind
                   # checked: true
-                  label: 'Yes'
+                  label: 'Eligible'
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
                   name: person_enrolled
-                  value: false
+                  value: is_enrolled
                   required: true
-                  id: 'is_enrolled_no2'
+                  id: 'is_enrolled'
                   model: benefit
-                  attribute: is_enrolled
+                  attribute: kind
                   # checked: false
-                  label: 'No'
+                  label: 'Enrolled'
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
@@ -37,78 +37,21 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_enrolled
-            # - cells:
-            #     - gutter: 6
-            #       type: text
-            #       text: Where can this person access coverage?*
-            #       required: true
-            #     - gutter: 6
-            #       type: 'dropdown'
-            #       name: kind
-            #       required: true
-            #       values:
-            #         - employer_sponsored_insurance
-            #         - cobra
-            #         - private_individual_and_family_coverage
-            #         - medicaid
-            #         - child_health_insurance_plan
-            #         - medicare
-            #         - tricare
-            #         - veterans_administration_health_benefits
-            #         - peace_corps_health_benefits
-            #       model: benefit
-            #       attribute: kind
             - cells:
                 - gutter: 3
                   type: input_date
                   placeholder: Start On *
                   # required: true
+                  id: 'start_on'
                   model: benefit
-                  attribute: enrolled_start_on
+                  attribute: start_on
                 - gutter: 3
                   type: input_date
-                  placeholder: End On *
+                  placeholder: End On
                   # required: true
+                  id: 'end_on'
                   model: benefit
-                  attribute: enrolled_end_on
-# - step:
-#     sections:
-#       - section:
-#           heading: Other Health Coverage for Mary
-#           heading_text: Please complete all other health coverage info for Mary. To go to a different member of your household, Select 'Back to All Applciations'. When youve finished, select CONTINUE.
-#           lines:
-            - cells:
-                - gutter: 6
-                  type: text
-                  text: Does this person currently have access to other health coverage, including through another person in your household ? *
-                  classNames: 'span-text'
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: true
-                  required: true
-                  id: 'is_eligible_yes2'
-                  # checked: true
-                  label: 'Yes'
-                  model: benefit
-                  attribute: is_eligible
-                - gutter: 1
-                  type: label_radio
-                  name: row2
-                  value: false
-                  required: true
-                  id: 'is_eligible_no2'
-                  # checked: false
-                  label: 'No'
-                  classNames: 'span-text'
-                  model: benefit
-                  attribute: is_eligible
-                - gutter: 4
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
-                  model: benefit
-                  attribute: is_eligible
+                  attribute: end_on
             - cells:
                 - gutter: 6
                   type: text
@@ -119,36 +62,39 @@
                   name: ''
                   # required: true
                   values:
-                    - employer_sponsored_insurance
-                    - cobra
-                    - private_individual_and_family_coverage
-                    - medicaid
+                    - acf_refugee_medical_assistance
+                    - americorps_health_benefits
                     - child_health_insurance_plan
+                    - medicaid
                     - medicare
+                    - medicare_advantage
+                    - medicare_part_b
+                    - private_individual_and_family_coverage
+                    - state_supplementary_payment
                     - tricare
+                    - veterans_benefits
+                    - naf_health_benefit_program
+                    - health_care_for_peace_corp_volunteers
+                    - state_supplementary_payment
+                    - department_of_defense_non_appropriated_health_benefits
+                    - cobra
+                    - employer_sponsored_insurance
+                    - self_funded_student_health_coverage
+                    - foreign_government_health_coverage
+                    - private_health_insurance_plan
+                    - coverage_obtained_through_another_exchange
+                    - coverage_under_the_state_health_benefits_risk_pool
                     - veterans_administration_health_benefits
                     - peace_corps_health_benefits
-                  id: 'kind_dropdown'
+                  id: 'insurance_kind'
                   model: benefit
-                  attribute: kind
-            - cells:
-                - gutter: 3
-                  type: input_date
-                  placeholder: Start On *
-                  # required: true
-                  model: benefit
-                  attribute: eligible_start_on
-                - gutter: 3
-                  type: input_date
-                  placeholder: End On *
-                  # required: true
-                  model: benefit
-                  attribute: eligible_end_on
+                  attribute: insurance_kind
             - cells:
                 - gutter: 6
                   type: 'dropdown'
                   name: who_can_be_covered?
                   # required: true
+                  id: 'esi_covered'
                   values:
                     - employee and spouse
                   model: benefit
@@ -164,6 +110,7 @@
                   name: employer_name
                   placeholder: EMPLOYER NAME *
                   # required: true
+                  id: 'employer_name'
                   model: benefit
                   attribute: employer_name
             - cells:
@@ -172,6 +119,7 @@
                   name: employer_address_line_1
                   placeholder: EMPLOYER ADDRESS  Line 1 *
                   # required: true
+                  id: 'add1'
                   model: employer_address
                   accessor:
                     - employer_address
@@ -181,6 +129,7 @@
                   name: employer_address_line_2
                   placeholder: EMPLOYER ADDRESS Line 2(APT, UNIT, ETC)
                   # required: true
+                  id: 'add2'
                   model: employer_address
                   accessor:
                     - employer_address
@@ -191,14 +140,16 @@
                   name: city
                   placeholder: CITY*
                   # required: true
+                  id: 'city'
                   model: employer_address
                   accessor:
                     - employer_address
                   attribute: city
                 - gutter: 3
                   type: 'dropdown'
-                  name: 'check'
+                  name: 'STATE'
                   # required: true
+                  id: 'state'
                   values:
                     - Choose State
                     - AL
@@ -260,6 +211,7 @@
                   name: zip
                   placeholder: ZIP *
                   # required: true
+                  id: 'zip'
                   model: employer_address
                   accessor:
                     - employer_address
@@ -271,6 +223,7 @@
                   placeholder: EMPLOYER PHONE
                   # required: true
                   model: employer_phone
+                  id: 'phone'
                   accessor:
                     - employer_phone
                   attribute: full_phone_number
@@ -279,6 +232,7 @@
                   name: employer_indentification_no.
                   placeholder: EMPLOYER IDENTIFICATION NO.(EIN)
                   # required: true
+                  id: 'fein'
                   model: benefit
                   attribute: employer_id
             - cells:
@@ -288,13 +242,12 @@
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
-                  # name: is_eligible
                   value: true
                   id: 'yes2'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: benefit
-                  # attribute: is_eligible
+                  attribute: is_esi_waiting_period
                 - gutter: 1
                   type: label_radio
                   name: is_eligible
@@ -303,7 +256,7 @@
                   label: 'No'
                   classNames: 'span-text'
                   model: benefit
-                  # attribute: is_eligible
+                  attribute: is_esi_waiting_period
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -319,7 +272,7 @@
                   value: true
                   id: 'yes2'
                   model: benefit
-                  attribute: is_employer_sponsored
+                  attribute: is_esi_mec_met
                   label: 'Yes'
                   classNames: 'span-text'
                 - gutter: 1
@@ -330,7 +283,7 @@
                   label: 'No'
                   classNames: 'span-text'
                   model: benefit
-                  attribute: is_employer_sponsored
+                  attribute: is_esi_mec_met
                 - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
@@ -350,12 +303,14 @@
                   name: amount
                   placeholder: AMOUNT*
                   # required: true
+                  id: 'amount'
                   model: benefit
                   attribute: employee_cost
                 - gutter: 6
                   type: 'dropdown'
-                  name: frequency
+                  name: 'FREQUENCY'
                   # required: true
+                  id: 'frequency'
                   values:
                     - biweekly 
                     - daily 

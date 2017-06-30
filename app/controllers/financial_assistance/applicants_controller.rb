@@ -36,7 +36,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
     begin
       @model.save!(context: :submission) if model_params[:is_pregnant].present?
-      @model.save!
+      @model.save! unless model_params[:is_pregnant].present?
 
       if params[:commit] == "Finish"
         redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
@@ -48,7 +48,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
-
 
   private
 

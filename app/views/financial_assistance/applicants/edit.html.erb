@@ -50,11 +50,13 @@
 		<h4>Edit Existing Benefit(s)</h4>
 		<table class="table">
 			<th>Benefit Type</th>
+			<th>Benefit Insurance Type</th>
 			<th></th>
 			<th></th>
 			<% @applicant.benefits.each do |benefit| %>
 			<tr>
-				<td><%=benefit.kind.present? ? benefit.kind : "Enrolled Benefit" %></td>
+				<td><%= benefit.kind.split('_').second.capitalize!%></td>
+				<td><%= benefit.insurance_kind.titleize %></td>
 				<td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-small btn-success" %></td>
 				<td><%= link_to "Delete", financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
 			</tr>

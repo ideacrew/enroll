@@ -48,7 +48,6 @@ class FinancialAssistance::Applicant
   field :has_fixed_address, type: Boolean, default: true
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
-  field :has_insurance, type: Boolean # not eligible and not enrolled in any other Health Coverage / Benefits
 
   field :is_required_to_file_taxes, type: Boolean, default: true
   field :tax_filer_kind, type: String, default: "tax_filer"
@@ -115,9 +114,9 @@ class FinancialAssistance::Applicant
 
   field :workflow, type: Hash, default: { }
   
-  embeds_many :incomes,     inverse_of: :income,     class_name: "::FinancialAssistance::Income"
-  embeds_many :deductions,  inverse_of: :deduction,  class_name: "::FinancialAssistance::Deduction"
-  embeds_many :benefits,    inverse_of: :benefit,    class_name: "::FinancialAssistance::Benefit"
+  embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
+  embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
+  embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
