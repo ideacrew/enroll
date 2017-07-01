@@ -13,24 +13,5 @@
         <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
       </div>
     <%end%>
-    </div>
-    </div>
-
-    <div class="row">
-    <div class="verification-update-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-extend"%>>
-    <div class="col-md-6">
-      Provide Extension reason:
-    </div>
-    <%= form_tag extend_due_date_documents_path, method: :put do %>
-      <%= hidden_field_tag 'person_id', person.id  %>
-      <%= hidden_field_tag 'verification_type', v_type%>
-      <%= hidden_field_tag 'family_member_id', f_member.id %>
-      <div class="form-group col-md-3">
-        <%= select_tag :extension_reason, options_for_select(::VlpDocument::EXTENSION_REASONS), {prompt: ' Select Reason', required: true}%>
-      </div>
-      <div class="col-md-3">
-        <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
-      </div>
-    <%end%>
   </div>
 </div>

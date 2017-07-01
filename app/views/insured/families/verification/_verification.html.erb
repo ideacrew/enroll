@@ -44,7 +44,7 @@
                     </div>
                     <% if current_user.has_hbx_staff_role? %>
                         <div class="v-type-actions col-md-2">
-                          <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                          <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", class: "fmv_#{f_member.id}-#{v_type}_fmv",prompt: 'Action'} %>
                         </div>
                     <% end %>
                   </div>
@@ -52,6 +52,9 @@
                 <% if current_user.has_hbx_staff_role? %>
                   <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, v_type: v_type, f_member: f_member} %>
                 <% end %>
+                <div id="extend-due-date" title="Verification Due Date" style="display: none;">
+                  <p>Verification due date will be extended </p>
+                </div>
                 <div class="row">
                   <% if documents_list(person, v_type).any? %>
                       <div class="v-doc-list col-md-12">

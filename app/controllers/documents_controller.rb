@@ -98,27 +98,32 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    family_member = FamilyMember.find(params[:family_member_id])
+    family_member = FamilyMember.find(params[:family_member_id].gsub("_", ""))
+    v_type = params[:verification_type].gsub("_", "")
     enrollment = family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
     if enrollment.present?
-      if enrollment.special_verification_period
-        sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => params[:verification_type]).order_by(:"created_at".desc).first
-        new_date = sv.present? ? (sv.due_date + 30.days) : (enrollment.special_verification_period + 30.days)
+      sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
+      if sv.present?
+        new_date = sv.due_date.to_date + 30.days
+        flash[:success] = "Special verification period was extended for 30 days."
+      elsif enrollment.special_verification_period
+        new_date = enrollment.special_verification_period.to_date + 30.days
         flash[:success] = "Special verification period was extended for 30 days."
       else
         new_date = (enrollment.submitted_at.to_date + 95.days) + 30.days
         flash[:success] = "You set special verification period for this Enrollment. Verification due date now is #{new_date.to_date}"
       end
+
       # special_verification_period is the day we send notices
       # enrollment.update_attributes!(:special_verification_period => new_date)
-      sv = SpecialVerification.new(due_date: new_date, verification_type: params[:verification_type], updated_by: current_user.id)
+      sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id)
       family_member.person.consumer_role.special_verifications << sv
       family_member.person.consumer_role.save!
     else
       # How did this get to here!!!
       flash[:danger] = "Family Member does not have any active Enrollment to extend verification due date."
     end
-    redirect_to :back
+    render :nothing => true
   end
 
   def destroy
