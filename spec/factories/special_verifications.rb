@@ -2,7 +2,6 @@ FactoryGirl.define do
   factory :special_verification do
     due_date {TimeKeeper.date_of_record + 95.days}
     verification_type "Citizenship"
-    extension_reason "reason"
     updated_by { FactoryGirl.build(:user).id}
 
     after(:build) do |sv, evaluator|

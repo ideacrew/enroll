@@ -4,14 +4,12 @@ describe SpecialVerification do
 
   it { should validate_presence_of :due_date }
   it { should validate_presence_of :verification_type }
-  it { should validate_presence_of :extension_reason }
   it { should validate_presence_of :updated_by }
 
   let(:params) {
     {
       due_date: TimeKeeper.date_of_record + 95.days,
       verification_type: "Citizenship",
-      extension_reason: "xyz",
       updated_by: double("AdminUser")
     }
   }
