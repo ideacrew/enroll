@@ -34,4 +34,17 @@ module Config::AcaHelper
   def carrier_special_plan_identifier_namespace
     @carrier_special_plan_identifier_namespace ||= Settings.aca.carrier_special_plan_identifier_namespace
   end
+
+  def market_rating_areas
+    @market_rating_areas ||= Settings.aca.rating_areas
+  end
+
+  def multiple_market_rating_areas?
+    @multiple_market_rating_areas ||= Settings.aca.rating_areas.many?
+  end
+
+  def use_simple_employer_calculation_model?
+    @use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
+  end
+
 end
