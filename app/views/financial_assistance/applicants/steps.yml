@@ -399,9 +399,9 @@
                     - Vocational
                     - Technical
                     - Undergraduate
-                  id: 'kind'
+                  id: 'student_school_kind'
                   model: applicant
-                  attribute: student_kind
+                  attribute: student_school_kind
             - cells:
                 - gutter: 8
                   type: text

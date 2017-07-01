@@ -120,8 +120,9 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
-  validate :presence_of_attr_step_1, :presence_of_attr_step_2 # In-step Validation
-  validates :validate_applicant_information, presence: true, on: :submission # Validation to procced to Attestations / Final Submission
+  validate :presence_of_attr_step_1, on: :step_1
+  validate :presence_of_attr_step_2, on: :step_2
+  validates :validate_applicant_information, presence: true, on: :submission
 
   validate :strictly_boolean
 
@@ -295,7 +296,7 @@ private
 
   def presence_of_attr_step_2
     if is_pregnant
-      errors.add(:pregnancy_due_on, "should be answered if you are someone's tax dependent") if pregnancy_due_on.nil?
+      errors.add(:pregnancy_due_on, "should be answered if you are pregnant") if pregnancy_due_on.nil?
       errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
 
       if is_post_partum_period
@@ -318,9 +319,9 @@ private
     end
 
     if is_student
-      errors.add(:student_kind, "should be answered") if student_kind.nil?
-      errors.add(:student_status_end_on, "should be answered") if student_status_end_on.nil?
-      errors.add(:student_kind, "should be answered") if student_kind.nil?
+      errors.add(:student_kind, "should be answered") if student_kind.blank?
+      errors.add(:student_status_end_on, "should be answered") if student_status_end_on.blank?
+      errors.add(:student_school_kind, "should be answered") if student_school_kind.blank?
     end
   end
 
@@ -339,13 +340,14 @@ private
       model_params[:claimed_as_tax_dependent_by] = nil
     end
 
-    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
-      model_params[:pregnancy_due_on] = nil
-      model_params[:children_expected_count] = nil
-      model_params[:is_post_partum_period] = nil
-      model_params[:pregnancy_end_on] = nil
-      model_params[:is_enrolled_on_medicaid] = nil
-    end
+    # TODO : Revise this logic for conditional saving!
+    # if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+    #   model_params[:pregnancy_due_on] = nil
+    #   model_params[:children_expected_count] = nil
+    #   model_params[:is_post_partum_period] = nil
+    #   model_params[:pregnancy_end_on] = nil
+    #   model_params[:is_enrolled_on_medicaid] = nil
+    # end
 
     if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
       model_params[:foster_care_us_state] = nil

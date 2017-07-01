@@ -29,7 +29,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
     if params.key?(model_name)
-      if @model.save
+      if @model.save(context: "step_#{@current_step.to_i}".to_sym)
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Finish"
           @model.update_attributes!(workflow: { current_step: 1 })
@@ -57,7 +57,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   private
 
   def build_error_messages(model)
-    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
   end
 
   def find_application

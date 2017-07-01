@@ -18,7 +18,7 @@ $(document).ready(function() {
           $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
         }
         else {
-          $('#medicaid_pregnency_yes').parents(".row").next().addClass('hide');
+          //$('#medicaid_pregnency_yes').parents(".row").next().addClass('hide');
           $('#medicaid_pregnency_yes').parents(".row").next().next().addClass('hide');
           $('#medicaid_pregnency_yes').parents(".row").next().next().next().addClass('hide');
           $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
@@ -125,6 +125,19 @@ $(document).ready(function() {
     });
 
   /* Benefit Form Related */
+
+  /* Toggle Show/Hide of  dates row when eligible/ enrolled types are selected */
+  $("#is_eligible, #is_enrolled").on('change', function() {
+    if ($('#is_eligible').is(':checked')) {
+      $('#is_eligible').parents(".row").next().addClass('hide');
+      $('#is_eligible').parents(".row").next().removeClass('show');
+    }
+    else {
+      $('#is_eligible').parents(".row").next().addClass('show');
+      $('#is_eligible').parents(".row").next().removeClass('hide');
+    }
+  });
+
 
   $('#benefit_insurance_kind').on('selectric-change', function(e){
     if ($(this).val() == 'employer_sponsored_insurance') {
@@ -252,6 +265,7 @@ $(document).ready(function() {
   if($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
     $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
   }
+
 /* Applicant's Tax Info Form Related */
 
 

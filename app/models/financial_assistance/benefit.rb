@@ -58,7 +58,7 @@ class FinancialAssistance::Benefit
 
   field :employer_name, type: String
   field :employer_id, type: Integer
-  
+
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
 
@@ -151,8 +151,7 @@ private
     if insurance_kind == "employer_sponsored_insurance"
       errors.add(:employer_name, " can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, " can't be blank ") if esi_covered.blank?
-      errors.add(:t_kind, " can't be blank ") if esi_covered.blank?
-      errors.add(:eligible_start_on, " date can't be blank ") if eligible_start_on.blank?
+      errors.add(:start_on, " date can't be blank ") if start_on.blank?
       errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
       errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?
       errors.add(:employee_cost, " can't be blank ") if employee_cost.blank?
