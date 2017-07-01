@@ -50,7 +50,7 @@ class V2GroupXmlGenerator
       begin
         employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
 
-        benefit_groups = employer_profile.plan_years.select(&:eligible_for_export?).select do |py|
+        benefit_groups = employer_profile.plan_years.select{|plan_year| !(PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state)}.select do |py|
           py.start_on == Date.parse(@plan_year[:start_date])
         end.flat_map(&:benefit_groups)
 
