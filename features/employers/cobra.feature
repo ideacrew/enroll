@@ -13,6 +13,7 @@ Feature: COBRA basic
     And Employer should see a button to create new plan year
     And Employer should be able to enter plan year, benefits, relationship benefits for cobra
     And Employer should see a success message after clicking on create plan year button
+    Then Employer uploads an attestation document
     When Employer goes to the benefits tab I should see plan year information
     Then Employer clicks on publish plan year
     Then Employer should see a published success message without employee
