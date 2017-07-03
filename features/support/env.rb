@@ -73,6 +73,7 @@ phantomjs_options.push('--proxy=localhost:9050', '--proxy-type=socks5') if Rails
 
 Capybara.register_driver :poltergeist do |app|
   options = {
+      :port => (51674 + ENV['TEST_ENV_NUMBER'].to_i),
       :js_errors => false,
       :timeout => 120,
       :debug => false,
