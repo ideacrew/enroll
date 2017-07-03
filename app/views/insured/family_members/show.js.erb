@@ -6,6 +6,9 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 }
 
 <% if @created %>
+  <%if @family.application_in_progress.present?%>
+    $('#btn-continue').addClass('disabled');
+  <%end%>
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
 
