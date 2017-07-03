@@ -3,7 +3,7 @@ module Subscribers
     include Acapi::Notifiers
 
     def self.subscription_details
-      ["acapi.info.events.employer.nfp_pdf_response"]
+      ["acapi.info.events.employer.nfp_pdf_success"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
