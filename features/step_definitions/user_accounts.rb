@@ -12,7 +12,7 @@ Then(/^Hbx Admin should see text Account Updates$/) do
 end
 
 Then(/^Hbx Admin should see columns related to user account$/) do
-  expect(page).to have_content('Name')
+  expect(page).to have_content('USERNAME')
   expect(page).to have_content('SSN')
   expect(page).to have_content('DOB')
   expect(page).to have_content('HBX ID')
