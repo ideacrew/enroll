@@ -242,8 +242,9 @@
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
+                  name: is_eligible
+                  id: 'is_eligible_yes'
                   value: true
-                  id: 'yes2'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: benefit

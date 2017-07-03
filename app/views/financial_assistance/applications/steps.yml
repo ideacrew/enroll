@@ -212,7 +212,7 @@
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
-                  
+
                 - gutter: 2
                   type: label_radio
                   name: row1
@@ -223,7 +223,7 @@
                   model: application
                   name: parent_living_out_of_home_terms
                   attribute: parent_living_out_of_home_terms
-                  
+
               - cells:
                   - gutter: 12
                     type: raw_html

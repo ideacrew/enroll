@@ -199,6 +199,26 @@ When (/^they click on 'Add Benefit' button$/) do
   click_link 'Add Benefit'
 end
 
+<<<<<<< HEAD
+=======
+<<<<<<< 38458344313b25cb752c57e37c5f19810568a524
+And (/^has added an benefit$/) do
+  choose("yes2")
+  find('#benefit_kind').select('medicare')
+  fill_in 'benefit[start_on]', with: "11/11/2016"
+  fill_in 'benefit[end_on]', with: "11/11/2017"
+  click_button 'Next step'
+  choose("access_to_hc_yes")
+  fill_in 'benefit[employer_name]', with: "JOHN"
+  fill_in 'employer_address[address_1]', with: " Test address 1"
+  fill_in 'employer_address[city]', with: " Herdon"
+  fill_in 'employer_address[zip]', with: " 51023"
+  choose("is_eligible_no")
+  choose("health_plan_yes")
+  fill_in 'benefit[employee_cost]', with: " 2.3"
+end
+
+>>>>>>> 4755489571b7645ca4bf1f93a0b611e7368f7883
 And (/^they complete the form for the benefit$/) do
   choose("is_enrolled_yes2")
 # fill_in 'benefit[amount]', with: '23.3'
@@ -209,6 +229,10 @@ And (/^they complete the form for the benefit$/) do
   choose("is_eligible_no2")
   click_button 'Finish'
 end
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4755489571b7645ca4bf1f93a0b611e7368f7883
 Then(/^they should be taken back to the applicant's detail page$/) do
 
 end
