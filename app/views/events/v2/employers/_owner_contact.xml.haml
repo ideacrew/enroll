@@ -2,7 +2,7 @@
   %id
     %id= owner_contact.hbx_id
   = render :partial => "events/v2/shared/person_name", :object => owner_contact
-  - addresses = owner_contact.addresses.select do |a| ['mailing', 'work', 'home'].include? a.kind end
+  - addresses = owner_contact.addresses.select do |a| ['mailing', 'work'].include? a.kind end
   - unless addresses.empty?
     %addresses
       = render :partial => "events/v2/addresses/address", :collection => addresses
