@@ -25,6 +25,31 @@ Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.button(value: /Search Person/).fire_event("onclick")
 end
 
+Then(/^.+ uploads an attestation document/) do
+  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+    find('.interaction-click-control-documents').click
+    wait_for_ajax
+    find('.interaction-click-control-upload').click
+    wait_for_ajax
+    find('#subject_Employee_Attestation').click
+    # There is no way to actually trigger the click and upload functionality
+    # with a JS driver.
+    # So we commit 2 sins:
+    #   1) We make the file input visible so we can set it.
+    #   2) We make the submit button visible so we can click it.
+    execute_script(<<-JSCODE)
+    $('#modal-wrapper div.employee-upload input[type=file]').attr("style", "display: block;");
+    JSCODE
+    wait_for_ajax
+    attach_file("file", "#{Rails.root}/test/JavaScript.pdf")
+    execute_script(<<-JSCODE)
+    $('#modal-wrapper div.employee-upload input[type=submit]').css({"visibility": "visible", "display": "inline-block"});
+    JSCODE
+    find("input[type=submit][value=Upload]").click
+    wait_for_ajax
+  end
+end
+
 And(/^My user data from existing the fieldset values are prefilled using data from my existing account$/) do
   @browser.button(value: /This is my info/).wait_until_present
   screenshot("employer_portal_person_match_form")

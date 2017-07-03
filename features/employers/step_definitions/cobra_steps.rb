@@ -154,9 +154,12 @@ Then(/^fill the form with hired date as future date$/) do
 end
 
 And(/^.+ should see census employee created success message for (.*)$/) do |named_person|
+  wait_for_ajax
   person = people_for_cobra[named_person]
   expect(page).to have_content('Census Employee is successfully created.')
   screenshot("employer_census_new_family_success_message")
+  find_by_id('Tab:by_cobra').click
+
   expect(page).to have_content(person[:first_name])
   expect(page).to have_content(person[:last_name])
 end
@@ -170,7 +173,7 @@ Then(/employer should see the message Your employee was successfully added to yo
 end
 
 And(/^.+ should see the status of cobra_eligible$/) do
-  expect(page).to have_content('Cobra Eligible')
+  expect(page).to have_content('Cobra eligible')
 end
 
 And(/^.+ should see the status of Cobra Linked$/) do
