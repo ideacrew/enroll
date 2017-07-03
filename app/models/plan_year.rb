@@ -882,7 +882,7 @@ class PlanYear
     end
 
     event :renew_plan_year, :after => :record_transition do
-      transitions from: :draft, to: :renewing_draft
+      transitions from: :draft, to: :renewing_draft, after: :employer_renewal_eligibility_denial_notice
     end
 
     event :renew_publish, :after => :record_transition do
@@ -1084,6 +1084,12 @@ class PlanYear
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+  end
+
+  def employer_renewal_eligibility_denial_notice
+    if !self.employer_profile.is_primary_office_local?
+      ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
+    end
   end
 
   def record_transition
