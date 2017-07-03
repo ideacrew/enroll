@@ -11,11 +11,13 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin do
                             :notice_template => 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
                             :mpi_indicator => 'MPI_SHOP16',
+                            :event_name => 'initial_eligibile_employer_open_enrollment_begins',
                             :title => "Application to Offer Group Health Coverage in DC Health Link"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
