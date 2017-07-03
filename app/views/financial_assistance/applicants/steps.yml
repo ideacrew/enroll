@@ -30,7 +30,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Will this person be filling jointly? *
+                  text: Will this person be filling jointly?
                 - gutter: 1
                   type: label_radio
                   name: row2
@@ -76,7 +76,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: This person will be claimed as a dependent by *
+                  text: This person will be claimed as a dependent by
                   required: true
                 - gutter: 6
                   type: 'dropdown'
@@ -105,7 +105,7 @@
                   value: true
                   id: 'is_ssn_applied_yes'
                   required: true
-                  #checked: true
+                  id: 'yes2'
                   label: 'Yes'
                   model: applicant
                   attribute: is_ssn_applied
@@ -115,7 +115,7 @@
                   value: false
                   id: 'is_ssn_applied_no'
                   required: true
-                  #checked: false
+                  id: 'no2'
                   label: 'No'
                   model: applicant
                   attribute: is_ssn_applied
@@ -129,6 +129,7 @@
                   value: true
                   id: 'is_pregnant_yes'
                   required: true
+                  id: 'pregnant_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_pregnant
@@ -138,7 +139,7 @@
                   value: false
                   id: 'is_pregnant_no'
                   required: true
-                  #checked: false
+                  id: 'pregnant_no'
                   label: 'No'
                   model: applicant
                   attribute: is_pregnant
@@ -149,7 +150,6 @@
                 - gutter: 3
                   type: input_date
                   placeholder: Due date
-                  # required: true
                   id: 'yes2'
                   model: applicant
                   attribute: pregnancy_due_on
@@ -157,11 +157,9 @@
                 - gutter: 6
                   type: text
                   text:  How many children is this person expecting?
-                  # required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: ''
-                  # required: true
                   values:
                     - 1
                     - 2
@@ -176,18 +174,16 @@
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
-                  # name: is_post_partum_period
                   value: true
-                  id: 'yes2'
+                  id: 'is_post_partum_period_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: applicant
                   attribute: is_post_partum_period
                 - gutter: 1
                   type: label_radio
-                  # name: is_post_partum_period
                   value: false
-                  id: 'no2'
+                  id: 'is_post_partum_period_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: applicant
@@ -199,7 +195,6 @@
                 - gutter: 3
                   type: input_date
                   placeholder: End on date
-                  # required: true
                   id: 'yes2'
                   model: applicant
                   attribute: pregnancy_end_on
@@ -210,18 +205,16 @@
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
-                  # name: is_post_partum_period
                   value: true
-                  id: 'yes2'
+                  id: 'medicaid_pregnency_yes'
                   label: 'Yes'
                   classNames: 'span-text'
                   model: applicant
                   attribute: is_enrolled_on_medicaid
                 - gutter: 1
                   type: label_radio
-                  # name: is_post_partum_period
                   value: false
-                  id: 'no2'
+                  id: 'medicaid_pregnency_no'
                   label: 'No'
                   classNames: 'span-text'
                   model: applicant
@@ -234,8 +227,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'is_self_attested_blind_yes'
-                  required: true
+                  id: 'former_foster_care_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_former_foster_care
@@ -243,8 +235,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'is_self_attested_blind_no'
-                  required: true
+                  id: 'former_foster_care_no'
                   label: 'No'
                   model: applicant
                   attribute: is_former_foster_care
@@ -252,11 +243,9 @@
                 - gutter: 6
                   type: text
                   text:  Where was this person in foster care?
-                  # required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: ''
-                  # required: true
                   values:
                     - Choose State
                     - AL
@@ -316,15 +305,11 @@
                 - gutter: 6
                   type: text
                   text:  How old was this person when they left foster care?
-                  # required: true
                 - gutter: 6
-                  type: 'dropdown'
+                  type: 'age_left_foster_care_dropdown'
                   name: ''
-                  # required: true
                   values:
-                    - xx
-                    - yy
-                    - zz
+                    # - xx
                   id: 'kind'
                   model: applicant
                   attribute: age_left_foster_care
@@ -336,7 +321,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'has_daily_living_help_yes'
+                  id: 'yes2'
                   label: 'Yes'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -344,7 +329,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'has_daily_living_help_no'
+                  id: 'no2'
                   label: 'No'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -358,6 +343,7 @@
                   value: true
                   id: 'need_help_paying_bills_yes'
                   required: true
+                  id: 'student_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_student
@@ -367,6 +353,7 @@
                   value: false
                   id: 'need_help_paying_bills_no'
                   required: true
+                  id: 'student_no'
                   label: 'No'
                   model: applicant
                   attribute: is_student
@@ -374,11 +361,9 @@
                 - gutter: 6
                   type: text
                   text:  What is the type of student?
-                  # required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: ''
-                  # required: true
                   values:
                     - Dropout
                     - Full Time
@@ -396,7 +381,6 @@
                 - gutter: 3
                   type: input_date
                   placeholder: End on
-                  # required: true
                   id: 'yes2'
                   model: applicant
                   attribute: student_status_end_on
@@ -404,11 +388,9 @@
                 - gutter: 6
                   type: text
                   text:  What type of school do you go to?
-                  # required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: ''
-                  # required: true
                   values:
                     - Pre School
                     - Graduate School
@@ -423,9 +405,9 @@
                     - Vocational
                     - Technical
                     - Undergraduate
-                  id: 'kind'
+                  id: 'student_school_kind'
                   model: applicant
-                  attribute: student_kind
+                  attribute: student_school_kind
             - cells:
                 - gutter: 8
                   type: text
@@ -436,6 +418,7 @@
                   value: true
                   id: 'is_former_foster_care_yes'
                   required: true
+                  id: 'yes2'
                   label: 'Yes'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -445,6 +428,7 @@
                   value: false
                   id: 'is_former_foster_care_no'
                   required: true
+                  id: 'no2'
                   label: 'No'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -458,7 +442,6 @@
                   value: true
                   required: true
                   id: 'yes2'
-                  #checked: true
                   label: 'Yes'
                   model: applicant
                   attribute: has_daily_living_help
@@ -468,7 +451,6 @@
                   value: false
                   required: true
                   id: 'no2'
-                  #checked: false
                   label: 'No'
                   model: applicant
                   attribute: has_daily_living_help
@@ -482,7 +464,6 @@
                   value: true
                   required: true
                   id: 'yes2'
-                  #checked: true
                   label: 'Yes'
                   model: applicant
                   attribute: need_help_paying_bills
@@ -492,7 +473,6 @@
                   value: false
                   required: true
                   id: 'no2'
-                  #checked: false
                   label: 'No'
                   model: applicant
                   attribute: need_help_paying_bills
