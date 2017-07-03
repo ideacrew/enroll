@@ -260,7 +260,7 @@ end
 
 Then(/^Broker Assisted is a family$/) do
   #
-  wait_for_ajax
+  # wait_for_ajax
   find(:xpath, "//li[contains(., 'Families')]/a").click
   expect(page).to have_content('Broker Assisted')
 end
