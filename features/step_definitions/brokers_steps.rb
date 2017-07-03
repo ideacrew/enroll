@@ -207,17 +207,17 @@ Then(/^.* creates and publishes a plan year$/) do
 
   fill_in "plan_year[benefit_groups_attributes][0][title]", with: "Silver PPO Group"
 
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
-
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plan label').click
   wait_for_ajax(10)
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", with: 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", with: 50
+
   find('.interaction-click-control-create-plan-year').trigger('click')
   find('.alert-notice')
   find('.interaction-click-control-benefits').click
