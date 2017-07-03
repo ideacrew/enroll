@@ -123,7 +123,7 @@ end
 Then(/^fill the form with hired date as future date$/) do
   person = people_for_cobra['Jack Employee']
   # Census Employee
-  fill_in 'census_employee[first_name]', with: person[:first_name]
+  fill_in 'census_employee[first_name]', with: person[:first_name], :wait => 10
   fill_in 'census_employee[last_name]', with: person[:last_name]
   find(:xpath, "//p[contains(., 'NONE')]").click
   find(:xpath, "//li[contains(., 'Jr.')]").click
@@ -331,7 +331,8 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 end
 
 And(/clicks on the Add New Employee button/) do
-  find('.interaction-click-control-add-employee i').click
+  execute_script(<<-JSCODE)
+    $('.interaction-click-control-add-employee')[0].click()
+  JSCODE
   wait_for_ajax(3,2)
-
 end
