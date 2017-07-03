@@ -35,6 +35,13 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
+        if @found_census_employees.size == 1
+          begin
+            ShopNoticesNotifierJob.perform_later(@found_census_employees.first.id.to_s, "employee_eligibility_notice")
+          rescue Exception => e
+            puts "Unable to deliver Employee Eligibility Notice to #{@found_census_employees.first.full_name} due to #{e}" unless Rails.env.test?
+          end
+        end
         respond_to do |format|
           format.html { render 'match' }
         end

@@ -360,6 +360,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'DAE053',
+    title: 'Employee Eligibility Notice',
+    description: 'This notices goes to all the employees who have successfully matched their employer.',
+    resource_name: 'employee_role',
+    event_name: 'employee_eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Employee Eligibility Notice',
+        notice_template: 'notices/shop_employee_notices/employee_eligibility_notice',
+        notice_builder: 'ShopEmployeeNotices::EmployeeEligibilityNotice',
+        mpi_indicator: 'DAE053',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP19',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Notice goes to renewal groups who did not meet Minimum Participation Requirement or non-owner enrollee requirement after open enrollment is completed.',

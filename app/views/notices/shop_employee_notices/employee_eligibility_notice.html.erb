@@ -17,13 +17,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! You successfully linked your #{Settings.site.short_name} account to your employer, <Legal Name>. You may be eligible to enroll in employer-sponsored health insurance at this time."} %>
+  { content: "Congratulations! You successfully linked your #{Settings.site.short_name} account to your employer, #{notice.employer_name}. You may be eligible to enroll in employer-sponsored health insurance at this time."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you have not already done so, you can complete the application process through your <a href='#{Settings.site.website_name}'>#{Settings.site.website_name}</a> employee account. For assistance with this process, <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf'>this guide</a> includes step-by-step instructions for applying to enroll in the health plan(s) offered to you by your employer."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<i>Note:</i> If you have other insurance coverage and do not wish to apply to enroll into the plan(s) offered to you by <Employer Name> during your enrollment period, you must still apply to “waive” coverage during your enrollment period. Instructions for how to waive coverage are included in <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf/'>this walkthrough guide.</a>"} %>
+  { content: "<i>Note:</i> If you have other insurance coverage and do not wish to apply to enroll into the plan(s) offered to you by #{notice.employer_name} during your enrollment period, you must still apply to “waive” coverage during your enrollment period. Instructions for how to waive coverage are included in <a href='https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf/'>this walkthrough guide.</a>"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
