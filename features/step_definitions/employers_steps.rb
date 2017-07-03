@@ -280,9 +280,6 @@ end
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
-  year = (Date.today + 2.months).year
-  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
-  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
   find('a.interaction-click-control-add-plan-year').click
 end
 
@@ -685,12 +682,12 @@ Then(/^Employer should see Action Needed under document/) do
 end
 
 And(/^the employer clicks document name/) do
-  find(:xpath,"//*[@id='effective_datatable_wrapper']/div/div/div[3]/div/table/tbody/tr[1]/td[4]/a").trigger('click')
+  find(:xpath,"//*[@id='effective_datatable_wrapper']//a[contains(.,'JavaScript.pdf')]").trigger('click')
 end
 
-Then(/^the employer should see Download,Cancel,Print Option/) do
+Then(/^the employer should see Download,Print Option/) do
   wait_for_ajax
-  expect(page).to have_content('Cancel')
+#  expect(page).to have_content('Cancel')
   expect(page).to have_content('Download')
   expect(page).to have_content('Print')
 end
