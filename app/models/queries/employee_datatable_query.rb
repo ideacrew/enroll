@@ -13,6 +13,7 @@ module Queries
     end
 
     def build_scope()
+      return [] if @employer_profile.nil?
       case @custom_attributes[:employers]
         when "active"
           @employer_profile.census_employees.active
@@ -40,6 +41,12 @@ module Queries
     def order_by(var)
       @order_by = var
       self
+    end
+
+    def any?
+      build_scope.each do |e|
+        return if yield(e)
+      end
     end
 
     def klass

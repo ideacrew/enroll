@@ -487,22 +487,22 @@ Then /^employer clicks on terminated filter$/ do
 end
 
 Then /^employer sees termination date column$/ do
-  expect(page).to have_content 'Termination Date'
+  expect(page).to have_content 'Terminated On'
 end
 
 And /^employer clicks on terminated employee$/ do
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 And /^employer clicks on linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "employee_role_linked")
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 Then /^ER should land on (.*) EE tab$/ do |val|
-  expect(page).to have_content val.upcase
+  expect(page.html).to match /val/
 end
 
 And /^ER enters (.*) EE name on search bar$/ do |val|
@@ -543,7 +543,7 @@ end
 And /^employer clicks on linked employee without address$/ do
   employees.first.address.delete
   expect(page).to have_content "Eddie Vedder"
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 Then /^employer should see the address on the roster$/ do
@@ -566,33 +566,32 @@ end
 
 And /^employer clicks on non-linked employee with address$/ do
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 And /^employer clicks on non-linked employee without address$/ do
   employees.first.address.delete
   employees.first.update_attributes(aasm_state: "eligible")
-  find(:xpath, '//*[@id="home"]/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div[1]/table/tbody/tr[1]/td[1]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[2]/a').click
 end
 
 And /^employer clicks on back button$/ do
   expect(page).to have_content "Details"
-  find('.interaction-click-control-back-to-employee-roster-\(terminated\)').click
+  find('.interaction-click-control-back').click
 end
 
 Then /^employer should see employee roaster$/ do
   expect(page).to have_content "Employee Roster"
 end
 And /^employer should also see termination date$/ do
-  expect(page).to have_content "Termination Date"
+  expect(page).to have_content "Terminated On"
 end
 
 And /^employer clicks on all employees$/ do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
-  find('.filter').click
+  find_by_id('Tab:all').click
+
   wait_for_ajax
-  page.execute_script("$('.filter-options').show();")
-  find("#family_all").trigger('click')
 end
 
 And /^employer clicks on cancel button$/ do
@@ -602,7 +601,7 @@ end
 
 Then /^employer should not see termination date column$/ do
   wait_for_ajax
-  expect(page).not_to have_content "Termination Date"
+  expect(page).not_to have_content "Terminated On"
 end
 
 Then /^they should see that employee's details$/ do

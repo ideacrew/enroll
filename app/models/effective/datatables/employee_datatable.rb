@@ -4,7 +4,6 @@ module Effective
 
       datatable do
 
-        # TODO: Implement Filters here
         bulk_actions_column do
           bulk_action 'Employee will enroll',  change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
           bulk_action 'Employee will not enroll with valid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
@@ -24,6 +23,10 @@ module Effective
           row.hired_on
         }, :sortable => false, :filter => false
 
+        table_column :terminated_on, :proc => Proc.new { |row|
+          row.employment_terminated_on || "Active"
+        }, :sortable => false, :filter => false, :visible => false
+
         table_column :status, :proc => Proc.new { |row|
           employee_state_format(row.aasm_state, row.employment_terminated_on)
         }, :sortable => false, :filter => false
@@ -35,12 +38,6 @@ module Effective
         if attributes["renewal"]
           table_column :renewal_benefit_package, :label => 'Renewal Benefit Package', :proc => Proc.new { |row|
             row.renewal_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
-          }, :filter => false, :sortable => false
-        end
-
-        if attributes["terminated"]
-          table_column :termination_date, :proc => Proc.new { |row|
-            row.employment_terminated_on
           }, :filter => false, :sortable => false
         end
 
@@ -95,8 +92,8 @@ module Effective
           {
             employers:
                 [
-                    {scope: 'active', label: 'Active & COBRA'},
                     {scope: 'active_alone', label: 'Active only'},
+                    {scope: 'active', label: 'Active & COBRA'},
                     {scope: 'by_cobra', label: 'COBRA only'},
                     {scope: 'terminated', label: 'Terminated'},
                     {scope: 'all', label: 'All'}
