@@ -1,6 +1,7 @@
 Feature: COBRA basic
 
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
+    Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
