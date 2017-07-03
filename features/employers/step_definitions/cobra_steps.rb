@@ -328,5 +328,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 end
 
 And(/clicks on the Add New Employee button/) do
-  find('.interaction-click-control-add-new-employee').click
+  find('.interaction-click-control-add-employee i').click
+  wait_for_ajax(3,2)
+
 end

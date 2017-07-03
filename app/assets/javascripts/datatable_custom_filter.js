@@ -49,6 +49,15 @@ DT = ( function() {
       DT.filter_params(keys, 1)
       keys["collection_scope"] = $('#collection_scope').html()
       var attributes_for_filtering = {"custom_attributes": keys}
+      var current_filter = attributes_for_filtering['custom_attributes']['employers'];
+      var hiredOnCol = document.querySelector('.col-hired_on');
+      if (current_filter === 'terminated') {
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(true)
+      } else if(current_filter === 'all'){
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(true)
+      } else {
+        $(".effective-datatable").DataTable().columns('.col-terminated_on').visible(false)
+      }
       return attributes_for_filtering;
     }
   }
