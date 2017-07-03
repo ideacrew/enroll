@@ -65,11 +65,11 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      put :extend_due_date, family_member_id: family.primary_applicant.id
+      put :extend_due_date, family_member_id: family.primary_applicant.id, verification_type: "Citizenship"
     end
 
     it "should redirect to back" do
-      expect(response).to redirect_to :back
+      expect(response).to render_template(nil)
     end
   end
   describe "PUT update_verification_type" do
