@@ -58,10 +58,9 @@ class FinancialAssistance::Benefit
 
   field :employer_name, type: String
   field :employer_id, type: Integer
-  
+
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
-  # validates :start_on, presence: true
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
@@ -143,7 +142,7 @@ private
 
   def presence_of_dates_if_enrolled
     if is_enrolled?
-      errors.add(:start_on, "If enrolled, must have start and end dates") if start_on.blank?
+      errors.add(:start_on, "must be present") if start_on.blank?
       start_on_must_precede_end_on(start_on, end_on)
     end
   end
@@ -152,6 +151,7 @@ private
     if insurance_kind == "employer_sponsored_insurance"
       errors.add(:employer_name, " can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, " can't be blank ") if esi_covered.blank?
+      errors.add(:start_on, " date can't be blank ") if start_on.blank?
       errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
       errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?
       errors.add(:employee_cost, " can't be blank ") if employee_cost.blank?

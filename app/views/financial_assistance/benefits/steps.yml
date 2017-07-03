@@ -7,7 +7,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Are you adding a health coverage that you are enrolled in or eligible for ? *
+                  text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio

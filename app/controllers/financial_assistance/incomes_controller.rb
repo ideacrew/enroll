@@ -15,24 +15,29 @@
   end
 
   def step
+    flash[:error] = nil
     @selectedTab = "jobIncome"
     @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     format_date_params model_params
 
-    if params.key?(model_name)
-      @model.workflow = { current_step: @current_step.to_i + 1 }
-      @current_step = @current_step.next_step if @current_step.next_step.present?
-    else
-      @model.workflow = { current_step: @current_step.to_i }
-    end
+    # if params.key?(model_name)
+    #   @model.workflow = { current_step: @current_step.to_i + 1 }
+    #   @current_step = @current_step.next_step if @current_step.next_step.present?
+    # else
+    #   @model.workflow = { current_step: @current_step.to_i }
+    # end
 
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
     update_employer_contact(@model, params) if @model.income_type == job_income_type
 
     begin
       @model.save!
+      if params.key?(model_name)
+        @model.workflow = { current_step: @current_step.to_i + 1 }
+        @current_step = @current_step.next_step if @current_step.next_step.present?
+      end
       if params[:commit] == "Finish"
         flash[:notice] = "Income Added - (#{@model.kind})"
         redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
@@ -40,6 +45,7 @@
         render 'workflow/step', layout: 'financial_assistance'
       end
     rescue
+      @model.workflow = { current_step: @current_step.to_i }
       flash[:error] = build_error_messages(@model)
       render 'workflow/step', layout: 'financial_assistance'
     end

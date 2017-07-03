@@ -120,9 +120,11 @@ class FinancialAssistance::Applicant
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
+  validate :presence_of_attr_step_1, on: :step_1
+  validate :presence_of_attr_step_2, on: :step_2
   validates :validate_applicant_information, presence: true, on: :submission
 
-  # validate :strictly_boolean
+  validate :strictly_boolean
 
   validates :tax_filer_kind,
     inclusion: { in: TAX_FILER_KINDS, message: "%{value} is not a valid tax filer kind" },
@@ -172,6 +174,7 @@ class FinancialAssistance::Applicant
   end
 
   def immigration_status?
+    person.citizen_status
   end
 
   def immigration_date?
@@ -179,20 +182,23 @@ class FinancialAssistance::Applicant
 
   #### Collect insurance from Benefit model
   def has_insurance?
+    benefits.present?
   end
 
   def had_prior_insurance?
   end
 
-  def prior_insurance_end_date?
+  def prior_insurance_end_date
   end
 
   def has_state_health_benefit?
+    benefits.where(insurance_kind: 'medicaid').present?
   end
 
   # Has access to employer-sponsored coverage that meets ACA minimum standard value and
   #   employee responsible premium amount is <= 9.5% of Household income
   def has_employer_sponsored_coverage?
+    benefits.where(insurance_kind: 'employer_sponsored_insurance').present?
   end
 
   def is_without_assistance?
@@ -265,10 +271,95 @@ class FinancialAssistance::Applicant
     is_applicant_valid?
   end
 
-private
+  def clean_conditional_params(model_params)
+    clean_params(model_params)
+  end
 
+  def age_of_the_applicant
+    age_of_applicant
+  end
+
+private
   def validate_applicant_information
     validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_joint_tax_filing, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+  end
+
+  def presence_of_attr_step_1
+    if is_required_to_file_taxes && is_joint_tax_filing.nil?
+      errors.add(:is_joint_tax_filing, "can't be blank")
+    end
+
+    if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
+      errors.add(:claimed_as_tax_dependent_by, "can't be blank")
+    end
+  end
+
+  def presence_of_attr_step_2
+    if is_pregnant
+      errors.add(:pregnancy_due_on, "should be answered if you are pregnant") if pregnancy_due_on.nil?
+      errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
+
+      if is_post_partum_period
+        errors.add(:is_enrolled_on_medicaid, "should be answered") if is_enrolled_on_medicaid.nil?
+      end
+    else
+      errors.add(:is_post_partum_period, "should be answered") if is_post_partum_period.nil?
+      errors.add(:pregnancy_end_on, "should be answered") if is_post_partum_period.nil?
+    end
+
+    if (18..26).include?(age_of_applicant)
+      if is_former_foster_care.nil?
+        errors.add(:is_former_foster_care, "should be answered")
+      end
+
+      if is_former_foster_care
+        errors.add(:foster_care_us_state, "should be answered") if foster_care_us_state.nil?
+        errors.add(:age_left_foster_care, "should be answered") if age_left_foster_care.nil?
+      end
+    end
+
+    if is_student
+      errors.add(:student_kind, "should be answered") if student_kind.blank?
+      errors.add(:student_status_end_on, "should be answered") if student_status_end_on.blank?
+      errors.add(:student_school_kind, "should be answered") if student_school_kind.blank?
+    end
+  end
+
+  def age_of_applicant
+    now = Time.now.utc.to_date
+    dob = self.family_member.person.dob
+    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
+
+  def clean_params(model_params)
+    if model_params[:is_required_to_file_taxes].present? && model_params[:is_required_to_file_taxes] == 'false'
+      model_params[:is_joint_tax_filing] = nil
+    end
+
+    if model_params[:is_claimed_as_tax_dependent].present? && model_params[:is_claimed_as_tax_dependent] == 'false'
+      model_params[:claimed_as_tax_dependent_by] = nil
+    end
+
+    # TODO : Revise this logic for conditional saving!
+    # if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+    #   model_params[:pregnancy_due_on] = nil
+    #   model_params[:children_expected_count] = nil
+    #   model_params[:is_post_partum_period] = nil
+    #   model_params[:pregnancy_end_on] = nil
+    #   model_params[:is_enrolled_on_medicaid] = nil
+    # end
+
+    if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
+      model_params[:foster_care_us_state] = nil
+      model_params[:age_left_foster_care] = nil
+      model_params[:had_medicaid_during_foster_care] = nil
+    end
+
+    if model_params[:is_student].present? && model_params[:is_student] == 'false'
+      model_params[:student_kind] = nil
+      model_params[:student_status_end_on] = nil
+      model_params[:student_kind] = nil
+    end
   end
 
   def is_applicant_valid?

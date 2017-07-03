@@ -40,6 +40,7 @@ Rails.application.routes.draw do
         put ':step/:step', on: :member, action: 'step'
         post :step, on: :collection
         get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        get :age_18_to_26
 
         resources :incomes do
           put 'step(/:step)', action: 'step', on: :member
