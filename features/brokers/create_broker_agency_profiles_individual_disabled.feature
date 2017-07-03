@@ -78,7 +78,7 @@ Feature: Create Primary Broker and Broker Agency
     When Primary Broker creates and publishes a plan year
     Then Primary Broker should see a published success message without employee
     When Primary Broker clicks on the Employees tab
-    Then Primary Broker clicks on the add employee button
+    Then Primary Broker clicks to add the first employee
     Then Primary Broker creates Broker Assisted as a roster employee
     Then Primary Broker sees employer census family created
     And I log out

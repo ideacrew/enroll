@@ -875,6 +875,13 @@ When(/^.+ should see a published success message without employee$/) do
 end
 
 When(/^.+ clicks? on the add employee button$/) do
+  evaluate_script(<<-JSCODE)
+  $('.interaction-click-control-add-employee')[0].click()
+  JSCODE
+  wait_for_ajax
+end
+
+When(/^.+ clicks? to add the first employee$/) do
   find('.interaction-click-control-add-new-employee', :wait => 10).click
 end
 

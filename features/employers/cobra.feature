@@ -19,7 +19,7 @@ Feature: COBRA basic
     Then Employer should see a published success message without employee
 
     When Employer clicks on the Employees tab
-    When Employer clicks on the add employee button
+    When Employer clicks to add the first employee
     Then Employer should see a form to enter information about employee, address and dependents details for Jack Cobra
     And Employer should see census employee created success message for Jack Cobra
     And Employer should see the status of cobra_eligible
