@@ -220,6 +220,30 @@ Then(/^.* creates and publishes a plan year$/) do
 
   find('.interaction-click-control-create-plan-year').trigger('click')
   find('.alert-notice')
+
+  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+    find('.interaction-click-control-documents').click
+    wait_for_ajax
+    find('.interaction-click-control-upload').click
+    wait_for_ajax
+    find('#subject_Employee_Attestation').click
+    # There is no way to actually trigger the click and upload functionality
+    # with a JS driver.
+    # So we commit 2 sins:
+    #   1) We make the file input visible so we can set it.
+    #   2) We make the submit button visible so we can click it.
+    execute_script(<<-JSCODE)
+     $('#modal-wrapper div.employee-upload input[type=file]').attr("style", "display: block;");
+    JSCODE
+    wait_for_ajax
+    attach_file("file", "#{Rails.root}/test/JavaScript.pdf")
+    execute_script(<<-JSCODE)
+     $('#modal-wrapper div.employee-upload input[type=submit]').css({"visibility": "visible", "display": "inline-block"});
+    JSCODE
+    find("input[type=submit][value=Upload]").click
+    wait_for_ajax
+  end
+
   find('.interaction-click-control-benefits').click
   find('.interaction-click-control-publish-plan-year').click
   wait_for_ajax
