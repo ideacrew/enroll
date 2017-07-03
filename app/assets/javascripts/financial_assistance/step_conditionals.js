@@ -9,6 +9,7 @@ $(document).ready(function() {
        }
     });
 
+    // To hide/show the foster care related questions based on the age_of_the_applicant.
     function hide_show_foster_care_related_qns(age) {
       if ($('#pregnant_yes')){
         if (age == "false"){
@@ -18,10 +19,10 @@ $(document).ready(function() {
           $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
         }
         else {
-          //$('#medicaid_pregnency_yes').parents(".row").next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
+          $('#medicaid_pregnency_yes').parents(".row").next().removeClass('hide');
+          $('#medicaid_pregnency_yes').parents(".row").next().next().removeClass('hide');
+          $('#medicaid_pregnency_yes').parents(".row").next().next().next().removeClass('hide');
+          $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().removeClass('hide');
         }
       }
     }

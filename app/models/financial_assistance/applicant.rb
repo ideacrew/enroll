@@ -341,13 +341,17 @@ private
     end
 
     # TODO : Revise this logic for conditional saving!
-    # if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
-    #   model_params[:pregnancy_due_on] = nil
-    #   model_params[:children_expected_count] = nil
-    #   model_params[:is_post_partum_period] = nil
-    #   model_params[:pregnancy_end_on] = nil
-    #   model_params[:is_enrolled_on_medicaid] = nil
-    # end
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+      model_params[:pregnancy_due_on] = nil
+      model_params[:children_expected_count] = nil
+      model_params[:is_enrolled_on_medicaid] = nil if model_params[:is_post_partum_period] == "false"
+    end
+
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'true'
+      model_params[:is_post_partum_period] = nil
+      model_params[:pregnancy_end_on] = nil
+      model_params[:is_enrolled_on_medicaid] = nil
+    end
 
     if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
       model_params[:foster_care_us_state] = nil
