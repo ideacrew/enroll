@@ -2,10 +2,10 @@
   %id
     %id= benefit_group.id
   %name= benefit_group.title
-  - if !use_simple_employer_calculation_model?
+  - if !benefit_group.use_simple_employer_calculation_model?
     %group_size= benefit_group.group_size_count
     %participation_rate= benefit_group.participation_rate
-  - if multiple_market_rating_areas?
+  - if benefit_group.multiple_market_rating_areas?
     - if !benefit_group.rating_area.blank?
       %rating_area= benefit_group.rating_area
   %elected_plans

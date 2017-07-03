@@ -48,9 +48,9 @@ class V2GroupXmlGenerator
     @feins.uniq.each do |fein|
 
       begin
-        employer_profile = Organization.where(:fein => fein).first.employer_profile
+        employer_profile = Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
 
-        benefit_groups = employer_profile.plan_years.select do |py|
+        benefit_groups = employer_profile.plan_years.select{|plan_year| !(PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state)}.select do |py|
           py.start_on == Date.parse(@plan_year[:start_date])
         end.flat_map(&:benefit_groups)
 
@@ -65,7 +65,7 @@ class V2GroupXmlGenerator
 
         cv_xml = nil
         carrier_profiles.each do |carrier|
-          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile}
+          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile, manual_gen: true}
 
           organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
 
