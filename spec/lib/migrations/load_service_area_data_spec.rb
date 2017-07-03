@@ -23,10 +23,11 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
       DatabaseCleaner.clean
     end
 
-    let!(:imported_areas) { CarrierServiceArea.all }
+    let!(:imported_areas) { CarrierServiceArea.all }    
 
     context "it creates ServiceArea elements correctly" do
-      subject { imported_areas.first }
+      subject { imported_areas.where(:serves_entire_state => true).first }
+
       it_should_behave_like "a carrier service area", {
                                                   active_year: '2017',
                                                   issuer_hios_id: '82569',
@@ -42,7 +43,7 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
     end
 
     context "for elements that serve partial state but total county" do
-      subject { imported_areas.second }
+      subject { imported_areas.where(:county_name => 'Suffolk', :county_code => '025', :state_code => '25', :service_area_zipcode => '10010', :service_area_id => "MAS001").first }
       it_should_behave_like "a carrier service area", {
                                                   active_year: '2017',
                                                   issuer_hios_id: '82569',
@@ -58,7 +59,7 @@ RSpec.describe 'Carrier Service Area Imports', :type => :task do
     end
 
     context "for elements that serve partial state and partial county" do
-      subject { imported_areas.third }
+      subject { imported_areas.where(:county_name => 'Middlesex', :county_code => "017", :state_code => '25', :service_area_zipcode => "01730").first}
 
       it_should_behave_like "a carrier service area", {
                                                   active_year: '2017',
