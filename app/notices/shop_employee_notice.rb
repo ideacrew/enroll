@@ -35,6 +35,14 @@ class ShopEmployeeNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
   end
 
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+  end
+
+  def non_discrimination_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
+  end
+
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
       url: "www.dhs.dc.gov",
