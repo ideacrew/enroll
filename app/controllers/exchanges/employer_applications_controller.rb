@@ -12,15 +12,15 @@ class Exchanges::EmployerApplicationsController < ApplicationController
   end
 
   def terminate
-
+    @application = @employer_profile.plan_years.find(params[:employer_application_id])
+    flash[:notice] = "Employer Application terminated successfully."
+    redirect_to exchanges_hbx_profiles_root_path
   end
 
   def cancel
-
   end
 
   def reinstate
-
   end
 
   private

@@ -1,8 +1,11 @@
-<td colspan="8"  style="border: none;">
+<td colspan="8" class="form_<%= @application.id %>" style="border: none;">
 
   <div class="row module forms">
     <div class="col-sm-8 col-sm-offset-2 col-xs-12">
 
+      <%= form_tag(exchanges_employer_application_terminate_path(@application), method: :put) do %>
+
+      <%= hidden_field_tag 'employer_id', @employer_profile.id %>
       <div class="row no-buffer">
         <div class="col-xs-12 form-group form-group-lg no-pd">
           <div class="row">
@@ -26,32 +29,21 @@
           </div>
         </div>
 
+        <% if @application.active? || @application.expired? %>
         <div class="col-xs-12 form-group form-group-lg no-pd">
           <div class="row">
             <div class="col-xs-6">
               <label for="terminateReason" class='pull-right'>Reason for termination</label>
             </div>
             <div class="col-xs-6">
-        <!--       <div class='row'>
-                <div class='col-xs-12'> -->
-                  <div class="radio pull-left">
-                    <label>
-                      <input type="radio" name="termReason" id="nonPaymentRadio" value="non_payment" checked>
-                      Non-payment of Premiums
-                    </label>
-                  </div>
-          <!--       </div>
+              <div class="radio pull-left">
+                <input type="radio" name="termReason" id="nonPaymentRadio" value="non_payment" checked>
+                Non-payment of Premiums
               </div>
-              <div class='row'>
-                <div class='col-xs-12'> -->
-                  <div class="radio">
-                    <label>
-                      <input type="radio" name="termReason" id="voluntaryRadio" value="voluntary">
-                      Voluntary
-                    </label>
-                  </div>
-            <!--     </div>
-              </div> -->
+              <div class="radio">
+                <input type="radio" name="termReason" id="voluntaryRadio" value="voluntary">
+                Voluntary
+              </div>
             </div>
           </div>
         </div>
@@ -62,18 +54,21 @@
               <label for="terminateReason" class='pull-right'>Group Termination Date</label>
             </div>
             <div class="col-xs-6">
-              <div class="form-group pull-left">
+              <div class="pull-left">
                 <%= text_field_tag 'termiantion_date', '', placeholder: "mm/dd/yyyy",
                 class: "required date-picker qle-date-picker form-control", required: true %>
               </div>
             </div>
           </div>
         </div>
+        <% end %>
 
         <div class="col-xs-12 form-group form-group-lg no-pd">
           <button type="submit" class="btn btn-primary">Terminate</button>
           <button type="button" class="btn btn-default" id="btnCancel">Cancel</button>
         </div>
+
+        <% end %>
       </div>
     </div>
   </div>
