@@ -111,7 +111,6 @@ gem 'chosen-rails'
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
-  gem "parallel_tests"
   gem "certified"
 end
 
@@ -144,6 +143,7 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'byebug', '8.2.2'
   gem 'rspec_junit_formatter', '0.2.3'
+  gem "parallel_tests"
 end
 
 group :test do
