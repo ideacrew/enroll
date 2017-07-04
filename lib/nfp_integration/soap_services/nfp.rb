@@ -18,44 +18,16 @@ module NfpIntegration
         token
       end
 
-      def  customer_pdf_statement
-
+      def  pdf_statement_info
         return nil if @token.blank?
 
-        uri = URI.parse(NFP_URL)
-        request = Net::HTTP::Post.new(uri)
-        request.content_type = "text/xml;charset=UTF-8"
-        request["Soapaction"] = "http://www.nfp.com/schemas/hbcore/IPremiumBillingIntegrationServices/GetStatementPDFForCustomer"
-        request.body = ""
-        request.body = <<-XMLCODE
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hbc="http://www.nfp.com/schemas/hbcore">
-   <soapenv:Header>
-      <hbc:AuthToken>#{@token}</hbc:AuthToken>
-   </soapenv:Header>
-   <soapenv:Body>
-      <hbc:StatementPdfReq>
-         <hbc:CustomerCode>#{@customer_id}</hbc:CustomerCode>
-      </hbc:StatementPdfReq>
-   </soapenv:Body>
-</soapenv:Envelope>
-XMLCODE
+        uri, request = build_request(NfpPdfStatement.new, {:token => token, :customer_id => @customer_id})
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
-
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options(uri)) do |http|
-            http.request(request)
+        response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
+          http.request(request)
         end
 
-
-        if response.code == "200"
-          doc = Nokogiri::XML(response.body)
-          return doc.remove_namespaces!
-        end
-
-        return response.code
-
+        return parse_response(response)
       end
 
       def payment_history
@@ -82,6 +54,7 @@ XMLCODE
         return parse_response(response)
       end
 
+      # Get Enrollment Data from NFP
       def  enrollment_data
         return nil if @token.blank?
 
@@ -94,6 +67,7 @@ XMLCODE
 
       end
 
+      # Gets local version of the token already retrieved
       def display_token
         @token.present? ? @token : nil
       end
