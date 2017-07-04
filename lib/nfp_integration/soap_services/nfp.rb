@@ -59,7 +59,6 @@ XMLCODE
       end
 
       def payment_history
-
         return nil if @token.blank?
 
         uri, request = build_request(NfpPaymentHistory.new, {:token => token, :customer_id => @customer_id})
@@ -68,48 +67,30 @@ XMLCODE
           http.request(request)
         end
 
-        if response.code == "200"
-          doc = Nokogiri::XML(response.body)
-          return doc.remove_namespaces!
-        end
-        return nil
+        return parse_response(response)
       end
 
 
       def statement_summary
-
         return nil if @token.blank?
 
         uri, request = build_request(NfpStatementSummary.new, {:token => token, :customer_id => @customer_id})
-
         response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
           http.request(request)
         end
 
-        if response.code == "200"
-          doc = Nokogiri::XML(response.body)
-          return doc.remove_namespaces!
-        end
-        return nil
+        return parse_response(response)
       end
 
       def  enrollment_data
-
         return nil if @token.blank?
 
         uri, request = build_request(NfpEnrollmentData.new, {:token => token, :customer_id => @customer_id})
-
         response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
             http.request(request)
         end
 
-
-        if response.code == "200"
-          doc = Nokogiri::XML(response.body)
-          return doc.remove_namespaces!
-        end
-
-        return nil
+        return parse_response(response)
 
       end
 
@@ -150,6 +131,14 @@ XMLCODE
           {
             use_ssl: uri.scheme == "https",
           }
+        end
+
+        def parse_response(response)
+          if response.code == "200"
+            doc = Nokogiri::XML(response.body)
+            return doc.remove_namespaces!
+          end
+          nil
         end
 
         def token
