@@ -47,4 +47,8 @@ module Config::AcaHelper
     @use_simple_employer_calculation_model ||= (Settings.aca.use_simple_employer_calculation_model.to_s.downcase == "true")
   end
 
+  def site_broker_quoting_enabled?
+   Settings.site.broker_quoting_enabled
+  end
+
 end
