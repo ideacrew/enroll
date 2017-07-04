@@ -119,6 +119,10 @@ class BenefitGroup
 
   alias_method :is_congress?, :is_congress
 
+  def sorted_composite_tier_contributions
+    self.composite_tier_contributions.sort{|a,b| a.sort_val <=> b.sort_val}
+  end
+
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id

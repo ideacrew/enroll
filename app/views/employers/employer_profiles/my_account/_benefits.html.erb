@@ -231,7 +231,7 @@
             		      <th>Employer</th>
             		      <th>Total</th>
                     </tr>
-                    <% bg.composite_tier_contributions.each_with_index do |ct, i| %>
+                    <% bg.sorted_composite_tier_contributions.each_with_index do |ct, i| %>
                     <tr>
                       <td><%= ct.composite_rating_tier.try(:humanize) %></td>
                       <td id="pct">
