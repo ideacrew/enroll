@@ -44,7 +44,7 @@ XMLCODE
           use_ssl: uri.scheme == "https",
         }
 
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options(uri)) do |http|
             http.request(request)
         end
 
@@ -62,32 +62,11 @@ XMLCODE
 
         return nil if @token.blank?
 
-        uri = URI.parse(NFP_URL)
-        request = Net::HTTP::Post.new(uri)
-        request.content_type = "text/xml;charset=UTF-8"
-        request["Soapaction"] = "http://www.nfp.com/schemas/hbcore/IPremiumBillingIntegrationServices/GetCustomersPaymentHistory"
-        request.body = ""
-        request.body = <<-XMLCODE
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hbc="http://www.nfp.com/schemas/hbcore">
-   <soapenv:Header>
-      <hbc:AuthToken>#{@token}</hbc:AuthToken>
-   </soapenv:Header>
-   <soapenv:Body>
-      <hbc:PaymentHistoryReq>
-         <hbc:CustomerCode>#{@customer_id}</hbc:CustomerCode>
-      </hbc:PaymentHistoryReq>
-   </soapenv:Body>
-</soapenv:Envelope>
-XMLCODE
+        uri, request = build_request(NfpPaymentHistory.new, {:token => token, :customer_id => @customer_id})
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
-
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-            http.request(request)
+        response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
+          http.request(request)
         end
-
 
         if response.code == "200"
           doc = Nokogiri::XML(response.body)
@@ -101,32 +80,11 @@ XMLCODE
 
         return nil if @token.blank?
 
-        uri = URI.parse(NFP_URL)
-        request = Net::HTTP::Post.new(uri)
-        request.content_type = "text/xml;charset=UTF-8"
-        request["Soapaction"] = "http://www.nfp.com/schemas/hbcore/IPremiumBillingIntegrationServices/GetCustomerStatementSummary"
-        request.body = ""
-        request.body = <<-XMLCODE
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hbc="http://www.nfp.com/schemas/hbcore">
-   <soapenv:Header>
-      <hbc:AuthToken>#{@token}</hbc:AuthToken>
-   </soapenv:Header>
-   <soapenv:Body>
-      <hbc:StatementSummaryReq>
-         <hbc:CustomerCode>#{@customer_id}</hbc:CustomerCode>
-      </hbc:StatementSummaryReq>
-   </soapenv:Body>
-</soapenv:Envelope>
-XMLCODE
+        uri, request = build_request(NfpStatementSummary.new, {:token => token, :customer_id => @customer_id})
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
-
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-            http.request(request)
+        response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
+          http.request(request)
         end
-
 
         if response.code == "200"
           doc = Nokogiri::XML(response.body)
@@ -139,32 +97,9 @@ XMLCODE
 
         return nil if @token.blank?
 
-        uri = URI.parse(NFP_URL)
-        request = Net::HTTP::Post.new(uri)
-        request.content_type = "text/xml;charset=UTF-8"
-        request["Soapaction"] = "http://www.nfp.com/schemas/hbcore/IPremiumBillingIntegrationServices/GetCustomerEnrollmentData"
-        request.body = ""
-        request.body = <<-XMLCODE
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hbc="http://www.nfp.com/schemas/hbcore">
-   <soapenv:Header>
-      <hbc:AuthToken>#{@token}</hbc:AuthToken>
-   </soapenv:Header>
-   <soapenv:Body>
-      <hbc:EnrollmentDataReq>
-         <!--Optional:-->
-         <hbc:CustomerCode>#{@customer_id}</hbc:CustomerCode>
-         <!--Optional:-->
-         <hbc:EnrollmentType>CurrentOnly</hbc:EnrollmentType>
-      </hbc:EnrollmentDataReq>
-   </soapenv:Body>
-</soapenv:Envelope>
-XMLCODE
+        uri, request = build_request(NfpEnrollmentData.new, {:token => token, :customer_id => @customer_id})
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
-
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
             http.request(request)
         end
 
@@ -187,11 +122,7 @@ XMLCODE
 
         uri, request = build_request(NfpGetTokenInfo.new, {:token => token})
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
-
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
           http.request(request)
         end
 
@@ -215,6 +146,12 @@ XMLCODE
 
         end
 
+        def request_options(uri)
+          {
+            use_ssl: uri.scheme == "https",
+          }
+        end
+
         def token
 
           return @token if defined? @token
@@ -223,11 +160,7 @@ XMLCODE
 
           uri, request = build_request(NfpAuthenticateUser.new, {:user => NFP_USER_ID, :password => NFP_PASS})
 
-          req_options = {
-            use_ssl: uri.scheme == "https",
-          }
-
-          response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          response = Net::HTTP.start(uri.hostname, uri.port, request_options(uri)) do |http|
             http.request(request)
           end
 
