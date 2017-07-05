@@ -13,7 +13,7 @@ describe DelinkBroker do
     allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
     allow(ENV).to receive(:[]).with("legal_name").and_return("legal_name")
     allow(ENV).to receive(:[]).with("fein").and_return("fein")
-    allow(ENV).to receive(:[]).with("organization_ids_to_move").and_return([employer_profile.organization.id])
+    allow(ENV).to receive(:[]).with("organization_ids_to_move").and_return(employer_profile.organization.id.to_s)
 
   end
 
