@@ -44,7 +44,7 @@
           <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
           <td><%= application.aasm_state.humanize %></td>
           <td>
-            <% if can_termiante_application?(application) %>
+            <% if can_terminate_application?(application)  %>
               <%= link_to 'Update', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
             <% end %>
           </td>
