@@ -31,11 +31,8 @@ class DelinkBroker < MongoidMigrationTask
       if organization_ids_to_move.present?
         organization_ids_to_move.each do |organization_id|
           org_er = Organization.find(organization_id)
-          old_broker_agency = org_er.employer_profile.broker_agency_accounts.where(:is_active => true).first
-          old_broker_agency.update_attributes!(:is_active => false) unless old_broker_agency.nil?
-          broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: org.broker_agency_profile.id, writing_agent_id: person.broker_role.id, start_on: TimeKeeper.datetime_of_record, is_active: true)
-          org_er.employer_profile.broker_agency_accounts.push(broker_agency_account)
-          org_er.save
+          broker_agency_account = org_er.employer_profile.broker_agency_accounts.where(:is_active => true, :writing_agent_id => person.broker_role.id).first
+          broker_agency_account.update_attributes!(:broker_agency_profile_id => org.broker_agency_profile.id)
         end
       end
     else
