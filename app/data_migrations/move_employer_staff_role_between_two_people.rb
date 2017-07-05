@@ -3,6 +3,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
   def migrate
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     begin
       from_hbx_id = ENV['from_hbx_id']
       to_hbx_id = ENV['to_hbx_id']
@@ -26,3 +27,6 @@ class MoveEmployerStaffRoleBetweenTwoPeople< MongoidMigrationTask
     end
   end
 end
+
+
+
