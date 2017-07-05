@@ -79,14 +79,11 @@
                   text: This person will be claimed as a dependent by
                   required: true
                 - gutter: 6
-                  type: 'dropdown'
+                  type: 'claimed_as_dependent_by_dropdown'
                   name: ''
                   required: true
                   values:
                     - Select who will claim this person
-                    - Employee
-                    - Spouse
-                    - Child
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
 - step:

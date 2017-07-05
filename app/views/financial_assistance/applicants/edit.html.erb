@@ -20,7 +20,7 @@
     <tr>
       <td><%=@applicant.family_member.person.full_name%></td>
       <td><%=human_boolean(@applicant.is_claimed_as_tax_dependent)%></td>
-      <td><%=@applicant.claimed_as_tax_dependent_by%></td>
+      <td><%=@applicant.claimed_as_tax_dependent_by.present? ? @application.applicants.find(@applicant.claimed_as_tax_dependent_by).person.full_name : '--'%></td>
     </tr>
   </table>
 
