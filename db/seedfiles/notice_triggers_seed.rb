@@ -296,6 +296,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOP16_B',
+    title: 'Initial Eligible Employee Open Enrollment Period begins',
+    description: 'When Employer application meets minimum participation and non-owner requirements',
+    resource_name: 'employee_role',
+    event_name: 'initial_employee_open_enrollment_begins',
+    notice_triggers: [
+      {
+        name: 'Initial Eligible Employee open enrollment begins',
+        notice_template: 'notices/shop_employee_notices/16b_initial_employee_open_enrollment_begins',
+        notice_builder: 'ShopEmployeeNotices::InitialEmployeeOpenEnrollmentBegin',
+        mpi_indicator: 'MPI_SHOP16_B',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
     hbx_id: 'SHOP17',
     title: 'Open Enrollment Completed',

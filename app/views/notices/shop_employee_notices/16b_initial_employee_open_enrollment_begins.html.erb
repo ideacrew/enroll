@@ -1,0 +1,68 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><%= notice.primary_fullname %></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>Enroll Now: Your Health Plan Open Enrollment Period has Begun</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td> Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Good News! #{notice.employer_name} has chosen to offer health insurance coverage to its employees through The Health Connector and will contribute to the monthly premium to make the cost of coverage more affordable. Your new open enrollment period begins on #{notice.plan_year.open_enrollment_start_on}." }%>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "You are now able to plan shop for insurance that will start on #{notice.plan_year.start_on}, as part of your open enrollment period. To enroll into employer-sponsored insurance through The Health Connector, you must complete your application by #{notice.plan_year.open_enrollment_end_on}."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by #{notice.employer_name} at this time, you should still “waive” coverage."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>What is Open Enrollment?</strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Open enrollment is your annual opportunity to enroll in health plans offered by your employer.  Outside of this open enrollment period, you will only be allowed to make changes to your enrollment if you experience certain qualifying life events (QLE) such as marriage, birth, adoption, or other qualifying events."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "<strong>To See Plan Options and Enroll:</strong>"} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  previous: "To complete the application process, please follow the steps listed below:",
+  listings: ["Go to <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>","Log-in or create an account as an employee", "If necessary, update your household information add any dependents","Make your plan selection(s) or waive coverage"]} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling :#{notice.hbe.phone}.", "TTY :#{Settings.contact_center.TTY} ", "Online at : <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>"] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>

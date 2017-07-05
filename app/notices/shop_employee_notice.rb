@@ -38,7 +38,7 @@ class ShopEmployeeNotice < Notice
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
       url: "www.dhs.dc.gov",
-      phone: "(855) 532-5465",
+      phone: "1-888-813-9220",
       fax: "(855) 532-5465",
       email: "#{Settings.contact_center.email_address}",
       address: PdfTemplates::NoticeAddress.new({
@@ -49,6 +49,10 @@ class ShopEmployeeNotice < Notice
         zip: "20005"
       })
     })
+  end
+
+  def non_discrimination_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
   end
 
   def append_broker(broker)
