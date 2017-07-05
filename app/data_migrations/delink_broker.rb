@@ -24,12 +24,14 @@ class DelinkBroker < MongoidMigrationTask
       person.broker_role.save
       #move organizations under to newly created borker agency profile 
       if organization_ids_to_move.present?
-        organization_ids_to_move.each do |organization_id|
-          org = Organization.find(organization_id)
-          org.employer_profile.broker_agency_profile = broker_agency_profile
-          org.save
-        end
-      end
+      organization_ids_to_move.each do |organization_id|
+      org = Organization.find(organization_id)
+      old_broker_agency = org.employer_profile.broker_agency_accounts.where(:is_active => true).first
+      old_broker_agency.update_attributes!(:is_active => false) unless old_broker_agency.nil?
+      broker_agency_account = BrokerAgencyAccount.new(broker_agency_profile_id: org.broker_agency_profile.id, writing_agent_id: person.broker_role.id, start_on: TimeKeeper.datetime_of_record, is_active: true)
+      org.employer_profile.broker_agency_accounts.push(broker_agency_account)
+    end
+  end
     else
       puts "Error for Person: #{person.first_name}" unless Rails.env.test?
     end
