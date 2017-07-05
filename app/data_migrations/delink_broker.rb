@@ -5,7 +5,7 @@ class DelinkBroker < MongoidMigrationTask
   def migrate
     hbx_id = ENV['person_hbx_id']
     legal_name = ENV['legal_name']
-    organization_ids_to_move = ENV['organization_ids_to_move']
+    organization_ids_to_move = ENV['organization_ids_to_move'].split(",")
     fein = ENV['fein']
     person=Person.where(hbx_id: hbx_id).first
     if person.broker_role
