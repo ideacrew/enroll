@@ -37,11 +37,9 @@ class ShopEmployerNotice < Notice
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
       url: "www.dhs.dc.gov",
-      phone: "1-888-813-9220",
+      phone: "(855) 532-5465",
       fax: "(855) 532-5465",
       email: "#{Settings.contact_center.email_address}",
-      tty: "#{Settings.contact_center.tty}",
-      ma_email: "#{Settings.contact_center.ma_email}",
       address: PdfTemplates::NoticeAddress.new({
         street_1: "100 K ST NE",
         street_2: "Suite 100",
@@ -58,6 +56,10 @@ class ShopEmployerNotice < Notice
 
   def non_discrimination_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
+  end
+
+  def employer_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employer_appeal_rights.pdf')]
   end
 
   def append_address(primary_address)
