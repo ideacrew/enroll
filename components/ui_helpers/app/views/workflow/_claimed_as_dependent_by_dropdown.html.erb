@@ -1,0 +1,5 @@
+<%= label_tag cell.name.titleize.upcase%>
+<%tax_filing_applicants = @application.applicants.where(is_claimed_as_tax_dependent: false) + [@applicant]%>
+<%options_hash = {}; tax_filing_applicants.each { |applicant| options_hash[applicant.person.full_name] = applicant.id.to_s}%>
+
+<%= select_tag(cell.name_attribute, options_for_select(options_hash, selected: selected_value(@model, cell)), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>
