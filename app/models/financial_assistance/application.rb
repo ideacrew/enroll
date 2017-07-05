@@ -442,10 +442,9 @@ private
     end
 
     # delete THH without any applicant.
-    empty_th = []
-    tax_households.each do |th|
-      empty_th << th if applicants.map(&:tax_household).exclude?(th)
+    empty_th = tax_households.select do |th|
+      applicants.map(&:tax_household).exclude?(th)
     end
-    empty_th.each {|th| th.destroy!}
+    empty_th.each &:destroy
   end
 end
