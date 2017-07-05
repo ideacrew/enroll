@@ -45,13 +45,17 @@ end
 When(/^they complete and submit the tax information$/) do
   choose("is_required_to_file_taxes_yes")
   choose("is_claimed_as_tax_dependent_yes")
+  find('#applicant_claimed_as_tax_dependent_by').select('Employee')
   click_button 'Next step'
   choose("is_ssn_applied_yes")
   choose("is_pregnant_yes")
+  fill_in 'applicant_pregnancy_due_on', with: "11/11/2016"
+  find('#applicant_children_expected_count').select('one')
+  choose("is_post_partum_period_yes")
+  fill_in 'student_status_end_on', with: "11/11/2017"
   choose("is_self_attested_blind_yes")
   choose("has_daily_living_help_yes")
   choose("need_help_paying_bills_yes")
-  choose("is_former_foster_care_yes")
   click_button 'Finish'
 end
 
@@ -89,9 +93,10 @@ And(/^they complete the form for the income$/) do
   fill_in 'employer_address[address_1]', with: "12 main st"
   fill_in 'employer_address[address_2]', with: "beside starbucks"
   fill_in 'employer_address[city]', with: "washington"
-  find('#employer_address_state').select('AZ')
+  find('#employer_address_state').select('DC')
   fill_in 'employer_address[zip]', with: "22046"
-  click_button 'Finish'
+  # click_button 'Finish'
+  page.find(".interaction-click-control-finish").trigger('click')
 end
 
 And(/^they click on 'Remove Income' button$/) do
@@ -165,12 +170,14 @@ end
 And (/^they review and submit the application$/) do
   choose("eligibility_easier_yes")
   choose("mailed_yes")
-# choose("application[medicaid_terms]")
-# choose("application[report_change_terms]")
-# choose("application[medicaid_insurance_collection_terms]")
-# choose("application[parent_living_out_of_home_terms]")
-# choose("application[attestation_terms]")
-# choose("application[submission_terms]")
+  click_button 'Next step'
+  check("application_medicaid_terms")
+  check("application_report_change_terms")
+  check("application_medicaid_insurance_collection_terms")
+  choose("living_outside_yes")
+  check("application_attestation_terms")
+  check("application_submission_terms")
+  page.find(".interaction-click-control-submit-my-application").trigger('click')
 end
 
 
@@ -199,7 +206,6 @@ When (/^they click on 'Add Benefit' button$/) do
   click_link 'Add Benefit'
 end
 
-
 # And (/^has added an benefit$/) do
 #   choose("yes2")
 #   find('#benefit_kind').select('medicare')
@@ -217,13 +223,8 @@ end
 # end
 
 And (/^they complete the form for the benefit$/) do
-  choose("is_enrolled_yes2")
-# fill_in 'benefit[amount]', with: '23.3'
-# find('.interaction-choice-control-benefit-kind', :text => 'medicare').click
-# find_all("#benifit_kind")[2].click
-  fill_in 'benefit_enrolled_start_on', with: "11/11/2016"
-  fill_in 'benefit_enrolled_end_on', with: "11/11/2017"
-  choose("is_eligible_no2")
+  find('#is_eligible').click
+  find('#benefit_insurance_kind').select('Acf Refugee Medical Assistance')
   click_button 'Finish'
 end
 
@@ -255,11 +256,11 @@ end
 
 And (/^they complete the form for the deduction/) do
   choose("adjustments_yes")
-  find('#deduction_kind').select('alimony_paid')
+  find('#deduction_kind').select('Alimony Paid')
   find('#deduction_frequency_kind').select('quarterly')
   fill_in 'deduction[amount]', with: "2.2"
-  find_all(".interaction-choice-control-deduction-frequency-kind")[2].click
-  fill_in 'deduction[start_on]', with: "11/11/2016"
+  # find_all(".interaction-choice-control-deduction-frequency-kind")[2].click
+  fill_in 'deduction[start_on]', with: "10/11/2016"
   fill_in 'deduction[end_on]', with: "11/18/2016"
   click_button 'Finish'
 end

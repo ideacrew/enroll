@@ -159,10 +159,10 @@
                   type: 'dropdown'
                   name: ''
                   values:
-                    - 1
-                    - 2
-                    - 3
-                  id: 'kind'
+                    - one
+                    - two
+                    - three
+                  id: 'applicant_children_expected_count'
                   model: applicant
                   attribute: children_expected_count
             - cells:
@@ -319,7 +319,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'is_self_attested_blind_yes'
+                  id: 'had_medicaid_during_foster_care_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -327,7 +327,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'is_self_attested_blind_no'
+                  id: 'had_medicaid_during_foster_care_no'
                   label: 'No'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -339,9 +339,8 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'need_help_paying_bills_yes'
                   required: true
-                  id: 'student_yes'
+                  id: 'is_student_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_student
@@ -349,9 +348,8 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'need_help_paying_bills_no'
                   required: true
-                  id: 'student_no'
+                  id: 'is_student_no'
                   label: 'No'
                   model: applicant
                   attribute: is_student
@@ -369,7 +367,7 @@
                     - Half Time
                     - Part Time
                     - Not In School
-                  id: 'kind'
+                  id: 'student_kind_id'
                   model: applicant
                   attribute: student_kind
             - cells:
@@ -379,7 +377,7 @@
                 - gutter: 3
                   type: input_date
                   placeholder: End on
-                  id: 'yes2'
+                  id: 'student_status_end_on'
                   model: applicant
                   attribute: student_status_end_on
             - cells:
@@ -414,9 +412,8 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'is_former_foster_care_yes'
                   required: true
-                  id: 'has_daily_living_help_yes'
+                  id: 'is_self_attested_blind_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -424,9 +421,8 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'is_former_foster_care_no'
                   required: true
-                  id: 'has_daily_living_help_no'
+                  id: 'is_self_attested_blind_no'
                   label: 'No'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -439,7 +435,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'need_help_paying_bills_yes'
+                  id: 'has_daily_living_help_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: has_daily_living_help
@@ -448,7 +444,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'need_help_paying_bills_no'
+                  id: 'has_daily_living_help_no'
                   label: 'No'
                   model: applicant
                   attribute: has_daily_living_help
@@ -461,7 +457,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'is_former_foster_care_yes'
+                  id: 'need_help_paying_bills_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: need_help_paying_bills
@@ -470,7 +466,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'is_former_foster_care_no'
+                  id: 'need_help_paying_bills_no'
                   label: 'No'
                   model: applicant
                   attribute: need_help_paying_bills
