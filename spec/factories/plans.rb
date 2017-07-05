@@ -17,6 +17,29 @@ FactoryGirl.define do
     family_deductible   "$500 per person | $1000 per group"
 
     # association :premium_tables, strategy: :build
+    #
+    trait :with_rating_factors do
+      after :create do |plan, evaluator|
+        active_year = plan.active_year
+        carrier_id = plan.carrier_profile_id
+        SicCodeRatingFactorSet.create!({
+          :carrier_profile_id => carrier_id,
+          :active_year => active_year,
+          :default_factor_value => 1.0
+        })
+        EmployerGroupSizeRatingFactorSet.create!({
+          :carrier_profile_id => carrier_id,
+          :active_year => active_year,
+          :default_factor_value => 1.0,
+          :max_integer_factor_key => 1
+        })
+        EmployerParticipationRateRatingFactorSet.create!({
+          :carrier_profile_id => carrier_id,
+          :active_year => active_year,
+          :default_factor_value => 1.0
+        })
+      end
+    end
 
     trait :with_dental_coverage do
       coverage_kind "dental"
