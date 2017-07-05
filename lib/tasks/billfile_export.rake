@@ -2,7 +2,7 @@ require 'csv'
 
 namespace :billfile do
   desc "Create a BillFile for Wells Fargo."
-  # Usage rake billfile:export
+  # Usage rake billfile:from_file_path
   task :export => [:environment] do
     orgs = Organization.all
 
@@ -43,9 +43,9 @@ namespace :billfile do
     Aws::S3Storage.save(FILE_PATH, 'billfile')
   end
   
-  task :remove_from_file_path do
+  task :from_file_path do
     File.delete(FILE_PATH)
   end
   
-  Rake::Task[:export].enhance [:save_to_s3, :remove_from_file_path]
+  Rake::Task[:from_file_path].enhance [:export, :save_to_s3]
 end
