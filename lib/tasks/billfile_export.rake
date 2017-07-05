@@ -43,9 +43,12 @@ namespace :billfile do
     Aws::S3Storage.save(FILE_PATH, 'billfile')
   end
   
-  task :from_file_path do
+  task :from_file_path => [:environment] do
     File.delete(FILE_PATH)
   end
+  
+  #task :remove_from_s3 => [:environment] do
+  #end
   
   Rake::Task[:from_file_path].enhance [:export, :save_to_s3]
 end
