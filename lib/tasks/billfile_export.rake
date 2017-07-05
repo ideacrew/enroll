@@ -4,7 +4,7 @@ namespace :billfile do
   desc "Create a BillFile for Wells Fargo."
   # Usage rake billfile:export
   task :export => [:environment] do
-    orgs = Organization.all.limit(50)
+    orgs = Organization.all
 
     FILE_PATH = Rails.root.join "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
     # keeps value two decimal places from right
@@ -24,7 +24,6 @@ namespace :billfile do
   
         if invoice.present?
           nfp = NfpIntegration::SoapServices::Nfp.new(reference_number)
-          binding.pry
           due_date = invoice.date.end_of_month.strftime("%m/%d/%Y")
           if nfp.present?
             total_due = format_total_due(nfp.statement_summary.xpath("//TotalDue").text)
@@ -41,10 +40,11 @@ namespace :billfile do
   end
   
   task :save_to_s3 => [:environment] do
-    puts "S3 alert Saved"
+    Aws::S3Storage.save(FILE_PATH, 'billfile')
   end
   
   task :remove_from_file_path do
+    File.delete(FILE_PATH)
   end
   
   Rake::Task[:export].enhance [:save_to_s3, :remove_from_file_path]
