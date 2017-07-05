@@ -428,9 +428,8 @@ private
 
   def create_tax_households
     # Create THH for the primary applicant.
-    yo = tax_households.create!
+    primary_applicant.tax_household = tax_households.create!
 
-    primary_applicant.tax_household = yo
     applicants.each do |applicant|
       if applicant.is_claimed_as_tax_dependent?
         # Assign this applicant to the same THH that the person claiming this dependent belongs to.
