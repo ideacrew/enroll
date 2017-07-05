@@ -1,13 +1,15 @@
 $(document).ready(function() {
 
-    $.ajax({
-      type: "GET",
-      data:{},
-      url: window.location.href.replace("step", "age_18_to_26"),
-      success: function (age) {
-        hide_show_foster_care_related_qns(age);
-       }
-    });
+    if ($('#medicaid_pregnency_yes').length) {
+      $.ajax({
+        type: "GET",
+        data:{},
+        url: window.location.href.replace(/step(\/\d)?/, "age_18_to_26"),
+        success: function (age) {
+          hide_show_foster_care_related_qns(age);
+        }
+      });
+    }
 
     // To hide/show the foster care related questions based on the age_of_the_applicant.
     function hide_show_foster_care_related_qns(age) {
