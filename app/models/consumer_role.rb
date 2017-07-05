@@ -74,6 +74,7 @@ class ConsumerRole
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
+  field :is_applying_coverage, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -468,7 +469,9 @@ class ConsumerRole
     person.addresses = []
     person.phones = []
     person.emails = []
-    person.update_attributes(*args)
+    person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
+    args[0].delete("is_applying_coverage")
+    person.update_attributes(args[0])
   end
 
   def build_nested_models_for_person
@@ -711,7 +714,21 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+    (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  end
+
+  def sensitive_information_changed(field, person_params)
+    if field == "dob"
+      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
+    elsif field == "ssn"
+      person.send(field).to_s != person_params[field].tr("-", "")
+    else
+      person.send(field).to_s != person_params[field]
+    end
+  end
+
+  def no_changes_24_h?
+    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
   end
 
   def record_transition(*args)
