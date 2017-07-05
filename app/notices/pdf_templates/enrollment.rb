@@ -13,7 +13,7 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
-    attribute :dependents, String
+    attribute :dependents, Array[String]
     attribute :plan_year, Date
   end
 end

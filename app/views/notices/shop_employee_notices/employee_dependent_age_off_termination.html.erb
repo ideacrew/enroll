@@ -18,7 +18,7 @@
   </tbody>
 </table>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents}, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance with #{notice.employer_name} will terminate automatically on December 31st of this year. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on December 31st of that year."} %>
+  content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance with #{notice.employer_name} will terminate automatically on December 31st of this year. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on December 31st of that year."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "This means that, although your dependent child may be eligible to participate in #{Settings.site.short_name},they are not eligible to remain active on your policy as a dependent.  This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
