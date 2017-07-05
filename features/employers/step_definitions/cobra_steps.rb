@@ -177,11 +177,13 @@ And(/^.+ should see the status of cobra_eligible$/) do
 end
 
 And(/^.+ should see the status of Cobra Linked$/) do
-  expect(page).to have_content('Cobra Linked')
+  find("div[data-key=active]", :wait => 3).click
+  wait_for_ajax
+  expect(page).to have_content('Cobra linked')
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee Role Linked')
+  expect(page).to have_content('Employee role linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
@@ -240,8 +242,10 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
-  element.find('i.fa-trash-o').click
+  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  element.find(".dropdown-toggle", :text => "Actions").click
+  wait_for_ajax
+  element.find('a', :text => "Terminate").click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
   click_link 'Terminate Employee'
@@ -253,17 +257,18 @@ Then(/^.+ should see terminate successful msg$/) do
 end
 
 When(/^.+ click all employee filter$/) do
-  find('.filter').click
-  find('input#family_all').trigger('click')
+  find('div[data-key=all]').click
 end
 
 Then(/^.+ should see the status of Employment terminated$/) do
-  expect(page).to have_content('Employment Terminated')
+  expect(page).to have_content('Employment terminated')
 end
 
 When(/^.+ cobra one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
-  element.find('a.show_cobra_confirm').click
+  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  element.find(".dropdown-toggle", :text => "Actions").click
+  wait_for_ajax
+  element.find('a', :text => "Initiate Cobra").click
 
   employee_id = element.find('a', :text => 'Employee Jr.')[:href].match(/^.*\/census_employees\/(\w+).*/i)[1]
   find("tr.cobra_confirm_#{employee_id}").find('a.cobra_confirm_submit').click
