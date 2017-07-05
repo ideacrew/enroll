@@ -1,4 +1,3 @@
-
 module Effective
   module Datatables
     class EmployerDatatable < Effective::MongoidDatatable
@@ -38,6 +37,7 @@ module Effective
           [@latest_plan_year.try(:enrolled_summary), @latest_plan_year.try(:waived_summary)].compact.join("/")
           }, :filter => false, :sortable => false
         table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
+        table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row| row.employer_profile.employer_attestation.aasm_state.try(:titleize) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -148,7 +148,7 @@ module Effective
             {scope: 'employer_attestations_submitted', label: 'Submited'},
             {scope: 'employer_attestations_pending', label: 'Pending'},
             {scope: 'employer_attestations_approved', label: 'Approved'},
-            # {scope: 'employer_attestations_denied', label: 'Denied'},
+            {scope: 'employer_attestations_denied', label: 'Denied'},
           ],  
         employers:
          [
