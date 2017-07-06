@@ -271,11 +271,21 @@ Then(/^.+ should see the status of Employment terminated$/) do
 end
 
 When(/^.+ cobra one employee$/) do
+  table = find("table.effective-datatable")
+  rows = table.all("tr")
+  waited_time = 0
+  puts rows.count
+  while((rows.count > 2) || (waited_time < 5)) do
+    sleep 1
+    table = find("table.effective-datatable")
+    rows = table.all("tr")
+    waited_time = waited_time + 1
+  end
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
   wait_for_ajax
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
-  find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
+#   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
   find('a.cobra_confirm', :wait => 3).click
 end
 
