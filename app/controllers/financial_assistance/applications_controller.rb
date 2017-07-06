@@ -1,11 +1,14 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
+
+  before_action :set_current_person
+
   include UIHelpers::WorkflowController
   include NavigationHelper
 
   before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit, :eligibility_results]
 
   def index
-    @family = current_user.person.primary_family
+    @family = @person.primary_family
     @applications = @family.applications
   end
 
@@ -14,14 +17,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def create
-    @application = current_user.person.primary_family.applications.new
+    @application = @person.primary_family.applications.new
     @application.populate_applicants_for(@current_user.person.primary_family)
     @application.save!
     redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def edit
-    @family = current_user.person.primary_family
+    @family = @person.primary_family
     @application = FinancialAssistance::Application.find(params[:id])
 
     render layout: 'financial_assistance'
@@ -54,7 +57,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def get_help_paying_coverage_response
-    @person = current_user.person
     family = @person.primary_family
     family.is_applying_for_assistance = params["is_applying_for_assistance"]
     family.save!
@@ -69,7 +71,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def application_checklist
-    @person = current_user.person
     @selectedTab = "householdInfo"
     @allTabs = NavigationHelper::getAllTabs
   end
@@ -77,14 +78,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def review_and_submit
     @selectedTab = "reviewAndSubmit"
     @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
-    @person = current_user.person
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.applicants
   end
 
   def eligibility_results
-    @person = current_user.person
+    @person
   end
 
   private
@@ -103,6 +103,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def find
-    @application = current_user.person.primary_family.applications.find(params[:id]) if params.key?(:id)
+    @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
   end
 end
