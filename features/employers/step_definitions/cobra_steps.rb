@@ -267,10 +267,10 @@ end
 
 When(/^.+ cobra one employee$/) do
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
-  element.find(".dropdown-toggle", :text => "Actions").click
-  wait_for_ajax(6)
-  element.find('a', :text => "Initiate Cobra").click
-  wait_for_ajax(5)
+  element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
+  wait_for_ajax
+  element.find(".dropdown", :wait => 2).find('a', :text => "Initiate Cobra", :wait => 3).click
+  wait_for_ajax
   find('input.date-picker').set((TimeKeeper.date_of_record + 30.days).to_s)
   find('a.cobra_confirm').click
 end
