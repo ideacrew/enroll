@@ -5,7 +5,7 @@ class DelinkBroker < MongoidMigrationTask
   def migrate
     hbx_id = ENV['person_hbx_id']
     legal_name = ENV['legal_name']
-    organization_ids_to_move = ENV['organization_ids_to_move'].split(",")
+    organization_ids_to_move = ENV['organization_ids_to_move'].split(",") if ENV['organization_ids_to_move'].present?
     fein = ENV['fein']
     person=Person.where(hbx_id: hbx_id).first
     orgn = Organization.where(:fein => fein).first
@@ -23,7 +23,7 @@ class DelinkBroker < MongoidMigrationTask
                                                       default_general_agency_profile_id: BSON::ObjectId('57334ab5082e761cd7000025'),
                                                       organization: org)
       org.save
-
+      org.broker_agency_profile.approve!
       #update fields
       person.broker_role.update_attributes!(broker_agency_profile_id: broker_agency_profile.id)
       person.broker_role.save
