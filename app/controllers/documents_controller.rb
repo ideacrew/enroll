@@ -71,7 +71,7 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    @person.consumer_role.redetermine!(verification_attr)
     respond_to do |format|
       format.html {
         flash[:success] = "Request was sent to FedHub."

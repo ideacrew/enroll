@@ -8,15 +8,22 @@ var Verification = (function(){
    function showReturnForDef(target){
        $('#'+target_id(target)+'-return').fadeIn('slow');
    }
+   function showHubCall(target){
+       $('#'+target_id(target)+'-hub').fadeIn('slow');
+   }
    function hideAllActions(target){
        hideVerifyAction(target);
        hideReturnForDef(target);
+       hideHubCall(target);
    }
    function hideVerifyAction(target){
        $('#'+target_id(target)).hide();
    }
    function hideReturnForDef(target){
        $('#'+target_id(target)+'-return').hide();
+   }
+   function hideHubCall(target){
+       $('#'+target_id(target)+'-hub').hide();
    }
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
@@ -34,6 +41,10 @@ var Verification = (function(){
          case 'Return for Deficiency':
              hideAllActions($selected_id);
              showReturnForDef($selected_id);
+             break;
+         case 'Call HUB':
+             hideAllActions($selected_id);
+             showHubCall($selected_id);
              break;
          default:
              hideAllActions($selected_id);
