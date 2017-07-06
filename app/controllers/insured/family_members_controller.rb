@@ -2,7 +2,6 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
 
   before_action :set_current_person, :set_family
-  before_action :setup_navigation, only: [:index]
 
   def index
     set_bookmark_url
@@ -204,12 +203,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
 private
-
-  def setup_navigation
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
-    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
-  end
 
   def set_family
     @family = @person.try(:primary_family)
