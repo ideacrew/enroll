@@ -335,8 +335,6 @@ var EmployerProfile = ( function( window, undefined ) {
   }
 
   function submitCobraDate(cobra_date, cobra_link) {
-    console.log(cobra_date);
-    console.log(cobra_link);
     $.ajax({
       type: 'get',
       datatype : 'js',
@@ -345,12 +343,22 @@ var EmployerProfile = ( function( window, undefined ) {
     });
   }
 
+  function viewCobraDateField() {
+    var target = $('#census_employee_existing_cobra');
+    if(target.prop("checked") == true){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
+    }else if(target.prop("checked") == false){
+      target.parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
+    }
+  }
+
   return {
       changeCensusEmployeeStatus: changeCensusEmployeeStatus,
       validateEditPlanYear : validateEditPlanYear,
       validatePlanYear : validatePlanYear,
       validateCobraBeginDate : validateCobraBeginDate,
       viewDetails : viewDetails,
+      viewCobraDateField: viewCobraDateField,
       showActionNeeded : showActionNeeded,
       submitCobraDate : submitCobraDate,
     };

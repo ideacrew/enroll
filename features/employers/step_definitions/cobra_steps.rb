@@ -258,6 +258,7 @@ end
 
 When(/^.+ click all employee filter$/) do
   find('div[data-key=all]').click
+  wait_for_ajax(4)
 end
 
 Then(/^.+ should see the status of Employment terminated$/) do
@@ -267,11 +268,11 @@ end
 When(/^.+ cobra one employee$/) do
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find(".dropdown-toggle", :text => "Actions").click
-  wait_for_ajax
+  wait_for_ajax(6)
   element.find('a', :text => "Initiate Cobra").click
-
-  employee_id = element.find('a', :text => 'Employee Jr.')[:href].match(/^.*\/census_employees\/(\w+).*/i)[1]
-  find("tr.cobra_confirm_#{employee_id}").find('a.cobra_confirm_submit').click
+  wait_for_ajax(5)
+  find('input.date-picker').set((TimeKeeper.date_of_record + 30.days).to_s)
+  find('a.cobra_confirm').click
 end
 
 Then(/^.+ should see cobra successful msg/) do
@@ -279,7 +280,7 @@ Then(/^.+ should see cobra successful msg/) do
 end
 
 And(/^.+ should only see the status of Cobra Linked$/) do
-  expect(page).to have_content('Cobra Linked')
+  expect(page).to have_content('Cobra linked')
   expect(page).not_to have_content('Employee Role Linked')
   expect(page).not_to have_content('Employment Terminated')
 end

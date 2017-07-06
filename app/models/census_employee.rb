@@ -398,6 +398,8 @@ class CensusEmployee < CensusMember
   end
 
   def update_for_cobra(cobra_date,current_user=nil)
+    Rails::logger.debug "in census_employee"
+    Rails::logger.debug cobra_date
     self.cobra_begin_date = cobra_date
     self.elect_cobra(current_user)
     self.save
@@ -711,9 +713,12 @@ class CensusEmployee < CensusMember
 
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
-    cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months) &&
-      coverage_terminated_on <= cobra_begin_date &&
+    return false unless cobra_begin_date.present?
+    return false unless coverage_terminated_on
+    return false unless coverage_terminated_on <= cobra_begin_date
+
+    (hired_on <= cobra_begin_date) &&
+      (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
       cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 

@@ -77,11 +77,17 @@ module Effective
       end
 
       def cobra_possible? census_employee
-        (rehire_possible? census_employee) && !census_employee.rehired? ? 'ajax' : 'disabled'
+        return 'disabled' if census_employee.cobra_linked?
+        return 'disabled' if census_employee.cobra_eligible?
+        return 'disabled' if census_employee.rehired?
+        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
       end
 
       def rehire_possible? census_employee
-        (census_employee.active_or_pending_termination? && !census_employee.rehired?) ? 'ajax' : 'disabled'
+        return 'disabled' if census_employee.cobra_linked?
+        return 'disabled' if census_employee.cobra_eligible?
+        return 'disabled' if census_employee.rehired?
+        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
       end
 
       def terminate_possible? census_employee
