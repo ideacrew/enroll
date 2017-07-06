@@ -329,7 +329,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_or_pending_termination?
-    return true if self.coverage_terminated_on.present?
+    return true if self.employment_terminated_on.present?
     return true if PENDING_STATES.include?(self.aasm_state)
     return false if self.rehired?
     !(self.is_eligible? || self.employee_role_linked?)

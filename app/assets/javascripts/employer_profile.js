@@ -334,25 +334,15 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
-  function submitCobraDate(type, ce_id) {
-    var target = $("tr."+type+'_'+ce_id);
-    var cobra_date = target.find('input.date-picker').val();
-    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  function submitCobraDate(cobra_date, cobra_link) {
+    console.log(cobra_date);
+    console.log(cobra_link);
     $.ajax({
       type: 'get',
       datatype : 'js',
       url: cobra_link,
       data: {cobra_date: cobra_date},
     });
-  }
-
-  function viewCobraDateField() {
-    var target = $('#census_employee_existing_cobra');
-    if(target.prop("checked") == true){
-      target.parents('#cobra_info').find('#cobra_begin_date_field').removeClass('hidden');
-    }else if(target.prop("checked") == false){
-      target.parents('#cobra_info').find('#cobra_begin_date_field').addClass('hidden');
-    }
   }
 
   return {
@@ -362,7 +352,6 @@ var EmployerProfile = ( function( window, undefined ) {
       validateCobraBeginDate : validateCobraBeginDate,
       viewDetails : viewDetails,
       showActionNeeded : showActionNeeded,
-      viewCobraDateField : viewCobraDateField,
       submitCobraDate : submitCobraDate,
     };
 
@@ -468,11 +457,27 @@ $(document).on('click', "a.terminate.cancel", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
+$(document).on('click', "a.cobra.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
     $('tr.child-row:visible').remove();
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
+
+$(document).on('click', '.cobra_confirm', function(){
+  event.preventDefault();
+  var datepicker = $(this).prev();
+  var cobra_date = datepicker.val();
+  var cobra_link = $(this).data('link');
+  // var target = $("tr."+type+'_'+ce_id);
+  // var cobra_date = target.find('input.date-picker').val();
+  // var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  EmployerProfile.submitCobraDate(cobra_date, cobra_link);
+})
 
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
