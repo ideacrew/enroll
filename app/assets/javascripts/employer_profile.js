@@ -470,6 +470,11 @@ $(document).on('click', "a.cobra.cancel", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
+$(document).on('click', "a.rehire.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
     $('tr.child-row:visible').remove();
@@ -507,7 +512,7 @@ $(document).on('click', ".delete_confirm", function(){
   });
 });
 
-$(document).on('click', ".rehire_confirm", function(){
+$(document).on('click', ".rehire-confirm", function(){
   var element_id = $(this).attr('id');
   var rehiring_date = $(this).siblings().val();
   var rehire_link = $(this).data('link');

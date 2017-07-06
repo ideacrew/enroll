@@ -184,9 +184,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def cobra
     cobra_date = params["cobra_date"]
-    Rails::logger.debug "inside controller"
-    Rails::logger.debug cobra_date
-    Rails::logger.debug TimeKeeper.date_of_record
+
     if cobra_date.present?
       @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
     else
