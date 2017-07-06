@@ -262,7 +262,7 @@ When(/^.+ click all employee filter$/) do
 end
 
 Then(/^.+ should see the status of Employment terminated$/) do
-  expect(page).to have_content('Employment terminated')
+  expect(find("td", :text => "Employment terminated", :wait => 3)).not_to be_nil
 end
 
 When(/^.+ cobra one employee$/) do
