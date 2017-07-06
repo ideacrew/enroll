@@ -22,6 +22,5 @@ module PdfTemplates
     def employee_notice?
       false
     end
-
   end
 end
