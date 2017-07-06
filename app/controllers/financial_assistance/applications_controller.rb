@@ -15,10 +15,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def create
     @application = current_user.person.primary_family.applications.new
-    @application.applicants = @current_user.person.primary_family.family_members.map do |family_member|
-      FinancialAssistance::Applicant.new family_member_id: family_member.id
-    end
-    @application.family.update_attributes(is_applying_for_assistance: true) unless @application.family.is_applying_for_assistance
+    @application.populate_applicants_for(@current_user.person.primary_family)
     @application.save!
     redirect_to edit_financial_assistance_application_path(@application)
   end
@@ -26,6 +23,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def edit
     @family = current_user.person.primary_family
     @application = FinancialAssistance::Application.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def step

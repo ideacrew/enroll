@@ -50,7 +50,7 @@ class FinancialAssistance::Applicant
   field :is_temp_out_of_state, type: Boolean, default: false
 
   field :is_required_to_file_taxes, type: Boolean, default: true
-  field :tax_filer_kind, type: String, default: "tax_filer"
+  field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
   field :is_joint_tax_filing, type: Boolean, default: false
   field :is_claimed_as_tax_dependent, type: Boolean
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
@@ -157,6 +157,14 @@ class FinancialAssistance::Applicant
     end
   end
 
+  def tax_filing?
+    is_required_to_file_taxes
+  end
+
+  def is_claimed_as_tax_dependent?
+    is_claimed_as_tax_dependent
+  end
+
   #### Use Person.consumer_role values for following
   def is_us_citizen?
   end
@@ -235,9 +243,13 @@ class FinancialAssistance::Applicant
     family_member.family
   end
 
+  def tax_household=(thh)
+    self.tax_household_id = thh.id
+  end
+
   def tax_household
     return nil unless tax_household_id
-    family.active_approved_application.tax_households.where(id: tax_household_id).first
+    self.application.tax_households.find(tax_household_id)
   end
 
   def age_on_effective_date
@@ -281,7 +293,7 @@ class FinancialAssistance::Applicant
 
 private
   def validate_applicant_information
-    validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_joint_tax_filing, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+    validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
   end
 
   def presence_of_attr_step_1
@@ -341,13 +353,17 @@ private
     end
 
     # TODO : Revise this logic for conditional saving!
-    # if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
-    #   model_params[:pregnancy_due_on] = nil
-    #   model_params[:children_expected_count] = nil
-    #   model_params[:is_post_partum_period] = nil
-    #   model_params[:pregnancy_end_on] = nil
-    #   model_params[:is_enrolled_on_medicaid] = nil
-    # end
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'false'
+      model_params[:pregnancy_due_on] = nil
+      model_params[:children_expected_count] = nil
+      model_params[:is_enrolled_on_medicaid] = nil if model_params[:is_post_partum_period] == "false"
+    end
+
+    if model_params[:is_pregnant].present? && model_params[:is_pregnant] == 'true'
+      model_params[:is_post_partum_period] = nil
+      model_params[:pregnancy_end_on] = nil
+      model_params[:is_enrolled_on_medicaid] = nil
+    end
 
     if model_params[:is_former_foster_care].present? && model_params[:is_former_foster_care] == 'false'
       model_params[:foster_care_us_state] = nil

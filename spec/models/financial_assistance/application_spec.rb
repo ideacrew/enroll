@@ -118,12 +118,18 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       let!(:valid_application) { FactoryGirl.create(:application, family: family, hbx_id: "345332", applicant_kind: "user and/or family", request_kind: "request-kind",
                                                     motivation_kind: "motivation-kind", us_state: "DC", is_ridp_verified: true, assistance_year: 2017, aasm_state: "draft",
                                                     medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
-                                                    report_change_terms: true, parent_living_out_of_home_terms: true) }
-      let!(:invalid_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft") }
+                                                    report_change_terms: true, parent_living_out_of_home_terms: true, applicants: [applicant_primary]) }
+      let!(:invalid_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", applicants: [applicant_primary2]) }
+
+      let!(:applicant_primary) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+      let!(:applicant_primary2) { FactoryGirl.create(:applicant, tax_household_id: tax_household2.id, application: application, family_member_id: family_member.id) }
+      let!(:tax_household1) {FactoryGirl.create(:tax_household, application: application, effective_ending_on: nil)}
+      let!(:tax_household2) {FactoryGirl.create(:tax_household, application: application, effective_ending_on: nil)}
+      let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
 
       it "should allow a sucessful state transition if the application is valid" do
         expect(valid_application.submit).to eq true
-        expect(valid_application.aasm_state).to eq "verifying_income"
+        expect(valid_application.aasm_state).to eq "submitted"
       end
 
       it "should invoke submit_application on a sucessful state transition on submit" do

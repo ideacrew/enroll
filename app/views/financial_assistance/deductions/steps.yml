@@ -12,7 +12,7 @@
                   type: label_radio
                   name: row2
                   value: 'yes2'
-                  id: 'yes2'
+                  id: 'adjustments_yes'
                   label: 'Yes'
                 - gutter: 1
                   type: label_radio
@@ -32,6 +32,7 @@
                   type: 'dropdown'
                   name: kind
                   required: true
+                  id: 'frequency_kind'
                   values:
                     - alimony_paid
                     - deductable_part_of_self_employment_taxes
@@ -59,7 +60,8 @@
                   attribute: amount
                 - gutter: 3
                   type: dropdown
-                  name: frequency
+                  id: 'frequency_kind'
+                  name: frequency_kind
                   required: true
                   values:
                     - biweekly

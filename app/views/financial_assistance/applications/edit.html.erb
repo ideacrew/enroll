@@ -1,7 +1,11 @@
-<div class="container bottom-pd">
+<div class="col-md-10">
 	<div class="row">
+    <div class="col-md-6">
+      <h3 class="title-inline"><b>Financial Assistance Application</b></h3>
+    </div>
+    <div class="col-md-6">
       <div> <%= link_to "Go To Household Member Page", insured_family_members_path, class: "btn btn-small btn-default back_to-household-btn" %></div>
-		<h3 class="title-inline"><b>Financial Assistance Application</b></h3>
+    </div>
 	</div>
 	<table class="table table-sm">
 		<tr>
@@ -9,16 +13,16 @@
 			<td><h4><b>Status:</b> <%=@application.aasm_state%></h4></td>
 		</tr>
 	</table>
-  <div class="row input-no-pd">
-	<h4><b>Primary Applicant</b><h4>
-	<%= render 'fa_table', members: [@family.primary_applicant] %>
 
-	<%if @family.dependents.present?%>
-		<h4><b>Household Members</b><h4>
-		<%= render 'fa_table', members: @family.dependents %>
-	<%end%>
+    <h4><b>Primary Applicant</b></h4>
+    <%= render 'fa_table', members: [@family.primary_applicant] %>
 
-	<div class="row input-no-pd small">
+    <%if @family.dependents.present?%>
+      <h4><b>Household Members</b></h4>
+      <%= render 'fa_table', members: @family.dependents %>
+    <%end%>
+
+	<div class="small">
 		<h3>Next Step : Add Household Members </h3>
 		<p>You must include all members of your household in the application, even if they're not enrolling in coverage.</p>
 		<i class="fa fa-question-circle"><small><a href="" data-toggle="modal" data-target="#help-me-decide"> Help me decide who is in my household</a></small></i>
@@ -28,7 +32,7 @@
 	<div>
 		<h4>OR</h4>
 	</div>
-	<div class="row input-no-pd small">
+	<div class="small">
 		<h3>Review and Continue</h3>
 		<p>If you have added everyone in your household, continue below:</p>
 		<div> <%= button_to "Review and Continue", go_to_step_financial_assistance_application_path(@application, 1), :id => "", :class => "btn btn-success", :method => :get %></div>

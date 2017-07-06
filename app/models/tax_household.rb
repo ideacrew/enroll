@@ -181,8 +181,8 @@ class TaxHousehold
   end
 
   def applicants
-    return nil unless family.active_approved_application
-    family.active_approved_application.applicants.where(tax_household_id: self.id)
+    return nil unless application.applicants
+    application.applicants.where(tax_household_id: self.id)
   end
 
   def preferred_eligibility_determination

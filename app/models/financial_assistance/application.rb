@@ -62,7 +62,7 @@ class FinancialAssistance::Application
   field :workflow, type: Hash, default: { }
 
   embeds_many :tax_households, class_name: "::TaxHousehold"
-  embeds_many :applicants, inverse_of: :applicant, class_name: "::FinancialAssistance::Applicant"
+  embeds_many :applicants, class_name: "::FinancialAssistance::Applicant"
   embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -175,10 +175,10 @@ class FinancialAssistance::Application
 
   end
 
-  def applicant
-    return nil unless tax_household_member
-    tax_household_member.family_member
-  end
+  # def applicant
+  #   return nil unless tax_household_member
+  #   tax_household_member.family_member
+  # end
 
   # The following methods will need to be refactored as there are multiple eligibility determinations - per THH
   # def eligibility_determination=(ed_instance)
@@ -295,6 +295,12 @@ class FinancialAssistance::Application
     tax_households.uniq
   end
 
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
+  end
+
   def current_csr_eligibility_kind(tax_household_id)
     eligibility_determination = eligibility_determination_for_tax_household(tax_household_id)
     eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
@@ -337,6 +343,12 @@ class FinancialAssistance::Application
 
   def is_draft?
     self.aasm_state == "draft" ? true : false
+  end
+
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
   end
 
 private
@@ -421,7 +433,30 @@ private
     set_assistance_year
     set_effective_date
 
-    # Trigger the CV generation process here.
+    create_tax_households
 
+    # Trigger the CV generation process here.
+  end
+
+  def create_tax_households
+    # Create THH for the primary applicant.
+    primary_applicant.tax_household = tax_households.create!
+
+    applicants.each do |applicant|
+      if applicant.is_claimed_as_tax_dependent?
+        # Assign this applicant to the same THH that the person claiming this dependent belongs to.
+        thh_of_claimer = applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
+        applicant.tax_household = thh_of_claimer
+      else
+        # Create a new THH and assign to the applicant.
+        applicant.tax_household = tax_households.create!
+      end
+    end
+
+    # delete THH without any applicant.
+    empty_th = tax_households.select do |th|
+      applicants.map(&:tax_household).exclude?(th)
+    end
+    empty_th.each &:destroy
   end
 end
