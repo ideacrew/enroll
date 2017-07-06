@@ -5,7 +5,7 @@
 %tax_filer_type= "urn:openhbx:terms:v1:tax_filer##{applicant.tax_filer_kind}"
 %is_joint_tax_filing= applicant.is_joint_tax_filing
 %is_claimed_as_tax_dependent= applicant.is_claimed_as_tax_dependent
-%has_insurance= applicant.has_insurance
+%has_insurance= applicant.has_insurance?
 %had_prior_insurance= applicant.had_prior_insurance?
 %has_state_health_benefit= applicant.has_state_health_benefit?
 %is_medicare_eligible= applicant.is_medicare_eligible
@@ -15,7 +15,7 @@
 - if applicant.student_school_kind
   %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind}"
 - if applicant.student_status_end_on
-  %student_status_end_on= simple_date_for(applicant.student_status_end_on)
+  %student_status_end_on= simple_date_for(Time.strptime(applicant.student_status_end_on,'%m/%d/%Y'))
 %is_ia_eligible= applicant.is_ia_eligible
 %is_medicaid_chip_eligible= applicant.is_medicaid_chip_eligible
 - if applicant.is_magi_medicaid

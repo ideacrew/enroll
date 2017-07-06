@@ -24,9 +24,9 @@
     %has_document_DS2019= person.consumer_role.has_ds2019?
     - if person.consumer_role.i551
       %document_I551_receipt_number= person.consumer_role.i551.receipt_number
-        - if person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_.present? }.size > 0
+    - if person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_.present? }.size > 0
       %document_I766
-          = render :partial => "events/lawful_presence/receipt_document", :collection => person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-7Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }, as: :receipt_document
+      = render :partial => "events/lawful_presence/receipt_document", :collection => person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-7Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }, as: :receipt_document
     - if person.consumer_role.mac_read_i551
       %document_mac_read_I551
       = render :partial => "events/lawful_presence/passport_information", :object => person.consumer_role.mac_read_i551, as: :passport_information
