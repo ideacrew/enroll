@@ -50,12 +50,20 @@ When(/^they complete and submit the tax information$/) do
   choose("is_ssn_applied_yes")
   choose("is_pregnant_yes")
   fill_in 'applicant_pregnancy_due_on', with: "11/11/2016"
-  find('#applicant_children_expected_count').select('one')
+  find('.selectric-interaction-choice-control-applicant-children-expected-count').click
+  page.all('.interaction-choice-control-applicant-children-expected-count-3')[1].click
   choose("is_post_partum_period_yes")
-  fill_in 'student_status_end_on', with: "11/11/2017"
-  choose("is_self_attested_blind_yes")
-  choose("has_daily_living_help_yes")
-  choose("need_help_paying_bills_yes")
+  fill_in 'applicant_pregnancy_end_on', with: "11/11/2017"
+  choose("medicaid_pregnency_yes")
+  choose("is_student_yes")
+  find('.selectric-interaction-choice-control-applicant-student-kind').click
+  page.all('.interaction-choice-control-applicant-children-expected-count-3')[1].click
+  find('.selectric-interaction-choice-control-applicant-student-school-kind').click
+  page.all('.interaction-choice-control-applicant-children-expected-count-3')[1].click
+  fill_in 'applicant_student_status_end_on', with: "12/15/2017"
+  find("#is_self_attested_blind_yes").trigger('click')
+  find("#has_daily_living_help_yes").trigger('click')
+  find("#need_help_paying_bills_yes").trigger('click')
   click_button 'Finish'
 end
 
