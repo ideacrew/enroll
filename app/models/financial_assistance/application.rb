@@ -295,6 +295,12 @@ class FinancialAssistance::Application
     tax_households.uniq
   end
 
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
+  end
+
   def current_csr_eligibility_kind(tax_household_id)
     eligibility_determination = eligibility_determination_for_tax_household(tax_household_id)
     eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
@@ -337,6 +343,12 @@ class FinancialAssistance::Application
 
   def is_draft?
     self.aasm_state == "draft" ? true : false
+  end
+
+  def populate_applicants_for(family)
+    self.applicants = family.family_members.map do |family_member|
+      FinancialAssistance::Applicant.new family_member_id: family_member.id
+    end
   end
 
 private

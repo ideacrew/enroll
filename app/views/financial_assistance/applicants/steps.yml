@@ -100,8 +100,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  required: true
-                  id: 'yes2'
+                  id: 'is_ssn_applied_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_ssn_applied
@@ -109,8 +108,9 @@
                   type: label_radio
                   name: row2
                   value: false
+                  id: 'is_ssn_applied_no'
                   required: true
-                  id: 'no2'
+                  id: 'is_ssn_applied_no'
                   label: 'No'
                   model: applicant
                   attribute: is_ssn_applied
@@ -122,8 +122,9 @@
                   type: label_radio
                   name: row2
                   value: true
+                  id: 'is_pregnant_yes'
                   required: true
-                  id: 'pregnant_yes'
+                  id: 'is_pregnant_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_pregnant
@@ -131,8 +132,9 @@
                   type: label_radio
                   name: row2
                   value: false
+                  id: 'is_pregnant_no'
                   required: true
-                  id: 'pregnant_no'
+                  id: 'is_pregnant_no'
                   label: 'No'
                   model: applicant
                   attribute: is_pregnant
@@ -154,10 +156,10 @@
                   type: 'dropdown'
                   name: ''
                   values:
-                    - 1
-                    - 2
-                    - 3
-                  id: 'kind'
+                    - one
+                    - two
+                    - three
+                  id: 'applicant_children_expected_count'
                   model: applicant
                   attribute: children_expected_count
             - cells:
@@ -314,7 +316,7 @@
                   type: label_radio
                   name: row2
                   value: true
-                  id: 'yes2'
+                  id: 'had_medicaid_during_foster_care_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -322,7 +324,7 @@
                   type: label_radio
                   name: row2
                   value: false
-                  id: 'no2'
+                  id: 'had_medicaid_during_foster_care_no'
                   label: 'No'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
@@ -335,7 +337,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'student_yes'
+                  id: 'is_student_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_student
@@ -344,7 +346,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'student_no'
+                  id: 'is_student_no'
                   label: 'No'
                   model: applicant
                   attribute: is_student
@@ -362,7 +364,7 @@
                     - Half Time
                     - Part Time
                     - Not In School
-                  id: 'kind'
+                  id: 'student_kind_id'
                   model: applicant
                   attribute: student_kind
             - cells:
@@ -372,7 +374,7 @@
                 - gutter: 3
                   type: input_date
                   placeholder: End on
-                  id: 'yes2'
+                  id: 'student_status_end_on'
                   model: applicant
                   attribute: student_status_end_on
             - cells:
@@ -408,7 +410,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'yes2'
+                  id: 'is_self_attested_blind_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -417,7 +419,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'no2'
+                  id: 'is_self_attested_blind_no'
                   label: 'No'
                   model: applicant
                   attribute: is_self_attested_blind
@@ -430,7 +432,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'yes2'
+                  id: 'has_daily_living_help_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: has_daily_living_help
@@ -439,7 +441,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'no2'
+                  id: 'has_daily_living_help_no'
                   label: 'No'
                   model: applicant
                   attribute: has_daily_living_help
@@ -452,7 +454,7 @@
                   name: row2
                   value: true
                   required: true
-                  id: 'yes2'
+                  id: 'need_help_paying_bills_yes'
                   label: 'Yes'
                   model: applicant
                   attribute: need_help_paying_bills
@@ -461,7 +463,7 @@
                   name: row2
                   value: false
                   required: true
-                  id: 'no2'
+                  id: 'need_help_paying_bills_no'
                   label: 'No'
                   model: applicant
                   attribute: need_help_paying_bills
