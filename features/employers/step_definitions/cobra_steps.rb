@@ -274,7 +274,6 @@ When(/^.+ cobra one employee$/) do
   table = find("table.effective-datatable")
   rows = table.all("tr")
   waited_time = 0
-  puts rows.count
   while((rows.count > 2) || (waited_time < 5)) do
     sleep 1
     table = find("table.effective-datatable")
@@ -285,8 +284,9 @@ When(/^.+ cobra one employee$/) do
   element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
   wait_for_ajax
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
+  wait_for_ajax
 #   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
-  find('a.cobra_confirm', :wait => 3).click
+  find('a.cobra_confirm', :text => /Initiate Cobra/i, :wait => 3).trigger('click')
 end
 
 Then(/^.+ should see cobra successful msg/) do
