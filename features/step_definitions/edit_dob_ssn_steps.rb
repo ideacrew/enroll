@@ -7,7 +7,7 @@ end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user
 When(/^Hbx Admin clicks on the Action button$/) do
-  find(:xpath, '(//*[@id="dropdownMenu1"])[1]').click
+  first("tr .dropdown-toggle", :text => "Actions").click
 end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user

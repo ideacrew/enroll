@@ -95,7 +95,7 @@ Then(/^the broker clicks on Home button$/) do
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
-  find('#dropdownMenu1').trigger 'click'
+  find('.dropdown-toggle', :text => "Actions").trigger 'click'
 end
 
 When(/^the broker clicks delete$/) do
