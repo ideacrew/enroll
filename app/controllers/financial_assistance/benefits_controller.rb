@@ -3,7 +3,6 @@ class FinancialAssistance::BenefitsController < ApplicationController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
-  before_action :setup_navigation
 
    def new
     @model = @applicant.benefits.build
@@ -94,10 +93,5 @@ class FinancialAssistance::BenefitsController < ApplicationController
   def format_date_params model_params
     model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["start_on"].present?
     model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
-  end
-
-  def setup_navigation
-    @selectedTab = "healthCoverage"
-    @allTabs = NavigationHelper::getAllYmlTabs
   end
 end

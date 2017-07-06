@@ -6,8 +6,6 @@
   before_filter :find_application_and_applicant
 
   def new
-    @selectedTab = "jobIncome"
-    @allTabs = NavigationHelper::getAllYmlTabs
     @model = @applicant.incomes.build
     load_steps
     current_step
@@ -16,18 +14,9 @@
 
   def step
     flash[:error] = nil
-    @selectedTab = "jobIncome"
-    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     format_date_params model_params
-
-    # if params.key?(model_name)
-    #   @model.workflow = { current_step: @current_step.to_i + 1 }
-    #   @current_step = @current_step.next_step if @current_step.next_step.present?
-    # else
-    #   @model.workflow = { current_step: @current_step.to_i }
-    # end
 
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
     update_employer_contact(@model, params) if @model.income_type == job_income_type

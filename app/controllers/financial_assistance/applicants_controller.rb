@@ -6,8 +6,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
 
   def edit
-    @selectedTab = "taxInfo"
-    @allTabs = NavigationHelper::getAllYmlTabs
     @applicant = @application.applicants.find(params[:id])
 
     render layout: 'financial_assistance'
@@ -15,16 +13,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def step
     flash[:error] = nil
-    case @current_step.heading.downcase
-      when "other questions"
-        @selectedTab = "otherQuestions"
-      when "tax info"
-        @selectedTab = "taxInfo"
-      else
-        @selectedTab = "placeholder"
-    end
-
-    @allTabs = NavigationHelper::getAllYmlTabs
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
     @model.clean_conditional_params(model_params) if model_params.present?

@@ -2,8 +2,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include UIHelpers::WorkflowController
   include NavigationHelper
 
-  before_action :setup_navigation, only: [:step, :help_paying_coverage, :application_checklist, :review_and_submit, :eligibility_results]
-
   def index
     @family = current_user.person.primary_family
     @applications = @family.applications
@@ -70,13 +68,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_checklist
     @person = current_user.person
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
   end
 
   def review_and_submit
-    @selectedTab = "reviewAndSubmit"
-    @allTabs << {"title" => "Review and Submit", "id" => "reviewAndSubmit"}
     @person = current_user.person
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
@@ -95,11 +89,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def permit_params(attributes)
     attributes.permit!
-  end
-
-  def setup_navigation
-    @selectedTab = "householdInfo"
-    @allTabs = NavigationHelper::getAllTabs
   end
 
   def find
