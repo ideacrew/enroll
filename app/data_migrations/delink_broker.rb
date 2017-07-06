@@ -9,7 +9,12 @@ class DelinkBroker < MongoidMigrationTask
     fein = ENV['fein']
     person=Person.where(hbx_id: hbx_id).first
     orgn = Organization.where(:fein => fein).first
+
     if orgn.nil? && person.broker_role
+
+      #update the broker role market kind
+      person.broker_role.update_attributes!(:market_kind => "both")
+
       hbx_office = OfficeLocation.new(
       is_primary: true, 
       address: {kind: "work", address_1: "10 Post Office Rd #233", address_2: "", city: "Silver Spring", state: "MD", zip: "20910" },
