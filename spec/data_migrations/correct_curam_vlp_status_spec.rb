@@ -25,7 +25,7 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
     subject { CorrectCuramVlpStatus.new("fix me task", double(:current_scope => nil)) }
 
     context "people with SSN, and NO qualifying ssa response" do
-      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role, :with_ssn)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
@@ -49,7 +49,7 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
     end
 
     context "people with SSN, and a qualifying ssa response" do
-      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role)}
+      let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role, :with_ssn)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"
         curam_user.consumer_role.lawful_presence_determination.aasm_state = "verification_pending"
