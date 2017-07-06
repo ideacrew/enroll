@@ -40,7 +40,12 @@ namespace :billfile do
   end
   
   task :save_to_s3 => [:environment] do
-    Aws::S3Storage.save(FILE_PATH, 'billfile')
+    bill_file = Aws::S3Storage.save(FILE_PATH, 'billfile')
+    if bill_file.present?
+      BillFile.create(urn: bill_file, creation_date: Date.today)
+    else
+      raise "No file present to save to S3."
+    end
   end
   
   task :from_file_path => [:environment] do
