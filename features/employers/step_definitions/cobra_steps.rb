@@ -256,6 +256,11 @@ Then(/^.+ should see terminate successful msg$/) do
   expect(page).to have_content('Successfully terminated Census Employee.')
 end
 
+When(/^.+ click terminated employee filter$/) do
+  find('div[data-key=terminated]').click
+  wait_for_ajax(4)
+end
+
 When(/^.+ click all employee filter$/) do
   find('div[data-key=all]').click
   wait_for_ajax(4)
@@ -269,10 +274,9 @@ When(/^.+ cobra one employee$/) do
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
   wait_for_ajax
-  element.find(".dropdown", :wait => 2).find('a', :text => "Initiate Cobra", :wait => 3).click
-  wait_for_ajax
+  element.find('a', :text => "Initiate Cobra", :wait => 3).click
   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
-  find('a.cobra_confirm').click
+  find('a.cobra_confirm', :wait => 3).click
 end
 
 Then(/^.+ should see cobra successful msg/) do
