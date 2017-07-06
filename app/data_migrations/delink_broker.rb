@@ -12,7 +12,7 @@ class DelinkBroker < MongoidMigrationTask
     if orgn.nil? && person.broker_role
       hbx_office = OfficeLocation.new(
       is_primary: true, 
-      address: {kind: "work", address_1: "21 Church St", address_2: "Suite 100", city: "Rockville", state: "MD", zip: "20850" },
+      address: {kind: "work", address_1: "10 Post Office Rd #233", address_2: "", city: "Silver Spring", state: "MD", zip: "20910" },
       phone: {kind: "main", area_code: "301", number: "509-3088"}
       )
 
