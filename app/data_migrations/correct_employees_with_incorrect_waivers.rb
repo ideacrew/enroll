@@ -71,8 +71,8 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
   end
 
   def renew_health_coverage(renewing_plan_year, ce, family)
-    employer = plan_year.employer_profile
-    active_plan_year = employer.plan_years.where(:start_on => renewing_plan_year.prev_year, :aasm_state.in => ['active', 'expired']).first
+    employer = renewing_plan_year.employer_profile
+    active_plan_year = employer.plan_years.where(:start_on => renewing_plan_year.start_on.prev_year, :aasm_state.in => ['active', 'expired']).first
 
     factory = Factories::FamilyEnrollmentRenewalFactory.new
     factory.family = family
