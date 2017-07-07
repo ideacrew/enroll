@@ -79,7 +79,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
     end
 
     it "should append necessary" do
-      renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING - PlanYear::RENEWING_PUBLISHED_STATE).first
+      renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
       active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on

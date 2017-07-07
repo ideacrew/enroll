@@ -13,7 +13,7 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
 
   def append_data
     active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
-    renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING - PlanYear::RENEWING_PUBLISHED_STATE).first
+    renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
     plan_year_warnings = []
     if renewing_plan_year.application_eligibility_warnings.include?(:primary_office_location)
       plan_year_warnings << "primary location is outside washington dc"
