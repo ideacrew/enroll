@@ -12,7 +12,7 @@ module Queries
     end
 
     def build_scope()
-      user = User
+      user = klass
       case @custom_attributes[:users]
         when "all_employer_staff_roles"
           if @custom_attributes[:lock_unlock] == "locked"
@@ -65,7 +65,7 @@ module Queries
     end
 
     def klass
-      Family
+      User
     end
 
     def size
