@@ -17,7 +17,7 @@
 
 
 <div class="container" id="attestation_documents_table">
-  <div class = "table-responsive table-override"> 
+  <div class = "table-responsive table-override">
   <h4> Attestation Documents </h4>
 
   <table class = "table" style="table-layout: fixed;">
@@ -39,7 +39,7 @@
           <td><%= "Employer Attestation" %>
           </td>
           <td></td>
-          <td><%= doc.created_at.strftime('%m/%d/%Y %I:%M%p') %></td>
+          <td><%= TimeKeeper.local_time(doc.created_at).strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
             <%= link_to 'Verify', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
