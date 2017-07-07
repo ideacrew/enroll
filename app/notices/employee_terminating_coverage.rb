@@ -29,7 +29,7 @@ class EmployeeTerminatingCoverage < Notice
     terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
       :terminated_on => terminated_enrollment.set_coverage_termination_date,
-      :dependents => terminated_enrollment.humanized_dependent_summary
+      :dependents_count => terminated_enrollment.humanized_dependent_summary
       })
   end
 

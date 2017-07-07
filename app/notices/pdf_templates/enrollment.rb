@@ -12,6 +12,6 @@ module PdfTemplates
     attribute :aptc_amount, String
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
-    attribute :dependents, String
+    attribute :dependents_count, String
   end
 end
