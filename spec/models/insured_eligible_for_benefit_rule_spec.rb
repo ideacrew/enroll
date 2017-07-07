@@ -438,4 +438,41 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
       end
     end
   end
+
+  context "benefit coverage period earliest effective date based on consumer DOB" do
+      let(:benefit_package) {double}
+      let(:consumer_role) {FactoryGirl.create(:consumer_role, person: family.family_members.where(is_primary_applicant: false).first.person)}
+      let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family) }
+      let(:family) {
+        family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent, person: person)
+        persn = family.family_members.where(is_primary_applicant: false).first.person
+        persn.dob = person.dob
+        persn.gender = person.gender
+        persn.save
+        family
+       }
+      let(:person) { FactoryGirl.create(:person)}
+      before :each do
+        person.person_relationships << PersonRelationship.new({
+          :kind => 'child',
+          :relative_id => family.family_members.where(is_primary_applicant: false).first.person.id
+        })
+      end
+
+      context "when day is less than 19th" do
+        it "should return true if age of child 28" do
+          dob= TimeKeeper.date_of_record - 28.years
+          allow(benefit_package).to receive_message_chain(:benefit_coverage_period,:earliest_effective_date).and_return TimeKeeper.date_of_record.end_of_month + 1.day
+          expect(rule.age_on_next_effective_date(dob.change(day: 1))).to eq 28
+        end
+      end
+
+      context "when day is above 19th" do
+        it "should return true if age of child 29" do
+          dob= TimeKeeper.date_of_record - 29.years
+          allow(benefit_package).to receive_message_chain(:benefit_coverage_period,:earliest_effective_date).and_return TimeKeeper.date_of_record.next_month.end_of_month + 1.day
+          expect(rule.age_on_next_effective_date(dob.change(day: 20))).to eq 29
+        end
+      end
+    end
 end
