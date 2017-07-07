@@ -3,6 +3,28 @@ puts "::: Cleaning ApplicationEventKinds :::"
 ApplicationEventKind.delete_all
 
 shop_notice_triggers = [
+  
+{
+    hbx_id: 'SHOP0',
+    title: 'Welcome Notice to Employer',
+    description: 'ER creates an account in Health',
+    resource_name: 'employer',
+    event_name: 'application_created',
+    notice_triggers: [
+      {
+        name: 'Welcome Notice sent to Employer',
+        notice_template: 'notices/shop_employer_notices/0_welcome_notice_employer',
+        notice_builder: 'ShopEmployerNotices::WelcomeEmployerNotice',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
     hbx_id: 'SHOP1A',
     title: 'Initial Employer SHOP Application Approval',

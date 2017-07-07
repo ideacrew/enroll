@@ -200,6 +200,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
+            welcome_employer_profile
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -554,6 +555,18 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def check_origin?
     request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
+  end
+
+  def welcome_employer_profile
+
+    if @employer_profile.present?
+      begin
+       ShopNoticesNotifierJob.perform_later(@employer_profile.first, "application_created")
+       rescue Exception => e
+       puts "Unable to deliver Employer Notice to #{@employer_profile.first.full_name} due to #{e}" unless Rails.env.test?
+      end
+    end
+
   end
 
   def get_sic_codes
