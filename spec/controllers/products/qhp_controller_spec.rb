@@ -9,10 +9,13 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
   let(:household) {double(latest_active_tax_household_with_year: tax_household)}
-  let(:family) {double(latest_household: household)}
+  let(:application) {double}
+  let(:family) {double(latest_household: household, active_approved_application: application)}
   context "GET comparison" do
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(person.primary_family).to receive(:active_approved_application).and_return(application)
+      allow(person.primary_family.active_approved_application).to receive(:latest_active_tax_households_with_year).with(2017).and_return(tax_household)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(plan).to receive(:coverage_kind).and_return("health")
@@ -38,37 +41,28 @@ RSpec.describe Products::QhpController, :type => :controller do
     before do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
-      allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
-      allow(benefit_group).to receive(:is_congress).and_return(false)
+      allow(hbx_enrollment).to receive(:build_plan_premium).and_return(true)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
-      allow(PlanCostDecorator).to receive(:new).and_return(true)
     end
 
     it "should return summary of a plan for shop and coverage_kind as health" do
-      allow(hbx_enrollment).to receive(:kind).and_return("shop")
       allow(hbx_enrollment).to receive(:plan).and_return(false)
-      allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "health"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "employer_sponsored"
       expect(assigns(:coverage_kind)).to eq "health"
-      expect(assigns(:benefit_group)).to be_truthy
-      expect(assigns(:reference_plan)).to be_truthy
     end
 
     it "should return summary of a plan for shop and coverage_kind as dental" do
-      allow(hbx_enrollment).to receive(:kind).and_return("shop")
       allow(plan).to receive(:coverage_kind).and_return("dental")
-      allow(benefit_group).to receive(:dental_reference_plan).and_return(dental_reference_plan)
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
       get :summary, standard_component_id: "11111100001111-01", hbx_enrollment_id: hbx_enrollment.id, active_year: "2015", market_kind: "shop", coverage_kind: "dental"
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "employer_sponsored"
       expect(assigns(:coverage_kind)).to eq "dental"
-      expect(assigns(:benefit_group)).to be_truthy
-      expect(assigns(:reference_plan)).to be_truthy
     end
 
     it "should return dental plan if hbx_enrollment does not have plan object" do
@@ -140,6 +134,9 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(person.primary_family).to receive(:active_approved_application).and_return(application)
+      allow(person.primary_family.active_approved_application).to receive(:latest_active_tax_households_with_year).and_return(tax_household)
+      allow(person.primary_family.active_approved_application.latest_active_tax_households_with_year).to receive(:first).and_return(tax_household)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:decorated_elected_plans).with("dental")

@@ -102,6 +102,7 @@ module Forms
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
+      family.build_relationship_matrix
       self.id = family_member.id
       true
     end
@@ -202,7 +203,6 @@ module Forms
                   found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
                 end
       mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
-
       record = self.new({
         :relationship => found_family_member.primary_relationship,
         :id => family_member_id,
@@ -221,6 +221,9 @@ module Forms
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
         :citizen_status => found_family_member.citizen_status,
+        :naturalized_citizen => found_family_member.naturalized_citizen,
+        :eligible_immigration_status => found_family_member.eligible_immigration_status,
+        :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
@@ -277,7 +280,10 @@ module Forms
         family_member.family.build_resident_role(family_member)
       end
       assign_person_address(family_member.person)
-      family_member.update_relationship(relationship)
+      #family_member.update_relationship(relationship) #old_code
+      family_member.person.add_relationship(family.primary_applicant.person, relationship, family_id, true)
+      family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
+      family.build_relationship_matrix
       family_member.save!
       true
     end

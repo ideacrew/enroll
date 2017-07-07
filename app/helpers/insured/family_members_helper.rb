@@ -26,15 +26,16 @@ module Insured::FamilyMembersHelper
   end
 
   # Returns [url, disable_flag]
-  def build_button consumer_role, family, find_sep_url
-    if family.application_in_progress.present?
-      if family.application_in_progress.ready_for_attestation?
-        [review_and_submit_financial_assistance_applications_path, false]
-      else
-        [review_and_submit_financial_assistance_applications_path, true]
-      end
+  def build_button consumer_role, family, find_sep_url, missing_relationships=nil
+    if missing_relationships.present?
+      [insured_family_relationships_path(:consumer_role_id => consumer_role.id), false]
     else
-      [(consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url), false]
+      if family.application_in_progress.present?
+        attestation_ready = family.application_in_progress.ready_for_attestation?
+        [review_and_submit_financial_assistance_applications_path, (attestation_ready ? false : true)]
+      else
+        [(consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url), false]
+      end
     end
   end
 
