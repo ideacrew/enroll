@@ -270,18 +270,26 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 
   describe "for a new person" do
+    let(:primary_person) {family.primary_applicant}
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
     let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
+    let(:new_person2) { double(:save => true, :errors => double(:has_key? => false)) }
 
     before do
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(new_person).to receive(:add_relationship).and_return nil
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(subject).to receive(:assign_person_address).and_return true
+      allow(subject).to receive(:relationship).and_return relationship
     end
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(family).to receive(:build_relationship_matrix).and_return(true)
       subject.save
     end
 
@@ -413,8 +421,15 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   before(:each) do
     allow(FamilyMember).to receive(:find).with(family_member_id).and_return(family_member)
     allow(family_member).to receive(:citizen_status)
+    allow(family_member).to receive(:naturalized_citizen)
+    allow(family_member).to receive(:eligible_immigration_status)
+    allow(family_member).to receive(:indian_tribe_member)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
+    allow(Family).to receive(:find).and_return family
+    allow(family).to receive(:primary_applicant).and_return family_member
+    allow(person).to receive(:add_relationship).and_return nil
+    allow(family).to receive(:build_relationship_matrix).and_return true
   end
 
   it "should be considered persisted" do
@@ -438,17 +453,29 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   end
 
   describe "when updated" do
-    it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
-      allow(subject).to receive(:assign_person_address).and_return true
-      expect(family_member).to receive(:update_relationship).with(relationship)
-      subject.update_attributes(update_attributes)
+
+    it "should update the person properties of the dependent" do
+    allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+    allow(subject).to receive(:assign_person_address).and_return true
+    subject.update_attributes(update_attributes)
     end
 
-    it "should update the attributes of the person" do
+    it "should update the person properties of the person" do
       expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
-      allow(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
+    end
+  end
+
+  describe "update existing relationship" do
+    let(:dependent_person) {FactoryGirl.create(:family_member, family: test_family).person}
+    let(:primary_person) {test_family.primary_applicant.person}
+    let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    it "should the old relationship from spouse to child" do
+      primary_person.person_relationships.create(predecessor_id: primary_person.id, :successor_id => dependent_person.id, :kind => "spouse", family_id: test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "spouse"
+      primary_person.add_relationship(dependent_person, "child", test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "child"
     end
   end
 end

@@ -65,15 +65,19 @@ module BradysAfterAll
     end
 
     def create_mikes_family
-      mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
-      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
+      # mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self") #old_code
+      family = FactoryGirl.build(:family)
+      family.add_family_member(mike, is_primary_applicant: true)
+
+      # mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse") #old_code
+      mike.person_relationships.build(predecessor_id: mike.id, :successor_id => carol.id, :kind => "spouse", family_id: family.id)
+      carol.person_relationships.build(successor_id: mike.id, :predecessor_id => carol.id, :kind => "spouse", family_id: family.id)
       brady_children.each do |child|
-        mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        mike.person_relationships.build(predecessor_id: mike.id, :successor_id => child.id, :kind => "parent", family_id: family.id)
+        child.person_relationships.build(successor_id: mike.id, :predecessor_id => child.id, :kind => "child", family_id: family.id)
       end
       mike.save
 
-      family = FactoryGirl.build(:family)
-      family.add_family_member(mike, is_primary_applicant: true)
       (bradys - [mike]).each do |brady|
         family.add_family_member(brady)
       end
@@ -82,15 +86,20 @@ module BradysAfterAll
     end
 
     def create_carols_family
-      carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
-      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
+      family = FactoryGirl.build(:family)
+      family.add_family_member(carol, is_primary_applicant: true)
+
+      # carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self") #old_code
+      # carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse") #old_code
+      mike.person_relationships.build(predecessor_id: mike.id, :successor_id => carol.id, :kind => "spouse", family_id: family.id)
+      carol.person_relationships.build(successor_id: mike.id, :predecessor_id => carol.id, :kind => "spouse", family_id: family.id)
       brady_children.each do |child|
-        carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        carol.person_relationships.build(predecessor_id: carol.id, :successor_id => child.id, :kind => "parent", family_id: family.id)
+        child.person_relationships.build(successor_id: carol.id, :predecessor_id => child.id, :kind => "child", family_id: family.id)
       end
       carol.save
 
-      family = FactoryGirl.build(:family)
-      family.add_family_member(carol, is_primary_applicant: true)
+
       (bradys - [carol]).each do |brady|
         family.add_family_member(brady)
       end

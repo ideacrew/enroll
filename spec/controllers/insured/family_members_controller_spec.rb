@@ -21,6 +21,11 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
         get :index, :employee_role_id => employee_role_id
@@ -36,7 +41,7 @@ RSpec.describe Insured::FamilyMembersController do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -44,6 +49,11 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
         get :index, :employee_role_id => employee_role_id
@@ -59,7 +69,7 @@ RSpec.describe Insured::FamilyMembersController do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -82,6 +92,9 @@ RSpec.describe Insured::FamilyMembersController do
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       sign_in(user)
       get :show, :id => family_member.id
     end
@@ -117,7 +130,7 @@ RSpec.describe Insured::FamilyMembersController do
     let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:save_result) { false }
-    # let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+    let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
 
     before :each do
       sign_in(user)
@@ -125,6 +138,9 @@ RSpec.describe Insured::FamilyMembersController do
       allow(dependent).to receive(:save).and_return(save_result)
       allow(dependent).to receive(:address=)
       allow(dependent).to receive(:family_id).and_return(dependent_properties)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
       post :create, :dependent => dependent_properties
     end

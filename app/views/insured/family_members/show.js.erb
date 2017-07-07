@@ -1,15 +1,16 @@
 if ($("#add_member_list_<%= @dependent.id %>").length) {
-  $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent,person: @person) %>");
+  $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent.family_member,person: @person) %>");
 
 } else {
-  $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent,person: @person) %>");
+  $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent.family_member,person: @person) %>");
+  <% if @missing_relationships.present? %>
+    $("#btn-continue").attr('href', '<%= @missing_relation_url %>' );
+  <% end %>
 }
-
 <% if @created %>
   <%if @family.application_in_progress.present?%>
     $('#btn-continue').addClass('disabled');
   <%end%>
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
-
 $("#dependent_buttons").removeClass('hidden');

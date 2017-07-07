@@ -36,10 +36,6 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
-  field :is_incarcerated_pending_charge_disposition, type: Boolean
-  field :is_incarcerated_in_dc, type: Boolean
-  field :incarceration_date, type: Date
-  field :expected_release_date, type: Date
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -168,7 +164,9 @@ class Person
   index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
-  index({"person_relationship.relative_id" =>  1})
+  # index({"person_relationship.relative_id" =>  1}) #old_code
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
@@ -214,6 +212,10 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+
+  def active_general_agency_staff_roles
+    general_agency_staff_roles.select(&:active?)
+  end
 
   def contact_addresses
     existing_addresses = addresses.to_a
@@ -277,17 +279,6 @@ class Person
     user.identity_verified?
   end
 
-  def consumer_fields_validations
-    if self.is_consumer_role.to_s == "true"
-      if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-        self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
-      elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
-        self.errors.add(:base, "Tribal id must be 9 digits")
-      end
-    end
-  end
-
-
   #after_save :update_family_search_collection
   after_validation :move_encrypted_ssn_errors
 
@@ -322,6 +313,7 @@ class Person
       unset_sparse("user_id")
     end
   end
+
   def ssn_changed?
     encrypted_ssn_changed?
   end
@@ -426,37 +418,53 @@ class Person
     verification_types
   end
 
-  def relatives
-    person_relationships.reject do |p_rel|
-      p_rel.relative_id.to_s == self.id.to_s
-    end.map(&:relative)
+  def relatives(family_id)
+    person_relationships.where(family_id: family_id).map(&:relative)
+    # person_relationships.reject do |p_rel|
+    #   p_rel.relative_id.to_s == self.id.to_s
+    # end.map(&:relative)
   end
 
-  def find_relationship_with(other_person)
+  def find_relationship_with(other_person, family_id)
     if self.id == other_person.id
       "self"
     else
-      person_relationship_for(other_person).try(:kind)
+      person_relationship_for(other_person, family_id).try(:kind)
     end
   end
 
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
+  def person_relationship_for(other_person, family_id)
+    person_relationships.where(successor_id: other_person.id, predecessor_id: self.id, family_id: family_id).first
+    # person_relationships.detect do |person_relationship|
+    #   person_relationship.relative_id == other_person.id
+    # end
   end
 
-  def ensure_relationship_with(person, relationship)
+  def ensure_relationship_with(person, relationship, family_id)
     return if person.blank?
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+    # existing_relationship = self.person_relationships.detect do |rel|
+    #   rel.relative_id.to_s == person.id.to_s
+    # end
+    direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: person.id).first
+    inverse_relationship = person.person_relationships.where(family_id: family_id, predecessor_id: person.id, successor_id: self.id).first
+    if direct_relationship.present? && inverse_relationship.present?
+      direct_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
+      inverse_relationship.update_attributes(:kind => relationship)
+      # existing_relationship.update_attributes(:kind => relationship)
     else
       self.person_relationships << PersonRelationship.new({
+        :kind => PersonRelationship::InverseMap[relationship],
+        # :relative_id => person.id,
+        :successor_id => person.id,
+        :predecessor_id => self.id,
+        :family_id => family_id
+      })
+      person.person_relationships << PersonRelationship.new({
         :kind => relationship,
-        :relative_id => person.id
+        # :relative_id => person.id,
+        :successor_id => self.id,
+        :predecessor_id => person.id,
+        :family_id => family_id
       })
     end
   end
@@ -718,8 +726,11 @@ class Person
     end
 
     def staff_for_employer(employer_profile)
-      staff_had_role = self.where(:'employer_staff_roles.employer_profile_id' => employer_profile.id)
-      staff_had_role.map(&:employer_staff_roles).flatten.select{|r|r.is_active?}.map(&:person)
+      self.where(:employer_staff_roles => {
+          '$elemMatch' => {
+              employer_profile_id: employer_profile.id,
+              aasm_state: :is_active}
+          }).to_a
     end
 
     def staff_for_employer_including_pending(employer_profile)
@@ -837,7 +848,7 @@ class Person
     elsif (!eligible_immigration_status.nil?)
       self.citizen_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
-      self.citizen_status = nil
+      self.errors.add(:base, "Citizenship status can't be nil.")
     end
   end
 
@@ -873,18 +884,50 @@ class Person
     ::MapReduce::FamilySearchForPerson.populate_for(self)
   end
 
-  def set_consumer_role_url
-    if consumer_role.present? && user.present?
-      if primary_family.present? && primary_family.active_household.present? && primary_family.active_household.hbx_enrollments.where(kind: "individual", is_active: true).present?
-        consumer_role.update_attribute(:bookmark_url, "/families/home") if user.identity_verified? && user.idp_verified && (addresses.present? || no_dc_address.present? || no_dc_address_reason.present?)
+  def set_ridp_for_paper_application(session_var)
+    if user && session_var == 'paper'
+      user.ridp_by_paper_application
+    end
+  end
+
+  # Related to Relationship Matrix
+  def add_relationship(successor, relationship_kind, family_id, destroy_relation=false)
+    if same_successor_exists?(successor, family_id)
+      direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first # Direct Relationship
+
+      # Destroying the relationships associated to the Person other than the new updated relationship.
+      if direct_relationship != nil && destroy_relation
+        other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+
+        other_relations.each do |otr|
+          otr_relation = Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first
+          otr_relation.destroy unless otr_relation.blank?
+        end
+      end
+
+      direct_relationship.update(kind: relationship_kind)
+    else
+      if self.id != successor.id
+        person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
       end
     end
   end
 
-  def check_for_paper_application(session_var)
-    if user && session_var == 'paper'
-      user.ridp_by_paper_application
+  def build_relationship(successor, relationship_kind, family_id)
+    person_relationships.build(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+  end
+
+  def remove_relationship(family_id)
+    successor_ids = person_relationships.where(family_id: family_id, predecessor_id: self.id).collect(&:successor_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id).each(&:destroy)
+    successor_ids.each do |s|
+      Person.find(s).person_relationships.where(family_id: family_id, successor_id: self.id).each(&:destroy)
     end
+  end
+
+  def same_successor_exists?(successor, family_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
   private
@@ -955,5 +998,36 @@ class Person
       errors.add(:date_of_death, "date of death cannot preceed date of birth")
       errors.add(:dob, "date of birth cannot follow date of death")
     end
+  end
+
+  def consumer_fields_validations
+    if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+      citizenship_validation
+      native_american_validation
+      incarceration_validation
+    end
+  end
+
+  def native_american_validation
+    self.errors.add(:base, "American Indian / Alaskan Native status is required.") if indian_tribe_member.to_s.blank?
+    if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
+      self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+    elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
+      self.errors.add(:base, "Tribal id must be 9 digits")
+    end
+  end
+
+  def citizenship_validation
+    if @us_citizen.to_s.blank?
+      self.errors.add(:base, "Citizenship status is required.")
+    elsif @us_citizen == false && @eligible_immigration_status.nil?
+      self.errors.add(:base, "Eligible immigration status is required.")
+    elsif @us_citizen == true && @naturalized_citizen.nil?
+      self.errors.add(:base, "Naturalized citizen is required.")
+    end
+  end
+
+  def incarceration_validation
+    self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end

@@ -72,9 +72,10 @@ describe Person do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship.
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil
@@ -386,19 +387,48 @@ describe Person do
         end
       end
 
-      context "with invalid Tribal Id" do
-        let(:params) {valid_params.deep_merge({tribal_id: "12124"})}
+      context "consumer fields validation" do
+        let(:params) {valid_params}
+        let(:person) { Person.new(**params) }
+        errors = { citizenship: "Citizenship status is required.",
+                         naturalized: "Naturalized citizen is required.",
+                         immigration: "Eligible immigration status is required.",
+                         native: "American Indian / Alaskan Native status is required.",
+                         tribal_id_presence: "Tribal id is required when native american / alaskan native is selected",
+                         tribal_id: "Tribal id must be 9 digits",
+                         incarceration: "Incarceration status is required." }
 
-        it "should fail validation" do
-          person = Person.new(**params)
-          person.us_citizen = "true"
-          person.indian_tribe_member = "1"
-          allow(person).to receive(:is_consumer_role).and_return(:true)
-          expect(person.valid?).to eq false
-          expect(person.errors[:base]).to eq ["Tribal id must be 9 digits"]
+        shared_examples_for "validate consumer_fields_validations private" do |citizenship, naturalized, immigration_status, native, tribal_id, incarceration, is_valid, error_list|
+          before do
+            person.instance_variable_set(:@is_consumer_role, true)
+            person.instance_variable_set(:@indian_tribe_member, native)
+            person.instance_variable_set(:@us_citizen, citizenship)
+            person.instance_variable_set(:@eligible_immigration_status, immigration_status)
+            person.instance_variable_set(:@naturalized_citizen, naturalized)
+            person.instance_variable_set(:@indian_tribe_member, native)
+            person.tribal_id = tribal_id
+            person.is_incarcerated = incarceration
+            person.valid?
+          end
+          it "#{is_valid ? 'pass' : 'fails'} validation" do
+            expect(person.valid?).to eq is_valid
+          end
+
+          it "#{is_valid ? 'does not raise' : 'raises'} the errors #{} with #{} errors" do
+            expect(person.errors[:base].count).to eq error_list.count
+            expect(person.errors[:base]).to eq error_list
+          end
         end
-      end
 
+        it_behaves_like "validate consumer_fields_validations private", true, true, false, true, "3344", false, false, [errors[:tribal_id]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, "true", false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, false, false, nil, false, false, [errors[:citizenship]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, false, nil, nil, false, [errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", true, false, false, true, nil, nil, false, [errors[:tribal_id_presence], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", false, nil, nil, true, nil, nil, false, [errors[:immigration], errors[:incarceration]]
+        it_behaves_like "validate consumer_fields_validations private", nil, nil, nil, nil, nil, nil, false, [errors[:citizenship], errors[:native], errors[:incarceration]]
+      end
 
       context "has_active_consumer_role?" do
         let(:person) {FactoryGirl.build(:person)}
@@ -641,17 +671,18 @@ describe Person do
     end
   end
 
-  describe '#person_relationships' do
-    it 'accepts associated addresses' do
-      # setup
-      person = FactoryGirl.build(:person)
-      relationship = person.person_relationships.build({kind: "self", relative: person})
+  #old_code
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     # setup
+  #     person = FactoryGirl.build(:person)
+  #     relationship = person.person_relationships.build({kind: "self", relative: person})
 
-      expect(person.save).to eq true
-      expect(person.person_relationships.size).to eq 1
-      expect(relationship.invert_relationship.kind).to eq "self"
-    end
-  end
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
 
   describe '#full_name' do
     it 'returns the concatenated name attributes' do
@@ -664,7 +695,7 @@ describe Person do
       person = Person.new
       person.phones.build({kind: 'home', area_code: '202', number: '555-1212'})
 
-      # expect(person.phones.first.number).to eq '5551212'
+      expect(person.phones.first.number).to eq '5551212'
     end
   end
 
@@ -1338,57 +1369,160 @@ describe Person do
     end
 
     it "should return true if user present & got paper in session variable" do
-      expect(person.check_for_paper_application('paper')).to eq true
+      expect(person.set_ridp_for_paper_application('paper')).to eq true
     end
 
     it "should return nil if no user present" do
       allow(person).to receive(:user).and_return nil
-      expect(person.check_for_paper_application('paper')).to eq nil
+      expect(person.set_ridp_for_paper_application('paper')).to eq nil
     end
 
     it "should return nil if session variable is not paper" do
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
 
     it "should return nil if session variable is nil" do
-      expect(person.check_for_paper_application(nil)).to eq nil
+      expect(person.set_ridp_for_paper_application(nil)).to eq nil
     end
 
     it "should return nil if no user present & if session var is not paper" do
       person.user.destroy!
-      expect(person.check_for_paper_application('something')).to eq nil
+      expect(person.set_ridp_for_paper_application('something')).to eq nil
     end
   end
 
-  describe "changing the bookmark url for a consumer role" do
-    let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_family, user: user) }
-    let(:household) { FactoryGirl.create(:household, family: person.primary_family) }
-    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: person.primary_family.latest_household, kind: "individual")}
-    let(:user) { FactoryGirl.create(:user)}
-    before(:each) do
-      allow(household).to receive(:hbx_enrollments).with(:first).and_return enrollment
-      person.consumer_role.update_attribute(:bookmark_url, "/insured/family_members?consumer_role_id")
-    end
 
-    it "should not change the bookmark_url if they not passed RIDP" do
-      person.user.update_attributes(:idp_verified => false)
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
-    end
+  describe "staff_for_employer" do
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
 
-    it "should not change the bookmark_url if they don't have addresses" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.addresses.to_a.each do |add|
-        add.delete
+    context "employer has no staff roles assigned" do
+      it "should return an empty array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq []
       end
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/insured/family_members?consumer_role_id"
     end
 
-    it "should change the bookmark_url if it has addresses, active enrollment and passed RIDP" do
-      person.user.update_attributes(idp_verified: true, identity_final_decision_code: "acc")
-      person.set_consumer_role_url
-      expect(person.consumer_role.bookmark_url).to eq "/families/home"
+    context "employer has an active staff role" do
+      let(:person) { FactoryGirl.build(:person) }
+      let(:staff_params)  {{ person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active }}
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params)
+        person.save!
+      end
+
+      it "should return the person object in an array" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
     end
+
+
+    context "multiple employers have same person as staff" do
+      let(:employer_profile2) { FactoryGirl.build(:employer_profile) }
+      let(:person) { FactoryGirl.build(:person) }
+
+      let(:staff_params1) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_active} }
+
+      let(:staff_params2) { {person: person, employer_profile_id: employer_profile2.id, aasm_state: :is_active} }
+
+      before do
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params1)
+        person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+        person.save!
+      end
+
+      it "should return the person object in an array for employer 1" do
+        expect(Person.staff_for_employer(employer_profile)).to eq [person]
+      end
+
+      it "should return the person object in an array for employer 2" do
+        expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+      end
+
+      context "target employer has staff role in inactive state" do
+        let(:staff_params3) { {person: person, employer_profile_id: employer_profile.id, aasm_state: :is_closed} }
+
+        before do
+          person.employer_staff_roles = []
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params3)
+          person.employer_staff_roles << EmployerStaffRole.new(**staff_params2)
+          person.save!
+        end
+
+        it "should return empty array for target employer" do
+          expect(Person.staff_for_employer(employer_profile)).to eq []
+        end
+
+        it "should return the person object in an array for employer 2" do
+          expect(Person.staff_for_employer(employer_profile2)).to eq [person]
+        end
+      end
+    end
+  end
+end
+
+describe Person, "given a relationship to update", dbclean: :after_each do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:primary_person) {family.primary_applicant.person}
+  let(:relationship) { "spouse" }
+  let(:person) { FactoryGirl.build(:person) }
+  subject { FactoryGirl.build(:family_member, person: person, family: family).person }
+  let(:family_member2) {FactoryGirl.create(:family_member, :family => family).person}
+  let(:family_member3) {FactoryGirl.create(:family_member, :family => family).person}
+
+  it "should update the direct relationship from the context of both persons" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+    rel = subject.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
+    expect(rel).to eq relationship
+    expect(subject.person_relationships.size).to eq 1
+  end
+
+  it "should create the relationships" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+
+    family_member3.add_relationship(primary_person, "child", family.id)
+    primary_person.add_relationship(family_member3, PersonRelationship::InverseMap["child"], family.id)
+
+    family.build_relationship_matrix
+    expect(primary_person.person_relationships.size).to eq 3
+    family_member2.add_relationship(primary_person, "unrelated", family.id) #Test for updating the exisiting relationship
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["unrelated"], family.id)
+
+    expect(primary_person.person_relationships.size).to eq 3
+    expect(family_member2.person_relationships.size).to eq 1
+    unr_relationship = family_member2.person_relationships.where(successor_id: primary_person.id, predecessor_id: family_member2.id).first.kind
+    expect(unr_relationship).to eq "unrelated"
+  end
+
+  it "should build relationship" do
+    family_member2.build_relationship(primary_person, "spouse", family.id)
+    primary_person.build_relationship(family_member2, PersonRelationship::InverseMap["spouse"], family.id)
+    expect(primary_person.person_relationships.size).to eq 1
+  end
+
+  it "should destroy relationships associated to removed family member" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.person_relationships.size).to eq 1
+    family_member2.remove_relationship(family.id)
+    expect(family_member2.person_relationships.size).to eq 0
+  end
+
+  it "should return true if same successor exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).to eq true
+  end
+
+  it "should not return true if same successor does not exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).not_to eq false
   end
 end

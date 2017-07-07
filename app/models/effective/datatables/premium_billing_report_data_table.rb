@@ -33,7 +33,7 @@ module Effective
             mixed_case(hbx.coverage_kind)
           end +
           content_tag(:span) do
-            " | # Covered: ".to_s + hbx.humanized_dependent_summary.to_s
+            " | # Dep(s) Covered: ".to_s + hbx.humanized_dependent_summary.to_s
           end +
           content_tag(:p, (hbx.plan.carrier_profile.legal_name.to_s + " -- " + hbx.plan.name.to_s))
         end

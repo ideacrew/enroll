@@ -41,7 +41,7 @@ RSpec.describe Insured::FamiliesController do
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , has_active_consumer_role?: false, has_active_employee_role?: true) }
-  let(:family) { double("Family", active_household: household) }
+  let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
   let(:family_members) { [double("FamilyMember")] }
@@ -69,9 +69,11 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET home" do
-    before :each do
-      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
+    let(:family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
 
+    before :each do
+      allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
+      allow(family).to receive(:enrollments).and_return(hbx_enrollments)
       allow(family).to receive(:enrollments_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:waivers_for_display).and_return(hbx_enrollments)
       allow(family).to receive(:coverage_waived?).and_return(false)
@@ -810,6 +812,24 @@ RSpec.describe Insured::FamiliesController do
       end
     end
   end
+
+  describe "GET family_member_matrix" do
+
+    before :each do
+      allow(family).to receive(:active_family_members).and_return(family_members)
+      allow(family).to receive(:build_relationship_matrix).and_return([])
+      allow(family).to receive(:find_missing_relationships).and_return([])
+      get :family_relationships_matrix
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render my account page" do
+      expect(response).to render_template("family_relationships_matrix")
+    end
+  end
 end
 
 RSpec.describe Insured::FamiliesController do
@@ -821,6 +841,7 @@ RSpec.describe Insured::FamiliesController do
     before :each do
       allow(HbxEnrollment).to receive(:find).and_return hbx_enrollment
       allow(person).to receive(:primary_family).and_return(family)
+      allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
       sign_in(user)
       get :purchase, id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'
     end

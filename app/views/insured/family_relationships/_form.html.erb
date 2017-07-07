@@ -1,0 +1,35 @@
+<%if missing_relationships.present?%>
+  <h1 class="darkblue">Household Relationships</h1>
+  <p>Enter this household member's relationship to other members of your household. Press Add Relationship to proceed.</p>
+  <%= form_tag "/insured/family_relationships", remote: form_remote do %>
+    <%= hidden_field_tag :family_id, family.id%>
+    <%= hidden_field_tag :predecessor_id, missing_relationships.first.flatten.first%>
+    <%= hidden_field_tag :successor_id, missing_relationships.first.flatten.second%>
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id]%>
+    <%= hidden_field_tag :resident_role_id, params[:resident_role_id]%>
+    <%= hidden_field_tag :employee_role_id, params[:employee_role_id]%>
+    <%= hidden_field_tag :redirect_url, redirect_url%>
+    <table width= 50% >
+      <tr>
+        <th> Member A </th>
+        <th> Relationship to </th>
+        <th> Member B </th>
+      </tr>
+      <tr>
+        <td><%= member_name_by_id(missing_relationships.first.flatten.first) %></td>
+        <td><%= select_tag "kind", options_for_select(relationship_kinds), include_blank: true%></td>
+        <td><%= member_name_by_id(missing_relationships.first.flatten.second) %></td>
+      </tr>
+    </table>
+    <br />
+    <%= submit_tag "Add Relationship", class: "btn btn-primary" %>
+  <% end %>
+<%else%>
+  <h1 class="darkblue">Household Relationships</h1>
+  <div>
+    <h4>All the relationships are added.</h4>
+    <% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present?%>
+      <h4> Please click continue to proceed.</h4>
+    <% end %>
+  </div>
+<%end%>

@@ -46,6 +46,8 @@
 - elsif step == 2 && application_checklist == true
   = link_to 'Continue', insured_family_members_path(consumer_role_id: @person.consumer_role.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: !enabled
 - elsif step == 2
+- elsif step == 7 && defined? url
+  = link_to 'Continue', url, class: "btn btn-lg btn-primary #{css_class} btn-block", id: 'btn-continue'
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: build_button(@person.consumer_role, @person.primary_family, url).second
 - elsif step == 4

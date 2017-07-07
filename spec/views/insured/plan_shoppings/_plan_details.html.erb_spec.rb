@@ -7,14 +7,20 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
   let(:family1) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:application) { FactoryGirl.create(:application, family: family1) }
 
-
-
   let(:plan) do
-    double(plan_type: "ppo", metal_level: "bronze", is_standard_plan: true,
-      nationwide: "true", total_employee_cost: 100, deductible: 500, family_deductible: 1000,
-      name: "My Plan", id: "991283912392", carrier_profile: nil,
+    double(plan_type: "ppo",
+      metal_level: "bronze",
+      is_standard_plan: true,
+      nationwide: "true",
+      total_employee_cost: 100,
+      deductible: 500,
+      family_deductible: "500 per person | $1000 per group",
+      name: "My Plan",
+      id: "991283912392",
+      carrier_profile: nil,
       carrier_profile_id: carrier_profile.id,
-      active_year: TimeKeeper.date_of_record.year, total_premium: 300,
+      active_year: TimeKeeper.date_of_record.year,
+      total_premium: 300,
       total_employer_contribution: 200,
       ehb: 0.9881,
       can_use_aptc?: true,
@@ -25,16 +31,46 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
                                     :identifier=>'urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-sbc#7816ce0f-a138-42d5-89c5-25c5a3408b82'})
     )
   end
+
   let(:plan_hsa_status) { Hash.new }
-  let(:hbx_enrollment_members) do
-    []
-  end
+  let(:hbx_enrollment_members) { [double("HbxEnrollmentMember"), double("HbxEnrollmentMember")]}
   let(:hbx_enrollment) do
     instance_double(
       "HbxEnrollment", id: "hbx enrollment id",
       hbx_enrollment_members: hbx_enrollment_members,
       plan: plan
     )
+  end
+
+  before :each do
+    sign_in(user)
+    allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+    assign(:person, person)
+    assign(:plan_hsa_status, plan_hsa_status)
+    assign(:hbx_enrollment, hbx_enrollment)
+    assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
+    assign(:carrier_names_map, {})
+    allow(plan).to receive(:total_employee_cost).and_return 100
+    allow(plan).to receive(:is_csr?).and_return false
+    family = person.primary_family
+    active_household = family.households.first
+    application.update_attributes!(family: family)
+    tax_household = FactoryGirl.create(:tax_household, application: application )
+    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
+  end
+
+  context "deductible" do
+    before :each do
+      render "insured/plan_shoppings/plan_details", plan: plan
+    end
+
+    it "should display family deductible when hbx_enrollment_members count > 1" do
+      expect(rendered).to include("#{plan.family_deductible.split("|").last.squish}")
+    end
+
+    it "should display individual deductible when hbx_enrollment_members count  <= 1" do
+      expect(rendered).to include("#{plan.deductible}")
+    end
   end
 
   context "without aptc" do
@@ -64,7 +100,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to match(/#{plan.name}/)
       expect(rendered).to match(/#{plan.carrier_profile}/)
       expect(rendered).to match(/#{plan.active_year}/)
-      expect(rendered).to match(/#{plan.family_deductible}/)
       expect(rendered).to match(/#{plan.is_standard_plan}/)
       expect(rendered).to match(/#{plan.nationwide}/)
       expect(rendered).to match(/#{plan.total_employee_cost}/)
@@ -102,14 +137,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   context "with aptc" do
     before :each do
-      sign_in(user)
-      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-      assign(:person, person)
-      assign(:plan_hsa_status, plan_hsa_status)
-      assign(:hbx_enrollment, hbx_enrollment)
-      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
-      assign(:carrier_names_map, {})
-      allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return true
       allow(view).to receive(:current_cost).and_return(52)
       family = person.primary_family
@@ -149,18 +176,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   end
 
-
   context "with dental coverage_kind" do
     before :each do
-      sign_in(user)
-      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-      assign(:person, person)
-      assign(:plan_hsa_status, plan_hsa_status)
-      assign(:hbx_enrollment, hbx_enrollment)
-      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
-      assign(:carrier_names_map, {})
-      allow(plan).to receive(:total_employee_cost).and_return 100
-      allow(plan).to receive(:is_csr?).and_return false
       allow(plan).to receive(:coverage_kind).and_return('dental')
       allow(plan).to receive(:metal_level).and_return('dental')
       family = person.primary_family
@@ -193,7 +210,7 @@ context "with tax household and eligibility determination of csr_94" do
     application.update_attributes!(family: family)
     tax_household = FactoryGirl.create(:tax_household, application: application )
     eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
-      render "insured/plan_shoppings/plan_details", plan: plan
+    render "insured/plan_shoppings/plan_details", plan: plan
     end
 
     it "should have hidden modal for csr elibility reminder" do
@@ -203,15 +220,6 @@ context "with tax household and eligibility determination of csr_94" do
 
   context "with tax household and eligibility determination of csr_94 plan shopping in 'shop' market" do
     before :each do
-      sign_in(user)
-      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-      assign(:person, person)
-      assign(:plan_hsa_status, plan_hsa_status)
-      assign(:hbx_enrollment, hbx_enrollment)
-      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
-      assign(:carrier_names_map, {})
-      allow(plan).to receive(:total_employee_cost).and_return 100
-      allow(plan).to receive(:is_csr?).and_return false
       allow(view).to receive(:params).and_return :market_kind => 'shop'
       family = person.primary_family
       active_household = family.households.first

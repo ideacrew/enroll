@@ -27,7 +27,8 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
                                                        open_enrollment_start_on: open_enrollment_start_on - 1.year,
                                                        open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
                                                        fte_count: 2,
-                                                       aasm_state: :published
+                                                       aasm_state: :published,
+                                                       is_conversion: true
 
   secondary_benefit_group = FactoryGirl.create :benefit_group, plan_year: active_plan_year
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on

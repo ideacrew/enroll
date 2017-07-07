@@ -4,7 +4,7 @@
   #new_person_wrapper
     .row
       .col-lg-3.col-md-3.col-sm-3.col-xs-12
-          = render  partial: 'shared/left_nav.html.erb'
+        = render  partial: 'shared/left_nav.html.erb'
       .col-lg-7.col-md-7.col-sm-8.col-xs-12
         = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
           %h3 Personal Information

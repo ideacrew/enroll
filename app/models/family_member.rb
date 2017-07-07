@@ -25,6 +25,8 @@ class FamilyMember
   # Immediately preceding family where this person was a member
   field :former_family_id, type: BSON::ObjectId
 
+  validate :no_duplicate_family_members
+
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
   scope :by_primary_member_role, ->{ where(:is_active => true).where(:is_primary_applicant => true) }
   embeds_many :hbx_enrollment_exemptions
@@ -55,6 +57,9 @@ class FamilyMember
   delegate :tribal_id, to: :person, allow_nil: true
   delegate :is_disabled, to: :person, allow_nil: true
   delegate :citizen_status, to: :person, allow_nil: true
+  delegate :indian_tribe_member, to: :person, allow_nil: true
+  delegate :naturalized_citizen, to: :person, allow_nil: true
+  delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
 
@@ -111,7 +116,7 @@ class FamilyMember
     if is_primary_applicant?
       "self"
     else
-      family.primary_applicant_person.find_relationship_with(person) unless family.primary_applicant_person.blank? || person.blank?
+      person.find_relationship_with(family.primary_applicant_person, self.family_id) unless family.primary_applicant_person.blank? || person.blank?
     end
   end
 
@@ -120,16 +125,17 @@ class FamilyMember
   end
 
   def reactivate!(relationship)
-    family.primary_applicant_person.ensure_relationship_with(person, relationship)
+    family.primary_applicant_person.ensure_relationship_with(person, relationship, family.id)
     family.add_family_member(person)
   end
 
-  def update_relationship(relationship)
-    return if (primary_relationship == relationship)
-    family.remove_family_member(person)
-    self.reactivate!(relationship)
-    family.save!
-  end
+  #old_code
+  # def update_relationship(relationship)
+  #   return if (primary_relationship == relationship)
+  #   family.remove_family_member(person)
+  #   self.reactivate!(relationship)
+  #   family.save!
+  # end
 
   def self.find(family_member_id)
     return [] if family_member_id.nil?
@@ -149,6 +155,15 @@ class FamilyMember
     if application.present?
       applicant = application.applicants.where(family_member_id: self.id).first
       return applicant if applicant.present?
+    end
+  end
+
+  private 
+
+  def no_duplicate_family_members
+    return unless family
+    family.family_members.group_by { |appl| appl.person_id }.select { |k, v| v.size > 1 }.each_pair do |k, v|
+      errors.add(:family_members, "Duplicate family_members for person: #{k}\n")
     end
   end
 end
