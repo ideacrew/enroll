@@ -446,7 +446,7 @@ private
       if applicant.is_claimed_as_tax_dependent?
         # Assign this applicant to the same THH that the person claiming this dependent belongs to.
         thh_of_claimer = applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
-        applicant.tax_household = thh_of_claimer
+        applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
       else
         # Create a new THH and assign to the applicant.
         applicant.tax_household = tax_households.create!
