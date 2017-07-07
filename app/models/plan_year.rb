@@ -776,7 +776,7 @@ class PlanYear
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
+    state :renewing_draft, :after_enter => [:renewal_group_notice, :employer_renewal_eligibility_denial_notice] # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -882,7 +882,7 @@ class PlanYear
     end
 
     event :renew_plan_year, :after => :record_transition do
-      transitions from: :draft, to: :renewing_draft, after: :employer_renewal_eligibility_denial_notice
+      transitions from: :draft, to: :renewing_draft
     end
 
     event :renew_publish, :after => :record_transition do
@@ -1087,7 +1087,7 @@ class PlanYear
   end
 
   def employer_renewal_eligibility_denial_notice
-    if !self.employer_profile.is_primary_office_local?
+    if application_eligibility_warnings.include?(:primary_office_location)
       ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
     end
   end

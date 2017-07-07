@@ -4,6 +4,7 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
     build
     append_data
     generate_pdf_notice
+    shop_dchl_rights_attachment
     non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
@@ -11,9 +12,16 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
   end
 
   def append_data
-    plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING - PlanYear::RENEWING_PUBLISHED_STATE).first
+    active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
+    renewing_plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING - PlanYear::RENEWING_PUBLISHED_STATE).first
+    plan_year_warnings = []
+    if renewing_plan_year.application_eligibility_warnings.include?(:primary_office_location)
+      plan_year_warnings << "primary location is outside washington dc"
+    end
     notice.plan_year = PdfTemplates::PlanYear.new({
-          :end_on => plan_year.end_on
+          :end_on => active_plan_year.end_on,
+          :start_on => renewing_plan_year.start_on,
+          :warnings => plan_year_warnings
         })
   end
 end
