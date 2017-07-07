@@ -8,7 +8,7 @@ module Effective
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
-        table_column :status, :proc => Proc.new { |row| 
+        table_column "Doc Status", :proc => Proc.new { |row|
           icon = ""
 
           if row.accepted?

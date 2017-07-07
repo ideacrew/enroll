@@ -12,7 +12,7 @@
 
 <div class="col-xs-10 upload-document">
   <div class="row">
-    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn btn-default " %>
+    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{ (@employer_profile.employer_attestation.aasm_state == 'unsubmitted' or @employer_profile.employer_attestation.aasm_state == 'pending')  ? 'btn-default' : 'btn-default disabled' }" %>
   </div>
 </div>
 

@@ -18,7 +18,7 @@ class EmployerAttestation
     state :denied
 
     event :submit, :after => :record_transition do 
-      transitions from: :unsubmitted, to: :submitted
+      transitions from: [:unsubmitted, :approved], to: :submitted
     end
 
     event :set_pending, :after => :record_transition do
@@ -26,11 +26,11 @@ class EmployerAttestation
     end
 
     event :approve, :after => :record_transition do
-      transitions from: [:submitted, :pending, :denied], to: :approved
+      transitions from: :submitted, to: :approved
     end
 
     event :deny, :after => :record_transition do
-      transitions from: [:submitted, :pending], to: :denied
+      transitions from: :submitted, to: :denied
     end
   end
 
