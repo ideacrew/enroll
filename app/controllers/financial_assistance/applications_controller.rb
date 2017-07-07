@@ -18,7 +18,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def create
     @application = @person.primary_family.applications.new
-    @application.populate_applicants_for(@current_user.person.primary_family)
+    @application.populate_applicants_for(@person.primary_family)
     @application.save!
     redirect_to edit_financial_assistance_application_path(@application)
   end
