@@ -154,6 +154,7 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       allow(CensusEmployee).to receive(:new).and_return(census_employee)
       allow(census_employee).to receive(:employee_role).and_return(true)
+      allow(census_employee).to receive(:find_or_create_benefit_group_assignment).and_return(true)
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return(hbx_enrollments)
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_groups)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)

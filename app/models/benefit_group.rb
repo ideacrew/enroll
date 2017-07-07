@@ -443,7 +443,7 @@ class BenefitGroup
         if self.plan_year.is_renewing?
           ce.add_renew_benefit_group_assignment(other_benefit_group)
         else
-          ce.find_or_create_benefit_group_assignment(other_benefit_group)
+          ce.find_or_create_benefit_group_assignment([other_benefit_group])
         end
       end
     end
@@ -455,7 +455,7 @@ class BenefitGroup
     start_on_year = (start_on.next_year).year
     if plan_option_kind == "single_carrier"
       Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
-    else 
+    else
       if plan_option_kind == "metal_level"
         Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
       else
