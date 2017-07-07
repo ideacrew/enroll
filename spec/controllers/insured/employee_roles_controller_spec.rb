@@ -26,6 +26,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(employee_role).to receive(:save!).and_return(true)
       allow(employee_role).to receive(:bookmark_url=).and_return(true)
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
+      allow(role_form).to receive(:active_employee_roles).and_return [employee_role]
       sign_in user
     end
 
@@ -184,14 +185,14 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       } )
     }
     let(:employment_relationship_properties) { { :skllkjasdfjksd => "a3r123rvf" } }
-    let(:user) { double(:idp_verified? => true) }
+    let(:user) { double(:idp_verified? => true, person: person) }
 
     context "can construct_employee_role" do
       before :each do
         allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
         allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([employee_role, family])
         allow(benefit_group).to receive(:effective_on_for).with(hired_on).and_return(effective_date)
-        allow(census_employee).to receive(:employee_role_linked?).and_return(true)
+        allow(census_employee).to receive(:is_linked?).and_return(true)
         allow(employee_role).to receive(:census_employee).and_return(census_employee)
         sign_in(user)
         allow(user).to receive(:switch_to_idp!)

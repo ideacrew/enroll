@@ -26,6 +26,9 @@ class EmployerProfile
   field :entity_kind, type: String
   field :sic_code, type: String
 
+#  field :converted_from_carrier_at, type: DateTime, default: nil
+#  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
+
   # Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
@@ -136,6 +139,8 @@ class EmployerProfile
     return unless active_broker_agency_account
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
+    active_broker_agency_account.save!
+    notify_broker_terminated
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -209,12 +214,17 @@ class EmployerProfile
   def fire_general_agency!(terminate_on = TimeKeeper.datetime_of_record)
     return if active_general_agency_account.blank?
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
+    notify_general_agent_terminated
   end
   alias_method :general_agency_profile=, :hire_general_agency
 
   def employee_roles
     return @employee_roles if defined? @employee_roles
     @employee_roles = EmployeeRole.find_by_employer_profile(self)
+  end
+
+  def notify_general_agent_terminated
+    notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
@@ -240,32 +250,45 @@ class EmployerProfile
   end
 
   def published_plan_year
-    plan_years.published.first
+    plan_years.published.last
   end
 
   def show_plan_year
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
-  def plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft" }
+  def dt_display_plan_year
+    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
   end
 
-  def is_coversion_employer?
-    profile_source.to_s == 'conversion'
+  def plan_year_drafts
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
+  end
+
+  def is_conversion?
+    self.profile_source.to_s == "conversion"
+  end
+
+  def is_converting?
+    self.is_conversion? && published_plan_year.present? && published_plan_year.is_conversion
   end
 
   def find_plan_year_by_effective_date(target_date)
-    plan_year = (plan_years.published + plan_years.renewing_published_state).detect do |py|
+    plan_year = (plan_years.published + plan_years.renewing_published_state + plan_years.where(aasm_state: "expired")).detect do |py|
       (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
     end
 
-    if plan_year.present?
-      (is_coversion_employer? && plan_year.coverage_period_contains?(registered_on)) ? plan_years.renewing_published_state.first : plan_year
-    else
-      plan_year
-    end
+    (plan_year.present? && plan_year.external_plan_year?) ? renewing_published_plan_year : plan_year
   end
+
+  def earliest_plan_year_start_on_date
+   plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+   plan_years.reject!{|py| py.can_be_migrated? }
+   plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+   if !plan_year.blank?
+     plan_year.start_on
+   end
+ end
 
   def billing_plan_year(billing_date = nil)
     billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
@@ -337,13 +360,13 @@ class EmployerProfile
   end
 
   def renewing_plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft" }
+    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft"; set }
   end
 
   def is_primary_office_local?
     organization.primary_office_location.address.state.to_s.downcase == Settings.aca.state_abbreviation.to_s.downcase
   end
-  
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -468,6 +491,16 @@ class EmployerProfile
       CensusEmployee.matchable(person.ssn, person.dob)
     end
 
+    def organizations_for_low_enrollment_notice(new_date)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
+          :"open_enrollment_end_on" => new_date+2.days
+          }
+      })
+
+    end
+
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
           { :$elemMatch => {
@@ -507,6 +540,15 @@ class EmployerProfile
       })
     end
 
+    def initial_employers_reminder_to_publish(start_on)
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :"start_on" => start_on,
+          :"aasm_state" => "draft"
+        }
+      })
+    end
+
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
@@ -523,6 +565,16 @@ class EmployerProfile
         :'employer_profile.plan_years' =>
         { :$elemMatch => {
           :start_on => new_date.next_month.beginning_of_month,
+          :aasm_state => 'renewing_draft'
+          }}
+      })
+    end
+
+    def renewal_employers_reminder_to_publish(start_on)
+      Organization.where({
+        :'employer_profile.plan_years' =>
+        { :$elemMatch => {
+          :start_on => start_on,
           :aasm_state => 'renewing_draft'
           }}
       })
@@ -550,17 +602,66 @@ class EmployerProfile
           open_enrollment_factory.end_open_enrollment
         end
 
+        organizations_for_low_enrollment_notice(new_date).each do |organization|
+          begin
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
+            #exclude congressional employees
+            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+            if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
+              organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
+            end
+          rescue Exception => e
+            puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
+          end
+        end
+
+        # Reminder notices to renewing employers to publish thier plan years.
+        start_on = new_date.next_month.beginning_of_month
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-7
+          renewal_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("renewal_employer_first_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-6
+          renewal_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("renewal_employer_second_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-2
+          renewal_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("renewal_employer_final_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        end
+
         employer_enroll_factory = Factories::EmployerEnrollFactory.new
         employer_enroll_factory.date = new_date
 
         organizations_for_plan_year_begin(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.begin
+          begin
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.begin
+          rescue Exception => e
+            puts "Error found for employer - #{organization.legal_name} during plan year begin"
+          end
         end
 
         organizations_for_plan_year_end(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.end
+          begin
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.end
+          rescue Exception => e
+            puts "Error found for employer - #{organization.legal_name} during plan year end"
+          end
         end
 
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
@@ -569,6 +670,39 @@ class EmployerProfile
             plan_year.force_publish!
           end
         end
+
+        #Initial employer reminder notices to publish plan year.
+        start_on = (new_date+2.months).beginning_of_month
+        start_on_1 = (new_date+1.month).beginning_of_month
+        if new_date+2.days == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        elsif new_date+1.day == start_on.last_month
+          initial_employers_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+            end
+          end
+        else
+          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
+          if (new_date + 2.days) == plan_year_due_date
+            initial_employers_reminder_to_publish(start_on_1).each do |organization|
+              begin
+                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+              rescue Exception => e
+                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              end
+            end
+          end
+        end
+
       end
 
       # Employer activities that take place monthly - on first of month
@@ -654,7 +788,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => :notify_binder_paid
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -728,7 +862,7 @@ class EmployerProfile
     end
   end
 
-  after_update :broadcast_employer_update
+  after_update :broadcast_employer_update, :notify_broker_added, :notify_general_agent_added
 
   def broadcast_employer_update
     if previous_states.include?(:binder_paid) || (aasm_state.to_sym == :binder_paid)
@@ -798,14 +932,40 @@ class EmployerProfile
     notify(BINDER_PREMIUM_PAID_EVENT_NAME, {:employer_id => self.hbx_id})
   end
 
+  def notify_initial_binder_paid
+    notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
+  end
+
+  def notify_broker_added
+    changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? &&  changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.broker_added", {employer_id: self.hbx_id, event_name: "broker_added"})
+    end
+  end
+
+  def notify_broker_terminated
+    notify("acapi.info.events.employer.broker_terminated", {employer_id: self.hbx_id, event_name: "broker_terminated"})
+  end
+
+  def notify_general_agent_added
+    changed_fields = general_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
+    if changed_fields.present? && changed_fields.include?("start_on")
+      notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
+    end
+  end
+
+  def conversion_employer?
+    !self.converted_from_carrier_at.blank?
+  end
+
   def self.by_hbx_id(an_hbx_id)
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
   end
 
-  def is_conversion?
-    self.profile_source == "conversion"
+  def trigger_notices(event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
 private
@@ -862,6 +1022,6 @@ private
   end
 
   def plan_year_publishable?
-    published_plan_year.is_application_valid?
+    !published_plan_year.is_application_unpublishable?
   end
 end

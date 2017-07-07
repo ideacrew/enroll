@@ -133,4 +133,505 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
     end
   end
+
+
+  describe "#selected_enrollment" do
+
+    context "selelcting the enrollment" do
+      let(:person) { FactoryGirl.create(:person) }
+      let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile, census_employee_id: census_employee.id)}
+      let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+      let(:qle_kind) { FactoryGirl.create(:qualifying_life_event_kind, :effective_on_event_date) }
+      let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: organization.employer_profile)}
+      let(:sep){
+        sep = family.special_enrollment_periods.new
+        sep.effective_on_kind = 'date_of_event'
+        sep.qualifying_life_event_kind= qle_kind
+        sep.qle_on= TimeKeeper.date_of_record - 7.days
+        sep.save
+        sep
+      }
+      let(:active_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'coverage_selected'
+      )}
+      let(:renewal_enrollment) { FactoryGirl.create(:hbx_enrollment,
+                         household: family.active_household,
+                         kind: "employer_sponsored",
+                         employee_role_id: employee_role.id,
+                         enrollment_kind: "special_enrollment",
+                         aasm_state: 'renewing_coverage_selected'
+      )}
+
+      before do
+        allow(family).to receive(:current_sep).and_return sep
+        active_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "active").first.benefit_groups.first
+        renewal_benefit_group = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first.benefit_groups.first
+        active_enrollment.update_attribute(:benefit_group_id, active_benefit_group.id)
+        renewal_enrollment.update_attribute(:benefit_group_id, renewal_benefit_group.id)
+      end
+
+      it "should return active enrollment if the coverage effective on covers active plan year" do
+        expect(subject.selected_enrollment(family, employee_role)).to eq active_enrollment
+      end
+
+      it "should return renewal enrollment if the coverage effective on covers renewal plan year" do
+        renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
+        sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+        expect(subject.selected_enrollment(family, employee_role)).to eq renewal_enrollment
+      end
+
+      context 'it should not return any enrollment' do
+
+        before do
+          allow(employee_role.census_employee).to receive(:active_benefit_group).and_return nil
+          allow(employee_role.census_employee).to receive(:renewal_published_benefit_group).and_return nil
+        end
+
+        it "should not return active enrollment although if the coverage effective on covers active plan year & if not belongs to the assigned benefit group" do
+          expect(subject.selected_enrollment(family, employee_role)).to eq nil
+        end
+
+        it "should not return renewal enrollment although if the coverage effective on covers renewal plan year & if not belongs to the assigned benefit group" do
+          renewal_plan_year = organization.employer_profile.plan_years.where(aasm_state: "renewing_enrolling").first
+          sep.update_attribute(:effective_on, renewal_plan_year.start_on + 2.days)
+          expect(subject.selected_enrollment(family, employee_role)).to eq nil
+        end
+      end
+    end
+  end
+
+  describe "#benefit_group_assignment_by_plan_year", dbclean: :after_each do
+    let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: organization.employer_profile)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: organization.employer_profile)}
+
+    before do
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+    end
+
+    it "should return active benefit group assignment when the benefit group belongs to active plan year" do
+      benefit_group = organization.employer_profile.active_plan_year.benefit_groups.first
+      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.active_benefit_group_assignment
+    end
+
+    it "should return renewal benefit group assignment when benefit_group belongs to renewing plan year" do
+      benefit_group = organization.employer_profile.show_plan_year.benefit_groups.first
+      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.renewal_benefit_group_assignment
+    end
+
+    # EE should have the ability to buy coverage from expired plan year if had an eligible SEP which falls in that period
+
+    context "when EE has an eligible SEP which falls in expired plan year period" do
+
+      let(:organization) { FactoryGirl.create(:organization, :with_expired_and_active_plan_years)}
+
+      it "should return benefit group assignment belongs to expired py when benefit_group belongs to expired plan year" do
+        benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+        expired_bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
+        expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, "sep")).to eq expired_bga
+      end
+    end
+  end
+
+  describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
+
+    context "#is_market_kind_disabled?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should disable the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq true
+          end
+
+          it "should not disable the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq false
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+          end
+
+          it "should disable the IVL market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq true
+          end
+
+          it "should not disable the shop market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq false
+          end
+        end
+      end
+
+      context "when user selected a QLE" do
+
+        context "when user selected shop QLE" do
+
+          before do
+            helper.instance_variable_set("@disable_market_kind", "individual")
+          end
+
+          it "should disable the IVL market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq true
+          end
+
+          it "should not disable the shop market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq false
+          end
+        end
+
+        context "when user selected IVL QLE" do
+
+          before do
+            helper.instance_variable_set("@disable_market_kind", "shop")
+          end
+
+          it "should disable the shop market if user selected IVL based QLE" do
+            expect(helper.is_market_kind_disabled?("shop")).to eq true
+          end
+
+          it "should not disable the shop market if user selected shop based QLE" do
+            expect(helper.is_market_kind_disabled?("individual")).to eq false
+          end
+        end
+      end
+    end
+
+    context "#is_market_kind_checked?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should not check the shop market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_checked?("shop")).to eq false
+          end
+
+          it "should check the IVL market kind if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_market_kind_checked?("individual")).to eq true
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+          end
+
+          it "should not check the IVL market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_checked?("individual")).to eq false
+          end
+
+          it "should check the shop market kind if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_market_kind_checked?("shop")).to eq true
+          end
+        end
+      end
+    end
+
+    context "#is_employer_disabled?" do
+
+      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should disable all the employers if user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_employer_disabled?(employee_role_one)).to eq true
+            expect(helper.is_employer_disabled?(employee_role_two)).to eq true
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+            helper.instance_variable_set("@hbx_enrollment", hbx_enrollment)
+          end
+
+          it "should not disable the current employer if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_employer_disabled?(employee_role_one)).to eq false
+          end
+
+          it "should disable all the other employers other than the one user clicked shop enrollment ER" do
+            expect(helper.is_employer_disabled?(employee_role_two)).to eq true
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should not disable all the employers if user clicked on 'make changes' for IVL enrollment" do
+          expect(helper.is_employer_disabled?(employee_role_one)).to eq false
+          expect(helper.is_employer_disabled?(employee_role_two)).to eq false
+        end
+      end
+    end
+
+    context "#is_employer_checked?" do
+
+      let(:employee_role_one) { FactoryGirl.create(:employee_role)}
+      let(:employee_role_two) { FactoryGirl.create(:employee_role)}
+      let!(:hbx_enrollment) { double("HbxEnrollment", employee_role: employee_role_one)}
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on IVL enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "individual")
+          end
+
+          it "should not check any of the employers when user clicked on 'make changes' for IVL enrollment" do
+            expect(helper.is_employer_checked?(employee_role_one)).to eq false
+            expect(helper.is_employer_checked?(employee_role_two)).to eq false
+          end
+        end
+
+        context "when user clicked on shop enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_market_kind", "shop")
+            helper.instance_variable_set("@hbx_enrollment", hbx_enrollment)
+          end
+
+          it "should check the current employer if user clicked on 'make changes' for shop enrollment" do
+            expect(helper.is_employer_checked?(employee_role_one)).to eq true
+          end
+
+          it "should not check all the other employers other than the one user clicked shop enrollment ER" do
+            expect(helper.is_employer_checked?(employee_role_two)).to eq false
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+          helper.instance_variable_set("@employee_role", employee_role_one)
+        end
+
+        it "should check the first employee role by default" do
+          expect(helper.is_employer_checked?(employee_role_one)).to eq true
+        end
+
+        it "should not check the other employee roles" do
+          expect(helper.is_employer_checked?(employee_role_two)).to eq false
+        end
+      end
+    end
+
+    context "#is_coverage_kind_disabled?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on health enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "health")
+          end
+
+          it "should disable the dental coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("dental")).to eq true
+          end
+
+          it "should not disable the health coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("health")).to eq false
+          end
+        end
+
+        context "when user clicked on dental enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "dental")
+          end
+
+          it "should not disable the dental coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("dental")).to eq false
+          end
+
+          it "should disable the health coverage kind" do
+            expect(helper.is_coverage_kind_disabled?("health")).to eq true
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should not disable the health coverage kind" do
+          expect(helper.is_coverage_kind_disabled?("health")).to eq false
+        end
+
+        it "should not disable the dental coverage kind" do
+          expect(helper.is_coverage_kind_disabled?("dental")).to eq false
+        end
+      end
+    end
+
+    context "#is_coverage_kind_checked?" do
+
+      context "when user clicked on 'make changes' on the enrollment in open enrollment" do
+        context "when user clicked on health enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "health")
+          end
+
+          it "should not check the dental coverage kind" do
+            expect(helper.is_coverage_kind_checked?("dental")).to eq false
+          end
+
+          it "should check the health coverage kind" do
+            expect(helper.is_coverage_kind_checked?("health")).to eq true
+          end
+        end
+
+        context "when user clicked on dental enrollment" do
+
+          before do
+            helper.instance_variable_set("@mc_coverage_kind", "dental")
+          end
+
+          it "should check the dental coverage kind" do
+            expect(helper.is_coverage_kind_checked?("dental")).to eq true
+          end
+
+          it "should not check the health coverage kind" do
+            expect(helper.is_coverage_kind_checked?("health")).to eq false
+          end
+        end
+      end
+
+      context "when user clicked on shop for plans" do
+
+        before do
+          helper.instance_variable_set("@mc_market_kind", nil)
+        end
+
+        it "should check the health coverage kind by default" do
+          expect(helper.is_coverage_kind_checked?("health")).to eq true
+        end
+
+        it "should not check the dental coverage kind" do
+          expect(helper.is_coverage_kind_checked?("dental")).to eq false
+        end
+      end
+    end
+  end
+
+  describe "#is_eligible_for_dental?" do
+
+    let(:active_bg) { double("ActiveBenefitGroup", plan_year: double("ActivePlanYear")) }
+    let(:renewal_bg) { double("RenewalBenefitGroup", plan_year: double("RenewingPlanYear")) }
+    let!(:sep) { FactoryGirl.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
+    let(:employee_role) { FactoryGirl.create(:employee_role)}
+    let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg)}
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: employee_role.person)}
+
+    before do
+      allow(employee_role).to receive(:census_employee).and_return census_employee
+    end
+
+    context "when ER is an initial ER" do
+
+      before do
+        allow(census_employee).to receive(:renewal_published_benefit_group).and_return nil
+      end
+
+      it "should return true if active benefit group offers dental" do
+        allow(active_bg).to receive(:is_offering_dental?).and_return true
+        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+      end
+
+      it "should return false if active benefit group not offers dental" do
+        allow(active_bg).to receive(:is_offering_dental?).and_return false
+        expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+      end
+    end
+
+    context "when ER is in renewing period" do
+
+      before do
+        allow(census_employee).to receive(:renewal_published_benefit_group).and_return renewal_bg
+      end
+
+      context "when EE is in renewal open enrollment & clicked on shop for plans" do
+
+        it "should return true if renewal benefit group offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq true
+        end
+
+        it "should return false if renewal benefit group not offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, nil)).to eq false
+        end
+      end
+
+      context "when EE selects SEP & effective_on covers under active plan year period", db_clean: :after_each do
+
+        before do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          allow(sep).to receive(:is_eligible?).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
+          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return true
+        end
+
+        it "should return true if active benefit group offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+        end
+
+        it "should return false if active benefit group not offers dental" do
+          allow(active_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+        end
+      end
+
+      context "when EE selects SEP & effective_on covers under renewal plan year period", db_clean: :after_each do
+
+        before do
+          allow(active_bg).to receive(:is_offering_dental?).and_return true
+          allow(sep).to receive(:is_eligible?).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
+          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return false
+        end
+
+        it "should return true if renewal benefit group offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return true
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq true
+        end
+
+        it "should return false if renewal benefit group not offers dental" do
+          allow(renewal_bg).to receive(:is_offering_dental?).and_return false
+          expect(helper.is_eligible_for_dental?(employee_role, "change_by_qle")).to eq false
+        end
+      end
+    end
+  end
 end

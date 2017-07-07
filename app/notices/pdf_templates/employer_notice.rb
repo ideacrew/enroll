@@ -2,6 +2,7 @@ module PdfTemplates
   class EmployerNotice
     include Virtus.model
 
+    attribute :notification_type, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
     attribute :notice_date, Date
@@ -15,7 +16,7 @@ module PdfTemplates
     attribute :coverage_start_on, Date
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
-    attribute :trigger_type, String
+    attribute :plan_year, PdfTemplates::PlanYear
 
     def shop?
       return true

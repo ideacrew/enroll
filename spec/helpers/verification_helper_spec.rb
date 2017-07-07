@@ -19,7 +19,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#verification_type_status" do
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
     context "Social Security Number" do
       it "returns outstanding status for consumer without state residency" do
         expect(helper.verification_type_status("Social Security Number", person)).to eq "outstanding"
@@ -363,5 +363,34 @@ RSpec.describe VerificationHelper, :type => :helper do
         expect(helper.show_v_type('Immigration status', person)).to eq("&nbsp;&nbsp;Processing&nbsp;&nbsp;")
       end
     end
+  end
+
+  describe "#documents_list" do
+    shared_examples_for "documents uploaded for one verification type" do |v_type, docs, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          docs.to_i.times { person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => v_type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    shared_examples_for "documents uploaded for multiple verification types" do |v_type, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          Person::VERIFICATION_TYPES.each {|type| person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    it_behaves_like "documents uploaded for one verification type", "Social Security Number", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
   end
 end

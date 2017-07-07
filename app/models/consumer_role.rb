@@ -69,11 +69,12 @@ class ConsumerRole
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
   field :native_validation, type: String, default: nil
-  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
+  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
   field :native_update_reason, type: String
+  field :is_applying_coverage, type: Boolean, default: true
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -119,7 +120,7 @@ class ConsumerRole
   alias_method :is_state_resident?, :is_state_resident
   alias_method :is_incarcerated?,   :is_incarcerated
 
-  embeds_one :lawful_presence_determination
+  embeds_one :lawful_presence_determination, as: :ivl_role
 
   embeds_many :local_residency_responses, class_name:"EventResponse"
 
@@ -361,7 +362,7 @@ class ConsumerRole
 
     before_all_events :ensure_validation_states
 
-    event :import, :after => [:record_transition, :notify_of_eligibility_change] do
+    event :import, :after => [:record_transition, :notify_of_eligibility_change, :update_all_verification_types] do
       transitions from: :unverified, to: :fully_verified
       transitions from: :ssa_pending, to: :fully_verified
       transitions from: :dhs_pending, to: :fully_verified
@@ -400,6 +401,7 @@ class ConsumerRole
       transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
@@ -457,9 +459,9 @@ class ConsumerRole
 
   def verify_ivl_by_admin(*args)
     if person.ssn || is_native?
-      self.ssn_valid_citizenship_valid! verification_attr
+      self.ssn_valid_citizenship_valid! verification_attr(args.first)
     else
-      self.pass_dhs! verification_attr
+      self.pass_dhs! verification_attr(args.first)
     end
   end
 
@@ -467,7 +469,9 @@ class ConsumerRole
     person.addresses = []
     person.phones = []
     person.emails = []
-    person.update_attributes(*args)
+    person.consumer_role.update_attributes(is_applying_coverage: args[0]["is_applying_coverage"])
+    args[0].delete("is_applying_coverage")
+    person.update_attributes(args[0])
   end
 
   def build_nested_models_for_person
@@ -641,8 +645,7 @@ class ConsumerRole
   end
 
   def record_partial_pass(*args)
-    lawful_presence_determination.citizen_status = "non_native_not_lawfully_present_in_us"
-    lawful_presence_determination.citizenship_result = "ssn_pass_citizenship_fails_with_SSA"
+    lawful_presence_determination.update_attributes!(:citizenship_result => "ssn_pass_citizenship_fails_with_SSA")
   end
 
   def fail_lawful_presence(*args)
@@ -659,6 +662,24 @@ class ConsumerRole
 
   def all_types_verified?
     person.verification_types.all?{ |type| is_type_verified?(type) }
+  end
+
+  def update_all_verification_types(*args)
+    person.verification_types.each do |v_type|
+      update_verification_type(v_type, "person is fully verified", lawful_presence_determination.try(:vlp_authority))
+    end
+  end
+
+  def update_verification_type(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.authorize!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type} successfully verified."
   end
 
   def is_type_verified?(type)
@@ -693,7 +714,21 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+    (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  end
+
+  def sensitive_information_changed(field, person_params)
+    if field == "dob"
+      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
+    elsif field == "ssn"
+      person.send(field).to_s != person_params[field].tr("-", "")
+    else
+      person.send(field).to_s != person_params[field]
+    end
+  end
+
+  def no_changes_24_h?
+    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
   end
 
   def record_transition(*args)
@@ -703,9 +738,10 @@ class ConsumerRole
     )
   end
 
-  def verification_attr
+  def verification_attr(*authority)
+    authority = authority.first == "curam" ? "curam" : "hbx"
     OpenStruct.new({:determined_at => Time.now,
-                    :vlp_authority => "hbx"
+                    :vlp_authority => authority
                    })
   end
 end
