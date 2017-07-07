@@ -631,6 +631,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOPDPTNC',
+    title: 'Census Dependent Termination due to Age-Off',
+    description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26 except for Non-Congressional',
+    resource_name: 'employee_role',
+    event_name: 'employee_dependent_age_off_termination',
+    notice_triggers: [
+      {
+        name: 'Notice to EE of DPT Termination due to Age-Off (Non-Congressional)',
+        notice_template: 'notices/shop_employee_notices/employee_dependent_age_off_termination',
+        notice_builder: 'ShopEmployeeNotices::EmployeeDependentAgeOffTermination',
+        mpi_indicator: 'MPI_SHOPDPTNC',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 ivl_notice_triggers = [
