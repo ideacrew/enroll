@@ -14,9 +14,11 @@
   - if income.employer_name
     %employer_name= income.employer_name
   %employer_id= income.employer_id
-  %employer_address
-    = render :partial => "events/addresses/address", :object => income.employer_address, as: :address
-  %employer_phone
-    = render :partial => "events/phones/phone", :object => income.employer_phone, as: :phone
+  - if income.employer_address
+    %employer_address
+      = render :partial => "events/addresses/address", :object => income.employer_address, as: :address
+  - if income.employer_phone
+    %employer_phone
+      = render :partial => "events/phones/phone", :object => income.employer_phone, as: :phone
   %is_projected= income.is_projected
   %submitted_at= income.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
