@@ -12,8 +12,8 @@ module PdfTemplates
     attribute :aptc_amount, String
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
-    attribute :dependents, String
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
+    attribute :dependents_count, String
   end
 end

@@ -603,7 +603,7 @@ shop_notice_triggers = [
         mpi_indicator: 'MPI_SHOP10023',
         notice_trigger_element_group: {
           market_places: ['shop'],
-          primary_recipients: ["employee"],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
