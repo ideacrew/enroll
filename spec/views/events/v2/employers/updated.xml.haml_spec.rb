@@ -7,6 +7,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
   let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+  let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
   let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
   let(:email  )  { Email.new(kind: "work", address: "info@sailaway.org") }
@@ -153,6 +154,21 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       it "should be included in xml" do
         render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
         expect(rendered).to have_selector('contact', count: 1)
+      end
+    end
+
+    context "POC address" do
+
+      before do
+        allow(employer).to receive(:staff_roles).and_return([staff])
+        allow(staff).to receive(:addresses).and_return([mailing_address,home_address])
+        render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
+        @doc = Nokogiri::XML(rendered)
+      end
+
+      it "should be included only poc mailing address" do
+        expect(@doc.xpath("//x:contacts/x:contact/x:addresses", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 1
+        expect(@doc.xpath("//x:contacts/x:contact/x:addresses/x:address/x:type", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:address_type#mailing"
       end
     end
 
