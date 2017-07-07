@@ -57,12 +57,12 @@
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling :#{notice.hbe.phone}.", "TTY :#{Settings.contact_center.TTY} ", "Online at : <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>"] } %>
+                                                                   ["By calling :#{Settings.contact_center.ma_phone_number}.", "TTY :#{Settings.contact_center.TTY} ", "Online at : <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>
