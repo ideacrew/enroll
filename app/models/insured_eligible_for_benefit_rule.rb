@@ -57,7 +57,7 @@ class InsuredEligibleForBenefitRule
 
   def set_status_and_error_if_not_applying_coverage
     status = false
-    @errors << ["Did not apply for coverage."]
+    @errors = ["Did not apply for coverage."]
     return status
   end
 
