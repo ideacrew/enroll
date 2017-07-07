@@ -42,7 +42,8 @@ module Aws
         object = get_object(env_bucket_name, key)
         read_object(object)
       rescue Exception => e
-        nil
+       puts "Error caused due to %s" %[$!.class]
+       raise e.backtrace
       end
     end
 
