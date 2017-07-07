@@ -8,7 +8,7 @@
 <% when "initial_employer_second_reminder_to_publish_plan_year" %>
   <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
 <% when "initial_employer_final_reminder_to_publish_plan_year" %>
-  <% subject = "Final Reminder – Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
+  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
 <% end %>
 
 <table class="total_table" border="0">
@@ -30,13 +30,13 @@
 <% case notice.notification_type %>
 <% when "initial_employer_first_reminder_to_publish_plan_year" %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/%d/%Y")}."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% when "initial_employer_second_reminder_to_publish_plan_year" %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}. Please complete your application by this date or you may have to reapply for coverage starting at a later date. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/%d/%Y")}."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% when "initial_employer_final_reminder_to_publish_plan_year" %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -115,7 +115,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
