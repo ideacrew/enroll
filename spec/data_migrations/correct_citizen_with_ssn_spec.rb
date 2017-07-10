@@ -227,7 +227,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
     end
   end
 
-  describe "given a citizen with ssn, ssa_response after July 5, and a previous response" do
+  describe "given a citizen with ssn, ssa_response after July 5, and a previous response", :dbclean => :after_each do
     subject { CorrectCitizenStatus.new("fix me task", double(:current_scope => nil)) }
 
     before :each do
