@@ -73,6 +73,7 @@ module Insured
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
+      session[:person_id] = @person.id
       #TODO TREY KEVIN JIM There is no user when CSR creates enroooment
       if consumer_user
         consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
