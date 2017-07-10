@@ -547,7 +547,7 @@ context "Verification process and notices" do
     end
   end
 
-  describe "Native American verification" do
+  describe "Native American verification", dbclean: :after_each do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
         person.update_attributes!(:citizen_status=>"indian_tribe_member") if tribe

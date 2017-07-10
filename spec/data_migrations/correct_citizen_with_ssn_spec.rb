@@ -153,8 +153,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
   let(:previous_response_successful) { EventResponse.new({:received_at => previous_date, :body => body_ssn_true_citizenship_true}) }
   let(:previous_response_citizenship_negative) { EventResponse.new({:received_at => previous_date, :body => body_ssn_true_citizenship_false}) }
   let(:previous_response_negative) { EventResponse.new({:received_at => previous_date, :body => body_no_ssn_verified_element}) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
-
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, ssn: "121456689")}
 
   describe "given a citizen with ssn, ssa_response after July 5, and no previous response" do
     subject { CorrectCitizenStatus.new("fix me task", double(:current_scope => nil)) }
@@ -228,7 +227,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
     end
   end
 
-  describe "given a citizen with ssn, ssa_response after July 5, and a previous response" do
+  describe "given a citizen with ssn, ssa_response after July 5, and a previous response", :dbclean => :after_each do
     subject { CorrectCitizenStatus.new("fix me task", double(:current_scope => nil)) }
 
     before :each do

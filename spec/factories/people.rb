@@ -12,6 +12,20 @@ FactoryGirl.define do
 
     #association :employee_role, strategy: :build
 
+    after(:build) do |p, evaluator|
+      if p.send(:is_ssn_composition_correct?) != nil
+        puts "\n original: #{p.ssn} \n"
+        stubbed_p = FactoryGirl.build_stubbed(:person, :with_ssn)
+        puts "\n first_stub: #{stubbed_p.ssn} \n"
+        until stubbed_p.send(:is_ssn_composition_correct?) == nil
+          stubbed_p = FactoryGirl.build_stubbed(:person, :with_ssn)
+          puts "\n looped_stub: #{stubbed_p.ssn} \n"
+        end
+        puts "\n first_stub: #{stubbed_p.ssn} \n"
+        evaluator.ssn = stubbed_p.ssn
+      end
+    end
+
     after(:create) do |p, evaluator|
       create_list(:address, 2, person: p)
       create_list(:phone, 2, person: p)
