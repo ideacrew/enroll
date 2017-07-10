@@ -33,7 +33,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
               if waiver.may_cancel_coverage?
                 waiver.cancel_coverage!
                 person = f.primary_applicant.person
-                puts "Canceled 2016 waiver for #{person.full_name}(#{person.hbx_id})"
+                puts "Canceled 2016 waiver for #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
               end
 
               cancel_waiver_and_trigger_renewal(f, renewal_plan_year)
@@ -42,7 +42,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
           end
         end
       end
-      puts "For #{i} month found #{count}."
+      puts "For #{i} month found #{count}." unless Rails.env.test?
     end
   end
 
@@ -62,7 +62,7 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
 
       if passives.present?
         person = family.primary_applicant.person
-        puts "Passively renewed #{person.full_name}(#{person.hbx_id})"
+        puts "Passively renewed #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
         passives.each{|e| e.cancel_coverage!}
         ce = passives.first.benefit_group_assignment.census_employee
         renew_health_coverage(plan_year, ce, family)
