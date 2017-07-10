@@ -4,6 +4,7 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://mhc.hbxshop.org/help"
   faqs_url: "https://mhc.hbxshop.org/faqs"
+  ma_url: " www.MAhealthconnector.org"
 
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
@@ -24,8 +25,10 @@ contact_center:
   alt_name: "Health Connector Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  ma_phone_number: "1-888-813-9220"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
+  tty: "711"
 
   mailing_address:
     name: "Massachusetts Health Connector"

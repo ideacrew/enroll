@@ -200,7 +200,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
-            welcome_employer_profile
+          welcome_employer_profile if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -558,15 +558,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def welcome_employer_profile
-
-    if @employer_profile.present?
-      begin
-       ShopNoticesNotifierJob.perform_later(@employer_profile.first, "application_created")
-       rescue Exception => e
-       puts "Unable to deliver Employer Notice to #{@employer_profile.first.full_name} due to #{e}" unless Rails.env.test?
-      end
+    begin
+     ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "application_created")
+     rescue Exception => e
+     puts "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
-
   end
 
   def get_sic_codes
