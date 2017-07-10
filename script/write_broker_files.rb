@@ -30,4 +30,3 @@ npn_list.each do |npn|
   controller.resource(ConnectionSlug.new(npn), "", properties_slug, "")
 end
 
-# rails -e production script/write_brokers.files.rb
