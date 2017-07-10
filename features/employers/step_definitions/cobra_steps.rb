@@ -256,22 +256,37 @@ Then(/^.+ should see terminate successful msg$/) do
   expect(page).to have_content('Successfully terminated Census Employee.')
 end
 
+When(/^.+ click terminated employee filter$/) do
+  find('div[data-key=terminated]').click
+  wait_for_ajax(4)
+end
+
 When(/^.+ click all employee filter$/) do
   find('div[data-key=all]').click
+  wait_for_ajax(4)
 end
 
 Then(/^.+ should see the status of Employment terminated$/) do
-  expect(page).to have_content('Employment terminated')
+  expect(find("td", :text => "Employment terminated", :wait => 3)).not_to be_nil
 end
 
 When(/^.+ cobra one employee$/) do
+  table = find("table.effective-datatable")
+  rows = table.all("tr")
+  waited_time = 0
+  while((rows.count > 2) || (waited_time < 5)) do
+    sleep 1
+    table = find("table.effective-datatable")
+    rows = table.all("tr")
+    waited_time = waited_time + 1
+  end
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
-  element.find(".dropdown-toggle", :text => "Actions").click
+  element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
   wait_for_ajax
-  element.find('a', :text => "Initiate Cobra").click
-
-  employee_id = element.find('a', :text => 'Employee Jr.')[:href].match(/^.*\/census_employees\/(\w+).*/i)[1]
-  find("tr.cobra_confirm_#{employee_id}").find('a.cobra_confirm_submit').click
+  element.find('a', :text => "Initiate Cobra", :wait => 3).click
+  wait_for_ajax
+#   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
+  find('a.cobra_confirm', :text => /Initiate Cobra/i, :wait => 3).trigger('click')
 end
 
 Then(/^.+ should see cobra successful msg/) do
@@ -279,7 +294,7 @@ Then(/^.+ should see cobra successful msg/) do
 end
 
 And(/^.+ should only see the status of Cobra Linked$/) do
-  expect(page).to have_content('Cobra Linked')
+  expect(page).to have_content('Cobra linked')
   expect(page).not_to have_content('Employee Role Linked')
   expect(page).not_to have_content('Employment Terminated')
 end

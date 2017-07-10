@@ -329,7 +329,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   #     end
   #
   #     it "should have cobra confirm area" do
-  #       expect(rendered).to have_selector('div.cobra_confirm')
+  #       expect(rendered).to have_selector('div.cobra-confirm')
   #       expect(rendered).to match /Employment Termination Date/
   #       expect(rendered).to have_selector('a.cobra_confirm_submit')
   #       expect(rendered).to have_selector('span.confirm-cobra-wrapper')
@@ -341,7 +341,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   #
   #     it "should have rehire area" do
   #       expect(rendered).to have_selector('div.confirm-terminate-wrapper')
-  #       expect(rendered).to have_selector('a.rehire_confirm')
+  #       expect(rendered).to have_selector('a.rehire-confirm')
   #     end
   #   end
   # end
