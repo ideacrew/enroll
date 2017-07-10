@@ -232,7 +232,7 @@ class EmployerProfile
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
-  # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/10823528
+  # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
     @roster_size = census_employees.active.size
