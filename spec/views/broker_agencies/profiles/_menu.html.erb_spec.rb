@@ -42,7 +42,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
       it "should have include Medicaid application" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:horizontal_menu)).to include('multi-line')
+        expect(view.content_for(:top_navigation)).to include('multi-line')
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
       it "should not include Medicaid application" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
+        expect(view.content_for(:top_navigation)).to_not include('multi-line')
       end
     end
 

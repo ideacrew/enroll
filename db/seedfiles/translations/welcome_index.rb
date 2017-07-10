@@ -1,5 +1,6 @@
 WELCOME_INDEX_TRANSLATIONS = {
   "en.welcome.index.sign_out" => "Sign Out",
+  "en.welcome.index.byline" => "The Right Place for the Right Plan",
   "en.welcome.index.assisted_consumer_family_portal" => "Assisted Consumer/Family Portal",
   "en.welcome.index.broker_agency_portal" => "Broker Agency Portal",
   "en.welcome.index.broker_registration" => "Broker Registration",

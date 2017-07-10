@@ -1,4 +1,5 @@
 module PortalHeaderHelper
+  include L10nHelper
   def portal_display_name(controller)
     if current_user.nil?
       "<a class='portal'>#{l10n("welcome.index.byline")}</a>".html_safe

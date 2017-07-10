@@ -4,7 +4,6 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
 
   describe "a signed in user" do
     let(:user) { FactoryGirl.create(:user, oim_id: "test@enroll.com") }
-    let!(:welcome) { create(:translation, key: "en.welcome.index.signed_in_as", value: '"Signed in as %{current_user}"') }
 
     before :each do
       sign_in user
@@ -55,11 +54,11 @@ RSpec.describe "welcome/index.html.erb", :type => :view do
       end
 
       it "shows the Consumer portal link" do
-        expect(rendered).to have_link('Consumer Family Portal')
+        expect(rendered).to have_link('Consumer/Family Portal')
       end
 
       it "shows the Assistest consumer portal link" do
-        expect(rendered).to have_link('Assisted Consumer Family Portal')
+        expect(rendered).to have_link('Assisted Consumer/Family Portal')
       end
     end
 
