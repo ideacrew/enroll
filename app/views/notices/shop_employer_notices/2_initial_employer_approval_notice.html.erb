@@ -90,7 +90,7 @@
    heading: 'For Questions or Assistance:', sub_heading: ''} %>
  <%= render partial: 'notices/shared/unordered_list', locals: {
  previous: "Please contact your broker for further assistance.  You can also contact the #{site_short_name} with any questions:",
- listings: ["By calling #{Settings.contact_center.phone}.","TTY : #{Settings.contact_center.tty}", "Online at <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>." ] } %>
+ listings: ["By calling #{Settings.contact_center.ma_phone_number}.","TTY : #{Settings.contact_center.tty}", "Online at <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>." ] } %>
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
