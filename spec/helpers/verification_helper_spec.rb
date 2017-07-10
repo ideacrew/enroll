@@ -364,4 +364,48 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
   end
+
+  describe "#documents_list" do
+    shared_examples_for "documents uploaded for one verification type" do |v_type, docs, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          docs.to_i.times { person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => v_type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    shared_examples_for "documents uploaded for multiple verification types" do |v_type, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.vlp_documents=[]
+          Person::VERIFICATION_TYPES.each {|type| person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    it_behaves_like "documents uploaded for one verification type", "Social Security Number", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
+    it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#build_admin_actions_list" do
+    shared_examples_for "admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return status
+      end
+      it "returns admin actions array" do
+        expect(helper.build_admin_actions_list(person, type)).to eq actions
+      end
+    end
+
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "Reject Document", "Clear Status", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Return for Deficiency", "Reject Document", "Clear Status", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Return for Deficiency", "Reject Document", "Clear Status", "View History", "Call HUB"]
+  end
 end

@@ -69,7 +69,7 @@ class ConsumerRole
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
   field :native_validation, type: String, default: nil
-  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
+  validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
@@ -404,6 +404,15 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+      transitions from: :verification_period_ended, to: :verification_outstanding
+    end
+
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
@@ -670,6 +679,28 @@ class ConsumerRole
     end
   end
 
+  def admin_verification_action(admin_action, v_type, update_reason)
+    case admin_action
+      when "verify"
+        update_verification_type(v_type, update_reason)
+      when "return_for_deficiency"
+        return_doc_for_deficiency(v_type, update_reason)
+    end
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.deny!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    reject!(verification_attr(authority.first))
+    "#{v_type} was returned for deficiency."
+  end
+
   def update_verification_type(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
       update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
@@ -714,7 +745,21 @@ class ConsumerRole
 
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
-    (dhs_pending? || ssa_pending?) && (workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now
+    (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  end
+
+  def sensitive_information_changed(field, person_params)
+    if field == "dob"
+      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
+    elsif field == "ssn"
+      person.send(field).to_s != person_params[field].tr("-", "")
+    else
+      person.send(field).to_s != person_params[field]
+    end
+  end
+
+  def no_changes_24_h?
+    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
   end
 
   def record_transition(*args)
