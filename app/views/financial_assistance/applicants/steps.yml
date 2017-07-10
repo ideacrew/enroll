@@ -5,10 +5,10 @@
       - section:
           lines:
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: Will this person file taxes for 2017? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -16,7 +16,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_required_to_file_taxes
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -24,14 +24,14 @@
                   label: 'No'
                   model: applicant
                   attribute: is_required_to_file_taxes
-                - gutter: 4
+                - gutter: 2
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: Will this person be filling jointly?
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -39,7 +39,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_joint_tax_filing
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -47,14 +47,14 @@
                   label: 'No'
                   model: applicant
                   attribute: is_joint_tax_filing
-                - gutter: 4
+                - gutter: 2
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: Will this person be claimed as somebody else’s tax dependent for 2017? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -62,7 +62,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -70,15 +70,15 @@
                   label: 'No'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
-                - gutter: 4
+                - gutter: 2
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: This person will be claimed as a dependent by
                   required: true
-                - gutter: 6
+                - gutter: 3
                   type: 'claimed_as_dependent_by_dropdown'
                   name: ''
                   required: true
@@ -93,10 +93,10 @@
       - section:
           lines:
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Has this person applied for an SSN *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -104,7 +104,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_ssn_applied
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -114,11 +114,12 @@
                   label: 'No'
                   model: applicant
                   attribute: is_ssn_applied
+
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Is this person pregnant? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -128,7 +129,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_pregnant
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -139,10 +140,10 @@
                   model: applicant
                   attribute: is_pregnant
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Pregnency Due date
-                - gutter: 3
+                - gutter: 2
                   type: input_date
                   placeholder: Due date
                   id: 'yes2'
@@ -152,7 +153,7 @@
                 - gutter: 6
                   type: text
                   text:  How many children is this person expecting?
-                - gutter: 6
+                - gutter: 3
                   type: 'dropdown'
                   name: ''
                   values:
@@ -167,7 +168,7 @@
                   type: text
                   text: Was this person pregnant in the last 60 days?
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   value: true
                   id: 'is_post_partum_period_yes'
@@ -175,7 +176,7 @@
                   classNames: 'span-text'
                   model: applicant
                   attribute: is_post_partum_period
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   value: false
                   id: 'is_post_partum_period_no'
@@ -184,10 +185,10 @@
                   model: applicant
                   attribute: is_post_partum_period
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Pregnency End on date
-                - gutter: 3
+                - gutter: 2
                   type: input_date
                   placeholder: End on date
                   id: 'yes2'
@@ -198,7 +199,7 @@
                   type: text
                   text: Was this person on Medicaid during pregnency?
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   value: true
                   id: 'medicaid_pregnency_yes'
@@ -206,7 +207,7 @@
                   classNames: 'span-text'
                   model: applicant
                   attribute: is_enrolled_on_medicaid
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   value: false
                   id: 'medicaid_pregnency_no'
@@ -215,10 +216,10 @@
                   model: applicant
                   attribute: is_enrolled_on_medicaid
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Was this person in foster care at age 18 or older? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -226,7 +227,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_former_foster_care
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -238,7 +239,7 @@
                 - gutter: 6
                   type: text
                   text:  Where was this person in foster care?
-                - gutter: 6
+                - gutter: 2
                   type: 'dropdown'
                   name: ''
                   values:
@@ -300,7 +301,7 @@
                 - gutter: 6
                   type: text
                   text:  How old was this person when they left foster care?
-                - gutter: 6
+                - gutter: 2
                   type: 'age_left_foster_care_dropdown'
                   name: ''
                   values:
@@ -309,10 +310,10 @@
                   model: applicant
                   attribute: age_left_foster_care
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Was this person enrolled in Medicaid when they left foster care?
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -320,7 +321,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: had_medicaid_during_foster_care
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -329,10 +330,10 @@
                   model: applicant
                   attribute: had_medicaid_during_foster_care
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Is this person a student? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -341,7 +342,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_student
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -354,7 +355,7 @@
                 - gutter: 6
                   type: text
                   text:  What is the type of student?
-                - gutter: 6
+                - gutter: 3
                   type: 'dropdown'
                   name: ''
                   values:
@@ -368,10 +369,10 @@
                   model: applicant
                   attribute: student_kind
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Student status end on date?
-                - gutter: 3
+                - gutter: 2
                   type: input_date
                   placeholder: End on
                   id: 'student_status_end_on'
@@ -381,7 +382,7 @@
                 - gutter: 6
                   type: text
                   text:  What type of school do you go to?
-                - gutter: 6
+                - gutter: 3
                   type: 'dropdown'
                   name: ''
                   values:
@@ -402,10 +403,10 @@
                   model: applicant
                   attribute: student_school_kind
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Is this person blind? * #is_self_attested_blind_or_disabled
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -414,7 +415,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: is_self_attested_blind
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -424,10 +425,10 @@
                   model: applicant
                   attribute: is_self_attested_blind
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Does this person need help with daily life activities, such as dressing or bathing? * #has_daily_living_help
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -436,7 +437,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: has_daily_living_help
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false
@@ -446,10 +447,10 @@
                   model: applicant
                   attribute: has_daily_living_help
             - cells:
-                - gutter: 8
+                - gutter: 6
                   type: text
                   text: Does this person need help paying for any medical bills from the last 3 months? * #need_help_paying_bills
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: true
@@ -458,7 +459,7 @@
                   label: 'Yes'
                   model: applicant
                   attribute: need_help_paying_bills
-                - gutter: 3
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: false

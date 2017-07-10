@@ -5,22 +5,22 @@
       - section:
           lines:
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: Does this person expect to have adjustments to income in 2017 ? *
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: 'yes2'
                   id: 'adjustments_yes'
                   label: 'Yes'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: row2
                   value: 'no2'
                   id: 'no2'
                   label: 'No'
-                - gutter: 4
+                - gutter: 2
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
