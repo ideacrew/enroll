@@ -1,0 +1,41 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date' %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This letter is notification that your employer, <Legal Name>, has removed you from their list of employees eligible for employer-sponsored health insurance. Effective <date of termination from roster>, you are no longer eligible to apply for or make changes to your health insurance with <Legal Name>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Your coverage into <SHOP Plan Name 1> for you and any covered dependents will end on <Coverage End Date>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Your coverage into <Terminated SHOP Plan Name 2> for you and <# of covered dependents> dependents will end on <Coverage End Date>."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: ["If you are enrolled in <Legal Name>’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members  through DC Health Link’s individual marketplace.  You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance.", "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the date of the loss of coverage, beginning <Date of Notice > until <Date of Notice Loss of Coverage.  To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period from <Upcoming IVL Open Enrollment Start Date> through <Upcoming IVL Open Enrollment End Date>.  Please log into your DC Health Link account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance.", "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs.  To find the Health Insurance Marketplace in your state, go to <a href='www.healthcare.gov'>www.healthcare.gov</a>.", "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll.  While you may generally have a 60-day Special Enrollment Period to enroll in individual market DC Health Link coverage, you typically only have a 30-day Special Enrollment Period to enroll in another employer’s group health plan."], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please contact your employer or your broker for further assistance."} %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{notice.hbe.phone}.",
+                                                                    "TTY: 711",
+                                                                    "Online at <a href='#{Settings.site.website_name}'>#{Settings.site.website_name}</a>"] } %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 C.F.R. 155.715(f) and 155.735(g)."} %>
