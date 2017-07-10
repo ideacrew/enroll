@@ -4,4 +4,5 @@ class BillFile
   
   field :urn, type: String
   field :creation_date, type: Date
+  field :name, type: String
 end

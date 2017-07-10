@@ -7,6 +7,7 @@ namespace :billfile do
     orgs = Organization.all
 
     FILE_PATH = Rails.root.join "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
+    Title = "#{Time.now.strftime('%Y-%m-%d')}_BillFile.csv"
     # keeps value two decimal places from right
     def format_total_due(total_due)
       ("%.2f" % total_due)
@@ -42,7 +43,7 @@ namespace :billfile do
   task :save_to_s3 => [:environment] do
     bill_file = Aws::S3Storage.save(FILE_PATH, 'billfile')
     if bill_file.present?
-      BillFile.create(urn: bill_file, creation_date: Date.today)
+      BillFile.create(urn: bill_file, creation_date: Date.today, name: Title)
     else
       raise "No file present to save to S3."
     end
