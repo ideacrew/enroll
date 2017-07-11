@@ -28,7 +28,6 @@ contact_center:
   tty: "711"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
-  tty: "711"
 
   mailing_address:
     name: "Massachusetts Health Connector"
