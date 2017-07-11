@@ -3,12 +3,10 @@
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 <% case notice.notification_type %>
-<% when "initial_employer_first_reminder_to_publish_plan_year" %>
+<% when "initial_employer_first_reminder_to_publish_plan_year" || "initial_employer_final_reminder_to_publish_plan_year"%>
   <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
 <% when "initial_employer_second_reminder_to_publish_plan_year" %>
   <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
-<% when "initial_employer_final_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
 <% end %>
 
 <table class="total_table" border="0">
@@ -28,13 +26,7 @@
 </table>
 
 <% case notice.notification_type %>
-<% when "initial_employer_first_reminder_to_publish_plan_year" %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
-<% when "initial_employer_second_reminder_to_publish_plan_year" %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
-<% when "initial_employer_final_reminder_to_publish_plan_year" %>
+<% when "initial_employer_first_reminder_to_publish_plan_year" || "initial_employer_second_reminder_to_publish_plan_year" || "initial_employer_final_reminder_to_publish_plan_year"%>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% end %>
