@@ -283,6 +283,7 @@ When(/^.+ cobra one employee$/) do
   element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
   wait_for_ajax
+  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
   wait_for_ajax
 #   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
