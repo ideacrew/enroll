@@ -49,9 +49,9 @@ class FinancialAssistance::Applicant
   field :is_living_in_state, type: Boolean, default: true
   field :is_temp_out_of_state, type: Boolean, default: false
 
-  field :is_required_to_file_taxes, type: Boolean, default: true
+  field :is_required_to_file_taxes, type: Boolean
   field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
-  field :is_joint_tax_filing, type: Boolean, default: false
+  field :is_joint_tax_filing, type: Boolean
   field :is_claimed_as_tax_dependent, type: Boolean
   field :claimed_as_tax_dependent_by, type: BSON::ObjectId
 
@@ -65,14 +65,14 @@ class FinancialAssistance::Applicant
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
 
-  field :is_student, type: Boolean#, default: false
+  field :is_student, type: Boolean
   field :student_kind, type: String
   field :student_school_kind, type: String
   field :student_status_end_on, type: String
 
   #split this out : change XSD too.
   #field :is_self_attested_blind_or_disabled, type: Boolean, default: false
-  field :is_self_attested_blind, type: Boolean#, default: false
+  field :is_self_attested_blind, type: Boolean
   field :is_self_attested_disabled, type: Boolean, default: false
 
   field :is_self_attested_long_term_care, type: Boolean, default: false
@@ -81,14 +81,14 @@ class FinancialAssistance::Applicant
   field :is_refugee, type: Boolean, default: false
   field :is_trafficking_victim, type: Boolean, default: false
 
-  field :is_former_foster_care, type: Boolean#, default: false
+  field :is_former_foster_care, type: Boolean
   field :age_left_foster_care, type: Integer, default: 0
   field :foster_care_us_state, type: String
   field :had_medicaid_during_foster_care, type: Boolean, default: false
 
-  field :is_pregnant, type: Boolean#, default: false
-  field :is_enrolled_on_medicaid, type: Boolean, default: false
-  field :is_post_partum_period, type: Boolean, default: false
+  field :is_pregnant, type: Boolean
+  field :is_enrolled_on_medicaid, type: Boolean
+  field :is_post_partum_period, type: Boolean
   field :children_expected_count, type: Integer, default: 0
   field :pregnancy_due_on, type: Date
   field :pregnancy_end_on, type: Date
