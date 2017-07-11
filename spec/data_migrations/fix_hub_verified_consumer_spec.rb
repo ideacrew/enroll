@@ -191,7 +191,7 @@ describe FixHubVerifiedConsumer, :dbclean => :after_each do
       person.consumer_role.lawful_presence_determination.aasm_state = "verification_outstanding"
     end
     describe "SSN, Citizenship, SSA Hub response" do
-      context "SSA response: SSN - ok, Citizenship - ok", dbclean: :after_each do
+      context "SSA response: SSN - ok, Citizenship - ok" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
           person.save!

@@ -48,7 +48,7 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
 
     end
 
-    context "people with SSN, and a qualifying ssa response", dbclean: :after_each do
+    context "people with SSN, and a qualifying ssa response" do
       let(:curam_user) { FactoryGirl.create(:person, :with_consumer_role, :with_ssn)}
       before :each do
         curam_user.consumer_role.lawful_presence_determination.vlp_authority = "curam"

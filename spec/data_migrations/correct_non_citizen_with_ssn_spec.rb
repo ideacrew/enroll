@@ -133,7 +133,7 @@ let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
 describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => :after_each do
   subject { CorrectNonCitizenStatus.new("fix me task", double(:current_scope => nil)) }
 
-  context "ssn response true", :dbclean => :after_each do
+  context "ssn response true" do
     describe "citizenship true" do
       before :each do
         person.consumer_role.aasm_state = "any state"
