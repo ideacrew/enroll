@@ -16,14 +16,29 @@
         <th></th>
         <th></th>
         <% @applicant.deductions.each do |deduction| %>
-        <tr>
-          <td><%= deduction.kind %></td>
-          <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
-          <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
-        </tr>
+          <tr>
+            <td><%= deduction.kind %></td>
+            <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
+            <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+          </tr>
         <% end %>
       </table>
     <%end%>
   </div>
   <%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+</div>
+
+<div class="col-md-2">
+  <%# This will eventually change to the applicant's other questions steps when it's done %>
+  <%= link_to financial_assistance_application_applicant_path(@application, @applicant) do %>
+    <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+  <% end %>
+
+  <ul class="list-unstyled list-right-section">
+    <li>
+      <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
+        <%= image_tag 'icons/list.png' %> PREVIOUS
+      <% end %>
+    </li>
+  </ul>
 </div>
