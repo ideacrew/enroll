@@ -1,4 +1,4 @@
-<div class="col-md-9">
+<div class="col-md-7">
 	<div class="row">
     <div class="col-md-6">
       <h3 class="title-inline"><b>Financial Assistance Application</b></h3>
@@ -39,6 +39,27 @@
 	</div>
 </div>
 
+<div class="col-md-2">
+  <%= if @application.incomplete_applicants? %>
+    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @application.next_applicant, 1) do %>
+      <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+    <% end %>
+
+      <ul class="list-unstyled list-right-section">
+        <li>
+          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
+            <%= image_tag 'icons/list.png' %> PREVIOUS
+          <% end %>
+        </li>
+      </ul>
+    <% end %>
+  <% else %>
+    <%= link_to review_and_submit_financial_assistance_application_path(@application) do %>
+      <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+    <% end %>
+  <% end %>
+</div>
+
 <!-- Modal -->
 <div id="help-me-decide" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -59,5 +80,3 @@
 
   </div>
 </div>
-
-
