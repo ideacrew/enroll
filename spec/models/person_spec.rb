@@ -72,9 +72,10 @@ describe Person do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship.
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil
@@ -647,17 +648,18 @@ describe Person do
     end
   end
 
-  describe '#person_relationships' do
-    it 'accepts associated addresses' do
-      # setup
-      person = FactoryGirl.build(:person)
-      relationship = person.person_relationships.build({kind: "self", relative: person})
+  #old_code
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     # setup
+  #     person = FactoryGirl.build(:person)
+  #     relationship = person.person_relationships.build({kind: "self", relative: person})
 
-      expect(person.save).to eq true
-      expect(person.person_relationships.size).to eq 1
-      expect(relationship.invert_relationship.kind).to eq "self"
-    end
-  end
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
 
   describe '#full_name' do
     it 'returns the concatenated name attributes' do
@@ -670,7 +672,7 @@ describe Person do
       person = Person.new
       person.phones.build({kind: 'home', area_code: '202', number: '555-1212'})
 
-      # expect(person.phones.first.number).to eq '5551212'
+      expect(person.phones.first.number).to eq '5551212'
     end
   end
 
@@ -1001,12 +1003,14 @@ describe Person do
       let(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:family1)  {FactoryGirl.create(:family, :with_primary_family_member)}
-      let(:household) {FactoryGirl.create(:household, family: family1)}
-      let(:tax_household) {FactoryGirl.create(:tax_household, household: household) }
-      let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
+      # let(:household) {FactoryGirl.create(:household, family: family1)}
+      let(:application) { FactoryGirl.create(:application, family: family1) }
+      let(:tax_household) {FactoryGirl.create(:tax_household, application: application) }
+      let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, csr_percent_as_integer: 10)}
 
       before :each do
-        family1.households.first.tax_households<<tax_household
+        family1.applications<<application
+        family1.applications.first.tax_households<<tax_household
         family1.save
         @person_aqhp = family1.primary_applicant.person
       end
@@ -1025,11 +1029,11 @@ describe Person do
       end
 
       it "creates family with households and tax_households" do
-        expect(family1.households.first.tax_households).not_to be_empty
+        expect(family1.applications.first.tax_households).not_to be_empty
       end
 
       it "true if person family households present" do
-        expect(@person_aqhp.check_households(family1)).to eq true
+        expect(@person_aqhp.check_applications(family1)).to eq true
       end
 
       it "true if person family households tax_households present" do
@@ -1430,5 +1434,72 @@ describe Person do
         end
       end
     end
+  end
+end
+
+describe Person, "given a relationship to update", dbclean: :after_each do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:primary_person) {family.primary_applicant.person}
+  let(:relationship) { "spouse" }
+  let(:person) { FactoryGirl.build(:person) }
+  subject { FactoryGirl.build(:family_member, person: person, family: family).person }
+  let(:family_member2) {FactoryGirl.create(:family_member, :family => family).person}
+  let(:family_member3) {FactoryGirl.create(:family_member, :family => family).person}
+
+  it "should update the direct relationship from the context of both persons" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+    rel = subject.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
+    expect(rel).to eq relationship
+    expect(subject.person_relationships.size).to eq 1
+  end
+
+  it "should create the relationships" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+
+    family_member3.add_relationship(primary_person, "child", family.id)
+    primary_person.add_relationship(family_member3, PersonRelationship::InverseMap["child"], family.id)
+
+    family.build_relationship_matrix
+    expect(primary_person.person_relationships.size).to eq 3
+    family_member2.add_relationship(primary_person, "unrelated", family.id) #Test for updating the exisiting relationship
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["unrelated"], family.id)
+
+    expect(primary_person.person_relationships.size).to eq 3
+    expect(family_member2.person_relationships.size).to eq 1
+    unr_relationship = family_member2.person_relationships.where(successor_id: primary_person.id, predecessor_id: family_member2.id).first.kind
+    expect(unr_relationship).to eq "unrelated"
+  end
+
+  it "should build relationship" do
+    family_member2.build_relationship(primary_person, "spouse", family.id)
+    primary_person.build_relationship(family_member2, PersonRelationship::InverseMap["spouse"], family.id)
+    expect(primary_person.person_relationships.size).to eq 1
+  end
+
+  it "should destroy relationships associated to removed family member" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.person_relationships.size).to eq 1
+    family_member2.remove_relationship(family.id)
+    expect(family_member2.person_relationships.size).to eq 0
+  end
+
+  it "should return true if same successor exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).to eq true
+  end
+
+  it "should not return true if same successor does not exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).not_to eq false
   end
 end

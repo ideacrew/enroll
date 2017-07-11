@@ -457,12 +457,36 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:)
+    def individual_plans(coverage_kind:, active_year:, tax_households:, family_member_ids:)
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        csr_kind = tax_household.try(:latest_eligibility_determination).try(:csr_eligibility_kind)
+
+        csr_kinds = []
+        csr_kind = nil
+
+        if tax_households.present?
+          if family_member_ids.present?
+            tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+              if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
+                csr_kinds << "csr_100"
+              end
+            end
+          end
+          tax_households.each do |tax_household|
+            if tax_household.preferred_eligibility_determination.present?
+              csr_kinds << tax_household.preferred_eligibility_determination.csr_eligibility_kind
+            end
+          end
+        end
+
+        #Selects the right csr_kind from the array of csr_kinds.
+        csr_kind = "csr_73" if csr_kinds.include? "csr_73"
+        csr_kind = "csr_87" if csr_kinds.include? "csr_87"
+        csr_kind = "csr_94" if csr_kinds.include? "csr_94"
+        csr_kind = "csr_100" if csr_kinds.include? "csr_100"
+
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

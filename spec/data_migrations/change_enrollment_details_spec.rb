@@ -24,7 +24,7 @@ describe ChangeEnrollmentDetails do
   end
 
   describe "changing enrollment attributes" do
-    
+
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
@@ -89,6 +89,19 @@ describe ChangeEnrollmentDetails do
       it_behaves_like "termination", "aasm_state", "coverage_terminated"
       it_behaves_like "termination", "terminated_on", Date.strptime("01/01/2016", "%m/%d/%Y")
 
+    end
+
+    context "it should cancel the enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "cancel"
+        subject.migrate
+        hbx_enrollment.reload
+      end
+
+      it "should cancel the enrollment" do
+        expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
     end
   end
 end

@@ -84,7 +84,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     person.update_attributes(person_profile_params)
     person.save!
-
     @broker_agency_profile.update_attributes(languages_spoken_params)
 
 

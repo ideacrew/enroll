@@ -3,6 +3,9 @@
 
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
 
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
+    <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+
       <% if dependent.errors.any? %>
         <div class="alert alert-error">
           <h4>

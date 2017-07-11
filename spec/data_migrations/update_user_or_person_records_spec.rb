@@ -15,6 +15,7 @@ describe UpdateUserOrPersonRecords, dbclean: :after_each do
   describe "update username & email on user and also destroying headless user", dbclean: :after_each do
 
     let(:user) { FactoryGirl.create(:user, :with_family)}
+
     before do
       allow(ENV).to receive(:[]).with('action').and_return ""
       allow(ENV).to receive(:[]).with('user_email').and_return user.email

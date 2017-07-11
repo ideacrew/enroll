@@ -105,6 +105,7 @@ module Forms
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
+      family.build_relationship_matrix
       self.id = family_member.id
       true
     end
@@ -284,7 +285,10 @@ module Forms
         family_member.family.build_resident_role(family_member)
       end
       assign_person_address(family_member.person)
-      family_member.update_relationship(relationship)
+      #family_member.update_relationship(relationship) #old_code
+      family_member.person.add_relationship(family.primary_applicant.person, relationship, family_id, true)
+      family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
+      family.build_relationship_matrix
       family_member.save!
       true
     end

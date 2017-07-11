@@ -3,6 +3,8 @@
 .container
   #new_person_wrapper
     .row
+      .col-lg-3.col-md-3.col-sm-3.col-xs-12
+        = render  partial: 'shared/left_nav.html.erb'
       = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
           %h3 Personal Information
@@ -11,5 +13,5 @@
             = render 'no_match'
           %br
 
-        .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+        .col-lg-2.col-md-2.col-sm-2.col-xs-12
           = render  partial: 'shared/individual_progress', locals: {step: '1', search_page: true}

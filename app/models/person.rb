@@ -18,6 +18,7 @@ class Person
 
   PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
+  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -167,7 +168,9 @@ class Person
   index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
-  index({"person_relationship.relative_id" =>  1})
+  # index({"person_relationship.relative_id" =>  1}) #old_code
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
@@ -261,18 +264,18 @@ class Person
   def is_aqhp?
     family = self.primary_family if self.primary_family
     if family
-      check_households(family) && check_tax_households(family)
+      check_applications(family) && check_tax_households(family)
     else
       false
     end
   end
 
-  def check_households family
-    family.households.present? ? true : false
+  def check_applications family
+    family.applications.present? ? true : false
   end
 
   def check_tax_households family
-    family.households.first.tax_households.present? ? true : false
+    family.applications.first.tax_households.present? ? true : false
   end
 
   def completed_identity_verification?
@@ -419,37 +422,53 @@ class Person
     verification_types
   end
 
-  def relatives
-    person_relationships.reject do |p_rel|
-      p_rel.relative_id.to_s == self.id.to_s
-    end.map(&:relative)
+  def relatives(family_id)
+    person_relationships.where(family_id: family_id).map(&:relative)
+    # person_relationships.reject do |p_rel|
+    #   p_rel.relative_id.to_s == self.id.to_s
+    # end.map(&:relative)
   end
 
-  def find_relationship_with(other_person)
+  def find_relationship_with(other_person, family_id)
     if self.id == other_person.id
       "self"
     else
-      person_relationship_for(other_person).try(:kind)
+      person_relationship_for(other_person, family_id).try(:kind)
     end
   end
 
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
+  def person_relationship_for(other_person, family_id)
+    person_relationships.where(successor_id: other_person.id, predecessor_id: self.id, family_id: family_id).first
+    # person_relationships.detect do |person_relationship|
+    #   person_relationship.relative_id == other_person.id
+    # end
   end
 
-  def ensure_relationship_with(person, relationship)
+  def ensure_relationship_with(person, relationship, family_id)
     return if person.blank?
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+    # existing_relationship = self.person_relationships.detect do |rel|
+    #   rel.relative_id.to_s == person.id.to_s
+    # end
+    direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: person.id).first
+    inverse_relationship = person.person_relationships.where(family_id: family_id, predecessor_id: person.id, successor_id: self.id).first
+    if direct_relationship.present? && inverse_relationship.present?
+      direct_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
+      inverse_relationship.update_attributes(:kind => relationship)
+      # existing_relationship.update_attributes(:kind => relationship)
     else
       self.person_relationships << PersonRelationship.new({
+        :kind => PersonRelationship::InverseMap[relationship],
+        # :relative_id => person.id,
+        :successor_id => person.id,
+        :predecessor_id => self.id,
+        :family_id => family_id
+      })
+      person.person_relationships << PersonRelationship.new({
         :kind => relationship,
-        :relative_id => person.id
+        # :relative_id => person.id,
+        :successor_id => self.id,
+        :predecessor_id => person.id,
+        :family_id => family_id
       })
     end
   end
@@ -867,6 +886,46 @@ class Person
     if user && session_var == 'paper'
       user.ridp_by_paper_application
     end
+  end
+
+  # Related to Relationship Matrix
+  def add_relationship(successor, relationship_kind, family_id, destroy_relation=false)
+    if same_successor_exists?(successor, family_id)
+      direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first # Direct Relationship
+
+      # Destroying the relationships associated to the Person other than the new updated relationship.
+      if direct_relationship != nil && destroy_relation
+        other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+
+        other_relations.each do |otr|
+          otr_relation = Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first
+          otr_relation.destroy unless otr_relation.blank?
+        end
+      end
+
+      direct_relationship.update(kind: relationship_kind)
+    else
+      if self.id != successor.id
+        person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+      end
+    end
+  end
+
+  def build_relationship(successor, relationship_kind, family_id)
+    person_relationships.build(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+  end
+
+  def remove_relationship(family_id)
+    successor_ids = person_relationships.where(family_id: family_id, predecessor_id: self.id).collect(&:successor_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id).each(&:destroy)
+    successor_ids.each do |s|
+      Person.find(s).person_relationships.where(family_id: family_id, successor_id: self.id).each(&:destroy)
+    end
+  end
+
+  def same_successor_exists?(successor, family_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
   private

@@ -1,0 +1,29 @@
+<%= workflow_form_for @model do %>
+  <div class="col-md-7">
+    <div class="">
+      <% if !@current_step.heading.nil? %>
+      <p class="alert alert-error hide"></p>
+        <h1 class="darkblue"><%= personalize_heading_text(@current_step.heading) %></h1>
+        <% if !@current_step.heading_text.nil? %>
+          <% if @current_step.heading_text.present? %>
+            <p><%= @current_step.heading_text%></p>
+            <p class="memo">* = required field</p>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="focus_effect module">
+        <% @current_step.sections.each do |section| %>
+          <div class="margin-bottom-30">
+            <%= render 'workflow/section', :lines => section.lines, :heading => section.heading, :heading_text => section.heading_text, :classNames => section.classNames %>
+          </div>
+        <% end %>
+      </div>
+      <br />
+      <%= render '/financial_assistance/shared/back_to_all_applicants'%>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <%= render '/financial_assistance/shared/right_nav'%>
+  </div>
+<% end %>

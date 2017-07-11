@@ -2,10 +2,10 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include NavigationHelper
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
-  #before_action :authorize_for, except: [:edit, :update]
 
   def ssn_taken
   end

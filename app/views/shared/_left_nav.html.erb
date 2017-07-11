@@ -1,0 +1,9 @@
+<nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
+  <ul class="nav nav-stacked" id="leftNavigation">
+    <% NavigationHelper::getAllTabs.each do |value| %>
+      <li id="<%= value['id'] %>" class="<%= value[:active] ? 'activer' : ''%> list-box step-tabs">
+        <a  href="#" ><%= value["title"] %></a>
+      </li>
+    <%end%>
+  </ul>
+</nav>

@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -20,6 +20,46 @@ Rails.application.routes.draw do
       post :login
       get :logout
       get :navigate_to_assistance
+    end
+  end
+
+  namespace :financial_assistance do
+    resources :applications do
+      put :step, on: :member
+      put ':step/:step', on: :member, action: 'step'
+      post :step, on: :collection
+      get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+      get 'help_paying_coverage',on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
+      get 'application_checklist',on: :collection, action: 'application_checklist', as: 'application_checklist'
+      get 'get_help_paying_coverage_response',on: :collection, action: 'get_help_paying_coverage_response', as: 'get_help_paying_coverage_response'
+      get :review_and_submit, on: :collection
+      get :eligibility_results, on: :collection
+
+      resources :applicants do
+        put :step, on: :member
+        put ':step/:step', on: :member, action: 'step'
+        post :step, on: :collection
+        get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        get :age_18_to_26
+
+        resources :incomes do
+          put 'step(/:step)', action: 'step', on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+
+        resources :benefits do
+          put 'step(/:step)', action: 'step', on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+
+        resources :deductions do
+          put 'step(/:step)', action: 'step', on: :member
+          post :step, on: :collection
+          get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
+        end
+      end
     end
   end
 
@@ -153,6 +193,7 @@ Rails.application.routes.draw do
       collection do
         get 'home'
         get 'manage_family'
+        get 'family_relationships_matrix'
         get 'personal'
         get 'inbox'
         get 'brokers'
@@ -164,6 +205,7 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -207,7 +249,9 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
+    resources :family_relationships
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate

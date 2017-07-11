@@ -9,10 +9,13 @@ RSpec.describe Products::QhpController, :type => :controller do
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
   let(:household) {double(latest_active_tax_household_with_year: tax_household)}
-  let(:family) {double(latest_household: household)}
+  let(:application) {double}
+  let(:family) {double(latest_household: household, active_approved_application: application)}
   context "GET comparison" do
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(person.primary_family).to receive(:active_approved_application).and_return(application)
+      allow(person.primary_family.active_approved_application).to receive(:latest_active_tax_households_with_year).with(2017).and_return(tax_household)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(plan).to receive(:coverage_kind).and_return("health")
@@ -131,6 +134,9 @@ RSpec.describe Products::QhpController, :type => :controller do
 
     before do
       allow(user).to receive(:person).and_return(person)
+      allow(person.primary_family).to receive(:active_approved_application).and_return(application)
+      allow(person.primary_family.active_approved_application).to receive(:latest_active_tax_households_with_year).and_return(tax_household)
+      allow(person.primary_family.active_approved_application.latest_active_tax_households_with_year).to receive(:first).and_return(tax_household)
       allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(hbx_enrollment).to receive(:decorated_elected_plans).with("dental")

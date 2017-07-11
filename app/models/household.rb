@@ -18,10 +18,9 @@ class Household
   field :is_active, type: Boolean, default: true
 
   embeds_many :hbx_enrollments
-  embeds_many :tax_households
   embeds_many :coverage_households, cascade_callbacks: true
 
-  accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
+  accepts_nested_attributes_for :hbx_enrollments, :coverage_households
 
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
@@ -182,28 +181,29 @@ class Household
     coverage_households.sort_by(&:submitted_at).last.submitted_at
   end
 
-  def latest_active_tax_household
-    return tax_households.first if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  # This following method will move to the FinancialAssistance::Application Model and
+  # also return all active tax_households in the 'active' Application
+  # as part of handeling multiple TaxHousehold.
+
+  # def latest_active_tax_households
+  #   return tax_households.first if tax_households.length == 1
+  #   tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  # end
+
+  def last_application_with_determination
+    applications.where(aasm_state: 'submitted', :eligibility_determination_id.ne => nil).order_by(:submitted_at => 'desc').first
   end
 
-  def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
-    if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
-    end
-
-    if tax_households.empty?
-      nil
-    else
-      tax_households.entries.last
-    end
+  def last_application_with_determination_by_year(year)
+    applications.where(aasm_state: 'submitted', :eligibility_determination_id.ne => nil, :assistance_year => year).order_by(:submitted_at => 'desc').first
   end
 
+  # TODO: Move to Aplication model and refactor accordingly.
   def latest_tax_household_with_year(year)
     tax_households.tax_household_with_year(year).try(:last)
   end
-
+  
+  # TODO: This can probably go away. I do not see it being used.
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -329,13 +329,13 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
-  def eligibility_determinations_for_year(year)
-    eds = []
-    tax_households.tax_household_with_year(year).each do |th|
-      th.eligibility_determinations.each do |ed|
-        eds << ed
-      end
-    end
-    eds
-  end
+  # def eligibility_determinations_for_year(year)
+  #   eds = []
+  #   applications.where(assistance_year: year).each do |app|
+  #     app.eligibility_determinations.each do |ed|
+  #       eds << ed
+  #     end
+  #   end
+  #   eds
+  # end
 end

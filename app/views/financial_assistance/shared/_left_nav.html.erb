@@ -1,0 +1,15 @@
+<nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
+  <ul class="nav nav-stacked" id="leftNavigation">
+    <li class="activer list-box step-tabs">
+      <%= link_to "Application", edit_financial_assistance_application_path(@application) %>
+    </li>
+    <%= nav_for_applicants %>
+    <% if action_name == 'review_and_submit' %>
+      <li class="activer list-box step-tabs">
+    <% else %>
+      <li class="list-box step-tabs">
+    <% end %>
+      <%= link_to "Review and Submit", review_and_submit_financial_assistance_applications_path(@application) %>
+    </li>
+  </ul>
+</nav>

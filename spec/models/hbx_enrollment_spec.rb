@@ -469,6 +469,7 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
       let(:person) { double(primary_family: family)}
       let(:family) { double }
+      let(:application) { double(family: family)}
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -496,6 +497,8 @@ describe HbxEnrollment, dbclean: :after_all do
           allow(household).to receive(:family).and_return family
           allow(family).to receive(:is_under_special_enrollment_period?).and_return false
           allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
         end
 
@@ -534,6 +537,8 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
           allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).and_return(bcp)
           allow(bcp).to receive(:elected_plans_by_enrollment_members).and_return [plan]

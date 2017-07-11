@@ -431,7 +431,7 @@ module ApplicationHelper
     relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.family_member.try(:relationship))
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
@@ -638,6 +638,10 @@ module ApplicationHelper
     else
       "2. You have 0 non-owner employees on your roster"
     end
+  end
+
+  def human_boolean(boolean)
+    boolean ? 'Yes' : 'No'
   end
 
   def is_new_paper_application?(current_user, app_type)

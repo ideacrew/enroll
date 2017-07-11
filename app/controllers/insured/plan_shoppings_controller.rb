@@ -147,11 +147,14 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @family_member_ids = params[:family_member_ids]
+    
+    shopping_tax_households = get_tax_household_from_family_members(@person, @family_member_ids)
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+
+    if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
+      @tax_household = shopping_tax_households
+      @max_aptc = total_aptc_on_tax_households(shopping_tax_households, @hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else
@@ -171,10 +174,12 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
+    @family_member_ids = params[:family_member_ids]
     set_consumer_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    if @person.primary_family.active_household.latest_active_tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person)
+    application = @person.primary_family.active_approved_application
+    if application.present? && application.tax_households.present?
+      if is_eligibility_determined_and_not_csr_100?(@person, params[:family_member_ids])
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -204,9 +209,20 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person)
-    csr_eligibility_kind = person.primary_family.active_household.latest_active_tax_household.current_csr_eligibility_kind
-    (EligibilityDetermination::CSR_KINDS.include? "#{csr_eligibility_kind}") && ("#{csr_eligibility_kind}" != "csr_100")
+  def is_eligibility_determined_and_not_csr_100?(person, family_member_ids)
+    primary_family = person.primary_family
+    family_members = primary_family.family_members.where(id: family_member_ids)
+    csr_kinds = []
+    family_member_ids.each do |key, member|
+      applicant = primary_family.active_approved_application.applicants.where(family_member_id: member).first
+      if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
+        return false
+      end
+      tax_household = primary_family.active_approved_application.tax_household_for_family_member(member)
+      csr_kind = primary_family.active_approved_application.current_csr_eligibility_kind(tax_household.id)
+      csr_kinds << csr_kind if EligibilityDetermination::CSR_KINDS.include? csr_kind
+    end
+    !csr_kinds.include? "csr_100"
   end
 
   def send_receipt_emails
@@ -225,6 +241,20 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    if @person.nil?
+      @enrolled_hbx_enrollment_plan_ids = []
+    else
+      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
+      if covered_plan_year.present?
+        id_list = covered_plan_year.benefit_groups.map(&:id)
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+      else
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      end
+    end
+
+    family_member_ids = @family_member_ids.collect { |k,v| v} if @family_member_ids.present?
+
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
@@ -235,10 +265,10 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
-      elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
-      else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
+      elsif @market_kind == 'individual'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, nil ,family_member_ids)
+      elsif @market_kind == 'coverall'
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind, family_member_ids)
       end
 
       build_same_plan_premiums

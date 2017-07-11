@@ -1,0 +1,159 @@
+<% content_for :horizontal_status do %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% end %>
+
+<div class="container">
+  <div id="dependents_info_wrapper">
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+        <%= render :partial => 'shared/left_nav.html.erb' %>
+      </div>
+      <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+        <h1 class="darkblue">Review Your Application </h1>
+        <p><strong> You're almost done! </STRONG>Review the application summary below and make sure it's correct. Slect the pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
+
+        <br>
+
+
+        <% @applicants.each do |applicant| %>
+          <div class="row white-background">
+            <div class="col-md-12 pz">
+              <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
+                <div class="col-md-11"><span></span> <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %></div>
+                <div class="col-md-1">
+                  <!-- <a><span class="glyphicon glyphicon-pencil grey-font" aria-hidden="true"></span></a> -->
+                </div>
+              </div>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-bottom-border">
+                <table class="table mb0">
+                  <thead>
+                    <tr class="form-heading">
+                      <th class="form-heading">AGE</th>
+                      <th class="form-heading">GENDER</th>
+                      <th class="form-heading">RELATIONSHIP</th>
+                      <th class="form-heading">STATUS</th>
+                      <th class="form-heading">INCARCERATED</th>
+                      <th class="form-heading">NEEDS COVERAGE?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="noBorder">
+                      <td><%= applicant.person.age_on(TimeKeeper.date_of_record)%></td>
+                      <td><%= applicant.person.gender %></td>
+                      <td><%= applicant.family_member.relationship %></td>
+                      <td><%= applicant.person.citizen_status %></td>
+                      <td><%= human_boolean applicant.person.is_incarcerated %></td>
+                      <td>Yes</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="form-bottom-border">
+                <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                  <div class="col-md-11 form-heading"> TAX INFO </div>
+                  <div class="col-md-1">
+                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                        <i class="glyphicon glyphicon-pencil grey-font"></i>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                  <div class="col-md-6">Will this Person file taxes for 2017?*</div>
+                  <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
+                </div>
+              </div>
+
+              <% if applicant.incomes.present? %>
+                <div class="form-bottom-border">
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                    <div class="col-md-11">Income</div>
+                  </div>
+
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Does this person expect to have any income in 2017? *</div>
+                    <div class="col-md-6">YES</div>
+                  </div>
+                </div>
+              <%end%>
+
+
+              <% if applicant.deductions.present? %>
+                <div class="form-bottom-border">
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                    <div class="col-md-11">Deductions</div>
+                  </div>
+
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Does this person expect to have adjustments to income in 2017 ? *</div>
+                    <div class="col-md-6">NO</div>
+                  </div>
+                </div>
+              <%end%>
+
+              <% if applicant.benefits.present? %>
+                <div class="form-bottom-border">
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                    <div class="col-md-11">Other Health Coverage</div>
+                    <div class="col-md-1">
+                      <%#= link_to go_to_step_financial_assistance_application_applicant_benefit_path(@application, applicant, benefit, 1) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <%# end %>
+                    </div>
+                  </div>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Currently enrolled in health covergae from</div>
+                    <div class="col-md-6">No</div>
+                  </div>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6">Qualifies for Health Coverage from</div>
+                    <div class="col-md-6">No</div>
+                  </div>
+                </div>
+              <%end%>
+
+              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                <div class="col-md-11">OTHER QUESTIONS</div>
+                <div class="col-md-1">
+                  <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 2) do %>
+                      <i class="glyphicon glyphicon-pencil grey-font"></i>
+                  <% end %>
+                </div>
+              </div>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Is the Person pregnant?</div>
+                <div class="col-md-6"><%= human_boolean applicant.is_pregnant %></div>
+              </div>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Is the Person blind?</div>
+                <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind  %></div>
+              </div>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Does this person need help with daily life activities?</div>
+                <div class="col-md-6"><%= human_boolean applicant.has_daily_living_help %></div>
+              </div>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Does this person have Disability?</div>
+                <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
+              </div>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-6">Has this person ever been in foster care?</div>
+                <div class="col-md-6"><%= human_boolean applicant.is_former_foster_care %></div>
+              </div>
+            </div>
+          </div>
+          <br>
+        <%end%>
+      </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <% url = go_to_step_financial_assistance_application_path(@application.id, 1)%>
+          <%= render  partial: 'shared/individual_progress', locals: {step: 3, review_and_submit: true, url: url, enabled: true} %>
+          <%= render partial: 'shared/help_me_sign_up' %>
+        </div>
+      </div>
+    </div>
+  </div>
+    <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+  </div>

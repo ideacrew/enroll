@@ -1,17 +1,17 @@
-require 'autoinc'
+# A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
+# when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
+  require 'autoinc'
+
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
-  include Mongoid::Autoinc
+  include SetCurrentUser
 
-  # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
-  # when determining eligibility for Insurance Assistance and Medicaid
-
-  embedded_in :household
+  embedded_in :application, class_name: "FinancialAssistance::Application"
 
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
@@ -23,39 +23,29 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  embeds_many :tax_household_members
-  accepts_nested_attributes_for :tax_household_members
-
-  embeds_many :eligibility_determinations
+  #accepts_nested_attributes_for :tax_household_members
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
-  def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
-  end
+  # def latest_eligibility_determination
+  #   eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  # end
 
-  def current_csr_eligibility_kind
-    latest_eligibility_determination.csr_eligibility_kind
-  end
+  # def current_csr_eligibility_kind
+  #   eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
+  # end
 
   def current_csr_percent
-    latest_eligibility_determination.csr_percent
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_percent : 0
   end
 
   def current_max_aptc
-    eligibility_determination = latest_eligibility_determination
-    #TODO need business rule to decide how to get the max aptc
-    #during open enrollment and determined_at
-    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
-      eligibility_determination.max_aptc
-    else
-      0
-    end
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.max_aptc : 0
   end
 
   def aptc_members
-    tax_household_members.find_all(&:is_ia_eligible?)
+    applicants.find_all(&:is_ia_eligible?)
   end
 
   def aptc_ratio_by_member
@@ -75,10 +65,10 @@ class TaxHousehold
 
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.each do |member|
+    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false && thm.is_without_assistance == false && thm.is_totally_ineligible == false}.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
-      benchmark_member_cost_hash[member.applicant_id.to_s] = premium
+      benchmark_member_cost_hash[member.family_member.id.to_s] = premium
     end
 
     # Sum premium total for aptc_members
@@ -113,7 +103,7 @@ class TaxHousehold
     end
 
     # FIXME should get hbx_enrollments by effective_starting_on
-    household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
+    family.active_household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
       if aptc_available_amount_hash.has_key?(applicant_id)
         aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
@@ -171,8 +161,8 @@ class TaxHousehold
   end
 
   def family
-    return nil unless household
-    household.family
+    return nil unless application
+    application.family
   end
 
   def is_eligibility_determined?
@@ -185,8 +175,28 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    tax_household_members.detect do |tax_household_member|
-      tax_household_member.is_subscriber == true
+    applicants.each do |applicant|
+      return applicant if applicant.family_member.is_primary_applicant?
     end
+  end
+
+  def applicants
+    return nil unless application.applicants
+    application.applicants.where(tax_household_id: self.id)
+  end
+
+  def preferred_eligibility_determination
+    return nil unless family.active_approved_application
+    eds = family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
+    admin_ed = eds.where(source: "Admin").first
+    curam_ed = eds.where(source: "Curam").first
+    return admin_ed if admin_ed.present?
+    return curam_ed if curam_ed.present?
+    return eds.first
+  end
+
+  def eligibility_determinations
+    return nil unless family.active_approved_application
+    family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
   end
 end

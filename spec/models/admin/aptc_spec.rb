@@ -6,13 +6,14 @@ RSpec.describe Admin::Aptc, :type => :model do
   # Household
   let(:family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) {FactoryGirl.create(:household, family: family)}
-  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
+  let(:application) { FactoryGirl.create(:application, family: family) }
+  let(:tax_household) {FactoryGirl.create(:tax_household, application: application, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
   let(:sample_max_aptc_1) {511.78}
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
   let(:sample_csr_percent_2) {94}
-  let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1 )}
-  let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2 )}
+  let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1, application: application, tax_household_id: tax_household.id)}
+  let(:eligibility_determination_2) {EligibilityDetermination.new(determined_at: TimeKeeper.date_of_record.beginning_of_year + 4.months, max_aptc: sample_max_aptc_2, csr_percent_as_integer: sample_csr_percent_2, application: application,tax_household_id: tax_household.id )}
 
   # Enrollments 
   let!(:hbx_with_aptc_1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_selected', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month - 40.days), applied_aptc_amount: 100)}
@@ -26,7 +27,7 @@ RSpec.describe Admin::Aptc, :type => :model do
     
     before(:each) do
       allow(family).to receive(:active_household).and_return household
-      allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      # allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
       allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
       allow(eligibility_determination_2).to receive(:tax_household).and_return tax_household
       allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1, eligibility_determination_2]
@@ -39,7 +40,7 @@ RSpec.describe Admin::Aptc, :type => :model do
 
     # MAX APTC
     context "build max_aptc values" do
-        let(:expected_hash_without_param_case)  { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"612.33", 
+      let(:expected_hash_without_param_case)  { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"612.33",
                                                  "Jul"=>"612.33", "Aug"=>"612.33", "Sep"=>"612.33", "Oct"=>"612.33", "Nov"=>"612.33", "Dec"=>"612.33" } }
       
       let(:expected_hash_with_param_case)     { {"Jan"=>"511.78", "Feb"=>"511.78", "Mar"=>"511.78", "Apr"=>"511.78", "May"=>"612.33", "Jun"=>"666.00", 
@@ -110,7 +111,7 @@ RSpec.describe Admin::Aptc, :type => :model do
 
       it "should create a new enrollment with a new hbx_id" do
         allow(family).to receive(:active_household).and_return household
-        allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+        # allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
         allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination_1
         enrollment_count = family.active_household.hbx_enrollments.count
         last_enrollment = family.active_household.hbx_enrollments.last
@@ -118,7 +119,6 @@ RSpec.describe Admin::Aptc, :type => :model do
         expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
         expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
       end
-
     end
   
 
