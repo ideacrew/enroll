@@ -157,7 +157,7 @@ describe CorrectCuramVlpStatus, dbclean: :after_each do
       if user.valid?
         user.save!
       elsif user.errors.messages == {:base=>["SSN is invalid"]}
-        p2 = FactoryGirl.build(:user, :with_ssn)
+        p2 = FactoryGirl.build(:person, :with_ssn)
         user.ssn = p2.ssn
         user.save!
       end
