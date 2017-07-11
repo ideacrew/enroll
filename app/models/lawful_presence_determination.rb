@@ -6,6 +6,7 @@ class LawfulPresenceDetermination
   include Mongoid::Timestamps
   include AASM
   include Acapi::Notifiers
+  include SetCurrentUser
 
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
@@ -92,7 +93,8 @@ class LawfulPresenceDetermination
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      transition_at: Time.now
+      transition_at: Time.now,
+      user_id: [:fail_dhs!, :fail_dhs, :pass_dhs, :pass_dhs].include?(aasm.current_event) ? nil : self.updated_by_id
     )
   end
 end
