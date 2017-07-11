@@ -23,6 +23,7 @@ window.setCaptchaSiteKey = function(key) {
 }
 
 $(document).ready(function(){
+  if (typeof grecaptcha !== 'undefined') {
     $('#invisible-recaptcha-form').on('submit', function(event) {
         if(grecaptcha.getResponse(captchaWidget) ==''){
             $('.recaptcha-error').text('reCAPTCHA verification failed, please try again.').show(300)
@@ -31,6 +32,7 @@ $(document).ready(function(){
             $('.recaptcha-error').text('').hide(100)
         }
     });
+  }
 })
 
 var captchaSubmit = function () {

@@ -121,6 +121,7 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(policy).to receive(:is_broker_for_employer?).and_return(false)
       allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
+      allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end
@@ -185,6 +186,7 @@ RSpec.describe Employers::EmployerProfilesController do
       census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
 
       xhr :get,:show_profile, {employer_profile_id: employer_profile.id.to_s, tab: 'employees'}
+      expect(assigns(:datatable)).not_to eq nil
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee]
     end

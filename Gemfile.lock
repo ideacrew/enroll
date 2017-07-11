@@ -244,6 +244,7 @@ GEM
       thread_safe (~> 0.1)
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
+    docile (1.1.5)
     easy_diff (1.0.0)
     email_spec (2.0.0)
       htmlentities (~> 4.3.3)
@@ -401,9 +402,6 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pdfjs_viewer-rails (0.0.9)
-      rails (> 4.2.0)
-      sass-rails (~> 5.0)
     poltergeist (1.11.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -549,6 +547,11 @@ GEM
     simple_form (3.3.1)
       actionpack (> 4, < 5.1)
       activemodel (> 4, < 5.1)
+    simplecov (0.14.1)
+      docile (~> 1.1.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.1)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -682,7 +685,6 @@ DEPENDENCIES
   nokogiri-happymapper
   openhbx_cv2!
   parallel_tests
-  pdfjs_viewer-rails
   poltergeist
   prawn!
   pry
@@ -708,6 +710,7 @@ DEPENDENCIES
   sdoc (~> 0.4.0)
   shoulda-matchers (= 3.1.1)
   simple_calendar!
+  simplecov (= 0.14.1)
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)

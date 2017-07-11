@@ -4,7 +4,7 @@ RSpec.describe RatingArea, type: :model, dbclean: :after_each do
   subject { RatingArea.new }
 
   it "has a valid factory" do
-    expect(create(:rating_area)).to be_valid
+    expect(create(:rating_area, zip_code: '99999')).to be_valid
   end
 
   it { is_expected.to validate_presence_of :zip_code }

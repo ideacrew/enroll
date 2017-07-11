@@ -59,6 +59,7 @@ Feature: Create Employee Roster
     And the broker saves the quote
     And Broker logs out
 
+  @quoting_enabled
   Scenario: Broker should create a quote with health and dental plans
     Given that a broker exists
     And the Plans exist

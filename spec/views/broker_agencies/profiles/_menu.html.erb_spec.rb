@@ -35,10 +35,28 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
     let(:user) { FactoryGirl.create(:user, person: person, roles: ["broker"]) }
     let(:person) { FactoryGirl.create(:person, :with_broker_role) }
 
-    it "should have right navigation section" do
-      render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-      expect(view.content_for(:horizontal_menu)).to include('multi-line')
+    context "with individual market enabled " do
+      before do
+        allow(view).to receive(:individual_market_is_enabled?).and_return(true)
+      end
+
+      it "should have include Medicaid application" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+        expect(view.content_for(:horizontal_menu)).to include('multi-line')
+      end
     end
+
+    context "with individual market disabled " do
+      before do
+        allow(view).to receive(:individual_market_is_enabled?).and_return(false)
+      end
+
+      it "should not include Medicaid application" do
+        render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
+        expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
+      end
+    end
+
 
     context "with general agency disabled" do
       before :each do

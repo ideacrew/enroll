@@ -15,6 +15,10 @@ class EmployerProfile
 
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+  INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_initial_application_eligible"
+  INITIAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+  RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_renewal_application_eligible"
+  RENEWAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
 
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
@@ -531,6 +535,16 @@ class EmployerProfile
       })
     end
 
+    def initial_employer_reminder_to_publish(start_on)
+      Organization.where(:"employee_profile.plan_years" =>
+      { :$elemMatch => {
+        :start_on => start_on,
+        :aasm_state => "draft"
+      }
+    })
+    end
+  
+
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
@@ -587,12 +601,45 @@ class EmployerProfile
           employer_enroll_factory.end
         end
 
-        if new_date.day == EmployerProfile.shop_market_renewal_application_force_publish_day_of_month
+        if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
           organizations_for_force_publish(new_date).each do |organization|
             plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-            plan_year.force_publish!
+            plan_year.force.publish!
           end
         end
+
+        #initial employer reminder notices to publish plan year.
+        start_on = (new_date+2.months).beginning_of_month
+        start_on_1 = (new_date+1.month).beginning_of_month
+        if new_date+2.days == start_on.last_month
+          initial_employer_reminder_to_publish(start_on).each do|organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error {e}"
+            end
+          end
+        elsif new_date+1.days == start_on.last_month
+          initial_employer_reminder_to_publish(start_on).each do |organization|
+            begin
+              organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+            rescue Exception => e
+              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
+            end
+          end
+        else 
+          plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.initial_application.publish_due_date_of_month)
+          if (start_on +2.days == plan_year_due_date)
+            initial_employer_reminder_to_publish(start_on_1).each do |organization|
+              begin
+                organization.employee_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
+              rescue Exception => e
+                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
+              end
+            end
+          end
+        end     
+
       end
 
       # Employer activities that take place monthly - on first of month
@@ -678,7 +725,7 @@ class EmployerProfile
     state :applicant, initial: true
     state :registered                 # Employer has submitted valid application
     state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
+    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid,:transmit_new_employer_if_immediate]
     state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
   # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
   state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
@@ -826,6 +873,20 @@ class EmployerProfile
     notify("acapi.info.events.employer.benefit_coverage_initial_binder_paid", {employer_id: self.hbx_id, event_name: "benefit_coverage_initial_binder_paid"})
   end
 
+  def transmit_new_employer_if_immediate
+    if transmit_employers_immediately?
+      transmit_initial_eligible_event
+    end
+  end
+
+  def transmit_initial_eligible_event
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
+  def transmit_renewal_eligible_event
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
   def notify_broker_added
     changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
     if changed_fields.present? &&  changed_fields.include?("start_on")
@@ -926,6 +987,7 @@ class EmployerProfile
   end
 
   def is_attestation_eligible?
+    return true unless enforce_employer_attestation?
     employer_attestation.present? && employer_attestation.is_eligible?
   end
   

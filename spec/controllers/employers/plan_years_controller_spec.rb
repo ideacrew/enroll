@@ -7,7 +7,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
   let(:service_area_two) { double(issuer_hios_id: '2') }
   let(:employer_profile) { double(:plan_years => plan_year_proxy, find_plan_year: plan_year_proxy, id: "test", service_areas: [service_area_one, service_area_two], organization: organization) }
   let(:organization) { double(:organization, primary_office_location: office_location) }
-  let(:address) { double(:address, zip: '11111', county: 'county') }
+  let(:address) { double(:address, zip: '11111', county: 'county', state: Settings.aca.state_abbreviation) }
   let(:office_location) { double(:office_location, address: address) }
 
   let(:user) { FactoryGirl.create(:user) }

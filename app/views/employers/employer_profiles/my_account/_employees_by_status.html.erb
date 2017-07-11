@@ -4,14 +4,14 @@
 <h4>No results found</h4>
 <% end %>
     <% end %>
-<div class="col-xs-10" style="text-align: right; top: 60px; margin-left: 5%;">
+<div class="col-xs-10 add-new-employees" >
   <div class="row">
     <%= pundit_span(EmployerProfile, :updateable?) %>
     <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
   </div>
 </div>
 
-<div style="width:90%">
+<div class= "effectivedatatable">
   <%= raw render_datatable(@datatable) %>
 </div>
 <script type="text/javascript" charset="utf-8">
@@ -19,11 +19,6 @@
     $('.buttons-csv').hide()
     $('.buttons-excel').hide()
 </script>
-<style>
-  .container {
-    width: 100%;
-  }
-</style>
 
 <%= paginate @census_employees, param_name: :pagina, remote: true if params[:page].present? %>
 <div class="row">

@@ -11,6 +11,10 @@ module Config::AcaModelConcern
     delegate :market_rating_areas, to: :class
     delegate :multiple_market_rating_areas?, to: :class
     delegate :constrain_service_areas?, to: :class
+    delegate :transmit_employers_immediately?, to: :class
+    delegate :enforce_employer_attestation?, to: :class
+    delegate :employee_participation_ratio_minimum, to: :class
+    delegate :non_owner_participation_count_minimum, to: :class
   end
 
   class_methods do
@@ -48,6 +52,22 @@ module Config::AcaModelConcern
 
     def constrain_service_areas?
       @@constrain_service_areas ||= (Settings.aca.offerings_constrained_to_service_areas.to_s.downcase == "true")
+    end
+
+    def transmit_employers_immediately?
+      @@transmit_employers_immediately ||= (Settings.aca.transmit_employers_immediately.to_s.downcase == "true")
+    end
+
+    def enforce_employer_attestation?
+      @@enforce_employer_attestation ||= (Settings.aca.enforce_employer_attestation.to_s.downcase == "true")
+    end
+
+    def employee_participation_ratio_minimum
+      @@employee_participation_ratio_minimum ||= Settings.aca.shop_market.employee_participation_ratio_minimum.to_f
+    end
+
+    def non_owner_participation_count_minimum
+      @@non_owner_participation_count_minimum ||= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
     end
   end
 end

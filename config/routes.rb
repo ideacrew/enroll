@@ -16,7 +16,11 @@ Rails.application.routes.draw do
   end
 
   resources :users do
-    post :unlock, :on => :member
+    member do
+      post :unlock
+      get :lockable
+      get :confirm_lock
+    end
   end
 
   resources :saml, only: [] do

@@ -24,8 +24,9 @@ class User
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
 
-  scope :locked,   ->{ where(unlock_token: nil) }
-  scope :unlocked, ->{ where(unlock_token: nil) }
+  scope :locked, ->{ where(:locked_at.ne => nil) }
+  scope :unlocked, ->{ where(locked_at: nil) }
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"name" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -244,6 +245,18 @@ class User
     self.save
   end
 
+  def update_lockable
+    if locked_at.nil?
+      self.lock_access!
+    else
+      self.unlock_access!
+    end
+  end
+
+  def lockable_notice
+    self.locked_at.nil? ? 'unlocked' : 'locked'
+  end
+
   def has_role?(role_sym)
     return false if person_id.blank?
     roles.any? { |r| r == role_sym.to_s }
@@ -386,13 +399,20 @@ class User
     end
 
     def login_captcha_required?(login)
-      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      begin
+        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      rescue => e
+        true
+      end
     end
 
     def current_user
       Thread.current[:current_user]
     end
 
+    def logins_before_captcha
+      4
+    end
   end
 
   # def password_digest(plaintext_password)
