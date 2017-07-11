@@ -5,6 +5,10 @@
 
   before_filter :find_application_and_applicant
 
+  def index
+    render layout: 'financial_assistance'
+  end
+
   def new
     @model = @applicant.incomes.build
     load_steps
@@ -97,4 +101,4 @@
       nil
     end
   end
-end
+ end

@@ -1,10 +1,7 @@
-<div class="col-md-10">
+<div class="col-md-7">
 	<div class="row">
     <div class="col-md-6">
       <h3 class="title-inline"><b>Financial Assistance Application</b></h3>
-    </div>
-    <div class="col-md-6">
-      <div> <%= link_to "Go To Household Member Page", insured_family_members_path, class: "btn btn-small btn-default back_to-household-btn" %></div>
     </div>
 	</div>
 	<table class="table table-sm">
@@ -39,6 +36,18 @@
 	</div>
 </div>
 
+<div class="col-md-2">
+  <% if @application.incomplete_applicants? %>
+    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @application.next_incomplete_applicant, 1) do %>
+      <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+    <% end %>
+  <% else %>
+    <%= link_to review_and_submit_financial_assistance_application_path(@application) do %>
+      <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+    <% end %>
+  <% end %>
+</div>
+
 <!-- Modal -->
 <div id="help-me-decide" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -59,5 +68,3 @@
 
   </div>
 </div>
-
-

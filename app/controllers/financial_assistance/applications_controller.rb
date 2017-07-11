@@ -75,6 +75,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.applicants
+
+    render layout: 'financial_assistance'
   end
 
   def eligibility_results
