@@ -4,7 +4,11 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
   before_filter :find_application_and_applicant
 
-   def new
+  def index
+    render layout: 'financial_assistance'
+  end
+
+  def new
     @model = @applicant.benefits.build
     load_steps
     current_step
@@ -48,7 +52,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   private
-  
+
   def update_employer_contact model, params
     if params[:employer_phone].present?
       @model.build_employer_phone
