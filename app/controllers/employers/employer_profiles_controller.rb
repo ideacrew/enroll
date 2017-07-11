@@ -303,12 +303,17 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def wells_fargo_sso
-    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id)
+
+    staff_email = @employer_profile.try(:staff_roles).try(:first).try(:work_email_or_best)
+
+    sso_req = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id,@employer_profile.hbx_id,@employer_profile.legal_name, staff_email)
     sso_req.token
     @redirct_url = sso_req.url
     unless @redirct_url.nil?
       redirect_to @redirct_url
     else
+      binding.pry
+      flash[:error] = "Not Able to communicate with Bill Pay server"
       redirect_to employers_employer_profile_path(tab:"home")
     end
   end
