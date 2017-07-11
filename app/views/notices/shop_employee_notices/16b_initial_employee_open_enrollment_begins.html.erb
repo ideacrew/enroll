@@ -48,7 +48,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To complete the application process, please follow the steps listed below:",
-  listings: ["Go to <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>","Log-in or create an account as an employee", "If necessary, update your household information add any dependents","Make your plan selection(s) or waive coverage"]} %>
+  listings: ["Go to <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_website}</a>","Log-in or create an account as an employee", "If necessary, update your household information add any dependents","Make your plan selection(s) or waive coverage"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
@@ -62,7 +62,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling :#{Settings.contact_center.ma_phone_number}.", "TTY :#{Settings.contact_center.TTY} ", "Online at : <a href='#{Settings.site.ma_url}'>#{Settings.site.ma_url}</a>"] } %>
+                                                                   ["By calling :#{Settings.contact_center.ma_phone_number}.", "TTY :#{Settings.contact_center.tty} ", "Online at : <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_webiste}</a>"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>

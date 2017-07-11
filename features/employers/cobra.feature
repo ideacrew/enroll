@@ -1,6 +1,7 @@
 Feature: COBRA basic
 
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
+    Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
@@ -12,12 +13,13 @@ Feature: COBRA basic
     And Employer should see a button to create new plan year
     And Employer should be able to enter plan year, benefits, relationship benefits for cobra
     And Employer should see a success message after clicking on create plan year button
+    Then Employer uploads an attestation document
     When Employer goes to the benefits tab I should see plan year information
     Then Employer clicks on publish plan year
     Then Employer should see a published success message without employee
 
     When Employer clicks on the Employees tab
-    When Employer clicks on the add employee button
+    When Employer clicks to add the first employee
     Then Employer should see a form to enter information about employee, address and dependents details for Jack Cobra
     And Employer should see census employee created success message for Jack Cobra
     And Employer should see the status of cobra_eligible
@@ -72,7 +74,7 @@ Feature: COBRA basic
     And Employer should see the status of Employee Role Linked
     When Jack Doe terminate one employee
     Then Employer should see terminate successful msg
-    When Employer click all employee filter
+    When Employer click terminated employee filter
     Then Employer should see the status of Employment terminated
     When Employer cobra one employee
     Then Employer should see cobra successful msg

@@ -329,7 +329,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_or_pending_termination?
-    return true if self.coverage_terminated_on.present?
+    return true if self.employment_terminated_on.present?
     return true if PENDING_STATES.include?(self.aasm_state)
     return false if self.rehired?
     !(self.is_eligible? || self.employee_role_linked?)
@@ -711,9 +711,12 @@ class CensusEmployee < CensusMember
 
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
-    cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months) &&
-      coverage_terminated_on <= cobra_begin_date &&
+    return false unless cobra_begin_date.present?
+    return false unless coverage_terminated_on
+    return false unless coverage_terminated_on <= cobra_begin_date
+
+    (hired_on <= cobra_begin_date) &&
+      (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
       cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 

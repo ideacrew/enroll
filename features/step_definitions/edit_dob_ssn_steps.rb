@@ -5,15 +5,17 @@ Then(/^Hbx Admin should see the list of primary applicants and an Action button$
   page.all('.dropdown-toggle').count.should > 0
 end
 
+# FIXME: Make this take a 'for' argument, that way we can select which user
 When(/^Hbx Admin clicks on the Action button$/) do
-  page.all('.dropdown-toggle')[1].click
-  # click_button('Actions')
+  first("tr .dropdown-toggle", :text => "Actions").click
 end
 
+# FIXME: Make this take a 'for' argument, that way we can select which user
 Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
   find_link('Edit DOB / SSN').visible?
 end
 
+# FIXME: Make this take a 'for' argument, that way we can select which user
 When(/^Hbx Admin clicks on edit DOB\/SSN link$/) do
   click_link('Edit DOB / SSN')
 end

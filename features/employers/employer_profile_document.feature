@@ -13,4 +13,4 @@ Feature: Document
     Then the employer clicks the upload button in popup
     Then the employer should see the document list
     And the employer clicks document name
-    Then the employer should see Download,Cancel,Print Option
+    Then the employer should see Download,Print Option
