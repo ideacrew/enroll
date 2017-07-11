@@ -74,7 +74,7 @@ Feature: COBRA basic
     And Employer should see the status of Employee Role Linked
     When Jack Doe terminate one employee
     Then Employer should see terminate successful msg
-    When Employer click all employee filter
+    When Employer click terminated employee filter
     Then Employer should see the status of Employment terminated
     When Employer cobra one employee
     Then Employer should see cobra successful msg

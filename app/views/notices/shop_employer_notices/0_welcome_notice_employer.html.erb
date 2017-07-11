@@ -87,7 +87,7 @@
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                    ["By calling #{Settings.contact_center.ma_phone_number}.",
                                                                     "TTY: #{Settings.contact_center.tty}",
-                                                                    "Online at <a href='#{Settings.site.ma_url}''>#{Settings.site.ma_url}</a>"] } %>
+                                                                    "Online at <a href='#{Settings.site.ma_website}''>#{Settings.site.ma_website}</a>"] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

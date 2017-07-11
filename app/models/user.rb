@@ -399,7 +399,11 @@ class User
     end
 
     def login_captcha_required?(login)
-      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      begin
+        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      rescue => e
+        true
+      end
     end
 
     def current_user
@@ -409,11 +413,6 @@ class User
     def logins_before_captcha
       4
     end
-
-    def login_captcha_required?(login)
-      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
-    end
-
   end
 
   # def password_digest(plaintext_password)

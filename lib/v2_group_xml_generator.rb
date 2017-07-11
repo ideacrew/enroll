@@ -17,7 +17,8 @@ class V2GroupXmlGenerator
 
   CARRIER_ABBREVIATIONS = {
       "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "United Health Care": "UHIC", "Delta Dental": "DDPA",
-      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META"}
+      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META", "Health New England, Inc.": "HNE", "Boston Medical Center HealthNet Plan": "BMCHP", "Fallon Community Health Plan, Inc.": "FCHP",
+      "Minuteman Health, Inc.": "MHI"}
 
   # Inputs
   # 1 Array of FEINS
@@ -36,6 +37,7 @@ class V2GroupXmlGenerator
     views = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
     views_helper = ActionView::Base.new views
     views_helper.class.send(:include, EventsHelper)
+    views_helper.class.send(:include, Config::AcaHelper)
 
     organizations_hash = {} # key is carrier name, value is the return object of remove_other_carrier_nodes()
 

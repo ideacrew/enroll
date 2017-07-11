@@ -1,8 +1,8 @@
 class Notice
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
 
-  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:recipient_document_store]
+  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 
   def initialize(params = {})
     validate_params(params)
@@ -11,6 +11,7 @@ class Notice
     self.template = params[:template]
     self.notice= params[:notice]
     self.market_kind= params[:market_kind]
+    self.event_name = params[:event_name]
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]

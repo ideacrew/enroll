@@ -66,7 +66,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
       allow(employer).to receive(:broker_agency_profile).and_return(broker_agency_profile)
       allow(broker_agency_profile).to receive(:brokers).and_return([broker])
       allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker)
-      render :template => "events/v2/employers/updated", :locals => { :employer => employer }
+      render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: false }
       @doc = Nokogiri::XML(rendered)
     end
 
@@ -124,7 +124,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
         end
 
         it "shows the dental plan in output" do
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
           expect(rendered).to include "new dental plan"
         end
       end
@@ -138,7 +138,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
         it "does not show the dental plan in output" do
 
-          render :template => "events/v2/employers/updated", :locals => {:employer => employer}
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: false}
           expect(rendered).not_to include "new dental plan"
         end
       end
