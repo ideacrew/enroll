@@ -97,10 +97,10 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(policy).to receive(:is_broker_for_employer?).and_return(false)
       allow(policy).to receive(:authorize_show).and_return(true)
       allow(user).to receive(:last_portal_visited=).and_return("true")
-      allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
-      allow(nfp_response).to receive(:display_token).and_return(false)
-      allow(nfp_response).to receive(:payment_history).and_return(false)
-      allow(nfp_response).to receive(:statement_summary).and_return(false)
+      # allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
+      # allow(nfp_response).to receive(:display_token).and_return(false)
+      # allow(nfp_response).to receive(:payment_history).and_return(false)
+      # allow(nfp_response).to receive(:statement_summary).and_return(false)
       employer_profile.plan_years = [plan_year]
       sign_in(user)
     end
@@ -243,10 +243,10 @@ RSpec.describe Employers::EmployerProfilesController do
         allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
         allow(employer_profile).to receive(:broker_agency_accounts).and_return([broker_agency_account])
         allow(employer_profile).to receive_message_chain(:organization ,:documents).and_return([])
-        allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
-        allow(nfp_response).to receive(:display_token).and_return(false)
-        allow(nfp_response).to receive(:payment_history).and_return(false)
-        allow(nfp_response).to receive(:statement_summary).and_return(false)
+        # allow(NfpIntegration::SoapServices::Nfp).to receive(:new).and_return(nfp_response)
+        # allow(nfp_response).to receive(:display_token).and_return(false)
+        # allow(nfp_response).to receive(:payment_history).and_return(false)
+        # allow(nfp_response).to receive(:statement_summary).and_return(false)
         sign_in(user)
       end
 
