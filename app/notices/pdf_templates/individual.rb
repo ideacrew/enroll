@@ -3,7 +3,7 @@ module PdfTemplates
     include Virtus.model
 
     attribute :full_name, String
-
+    attribute :age, String
     attribute :ssn_verified, Boolean, :default => false
     attribute :citizenship_verified, Boolean, :default => false
     attribute :citizen_status, String
