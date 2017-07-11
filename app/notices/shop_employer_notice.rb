@@ -59,6 +59,10 @@ class ShopEmployerNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
   end
 
+  def employer_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employer_appeal_rights.pdf')]
+  end
+
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
       street_1: primary_address.address_1.titleize,
