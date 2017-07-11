@@ -1,0 +1,29 @@
+<div class="col-md-10">
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="title-inline"><b>Add Deductions</b></h3>
+    </div>
+    <div class="col-md-6">
+      <div> <%= link_to "Go To Household Member Page", insured_family_members_path, class: "btn btn-small btn-default back_to-household-btn" %></div>
+    </div>
+  </div>
+
+  <div>
+    <% if @applicant.deductions.present? %>
+      <h4>Edit Existing Deductions (Income)</h4>
+      <table class="table">
+        <th>Deduction Income Type</th>
+        <th></th>
+        <th></th>
+        <% @applicant.deductions.each do |deduction| %>
+        <tr>
+          <td><%= deduction.kind %></td>
+          <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
+          <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+        </tr>
+        <% end %>
+      </table>
+    <%end%>
+  </div>
+  <%= link_to "Add Deductions", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+</div>
