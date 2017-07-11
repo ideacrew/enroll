@@ -38,16 +38,9 @@
 
 <div class="col-md-2">
   <% if @application.incomplete_applicants? %>
-    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @application.next_applicant, 1) do %>
+    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @application.next_incomplete_applicant, 1) do %>
       <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
     <% end %>
-      <ul class="list-unstyled list-right-section">
-        <li>
-          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
-            <%= image_tag 'icons/list.png' %> PREVIOUS
-          <% end %>
-        </li>
-      </ul>
   <% else %>
     <%= link_to review_and_submit_financial_assistance_application_path(@application) do %>
       <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
