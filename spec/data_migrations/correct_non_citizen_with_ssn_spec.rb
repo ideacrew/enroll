@@ -141,7 +141,13 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
       end
@@ -161,7 +167,13 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
           person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
           person.consumer_role.lawful_presence_determination.ssa_responses = []
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -181,7 +193,13 @@ describe "given a NON citizen with ssn, ssa_response after July 5", :dbclean => 
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_false
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
       end
