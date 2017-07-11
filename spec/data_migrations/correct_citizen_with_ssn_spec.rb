@@ -164,7 +164,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
         person.consumer_role.lawful_presence_determination.aasm_state = "verification_successful"
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_false
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
       end
@@ -181,7 +187,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
       describe "citizenship true" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_true
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -197,7 +209,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
       describe "citizenship false" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_citizenship_false
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -212,7 +230,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
       describe "no citizenship response" do
         before :each do
           person.consumer_role.lawful_presence_determination.ssa_responses << ssa_response_ssn_true_NO_citizenship
-          person.save!
+          if person.valid?
+            person.save!
+          elsif person.errors.messages == {:base=>["SSN is invalid"]}
+            p2 = FactoryGirl.build(:person, :with_ssn)
+            person.ssn = p2.ssn
+            person.save!
+          end
           subject.migrate
           person.reload
         end
@@ -227,7 +251,7 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
     end
   end
 
-  describe "given a citizen with ssn, ssa_response after July 5, and a previous response", :dbclean => :after_each do
+  describe "given a citizen with ssn, ssa_response after July 5, and a previous response" do
     subject { CorrectCitizenStatus.new("fix me task", double(:current_scope => nil)) }
 
     before :each do
@@ -236,7 +260,13 @@ describe CorrectCitizenStatus, :dbclean => :after_each do
         person.consumer_role.lawful_presence_determination.ssa_responses = []
         person.consumer_role.lawful_presence_determination.ssa_responses << most_recent_response
         person.consumer_role.lawful_presence_determination.ssa_responses << previous_response
-        person.save!
+        if person.valid?
+          person.save!
+        elsif person.errors.messages == {:base=>["SSN is invalid"]}
+          p2 = FactoryGirl.build(:person, :with_ssn)
+          person.ssn = p2.ssn
+          person.save!
+        end
         subject.migrate
         person.reload
     end
