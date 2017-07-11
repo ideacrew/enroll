@@ -1,18 +1,18 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
+RSpec.describe ShopEmployerNotices::InitialEmployerDenialNotice do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolling' ) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'draft', :fte_count => 55) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Initial Employee Open Enrollment Successfully Completed',
-                            :notice_template => 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
-                            :notice_builder => 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-                            :mpi_indicator => 'MPI_SHOP17',
-                            :event_name => 'initial_employer_open_enrollment_completed',
-                            :title => "Open Enrollment Completed"})
+                            :name =>'Denial of Initial Employer Application/Request for Clarifying Documentation',
+                            :notice_template => 'notices/shop_employer_notices/2_initial_employer_denial_notice',
+                            :notice_builder => 'ShopEmployerNotices::InitialEmployerDenialNotice',
+                            :mpi_indicator => 'MPI_SHOP2B',
+                            :event_name => 'initial_employer_denial',
+                            :title => "Employer Denial Notice"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
@@ -27,7 +27,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,14 +57,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerDenialNotice.new(employer_profile, valid_parmas)
+      # plan_year.publish
+      plan_year.force_publish
     end
-    it "should append necessary" do
-      plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ELIGIBLE_STATE).first
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
+    it "should append necessary information" do
+      plan_year = employer_profile.plan_years.first
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
-      expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
+      expect(@employer_notice.notice.plan_year.warnings).to eq ["Full Time Equivalent must be 1-50"]
     end
   end
 
