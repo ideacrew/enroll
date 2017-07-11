@@ -20,7 +20,7 @@ describe Person do
       }
     end
 
-    describe ".create", dbclean: :after_each do
+    describe ".create", dbclean: :around_each do
       context "with valid arguments" do
         let(:params) {valid_params}
         let(:person) {Person.create(**params)}
@@ -541,7 +541,7 @@ describe Person do
     end
   end
 
-  describe '.active', :dbclean => :after_each do
+  describe '.active', :dbclean => :around_each do
     it 'new person defaults to is_active' do
       expect(Person.create!(first_name: "eric", last_name: "Clapton").is_active).to eq true
     end
