@@ -19,7 +19,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:person){ create :person}
   let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calender_year - 1, 5, 1), :end_on => Date.new(calender_year, 4, 30)}
-  let!(:renewing_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_draft, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30)}
+  let!(:renewing_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :renewing_publish_pending, :start_on => Date.new(calender_year, 5, 1), :end_on => Date.new(calender_year+1, 4, 30)}
   let(:warnings) { { primary_office_location: "primary location is outside washington dc"} }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employer Annual Renewal - Denial of Eligibility',
@@ -79,7 +79,7 @@ RSpec.describe ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice do
     end
 
     it "should append necessary" do
-      renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_draft").first
+      renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_publish_pending").first
       active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq renewing_plan_year.start_on
