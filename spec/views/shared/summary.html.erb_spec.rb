@@ -107,6 +107,7 @@ describe "shared/_summary.html.erb" do
 
     it "should not have provider directory url if nationwide = false" do
       allow(mock_plan).to receive(:nationwide).and_return(false)
+      allow(mock_plan).to receive(:service_area_id).and_return('XX-111')
       render "shared/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
     end

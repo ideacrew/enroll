@@ -43,13 +43,40 @@ describe EmployerParticipationRateRatingFactorSet, "given
   end
 
   it "returns the default factor on all lookups" do
-    expect(subject.lookup(:bdklajdlfs)).to eq default_factor_value
+    expect(subject.lookup(500)).to eq default_factor_value
+    expect(subject.lookup(1)).to eq default_factor_value
+    expect(subject.lookup(3.234)).to eq default_factor_value
   end
 
 end
 
 describe EmployerParticipationRateRatingFactorSet, "given
 - a rating factor entry with key '11' and value '1.345'
+" do
+
+  subject do
+    EmployerParticipationRateRatingFactorSet.new({
+      :rating_factor_entries => [
+        RatingFactorEntry.new({
+          :factor_key => '1',
+          :factor_value => 1.345
+        })
+      ]
+    })
+  end
+
+  it "returns the '1.345' for a lookup of 0" do
+    expect(subject.lookup(0)).to eq 1.345
+  end
+
+  it "returns the '1.345' for a lookup of 0.49" do
+    expect(subject.lookup(0.49)).to eq 1.345
+  end
+
+end
+
+describe EmployerParticipationRateRatingFactorSet, "given
+- a rating factor entry with key '1' and value '1.345'
 " do
 
   subject do

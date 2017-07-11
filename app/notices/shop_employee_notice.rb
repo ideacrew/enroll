@@ -10,7 +10,7 @@ class ShopEmployeeNotice < Notice
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployeeNotice.new
     args[:to] = census_employee.employee_role.person.work_email_or_best
-    args[:name] = "Employee Notice"
+    args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
@@ -22,17 +22,24 @@ class ShopEmployeeNotice < Notice
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
+    non_discrimination_attachment
   end
 
   def build
+    notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)
+    append_address(census_employee.employee_role.person.mailing_address)
+  end
+
+  def non_discrimination_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
   end
 
   def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
   end
 
   def append_hbe
@@ -49,6 +56,16 @@ class ShopEmployeeNotice < Notice
         zip: "20005"
       })
     })
+  end
+
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: primary_address.address_1.titleize,
+      street_2: primary_address.address_2.titleize,
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
   end
 
   def append_broker(broker)

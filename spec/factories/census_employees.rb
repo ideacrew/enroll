@@ -18,10 +18,18 @@ FactoryGirl.define do
       renewal_benefit_group { build(:benefit_group) }
     end
 
+    after(:create) do |census_employee, evaluator|
+      census_employee.created_at = TimeKeeper.date_of_record
+    end
+
+
     trait :owner do
       is_business_owner  true
     end
 
+    trait :blank_email do
+      email nil
+    end
     trait :termination_details do
       # aasm_state "employment_terminated"
       employment_terminated_on {TimeKeeper.date_of_record.last_month}
@@ -49,7 +57,7 @@ FactoryGirl.define do
 
     factory :census_employee_with_active_assignment do
       after(:create) do |census_employee, evaluator|
-        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee) 
+        create(:benefit_group_assignment, benefit_group: evaluator.benefit_group, census_employee: census_employee)
       end
     end
 

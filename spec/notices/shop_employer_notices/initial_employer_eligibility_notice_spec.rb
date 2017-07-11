@@ -11,11 +11,13 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
                             :mpi_indicator => 'MPI_SHOP2A',
+                            :event_name => 'initial_employer_approval',
                             :title => "Employer Approval Notice"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 

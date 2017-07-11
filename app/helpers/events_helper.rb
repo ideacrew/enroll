@@ -72,6 +72,10 @@ module EventsHelper
     employer.plan_years.select(&:eligible_for_export?)
   end
 
+  def manual_gen_plan_years(employer)
+    employer.plan_years.select{|plan_year| !(PlanYear::INELIGIBLE_FOR_EXPORT_STATES.include? plan_year.aasm_state)}
+  end
+
   def is_initial_or_conversion_employer?(employer)
     (employer.published_plan_year.present? && employer.renewing_published_plan_year.blank?) && (!employer.is_conversion? || (employer.is_conversion? && !employer.published_plan_year.is_conversion))
   end

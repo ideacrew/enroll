@@ -18,7 +18,7 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   let(:binder_payment_due_on)   { open_enrollment_end_on + 2.days }
   let(:next_premium_due_on)     { binder_payment_due_on }
   let(:next_premium_amount)     { 3155.86 }
-  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
 
   let(:valid_params) do
     {

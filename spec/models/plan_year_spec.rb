@@ -7,7 +7,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   it { should validate_presence_of :open_enrollment_end_on }
 
   let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
-  let!(:rating_area)                    { FactoryGirl.create(:rating_area)  }
+  let!(:rating_area)                    { RatingArea.first || FactoryGirl.create(:rating_area)  }
   let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
   let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
   let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
@@ -1699,6 +1699,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         ce.benefit_group_assignments.each{|bg| bg.delete }
         FactoryGirl.create(:benefit_group_assignment, census_employee: ce, benefit_group: white_collar_benefit_group)
       end
+      allow(PlanCostDecorator).to receive(:multiple_market_rating_areas?).and_return(false)
       allow(SicCodeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
       allow(EmployerGroupSizeRatingFactorSet).to receive(:where).and_return([double(lookup: 1.0)])
     end

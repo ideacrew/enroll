@@ -4,7 +4,6 @@ module Effective
 
       datatable do
 
-        # TODO: Implement Filters here
         bulk_actions_column do
           bulk_action 'Employee will enroll',  change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"enroll"), data: {confirm: 'These employees will be used to estimate your group size and participation rate', no_turbolink: true}
           bulk_action 'Employee will not enroll with valid waiver', change_expected_selection_employers_employer_profile_census_employees_path(@employer_profile,:expected_selection=>"waive"), data: {confirm: 'Remember, your group size can affect your premium rates', no_turbolink: true}
@@ -24,6 +23,10 @@ module Effective
           row.hired_on
         }, :sortable => false, :filter => false
 
+        table_column :terminated_on, :proc => Proc.new { |row|
+          row.employment_terminated_on || "Active"
+        }, :sortable => false, :filter => false, :visible => false
+
         table_column :status, :proc => Proc.new { |row|
           employee_state_format(row.aasm_state, row.employment_terminated_on)
         }, :sortable => false, :filter => false
@@ -35,12 +38,6 @@ module Effective
         if attributes["renewal"]
           table_column :renewal_benefit_package, :label => 'Renewal Benefit Package', :proc => Proc.new { |row|
             row.renewal_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
-          }, :filter => false, :sortable => false
-        end
-
-        if attributes["terminated"]
-          table_column :termination_date, :proc => Proc.new { |row|
-            row.employment_terminated_on
           }, :filter => false, :sortable => false
         end
 
@@ -66,7 +63,7 @@ module Effective
               ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
               ['Terminate', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'terminate'), terminate_possible?(row)],
               ['Rehire', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'rehire'), rehire_possible?(row)],
-              ['Initiate Cobra', employers_employer_profile_census_employee_cobra_path(@employer_profile, census_employee_id: row.id), cobra_possible?(row)]
+              ['Initiate Cobra', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, type: 'cobra'), cobra_possible?(row)]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "census_employeeid_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -80,23 +77,29 @@ module Effective
       end
 
       def cobra_possible? census_employee
-        rehire_possible? census_employee
+        return 'disabled' if census_employee.cobra_linked?
+        return 'disabled' if census_employee.cobra_eligible?
+        return 'disabled' if census_employee.rehired?
+        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
       end
 
       def rehire_possible? census_employee
-        census_employee.active_termination? ? 'ajax' : 'disabled'
+        return 'disabled' if census_employee.cobra_linked?
+        return 'disabled' if census_employee.cobra_eligible?
+        return 'disabled' if census_employee.rehired?
+        census_employee.active_or_pending_termination? ? 'ajax' : 'disabled'
       end
 
       def terminate_possible? census_employee
-        census_employee.active_termination? ? 'disabled' : 'ajax'
+        census_employee.active_or_pending_termination? ? 'disabled' : 'ajax'
       end
 
       def nested_filter_definition
           {
             employers:
                 [
-                    {scope: 'active', label: 'Active & COBRA'},
                     {scope: 'active_alone', label: 'Active only'},
+                    {scope: 'active', label: 'Active & COBRA'},
                     {scope: 'by_cobra', label: 'COBRA only'},
                     {scope: 'terminated', label: 'Terminated'},
                     {scope: 'all', label: 'All'}
