@@ -25,11 +25,11 @@
         <%= link_to "Income", financial_assistance_application_applicant_incomes_path(@application, @applicant) %>
       </li>
 
-      <li class="list-box step-tabs">
+      <li class="list-box step-tabs <%= controller_name == 'benefits' ? 'activer' : '' %>" >
         <%= link_to "Income Adjustments", financial_assistance_application_applicant_deductions_path(@application, @applicant) %>
       </li>
 
-      <li class="list-box step-tabs <%= controller_name == 'deductions' ? 'activer' : '' %>" >
+      <li class="list-box step-tabs">
         <%= link_to "Health Coverage", financial_assistance_application_applicant_benefits_path(@application, @applicant) %>
       </li>
     <% end %>

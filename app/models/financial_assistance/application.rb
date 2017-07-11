@@ -432,6 +432,10 @@ private
     # Trigger the CV generation process here.
   end
 
+  def incomplete_applicants?
+
+  end
+
   def create_tax_households
     # Create THH for the primary applicant.
     primary_applicant.tax_household = tax_households.create!
