@@ -345,6 +345,13 @@ class FinancialAssistance::Application
     self.aasm_state == "draft" ? true : false
   end
 
+  def incomplete_applicants?
+    applicants.each do |applicant|
+      return true if applicant.applicant_validation_complete? == false
+    end
+    return false
+  end
+
 private
   def set_hbx_id
     #TODO: Use hbx_id generator for Application
@@ -430,10 +437,6 @@ private
     create_tax_households
 
     # Trigger the CV generation process here.
-  end
-
-  def incomplete_applicants?
-
   end
 
   def create_tax_households
