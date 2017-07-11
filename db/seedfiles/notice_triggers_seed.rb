@@ -851,6 +851,27 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_ELIGA',
+    title: 'Eligibilty notice',
+    description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+    resource_name: 'consumer_role',
+    event_name: 'eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Eligibilty Notice',
+        notice_template: 'notices/ivl/eligibility_notice',
+        notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_ELIGA',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
