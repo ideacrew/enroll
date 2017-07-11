@@ -1,13 +1,14 @@
 <% content_for :content do %>
   <%= render '/financial_assistance/shared/progress'%>
- <div class="container">
-  <div class="row">
-    <div class="col-md-2">
-      <%= render '/financial_assistance/shared/left_nav'%>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <%= render '/financial_assistance/shared/left_nav'%>
+      </div>
+
+      <%= yield %>
     </div>
-    <%= yield %>
   </div>
-  </div>
-</div>
 <% end %>
+
 <%= render template: "layouts/application" %>

@@ -1,15 +1,41 @@
 <nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
   <ul class="nav nav-stacked" id="leftNavigation">
+    <%# We need to turn these links in to actual links or make it so we don't need fake a's %>
     <li class="activer list-box step-tabs">
-      <%= link_to "Application", edit_financial_assistance_application_path(@application) %>
+      <a href="#">Account Registration</a>
     </li>
-    <%= nav_for_applicants %>
-    <% if action_name == 'review_and_submit' %>
+    <li class="activer list-box step-tabs">
+      <a href="#">Tell Us About Yourself</a>
+    </li>
+    <li class="activer list-box step-tabs">
+      <a href="#">Household Info</a>
+    </li>
+
+    <li class="activer list-box step-tabs">
+      <%= link_to "Financial Assitance", edit_financial_assistance_application_path(@application) %>
+    </li>
+
+    <% if defined?(@applicant) %>
       <li class="activer list-box step-tabs">
-    <% else %>
+        <%= link_to @applicant.person.first_name, edit_financial_assistance_application_applicant_path(@application, @applicant) %>
+      </li>
+
+      <%# these next 3 li's needs to be indented or styled as sub links from the applicant %>
+      <li class="list-box step-tabs <%= ['benefits', 'deductions'].include?(controller_name) ? 'activer' : '' %>" >
+        <%= link_to "Income", financial_assistance_application_applicant_incomes_path(@application, @applicant) %>
+      </li>
+
       <li class="list-box step-tabs">
+        <%= link_to "Income Adjustments", financial_assistance_application_applicant_deductions_path(@application, @applicant) %>
+      </li>
+
+      <li class="list-box step-tabs <%= controller_name == 'deductions' ? 'activer' : '' %>" >
+        <%= link_to "Health Coverage", financial_assistance_application_applicant_benefits_path(@application, @applicant) %>
+      </li>
     <% end %>
-      <%= link_to "Review and Submit", review_and_submit_financial_assistance_applications_path(@application) %>
+
+    <li class="list-box step-tabs">
+      <a href="#">Review and Submit</a>
     </li>
   </ul>
 </nav>
