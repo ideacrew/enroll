@@ -31,7 +31,6 @@
               <label class="static_label label-floatlabel" for="relation">RELATION</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
             </div>
-            <%= render "financial_assistance_row", family_member: @family.primary_applicant %>
           </div>
         </div>
 
@@ -87,7 +86,7 @@
           } %>
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
-            step: '3',
+            step: 3,
             url: build_button(@consumer_role, @family, find_sep_url, @missing_relationships).first
           } %>
         <% end %>
