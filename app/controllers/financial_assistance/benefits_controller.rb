@@ -30,7 +30,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
         if params[:commit] == "Finish"
           @model.update_attributes!(workflow: { current_step: 1 })
           flash[:notice] = 'Benefit Info Added.'
-          redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+          redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
@@ -48,7 +48,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     benefit = @applicant.benefits.find(params[:id])
     benefit.destroy!
     flash[:success] = "Benefit deleted - (#{benefit.kind}, #{benefit.insurance_kind})"
-    redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+    redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)
   end
 
   private
