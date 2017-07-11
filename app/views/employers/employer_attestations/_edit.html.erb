@@ -29,7 +29,6 @@
        <th>Size</th>
        <th>Submitted At</th>
        <th></th>
-       <th></th>
       </tr>
     </thead>
     <tbody>
@@ -43,11 +42,6 @@
           <td><%= doc.created_at.strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
             <%= link_to 'Verify', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
-          </td>
-          <td>
-            <%if doc.may_submit?%>
-                <%= link_to 'Revert', employers_employer_attestation_revert_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
-            <%end%>
           </td>
         </tr>
         <% end %>

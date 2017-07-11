@@ -258,7 +258,7 @@ Rails.application.routes.draw do
     resources :employer_attestations do 
        get 'authorized_download'
        get 'verify_attestation'
-       get 'revert_attestation'
+       #get 'revert_attestation'
     end
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
