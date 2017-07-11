@@ -31,6 +31,11 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
+
+  wait_for_condition_until(5) do
+    find_all('.hbx-enrollment-panel').count { |n| n.find_all("h3", :text => "Coverage").any? } > 1
+  end
+
   expect(page.find_all('.hbx-enrollment-panel').any?{|e|
     (e.find('.label-success').text() == 'Auto Renewing') &&
     (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))

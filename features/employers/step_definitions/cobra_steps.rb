@@ -274,7 +274,7 @@ When(/^.+ cobra one employee$/) do
   table = find("table.effective-datatable")
   rows = table.all("tr")
   waited_time = 0
-  while((rows.count > 2) || (waited_time < 5)) do
+  while((rows.count > 2) && (waited_time < 5)) do
     sleep 1
     table = find("table.effective-datatable")
     rows = table.all("tr")
@@ -333,7 +333,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   # Benefit Group
   fill_in "plan_year[benefit_groups_attributes][0][title]", :with => "Silver PPO Group"
 
-  find('.interaction-choice-control-plan-year-start-on').click
+  find('.interaction-choice-control-plan-year-start-on', :visible => true).click
   find('li.interaction-choice-control-plan-year-start-on-1').click
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click

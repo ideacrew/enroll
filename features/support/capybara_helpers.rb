@@ -1,4 +1,13 @@
 module CapybaraHelpers
+  def wait_for_condition_until(timeout, &blk)
+    test_val = blk.call
+    waited_time = 0
+    while((!test_val) && (waited_time < timeout)) do
+      sleep 1
+      test_val = blk.call
+      waited_time = waited_time + 1
+    end
+  end
 
   def select_from_chosen(val, from:)
     chosen_input = find 'a.chosen-single'
