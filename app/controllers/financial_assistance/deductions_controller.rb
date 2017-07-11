@@ -4,6 +4,10 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   before_filter :find_application_and_applicant
 
+  def index
+    render layout: 'financial_assistance'
+  end
+
   def new
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
