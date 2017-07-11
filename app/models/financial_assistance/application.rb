@@ -352,6 +352,11 @@ class FinancialAssistance::Application
     return false
   end
 
+  def next_incomplete_applicant
+    applicants.each do |applicant|
+      return applicant if applicant.applicant_validation_complete? == false
+    end
+  end
 private
   def set_hbx_id
     #TODO: Use hbx_id generator for Application
