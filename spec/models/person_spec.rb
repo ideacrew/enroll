@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Person do
+describe Person, :dbclean => :after_each do
 
   describe "model" do
     it { should validate_presence_of :first_name }
@@ -481,16 +481,16 @@ describe Person do
   end
 
   describe '.match_by_id_info' do
-    before(:all) do
+    before(:each) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
     end
 
-    after(:all) do
-      DatabaseCleaner.clean
-    end
+#    after(:all) do
+#      DatabaseCleaner.clean
+#    end
 
     it 'matches by last_name, first name and dob if no previous ssn and no current ssn' do
       expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name)).to eq [@p4]
