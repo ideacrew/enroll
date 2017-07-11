@@ -25,7 +25,6 @@ contact_center:
   phone_number: "1-855-532-5465"
   ma_phone_number: "1-888-813-9220"
   tty_number: "1-855-532-5465"
-  tty: "711"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
   tty: "711"

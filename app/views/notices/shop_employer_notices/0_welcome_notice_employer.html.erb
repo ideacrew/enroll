@@ -1,0 +1,99 @@
+<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><%= notice.primary_fullname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Welcome to the #{site_short_name}!  Now that you created your employer account, you can start the process of offering medical and dental coverage to your employees.  Please follow the steps below:"} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: [""],
+  heading: 'Next Steps', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+           <strong>Log in to your MAhealthconnector.org Account</strong>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>Employee Enrollments</strong> <br><br><strong>Employers should review their roster to ensure that it includes all eligible employees and ensure that any employees who are also owners (owner’s spouses) are identified as owners on their roster. </strong>For your group to receive coverage through the Small Business Marketplace, you must have at least one non-owner employee enrolled in a health plan at the end of each annual employee open enrollment period. <br>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>First Month’s Premium Payment</strong><br>Your first month’s premium payment must be made over the phone or online so it can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:<br><br>
+          <strong>Make a Secure Online Payment</strong><br>
+          The Health Connector now offers small businesses the option to make their premium payments online through secure electronic check payment. Make your premium payment online here:<a href="https://ww2.e-billexpress.com/ebpp/maconnector/"> https://ww2.e-billexpress.com/ebpp/maconnector/</a>.<br> <br><strong>To make a secure electronic check payment by phone</strong><br>Call <%= Settings.contact_center.ma_phone_number %><br>Select your language (1 for English, 2 for Spanish, additional language options available)<br>Select option for Small Business Employer<br>Select option for Need to Make a Payment<br>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li>
+          <strong>Dental Coverage through the Health Connector</strong> <br><br>It is optional to offer dental coverage to your employees.  <br> <br>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                   ["By calling #{Settings.contact_center.ma_phone_number}.",
+                                                                    "TTY: #{Settings.contact_center.tty}",
+                                                                    "Online at <a href='#{Settings.site.ma_website}''>#{Settings.site.ma_website}</a>"] } %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number} ."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "This notice is being provided in accordance with 45 CFR 155.715(f)."} %>
