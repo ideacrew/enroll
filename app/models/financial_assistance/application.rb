@@ -6,7 +6,7 @@ class FinancialAssistance::Application
 
   belongs_to :family, class_name: "::Family"
 
-  before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified
+  before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id
   validates :application_submission_validity, presence: true, on: :submission
   validates :before_attestation_validity, presence: true, on: :before_attestation
 
@@ -160,7 +160,7 @@ class FinancialAssistance::Application
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :submitted, :after => :submit_application do
+      transitions from: :draft, to: :draft, :after => :submit_application do
         guard do
           is_application_valid?
         end
@@ -400,6 +400,11 @@ private
   def set_effective_date
     effective_date = HbxProfile.try(:current_hbx).try(:benefit_sponsorship).try(:earliest_effective_date)
     update_attribute(:effective_date, effective_date)
+  end
+
+  def set_benchmark_plan_id
+    benchmark_plan_id = Plan.where(active_year: 2017, hios_id: "86052DC0400001-01").first.id
+    write_attribute(:benchmark_plan_id, benchmark_plan_id)
   end
 
   def application_submission_validity

@@ -29,11 +29,10 @@ end
 
 count = 0
 
-family_ids = FinancialAssistance::Application.where(aasm_state: "draft").map(&:family_id)
+family_ids = FinancialAssistance::Application.where(aasm_state: "submitted").map(&:family_id)
 
 family_ids.each do |fid|
   count += 1
-  puts "#{Time.now} - #{count}/#{total_count}" if count % 100 == 0
   family = Family.find(fid)
   if family.nil?
     raise "NO SUCH FAMILY #{fid}"
