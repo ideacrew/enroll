@@ -4,6 +4,10 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   before_filter :find_application_and_applicant
 
+  def index
+    render layout: 'financial_assistance'
+  end
+
   def new
     @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
@@ -17,17 +21,15 @@ class FinancialAssistance::DeductionsController < ApplicationController
     format_date_params model_params
 
     if params.key?(model_name)
-      @model.workflow = { current_step: @current_step.to_i + 1 }
+      @model.workflow = { current_step: @current_step.to_i}
       @current_step = @current_step.next_step if @current_step.next_step.present?
-    else
-      @model.workflow = { current_step: @current_step.to_i }
     end
 
     begin
       @model.update_attributes!(permit_params(model_params)) if model_params.present?
       if params[:commit] == "Finish"
         flash[:notice] = "Deduction Added - (#{@model.kind})"
-        redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+        redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
       else
         render 'workflow/step', layout: 'financial_assistance'
       end
@@ -41,7 +43,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     deduction = @applicant.deductions.find(params[:id])
     deduction.destroy!
     flash[:success] = "Deduction deleted - (#{deduction.kind})"
-    redirect_to edit_financial_assistance_application_applicant_path(@application, @applicant)
+    redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
   end
 
   private

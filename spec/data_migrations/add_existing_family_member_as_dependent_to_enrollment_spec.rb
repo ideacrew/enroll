@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "add_existing_family_member_as_dependent_to_enrollment")
 
-describe AddExistingFamilyMemberAsDependentToEnrollment do
+describe AddExistingFamilyMemberAsDependentToEnrollment, dbclean: :after_each do
   subject { AddExistingFamilyMemberAsDependentToEnrollment.new("remove dependent from ee enrollment", double(:current_scope => nil)) }
   let(:family){FactoryGirl.create(:family,:with_primary_family_member)}
   let(:person) { FactoryGirl.create(:person) }

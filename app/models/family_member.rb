@@ -62,6 +62,7 @@ class FamilyMember
   delegate :eligible_immigration_status, to: :person, allow_nil: true
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
+  delegate :is_applying_coverage, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -128,14 +129,6 @@ class FamilyMember
     family.primary_applicant_person.ensure_relationship_with(person, relationship, family.id)
     family.add_family_member(person)
   end
-
-  #old_code
-  # def update_relationship(relationship)
-  #   return if (primary_relationship == relationship)
-  #   family.remove_family_member(person)
-  #   self.reactivate!(relationship)
-  #   family.save!
-  # end
 
   def self.find(family_member_id)
     return [] if family_member_id.nil?

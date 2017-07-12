@@ -169,6 +169,7 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
   # end
 
 
+
   # context "with an enrolled hbx enrollment" do
   #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
   #   let(:hbx_enrollments) { [mock_hbx_enrollment] }
