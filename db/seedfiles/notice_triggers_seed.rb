@@ -872,6 +872,48 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_INELIGA',
+    title: 'Ineligibilty notice',
+    description: 'Notice will be sent to the household if everyone in the household is ineligible',
+    resource_name: 'consumer_role',
+    event_name: 'ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Ineligibilty Notice',
+        notice_template: 'notices/ivl/ineligibility_notice',
+        notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_INELIGA',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Enrollment notice',
+    description: 'Notice will be sent to families after their enrollment is done.',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+        mpi_indicator: 'IVL_ENR',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
