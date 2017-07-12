@@ -1039,7 +1039,7 @@ class PlanYear
 
   def cancel_renewal_application
     renewal_plan_year = employer_profile.plan_years.where(:start_on => self.start_on.next_year).first
-    if renewing_plan_year.present?
+    if renewal_plan_year.present?
       renewing_plan_year.cancel! if renewing_plan_year.may_cancel?
       renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
     end
@@ -1345,7 +1345,8 @@ class PlanYear
                  "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
-    if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+    if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)
+
       if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
