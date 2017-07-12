@@ -857,6 +857,7 @@ class PlanYear
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
+    state :terminated_pending
     state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
 
     event :activate, :after => :record_transition do
@@ -947,9 +948,13 @@ class PlanYear
       transitions from: :active, to: :suspended
     end
 
-    # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
+    end
+
+    # Termination pending due to attestation document rejection
+    event :terminate_pending, :after => :record_transition do
+      transitions from: [:enrolled, :active], to: :terminate_pending
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -986,6 +991,14 @@ class PlanYear
 
     event :conversion_expire, :after => :record_transition do
       transitions from: [:expired, :active], to: :conversion_expired, :guard => :can_be_migrated?
+    end
+  end
+
+  def plan_year_on_attestation_rejection
+    if (TimeKeeper.date_of_record >= self.start_on )
+       self.terminate_pending! if self.may_terminate_pending?
+    else
+       self.cancel! if self.may_cancel?
     end
   end
 
