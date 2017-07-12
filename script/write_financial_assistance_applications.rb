@@ -16,11 +16,11 @@ ConnectionSlug = Struct.new(:family_id) do
 
   def publish(payload, properties)
     if properties[:headers][:return_status] == "200"
-      File.open(File.join("policy_cvs", "#{family_id}.xml"), 'w') do |f|
+      File.open(File.join("faa_cvs", "#{family_id}_#{Time.now.strftime("%Y%m%e%S%M%p")}.xml"), 'w') do |f|
         f.puts payload
       end
     else
-      File.open(File.join("policy_cvs", "#ERROR_#{family_id}.xml"), 'w') do |f|
+      File.open(File.join("faa_cvs", "#ERROR_#{family_id}_#{Time.now.strftime("%Y%m%e%S%M%p")}.xml"), 'w') do |f|
         f.puts payload
       end
     end
@@ -29,7 +29,7 @@ end
 
 count = 0
 
-family_ids = FinancialAssistance::Application.all.map(&:family_id)
+family_ids = FinancialAssistance::Application.where(aasm_state: "draft").map(&:family_id)
 
 family_ids.each do |fid|
   count += 1
