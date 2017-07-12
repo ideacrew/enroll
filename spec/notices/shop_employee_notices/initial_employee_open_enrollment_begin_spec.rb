@@ -13,12 +13,14 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeeOpenEnrollmentBegin, :dbclean
                             :notice_template => 'notices/shop_employee_notices/16b_initial_employee_open_enrollment_begins',
                             :notice_builder => 'ShopEmployeeNotices::InitialEmployeeOpenEnrollmentBegin',
                             :mpi_indicator => 'MPI_SHOP16_B',
+                            :event_name => 'initial_employee_open_enrollment_begins',
                             :title => "Initial Eligible Employee Open Enrollment Period begins"})
                           }
 
     let(:valid_params) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 
