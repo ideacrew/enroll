@@ -20,7 +20,7 @@ class ConsumerRole
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
-  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob)
+  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -555,7 +555,7 @@ class ConsumerRole
 
   def check_for_critical_changes(person_params)
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine!(verification_attr)
+      redetermine!(verification_attr) if Person.person_has_an_active_enrollment?(person)
     end
   end
 
@@ -724,28 +724,8 @@ class ConsumerRole
     (dhs_pending? || ssa_pending?) && no_changes_24_h?
   end
 
-  def sensitive_information_changed(field, person_params)
-    if field == "dob"
-      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
-    elsif field == "ssn"
-      person.send(field).to_s != person_params[field].tr("-", "")
-    else
-      person.send(field).to_s != person_params[field]
-    end
-  end
-
   def no_changes_24_h?
     workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
-  end
-
-  def sensitive_information_changed(field, person_params)
-    if field == "dob"
-      person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
-    elsif field == "ssn"
-      person.send(field).to_s != person_params[field].tr("-", "")
-    else
-      person.send(field).to_s != person_params[field]
-    end
   end
 
   def sensitive_information_changed(field, person_params)
