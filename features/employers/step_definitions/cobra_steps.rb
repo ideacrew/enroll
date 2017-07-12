@@ -258,7 +258,10 @@ end
 
 When(/^.+ click terminated employee filter$/) do
   find('div[data-key=terminated]').click
-  wait_for_ajax(4)
+  wait_for_condition_until(7) do
+    nodes = all('table.effective-datatable tbody tr')
+    (nodes.any? { |ele| ele.all('a', :text => 'Employee Jr.').present? })
+  end
 end
 
 When(/^.+ click all employee filter$/) do
@@ -271,19 +274,18 @@ Then(/^.+ should see the status of Employment terminated$/) do
 end
 
 When(/^.+ cobra one employee$/) do
-  table = find("table.effective-datatable")
-  rows = table.all("tr")
-  waited_time = 0
-  while((rows.count > 2) && (waited_time < 5)) do
-    sleep 1
-    table = find("table.effective-datatable")
-    rows = table.all("tr")
-    waited_time = waited_time + 1
+  wait_for_condition_until(7) do
+    nodes = all('table.effective-datatable tbody tr')
+    (nodes.count == 1) &&
+      (nodes.any? { |ele| ele.all('a', :text => 'Employee Jr.').present? })
   end
-  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find(".dropdown-toggle", :text => "Actions", :wait => 3).click
-  wait_for_ajax
-  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  wait_for_condition_until(7) do
+    element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+    element.all('a', :text => "Initiate Cobra").any?
+  end
+    element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
   wait_for_ajax
 #   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
