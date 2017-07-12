@@ -44,8 +44,18 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
   end
 
   def append_data
-    recipient.primary_family.family_members.map(&:person).uniq.each do |person|
-      notice.individuals << append_family_members(person)
+    notice.has_applied_for_assistance = applications.where(:assistance_year => TimeKeeper.date_of_record.year).present?
+    latest_application = recipient.primary_family.applications.sort_by(&:submitted_at).last
+    if (notice.has_applied_for_assistance && latest_application.present? && latest_application.is_family_totally_ineligibile)
+      notice.request_full_determination = latest_application.request_full_determination
+      notice.is_family_totally_ineligibile = latest_application.is_family_totally_ineligibile
+      latest_application.applicants.map(&:person).uniq.each do |person|
+        notice.individuals << append_family_members(person)
+      end
+    else
+      recipient.primary_family.family_members.map(&:person).uniq.each do |person|
+        notice.individuals << append_family_members(person)
+      end
     end
   end
 

@@ -144,6 +144,10 @@ class FinancialAssistance::Application
     end
   end
 
+  def is_family_totally_ineligibile
+    applicants.map(&:is_totally_ineligible).uniq == [true]
+  end
+
   # Get the {FamilyMember} who is primary for this application.
   # @return [ {FamilyMember} ] primary {FamilyMember}
   def primary_applicant
