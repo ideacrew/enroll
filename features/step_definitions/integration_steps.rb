@@ -699,7 +699,7 @@ Then(/^.+ should see ((?:(?!the).)+) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link "Add Member"
+  click_link("Add Member", :visible => true)
 end
 
 Then(/^.+ should see the new dependent form$/) do

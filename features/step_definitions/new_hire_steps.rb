@@ -124,7 +124,10 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   sep_enr = enrollments.order_by(:'created_at'.desc).first.enrollment_kind == "special_enrollment" if enrollments.present?
   enrollment = first('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
-  enrollment.find('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
+  wait_for_condition_until(5) do
+    enrollment_selection_badges.count > 0
+  end
+  expect(enrollment_selection_badges.any? { |n| n.find_all('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y")).any? }).to be_truthy
   # Timekeeper is probably UTC in this case, as we are in a test environment
   # this will cause arbitrary problems with the specs late at night.
 #  enrollment.find('.enrollment-created-at', text: TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
