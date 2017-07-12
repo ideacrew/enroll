@@ -1,5 +1,6 @@
-%id
-  %id= individual.hbx_id
+- if individual.hbx_id
+  %id
+    %id= individual.hbx_id
 = render :partial => "events/individuals/person", :object => individual
 - if individual.person_relationships.any?
   %person_relationships
