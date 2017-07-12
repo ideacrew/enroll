@@ -49,11 +49,7 @@ class EmployerAttestationDocument < Document
       else
         employer_attestation.deny! if employer_attestation.may_deny?
       end
-
-      if params[:status].to_sym == :rejected
-        self.employer_profile.plan_years.last.plan_year_on_attestation_rejection
-      end
-
+      
       add_reason_for_rejection(params)
     elsif params[:status].to_sym == :accepted
       self.accept! if self.may_accept?

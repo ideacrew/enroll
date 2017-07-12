@@ -856,9 +856,9 @@ class PlanYear
     state :renewing_canceled
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
-    state :terminated           # Coverage under this application is terminated
+    state :terminated, :after_enter => :terminate_application           # Coverage under this application is terminated
     state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
-    state :terminate_pending
+    state :termination_pending
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -949,12 +949,12 @@ class PlanYear
     end
 
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended], to: :terminated
+      transitions from: [:active, :suspended, :termination_pending], to: :terminated
     end
 
     # Termination pending due to attestation document rejection
-    event :terminate_pending, :after => :record_transition do
-      transitions from: [:enrolled, :active], to: :terminate_pending
+    event :schedule_termination, :after => :record_transition do
+      transitions from: :active, to: :termination_pending
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -994,14 +994,6 @@ class PlanYear
     end
   end
 
-  def plan_year_on_attestation_rejection
-    if (TimeKeeper.date_of_record >= self.start_on )
-       self.terminate_pending! if self.may_terminate_pending?
-    else
-       self.cancel! if self.may_cancel?
-    end
-  end
-
 
   def trigger_passive_renewals
     open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
@@ -1020,6 +1012,20 @@ class PlanYear
     if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
       update_attributes(:open_enrollment_start_on => TimeKeeper.date_of_record)
     end
+  end
+
+  def terminate_employee_enrollments
+    # TODO
+  end
+
+  def cancel_renewal_application
+    # TODO
+  end
+
+  def terminate_application
+    cancel_renewal_application
+    terminate_employee_enrollments
+    employer_profile.benefit_terminated! if employer_profile.may_benefit_terminated?
   end
 
   def accept_application

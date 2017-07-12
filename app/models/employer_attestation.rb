@@ -30,7 +30,7 @@ class EmployerAttestation
     end
 
     event :deny, :after => :record_transition do
-      transitions from: [:submitted, :pending], to: :denied
+      transitions from: [:submitted, :pending], to: :denied, :after => :terminate_employer
     end
   end
 
@@ -44,6 +44,18 @@ class EmployerAttestation
 
   def has_documents?
     self.employer_attestation_documents
+  end
+
+  def terminate_employer
+    plan_year = self.employer_profile.show_plan_year
+    plan_year = self.employer_profile.plan_years.last if plan_year.blank?
+  
+    if plan_year.may_schedule_termination?
+      plan_year.update(terminated_on: TimeKeeper.date_of_record.end_of_month)
+      plan_year.schedule_termination!
+    else
+      plan_year.cancel!
+    end
   end
 
   private
