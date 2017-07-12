@@ -1,33 +1,33 @@
 $(document).ready(function() {
 
-    if ($('#medicaid_pregnency_yes').length) {
-      $.ajax({
-        type: "GET",
-        data:{},
-        url: window.location.href.replace(/step(\/\d)?/, "age_18_to_26"),
-        success: function (age) {
-          hide_show_foster_care_related_qns(age);
-        }
-      });
-    }
+  if ($('#medicaid_pregnency_yes').length) {
+    $.ajax({
+      type: "GET",
+      data:{},
+      url: window.location.href.replace(/step(\/\d)?/, "age_18_to_26"),
+      success: function (age) {
+        hide_show_foster_care_related_qns(age);
+      }
+    });
+  }
 
-    // To hide/show the foster care related questions based on the age_of_the_applicant.
-    function hide_show_foster_care_related_qns(age) {
-      if ($('#pregnant_yes')){
-        if (age == "false"){
-          $('#medicaid_pregnency_yes').parents(".row").next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().addClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
-        }
-        else {
-          $('#medicaid_pregnency_yes').parents(".row").next().removeClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().removeClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().removeClass('hide');
-          $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().removeClass('hide');
-        }
+  // To hide/show the foster care related questions based on the age_of_the_applicant.
+  function hide_show_foster_care_related_qns(age) {
+    if ($('#is_pregnant_yes')){
+      if (age == "false"){
+        $('#medicaid_pregnency_yes').parents(".row").next().addClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().addClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().next().addClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().addClass('hide');
+      }
+      else {
+        $('#medicaid_pregnency_yes').parents(".row").next().removeClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().removeClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().next().removeClass('hide');
+        $('#medicaid_pregnency_yes').parents(".row").next().next().next().next().removeClass('hide');
       }
     }
+  }
 
   $('#income_kind').on('selectric-change', function(e){
     if ($(this).val() == 'wages_and_salaries')
@@ -273,8 +273,8 @@ $(document).ready(function() {
 
 
 /* Applicant's Other Questions Form Related */
-  $("body").on("change", "#pregnant_no", function(){
-    if ($('#pregnant_no').is(':checked')) {
+  $("body").on("change", "#is_pregnant_no", function(){
+    if ($('#is_pregnant_no').is(':checked')) {
       $(this).parents(".row").next().addClass('hide');
       $(this).parents(".row").next().next().addClass('hide');
       $(this).parents(".row").next().next().next().removeClass('hide');
@@ -282,8 +282,8 @@ $(document).ready(function() {
     };
   });
 
-  $("body").on("change", "#pregnant_yes", function(){
-    if ($('#pregnant_yes').is(':checked')) {
+  $("body").on("change", "#is_pregnant_yes", function(){
+    if ($('#is_pregnant_yes').is(':checked')) {
       $(this).parents(".row").next().removeClass('hide');
       $(this).parents(".row").next().next().removeClass('hide');
       $(this).parents(".row").next().next().next().addClass('hide');
@@ -292,19 +292,19 @@ $(document).ready(function() {
     };
   });
 
-  if($('#pregnant_no').is(':checked')) {
-    $('#pregnant_no').parents(".row").next().addClass('hide');
-    $('#pregnant_no').parents(".row").next().next().addClass('hide');
-    $('#pregnant_no').parents(".row").next().next().next().removeClass('hide');
-    $('#pregnant_no').parents(".row").next().next().next().next().removeClass('hide');
+  if($('#is_pregnant_no').is(':checked')) {
+    $('#is_pregnant_no').parents(".row").next().addClass('hide');
+    $('#is_pregnant_no').parents(".row").next().next().addClass('hide');
+    $('#is_pregnant_no').parents(".row").next().next().next().removeClass('hide');
+    $('#is_pregnant_no').parents(".row").next().next().next().next().removeClass('hide');
   }
 
-  if($('#pregnant_yes').is(':checked')) {
-    $('#pregnant_yes').parents(".row").next().removeClass('hide');
-    $('#pregnant_yes').parents(".row").next().next().removeClass('hide');
-    $('#pregnant_yes').parents(".row").next().next().next().addClass('hide');
-    $('#pregnant_yes').parents(".row").next().next().next().next().addClass('hide');
-    $('#pregnant_yes').parents(".row").next().next().next().next().next().addClass('hide');
+  if($('#is_pregnant_yes').is(':checked')) {
+    $('#is_pregnant_yes').parents(".row").next().removeClass('hide');
+    $('#is_pregnant_yes').parents(".row").next().next().removeClass('hide');
+    $('#is_pregnant_yes').parents(".row").next().next().next().addClass('hide');
+    $('#is_pregnant_yes').parents(".row").next().next().next().next().addClass('hide');
+    $('#is_pregnant_yes').parents(".row").next().next().next().next().next().addClass('hide');
   }
 
   $("body").on("change", "#is_post_partum_period_yes", function(){

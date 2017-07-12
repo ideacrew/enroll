@@ -32,7 +32,7 @@ Rails.application.routes.draw do
       get 'help_paying_coverage',on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
       get 'application_checklist',on: :collection, action: 'application_checklist', as: 'application_checklist'
       get 'get_help_paying_coverage_response',on: :collection, action: 'get_help_paying_coverage_response', as: 'get_help_paying_coverage_response'
-      get :review_and_submit, on: :collection
+      get :review_and_submit, on: :member
       get :eligibility_results, on: :collection
 
       resources :applicants do
@@ -120,6 +120,7 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :get_user_info
       end
 
       member do
@@ -204,6 +205,7 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'

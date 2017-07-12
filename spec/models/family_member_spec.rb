@@ -58,7 +58,7 @@ describe FamilyMember, dbclean: :after_each do
     it "should be possible to find the primary_relationship" do
       mikes_family.dependents.each do |dependent|
         if brady_children.include?(dependent.person)
-          expect(dependent.primary_relationship).to eq "parent"
+          expect(dependent.primary_relationship).to eq "child"
         else
           expect(dependent.primary_relationship).to eq "spouse"
         end
@@ -182,21 +182,6 @@ end
 
 # describe FamilyMember, "which is inactive" do
 #   it "can be reactivated with a specified relationship"
-# end
-
-#old_code
-
-# describe FamilyMember, "given a relationship to update" do
-#   let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-#   let(:relationship) { "spouse" }
-#   let(:person) { FactoryGirl.build(:person) }
-#   subject { FactoryGirl.build(:family_member, person: person, family: family) }
-
-#   it "should update the relationship if different" do
-#     expect(subject.primary_relationship).not_to eq relationship
-#     subject.update_relationship(relationship)
-#     expect(subject.primary_relationship).to eq relationship
-#   end
 # end
 
 describe "for families with financial assistance application" do
