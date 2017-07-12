@@ -257,10 +257,8 @@ Then(/^.+ should see terminate successful msg$/) do
 end
 
 When(/^.+ click terminated employee filter$/) do
-  find('div[data-key=terminated]').click
-  wait_for_condition_until(7) do
-    nodes = all('table.effective-datatable tbody tr')
-    (nodes.any? { |ele| ele.all('a', :text => 'Employee Jr.').present? })
+  with_datatable_load_wait(7) do
+    find('div[data-key=terminated]').click
   end
 end
 

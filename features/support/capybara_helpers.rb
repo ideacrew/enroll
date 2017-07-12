@@ -1,4 +1,24 @@
 module CapybaraHelpers
+  # Throw a one-time load callback on datatables so we can use it to make sure
+  # it has finished loading.  Useful for clicking a filter and making sure it's
+  # done reloading.
+  def with_datatable_load_wait(timeout, &blk)
+    execute_script(<<-JSCODE)
+      $('.effective-datatable').DataTable().one('draw.dt', function() {
+        window['ef_datatables_done_loading'] = true; 
+      });
+    JSCODE
+    blk.call
+    wait_for_condition_until(timeout) do
+      evaluate_script(<<-JSCODE)
+        window['ef_datatables_done_loading'] == true
+      JSCODE
+    end
+    execute_script(<<-JSCODE)
+      delete window['ef_datatables_done_loading'];
+    JSCODE
+  end
+
   def wait_for_condition_until(timeout, &blk)
     test_val = blk.call
     waited_time = 0
