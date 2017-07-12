@@ -8,20 +8,22 @@ module Events
       family_id = headers.stringify_keys["family_id"]
       family = Family.find(family_id)
       unless family.nil?
-        begin
-          response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => family.applications.first }
-          reply_with(connection, reply_to, family_id, "200", response_payload)
-        rescue Exception=>e
-          reply_with(
-            connection,
-            reply_to,
-            family_id,
-            "500",
-            JSON.dump({
-               exception: e.inspect,
-               backtrace: e.backtrace.inspect
-            })
-          )
+        family.applications.where(aasm_state: "draft").each do |application|
+          begin
+            response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
+            reply_with(connection, reply_to, family_id, "200", response_payload)
+          rescue Exception=>e
+            reply_with(
+              connection,
+              reply_to,
+              family_id,
+              "500",
+              JSON.dump({
+                exception: e.inspect,
+                backtrace: e.backtrace.inspect
+              })
+            )
+          end
         end
       end
     end
