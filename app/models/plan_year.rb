@@ -857,8 +857,8 @@ class PlanYear
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated           # Coverage under this application is terminated
-    state :terminated_pending
     state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
+    state :terminate_pending
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?

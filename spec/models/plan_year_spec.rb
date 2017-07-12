@@ -398,6 +398,38 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
+
+  context "state changes to terminate pending and cancel" do
+    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
+    let(:plan_year_current_effective_date) do
+      py = PlanYear.new(**valid_params)
+      py.aasm_state = 'enrolled'
+      py.start_on = Time.now
+      py.employer_profile = employer_profile
+      py.benefit_groups = [benefit_group]
+      py.save
+      py
+    end
+    let(:plan_year_current_future_date) do
+      py = PlanYear.new(**valid_params)
+      py.aasm_state = 'enrolled'
+      py.start_on = Time.now + 60.days
+      py.employer_profile = employer_profile
+      py.benefit_groups = [benefit_group]
+      py.save
+      py
+    end
+
+    it "should terminate the plan year" do
+      plan_year_current_effective_date.plan_year_on_attestation_rejection
+      expect(plan_year_current_effective_date.aasm_state).to eq "terminate_pending"
+    end
+    it "should cancel the plan year" do
+      plan_year_current_future_date.plan_year_on_attestation_rejection
+      expect(plan_year_current_future_date.aasm_state).to eq "canceled"
+    end
+  end
+
   context "an employer with renewal plan year application" do
 
     let(:benefit_group) { FactoryGirl.build(:benefit_group) }
