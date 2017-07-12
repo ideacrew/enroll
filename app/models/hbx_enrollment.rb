@@ -157,6 +157,7 @@ class HbxEnrollment
   #scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES, :terminated_on.gte => TimeKeeper.date_of_record.beginning_of_day) }
   scope :terminated, -> { where(:aasm_state.in => TERMINATED_STATUSES) }
   scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
+  scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
@@ -533,29 +534,18 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
+  def is_applicable_for_renewal?
+    is_shop? && self.benefit_group.present? && self.benefit_group.plan_year.is_published?
+  end
+
   def update_renewal_coverage
-    if is_shop?
-      if self.benefit_group.plan_year.is_published?
-
-        renewal_plan_year = self.employee_role.employer_profile.renewing_published_plan_year
-
-        if renewal_plan_year.present?
-          renewal_enrollments = self.family.active_household.hbx_enrollments.where({
-            :coverage_kind => self.coverage_kind,
-            :benefit_group_id.in => renewal_plan_year.benefit_groups.map(&:id)
-          }).or(HbxEnrollment::renewing.selector, HbxEnrollment::waived.selector)
-
-          renewal_enrollments.reject!{|e| e.inactive?}
-          renewal_enrollments.each{|e| e.cancel_coverage! if e.may_cancel_coverage?}
-
-          begin
-            factory = Factories::FamilyEnrollmentRenewalFactory.new
-            factory.enrollment = self
-            factory.disable_notifications = true
-            factory.renew
-          rescue Exception => e
-            Rails.logger.error { e }
-          end
+    if is_applicable_for_renewal?
+      employer = benefit_group.plan_year.employer_profile
+      if employer.active_plan_year.present? && employer.renewing_published_plan_year.present?
+        begin
+          Factories::ShopEnrollmentRenewalFactory.new({enrollment: self}).update_passive_renewal
+        rescue Exception => e
+          Rails.logger.error { e }
         end
       end
     end
@@ -821,6 +811,25 @@ class HbxEnrollment
     end
   end
 
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+    qhp_plan ||= self.plan
+
+    if self.is_shop?
+      if benefit_group.is_congress
+        PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
+      else
+        reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
+        PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
+      end
+    else
+      if apply_aptc
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+      else
+        UnassistedPlanCostDecorator.new(qhp_plan, self)
+      end
+    end
+  end
+
   def decorated_elected_plans(coverage_kind, market=nil, family_member_ids=nil)
     benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
@@ -834,6 +843,10 @@ class HbxEnrollment
     application = family.active_approved_application
     tax_households = application.latest_active_tax_households_with_year(effective_on.year) if application.present?
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households, family_member_ids)
+    elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
+  end
+
+  def calculate_costs_for_plans(elected_plans)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
 
@@ -949,7 +962,7 @@ class HbxEnrollment
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
 
-  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil)
+  def self.new_from(employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, resident_role: nil, external_enrollment: false, coverage_start: nil, opt_effective_on: nil )
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
 
@@ -990,9 +1003,8 @@ class HbxEnrollment
       enrollment.kind = "individual"
       enrollment.benefit_package_id = benefit_package.try(:id)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
@@ -1007,7 +1019,7 @@ class HbxEnrollment
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
 
       if qle && enrollment.family.is_under_special_enrollment_period?
-        enrollment.effective_on = enrollment.family.current_sep.effective_on
+        enrollment.effective_on = opt_effective_on.present? ? opt_effective_on : enrollment.family.current_sep.effective_on
         enrollment.enrollment_kind = "special_enrollment"
       elsif enrollment.family.is_under_ivl_open_enrollment?
         enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date

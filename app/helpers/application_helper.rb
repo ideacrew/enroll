@@ -431,7 +431,7 @@ module ApplicationHelper
     relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: PersonRelationship::InverseMap[dependent.family_member.try(:relationship)] )
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.family_member.try(:relationship))
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
@@ -527,22 +527,6 @@ module ApplicationHelper
     pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
     name=family_member.try(:first_name) || ''
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
-  end
-
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
-
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
-      when 'fixed_first_of_next_month'
-        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
-      end
-    end
-
-    options
   end
 
   def purchase_or_confirm

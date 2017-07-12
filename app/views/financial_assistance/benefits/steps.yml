@@ -1,11 +1,11 @@
 - step:
-    heading: Other Health Coverage for <family-member-name-placeholder>
+    heading: Health Coverage for <family-member-name-placeholder>
     heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
     sections:
       - section:
           lines:
             - cells:
-                - gutter: 5
+                - gutter: 4
                   type: text
                   text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
@@ -20,7 +20,7 @@
                   # checked: true
                   label: 'Eligible'
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 3
                   type: label_radio
                   name: person_enrolled
                   value: is_enrolled
@@ -31,7 +31,7 @@
                   # checked: false
                   label: 'Enrolled'
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
@@ -258,7 +258,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_waiting_period
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
@@ -285,7 +285,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_mec_met
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
@@ -294,7 +294,7 @@
                   type: text
                   text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'

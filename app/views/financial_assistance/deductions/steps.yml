@@ -20,7 +20,7 @@
                   value: 'no2'
                   id: 'no2'
                   label: 'No'
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:

@@ -1,5 +1,5 @@
 - step:
-    heading: Other Income for <family-member-name-placeholder>
+    heading: Income for <family-member-name-placeholder>
     heading_text: Tell us about this person's other income. When you're finished select CONTINUE.
     sections:
       - section:
@@ -21,7 +21,7 @@
                   value: false
                   id: 'no2'
                   label: 'No'
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
