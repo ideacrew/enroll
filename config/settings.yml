@@ -28,6 +28,7 @@ contact_center:
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
+  tty: "711"
 
   appeals: "connector-appeals@state.ma.us" 
 
