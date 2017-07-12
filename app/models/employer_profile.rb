@@ -610,9 +610,7 @@ class EmployerProfile
 
         #initial employer reminder notices to publish plan year.
         start_on = (new_date+2.months).beginning_of_month
-        start_on_1 = (new_date+1.month).beginning_of_month
-        
-        if new_date+1.days == start_on.last_month
+        if new_date.next_day == start_on.last_month
           initial_employer_reminder_to_publish(start_on).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_reminder_to_publish_plan_year")
