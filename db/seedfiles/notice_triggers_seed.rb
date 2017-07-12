@@ -547,6 +547,27 @@ shop_notice_triggers = [
         }
       }
     ]
+  },
+  {
+    hbx_id: 'SHOP35',
+    title: 'EE SEP Request Denied',
+    description: 'EE SEP Requested by Employee outside of allowable time frame',
+    resource_name: 'employee_role',
+    event_name: 'sep_request_denial_notice',
+    notice_triggers: [
+      {
+        name: 'Denial of SEP Requested by EE outside of allowable time frame',
+        notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
+        notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
+        mpi_indicator: 'MPI_SHOP35',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   }
 ]
 

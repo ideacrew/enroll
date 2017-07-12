@@ -139,13 +139,16 @@ class Insured::FamiliesController < FamiliesController
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
 
+    if (@future_qualified_date || !@qualified_date) == true
+      sep_request_denial_notice
+    end
   end
 
   def check_move_reason
@@ -230,6 +233,10 @@ class Insured::FamiliesController < FamiliesController
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
     end
+  end
+
+  def sep_request_denial_notice
+    ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
   end
 
   private
