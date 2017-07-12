@@ -19,6 +19,10 @@ module Config::AcaHelper
     Settings.aca.general_agency_enabled
   end
 
+  def dental_market_enabled?
+    Settings.aca.dental_market_enabled
+  end
+
   def individual_market_is_enabled?
     Settings.aca.market_kinds.include?("individual")
   end

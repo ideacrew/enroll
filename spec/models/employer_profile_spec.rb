@@ -3,7 +3,7 @@ require 'rails_helper'
 describe EmployerProfile, dbclean: :after_each do
 
   let(:entity_kind)     { "partnership" }
-  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area) }
   let(:bad_entity_kind) { "fraternity" }
   let(:entity_kind_error_message) { "#{bad_entity_kind} is not a valid business entity kind" }
 
@@ -38,6 +38,10 @@ describe EmployerProfile, dbclean: :after_each do
       entity_kind: entity_kind,
       sic_code: '1111'
     }
+  end
+
+  before :each do
+    allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
   end
 
   let!(:rating_area) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
@@ -762,16 +766,12 @@ end
 
 describe EmployerProfile, "roster size" do
   let(:employer_profile) {FactoryGirl.create(:employer_profile)}
-  let(:census_employee1) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: 'eligible')}
-  let(:census_employee2) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'employee_role_linked')}
-  let(:census_employee3) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'employment_terminated')}
-  let(:census_employee4) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'rehired')}
+  let!(:census_employee1) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id, aasm_state: 'eligible')}
+  let!(:census_employee2) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'employee_role_linked')}
+  let!(:census_employee3) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'employment_terminated')}
+  let!(:census_employee4) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id).update(aasm_state: 'rehired')}
 
   it "should got 2" do
-    census_employee1
-    census_employee2
-    census_employee3
-    census_employee4
     expect(employer_profile.roster_size).to eq 2
   end
 end
@@ -901,6 +901,10 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
   let(:broker_role) { FactoryGirl.create(:broker_role) }
 
+  before :each do
+    allow(EmployerProfile).to receive(:enforce_employer_attestation?).and_return(false)
+  end
+
   context "active_general_agency_account" do
     it "should get active general_agency_account" do
       FactoryGirl.create(:general_agency_account, employer_profile: employer_profile, aasm_state: 'inactive')
@@ -1013,47 +1017,16 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
     end
   end
 
-  describe "has_documents? check before publish plan" do
-    context "has_document" do
-      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-
+  describe "is_attestation_eligible? check before publish plan" do
+    context "is_attestation_eligible" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile_no_attestation) }
       it "should return false" do
-        expect(employer_profile.has_document?).to eq(false)
-      end
+        allow(employer_profile).to receive(:enforce_employer_attestation?).and_return(true)
 
-      it "should retun true" do
-        employer_profile.documents << Document.new()
-        expect(employer_profile.has_document?).to eq(true)
-      end
-    end
-  end
-
-  context "Document Upload" do
-    let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-    let(:file_path){ "test/JavaScript.pdf" }
-    let(:file_name){ "JavaScript.pdf" }
-    let(:subject){ "Employer Attestation" }
-    let(:size){ 1024*1024 }
-
-    context "with valid arguments" do
-
-      before do
-        employer_profile.upload_document(file_path,file_name,subject,size)
-      end
-
-      it "should upload document to the employer profile" do
-        expect(employer_profile.documents.size).to eq 1
-      end
-
-      it "should have valid document inputs" do
-        expect(employer_profile.documents.first.title).to eq file_name
-        expect(employer_profile.documents.first.subject).to eq subject
-        expect(employer_profile.documents.first.size.to_i).to eq size
-        expect(employer_profile.documents.first.date).to eq Date.today
+        expect(employer_profile.is_attestation_eligible?).to eq(false)
       end
 
     end
-
   end
 
 end

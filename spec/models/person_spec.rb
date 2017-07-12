@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Person do
+describe Person, :dbclean => :after_each do
 
   describe "model" do
     it { should validate_presence_of :first_name }
@@ -20,7 +20,7 @@ describe Person do
       }
     end
 
-    describe ".create", dbclean: :after_each do
+    describe ".create", dbclean: :around_each do
       context "with valid arguments" do
         let(:params) {valid_params}
         let(:person) {Person.create(**params)}
@@ -481,16 +481,16 @@ describe Person do
   end
 
   describe '.match_by_id_info' do
-    before(:all) do
+    before(:each) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
       @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
       @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
     end
 
-    after(:all) do
-      DatabaseCleaner.clean
-    end
+#    after(:all) do
+#      DatabaseCleaner.clean
+#    end
 
     it 'matches by last_name, first name and dob if no previous ssn and no current ssn' do
       expect(Person.match_by_id_info(last_name: @p4.last_name, dob: @p4.dob, first_name: @p4.first_name)).to eq [@p4]
@@ -541,7 +541,7 @@ describe Person do
     end
   end
 
-  describe '.active', :dbclean => :after_each do
+  describe '.active', :dbclean => :around_each do
     it 'new person defaults to is_active' do
       expect(Person.create!(first_name: "eric", last_name: "Clapton").is_active).to eq true
     end
@@ -838,6 +838,31 @@ describe Person do
   describe "does not allow two people with the same user ID to be saved" do
     let(:person1){FactoryGirl.build(:person)}
     let(:person2){FactoryGirl.build(:person)}
+        def drop_user_id_index_in_db
+          Person.collection.indexes.each do |spec|
+            if spec["key"].keys.include?("user_id")
+              if spec["unique"] && spec["sparse"]
+                Person.collection.indexes.drop_one(spec["key"])
+              end
+            end
+          end
+        end
+
+        def create_user_id_uniqueness_index
+          Person.index_specifications.each do |spec|
+            if spec.options[:unique] && spec.options[:sparse]
+              if spec.key.keys.include?(:user_id)
+                key, options = spec.key, spec.options
+                Person.collection.indexes.create_one(key, options)
+              end
+            end
+          end
+        end
+
+        before :each do
+          drop_user_id_index_in_db
+          create_user_id_uniqueness_index
+        end
 
     it "should let fail to save" do
       user_id = BSON::ObjectId.new

@@ -334,10 +334,7 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
-  function submitCobraDate(type, ce_id) {
-    var target = $("tr."+type+'_'+ce_id);
-    var cobra_date = target.find('input.date-picker').val();
-    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  function submitCobraDate(cobra_date, cobra_link) {
     $.ajax({
       type: 'get',
       datatype : 'js',
@@ -361,8 +358,8 @@ var EmployerProfile = ( function( window, undefined ) {
       validatePlanYear : validatePlanYear,
       validateCobraBeginDate : validateCobraBeginDate,
       viewDetails : viewDetails,
+      viewCobraDateField: viewCobraDateField,
       showActionNeeded : showActionNeeded,
-      viewCobraDateField : viewCobraDateField,
       submitCobraDate : submitCobraDate,
     };
 
@@ -468,11 +465,32 @@ $(document).on('click', "a.terminate.cancel", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
+$(document).on('click', "a.cobra.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', "a.rehire.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
 $(document).on('click', "a.interaction-click-control-terminate", function(){
   event.preventDefault();
     $('tr.child-row:visible').remove();
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
+
+$(document).on('click', '.cobra_confirm', function(){
+  event.preventDefault();
+  var datepicker = $(this).prev();
+  var cobra_date = datepicker.val();
+  var cobra_link = $(this).data('link');
+  // var target = $("tr."+type+'_'+ce_id);
+  // var cobra_date = target.find('input.date-picker').val();
+  // var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  EmployerProfile.submitCobraDate(cobra_date, cobra_link);
+})
 
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
@@ -494,7 +512,7 @@ $(document).on('click', ".delete_confirm", function(){
   });
 });
 
-$(document).on('click', ".rehire_confirm", function(){
+$(document).on('click', ".rehire-confirm", function(){
   var element_id = $(this).attr('id');
   var rehiring_date = $(this).siblings().val();
   var rehire_link = $(this).data('link');

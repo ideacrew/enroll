@@ -11,9 +11,9 @@ class CensusEmployee < CensusMember
 
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending rehired)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
-  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked rehired)
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
@@ -328,8 +328,11 @@ class CensusEmployee < CensusMember
     EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
   end
 
-  def active_termination?
-    (self.coverage_terminated_on.present? && !(self.is_eligible? || self.employee_role_linked?)) && !self.rehired?
+  def active_or_pending_termination?
+    return true if self.employment_terminated_on.present?
+    return true if PENDING_STATES.include?(self.aasm_state)
+    return false if self.rehired?
+    !(self.is_eligible? || self.employee_role_linked?)
   end
 
   def employee_relationship
@@ -708,9 +711,12 @@ class CensusEmployee < CensusMember
 
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
-    cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months) &&
-      coverage_terminated_on <= cobra_begin_date &&
+    return false unless cobra_begin_date.present?
+    return false unless coverage_terminated_on
+    return false unless coverage_terminated_on <= cobra_begin_date
+
+    (hired_on <= cobra_begin_date) &&
+      (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
       cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 
@@ -756,7 +762,6 @@ class CensusEmployee < CensusMember
   end
 
 
-  # TODO: Implement for 16019 and children
   def expected_to_enroll?
     expected_selection == 'enroll'
   end

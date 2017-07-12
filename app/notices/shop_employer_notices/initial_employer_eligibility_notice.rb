@@ -4,9 +4,11 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
+    employer_appeal_rights_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
+    non_discrimination_attachment
   end
 
   def append_data

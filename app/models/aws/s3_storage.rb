@@ -42,7 +42,8 @@ module Aws
         object = get_object(env_bucket_name, key)
         read_object(object)
       rescue Exception => e
-        nil
+       puts "Error caused due to %s" %[$!.class]
+       raise e.backtrace
       end
     end
 
@@ -79,11 +80,11 @@ module Aws
     end
 
     def env_bucket_name(bucket_name)
-      "mhc-enroll-#{bucket_name}-#{aws_env}"
+      "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
     end
 
     def setup
-      client=Aws::S3::Client.new
+      client=Aws::S3::Client.new(stub_responses: (Rails.env.development? || Rails.env.test?))
       @resource=Aws::S3::Resource.new(client: client)
     end
   end

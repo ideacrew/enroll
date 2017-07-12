@@ -10,7 +10,7 @@ describe Aws::S3Storage do
   let(:bucket_name) { "bucket1" }
   let(:file_path) { File.dirname(__FILE__) }
   let(:key) { SecureRandom.uuid }
-  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:dchbx-enroll-#{bucket_name}-#{aws_env}##{key}" }
+  let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}##{key}" }
   let(:invalid_url) { "urn:openhbx:terms:v1:file_storage:s3:bucket:" }
   let(:file_content) { "test content" }
 
@@ -52,7 +52,9 @@ describe Aws::S3Storage do
     context "failure (invalid uri)" do
       it "returns nil" do
         allow_any_instance_of(Aws::S3Storage).to receive(:get_object).and_raise(Exception)
-        expect(subject.find(invalid_url)).to be_nil
+        expect do
+          subject.find(invalid_url)
+        end.to raise_exception
       end
     end
   end

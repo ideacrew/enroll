@@ -153,6 +153,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @current_plan_year = @employer_profile.active_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
+      @datatable ||= Effective::Datatables::EmployeeDatatable.new({id: @employer_profile.id, scopes: params[:scopes]})
       paginate_employees
     elsif @tab == 'families'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
@@ -199,6 +200,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           # flash[:notice] = 'Your Employer Staff application is pending'
           render action: 'show_pending'
         else
+          welcome_employer_profile if @organization.employer_profile.present?
           redirect_to employers_employer_profile_path(@organization.employer_profile, tab: 'home')
         end
       end
@@ -553,6 +555,14 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def check_origin?
     request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
+  end
+
+  def welcome_employer_profile
+    begin
+     ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "application_created")
+     rescue Exception => e
+     puts "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" unless Rails.env.test?
+    end
   end
 
   def get_sic_codes
