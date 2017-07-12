@@ -1458,3 +1458,16 @@ describe Family, "given a primary applicant and 2 dependents with valid relation
     expect(relation).not_to eq "unrelated"
   end
 end
+
+describe Family, "#check_dep_consumer_role", dbclean: :after_each do
+  let(:person_consumer) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person_consumer) }
+  let(:dependent) { FactoryGirl.create(:person) }
+  let(:family_member_dependent) { FactoryGirl.build(:family_member, person: dependent, family: family)}
+
+  it "test" do
+    allow(family).to receive(:dependents).and_return([family_member_dependent])
+    family.send(:create_dep_consumer_role)
+    expect(family.dependents.first.person.consumer_role?).to be_truthy
+  end
+end

@@ -101,6 +101,7 @@
                   name: row2
                   value: true
                   id: 'is_ssn_applied_yes'
+                  required: true
                   label: 'Yes'
                   model: applicant
                   attribute: is_ssn_applied
@@ -110,7 +111,6 @@
                   value: false
                   id: 'is_ssn_applied_no'
                   required: true
-                  id: 'is_ssn_applied_no'
                   label: 'No'
                   model: applicant
                   attribute: is_ssn_applied

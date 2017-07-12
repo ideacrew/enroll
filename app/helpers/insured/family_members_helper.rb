@@ -31,8 +31,7 @@ module Insured::FamilyMembersHelper
       [insured_family_relationships_path(:consumer_role_id => consumer_role.id), false]
     else
       if family.application_in_progress.present?
-        attestation_ready = family.application_in_progress.ready_for_attestation?
-        [review_and_submit_financial_assistance_applications_path, (attestation_ready ? false : true)]
+        [edit_financial_assistance_application_path(family.application_in_progress), !family.application_in_progress.ready_for_attestation?]
       else
         [(consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url), false]
       end
@@ -47,5 +46,15 @@ module Insured::FamilyMembersHelper
     else
       family_member.applicant
     end
+  end
+
+  def is_applying_coverage_value_dependent(dependent)
+    first_checked = true
+    second_checked = false
+    if dependent.family_member.try(:person).try(:consumer_role).present?
+      first_checked = dependent.family_member.person.consumer_role.is_applying_coverage
+      second_checked = !dependent.family_member.person.consumer_role.is_applying_coverage
+    end
+    return first_checked, second_checked
   end
 end

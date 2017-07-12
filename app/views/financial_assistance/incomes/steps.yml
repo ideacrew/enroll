@@ -1,5 +1,5 @@
 - step:
-    heading: Other Income for <family-member-name-placeholder>
+    heading: Income for <family-member-name-placeholder>
     heading_text: Tell us about this person's other income. When you're finished select CONTINUE.
     sections:
       - section:
