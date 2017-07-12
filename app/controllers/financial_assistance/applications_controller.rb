@@ -4,6 +4,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   include UIHelpers::WorkflowController
   include NavigationHelper
+  include Acapi::Notifiers
+  require 'securerandom'
 
   def index
     @family = @person.primary_family
@@ -44,10 +46,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       redirect_to edit_financial_assistance_application_path(@application)
     elsif params[:commit] == "Submit my Application"
       @application.submit! if @application.complete?
+      publish_application(@application)
       redirect_to eligibility_results_financial_assistance_applications_path
     else
       render 'workflow/step', layout: 'financial_assistance'
     end
+  end
+
+  def publish_application(application)
+    response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => @application }
+    notify(“acapi.info.events.assistance_application.submitted”,
+              {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                :body => response_payload,
+                :family_id => application.family_id.to_s,
+                :application_id => application._id.to_s})
   end
 
   def help_paying_coverage
