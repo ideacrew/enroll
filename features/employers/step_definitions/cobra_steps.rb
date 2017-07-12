@@ -249,6 +249,13 @@ When(/^.+ terminate one employee$/) do
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
   click_link 'Terminate Employee'
+  # Once employee termination is complete, this actually refreshes the page (!)
+  # by re-visiting with a change of window.location (ugh).  We need to wait for
+  # this ajax page refresh to happen before we start doing anything else like
+  # clicking around on our datatables.
+  # FIXME
+  # FIXME
+  # FIXME
   wait_for_ajax(5)
 end
 

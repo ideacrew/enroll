@@ -19,13 +19,13 @@ module CapybaraHelpers
     JSCODE
   end
 
-  def wait_for_condition_until(timeout, &blk)
+  def wait_for_condition_until(timeout, slice_size = 0.2, &blk)
     test_val = blk.call
     waited_time = 0
     while((!test_val) && (waited_time < timeout)) do
-      sleep 1
+      sleep slice_size
       test_val = blk.call
-      waited_time = waited_time + 1
+      waited_time = waited_time + slice_size
     end
   end
 
