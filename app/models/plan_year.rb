@@ -780,7 +780,7 @@ class PlanYear
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
-    state :renewing_enrolled
+    state :renewing_enrolled, :after_enter => :renewal_employer_open_enrollment_completed
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
     state :renewing_canceled
 
@@ -1096,6 +1096,11 @@ class PlanYear
     #also check if minimum participation and non owner conditions are met by ER.
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("initial_employer_open_enrollment_completed")
+  end
+
+  def renewal_employer_open_enrollment_completed
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
   end
 
   def renewal_employer_ineligibility_notice

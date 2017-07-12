@@ -22,6 +22,7 @@ contact_center:
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
   psi_number: "1-855-532-5432" # plan-shopping-information
+  tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
