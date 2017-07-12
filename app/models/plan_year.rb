@@ -844,7 +844,7 @@ class PlanYear
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled,          :after_enter => :cancel_application             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
@@ -954,7 +954,7 @@ class PlanYear
 
     # Termination pending due to attestation document rejection
     event :schedule_termination, :after => :record_transition do
-      transitions from: :active, to: :termination_pending
+      transitions from: :active, to: :termination_pending, :after => :schedule_employee_terminations
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1014,18 +1014,46 @@ class PlanYear
     end
   end
 
-  def terminate_employee_enrollments
-    # TODO
+  def coverages_under_plan_year
+    bg_ids = benefit_groups.pluck(:id)
+
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).non_expired_and_non_terminated.to_a
+    end
   end
 
-  def cancel_renewal_application
-    # TODO
+  def schedule_employee_terminations
+
+  end
+
+  def terminate_employee_enrollments
+
   end
 
   def terminate_application
     cancel_renewal_application
     terminate_employee_enrollments
     employer_profile.benefit_terminated! if employer_profile.may_benefit_terminated?
+  end
+
+  def cancel_renewal_application
+    renewal_plan_year = employer_profile.plan_years.where(:start_on => self.start_on.next_year).first
+    if renewing_plan_year.present?
+      renewing_plan_year.cancel! if renewing_plan_year.may_cancel?
+      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
+    end
+  end
+
+  def cancel_application
+    cancel_employee_enrollments
+    employer_profile.benefit_canceled! if employer_profile.may_benefit_canceled?
+  end
+
+  def cancel_employee_enrollments
+    coverages_under_plan_year.each do |en|
+      en.cancel_coverage! if en.may_cancel_coverage?
+    end
   end
 
   def accept_application

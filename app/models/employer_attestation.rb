@@ -54,7 +54,7 @@ class EmployerAttestation
       plan_year.update(terminated_on: TimeKeeper.date_of_record.end_of_month)
       plan_year.schedule_termination!
     else
-      plan_year.cancel!
+      plan_year.cancel! if plan_year.may_cancel?
     end
   end
 
