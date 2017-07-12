@@ -1,15 +1,32 @@
 module CapybaraHelpers
+  # Perform an action then wait for the page to reload before proceeding
+  def wait_for_page_reload_until(timeout, slice_size = 0.2, &blk)
+    execute_script(<<-JSCODE)
+      window.document['_test_waiting_for_page_reload'] = true; 
+    JSCODE
+    blk.call
+    wait_for_condition_until(timeout, slice_size) do
+      evaluate_script(<<-JSCODE)
+        !(window.document['_test_waiting_for_page_reload'] == true)
+      JSCODE
+    end
+    execute_script(<<-JSCODE)
+      delete window.document['_test_waiting_for_page_reload'];
+    JSCODE
+  end
+
+
   # Throw a one-time load callback on datatables so we can use it to make sure
   # it has finished loading.  Useful for clicking a filter and making sure it's
   # done reloading.
-  def with_datatable_load_wait(timeout, &blk)
+  def with_datatable_load_wait(timeout, slice_size = 0.2, &blk)
     execute_script(<<-JSCODE)
       $('.effective-datatable').DataTable().one('draw.dt', function() {
         window['ef_datatables_done_loading'] = true; 
       });
     JSCODE
     blk.call
-    wait_for_condition_until(timeout) do
+    wait_for_condition_until(timeout, slice_size) do
       evaluate_script(<<-JSCODE)
         window['ef_datatables_done_loading'] == true
       JSCODE
