@@ -32,7 +32,7 @@
 	<div class="small">
 		<h3>Review and Continue</h3>
 		<p>If you have added everyone in your household, continue below:</p>
-		<div> <%= button_to "Review and Continue", review_and_submit_financial_assistance_application_path, :id => "", :class => "btn btn-success", :method => :get %></div>
+		<div> <%= button_to "Review and Continue", review_and_submit_financial_assistance_application_path, :id => "", :class => "btn btn-success", :method => :get, disabled: !@application.ready_for_attestation?%></div>
 	</div>
 </div>
 
