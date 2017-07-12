@@ -263,8 +263,9 @@ When(/^.+ click terminated employee filter$/) do
 end
 
 When(/^.+ click all employee filter$/) do
-  find('div[data-key=all]').click
-  wait_for_ajax(4)
+  with_datatable_load_wait(7) do
+    find('div[data-key=all]').click
+  end
 end
 
 Then(/^.+ should see the status of Employment terminated$/) do
