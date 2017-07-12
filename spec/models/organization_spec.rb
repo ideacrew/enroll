@@ -533,4 +533,20 @@ RSpec.describe Organization, dbclean: :after_each do
     end
   end
 
+  describe "check employer_attestations scopes" do
+    context "employer attestation documents scope" do
+      it "should return exact scope match records" do
+        ["submitted","approved","pending","denied"].each do |state|
+          FactoryGirl.create(:organization,
+                             employer_profile: FactoryGirl.build(:employer_profile,
+                                                                 employer_attestation:  FactoryGirl.build(:employer_attestation,{aasm_state: state})))
+        end
+        expect(Organization.employer_attestations_submitted[0].employer_profile.employer_attestation.aasm_state).to eq "submitted"
+        expect(Organization.employer_attestations_pending[0].employer_profile.employer_attestation.aasm_state).to eq "pending"
+        expect(Organization.employer_attestations_approved[0].employer_profile.employer_attestation.aasm_state).to eq "approved"
+        expect(Organization.employer_attestations_denied[0].employer_profile.employer_attestation.aasm_state).to eq "denied"
+      end
+    end
+  end
+
 end
