@@ -8,7 +8,7 @@ module Events
       family_id = headers.stringify_keys["family_id"]
       family = Family.find(family_id)
       unless family.nil?
-        family.applications.where(aasm_state: "draft").each do |application|
+        family.applications.where(aasm_state: "submitted").each do |application|
           begin
             response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
             reply_with(connection, reply_to, family_id, "200", response_payload)
