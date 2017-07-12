@@ -131,6 +131,7 @@ Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
 end
 
 Then /Point of Contact count is (\d+)/ do |count|
+  sleep(10)
   expect(page.all('tr').count - 1).to eq(count.to_i)
 end
 
