@@ -14,10 +14,10 @@
       <div class="col-xs-3">
         <span class="icon-calendar-large icon-calendar-large-dims">
           <h3 class="day">
-            <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%e") %>
+            <%= @schedule[:advertised_due_date_of_month].strftime("%e") %>
           </h3>
           <span class="month">
-            <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%B") %>
+            <%= @schedule[:advertised_due_date_of_month].strftime("%B") %>
           </span>
         </span>
       </div>
@@ -68,7 +68,7 @@
     <tr>
       <td>Employer initial application latest submit on</td>
       <td>:</td>
-      <td><%= @schedule[:employer_initial_application_latest_submit_on].to_s %></td>
+      <td><%= @schedule[:advertised_due_date_of_month].to_s %></td>
     </tr>
     <tr>
       <td>Binder payment due date</td>

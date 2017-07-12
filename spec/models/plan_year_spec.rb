@@ -1618,7 +1618,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2015,9,1))
       expect(binder_payment_due_date).to eq Date.new(2015,8,12)
       binder_payment_due_date_1 = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
-      expect(binder_payment_due_date_1).to eq Date.new(2017,8,14)
+      expect(binder_payment_due_date_1).to eq Date.new(2017,8,23)
     end
 
     it "out of map" do

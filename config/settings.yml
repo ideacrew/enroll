@@ -93,6 +93,7 @@ aca:
 
     initial_application:
       publish_due_day_of_month: 15
+      advertised_deadline_of_month: 10  
       earliest_start_prior_to_effective_on:
         months: -2
       appeal_period_after_application_denial:
@@ -123,6 +124,7 @@ aca:
 
       minimum_length:
         days: 5
+        adv_days: 10
       maximum_length:
         months: 2
 
