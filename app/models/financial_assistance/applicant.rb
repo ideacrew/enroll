@@ -112,6 +112,14 @@ class FinancialAssistance::Applicant
   field :is_resident_post_092296, type: Boolean, default: false
   field :is_vets_spouse_or_child, type: Boolean, default: false
 
+  # Driver QNs.
+  field :has_job_income, type: Boolean, default: false
+  field :has_self_employment_income, type: Boolean, default: false
+  field :has_other_income, type: Boolean, default: false
+  field :has_deductions, type: Boolean, default: false
+  field :has_enrolled_health_coverage, type: Boolean, default: false
+  field :has_eligible_health_coverage, type: Boolean, default: false
+
   field :workflow, type: Hash, default: { }
   
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
