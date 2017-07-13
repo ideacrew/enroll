@@ -735,7 +735,7 @@ class ConsumerRole
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      user_id: [:fail_dhs!, :fail_dhs, :pass_dhs!, :pass_dhs].include?(aasm.current_event) ? nil : self.updated_by_id
+      user_id: SAVEUSER[:current_user_id]
     )
   end
 
