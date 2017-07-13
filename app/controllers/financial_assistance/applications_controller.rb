@@ -56,7 +56,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def publish_application(application)
-    response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => @application }
+    response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
     notify("acapi.info.events.assistance_application.submitted",
               {:correlation_id => SecureRandom.uuid.gsub("-",""),
                 :body => response_payload,
