@@ -550,7 +550,7 @@ module ApplicationHelper
 
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "local"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
