@@ -24,7 +24,7 @@
                   label: 'No'
                   model: applicant
                   attribute: is_required_to_file_taxes
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
@@ -47,7 +47,7 @@
                   label: 'No'
                   model: applicant
                   attribute: is_joint_tax_filing
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
@@ -70,7 +70,7 @@
                   label: 'No'
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
