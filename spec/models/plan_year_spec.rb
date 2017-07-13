@@ -2497,7 +2497,3 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
     end
   end 
 end
-
-
-
-
