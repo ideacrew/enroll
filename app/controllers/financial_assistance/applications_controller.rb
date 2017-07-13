@@ -36,7 +36,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @model.update_attributes!(permit_params(model_params)) if model_params.present?
     if params.key?(model_name)
      @model.workflow = { current_step: @current_step.to_i + 1}
-     @current_step = @current_step.next_step
+     @current_step = @current_step.next_step if @current_step.present?
     else
      @model.workflow = { current_step: @current_step.to_i}
     end
@@ -47,7 +47,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     elsif params[:commit] == "Submit my Application"
       @application.submit! if @application.complete?
       publish_application(@application)
-      redirect_to eligibility_results_financial_assistance_applications_path
+      dummy_data_for_demo(params) if @application.complete? #Dummy_code_for_DEMO
+      #redirect_to eligibility_results_financial_assistance_application_path(@application)
+      redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
     else
       render 'workflow/step', layout: 'financial_assistance'
     end
@@ -91,10 +93,26 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     render layout: 'financial_assistance'
   end
 
+  def wait_for_eligibility_response
+  end
+
   def eligibility_results
   end
 
   private
+
+  def dummy_data_for_demo(params)
+    #Dummy_ED
+    @model.update_attributes!(aasm_state: "approved", assistance_year: TimeKeeper.date_of_record.year)
+    @model.applicants.each do |applicant|
+      applicant.update_attributes!(is_ia_eligible: true)
+    end
+    @model.tax_households.each do |txh|
+      txh.update_attributes!(allocated_aptc: 200.00)
+      @model.eligibility_determinations.build(max_aptc: 200.00, csr_percent_as_integer: 73, csr_eligibility_kind: "csr_73", determined_on: TimeKeeper.datetime_of_record - 30.days, determined_at: TimeKeeper.datetime_of_record - 30.days, premium_credit_strategy_kind: "allocated_lump_sum_credit", e_pdc_id: "3110344", source: "Admin", tax_household_id: txh.id).save!
+      @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true) if txh.applicants.count > 1
+    end
+  end
 
   def hash_to_param param_hash
     ActionController::Parameters.new(param_hash)

@@ -138,9 +138,9 @@ class FamilyMember
 
   def create_financial_assistance_applicant
     # If there is an application in progress create an applicant for the added family member.
-    if family.application_in_progress.present?
+    # if family.application_in_progress.present? #Review this condition dummy
       family.application_in_progress.applicants.create!({family_member_id: self.id})
-    end
+    # end
   end
 
   def applicant
