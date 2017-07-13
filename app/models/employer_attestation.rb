@@ -52,10 +52,6 @@ class EmployerAttestation
   
     if plan_year.may_schedule_termination?
       plan_year.schedule_termination!
-      plan_year.update_attributes!({
-        end_on: TimeKeeper.date_of_record.end_of_month, 
-        terminated_on: TimeKeeper.date_of_record.end_of_month
-      })
     else
       plan_year.cancel! if plan_year.may_cancel?
     end

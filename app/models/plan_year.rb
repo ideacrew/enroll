@@ -954,7 +954,11 @@ class PlanYear
 
     # Termination pending due to attestation document rejection
     event :schedule_termination, :after => :record_transition do
+<<<<<<< HEAD
       transitions from: :active, to: :termination_pending, :after => :schedule_employee_terminations
+=======
+      transitions from: :active, to: :termination_pending, :after => [:set_termination_date, :schedule_employee_terminations, :cancel_renewal_application]
+>>>>>>> c6ff37862... Refs #16732 moved termination date setter method into plan year
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1023,12 +1027,8 @@ class PlanYear
     end
   end
 
-  def schedule_employee_terminations
-
-  end
-
-  def terminate_employee_enrollments
-
+  def set_termination_date(termination_date = TimeKeeper.date_of_record.end_of_month)
+    self.update_attributes({ end_on: termination_date, terminated_on: termination_date })
   end
 
   def terminate_application
