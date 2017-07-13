@@ -1077,6 +1077,137 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, ".terminate", dbclean: :after_each do
+
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month.next_month }
+  let(:plan_year_status) { 'enrolled' }
+  let(:employer_status) { 'eligible' }
+
+  let!(:employer_profile) { 
+    employer = create(:employer_with_planyear, plan_year_state: plan_year_status, start_on: start_on)
+    employer.update(aasm_state: employer_status)
+    employer
+  }
+
+  let(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+
+  let!(:census_employees){
+    FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+  }
+
+  let!(:plan) {
+    FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: benefit_group.start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  }
+
+  let(:ce) { employer_profile.census_employees.non_business_owner.first }
+
+  let!(:family) {
+    person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes({employee_role: employee_role})
+    Family.find_or_build_from_employee_role(employee_role)
+  }
+
+  let(:person) { family.primary_applicant.person }
+
+  let!(:enrollment) {
+      FactoryGirl.create(:hbx_enrollment,
+       household: family.active_household,
+       coverage_kind: "health",
+       effective_on: benefit_group.start_on,
+       enrollment_kind: "open_enrollment",
+       kind: "employer_sponsored",
+       benefit_group_id: benefit_group.id,
+       employee_role_id: person.active_employee_roles.first.id,
+       benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+       plan_id: plan.id
+       )
+    }
+
+  let(:terminated_on) { TimeKeeper.date_of_record.end_of_month }
+  let(:plan_year) { employer_profile.plan_years.first }
+
+  describe "when employer has non effective plan year" do
+
+    context "employer termination" do
+      before do
+        employer_profile.terminate(terminated_on) 
+      end
+
+      it 'should cancel plan year' do
+        expect(plan_year.canceled?).to be_truthy
+      end
+
+      it 'should cancel employee coverages' do 
+        enrollment.reload
+        expect(enrollment.coverage_canceled?).to be_truthy
+      end
+
+      it 'should revert employer to applicant' do
+        employer_profile.reload
+        expect(employer_profile.applicant?).to be_truthy
+      end
+    end
+  end
+
+  describe "when empoyer has plan year already active" do
+    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:plan_year_status) { 'active' }
+    let(:employer_status) { 'enrolled' }
+
+    context "employer termination" do
+      context 'when termination date in future' do 
+        before do
+          employer_profile.terminate(terminated_on) 
+        end
+
+        it 'should schedule termination on active plan year' do
+          expect(plan_year.termination_pending?).to be_truthy
+        end
+
+        it 'should set termination and end dates on plan year' do
+          expect(plan_year.terminated_on).to eq terminated_on
+          expect(plan_year.end_on).to eq terminated_on
+        end
+
+        it 'should schedule termination on employee enrollments' do
+          enrollment.reload
+          expect(enrollment.coverage_termination_pending?).to be_truthy
+          expect(enrollment.terminated_on).to eq terminated_on
+        end
+
+        it 'should not modify employer status until termination date reached' do
+          expect(employer_profile.enrolled?).to be_truthy
+        end
+      end
+
+      context 'when termination date in past' do
+        let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 2.months }
+        let(:terminated_on) { TimeKeeper.date_of_record.beginning_of_month.prev_day }
+
+        before do
+          employer_profile.terminate(terminated_on) 
+        end
+
+        it 'should terminate active plan year' do
+          expect(plan_year.terminated?).to be_truthy
+        end
+
+        it 'should set termination and end dates on plan year' do
+          expect(plan_year.terminated_on).to eq terminated_on
+          expect(plan_year.end_on).to eq terminated_on
+        end
+
+        it 'should revert employer profile to applicant status' do
+          expect(employer_profile.applicant?).to be_truthy
+        end
+      end
+    end
+  end
+end
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }

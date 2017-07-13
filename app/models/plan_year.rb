@@ -1014,12 +1014,11 @@ class PlanYear
     end
   end
 
-  def coverages_under_plan_year
-    bg_ids = benefit_groups.pluck(:id)
-
-    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-    families.inject([]) do |enrollments, family|
-      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).non_expired_and_non_terminated.to_a
+  def schedule_employee_terminations(terminated_on=TimeKeeper.date_of_record.end_of_month)
+    hbx_enrollments.each do |hbx_enrollment|
+      if hbx_enrollment.may_schedule_coverage_termination?
+        hbx_enrollment.schedule_coverage_termination!(terminated_on)
+      end
     end
   end
 
