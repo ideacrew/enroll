@@ -14,6 +14,7 @@ namespace :reports do
       First_Name
       Last_Name
       Admin_User
+      Admin_User_HBX_ID
       Action_Date
     )
 
@@ -42,6 +43,7 @@ namespace :reports do
               person.first_name,
               person.last_name,
               admin_user.person.full_name,
+              admin_user.person.hbx_id,
               wfst.transition_at
             ]
           end
