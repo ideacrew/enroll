@@ -17,25 +17,25 @@
   <div class="module verification-process col-md-12">
     <% @family_members.each do |f_member| %>
         <% person = f_member.person %>
-        <div class="row">
-          <div class="family-member col-md-12">
-            <div class="person">
-              <%= f_member.person.full_name %>
-            </div>
-            <div class="verification-types col-md-12">
-              <% person.verification_types.each do |v_type| %>
-                  <div class="row">
-                    <div class="v-type col-md-12">
-                      <div class="v-type-name col-md-3">
-                        <%= v_type %>
-                      </div>
-                      <div class="v-type-status col-md-3">
-                        <% if f_member.is_applying_coverage %>
-                             <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
-                               <%= show_v_type(v_type, person) %>
-                             </span>&nbsp;
-                             <%= pundit_span Family, :updateable? %>
-                        <% end %>
+      <div class="row">
+        <div class="family-member col-md-12">
+          <div class="person">
+            <%= f_member.person.full_name %>
+          </div>
+          <div class="verification-types col-md-12">
+            <% person.verification_types.each do |v_type| %>
+                <div class="row">
+                  <div class="v-type col-md-12">
+                    <div class="v-type-name col-md-3">
+                      <%= v_type %>
+                    </div>
+                    <div class="v-type-status col-md-3">
+                      <% if f_member.is_applying_coverage %>
+                           <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
+                             <%= show_v_type(v_type, person) %>
+                           </span>&nbsp;
+                           <%= pundit_span Family, :updateable? %>
+                      <% end %>
                       </div>
                       <div class="v-type-upload col-md-3">
                         <% if type_unverified?(v_type, person) && f_member.is_applying_coverage %>
@@ -128,7 +128,7 @@
                                   <div class="v-doc col-md-11">
                                     <% if vlp_doc.identifier.present? %>
                                         <% key = vlp_doc.identifier.split('#').last %>
-                                        <%= link_to "Document copy for #{vlp_doc.verification_type.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
+                                        <%= link_to "#{vlp_doc.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
                                     <% end %>
                                   </div>
                                   <div class="v-doc col-md-1">
