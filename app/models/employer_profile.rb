@@ -1015,15 +1015,15 @@ class EmployerProfile
   end
 
   def cancel_benefit
-    published_plan_year.cancel
+    published_plan_year.cancel if published_plan_year.present?
   end
 
   def suspend_benefit
-    published_plan_year.suspend
+    published_plan_year.suspend if published_plan_year.present?
   end
 
   def terminate_benefit
-    published_plan_year.terminate
+    published_plan_year.terminate if published_plan_year.present?
   end
 
   def record_transition

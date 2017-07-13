@@ -2467,11 +2467,8 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
   let!(:benefit_group)  { FactoryGirl.create(:benefit_group) }
-  let!(:renewing_plan_year)  { FactoryGirl.create(:plan_year, aasm_state: 'renewing_draft', benefit_groups:[benefit_group],start_on:TimeKeeper.date_of_record.beginning_of_month) }
   let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
-  let!(:renewing_benefit_group) { renewing_plan_year.benefit_groups.first}
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
-  let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: renewing_plan_year.benefit_groups.first.id, aasm_state:'coverage_canceled')}
 
   context 'schedule_termination with active plan year' do
 
@@ -2487,13 +2484,11 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
 
     before do
       employer_profile.plan_years.first.update_attributes(start_on:TimeKeeper.date_of_record.beginning_of_month - 1.year)
-      employer_profile.plan_years << renewing_plan_year
     end 
 
-    it "should termiante active plan year and cancel renewing plan year" do    
+    it "should termiante active plan year" do    
       plan_year.schedule_termination!
       expect(plan_year.aasm_state).to eq "termination_pending"
-      expect(renewing_plan_year.aasm_state).to eq "renewing_canceled"
     end
   end 
 end
