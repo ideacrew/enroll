@@ -2466,7 +2466,6 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
   let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
   let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
   let!(:plan_year) { employer_profile.published_plan_year}
-  let!(:benefit_group)  { FactoryGirl.create(:benefit_group) }
   let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
   let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
 
@@ -2477,18 +2476,6 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
       expect(plan_year.aasm_state).to eq "termination_pending"
       expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
       expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
-    end
-  end 
-
-  context 'schedule_termination with active and renewing plan year' do
-
-    before do
-      employer_profile.plan_years.first.update_attributes(start_on:TimeKeeper.date_of_record.beginning_of_month - 1.year)
-    end 
-
-    it "should termiante active plan year" do    
-      plan_year.schedule_termination!
-      expect(plan_year.aasm_state).to eq "termination_pending"
     end
   end 
 end
