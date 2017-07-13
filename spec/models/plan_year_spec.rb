@@ -398,38 +398,6 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
   end
 
-
-  context "state changes to terminate pending and cancel" do
-    let(:benefit_group) { FactoryGirl.build(:benefit_group) }
-    let(:plan_year_current_effective_date) do
-      py = PlanYear.new(**valid_params)
-      py.aasm_state = 'enrolled'
-      py.start_on = Time.now
-      py.employer_profile = employer_profile
-      py.benefit_groups = [benefit_group]
-      py.save
-      py
-    end
-    let(:plan_year_current_future_date) do
-      py = PlanYear.new(**valid_params)
-      py.aasm_state = 'enrolled'
-      py.start_on = Time.now + 60.days
-      py.employer_profile = employer_profile
-      py.benefit_groups = [benefit_group]
-      py.save
-      py
-    end
-
-    it "should terminate the plan year" do
-      plan_year_current_effective_date.plan_year_on_attestation_rejection
-      expect(plan_year_current_effective_date.aasm_state).to eq "terminate_pending"
-    end
-    it "should cancel the plan year" do
-      plan_year_current_future_date.plan_year_on_attestation_rejection
-      expect(plan_year_current_future_date.aasm_state).to eq "canceled"
-    end
-  end
-
   context "an employer with renewal plan year application" do
 
     let(:benefit_group) { FactoryGirl.build(:benefit_group) }
@@ -2455,3 +2423,81 @@ describe PlanYear, "given a recored rating area value" do
     expect(subject.errors.keys).to include(:recorded_rating_area)
   end
 end
+
+describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :after_all do
+
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:person) { FactoryGirl.create(:person)}
+  let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
+  let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_selected')}
+  let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,aasm_state:'coverage_canceled')}
+
+  context 'should terminate active enrollment' do
+
+    before do
+      allow(plan_year).to receive(:hbx_enrollments).and_return([hbx_enrollment])
+    end
+
+    it "enrollemnt should be in coverage_termination_pending state " do
+      expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_termination_pending"
+    end
+
+  end 
+
+  context 'should not terminate inactive enrollment' do
+
+    before do
+      allow(plan_year).to receive(:hbx_enrollments).and_return([renewing_hbx_enrollment])
+    end
+
+    it "enrollemnt should not be in coverage_termination_pending state" do
+      expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_canceled"
+    end
+  end 
+end
+
+
+describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
+
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:person) { FactoryGirl.create(:person)}
+  let!(:shop_family)       { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
+  let!(:plan_year) { employer_profile.published_plan_year}
+  let!(:benefit_group)  { FactoryGirl.create(:benefit_group) }
+  let!(:renewing_plan_year)  { FactoryGirl.create(:plan_year, aasm_state: 'renewing_draft', benefit_groups:[benefit_group],start_on:TimeKeeper.date_of_record.beginning_of_month) }
+  let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+  let!(:renewing_benefit_group) { renewing_plan_year.benefit_groups.first}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: benefit_group.id,aasm_state:'coverage_selected')}
+  let!(:renewing_hbx_enrollment) {FactoryGirl.create(:hbx_enrollment,household: shop_family.latest_household,benefit_group_id: renewing_plan_year.benefit_groups.first.id, aasm_state:'coverage_canceled')}
+
+  context 'schedule_termination with active plan year' do
+
+    it "should termiante plan year and enrollments" do
+      plan_year.schedule_termination!
+      expect(plan_year.aasm_state).to eq "termination_pending"
+      expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
+      expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
+    end
+  end 
+
+  context 'schedule_termination with active and renewing plan year' do
+
+    before do
+      employer_profile.plan_years.first.update_attributes(start_on:TimeKeeper.date_of_record.beginning_of_month - 1.year)
+      employer_profile.plan_years << renewing_plan_year
+    end 
+
+    it "should termiante active plan year and cancel renewing plan year" do    
+      plan_year.schedule_termination!
+      expect(plan_year.aasm_state).to eq "termination_pending"
+      expect(renewing_plan_year.aasm_state).to eq "renewing_canceled"
+    end
+  end 
+end
+
+
+
+
