@@ -1038,8 +1038,8 @@ class PlanYear
   end
 
   def cancel_renewal_application
-    renewal_plan_year = employer_profile.plan_years.where(:start_on => self.start_on.next_year).first
-    if renewal_plan_year.present?
+    renewing_plan_year = employer_profile.plan_years.where(:start_on => self.start_on.next_year).first
+    if renewing_plan_year.present?
       renewing_plan_year.cancel! if renewing_plan_year.may_cancel?
       renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
     end
