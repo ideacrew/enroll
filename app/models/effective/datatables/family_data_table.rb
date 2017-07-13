@@ -41,7 +41,7 @@ module Effective
         unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
           @families = Queries::FamilyDatatableQuery.new(attributes)
         end
-        @families
+        @families.where("is_active" => true)
       end
 
       def global_search?
