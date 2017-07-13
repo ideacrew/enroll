@@ -16,6 +16,7 @@ namespace :reports do
       HbxId
       First_Name
       Last_Name
+      Verification_Reason
     )
 
     fiels_names_2= %w(
@@ -29,7 +30,9 @@ namespace :reports do
     file_name_2 = "#{Rails.root}/public/people_uploaded_new_documents_report.csv"
 
     CSV.open(file_name_1, "w", force_quotes: true) do |row|
+
       row << fiels_names_1
+
       def verified_succesfully_in_past_week(lpd, start_date, end_date)
         event = lpd.workflow_state_transitions.where(from_state: "verification_pending", to_state: "verification_successful").first
         (start_date.beginning_of_day..end_date.end_of_day).cover? event.transition_at if event.present?
@@ -37,14 +40,27 @@ namespace :reports do
 
       Person.all_consumer_roles.where(:"consumer_role.lawful_presence_determination.aasm_state" => "verification_successful").each do |person|
         begin
-          lpd = person.consumer_role.lawful_presence_determination
+          consumer_role = person.consumer_role
+          lpd = consumer_role.lawful_presence_determination
           if verified_succesfully_in_past_week(lpd, start_date, end_date)
             verified_count += 1
+            verification_reasons = []
+            person.verification_types.each do |v_type|
+              verification_reasons << case v_type
+              when "Social Security Number"
+                consumer_role.ssn_update_reason
+              when "American Indian Status"
+                consumer_role.native_update_reason
+              else
+                consumer_role.lawful_presence_update_reason[:update_reason] if consumer_role.lawful_presence_update_reason.present?
+              end
+            end
 
             row << [
               person.hbx_id,
               person.first_name,
-              person.last_name
+              person.last_name,
+              verification_reasons.compact
             ]
           end
         rescue Exception => e
