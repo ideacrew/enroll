@@ -51,8 +51,11 @@ class EmployerAttestation
     plan_year = self.employer_profile.plan_years.last if plan_year.blank?
   
     if plan_year.may_schedule_termination?
-      plan_year.update(terminated_on: TimeKeeper.date_of_record.end_of_month)
       plan_year.schedule_termination!
+      plan_year.update_attributes!({
+        end_on: TimeKeeper.date_of_record.end_of_month, 
+        terminated_on: TimeKeeper.date_of_record.end_of_month
+      })
     else
       plan_year.cancel! if plan_year.may_cancel?
     end
