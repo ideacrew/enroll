@@ -27,8 +27,8 @@ describe ConsumerRole, dbclean: :after_each do
   describe ".new" do
     let(:valid_params) do
       {
-        is_applicant: is_applicant,
-        person: saved_person
+          is_applicant: is_applicant,
+          person: saved_person
       }
     end
 
@@ -180,7 +180,7 @@ describe "#latest_active_tax_household_with_year" do
 end
 
 context "Verification process and notices" do
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let(:person) {FactoryGirl.create(:person, :with_consumer_role)}
   describe "#has_docs_for_type?" do
     before do
       person.consumer_role.vlp_documents=[]
@@ -389,12 +389,12 @@ context "Verification process and notices" do
     context "coverage_purchased" do
       it "changes state to dhs_pending on coverage_purchased! for non_native without ssn" do
         person.ssn=nil
-        consumer.citizen_status = "not_us"
+        consumer.citizen_status = "non_native_citizen"
         expect(consumer).to transition_from(:unverified).to(:dhs_pending).on_event(:coverage_purchased)
       end
 
       it "changes state to ssa_pending on coverage_purchased! for non_native with SSN" do
-        consumer.citizen_status = "not_us"
+        consumer.citizen_status = "non_native_citizen"
         expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
       end
 
@@ -481,7 +481,7 @@ context "Verification process and notices" do
       end
       it "changes state from dhs_pending to fully_verified" do
         person.ssn=nil
-        consumer.citizen_status = "not_us"
+        consumer.citizen_status = "non_native_citizen"
         expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
@@ -531,12 +531,127 @@ context "Verification process and notices" do
 
         it "change #{state} to dhs_pending if DHS applied" do
           person.ssn=nil
-          consumer.citizen_status = "not_us"
+          consumer.citizen_status = "non_native_citizen"
           expect(consumer).to transition_from(state).to(:dhs_pending).on_event(:redetermine, verification_attr)
           expect(consumer.lawful_presence_determination.verification_pending?).to eq true
         end
       end
     end
+  end
+
+  describe "#check_for_critical_changes" do
+    sensitive_fields = ConsumerRole::VERIFICATION_SENSITIVE_ATTR
+    all_fields = FactoryGirl.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
+    mask_hash = all_fields.map{|v| [v, (sensitive_fields.include?(v) ? "call" : "don't call")]}.to_h
+    subject { ConsumerRole.new(:person => person) }
+    shared_examples_for "reping the hub fo critical changes" do |field, call, params|
+      it "#{call} the hub if #{field} record was changed" do
+        allow(Person).to receive(:person_has_an_active_enrollment?).and_return true
+        if call == "call"
+          expect(subject).to receive(:redetermine!)
+        else
+          expect(subject).to_not receive(:redetermine!)
+        end
+        subject.check_for_critical_changes(params)
+      end
+    end
+    mask_hash.each do |field, action|
+      value = field == "dob" ? "2016-08-08" : "new filed record"
+      it_behaves_like "reping the hub fo critical changes", field, action, {field => value}
+    end
+  end
+end
+
+describe "#find_document" do
+  let(:consumer_role) {ConsumerRole.new}
+  context "consumer role does not have any vlp_documents" do
+    it "it creates and returns an empty document of given subject" do
+      doc = consumer_role.find_document("Certificate of Citizenship")
+      expect(doc).to be_a_kind_of(VlpDocument)
+      expect(doc.subject).to eq("Certificate of Citizenship")
+    end
+  end
+
+  context "consumer role has a vlp_document" do
+    it "it returns the document" do
+      document = consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
+      found_document = consumer_role.find_document("Certificate of Citizenship")
+      expect(found_document).to be_a_kind_of(VlpDocument)
+      expect(found_document).to eq(document)
+      expect(found_document.subject).to eq("Certificate of Citizenship")
+    end
+  end
+end
+
+describe "#find_vlp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:vlp_document) {VlpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a vlp_document without a file uploaded" do
+    before do
+      consumer_role.vlp_documents.build({subject: "Certificate of Citizenship"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_vlp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a vlp_document with a file uploaded" do
+    before do
+      consumer_role.vlp_documents << vlp_document
+    end
+
+    it "returns vlp_document document" do
+      found_document = consumer_role.find_vlp_document_by_key(key)
+      expect(found_document).to eql(vlp_document)
+    end
+  end
+end
+
+describe "#build_nested_models_for_person" do
+  let(:person) {FactoryGirl.create(:person)}
+  let(:consumer_role) {ConsumerRole.new}
+
+  before do
+    allow(consumer_role).to receive(:person).and_return person
+    consumer_role.build_nested_models_for_person
+  end
+
+  it "should get home and mailing address" do
+    expect(person.addresses.map(&:kind)).to include "home"
+    expect(person.addresses.map(&:kind)).to include 'mailing'
+  end
+
+  it "should get home and mobile phone" do
+    expect(person.phones.map(&:kind)).to include "home"
+    expect(person.phones.map(&:kind)).to include "mobile"
+  end
+
+  it "should get emails" do
+    Email::KINDS.each do |kind|
+      expect(person.emails.map(&:kind)).to include kind
+    end
+  end
+end
+
+describe "#latest_active_tax_household_with_year" do
+  include_context "BradyBunchAfterAll"
+  before :all do
+    create_tax_household_for_mikes_family
+    @consumer_role = mike.consumer_role
+    @taxhouhold = mikes_family.latest_household.tax_households.last
+  end
+
+  it "should rerturn active taxhousehold of this year" do
+    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq @taxhouhold
+  end
+
+  it "should rerturn nil when can not found taxhousehold" do
+    expect(ConsumerRole.new.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq nil
   end
 end
 
