@@ -41,7 +41,7 @@
           <td><%=number_to_human_size(doc.size, precision: 2)%></td>
           <td><%= doc.created_at.strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to 'Verify', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            <%= link_to 'View', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
         </tr>
         <% end %>

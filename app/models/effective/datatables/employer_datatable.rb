@@ -145,7 +145,7 @@ module Effective
          attestations:
           [
             {scope: 'employer_attestations', label: 'All'},
-            {scope: 'employer_attestations_submitted', label: 'Submited'},
+            {scope: 'employer_attestations_submitted', label: 'Submitted'},
             {scope: 'employer_attestations_pending', label: 'Pending'},
             {scope: 'employer_attestations_approved', label: 'Approved'},
             {scope: 'employer_attestations_denied', label: 'Denied'},
