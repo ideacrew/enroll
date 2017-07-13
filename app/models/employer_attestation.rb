@@ -47,15 +47,7 @@ class EmployerAttestation
   end
 
   def terminate_employer
-    plan_year = employer_profile.show_plan_year || employer_profile.draft_plan_year
-
-    if plan_year.present?
-      if TimeKeeper.date_of_record >= plan_year.start_on
-        plan_year.schedule_termination! if plan_year.may_schedule_termination?
-      else
-        plan_year.cancel! if plan_year.may_cancel?
-      end
-    end
+    employer_profile.terminate(TimeKeeper.date_of_record.end_of_month)
   end
 
   private

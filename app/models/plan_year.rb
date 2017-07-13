@@ -853,7 +853,7 @@ class PlanYear
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => [:renewal_successful]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-    state :renewing_canceled
+    state :renewing_canceled,          :after_enter => :cancel_application
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
     state :terminated, :after_enter => :terminate_application           # Coverage under this application is terminated
@@ -954,11 +954,7 @@ class PlanYear
 
     # Termination pending due to attestation document rejection
     event :schedule_termination, :after => :record_transition do
-<<<<<<< HEAD
-      transitions from: :active, to: :termination_pending, :after => :schedule_employee_terminations
-=======
-      transitions from: :active, to: :termination_pending, :after => [:set_termination_date, :schedule_employee_terminations, :cancel_renewal_application]
->>>>>>> c6ff37862... Refs #16732 moved termination date setter method into plan year
+      transitions from: :active, to: :termination_pending, :after => [:set_termination_date, :schedule_employee_terminations]
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1037,17 +1033,9 @@ class PlanYear
     employer_profile.benefit_terminated! if employer_profile.may_benefit_terminated?
   end
 
-  def cancel_renewal_application
-    renewing_plan_year = employer_profile.plan_years.where(:start_on => self.start_on.next_year).first
-    if renewing_plan_year.present?
-      renewing_plan_year.cancel! if renewing_plan_year.may_cancel?
-      renewing_plan_year.cancel_renewal! if renewing_plan_year.may_cancel_renewal?
-    end
-  end
-
   def cancel_application
     cancel_employee_enrollments
-    employer_profile.benefit_canceled! if employer_profile.may_benefit_canceled?
+    employer_profile.benefit_canceled! if canceled? && employer_profile.may_benefit_canceled?
   end
 
   def cancel_employee_enrollments

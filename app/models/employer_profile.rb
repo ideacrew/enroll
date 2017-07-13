@@ -986,6 +986,27 @@ class EmployerProfile
     return true unless enforce_employer_attestation?
     employer_attestation.present? && employer_attestation.is_eligible?
   end
+
+  def terminate(termination_date)
+    plan_year = published_plan_year
+    if plan_year.present?
+      if termination_date >= plan_year.start_on
+        plan_year.schedule_termination!(termination_date) if plan_year.may_schedule_termination?
+
+        if termination_date < TimeKeeper.date_of_record
+          plan_year.terminate! if plan_year.may_terminate?
+        end
+      else
+        plan_year.cancel! if plan_year.may_cancel?
+      end
+
+      renewal_plan_year = plan_years.where(:start_on => plan_year.start_on.next_year).first
+      if renewal_plan_year.present?
+        renewal_plan_year.cancel! if renewal_plan_year.may_cancel?
+        renewal_plan_year.cancel_renewal! if renewal_plan_year.may_cancel_renewal?
+      end
+    end
+  end
   
   private
   
