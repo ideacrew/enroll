@@ -148,10 +148,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @family_member_ids = params[:family_member_ids]
-    
+
     shopping_tax_households = get_tax_household_from_family_members(@person, @family_member_ids)
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-
     if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_household = shopping_tax_households
       @max_aptc = total_aptc_on_tax_households(shopping_tax_households, @hbx_enrollment)
@@ -211,7 +210,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def is_eligibility_determined_and_not_csr_100?(person, family_member_ids)
     primary_family = person.primary_family
-    family_members = primary_family.family_members.where(id: family_member_ids)
+    # family_members = primary_family.family_members.where(id: family_member_ids)
     csr_kinds = []
     family_member_ids.each do |key, member|
       applicant = primary_family.active_approved_application.applicants.where(family_member_id: member).first

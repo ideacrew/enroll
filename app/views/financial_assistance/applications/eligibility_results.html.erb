@@ -26,6 +26,12 @@
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
                     <h3>These people <strong> appear to be eligible </strong> for medicaid:</h3>
+                    <% application = FinancialAssistance::Application.find(params[:id]) %>
+                    <% application.applicants.each do |applicant| %>
+                      <% if applicant.is_medicaid_chip_eligible == true %>
+                        <li><%= applicant.person.full_name.titleize  %></li>
+                      <% end %>
+                    <% end %>
                   </div>
                 </div>
 
@@ -46,7 +52,7 @@
                 
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
-                      These people <strong> are eligible for savings of $137 per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance. <br> <br> <br> They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit
+                      These people <strong> are eligible for savings of <%=total_aptc_sum application%> per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance. <br> <br> <br> They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit
                   </div>
                 </div>
 

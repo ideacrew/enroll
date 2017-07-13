@@ -5,11 +5,11 @@
       - section:
           lines:
             - cells:
-                - gutter: 6
+                - gutter: 4
                   type: text
                   text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: person_enrolled
                   value: is_eligible
@@ -20,7 +20,7 @@
                   # checked: true
                   label: 'Eligible'
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 3
                   type: label_radio
                   name: person_enrolled
                   value: is_enrolled
@@ -31,21 +31,21 @@
                   # checked: false
                   label: 'Enrolled'
                   classNames: 'span-text'
-                - gutter: 4
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_enrolled
             - cells:
-                - gutter: 3
+                - gutter: 6
                   type: input_date
                   placeholder: Start On *
                   # required: true
                   id: 'start_on'
                   model: benefit
                   attribute: start_on
-                - gutter: 3
+                - gutter: 6
                   type: input_date
                   placeholder: End On
                   # required: true
@@ -104,7 +104,7 @@
                   type: raw_html
                   text: '<strong> Please Note: </strong> Have this employers Human Resource Department fill out the Employer Coverage Tool to answer the questions in this section.'
                   classNames: 'span-text'
-            - cells:
+            - cells:  
                 - gutter: 12
                   type: input
                   name: employer_name
@@ -135,7 +135,7 @@
                     - employer_address
                   attribute: address_2
             - cells:
-                - gutter: 3
+                - gutter: 4
                   type: input
                   name: city
                   placeholder: CITY*
@@ -145,7 +145,7 @@
                   accessor:
                     - employer_address
                   attribute: city
-                - gutter: 3
+                - gutter: 4
                   type: 'dropdown'
                   name: 'STATE'
                   # required: true
@@ -206,7 +206,7 @@
                   accessor:
                     - employer_address
                   attribute: state
-                - gutter: 3
+                - gutter: 4
                   type: input
                   name: zip
                   placeholder: ZIP *
@@ -236,11 +236,11 @@
                   model: benefit
                   attribute: employer_id
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text: Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: is_eligible
                   id: 'is_eligible_yes'
@@ -249,7 +249,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_waiting_period
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: is_eligible
                   value: false
@@ -258,16 +258,16 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_waiting_period
-                - gutter: 4
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
             - cells:
-                - gutter: 6
+                - gutter: 5
                   type: text
                   text:  Does this employer offer a health plan that meets the minimum value standard ? *
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: employer_sponsored
                   value: true
@@ -276,7 +276,7 @@
                   attribute: is_esi_mec_met
                   label: 'Yes'
                   classNames: 'span-text'
-                - gutter: 1
+                - gutter: 2
                   type: label_radio
                   name: employer_sponsored
                   value: false
@@ -285,7 +285,7 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_mec_met
-                - gutter: 4
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
@@ -294,12 +294,12 @@
                   type: text
                   text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 4
                   type: raw_html
                   text: '| &nbsp <a href=""> Not Sure? </a>'
                   classNames: 'span-text'
             - cells:
-                - gutter: 4
+                - gutter: 6
                   type: input
                   name: amount
                   placeholder: AMOUNT*

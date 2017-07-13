@@ -11,6 +11,8 @@ class TaxHousehold
   include Acapi::Notifiers
   include SetCurrentUser
 
+  before_create :set_effective_starting_on
+
   embedded_in :application, class_name: "FinancialAssistance::Application"
 
   field :hbx_assigned_id, type: Integer
@@ -110,7 +112,6 @@ class TaxHousehold
         aptc_available_amount_hash[applicant_id] = 0 if aptc_available_amount_hash[applicant_id] < 0
       end
     end
-
     aptc_available_amount_hash
   end
 
@@ -190,7 +191,7 @@ class TaxHousehold
     eds = family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
     admin_ed = eds.where(source: "Admin").first
     curam_ed = eds.where(source: "Curam").first
-    return admin_ed if admin_ed.present?
+    return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
     return curam_ed if curam_ed.present?
     return eds.first
   end
@@ -198,5 +199,9 @@ class TaxHousehold
   def eligibility_determinations
     return nil unless family.active_approved_application
     family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
+  end
+
+  def set_effective_starting_on
+    write_attributes(effective_starting_on: TimeKeeper.date_of_record)
   end
 end
