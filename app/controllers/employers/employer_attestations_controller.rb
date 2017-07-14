@@ -25,6 +25,14 @@ class Employers::EmployerAttestationsController < ApplicationController
     @document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
   end
 
+  # def revert_attestation
+  #   attestation = @employer_profile.employer_attestation
+  #   @document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
+  #   @document.submit! if @document.may_submit?
+  #   attestation.submit! if attestation.may_submit?
+  #   redirect_to employer_invoice_exchanges_hbx_profiles_path
+  # end
+
   def create
     @errors = []
     if params[:file]

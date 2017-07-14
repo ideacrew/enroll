@@ -26,7 +26,7 @@ class EmployerAttestation
     end
 
     event :approve, :after => :record_transition do
-      transitions from: [:submitted, :pending, :denied], to: :approved
+      transitions from: [:submitted,:pending], to: :approved
     end
 
     event :deny, :after => :record_transition do

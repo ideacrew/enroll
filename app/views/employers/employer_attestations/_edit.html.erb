@@ -23,10 +23,10 @@
   <table class = "table" style="table-layout: fixed;">
     <thead>
       <tr>
-       <th>Status</th>
+       <th>Doc Status</th>
        <th>Doc Name</th>
        <th>Doc Type</th>
-       <th>Effective Date</th>
+       <th>Size</th>
        <th>Submitted At</th>
        <th></th>
       </tr>
@@ -38,10 +38,10 @@
           <td class='pull-left'><%= truncate doc.title %></td>
           <td><%= "Employer Attestation" %>
           </td>
-          <td></td>
+          <td><%=number_to_human_size(doc.size, precision: 2)%></td>
           <td><%= doc.created_at.strftime('%m/%d/%Y %I:%M%p') %></td>
           <td>
-            <%= link_to 'Verify', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
+            <%= link_to 'View', employers_employer_attestation_verify_attestation_path(doc.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
         </tr>
         <% end %>

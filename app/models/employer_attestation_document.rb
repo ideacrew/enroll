@@ -21,6 +21,7 @@ class EmployerAttestationDocument < Document
     state :submitted, initial: true
     state :accepted, :after_enter => :approve_attestation
     state :rejected
+    state :info_needed
 
     event :accept, :after => :record_transition do
       transitions from: :submitted, to: :accepted
@@ -28,6 +29,14 @@ class EmployerAttestationDocument < Document
 
     event :reject, :after => :record_transition do
       transitions from: :submitted, to: :rejected
+    end
+
+    event :info_needed, :after => :record_transition do
+      transitions from: :submitted, to: :info_needed
+    end
+
+    event :submit, :after => :record_transition do
+      transitions from: :accepted, to: :submitted
     end
   end
  
@@ -42,7 +51,12 @@ class EmployerAttestationDocument < Document
 
   def submit_review(params)
     if [:info_needed, :rejected].include?(params[:status].to_sym)
-      self.reject! if self.may_reject?
+
+      if params[:status].to_sym == :rejected
+        self.reject!
+      elsif params[:status].to_sym == :info_needed
+        self.info_needed!
+      end
 
       if params[:status].to_sym == :info_needed
         employer_attestation.set_pending! if employer_attestation.may_set_pending?
