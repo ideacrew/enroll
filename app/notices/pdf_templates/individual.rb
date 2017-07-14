@@ -13,6 +13,7 @@ module PdfTemplates
     attribute :tax_status, String
     attribute :filer_type, String
     attribute :uqhp_reason, String
+    attribute :reason_for_ineligibility, Array[String]
     attribute :mec, String
     attribute :residency_verified, Boolean, :default => false
     attribute :indian_conflict, Boolean, :default => false
