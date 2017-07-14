@@ -1,13 +1,13 @@
 <div class="col-md-7">
   <div class="row">
-    <div class="col-md-6">
-      <h3 class="title-inline"><b>Add Health Coverages</b></h3>
+    <div class="col-md-8">
+      <h3 class="title-inline"><b>HEALTH COVERAGE for <%= @applicant.family_member.person.first_name.titleize %></b></h3>
     </div>
   </div>
 
   <div>
     <% if @applicant.benefits.present? %>
-      <h4>Edit Existing Health Coverages</h4>
+      <h4>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</h4>
       <table class="table">
         <th>Benefit Type</th>
         <th>Benefit Insurance Type</th>
@@ -24,7 +24,9 @@
       </table>
     <%end%>
   </div>
-  <%= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant) %>
+  <div class="col-md-4 col-sm-4 col-xs-4">
+  <%= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+  </div>
 </div>
 
 <div class="col-md-2">
