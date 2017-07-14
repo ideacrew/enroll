@@ -25,8 +25,4 @@ module DeviseHelper
     html.html_safe
   end
 
-  def recaptcha_site_key
-    Rails.application.secrets.recaptcha_invisible_site_key
-  end
-
 end
