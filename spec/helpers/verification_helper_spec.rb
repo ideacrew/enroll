@@ -383,7 +383,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Return for Deficiency", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB"]
   end
 end

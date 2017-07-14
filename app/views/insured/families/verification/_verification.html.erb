@@ -77,11 +77,11 @@
                       </div>
                       <!-- ==== verification reason ==== -->
 
-                      <!-- ***** Return for Deficiency reason ***** -->
+                      <!-- ***** Reject reason ***** -->
                       <div class="row">
                         <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
                           <div class="col-md-6">
-                            Return for Deficiency reason:
+                            Reject reason:
                           </div>
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
@@ -96,7 +96,7 @@
                           <%end%>
                         </div>
                       </div>
-                      <!-- ==== return for deficiency reason ==== -->
+                      <!-- ==== reject reason ==== -->
 
                       <!-- ***** FEDhub request ***** -->
                       <div class="row">
