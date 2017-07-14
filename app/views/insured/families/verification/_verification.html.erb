@@ -1,8 +1,23 @@
+<div class="row">
+  <div class="col-xs-6">
+    <h4>
+      <% if can_show_due_date?(@person) %>
+          Document Due Date:&nbsp;&nbsp;
+          <% if min_verification_due_date_on_family(@person.primary_family) <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= min_verification_due_date_on_family(@person.primary_family) %> (Past Due)</span>
+          <% else %>
+              <span class="label label-warning"><%= min_verification_due_date_on_family(@person.primary_family) %></span>
+          <% end %>
+      <% end %>
+    </h4>
+  </div>
+</div>
+
 <!--  **** Verification Page redesign #13324  ****  -->
 <h3 class="darkblue no-buffer"> Family Members </h3>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
-    <% contingent_enrolled_active_family_members(@person.primary_family).each do |f_member| %>
+    <% @family_members.each do |f_member| %>
       <% person = f_member.person %>
       <div class="row">
         <div class="family-member col-md-12">
@@ -24,10 +39,11 @@
                     </div>
 
                     <div class="v-type-due-date col-md-3">
-                      <span class="text-danger">Due Date:</span>
+                      <% if can_show_due_date?(@person) %>
+                        <span class="text-danger">Due Date:</span>
                         <%= document_due_date(f_member, f_member.family, v_type).to_date %>
+                      <% end %>
                     </div>
-
 
                     <div class="v-type-upload col-md-3">
                       <% if unverified?(person) %>

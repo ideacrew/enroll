@@ -120,8 +120,7 @@ class DocumentsController < ApplicationController
       family_member.person.consumer_role.special_verifications << sv
       family_member.person.consumer_role.save!
     else
-      # How did this get to here!!!
-      flash[:danger] = "Family Member does not have any active Enrollment to extend verification due date."
+      flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
     end
     render :nothing => true
   end

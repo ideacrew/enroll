@@ -82,9 +82,6 @@ class VlpDocument < Document
   # reasons admin can provide when verifying type
   VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
 
-  # reasons admin can provide while extending due date
-  EXTENSION_REASONS = ["Reason1", "Reason2", "Reason3", "Reason4"]
-
   field :alien_number, type: String
   field :i94_number, type: String
   field :visa_number, type: String
