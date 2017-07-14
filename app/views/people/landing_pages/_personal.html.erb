@@ -109,6 +109,7 @@
 <% end %>
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
-    <span class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));'><i class="fa fa-user-plus"></i> Save</span>
+    <button type="button" class="btn btn-default close_member_form hide"> Cancel</button>
+    <span class='btn btn-lg btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'><i class="fa fa-user-plus"></i> Save</span>
   </div>
 <% end %><br>
