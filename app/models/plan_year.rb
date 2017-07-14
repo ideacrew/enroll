@@ -1027,8 +1027,6 @@ class PlanYear
   end
 
   def terminate_application
-    cancel_renewal_application
-    terminate_employee_enrollments
     employer_profile.benefit_terminated! if employer_profile.may_benefit_terminated?
   end
 
@@ -1038,8 +1036,12 @@ class PlanYear
   end
 
   def cancel_employee_enrollments
-    coverages_under_plan_year.each do |en|
-      en.cancel_coverage! if en.may_cancel_coverage?
+    id_list = benefit_groups.pluck(:id)
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    families.each do |family|
+      family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).non_expired_and_non_terminated.each do |en|
+        en.cancel_coverage! if en.may_cancel_coverage?
+      end
     end
   end
 
