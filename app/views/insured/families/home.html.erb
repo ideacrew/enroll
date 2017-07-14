@@ -1,6 +1,8 @@
-<% content_for :navigation do %>
+<% content_for :left_navigation do %>
   <%= render 'navigation' %>
 <% end %>
+
+<% content_for :main do %>
 <div class="col-xs-12">
   <div id="plan-summary"></div>
 </div>
@@ -29,3 +31,4 @@
   </div>
 </div>
 <%= render 'insured/plan_shoppings/help_with_plan' %>
+<% end %>

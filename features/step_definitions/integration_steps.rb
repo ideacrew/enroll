@@ -568,7 +568,8 @@ When(/^.+ go(?:es)? to register as an employee$/) do
 end
 
 Then(/^.+ should see the employee search page$/) do
-  wait_for_ajax(5)
+  wait_for_ajax(2, 2)
+  sleep(1)
   expect(find('.interaction-field-control-person-first-name')).to be_visible
   screenshot("employer_search")
 end
