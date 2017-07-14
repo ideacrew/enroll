@@ -49,6 +49,7 @@ var Verification = (function(){
 
             "cancel": function(){
               $(this).dialog('close');
+              location.reload(true);
             }
           }
         });
