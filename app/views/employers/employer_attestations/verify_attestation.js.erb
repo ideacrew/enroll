@@ -8,10 +8,12 @@ $("input[name='status']").click(function(){
     if ($(this).val() === 'rejected' || $(this).val() === 'info_needed') {
         $('.rejection_reason').removeClass('hidden');
         $('#attestation_submit').addClass('disabled');
+        $("input[name='other_reason']").val('');
     }
     else {
         $('.rejection_reason').addClass('hidden');
         $("input[name='other_reason']").addClass('hidden');
+         $('#attestation_submit').removeClass('disabled');
     }
 });
 
@@ -30,7 +32,12 @@ function rejectReason() {
 }
 
 $("input[name='other_reason']").on('change keydown paste input', function(){
-    $('#attestation_submit').removeClass('disabled');
+    if ($("input[name='other_reason']").val() == '') {
+        $('#attestation_submit').addClass('disabled');
+    }
+    else {
+        $('#attestation_submit').removeClass('disabled');
+    }
 });
 
 $('#attestation_submit').click(function() {
