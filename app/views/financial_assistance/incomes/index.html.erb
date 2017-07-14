@@ -1,13 +1,13 @@
 <div class="col-md-7">
   <div class="row">
     <div class="col-md-6">
-      <h3 class="title-inline"><b>Add Incomes</b></h3>
+      <h3 class="title-inline"><b>INCOME for <%= @applicant.family_member.person.first_name.titleize %></b></h3>
     </div>
   </div>
 
   <div>
     <% if @applicant.incomes.present? %>
-      <h4>Edit Existing Incomes</h4>
+      <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
       <table class="table">
         <th>Income Type</th>
         <th></th>
@@ -21,8 +21,10 @@
         <% end %>
       </table>
     <%end%>
-    </ div>
-    <%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant) %>
+    </div>
+    <div class="col-md-4 col-sm-4 col-xs-4">
+    <%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant), class: "btn btn-default center-block" %>
+    </div>
   </div>
 </div>
 
