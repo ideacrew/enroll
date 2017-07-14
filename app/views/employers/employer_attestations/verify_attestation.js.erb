@@ -41,7 +41,8 @@ $("input[name='other_reason']").on('change keydown paste input', function(){
 });
 
 $('#attestation_submit').click(function() {
-    var new_val = $("input[name='status']:checked").val()
-    var prev_val = $("input[name='prev_status']").val()
-    alert('Are You Sure? Changing Employer Attestation Documentation status from '+ prev_val + ' to ' + new_val)
+    var confirmation = confirm('Are You Sure? Changing Employer Attestation Documentation status from '+ $("input[name='prev_status']").val() + ' to ' + $("input[name='status']:checked").val());
+    if (confirmation != true) {
+      return false;
+    }
 })
