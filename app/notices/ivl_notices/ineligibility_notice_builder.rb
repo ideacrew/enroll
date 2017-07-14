@@ -32,7 +32,6 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
   end
 
   def build
-    family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
@@ -44,8 +43,9 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
   end
 
   def append_data
-    notice.has_applied_for_assistance = applications.where(:assistance_year => TimeKeeper.date_of_record.year).present?
-    latest_application = recipient.primary_family.applications.sort_by(&:submitted_at).last
+    family = recipient.primary_family
+    notice.has_applied_for_assistance = family.applications.where(:assistance_year => TimeKeeper.date_of_record.year).present?
+    latest_application = family.applications.sort_by(&:submitted_at).last
     if (notice.has_applied_for_assistance && latest_application.present? && latest_application.is_family_totally_ineligibile)
       notice.request_full_determination = latest_application.request_full_determination
       notice.is_family_totally_ineligibile = latest_application.is_family_totally_ineligibile
@@ -53,19 +53,26 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
         notice.individuals << append_family_members(person)
       end
     else
-      recipient.primary_family.family_members.map(&:person).uniq.each do |person|
+      family.family_members.map(&:person).uniq.each do |person|
         notice.individuals << append_family_members(person)
       end
     end
   end
 
   def append_family_members(person)
-    params = {full_name: person.full_name}
-    if consumer_role = person.consumer_role
-      params.merge!({
-        :age => person.age_on(TimeKeeper.date_of_record)
-        })
-    end
+    reason_for_ineligibility = []
+    reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state" if !person.is_dc_resident?
+    reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction" if person.is_incarcerated
+    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465" if lawful_presence_outstanding?(person)
+
+    params = {full_name: person.full_name,
+              :age => person.age_on(TimeKeeper.date_of_record),
+              :reason_for_ineligibility =>  reason_for_ineligibility
+            }
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
   def append_address(primary_address)
