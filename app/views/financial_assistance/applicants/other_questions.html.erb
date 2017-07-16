@@ -1,0 +1,442 @@
+<form action="save_questions" method="get">
+<div class="col-md-7">
+  <p class="alert alert-error hide"></p>
+  <h1 class="darkblue">Other Questions for ksjdf</h1>
+  <p>Tell us about this person's other questions. When you're finished select CONTINUE.</p>
+  <p class="memo">* = required field</p>
+  
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Has this person applied for an SSN *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_ssn_applied" id="is_ssn_applied_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_ssn_applied" id="is_ssn_applied_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_ssn_applied_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Is this person pregnant? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_pregnant" id="is_pregnant_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_pregnant_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_pregnant" id="is_pregnant_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_pregnant_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Pregnency Due date</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="text" name="pregnancy_due_on" id="applicant_pregnancy_due_on" placeholder="Due date" class="jq-datepicker" />
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>How many children is this person expecting?</span>
+  </div>
+  
+  <div class='col-md-3'>
+  <label></label>
+  <!--This is for Titleizing dropdown values with underscores -->
+  
+  <select name="children_expected_count" id="applicant_children_expected_count" class="form-control"><option value=""> NONE</option>
+  <option value="one">one</option>
+  <option value="two">two</option>
+  <option value="three">three</option></select>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Was this person pregnant in the last 60 days?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_post_partum_period" id="is_post_partum_period_yes" value="true" class="radio-yml" />
+  <label class="radio-yml" for="is_post_partum_period_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_post_partum_period" id="is_post_partum_period_no" value="false" class="radio-yml" />
+  <label class="radio-yml" for="is_post_partum_period_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Pregnency End on date</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="text" name="pregnancy_end_on" id="applicant_pregnancy_end_on" placeholder="End on date" class="jq-datepicker" />
+  
+  <!--TODO : move this to assets-->
+  
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Was this person on Medicaid during pregnency?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_enrolled_on_medicaid" id="medicaid_pregnency_yes" value="true" class="radio-yml" />
+  <label class="radio-yml" for="medicaid_pregnency_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_enrolled_on_medicaid" id="medicaid_pregnency_no" value="false" class="radio-yml" />
+  <label class="radio-yml" for="medicaid_pregnency_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Was this person in foster care at age 18 or older? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_former_foster_care" id="former_foster_care_yes" value="true" class="radio-yml" />
+  <label class="radio-yml" for="former_foster_care_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_former_foster_care" id="former_foster_care_no" value="false" class="radio-yml" />
+  <label class="radio-yml" for="former_foster_care_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Where was this person in foster care?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <label></label>
+  <!--This is for Titleizing dropdown values with underscores -->
+  
+  <select name="foster_care_us_state" id="applicant_foster_care_us_state" class="form-control"><option value=""> NONE</option><option value="Choose State">Choose State</option>
+  <option value="AL">AL</option>
+  <option value="AK">AK</option>
+  <option value="AZ">AZ</option>
+  <option value="AR">AR</option>
+  <option value="CA">CA</option>
+  <option value="CO">CO</option>
+  <option value="CT">CT</option>
+  <option value="DE">DE</option>
+  <option value="DC">DC</option>
+  <option value="FL">FL</option>
+  <option value="GA">GA</option>
+  <option value="HI">HI</option>
+  <option value="ID">ID</option>
+  <option value="IL">IL</option>
+  <option value="IN">IN</option>
+  <option value="IA">IA</option>
+  <option value="KS">KS</option>
+  <option value="KY">KY</option>
+  <option value="LA">LA</option>
+  <option value="ME">ME</option>
+  <option value="MD">MD</option>
+  <option value="MA">MA</option>
+  <option value="MI">MI</option>
+  <option value="MN">MN</option>
+  <option value="MS">MS</option>
+  <option value="MO">MO</option>
+  <option value="MT">MT</option>
+  <option value="NE">NE</option>
+  <option value="NV">NV</option>
+  <option value="NH">NH</option>
+  <option value="NJ">NJ</option>
+  <option value="NY">NY</option>
+  <option value="NC">NC</option>
+  <option value="ND">ND</option>
+  <option value="OH">OH</option>
+  <option value="OK">OK</option>
+  <option value="OR">OR</option>
+  <option value="PA">PA</option>
+  <option value="PR">PR</option>
+  <option value="RI">RI</option>
+  <option value="SC">SC</option>
+  <option value="SD">SD</option>
+  <option value="TN">TN</option>
+  <option value="TX">TX</option>
+  <option value="UT">UT</option>
+  <option value="VT">VT</option>
+  <option value="WA">WA</option>
+  <option value="WV">WV</option>
+  <option value="WI">WI</option>
+  <option value="WY">WY</option></select>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>How old was this person when they left foster care?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <label></label>
+  <select name="age_left_foster_care" id="applicant_age_left_foster_care" class="form-control"><option value=""> NONE</option><option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+  <option value="13">13</option>
+  <option value="14">14</option>
+  <option value="15">15</option>
+  <option value="16">16</option>
+  <option value="17">17</option>
+  <option value="18">18</option>
+  <option value="19">19</option>
+  <option value="20">20</option>
+  <option value="21">21</option>
+  <option value="22">22</option>
+  <option value="23">23</option>
+  <option value="24">24</option>
+  <option value="25">25</option>
+  <option value="26">26</option>
+  <option value="27">27</option>
+  <option value="28">28</option>
+  <option value="29">29</option>
+  <option value="30">30</option>
+  <option value="31">31</option>
+  <option value="32">32</option></select>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Was this person enrolled in Medicaid when they left foster care?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="had_medicaid_during_foster_care" id="had_medicaid_during_foster_care_yes" value="true" class="radio-yml" />
+  <label class="radio-yml" for="had_medicaid_during_foster_care_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="had_medicaid_during_foster_care" id="had_medicaid_during_foster_care_no" value="false" class="radio-yml" checked="checked" />
+  <label class="radio-yml" for="had_medicaid_during_foster_care_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Is this person a student? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_student" id="is_student_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_student_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_student" id="is_student_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_student_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>What is the type of student?</span>
+  </div>
+  
+  <div class='col-md-3'>
+  <label></label>
+  <!--This is for Titleizing dropdown values with underscores -->
+  
+  <select name="student_kind" id="applicant_student_kind" class="form-control"><option value=""> NONE</option><option value="Dropout">Dropout</option>
+  <option value="Full Time">Full Time</option>
+  <option value="Graduated">Graduated</option>
+  <option value="Half Time">Half Time</option>
+  <option value="Part Time">Part Time</option>
+  <option value="Not In School">Not In School</option></select>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Student status end on date?</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="text" name="student_status_end_on" id="applicant_student_status_end_on" placeholder="End on" class="jq-datepicker" />
+  
+  <!--TODO : move this to assets-->
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>What type of school do you go to?</span>
+  </div>
+  
+  <div class='col-md-3'>
+  <label></label>
+  <!--This is for Titleizing dropdown values with underscores -->
+  
+  <select name="student_school_kind" id="applicant_student_school_kind" class="form-control"><option value=""> NONE</option><option value="Pre School">Pre School</option>
+  <option value="Graduate School">Graduate School</option>
+  <option value="English Language Institute">English Language Institute</option>
+  <option value="Open University">Open University</option>
+  <option value="Primary">Primary</option>
+  <option value="Elementary">Elementary</option>
+  <option value="GED">GED</option>
+  <option value="Junior School">Junior School</option>
+  <option value="Secondary (High School)">Secondary (High School)</option>
+  <option value="Equivalent Vocational/Tech">Equivalent Vocational/Tech</option>
+  <option value="Vocational">Vocational</option>
+  <option value="Technical">Technical</option>
+  <option value="Undergraduate">Undergraduate</option></select>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Is this person blind? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_self_attested_blind" id="is_self_attested_blind_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_self_attested_blind_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="is_self_attested_blind" id="is_self_attested_blind_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="is_self_attested_blind_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Does this person need help with daily life activities, such as dressing or bathing? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="has_daily_living_help" id="has_daily_living_help_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="has_daily_living_help_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="has_daily_living_help" id="has_daily_living_help_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="has_daily_living_help_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-6'>
+  <span class='span-text'>Does this person need help paying for any medical bills from the last 3 months? *</span>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="need_help_paying_bills" id="need_help_paying_bills_yes" value="true" class="radio-yml" required="required" />
+  <label class="radio-yml" for="need_help_paying_bills_yes">Yes</label>
+  </div>
+  
+  <div class='col-md-2'>
+  <input type="radio" name="need_help_paying_bills" id="need_help_paying_bills_no" value="false" class="radio-yml" required="required" />
+  <label class="radio-yml" for="need_help_paying_bills_no">No</label>
+  </div>
+  
+  </div>
+  <div class="row row-form-wrapper no-buffer row-height">
+  
+  <div class='col-md-12'>
+  Help may include 
+  <span data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, 
+  <span data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, 
+  or <span data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan's metal level." class= "dottedline test">cost-sharing reductions</span>
+  
+  
+  </div>
+  
+  </div>
+  <br><br>
+  
+  </div>
+  <div class="col-md-2">
+  <%# This will eventually change to the applicant's other questions steps when it's done %>
+  <%#= link_to edit_financial_assistance_application_path(@application) do %>
+    <button id="btn-continue" class="button btn btn-lg btn-primary" type="submit">CONTINUE</button>
+  <%# end %>
+
+  <ul class="list-unstyled list-right-section">
+    <li>
+      <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+        <%= image_tag 'icons/list.png' %> PREVIOUS
+      <% end %>
+    </li>
+  </ul>
+</div>
+</form>
+
+<script>
+$(function(){
+  var applicantValues = {};
+  <% @applicant.attributes.each do |key,value| %>
+    applicantValues["<%=key%>"] = "<%=value%>";
+  <%end%>
+  console.log(applicantValues)
+  var radioButtons = $('input[type=radio]');
+  var allnames = {};
+  for(var i=0;i<radioButtons.length;i++) {
+    allnames[$(radioButtons[i]).attr('name')] = true;
+  }
+  allnames = Object.keys(allnames);
+  for(var i=0;i<allnames.length;i++) {
+    if(applicantValues[allnames[i]] == "true") {
+      $($('input[name='+allnames[i]+']')[0]).prop("checked", true);
+    }
+    else if(applicantValues[allnames[i]] == "false") {
+      $($('input[name='+allnames[i]+']')[1]).prop("checked", true);
+    }
+  }
+  $('[name=pregnancy_due_on]').val(applicantValues["pregnancy_due_on"]);
+  $('[name=student_status_end_on]').val(applicantValues["student_status_end_on"]);
+  $('[name=pregnancy_end_on]').val(applicantValues["pregnancy_end_on"]);
+});
+</script>
+  

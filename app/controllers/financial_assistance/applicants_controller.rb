@@ -11,6 +11,24 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     render layout: 'financial_assistance'
   end
 
+  def other_questions
+     @applicant = @application.applicants.find(params[:id])
+     render layout: 'financial_assistance'
+  end
+
+  def save_questions
+    applicant = @application.applicants.find(params[:id])
+    params.each do |key,value|
+      if(key == "controller" || key == "id" || key == "action" || key == "application_id")
+        next
+      else
+        applicant[key] = value
+      end
+    end
+    applicant.save!
+    redirect_to edit_financial_assistance_application_path(@application)
+  end
+
   def step
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
