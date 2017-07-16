@@ -2,6 +2,9 @@ $('.attestation_form').html("<%= escape_javascript(render "verify_attestation") 
 $('.attestation_form').show();
 $('#reviewClose').click(function() {
     $('.attestation_form').hide();
+    event.preventDefault();
+    $('tr.child-row:visible').remove();
+    $('#attestation_documents_table').hide();
 });
 
 $("input[name='status']").click(function(){

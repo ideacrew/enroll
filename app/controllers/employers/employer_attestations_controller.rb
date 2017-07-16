@@ -25,17 +25,10 @@ class Employers::EmployerAttestationsController < ApplicationController
     @document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
   end
 
-  # def revert_attestation
-  #   attestation = @employer_profile.employer_attestation
-  #   @document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
-  #   @document.submit! if @document.may_submit?
-  #   attestation.submit! if attestation.may_submit?
-  #   redirect_to employer_invoice_exchanges_hbx_profiles_path
-  # end
-
   def create
     @errors = []
     if params[:file]
+      # I could not see this helper
       @employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
@@ -51,22 +44,26 @@ class Employers::EmployerAttestationsController < ApplicationController
           flash[:error] = "Could not save file. " + errors.join(". ")
         end
       else
-        flash[:error] = "Could not save file"
+        flash[:error] = "Could not save the file in S3 storage"
       end
     else
       flash[:error] = "Please upload file"
     end
 
-    redirect_to "/employers/employer_profiles/#{@employer_profile.id}"+'?tab=documents'
+    redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
   end
 
+  # It requires special attention on updating when reject and required more info.
+  # Needs update on conditional loop
   def update
     attestation = @employer_profile.employer_attestation
     document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
 
-    if document.present?
+    if document.present? && attestation.aasm_state!="approved"
       document.submit_review(params)
       flash[:notice] = "Employer attestation updated successfully"
+    elsif
+      flash[:notice] = "Attestation document is already been approved"
     else
       flash[:error] = "Failed: Unable to find attestation document."
     end
