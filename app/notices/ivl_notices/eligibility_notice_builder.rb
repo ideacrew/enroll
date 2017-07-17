@@ -32,7 +32,6 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
   end
 
   def build
-    family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
@@ -44,18 +43,38 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
   end
 
   def append_data
-    recipient.primary_family.family_members.map(&:person).uniq.each do |person|
-      notice.individuals << append_family_members(person)
+    #Family has many applications - Pull the right application.
+    family = recipient.primary_family
+    application = recipient.primary_family.applications.first
+    latest_application = family.applications.sort_by(&:submitted_at).last
+    latest_application.applicants.each do |applicant|
+      notice.individuals << append_applicant_information(applicant)
+    end
+    latest_application.tax_households.each do |th|
+      notice.tax_households << append_tax_households(th)
     end
   end
 
-  def append_family_members(person)
-    params = {full_name: person.full_name}
-    if consumer_role = person.consumer_role
-      params.merge!({
-        :age => person.age_on(TimeKeeper.date_of_record)
-        })
-    end
+  def append_tax_households(th)
+    params = {
+              csr_percent_as_integer: th.preferred_eligibility_determination.csr_percent_as_integer,
+              max_aptc: th.preferred_eligibility_determination.max_aptc,
+              aptc_csr_annual_household_income: th.preferred_eligibility_determination.aptc_csr_annual_household_income,
+              aptc_annual_income_limit: th.preferred_eligibility_determination.aptc_annual_income_limit,
+              csr_annual_income_limit: th.preferred_eligibility_determination.csr_annual_income_limit
+              }
+  end
+
+  def append_applicant_information(applicant)
+    params = {
+              full_name: applicant.person.full_name,
+              age: applicant.person.age_on(TimeKeeper.date_of_record),
+              is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,
+              is_ia_eligible: applicant.is_ia_eligible,
+              is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
+              is_without_assistance: applicant.is_without_assistance,
+              is_totally_ineligible: applicant.is_totally_ineligible
+              }
   end
 
   def append_address(primary_address)
