@@ -405,6 +405,15 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :verification_outstanding
+      transitions from: :dhs_pending, to: :verification_outstanding
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+      transitions from: :verification_period_ended, to: :verification_outstanding
+    end
+
     event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
@@ -669,6 +678,28 @@ class ConsumerRole
     person.verification_types.each do |v_type|
       update_verification_type(v_type, "person is fully verified", lawful_presence_determination.try(:vlp_authority))
     end
+  end
+
+  def admin_verification_action(admin_action, v_type, update_reason)
+    case admin_action
+      when "verify"
+        update_verification_type(v_type, update_reason)
+      when "return_for_deficiency"
+        return_doc_for_deficiency(v_type, update_reason)
+    end
+  end
+
+  def return_doc_for_deficiency(v_type, update_reason, *authority)
+    if v_type == "Social Security Number"
+      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason)
+    elsif v_type == "American Indian Status"
+      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason)
+    else
+      lawful_presence_determination.deny!(verification_attr(authority.first))
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    end
+    reject!(verification_attr(authority.first))
+    "#{v_type} was returned for deficiency."
   end
 
   def update_verification_type(v_type, update_reason, *authority)

@@ -5,60 +5,80 @@ var Verification = (function(){
    function showVerifyType(target){
        $('#'+target_id(target)).fadeIn('slow');
    }
+   function showReturnForDef(target){
+       $('#'+target_id(target)+'-return').fadeIn('slow');
+   }
+   function showHubCall(target){
+       $('#'+target_id(target)+'-hub').fadeIn('slow');
+   }
    function hideAllActions(target){
-      hideVerifyAction(target);
+       hideVerifyAction(target);
+       hideReturnForDef(target);
+       hideHubCall(target);
    }
    function hideVerifyAction(target){
-      $('#'+target_id(target)).hide();
+       $('#'+target_id(target)).hide();
+   }
+   function hideReturnForDef(target){
+       $('#'+target_id(target)+'-return').hide();
+   }
+   function hideHubCall(target){
+       $('#'+target_id(target)+'-hub').hide();
    }
    function confirmVerificationType(){
-      $(this).closest('div').parent().hide();
+       $(this).closest('div').parent().hide();
    }
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
 
-    switch ($selected_el_val) {
-      case 'Verify':
-        hideAllActions($selected_id);
-        showVerifyType($selected_id);
-        break;
+     switch ($selected_el_val) {
+         case 'Verify':
+             hideAllActions($selected_id);
+             showVerifyType($selected_id);
+             break;
+         case 'Return for Deficiency':
+             hideAllActions($selected_id);
+             showReturnForDef($selected_id);
+             break;
+         case 'Call HUB':
+             hideAllActions($selected_id);
+             showHubCall($selected_id);
+             break;
+         case 'Extend':
+            hideAllActions($selected_id);
+            var target = $(event.target).attr('class').split('fmv')
+            var attrs = target[target.length - 2].split("-")
+            $("#extend-due-date").dialog({
+              buttons: {
+                "confirm": function() {
+                  $(this).dialog('close');
+                  $.ajax({
+                    url: "/documents/extend_due_date",
+                    data: {
+                      verification_type: attrs[attrs.length - 1],
+                      family_member_id: attrs[attrs.length - 2]
+                    },
+                    type: "PUT",
+                    success: function(){
+                      location.reload(true);
+                    }
 
-      case 'Extend':
-        hideAllActions($selected_id);
-        var target = $(event.target).attr('class').split('fmv')
-        var attrs = target[target.length - 2].split("-")
-        $("#extend-due-date").dialog({
-          buttons: {
-            "confirm": function() {
-              $(this).dialog('close');
-              $.ajax({
-                url: "/documents/extend_due_date",
-                data: {
-                  verification_type: attrs[attrs.length - 1],
-                  family_member_id: attrs[attrs.length - 2]
+                  });
                 },
-                type: "PUT",
-                success: function(){
+
+                "cancel": function(){
+                  $(this).dialog('close');
                   location.reload(true);
                 }
-
-              });
-            },
-
-            "cancel": function(){
-              $(this).dialog('close');
-              location.reload(true);
-            }
-          }
-        });
-        break;
-
-      default:
-        hideAllActions($selected_id);
-    }
-    }
+              }
+            });
+            break;
+         default:
+             hideAllActions($selected_id);
+     }
+   }
 
    return {
        show_update: showVerifyType,
