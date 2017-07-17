@@ -4,14 +4,14 @@ class UpdateCarrierAppointments < MongoidMigrationTask
   def migrate
 
     mappings = {
-                "Altus Dental" => "Altus Dental",
-                "Blue Cross Blue Shield of MA" => "Blue Cross Blue Shield of MA",
-                "Boston Medical Center Health Planc" => "Boston Medical Center Health Planc",
-                "Delta Dental" => "Delta Dental",
+                "Altus" => "Altus",
+                "Blue Cross Blue Shield MA" => "Blue Cross Blue Shield MA",
+                "Boston Medical Center Health Plan" => "Boston Medical Center Health Plan",
+                "Delta" => "Delta",
                 "FCHP" => "FCHP",
                 "Guardian" => "Guardian",
                 "Health New England" => "Health New England",
-                "Harvard Pilgrim Health Car" => "Harvard Pilgrim Health Car",
+                "Harvard Pilgrim Health Care" => "Harvard Pilgrim Health Care",
                 "Minuteman Health" => "Minuteman Health",
                 "Neighborhood Health Plan" => "Neighborhood Health Plan",
                 "Tufts Health Plan Direct" => "Tufts Health Plan Direct",

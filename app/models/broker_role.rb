@@ -14,14 +14,14 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  BROKER_CARRIER_APPOINTMENTS = {"Altus Dental" => nil,
-    "Blue Cross Blue Shield of MA" => nil,
-     "Boston Medical Center Health Planc" => nil,
-     "Delta Dental" => nil,
+  BROKER_CARRIER_APPOINTMENTS = {"Altus" => nil,
+    "Blue Cross Blue Shield MA" => nil,
+     "Boston Medical Center Health Plan" => nil,
+     "Delta" => nil,
      "FCHP" => nil,
      "Guardian" => nil,
      "Health New England" => nil,
-     "Harvard Pilgrim Health Car" => nil,
+     "Harvard Pilgrim Health Care" => nil,
      "Minuteman Health" => nil,
      "Neighborhood Health Plan" => nil,
      "Tufts Health Plan Direct" => nil,
