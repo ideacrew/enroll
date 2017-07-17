@@ -92,17 +92,28 @@ module Factories
       @plan_year_start_on = renewing_plan_year.start_on if renewing_plan_year.present?
     end
 
+    def renewal_assignment
+      assignment = renewing_plan_year.active? ? census_employee.active_benefit_group_assignment 
+           : census_employee.renewal_benefit_group_assignment
+
+      (assignment.present? && renewing_plan_year.benefit_groups.pluck(:_id).include?(assignment.benefit_group_id)) ? assignment : nil
+    end
+
     def verify_and_populate_benefit_group_assignment
-      if census_employee.renewal_benefit_group_assignment.blank?
+      if renewal_assignment.blank?
         benefit_group = renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
-        census_employee.add_renew_benefit_group_assignment(benefit_group)
+        if renewing_plan_year.active?
+          census_employee.add_benefit_group_assignment(benefit_group, benefit_group.start_on)
+        else
+          census_employee.add_renew_benefit_group_assignment(benefit_group)
+        end
         census_employee.save!
       end
     end
 
     def renewal_plan_offered_by_er?(enrollment)
       if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
-        benefit_group = census_employee.renewal_benefit_group_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
+        benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
         elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
       else

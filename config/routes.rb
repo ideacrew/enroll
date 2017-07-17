@@ -164,6 +164,7 @@ Rails.application.routes.draw do
         get 'check_qle_date'
         get 'check_move_reason'
         get 'check_insurance_reason'
+        get 'check_marriage_reason'
         get 'purchase'
         get 'family'
         get 'upload_notice_form'
@@ -495,7 +496,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :enrollment_docs_state
       put :extend_due_date
-      get :fed_hub_request
+      post :fed_hub_request
     end
   end
 
