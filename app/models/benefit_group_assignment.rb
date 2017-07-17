@@ -139,7 +139,7 @@ class BenefitGroupAssignment
 
       families.each do |family|
         family.households.each do |household|
-          household.hbx_enrollments.each do |enrollment|
+          household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
             if enrollment.benefit_group_assignment_id == self.id
               @hbx_enrollment = enrollment
             end

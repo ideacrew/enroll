@@ -15,12 +15,12 @@ Then (/(.*) sign in to portal/) do |name|
 end
 
 And (/Employee should see a button to enroll in ivl market/) do
-  expect(page).to have_content "Enroll for health or dental coverage on the IVL market"
+  expect(page).to have_content "Enroll in health or dental coverage on the District of Columbia's individual market"
   expect(page).to have_link "Enroll"
 end
 
 Then (/Dual Role Person should not see any button to enroll in ivl market/) do
-  expect(page).not_to have_content "Enroll for health or dental coverage on the IVL market"
+  expect(page).not_to have_content "Enroll in health or dental coverage on the District of Columbia's individual market"
   expect(page).not_to have_link "Enroll"
 end
 
