@@ -17,15 +17,8 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def save_questions
-    applicant = @application.applicants.find(params[:id])
-    params.each do |key,value|
-      if(key == "controller" || key == "id" || key == "action" || key == "application_id")
-        next
-      else
-        applicant[key] = value
-      end
-    end
-    applicant.save!
+    @applicant = @application.applicants.find(params[:id])
+    @applicant.update_attributes!(permit_params(params[:applicant]))
     redirect_to edit_financial_assistance_application_path(@application)
   end
 

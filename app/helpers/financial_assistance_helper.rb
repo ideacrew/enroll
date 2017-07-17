@@ -16,4 +16,10 @@ module FinancialAssistanceHelper
     application = FinancialAssistance::Application.find(application_id)
     application.applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
   end
+
+  def applicant_age applicant
+    now = Time.now.utc.to_date
+    dob = applicant.family_member.person.dob
+    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+  end
 end

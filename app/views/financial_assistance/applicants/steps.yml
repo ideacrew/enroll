@@ -22,7 +22,7 @@
                   name: row2
                   value: false
                   id: 'income_from_employer_no'
-                  required: false
+                  required: true
                   label: 'No'
                   model: applicant
                   attribute: has_job_income
@@ -72,7 +72,7 @@
                   name: row2
                   value: false
                   id: 'other_income_no'
-                  required: false
+                  required: true
                   label: 'No'
                   model: applicant
                   attribute: has_other_income
