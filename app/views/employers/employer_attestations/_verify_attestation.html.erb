@@ -82,7 +82,11 @@
               <div class="row">
                 <div class="col-sm-12">
                    <div class="form-group pull-right">
-                    <button type="submit" id = "attestation_submit" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>">Submit</button>
+                    <%if @document.may_accept? %>
+                       <button type="submit" id = "attestation_submit" class='btn btn-primary'>Submit</button>
+                    <%else%>
+                       <button type="button" class="btn disabled"> Submit </button>
+                    <%end%>
                      <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
                   </div>
                 </div>

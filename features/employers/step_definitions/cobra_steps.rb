@@ -29,6 +29,11 @@ def people_for_cobra
       email: "jack@dc.gov",
       password: 'aA1!aA1!aA1!'
     },
+
+    "Hbx Admin" => {
+        email: 'admin@dc.gov',
+        password: 'aA1!aA1!aA1!'
+    },
   }
 end
 

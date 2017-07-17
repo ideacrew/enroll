@@ -28,11 +28,10 @@ class Employers::EmployerAttestationsController < ApplicationController
   def create
     @errors = []
     if params[:file]
-      # I could not see this helper
-      @employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
+      #@employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
-      if doc_uri.present?
+      if doc_uri.present? and @employer_profile.employer_attestation
         attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
         success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size, :format => "application/pdf"})
         errors = attestation_document.errors.full_messages unless success
@@ -53,17 +52,13 @@ class Employers::EmployerAttestationsController < ApplicationController
     redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
   end
 
-  # It requires special attention on updating when reject and required more info.
-  # Needs update on conditional loop
   def update
     attestation = @employer_profile.employer_attestation
     document = attestation.employer_attestation_documents.find(params[:employer_attestation_id])
 
-    if document.present? && attestation.aasm_state!="approved"
+    if document.present?
       document.submit_review(params)
       flash[:notice] = "Employer attestation updated successfully"
-    elsif
-      flash[:notice] = "Attestation document is already been approved"
     else
       flash[:error] = "Failed: Unable to find attestation document."
     end

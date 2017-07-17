@@ -43,7 +43,7 @@ RSpec.describe Employers::EmployerAttestationsController do
       let(:doc_uri) { nil } 
 
       it "should render the edit template" do
-        expect(flash[:error]).to eq "Could not save file"
+        expect(flash[:error]).to eq "Could not save the file in S3 storage"
         expect(response).to have_http_status(:redirect)
       end
     end

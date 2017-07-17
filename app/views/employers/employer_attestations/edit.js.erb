@@ -7,9 +7,7 @@ if ( $('tr.child-row:visible').length > 0 ) {
 
 }
 
-if ( $parent_row.next().hasClass('child-row') ) {
-} 
-else {
+if ( !($parent_row.next().hasClass('child-row'))) {
   $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "edit"%></td></tr>');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
   $('.dropdown.pull-right').removeClass('open');

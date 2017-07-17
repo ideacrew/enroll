@@ -50,25 +50,27 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-    if [:info_needed, :rejected].include?(params[:status].to_sym)
+      if self.aasm_state == 'submitted' and ["submitted", "pending"].include?(employer_attestation.aasm_state)
+        if [:info_needed, :rejected].include?(params[:status].to_sym)
 
-      if params[:status].to_sym == :rejected
-        self.reject!
-      elsif params[:status].to_sym == :info_needed
-        self.info_needed!
-      end
+          if params[:status].to_sym == :rejected
+            self.reject!
+          elsif params[:status].to_sym == :info_needed
+            self.info_needed!
+          end
 
-      if params[:status].to_sym == :info_needed
-        employer_attestation.set_pending! if employer_attestation.may_set_pending?
-      else
-        employer_attestation.deny! if employer_attestation.may_deny?
+          if params[:status].to_sym == :info_needed
+            employer_attestation.set_pending! if employer_attestation.may_set_pending?
+          else
+            employer_attestation.deny! if employer_attestation.may_deny?
+          end
+          
+          add_reason_for_rejection(params)
+        elsif params[:status].to_sym == :accepted
+          self.accept! if self.may_accept?
+        end
       end
-      
-      add_reason_for_rejection(params)
-    elsif params[:status].to_sym == :accepted
-      self.accept! if self.may_accept?
     end
-  end
 
   def add_reason_for_rejection(params)
     if params[:reason_for_rejection].present?
