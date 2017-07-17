@@ -386,4 +386,25 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB"]
     it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB"]
   end
+
+  describe "#build_reject_reason_list" do
+    shared_examples_for "reject reason dropdown list" do |type, reason_in, reason_out|
+      before do
+        allow(helper).to receive(:verification_type_status).and_return "in review"
+      end
+      it "includes #{reason_in} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to include reason_in
+      end
+      it "don't include #{reason_out} reject reason for #{type} verification type" do
+        expect(helper.build_reject_reason_list(type)).to_not include reason_out
+      end
+    end
+
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", "4 weeks"
+    it_behaves_like "reject reason dropdown list", "Immigration status", "Expired", "Too old"
+    it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", nil
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible Doc", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Member Data Change", "Too old"
+    it_behaves_like "reject reason dropdown list", "American Indian Status", "Document Expired", "Expired"
+  end
 end

@@ -165,6 +165,19 @@ module VerificationHelper
     end
   end
 
+  def build_reject_reason_list(v_type)
+    case v_type
+      when "Citizenship"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Immigration status"
+        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      when "Income" #will be implemented later
+        ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+      else
+        ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    end
+  end
+
   def type_unverified?(v_type, person)
     verification_type_status(v_type, person) != "verified"
   end

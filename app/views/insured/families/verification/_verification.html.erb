@@ -88,7 +88,7 @@
                               <%= hidden_field_tag 'verification_type', v_type%>
                               <%= hidden_field_tag 'admin_action', 'return_for_deficiency' %>
                               <div class="form-group col-md-3">
-                                <%= select_tag :verification_reason, options_for_select(::VlpDocument::RETURNING_FOR_DEF_REASONS), {prompt: ' Select Reason', required: true}%>
+                                <%= select_tag :verification_reason, options_for_select(build_reject_reason_list(v_type)), {prompt: ' Select Reason', required: true}%>
                               </div>
                               <div class="col-md-3">
                                 <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
