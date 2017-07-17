@@ -160,7 +160,7 @@ class FinancialAssistance::Application
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :draft, :after => :submit_application do
+      transitions from: :draft, to: :submitted, :after => :submit_application do
         guard do
           is_application_valid?
         end
