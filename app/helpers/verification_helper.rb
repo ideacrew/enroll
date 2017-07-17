@@ -155,7 +155,7 @@ module VerificationHelper
 
   def build_admin_actions_list(v_type, f_member)
     if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
