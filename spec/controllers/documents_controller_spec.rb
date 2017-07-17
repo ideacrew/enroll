@@ -69,7 +69,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it "should redirect to back" do
-      expect(response).to render_template(nil)
+      expect(response).to redirect_to :back
     end
   end
   describe "PUT update_verification_type" do

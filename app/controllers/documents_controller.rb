@@ -101,8 +101,8 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    family_member = FamilyMember.find(params[:family_member_id].gsub("_", ""))
-    v_type = params[:verification_type].gsub("_", "")
+    family_member = FamilyMember.find(params[:family_member_id])
+    v_type = params[:verification_type]
     enrollment = family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
     if enrollment.present?
       sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
@@ -125,7 +125,7 @@ class DocumentsController < ApplicationController
     else
       flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
     end
-    render :nothing => true
+    redirect_to :back
   end
 
   def destroy

@@ -11,10 +11,15 @@ var Verification = (function(){
    function showHubCall(target){
        $('#'+target_id(target)+'-hub').fadeIn('slow');
    }
+
+   function showExtendAction(target) {
+       $('#'+target_id(target)+'-extend').fadeIn('slow');
+   }
    function hideAllActions(target){
        hideVerifyAction(target);
        hideReturnForDef(target);
        hideHubCall(target);
+       hideExtendAction(target);
    }
    function hideVerifyAction(target){
        $('#'+target_id(target)).hide();
@@ -24,6 +29,9 @@ var Verification = (function(){
    }
    function hideHubCall(target){
        $('#'+target_id(target)+'-hub').hide();
+   }
+   function hideExtendAction(target){
+       $('#'+target_id(target)+'-extend').hide();
    }
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
@@ -48,32 +56,7 @@ var Verification = (function(){
              break;
          case 'Extend':
             hideAllActions($selected_id);
-            var target = $(event.target).attr('class').split('fmv')
-            var attrs = target[target.length - 2].split("-")
-            $("#extend-due-date").dialog({
-              buttons: {
-                "confirm": function() {
-                  $(this).dialog('close');
-                  $.ajax({
-                    url: "/documents/extend_due_date",
-                    data: {
-                      verification_type: attrs[attrs.length - 1],
-                      family_member_id: attrs[attrs.length - 2]
-                    },
-                    type: "PUT",
-                    success: function(){
-                      location.reload(true);
-                    }
-
-                  });
-                },
-
-                "cancel": function(){
-                  $(this).dialog('close');
-                  location.reload(true);
-                }
-              }
-            });
+            showExtendAction($selected_id);
             break;
          default:
              hideAllActions($selected_id);
