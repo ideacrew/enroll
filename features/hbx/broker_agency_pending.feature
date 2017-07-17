@@ -15,7 +15,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Then Hbx Admin should see the list of broker applicants
     When Hbx Admin clicks on the current broker applicant show button
     Then Hbx Admin should see the broker application
-    And Hbx Admin checks Kaiser Foundation
+    And Hbx Admin checks FCHP
     And Hbx Admin checks Guardian
     When Hbx Admin clicks pending button
     Then Hbx Admin sees a successful message

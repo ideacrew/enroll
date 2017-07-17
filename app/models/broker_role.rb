@@ -18,7 +18,7 @@ class BrokerRole
     "Blue Cross Blue Shield of MA" => nil,
      "Boston Medical Center Health Planc" => nil,
      "Delta Dental" => nil,
-     "Kaiser Foundation" => nil,
+     "FCHP" => nil,
      "Guardian" => nil,
      "Health New England" => nil,
      "Harvard Pilgrim Health Car" => nil,
