@@ -31,7 +31,7 @@ class Employers::EmployerAttestationsController < ApplicationController
       #@employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
-      if doc_uri.present? and @employer_profile.employer_attestation
+      if doc_uri.present? && @employer_profile.employer_attestation
         attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
         success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size, :format => "application/pdf"})
         errors = attestation_document.errors.full_messages unless success

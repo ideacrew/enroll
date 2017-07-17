@@ -29,9 +29,6 @@ module Effective
         table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| TimeKeeper.local_time(row.created_at).strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
       end
 
-      # def generate_invoice_link_type(row)
-      #   row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
-      # end
 
       def collection
         @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])

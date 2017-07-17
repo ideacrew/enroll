@@ -50,7 +50,7 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-      if self.aasm_state == 'submitted' and ["submitted", "pending"].include?(employer_attestation.aasm_state)
+      if self.aasm_state == 'submitted' && ["submitted", "pending"].include?(employer_attestation.aasm_state)
         if [:info_needed, :rejected].include?(params[:status].to_sym)
 
           if params[:status].to_sym == :rejected
