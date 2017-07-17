@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Action Required: Denial of Application to Offer Group Health Coverage through the <%= Settings.site.short_name %></h3></td>
+      <td><h3>Action Required: Denial of Application to Offer Group Health Coverage through the <%= site_short_name %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -19,25 +19,25 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}.  However, based upon the information you have provided, we are unable to verify your eligibility to offer group health coverage in #{Settings.site.short_name} at this time."} %>
+  { content: "Thank you for applying to offer group health coverage through #{site_short_name}.  However, based upon the information you have provided, we are unable to verify your eligibility to offer group health coverage in #{site_short_name} at this time."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "We have been unable to determine whether your organization meets #{Settings.site.short_name} eligibility criteria <strong><i>#{notice.plan_year.warnings.join(' and ')}</i></strong> as listed below."} %>
+  { content: "We have been unable to determine whether your organization meets #{site_short_name} eligibility criteria <strong><i>#{notice.plan_year.warnings.join(' and ')}</i></strong> as listed below."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "In order to participate in #{Settings.site.short_name}, federal regulations require that an employer:"} %>
+  { content: "In order to participate in #{site_short_name}, federal regulations require that an employer:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  [["Meets residency requirements:",["Your principal business address in the Massachusetts and you offer coverage to all full-time employees through the Health Connector, OR ","You offer coverage through the #{Settings.site.short_name} to all full-time employees whose primary worksite is located in Massachusetts and offer coverage to non-Massachusetts based employees through the small group exchange serving their primary worksite(s)"]],"At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage","One non-owner employee enrolls in health coverage."]} %>
+  [["Meets residency requirements:",["Your principal business address in the Massachusetts and you offer coverage to all full-time employees through the Health Connector, OR ","You offer coverage through the #{site_short_name} to all full-time employees whose primary worksite is located in Massachusetts and offer coverage to non-Massachusetts based employees through the small group exchange serving their primary worksite(s)"]],"At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage","One non-owner employee enrolls in health coverage."]} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "For more information about small group employer eligibility requirements, please refer to the Health Connector’s “Employer Group Eligibility and Verification” policy."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "In order to offer coverage to your employees through the Health Connector, you will need to document that you meet the eligibility requirements.  If you are unable to document that you meet the eligibility requirements, you will not be able to offer coverage to your employees through the #{Settings.site.short_name} at this time. "} %>
+  { content: "In order to offer coverage to your employees through the Health Connector, you will need to document that you meet the eligibility requirements.  If you are unable to document that you meet the eligibility requirements, you will not be able to offer coverage to your employees through the #{site_short_name} at this time. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-  { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage through the #{Settings.site.short_name}. Supporting documentation can be provided to:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
+  { contents: ["You have <strong><u>30 days from the date of this notification</u></strong> to provide supporting documentation related to your application to offer coverage through the #{site_short_name}. Supporting documentation can be provided to:"], heading: 'What If I Think I Am Eligible?', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Email: 	<a href=“#{Settings.contact_center.appeals}”>#{Settings.contact_center.appeals}</a>",
@@ -47,66 +47,66 @@
         Boston, MA 02196"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "At the end of the 30-day period, if you are not able to provide documentation supporting your eligibility to offer health coverage through the #{Settings.site.short_name}, we will notify you that you have been determined to be ineligible for coverage through the #{Settings.site.short_name} and explain your right to appeal that determination."} %>
+  { content: "At the end of the 30-day period, if you are not able to provide documentation supporting your eligibility to offer health coverage through the #{site_short_name}, we will notify you that you have been determined to be ineligible for coverage through the #{site_short_name} and explain your right to appeal that determination."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "If you are unable to meet eligibility requirements at this time, you can reapply at any time."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-  { contents: ["Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+  { contents: ["Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling #{Settings.contact_center.ma_phone_number}.","TTY : #{Settings.contact_center.tty}","Online at <a href='#{Settings.site.ma_webiste}'>#{Settings.site.ma_website}</a>." ] } %>
+                                                                   ["By calling #{Settings.contact_center.ma_phone_number}.","TTY : #{contact_center_tty_number}","Online at #{site_main_web_link}." ] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.715(d)"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you do not agree with our decision about whether or not you are an eligible employer, you have a right to appeal our decision and receive a hearing. Employers have the right to appeal a denial of eligibility, the failure of #{Settings.site.short_name} to provide a timely eligibility determination, or the failure of the #{Settings.site.short_name} to provide a timely notice of an eligibility determination."], heading: '<strong style= "color:black;"><u>Massachusetts Health Connector Small Group Employer Appeal Rights</u></strong>', sub_heading: ''} %>  
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["If you do not agree with our decision about whether or not you are an eligible employer, you have a right to appeal our decision and receive a hearing. Employers have the right to appeal a denial of eligibility, the failure of #{site_short_name} to provide a timely eligibility determination, or the failure of the #{site_short_name} to provide a timely notice of an eligibility determination."], heading: '<strong style= "color:black;"><u>Massachusetts Health Connector Small Group Employer Appeal Rights</u></strong>', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "You have 90 days from the date of the eligibility notice to request an appeal. If you do not appeal within 90 days, you may lose your appeal right."} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You may appeal by completing a #{Settings.site.short_name} Small Group Request for Hearing Form, available at MAhealthconnector.org."], heading: 'How to Request an Appeal', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You may appeal by completing a #{site_short_name} Small Group Request for Hearing Form, available at MAhealthconnector.org."], heading: 'How to Request an Appeal', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "The form can be mailed or faxed."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<span style='font-weight:bold'>Mail</span>: #{Settings.site.short_name} Appeals Unit, PO Box 960189, Boston, MA 02196"} %>
+  { content: "<span style='font-weight:bold'>Mail</span>: #{site_short_name} Appeals Unit, PO Box 960189, Boston, MA 02196"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Fax</strong>: #{Settings.contact_center.fax}"} %>
+  { content: "<strong>Fax</strong>: #{contact_center_fax_number}"} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Once your appeal is received, it simultaneously triggers both an informal and formal review process."], heading: 'What Happens When You Appeal', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong><i>Informal Review</i></strong> – You may be contacted by a staff member within the #{Settings.site.short_name} to review your eligibility and enrollment history with the intent of exploring whether your appeal can be resolved short of a formal hearing. Engaging in this informal review is optional both for you and for the #{Settings.site.short_name}.
+  { content: "<strong><i>Informal Review</i></strong> – You may be contacted by a staff member within the #{site_short_name} to review your eligibility and enrollment history with the intent of exploring whether your appeal can be resolved short of a formal hearing. Engaging in this informal review is optional both for you and for the #{site_short_name}.
 "} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Hearing</i></strong> - You will be scheduled for a hearing before an independent hearing officer. The hearing will take place telephonically. The #{Settings.site.short_name} will contact you and tell you when and where your hearing will take place. The #{Settings.site.short_name} will send you a scheduling order, including the time and date of your hearing."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Hearing</i></strong> - You will be scheduled for a hearing before an independent hearing officer. The hearing will take place telephonically. The #{site_short_name} will contact you and tell you when and where your hearing will take place. The #{site_short_name} will send you a scheduling order, including the time and date of your hearing."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "At the hearing, you can testify, have others testify for you, and submit documents. At the hearing, the hearing officer will also ask questions of you and any other people who testify. After completion of the hearing, the hearing officer will make a decision in writing and sent it to you. The decision will also tell you what you can do if you do not agree with the decision."} %>
 
  <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Any decisions by a hearing officer about your eligibility as an employer might also change the eligibility of your employees and their dependents.</strong>"} %> 
+  { content: "<strong>Any decisions by a hearing officer about your eligibility as an employer might also change the eligibility of your employees and their dependents.</strong>"} %>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You may withdraw your request for a hearing at any time before the hearing officer makes a final written decision. This includes before the hearing, potentially as a result of your informal resolution with the #{Settings.site.short_name}. To withdraw your request for a hearing, you must send a written withdrawal request, including your name and case number, to the #{Settings.site.short_name} by mail, e-mail, or fax."], heading: 'Ending your Appeal Early', sub_heading: ''} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You may withdraw your request for a hearing at any time before the hearing officer makes a final written decision. This includes before the hearing, potentially as a result of your informal resolution with the #{site_short_name}. To withdraw your request for a hearing, you must send a written withdrawal request, including your name and case number, to the #{site_short_name} by mail, e-mail, or fax."], heading: 'Ending your Appeal Early', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Mail</strong>: #{Settings.site.short_name} Appeals Unit, PO Box 960189, Boston, MA 02196"} %>
+  { content: "<strong>Mail</strong>: #{site_short_name} Appeals Unit, PO Box 960189, Boston, MA 02196"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "<strong>Email</strong>: <a href=“#{Settings.contact_center.appeals}”>#{Settings.contact_center.appeals}</a>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<strong>Fax</strong>: 1-617-933-3099"} %> 
+  { content: "<strong>Fax</strong>: 1-617-933-3099"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you withdraw your request for a hearing because the #{Settings.site.short_name} has promised to change its decision, we will implement the new #{Settings.site.short_name} decision. <strong>If you stop your appeal before the Health Connector has changed its decision, the eligibility determination will be implemented as it is written in the notice you first received before you filed your appeal.</strong>"} %> 
+  { content: "If you withdraw your request for a hearing because the #{site_short_name} has promised to change its decision, we will implement the new #{site_short_name} decision. <strong>If you stop your appeal before the Health Connector has changed its decision, the eligibility determination will be implemented as it is written in the notice you first received before you filed your appeal.</strong>"} %>

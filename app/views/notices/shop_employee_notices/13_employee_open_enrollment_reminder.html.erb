@@ -44,19 +44,17 @@
 
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling <a href='#{Settings.contact_center.ma_phone_number}'>#{Settings.contact_center.ma_phone_number}</a>",
-                                                                     "TTY: #{Settings.contact_center.tty}",
-                                                                     "Online at <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_website}."] } %>
+                                                                   ["By calling <a href='#{contact_center_phone_number}'>#{contact_center_phone_number}</a>",
+                                                                     "TTY: #{contact_center_tty_number}",
+                                                                     "Online at #{site_main_web_link}"] } %>
 
 <% if notice.broker.present? %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:"} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:"} %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => 
-  { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling <a href='#{Settings.contact_center.ma_phone_number}'>#{Settings.contact_center.ma_phone_number}.</a>"} %>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling <a href='#{contact_center_phone_number}'>#{contact_center_phone_number}.</a>"} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => 
+<%= render partial: 'notices/shared/paragraph', :locals =>
 {content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>
-
-

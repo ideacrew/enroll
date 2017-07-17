@@ -23,6 +23,10 @@ module Config::ContactCenterHelper
     Settings.contact_center.phone_number
   end
 
+  def contaxt_center_fax_number
+    Settings.contact_center.fax
+  end
+  
   def contact_center_postal_code
     Settings.contact_center.mailing_address.zip
   end

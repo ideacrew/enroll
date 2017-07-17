@@ -1,14 +1,10 @@
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
 <% case notice.notification_type %>
-<% when "initial_employer_first_reminder_to_publish_plan_year" || "initial_employer_final_reminder_to_publish_plan_year"%>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name}" %>
-<% when "initial_employer_second_reminder_to_publish_plan_year" %>
-  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{Settings.site.short_name} – Deadline Extended" %>
+<% when "initial_employer_final_reminder_to_publish_plan_year" %>
+  <% subject = "Action Required to Complete #{notice.primary_fullname}’s Application for Employer-sponsored Coverage with #{site_short_name} – Deadline Extended" %>
 <% end %>
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -16,7 +12,6 @@
     </tr>
   </tbody>
 </table>
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -24,26 +19,21 @@
     </tr>
   </tbody>
 </table>
-
 <% case notice.notification_type %>
-<% when "initial_employer_first_reminder_to_publish_plan_year" || "initial_employer_second_reminder_to_publish_plan_year" || "initial_employer_final_reminder_to_publish_plan_year"%>
+<% when "initial_employer_final_reminder_to_publish_plan_year"%>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with #{Settings.site.short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with #{site_short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% end %>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Additional resources can also be found on the Forms section of the Health Connector’s website."} %>
-
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Please note in order to participate in #{Settings.site.short_name}, your group must meet eligibility requirements:",
-  listings: [["You must meet residency requirements:", ["Have your primary business address in Massachusetts and you offer coverage to all full-time employees through #{Settings.site.short_name}, OR", "You offer coverage through #{Settings.site.short_name} to all full-time employees whose primary worksite is located in Massachusetts and offer coverage to non-Massachusetts based employees through the SHOP exchange serving their primary worksite(s);"]],
-    "At least two-thirds of eligible employees enroll in your group health coverage or waive due to having other coverage; and", 
+  previous: "Please note in order to participate in #{site_short_name}, your group must meet eligibility requirements:",
+  listings: [["You must meet residency requirements:", ["Have your primary business address in Massachusetts and you offer coverage to all full-time employees through #{site_short_name}, OR", "You offer coverage through #{site_short_name} to all full-time employees whose primary worksite is located in Massachusetts and offer coverage to non-Massachusetts based employees through the SHOP exchange serving their primary worksite(s);"]],
+    "At least two-thirds of eligible employees enroll in your group health coverage or waive due to having other coverage; and",
     "One non-owner employee enrolls in health coverage."]} %>
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
     heading: 'Next Steps', sub_heading: ''} %>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -59,7 +49,6 @@
     </tbody>
   </table>
 </div>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -78,7 +67,6 @@
     </tbody>
   </table>
 </div>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -96,19 +84,17 @@
     </tbody>
   </table>
 </div>
-
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "You can also contact #{Settings.site.short_name} with any questions:",
-  listings: [ "By calling #{Settings.contact_center.ma_phone_number}.",
-              "TTY: #{Settings.contact_center.tty}",
-              "Online at <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_website}</a>"
+  previous: "You can also contact #{site_short_name} with any questions:",
+  listings: [ "By calling #{contact_center_phone_number}.",
+              "TTY: #{contact_center_tty_number}",
+              "Online at #{site_main_web_link}</a>"
              ] } %>
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
+ content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>

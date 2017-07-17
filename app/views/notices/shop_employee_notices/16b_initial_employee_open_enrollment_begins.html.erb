@@ -48,7 +48,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "To complete the application process, please follow the steps listed below:",
-  listings: ["Go to <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_website}</a>","Log-in or create an account as an employee", "If necessary, update your household information add any dependents","Make your plan selection(s) or waive coverage"]} %>
+  listings: ["Go to #{site_main_web_link}","Log-in or create an account as an employee", "If necessary, update your household information add any dependents","Make your plan selection(s) or waive coverage"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
@@ -57,12 +57,12 @@
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:"} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{site_short_name} with any questions:"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                   ["By calling :#{Settings.contact_center.ma_phone_number}.", "TTY :#{Settings.contact_center.tty} ", "Online at : <a href='#{Settings.site.ma_website}'>#{Settings.site.ma_webiste}</a>"] } %>
+                                                                   ["By calling :#{contact_center_phone_number}.", "TTY : #{contact_center_tty_number} ", "Online at : #{site_main_web_link}"] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is being provided in accordance with 45 C.F.R. 155.725(f)"} %>
