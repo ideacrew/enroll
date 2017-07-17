@@ -15,9 +15,11 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
+    attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
     attribute :last_name, String
     attribute :due_date, String
+    attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
@@ -70,5 +72,26 @@ module PdfTemplates
     def renewal_dental_enrollment
       enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
+
+    def magi_medicaid_eligible
+      individuals.select{ |individual| individual.is_medicaid_chip_eligible == true }
+    end
+
+    def aqhp
+      individuals.select{ |individual| individual.is_ia_eligible == true  }
+    end
+
+    def uqhp
+      individuals.select{ |individual| individual.is_without_assistance == true  }
+    end
+
+    def ineligible_applicants
+      individuals.select{ |individual| individual.is_totally_ineligible == true  }
+    end
+
+    def non_magi_medicaid_eligible
+      individuals.select{ |individual| individual.is_non_magi_medicaid_eligible == true  }
+    end
+
   end
 end
