@@ -1,0 +1,24 @@
+ul.nav-stacked > li > a > i {
+  float: right;
+}
+ul.nav-stacked ul.nav-stacked {
+  margin-bottom: 0;
+}
+ul.nav-stacked ul.nav-stacked > li > a {
+  padding-left: 2em;
+}
+ul.nav-stacked ul.nav-stacked > li:first-child > a {
+  border-radius: 0;
+  border-top: 0;
+}
+ul.nav-stacked ul.nav-stacked > li:last-child:visible > a {
+  border-radius: 0;
+  border-bottom: 0;
+}
+.nav-stacked > .active > a,
+.nav-stacked > .active > a:hover {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #0088cc;
+  cursor: pointer;
+}
