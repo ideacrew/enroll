@@ -10,6 +10,8 @@ module PdfTemplates
     attribute :is_family_totally_ineligibile, Boolean, :default => false
     attribute :has_applied_for_assistance, Boolean, :default => false
     attribute :notice_date, Date
+    attribute :ivl_open_enrollment_start_on, Date
+    attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
     attribute :individuals, Array[PdfTemplates::Individual]
@@ -74,23 +76,23 @@ module PdfTemplates
     end
 
     def magi_medicaid_eligible
-      individuals.select{ |individual| individual.is_medicaid_chip_eligible == true }
+      individuals.select{ |individual| individual[:is_medicaid_chip_eligible] == true }
     end
 
     def aqhp
-      individuals.select{ |individual| individual.is_ia_eligible == true  }
+      individuals.select{ |individual| individual[:is_ia_eligible] == true  }
     end
 
     def uqhp
-      individuals.select{ |individual| individual.is_without_assistance == true  }
+      individuals.select{ |individual| individual[:is_without_assistance] == true  }
     end
 
     def ineligible_applicants
-      individuals.select{ |individual| individual.is_totally_ineligible == true  }
+      individuals.select{ |individual| individual[:is_totally_ineligible] == true  }
     end
 
     def non_magi_medicaid_eligible
-      individuals.select{ |individual| individual.is_non_magi_medicaid_eligible == true  }
+      individuals.select{ |individual| individual[:is_non_magi_medicaid_eligible] == true  }
     end
 
   end
