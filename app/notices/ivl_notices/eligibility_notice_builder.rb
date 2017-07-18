@@ -53,28 +53,42 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     latest_application.tax_households.each do |th|
       notice.tax_households << append_tax_households(th)
     end
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
   def append_tax_households(th)
     params = {
-              csr_percent_as_integer: th.preferred_eligibility_determination.csr_percent_as_integer,
-              max_aptc: th.preferred_eligibility_determination.max_aptc,
-              aptc_csr_annual_household_income: th.preferred_eligibility_determination.aptc_csr_annual_household_income,
-              aptc_annual_income_limit: th.preferred_eligibility_determination.aptc_annual_income_limit,
-              csr_annual_income_limit: th.preferred_eligibility_determination.csr_annual_income_limit
+              csr_percent_as_integer: th.preferred_eligibility_determination.csr_percent_as_integer.to_i,
+              max_aptc: th.preferred_eligibility_determination.max_aptc.to_i,
+              aptc_csr_annual_household_income: th.preferred_eligibility_determination.aptc_csr_annual_household_income.to_i,
+              aptc_annual_income_limit: th.preferred_eligibility_determination.aptc_annual_income_limit.to_i,
+              csr_annual_income_limit: th.preferred_eligibility_determination.csr_annual_income_limit.to_i
               }
   end
 
   def append_applicant_information(applicant)
+    reason_for_ineligibility = []
+    reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state" if !applicant.person.is_dc_resident?
+    reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction" if applicant.person.is_incarcerated
+    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465" if lawful_presence_outstanding?(applicant.person)
     params = {
+              first_name: applicant.person.first_name,
               full_name: applicant.person.full_name,
               age: applicant.person.age_on(TimeKeeper.date_of_record),
               is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,
               is_ia_eligible: applicant.is_ia_eligible,
               is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
               is_without_assistance: applicant.is_without_assistance,
-              is_totally_ineligible: applicant.is_totally_ineligible
+              is_totally_ineligible: applicant.is_totally_ineligible,
+              reason_for_ineligibility: reason_for_ineligibility
               }
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
   end
 
   def append_address(primary_address)

@@ -2,6 +2,7 @@ module PdfTemplates
   class Individual
     include Virtus.model
 
+    attribute :first_name, String
     attribute :full_name, String
     attribute :age, String
     attribute :ssn_verified, Boolean, :default => false
