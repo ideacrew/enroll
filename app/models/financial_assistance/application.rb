@@ -9,6 +9,7 @@ class FinancialAssistance::Application
   before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id
   validates :application_submission_validity, presence: true, on: :submission
   validates :before_attestation_validity, presence: true, on: :before_attestation
+  validate :attestation_terms_on_parent_living_out_of_home
 
   YEARS_TO_RENEW_RANGE = 0..4
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
@@ -160,7 +161,7 @@ class FinancialAssistance::Application
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :draft, :after => :submit_application do
+      transitions from: :draft, to: :submitted, :after => :submit_application do
         guard do
           is_application_valid?
         end
@@ -357,7 +358,23 @@ class FinancialAssistance::Application
       return applicant if applicant.applicant_validation_complete? == false
     end
   end
+
+  def clean_conditional_params(model_params)
+    clean_params(model_params)
+  end
+
 private
+
+  def clean_params(model_params)
+    model_params[:attestation_terms] = nil if model_params[:parent_living_out_of_home_terms].present? && model_params[:parent_living_out_of_home_terms] == 'false'
+  end
+
+  def attestation_terms_on_parent_living_out_of_home
+    if parent_living_out_of_home_terms
+      errors.add(:attestation_terms, "can't be blank") if attestation_terms.nil?
+    end
+  end
+
   def set_hbx_id
     #TODO: Use hbx_id generator for Application
     write_attribute(:hbx_id, self.id)
@@ -411,7 +428,7 @@ private
     # Mandatory Fields before submission
     validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
     # User must agree with terms of service check boxes before submission
-    validates_acceptance_of :medicaid_terms, :attestation_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+    validates_acceptance_of :medicaid_terms, :parent_living_out_of_home_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
   end
 
   def before_attestation_validity

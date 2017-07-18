@@ -99,34 +99,6 @@ $(document).ready(function() {
     }
   });
 
-  $("body").on("click", ".interaction-click-control-next-step", function(e){
-        var errorMsgs = [];
-        var form = $(this).parents("form");
-        var $requiredFieldRows = $(this).parents("form").find(".row:not(.hide):not(:last-child)");
-        var totalRequiredCount = $requiredFieldRows.length - 1;  // -1 for the last row..
-        var totRadioSelected = $(this).parents("form").find(".row:not(.hide) input[type='radio']:checked").length;
-        var isValid = totRadioSelected == totalRequiredCount;
-        $requiredFieldRows.each(function(index, element) {
-            var $this = $(this);
-            if($this.find("input[type='radio']").length && !$this.find("input[type='radio']:checked").length) {
-                 errorMsgs.push("PLEASE SELECT * " + $this.find("span").text().replace('*', ''));
-            } else {
-                $this.find(".alert-error").html("");
-            }
-        });
-        if ($(errorMsgs).length > 0){
-            $(".alert-error").text(errorMsgs);
-            $(".alert-error").removeClass('hide');
-        }
-        else{
-            $(".alert-error").text("");
-            $(".alert-error").addClass('hide');
-            $(form).submit();
-
-        }
-        return isValid;
-    });
-
   /* Benefit Form Related */
 
   /* Toggle Show/Hide of  dates row when eligible/ enrolled types are selected */
