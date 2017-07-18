@@ -23,10 +23,38 @@ module FinancialAssistanceHelper
     age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def checked_value_for_radio model, attribute, bool
-    if bool == false
-      val = model.send(attribute)
-      val || val.blank? ? false : true
+  def activer_for(target)
+    p controller_name
+    p action_name
+    p target
+    if controller_name == 'applicants'
+      if action_name == 'step'
+        if target == 'income_and_coverage'
+          'activer'
+        else
+          ''
+        end
+      else
+        ''
+      end
+    elsif controller_name == 'incomes'
+      if ['income_and_coverage', 'tax_info'].include?(target)
+        'activer'
+      else
+        ''
+      end
+    elsif controller_name == "deductions"
+      if ['income_and_coverage', 'tax_info', 'income'].include?(target)
+        'activer'
+      else
+        ''
+      end
+    elsif controller_name == "benefits"
+      if ['income_and_coverage', 'tax_info', 'income', 'income_adjustments'].include?(target)
+        'activer'
+      else
+        ''
+      end
     end
   end
 end

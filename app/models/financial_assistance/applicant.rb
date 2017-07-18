@@ -107,10 +107,10 @@ class FinancialAssistance::Applicant
   field :is_currently_enrolled_in_health_plan, type: Boolean
 
   # Other QNs.
-  field :has_daily_living_help, type: Boolean#, default: false
-  field :need_help_paying_bills, type: Boolean#, default: false
-  field :is_resident_post_092296, type: Boolean, default: false
-  field :is_vets_spouse_or_child, type: Boolean, default: false
+  field :has_daily_living_help, type: Boolean
+  field :need_help_paying_bills, type: Boolean
+  field :is_resident_post_092296, type: Boolean
+  field :is_vets_spouse_or_child, type: Boolean
 
   # Driver QNs.
   field :has_job_income, type: Boolean
@@ -298,6 +298,36 @@ class FinancialAssistance::Applicant
 
   def age_of_the_applicant
     age_of_applicant
+  end
+
+  def other_questions_complete?
+    !has_daily_living_help.nil? &&
+      !need_help_paying_bills.nil? &&
+      !is_resident_post_092296.nil? &&
+      !is_vets_spouse_or_child.nil?
+  end
+
+  def tax_info_complete?
+    !is_required_to_file_taxes.nil? &&
+      !is_claimed_as_tax_dependent.nil?
+  end
+
+  def incomes_complete?
+    self.incomes.all? do |income|
+      income.valid?
+    end
+  end
+
+  def benefits_complete?
+    self.benefits.all? do |benefit|
+      benefit.valid?
+    end
+  end
+
+  def deductions_complete?
+    self.deductions.all? do |deduction|
+      deduction.valid?
+    end
   end
 
 private
