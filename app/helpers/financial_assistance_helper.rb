@@ -76,4 +76,11 @@ module FinancialAssistanceHelper
     end
     next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_financial_assistance_application_applicant_path(application, applicant)
   end
+
+  def checked_value_for_radio model, attribute, bool
+    if bool == false
+      val = model.send(attribute)
+      val || val.blank? ? false : true
+    end
+  end
 end
