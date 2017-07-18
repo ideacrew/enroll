@@ -1398,6 +1398,30 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def is_non_renewed_enrollment?
+    return false unless is_shop?
+
+    renewing_plan_year = employer_profile.renewing_plan_year
+    return false unless (renewing_plan_year.present? && renewing_plan_year.is_open_enrollment_closed?)
+
+    benefit_groups = renewing_plan_year.benefit_groups
+    bg_list = benefit_groups.map(&:id)
+    enrollments = family.active_household.hbx_enrollments.show_enrollments_sans_canceled
+    return false if enrollments.where(:"benefit_group_id".in => bg_list).present?
+
+    bga_list = benefit_groups.flat_map(&:benefit_group_assignments).map(&:id)
+    return false if enrollments.where(:"benefit_group_assignment_id".in => bga_list).present?
+
+    return true
+  end
+
+  def end_date_for_non_renewed_enrollment
+    return nil unless is_non_renewed_enrollment?
+    return terminated_on if terminated_on.present?
+    return benefit_group.plan_year.end_on if benefit_group.present?
+    return employer_profile.active_plan_year.end_on
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.

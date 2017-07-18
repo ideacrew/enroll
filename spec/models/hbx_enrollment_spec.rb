@@ -2583,6 +2583,69 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
       expect(plan).to be_kind_of(UnassistedPlanCostDecorator)
     end
   end
+
+  context "#is_non_renewed_enrollment?", dbclean: :after_each do
+
+    let(:enrollment1) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
+    let(:enrollment2) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:enrollment3) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:enrollment4) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:enrollment5) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+
+    before do
+      allow(enrollment2).to receive(:employer_profile).and_return employer_profile
+      allow(enrollment3).to receive(:employer_profile).and_return employer_profile
+      allow(enrollment4).to receive(:employer_profile).and_return employer_profile
+    end
+
+    it "should return false if enrollment not belongs to shop" do
+      expect(enrollment1.is_non_renewed_enrollment?).to eq false
+    end
+
+    it "should return false if renewing_plan_year not exist" do
+      allow(employer_profile).to receive(:renewing_plan_year).and_return nil
+      expect(enrollment2.is_non_renewed_enrollment?).to eq false
+    end
+
+    it "should return false if open_enrollment not ended for renewing_plan_year" do
+      allow(employer_profile).to receive(:renewing_plan_year).and_return employer_profile.plan_years.first
+      employer_profile.plan_years.first.update_attribute(:open_enrollment_end_on, TimeKeeper.date_of_record + 3.days)
+      expect(enrollment3.is_non_renewed_enrollment?).to eq false
+    end
+
+    it "should return false if user enrolled/waived through renewing_plan_year" do
+      allow(employer_profile).to receive(:renewing_plan_year).and_return employer_profile.plan_years.first
+      enrollment5.update_attributes(aasm_state: "renewing_waived", benefit_group_id: employer_profile.plan_years.first.benefit_groups[0].id)
+      expect(enrollment4.is_non_renewed_enrollment?).to eq false
+    end
+
+    it "should return true if user not enrolled/waived through renewing_plan_year" do
+      allow(employer_profile).to receive(:renewing_plan_year).and_return employer_profile.plan_years.first
+      expect(enrollment4.is_non_renewed_enrollment?).to eq true
+    end
+  end
+
+  context "#end_date_for_non_renewed_enrollment" do
+    let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+
+    it "should return nil if the enrollment is not a non_renewed enrollment" do
+      allow(enrollment).to receive(:is_non_renewed_enrollment?).and_return false
+      expect(enrollment.end_date_for_non_renewed_enrollment).to eq nil
+    end
+
+    it "should return terminated on date if exists" do
+      allow(enrollment).to receive(:is_non_renewed_enrollment?).and_return true
+      enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record + 8.days)
+      expect(enrollment.end_date_for_non_renewed_enrollment).to eq TimeKeeper.date_of_record + 8.days
+    end
+
+    it "should return the plan year end on date if it is a non_renewed enrollment" do
+      bg = employer_profile.plan_years[0].benefit_groups[0]
+      allow(enrollment).to receive(:is_non_renewed_enrollment?).and_return true
+      allow(enrollment).to receive(:benefit_group).and_return bg
+      expect(enrollment.end_date_for_non_renewed_enrollment).to eq bg.end_on
+    end
+  end
 end
 
 describe HbxEnrollment, dbclean: :after_all do
