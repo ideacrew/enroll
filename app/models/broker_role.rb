@@ -246,7 +246,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :broker_agency_declined
     end
 
-    event :broker_agency_terminate, :after => [:record_transition, :remove_from_employer_profile] do
+    event :broker_agency_terminate, :after => [:record_transition, :remove_broker_assignments] do
       transitions from: :active, to: :broker_agency_terminated
     end
 
@@ -255,7 +255,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :denied
     end
 
-    event :decertify, :after => [:record_transition, :remove_from_employer_profile]  do
+    event :decertify, :after => [:record_transition, :remove_broker_assignments]  do
       transitions from: :active, to: :decertified
     end
 
@@ -343,12 +343,22 @@ class BrokerRole
     aasm_state.gsub(/\_/,' ').camelcase
   end
   
-  def remove_from_employer_profile
+  def remove_broker_assignments
     @orgs = Organization.by_broker_role(id)
     @employers = @orgs.map(&:employer_profile)
-
+    # Remove broker from employers
     @employers.each do |e|
       e.fire_broker_agency
+      # Remove General Agency
+      e.fire_general_agency!
     end
+    # Remove broker from families
+    if has_broker_agency_profile?
+      families = self.broker_agency_profile.family_clients
+      families.each do |f|
+        f.terminate_broker_agency
+      end
+    end
+    
   end
 end
