@@ -11,7 +11,7 @@
   %frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{income.frequency_kind}"
   %start_on= simple_date_for(income.start_on)
   %end_on= simple_date_for(income.end_on)
-  - if income.employer_name
+  - unless income.employer_name.blank?
     %employer_name= income.employer_name
   %employer_id= income.employer_id
   - if income.employer_address
