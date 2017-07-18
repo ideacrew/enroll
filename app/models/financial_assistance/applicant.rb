@@ -113,12 +113,12 @@ class FinancialAssistance::Applicant
   field :is_vets_spouse_or_child, type: Boolean, default: false
 
   # Driver QNs.
-  field :has_job_income, type: Boolean, default: false
-  field :has_self_employment_income, type: Boolean, default: false
-  field :has_other_income, type: Boolean, default: false
-  field :has_deductions, type: Boolean, default: false
-  field :has_enrolled_health_coverage, type: Boolean, default: false
-  field :has_eligible_health_coverage, type: Boolean, default: false
+  field :has_job_income, type: Boolean
+  field :has_self_employment_income, type: Boolean
+  field :has_other_income, type: Boolean
+  field :has_deductions, type: Boolean
+  field :has_enrolled_health_coverage, type: Boolean
+  field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
   
@@ -130,6 +130,7 @@ class FinancialAssistance::Applicant
 
   validate :presence_of_attr_step_1, on: :step_1
   validate :presence_of_attr_step_2, on: :step_2
+  validate :presence_of_attr_other_qns, on: :other_qns
   validates :validate_applicant_information, presence: true, on: :submission
 
   validate :strictly_boolean
@@ -305,6 +306,32 @@ private
   end
 
   def presence_of_attr_step_1
+    if has_job_income.nil?
+      errors.add(:has_job_income, "can't be blank")
+    end
+
+    if has_self_employment_income.nil?
+      errors.add(:has_self_employment_income, "can't be blank")
+    end
+
+    if has_other_income.nil?
+      errors.add(:has_other_income, "can't be blank")
+    end
+
+    if has_deductions.nil?
+      errors.add(:has_deductions, "can't be blank")
+    end
+
+    if has_enrolled_health_coverage.nil?
+      errors.add(:has_enrolled_health_coverage, "can't be blank")
+    end
+
+    if has_eligible_health_coverage.nil?
+      errors.add(:has_eligible_health_coverage, "can't be blank")
+    end
+  end
+
+  def presence_of_attr_step_2
     if is_required_to_file_taxes && is_joint_tax_filing.nil?
       errors.add(:is_joint_tax_filing, "can't be blank")
     end
@@ -314,7 +341,7 @@ private
     end
   end
 
-  def presence_of_attr_step_2
+  def presence_of_attr_other_qns
     if is_pregnant
       errors.add(:pregnancy_due_on, "should be answered if you are pregnant") if pregnancy_due_on.nil?
       errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
