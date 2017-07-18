@@ -46,7 +46,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
         elsif params[:commit] == "Submit my Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           @application.submit! if @application.complete?
-          redirect_to eligibility_results_financial_assistance_applications_path
+          publish_application(@application)
+          redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
