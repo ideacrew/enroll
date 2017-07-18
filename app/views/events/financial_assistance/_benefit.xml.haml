@@ -12,7 +12,7 @@
       = render :partial => "events/addresses/address", :object => benefit.employer_address
   - if benefit.employer_phone
     %employer_phone
-      = render :partial => "events/phones/phone", :object => income.employer_phone
+      = render :partial => "events/phones/phone", :object => benefit.employer_phone
   - if benefit.is_esi_waiting_period
     %is_esi_waiting_period= benefit.is_esi_waiting_period
   - if benefit.is_esi_mec_met
