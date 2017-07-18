@@ -409,7 +409,7 @@ def employer_poc
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families[dt_query.skip, dt_query.take]
+    @families = families.drop(dt_query.skip).take(dt_query.take)
     render
   end
 
