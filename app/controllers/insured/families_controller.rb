@@ -82,6 +82,7 @@ class Insured::FamiliesController < FamiliesController
   def record_sep
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
+      session[:qle_id] = params[:qle_id]
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
       special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
@@ -93,6 +94,7 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
+    ee_sep_request_accepted_notice
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -348,6 +350,10 @@ class Insured::FamiliesController < FamiliesController
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def ee_sep_request_accepted_notice
+    ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
   end
 
   def calculate_dates

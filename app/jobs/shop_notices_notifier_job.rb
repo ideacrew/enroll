@@ -1,7 +1,8 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def perform(id, event)
+  def self.perform(id, event)
+    Rails.logger.info("Hit notifier job **************************")
     Resque.logger.level = Logger::DEBUG
     profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
