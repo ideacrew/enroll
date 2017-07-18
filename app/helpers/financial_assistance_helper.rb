@@ -22,4 +22,11 @@ module FinancialAssistanceHelper
     dob = applicant.family_member.person.dob
     age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
+
+  def checked_value_for_radio model, attribute, bool
+    if bool == false
+      val = model.send(attribute)
+      val || val.blank? ? false : true
+    end
+  end
 end
