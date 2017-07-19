@@ -49,7 +49,6 @@ module Enroll
     ]
 
     unless Rails.env.test?
-      puts "code loaded"
       config.acapi.add_subscription("Events::ResidencyVerificationRequestsController")
       config.acapi.add_subscription("Events::SsaVerificationRequestsController")
       config.acapi.add_subscription("Events::VlpVerificationRequestsController")
