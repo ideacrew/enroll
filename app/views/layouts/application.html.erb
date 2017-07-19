@@ -21,6 +21,17 @@
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
 
+
+
+        <script>
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+                ga('create', 'UA-71192042-1', 'auto');
+                ga('send', 'pageview');
+        </script>
+
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= csrf_meta_tags %>
   </head>
@@ -55,12 +66,13 @@
         </nav>
     <% else %>
       <!-- Default is top navigation -->
-      <nav class="navbar navbar-default navbar-static-top" role="navigation" aria-label="main navigation">
-        <div class="container">
-          <%= content_for?(:top_navigation) ? yield(:top_navigation) : "Provide content for :top_navigation" %>
-        </div>
-      </nav>
-
+      <% if content_for?(:top_navigation) %>
+        <nav class="navbar navbar-default navbar-static-top nav-list" role="navigation" aria-label="main navigation">
+          <div class="container">
+            <%= content_for?(:top_navigation) ? yield(:top_navigation) : "Provide content for :top_navigation" %>
+          </div>
+        </nav>
+      <% end %>
       <!-- Main Content -->
       <div class="container">
         <main role="main" aria-label="main content">
@@ -68,7 +80,7 @@
           <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
           <%= content_for?(:main) ? yield(:main) : yield %>
         </main>
-      </div>          
+      </div>
     <% end %>
 
     <%= render 'layouts/application_footer' %>
