@@ -18,7 +18,7 @@
     %renewal_base_year= financial_assistance_application.renewal_base_year
   - unless financial_assistance_application.years_to_renew.blank?
     %years_to_renew= financial_assistance_application.years_to_renew
-  %us_state= "urn:openhbx:terms:v1:us_state##{financial_assistance_application.us_state.upcase}"
+  %us_state= financial_assistance_application.us_state.upcase
   = render :partial => "events/financial_assistance/benchmark_plan", :locals=> {:financial_assistance_application => financial_assistance_application}
   %has_accepted_medicaid_terms= financial_assistance_application.medicaid_terms
   %has_accepted_medicaid_insurance_collection_terms= financial_assistance_application.medicaid_insurance_collection_terms
