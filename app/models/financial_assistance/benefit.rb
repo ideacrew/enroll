@@ -65,21 +65,27 @@ class FinancialAssistance::Benefit
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
-                      message: "pick a name length between #{TITLE_SIZE_RANGE}"
+                      message: "pick a name length between #{TITLE_SIZE_RANGE}",
+                      on: [:step_1, :submit]
 
-  validates :kind,    presence: true,
-                      inclusion: {
-                        in: KINDS,
-                        message: "%{value} is not a valid benefit kind type"
-                      }
+  validates :kind, presence: true,
+                   inclusion: {
+                     in: KINDS,
+                     message: "%{value} is not a valid benefit kind type"
+                   },
+                   on: [:step_1, :submit]
 
-  validates :insurance_kind,    presence: true,
-                                inclusion: {
-                                  in: INSURANCE_KINDS,
-                                  message: "%{value} is not a valid benefit insurance kind type"
-                                }
+  validates :insurance_kind, presence: true,
+                             inclusion: {
+                               in: INSURANCE_KINDS,
+                               message: "%{value} is not a valid benefit insurance kind type"
+                             },
+                             on: [:step_1, :submit]
 
-  validate :presence_of_esi_details_if_esi, :presence_of_dates_if_enrolled
+
+  validate :presence_of_esi_details_if_esi,
+           :presence_of_dates_if_enrolled,
+           on: [:step_1, :submit]
 
   before_create :set_submission_timestamp
 

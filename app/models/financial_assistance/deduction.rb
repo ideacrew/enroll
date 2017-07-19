@@ -36,17 +36,21 @@ class FinancialAssistance::Deduction
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
-                      message: "pick a name length between #{TITLE_SIZE_RANGE}"
+                      message: "pick a name length between #{TITLE_SIZE_RANGE}",
+                      on: [:step_1, :submit]
 
   validates :amount,          presence: true,
-                              numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
+                              numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
+                              on: [:step_1, :submit]
   validates :kind,            presence: true,
-                              inclusion: { in: KINDS, message: "%{value} is not a valid deduction type" }
+                              inclusion: { in: KINDS, message: "%{value} is not a valid deduction type" },
+                              on: [:step_1, :submit]
   validates :frequency_kind,  presence: true,
-                              inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
-  validates :start_on,        presence: true
+                              inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" },
+                              on: [:step_1, :submit]
+  validates :start_on,        presence: true, on: [:step_1, :submit]
 
-  validate :start_on_must_precede_end_on
+  validate :start_on_must_precede_end_on, on: [:step_1, :submit]
 
   before_create :set_submission_timestamp
 
