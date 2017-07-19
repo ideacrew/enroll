@@ -1,7 +1,9 @@
 <%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-<br><br><br><br><br>
+<br><br><br><br>
+
+<strong>Welcome to The <%=site_short_name%></strong>
 
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
@@ -66,6 +68,10 @@
         </li>
         <li class="notice-font">
             Online at <%=site_main_web_link%>
+        <li>
+          <strong>First Month’s Premium Payment</strong><br>Your first month’s premium payment must be made over the phone or online so it can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:<br><br>
+          <strong>Make a Secure Online Payment</strong><br>
+          The Massachusetts <%= site_short_name %> offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in our <strong>Employer guide to paying premiums</strong> in the <a href="https://www.mahealthconnector.org/business/business-resource-center">Business Resource Center</a>. You can <a href="https://www.mahealthconnector.org/business/employers/payment-information">make your premium payment online</a> through our website.<br> <br><strong>To make a secure electronic check payment by phone</strong><br>Call <%= "#{contact_center_phone_number}" %>. Select your language (1 for English, 2 for Spanish, additional language options available).<br>
         </li>
         </ul>
       </td>
@@ -78,6 +84,7 @@
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling 888-813-9220 ."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
