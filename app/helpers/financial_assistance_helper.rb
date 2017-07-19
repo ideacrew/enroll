@@ -57,7 +57,7 @@ module FinancialAssistanceHelper
     end
   end
 
-  def find_path_for_faa_flow(application)
+  def find_application_path(application)
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
@@ -65,7 +65,7 @@ module FinancialAssistanceHelper
     end
   end
 
-  def find_redirection_path(application, applicant, options={})
+  def find_applicant_path(application, applicant, options={})
     document_flow = ['incomes', 'deductions', 'benefits']
     next_path = document_flow.find do |embeded_document|
       # this is a complicated condition but we need to make sure we don't work backwards in the flow from incomes to deductions to benefits

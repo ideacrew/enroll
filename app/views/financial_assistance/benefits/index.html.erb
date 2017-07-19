@@ -32,7 +32,7 @@
 
 <div class="col-md-2">
   <%# This will eventually change to the applicant's other questions steps when it's done %>
-  <%= link_to find_redirection_path(@application, @applicant, current: 'benefits') do %>
+  <%= link_to find_applicant_path(@application, @applicant, current: 'benefits') do %>
     <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
   <% end %>
 
