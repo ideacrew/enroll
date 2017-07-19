@@ -403,7 +403,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should display effective on date" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/EFFECTIVE DATE/)
+      expect(rendered).to match(/Effective Date/)
     end
   end
 
