@@ -1,0 +1,12 @@
+<% if @applicant.has_enrolled_health_coverage%>
+<div class="row row-form-wrapper no-buffer row-height">
+  <div class="col-md-7"> Is this person currently enrolled in health coverage? </div>
+  <div class="col-md-5"> YES</div>
+</div>
+<% end %>
+<% if @applicant.has_eligible_health_coverage%>
+<div class="row row-form-wrapper no-buffer row-height">
+  <div class="col-md-7">Does this person currently have access to other health coverage, including through another person? </div>
+  <div class="col-md-5"> YES</div>
+</div>
+<% end %>

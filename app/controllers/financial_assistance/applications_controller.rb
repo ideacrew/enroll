@@ -102,9 +102,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def wait_for_eligibility_response
+    @family = @person.primary_family
   end
 
   def eligibility_results
+    @family = @person.primary_family
   end
 
   private

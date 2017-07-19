@@ -33,6 +33,7 @@ class FinancialAssistance::Income
   )
 
   JOB_INCOME_TYPE_KIND = "wages_and_salaries"
+  NET_SELF_EMPLOYMENT_INCOME_KIND = "net_self_employment"
 
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
 
@@ -60,24 +61,34 @@ class FinancialAssistance::Income
 
   field :workflow, type: Hash, default: { }
 
+  scope :jobs, -> { where(kind: JOB_INCOME_TYPE_KIND)}
+  scope :self_employment, -> { where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
+  scope :other, -> { where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND]) }
+
+
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
 
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
-                      message: "pick a name length between #{TITLE_SIZE_RANGE}"
+                      message: "pick a name length between #{TITLE_SIZE_RANGE}",
+                      on: [:step_1, :submit]
 
-  validates :amount,          presence: true,
-                              numericality: { greater_than: 0, message: "%{value} must be greater than $0" }
-  validates :kind,            presence: true,
-                              inclusion: { in: KINDS, message: "%{value} is not a valid income type" }
+  validates :amount, presence: true,
+                     numericality: { greater_than: 0, message: "%{value} must be greater than $0" },
+                     on: [:step_1, :submit]
+
+  validates :kind, presence: true,
+                   inclusion: { in: KINDS, message: "%{value} is not a valid income type" },
+                   on: [:step_1, :submit]
 
   # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
 
-  validates :frequency_kind,  presence: true,
-                              inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
-  validates :start_on,        presence: true
+  validates :frequency_kind, presence: true,
+                             inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" },
+                             on: [:step_1, :submit]
+  validates :start_on, presence: true, on: [:step_1, :submit]
 
   # validates :tax_form,        presence: true,
   #                             inclusion: { in: TAX_FORM_KINDS, message: "%{value} is not a valid tax form type" }
