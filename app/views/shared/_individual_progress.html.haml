@@ -50,7 +50,7 @@
   = link_to 'Continue', url, class: "btn btn-lg btn-primary #{css_class} btn-block", id: 'btn-continue'
 - elsif defined? url
   - if @family.application_in_progress.present?
-    = link_to 'Continue', find_path_for_faa_flow(@family.application_in_progress), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
+    = link_to 'Continue', find_application_path(@family.application_in_progress), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
   - else
     = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4

@@ -19,7 +19,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   def save_questions
     @applicant = @application.applicants.find(params[:id])
     @applicant.update_attributes!(permit_params(params[:applicant]))
-    redirect_to find_path_for_faa_flow(@application)
+    redirect_to find_application_path(@application)
   end
 
   def step
@@ -34,8 +34,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Finish"
           @model.update_attributes!(workflow: { current_step: 1 })
-          redirect_to find_redirection_path(@application, @applicant)
-          #redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+          redirect_to find_applicant_path(@application, @applicant)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
