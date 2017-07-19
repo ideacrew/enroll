@@ -6,59 +6,59 @@
     </li>
 
     <% if defined?(@applicant) %>
-			<ul class="nav nav-stacked">
-				<li class="list-box step-tabs <%= activer_for("income_and_coverage") %>">
+      <ul class="nav nav-stacked">
+        <li class="list-box step-tabs <%= activer_for("income_and_coverage") %>">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
             <% if @applicant.other_questions_complete? %>
               <span class="fa fa-check"></span>
             <% end %>
             Income and Coverage
           <% end %>
-				</li>
+        </li>
 
-				<li class="list-box step-tabs <%= activer_for("tax_info") %>">
-					<%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2) do %>
+        <li class="list-box step-tabs <%= activer_for("tax_info") %>">
+          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2) do %>
             <% if @applicant.tax_info_complete? %>
               <span class="fa fa-check"></span>
             <% end %>
             Tax Info
           <% end %>
-				</li>
+        </li>
         <% if @applicant.incomes.present? %>
           <li class="list-box step-tabs <%= activer_for("income") %>">
-		      <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant) do %>
+            <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant) do %>
               <% if @applicant.incomes_complete? %>
                 <span class="fa fa-check"></span>
               <% end %>
               Income
             <% end %>
-			   </li>
+          </li>
         <% end %>
-       <% if @applicant.deductions.present? %>
-			   <li class="list-box step-tabs <%= activer_for("income_adjustments") %>">
-		        <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+        <% if @applicant.deductions.present? %>
+          <li class="list-box step-tabs <%= activer_for("income_adjustments") %>">
+            <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
               <% if @applicant.deductions_complete? %>
                 <span class="fa fa-check"></span>
               <% end %>
               Income Adjustments
             <% end %>
-			   </li>
+          </li>
         <%end%>
         <% if @applicant.benefits.present? %>
-				  <li class="list-box step-tabs <%= activer_for("health_coverage") %>">
-              <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
+          <li class="list-box step-tabs <%= activer_for("health_coverage") %>">
+            <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
               <% if @applicant.benefits_complete? %>
                 <span class="fa fa-check"></span>
               <% end %>
               Health Coverage
             <% end %>
-			   </li>
+          </li>
         <%end%>
-			<% end %>
-		</ul>
+      <% end %>
+      </ul>
 
-    <li class="list-box step-tabs">
-      <a href="#">Review and Submit</a>
-    </li>
+      <li class="list-box step-tabs">
+        <a href="#">Review and Submit</a>
+      </li>
   </ul>
 </nav>
