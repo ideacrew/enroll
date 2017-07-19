@@ -20,9 +20,8 @@
         <h1 class="darkblue">Household Info: Family Members</h1>
         <h4>If you need to get insurance coverage for other members of your household, select 'Add Member'. When you’re finished, select CONTINUE.</h4>
         <p class='memo'>* = required field</p>
-
-        <div class="row no-buffer">
-          <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
+         <div class="row no-buffer">
+          <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
               <label class="static_label label-floatlabel" for="name">NAME</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
@@ -30,6 +29,16 @@
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
               <label class="static_label label-floatlabel" for="relation">RELATION</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
+              <%=
+                  link_to personal_insured_families_path, remote: true, class: 'close close-2' do
+                    '<i class="fa fa-pencil"></i>'.html_safe
+
+                  end
+              %>
+            </div>
+
+            <div class="append_consumer_info">
+
             </div>
           </div>
         </div>
