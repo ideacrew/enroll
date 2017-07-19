@@ -16,6 +16,11 @@ module Subscribers
         stringed_key_payload = payload.stringify_keys
         xml = stringed_key_payload['body']
 
+        Rails.logger.info "==================="
+        Rails.logger.info "Enroll received nfp_statement_summary_success"
+        Rails.logger.info xml.to_s
+        Rails.logger.info "==================="
+
         #TODO change response handler
         if "503" == return_status.to_s
 
