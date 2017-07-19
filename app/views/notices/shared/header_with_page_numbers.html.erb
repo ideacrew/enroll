@@ -8,7 +8,7 @@
       -ms-text-size-adjust:100%;
       margin:0;
       padding:0;
-      color:rgb(0,0,0);
+      color:#808080;
       font-family: "TimesNewRoman", Times, serif;
     }
     
@@ -32,7 +32,7 @@
               continue;
             }
           }
-          y[j].textContent = "Page "+(vars[x[i]]-1)+ " of " + (vars[x[1]]-1);
+        y[j].textContent = "Your Health Connector ID is: <%= notice.primary_identifier %>" + "| Page "+(vars[x[i]]-1)+ " of " + (vars[x[1]]-1);
         }
       }
     }

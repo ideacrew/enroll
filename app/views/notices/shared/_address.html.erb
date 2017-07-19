@@ -10,7 +10,7 @@
     </tr>
     <% end %>
     <tr class="fssize1">
-       <td><%= notice.primary_address.street_1 %></td>
+       <td><%= notice.primary_address.street_1 %> <td align="right" style="padding-right: 15px">Notice No. <%= notice.mpi_indicator %></td></td>
     </tr>
     <% if notice.primary_address.street_2.present? %>
     <tr class="fssize1">

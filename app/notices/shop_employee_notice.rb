@@ -28,6 +28,8 @@ class ShopEmployeeNotice < Notice
   def build
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name
+    notice.mpi_indicator = self.mpi_indicator
+    notice.primary_identifier = census_employee.employee_role.person.hbx_id
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)

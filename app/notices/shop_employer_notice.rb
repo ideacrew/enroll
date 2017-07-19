@@ -27,6 +27,7 @@ class ShopEmployerNotice < Notice
 
   def build
     notice.notification_type = self.event_name
+    notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id
