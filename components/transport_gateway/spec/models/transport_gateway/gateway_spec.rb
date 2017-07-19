@@ -2,30 +2,36 @@ require 'rails_helper'
 require 'net/http'
 
 module TransportGateway
-  RSpec.describe Gateway, type: :model do
+  RSpec.describe Gateway do
 
     let(:sftp_uri)      { URI("sftp://foo:bar@sftp.example.com/path/to/file;type=b") } 
     let(:binary_file)   {  }
+    let(:logger) { double }
+    let(:credential_provider) { double }
+
+     let(:message_inspected_string) { "MESSAGE INSPECTED STRING" }
 
 
     context "A common interface for sending messages with payloads using various protocols" do
 
       context "when a Gateway is initialized" do
 
+        let(:gateway) { Gateway.new(credential_provider, logger) }
+
         it "should load an SFTP adapter" do
-          expect(Gateway.new().adapters).to include(:sftp_adapter)
+          expect(gateway.adapters).to include(:sftp_adapter)
         end
 
         it "should load an HTTP adapter" do
-          expect(Gateway.new().adapters).to include(:http_adapter)
+          expect(gateway.adapters).to include(:http_adapter)
         end
 
         it "should load an File adapter" do
-          expect(Gateway.new().adapters).to include(:file_adapter)
+          expect(gateway.adapters).to include(:file_adapter)
         end
 
         it "should load an AWS S3 adapter" do
-          expect(Gateway.new().adapters).to include(:s3_adapter)
+          expect(gateway.adapters).to include(:s3_adapter)
         end
 
 
@@ -51,21 +57,19 @@ module TransportGateway
             let(:message)           { Message.new(from: from, to: to) }
 
             before(:each) do
+              allow(message).to receive(:log_inspect).and_return(message_inspected_string)
+              allow(logger).to receive(:info) do |progname, &block|
+                expect(progname).to eq "transport_gateway"
+                expect(block.call).to eq "Started send of message:\n#{message_inspected_string}"
+              end
               stub_request(:put, /www.example.com/).to_return(status: 200, body: "http stubbed response", headers: {})
             end
 
+            let (:gateway) { Gateway.new(credential_provider, logger) }
+
             it "should successfully send the file, returning a HTTP success status" do
-              expect(Gateway.new().send_message(message)).to be_kind_of Net::HTTPSuccess
+              expect(gateway.send_message(message)).to be_kind_of Net::HTTPSuccess
             end
-          end
-
-          context "and a message is sent using SMTP protocol" do
-          end
-
-          context "and a message is sent using File protocol" do
-          end
-
-          context "and a message is sent using S3 protocol" do
           end
 
           context "and a message is sent with unsupported protocol" do
@@ -77,7 +81,19 @@ module TransportGateway
             let(:to)                { URI::Generic.build({ scheme: bogus_protocol, host: target_host, path: target_service}) } 
             let(:message)           { Message.new(from: nil, to: to) }
 
-            let(:gateway) { Gateway.new }
+            let(:gateway) { Gateway.new(credential_provider, logger) }
+
+            before(:each) do
+              allow(message).to receive(:log_inspect).and_return(message_inspected_string)
+              allow(logger).to receive(:info) do |progname, &block|
+                expect(progname).to eq "transport_gateway"
+                expect(block.call).to eq "Started send of message:\n#{message_inspected_string}"
+              end
+              allow(logger).to receive(:error) do |progname, &block|
+                expect(progname).to eq "transport_gateway"
+                expect(block.call).to eq "No Adapter found for #{to.to_s}"
+              end
+            end
 
             it "should raise an error" do
               expect { gateway.send_message(message) }.to raise_error(URI::BadURIError, "unsupported scheme: #{bogus_protocol}")

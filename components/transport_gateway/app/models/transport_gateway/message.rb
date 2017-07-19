@@ -28,7 +28,26 @@ module TransportGateway
       @to = to_uri(options[:to])
     end
 
-  private 
+    def log_inspect()
+      <<-LOGSTRING
+        From: #{from.to_s}
+        To: #{to.to_s}
+        #{log_body}
+      LOGSTRING
+    end
+
+  private
+
+    def log_body
+      return("------- NIL BODY VALUE ------") if body.nil?
+      if body.respond_to?(:size)
+        if body.size > 1024
+          "------- Large body > 1024 bytes -------"
+        else
+          body.to_s
+        end
+      end
+    end
 
     def to_uri(value)
       return if value.nil?

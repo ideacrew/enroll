@@ -5,11 +5,12 @@ module TransportGateway
   CREDENTIAL_KINDS  = ["basic", "key"]
 
   class Gateway
-    attr_reader :credential_provider
+    attr_reader :credential_provider, :logger
 
-    def initialize(credential_provider = nil)
+    def initialize(credential_provider, l_provider)
       @adapters = []
       @credential_provider = credential_provider
+      @logger = l_provider
       load_adapters
     end
 
@@ -18,14 +19,18 @@ module TransportGateway
     end
 
     def receive_message(message)
+      logger.info("transport_gateway") { "Started receive of message:\n#{message.log_inspect}" }
       adapter = adapter_from(message)
       adapter.assign_providers(self, credential_provider)
+      adapter.add_observer(LoggingObserver.new(logger))
       adapter.receive(message)
     end
 
     def send_message(message)
+      logger.info("transport_gateway") { "Started send of message:\n#{message.log_inspect}" }
       adapter = adapter_to(message)
       adapter.assign_providers(self, credential_provider)
+      adapter.add_observer(LoggingObserver.new(logger))
       adapter.send_message(message)
     end
 
@@ -48,6 +53,7 @@ module TransportGateway
 
       adapter_klass = klass_for(TransportGateway::ADAPTER_FOLDER, protocol)
       if adapter_klass.nil?
+        logger.error("transport_gateway") { "No Adapter found for #{uri.to_s}" }
         raise URI::BadURIError.new("unsupported scheme: #{uri.scheme}")
       end
       adapter_klass.new
