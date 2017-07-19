@@ -39,7 +39,6 @@
   "en.uis.bootstrap3_examples.index.second_header" => "SECOND VERTICAL TYPE:",
   "en.uis.bootstrap3_examples.index.third_header" => "THIRD JUSTIFIED TYPE :",
   "en.uis.bootstrap3_examples.index.button_group_type_group_desc" => "we can also mix input groups with button groups",
-  "en.uis.bootstrap3_examples.index.panels" => "Panels",
   "en.uis.bootstrap3_examples.index.panel_desc" => "Panel Heading for enrollment reports goes here",
   "en.uis.bootstrap3_examples.index.panel_body_desc" => "It will display the all the enrollment reports",
   "en.uis.bootstrap3_examples.index.hbx_id" => "HBX_ID",
