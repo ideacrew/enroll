@@ -6,8 +6,9 @@
   </div>
 
   <div>
-    <% if @applicant.deductions.present? %>
-      <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+  <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+    <%= render "income_adjustments_question"%>
+    <% if @applicant.deductions.present?%>
       <table class="table">
         <th>Deduction Income Type</th>
         <th></th>
@@ -28,7 +29,7 @@
 </div>
 
 <div class="col-md-2">
-  <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
+  <%= link_to find_redirection_path(@application, @applicant, current: 'deductions') do %>
     <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
   <% end %>
 
