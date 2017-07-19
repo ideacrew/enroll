@@ -21,9 +21,10 @@
         <div class="row employer_attestation_fields">
           <div class="col-md-12">
 
-            <%= form_tag employers_employer_attestation_path(@employer_profile), :method => :put do |f| %>
+            <%= form_tag employers_employer_attestation_path(@employer_profile),:method => :put do |f| %>
               <%= hidden_field_tag :employer_attestation_id, @document.id %>
-             
+              <%= hidden_field_tag :prev_status, @document.aasm_state %>
+
               <div class='row'>
                 <div class="col-sm-8">
                   <div class="form-group">
@@ -59,8 +60,7 @@
                 </div>
                 <div class="col-sm-9">
                   <div class="form-group rejection_reason hidden">
-                    <%= select_tag "reason_for_rejection", options_for_select(EmployerAttestationDocument::REASON_KINDS), prompt: "Reason for rejection" %>
-                  </div>
+                    <%= select_tag "reason_for_rejection", options_for_select(EmployerAttestationDocument::REASON_KINDS), prompt: "Reason for rejection",onchange: "rejectReason()" %>                  </div>
                 </div>
               </div>
 
@@ -82,8 +82,12 @@
               <div class="row">
                 <div class="col-sm-12">
                    <div class="form-group pull-right">
-                    <button type="submit" class="btn <%= @document.may_accept? ? 'btn-primary' : 'disabled' %>">Submit</button>
-                    <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
+                    <%if @document.may_accept? %>
+                       <button type="submit" id = "attestation_submit" class='btn btn-primary'>Submit</button>
+                    <%else%>
+                       <button type="button" class="btn disabled"> Submit </button>
+                    <%end%>
+                     <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
                   </div>
                 </div>
               </div>

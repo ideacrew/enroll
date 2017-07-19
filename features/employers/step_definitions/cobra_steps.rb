@@ -29,6 +29,11 @@ def people_for_cobra
       email: "jack@dc.gov",
       password: 'aA1!aA1!aA1!'
     },
+
+    "Hbx Admin" => {
+        email: 'admin@dc.gov',
+        password: 'aA1!aA1!aA1!'
+    },
   }
 end
 
@@ -273,6 +278,12 @@ When(/^.+ click all employee filter$/) do
   end
 end
 
+When(/^.+ click active employee filter$/) do
+  with_datatable_load_wait(7) do
+    find('div[data-key=active]').click
+  end
+end
+
 Then(/^.+ should see the status of Employment terminated$/) do
   expect(find("td", :text => "Employment terminated", :wait => 3)).not_to be_nil
 end
@@ -325,8 +336,8 @@ Then(/^.+ should not see individual on enrollment title/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click

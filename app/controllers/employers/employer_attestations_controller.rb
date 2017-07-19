@@ -28,10 +28,10 @@ class Employers::EmployerAttestationsController < ApplicationController
   def create
     @errors = []
     if params[:file]
-      @employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
+      #@employer_profile.build_employer_attestation unless @employer_profile.employer_attestation
       file = params[:file]
       doc_uri = Aws::S3Storage.save(file.tempfile.path, 'attestations')
-      if doc_uri.present?
+      if doc_uri.present? && @employer_profile.employer_attestation
         attestation_document = @employer_profile.employer_attestation.employer_attestation_documents.new
         success = attestation_document.update_attributes({:identifier => doc_uri, :subject => file.original_filename, :title=>file.original_filename, :size => file.size, :format => "application/pdf"})
         errors = attestation_document.errors.full_messages unless success
@@ -43,13 +43,13 @@ class Employers::EmployerAttestationsController < ApplicationController
           flash[:error] = "Could not save file. " + errors.join(". ")
         end
       else
-        flash[:error] = "Could not save file"
+        flash[:error] = "Could not save the file in S3 storage"
       end
     else
       flash[:error] = "Please upload file"
     end
 
-    redirect_to "/employers/employer_profiles/#{@employer_profile.id}"+'?tab=documents'
+    redirect_to employers_employer_profile_path(@employer_profile.id, :tab=>'documents')
   end
 
   def update

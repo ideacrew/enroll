@@ -26,11 +26,11 @@ class EmployerAttestation
     end
 
     event :approve, :after => :record_transition do
-      transitions from: [:submitted, :pending, :denied], to: :approved
+      transitions from: [:submitted,:pending], to: :approved
     end
 
     event :deny, :after => :record_transition do
-      transitions from: [:submitted, :pending], to: :denied
+      transitions from: [:submitted, :pending], to: :denied, :after => :terminate_employer
     end
   end
 
@@ -44,6 +44,10 @@ class EmployerAttestation
 
   def has_documents?
     self.employer_attestation_documents
+  end
+
+  def terminate_employer
+    employer_profile.terminate(TimeKeeper.date_of_record.end_of_month)
   end
 
   private

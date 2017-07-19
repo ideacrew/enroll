@@ -181,7 +181,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   find(tab_class, wait: 10).click
 end
 Given /Admin selects Hannahs company/ do
-  company = find('a', text: 'Turner Agency, Inc')
+  company = find('a', text: 'Turner Agency, Inc', :wait => 3)
   company.click
 end
 

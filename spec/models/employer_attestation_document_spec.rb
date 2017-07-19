@@ -38,7 +38,7 @@ describe EmployerAttestationDocument, dbclean: :after_each do
         attestation.update(aasm_state: 'submitted')
         document.submit_review({status: 'info_needed', reason_for_rejection: reject_reason, other_reason: 'info needed'})
         employer_profile.reload
-        expect(document.rejected?).to be_truthy
+        expect(document.info_needed?).to be_truthy
         expect(document.reason_for_rejection).to eq 'info needed'
         expect(document.employer_attestation.pending?).to be_truthy
       end

@@ -844,7 +844,7 @@ class PlanYear
     #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
     state :expired              # Non-published plans are expired following their end on date
-    state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
+    state :canceled,          :after_enter => :cancel_application             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
@@ -853,11 +853,12 @@ class PlanYear
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
     state :renewing_enrolled, :after_enter => [:renewal_successful]
     state :renewing_application_ineligible, :after_enter => :deny_enrollment  # Renewal application is non-compliant for enrollment
-    state :renewing_canceled
+    state :renewing_canceled,          :after_enter => :cancel_application
 
     state :suspended            # Premium payment is 61-90 days past due and coverage is currently not in effect
-    state :terminated           # Coverage under this application is terminated
+    state :terminated, :after_enter => :terminate_application           # Coverage under this application is terminated
     state :conversion_expired   # Conversion employers who did not establish eligibility in a timely manner
+    state :termination_pending
 
     event :activate, :after => :record_transition do
       transitions from: [:published, :enrolling, :enrolled, :renewing_published, :renewing_enrolling, :renewing_enrolled],  to: :active,  :guard  => :can_be_activated?
@@ -947,9 +948,13 @@ class PlanYear
       transitions from: :active, to: :suspended
     end
 
-    # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended], to: :terminated
+      transitions from: [:active, :suspended, :termination_pending], to: :terminated
+    end
+
+    # Termination pending due to attestation document rejection
+    event :schedule_termination, :after => :record_transition do
+      transitions from: :active, to: :termination_pending, :after => [:set_termination_date, :schedule_employee_terminations]
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1006,6 +1011,37 @@ class PlanYear
   def adjust_open_enrollment_date
     if TimeKeeper.date_of_record > open_enrollment_start_on && TimeKeeper.date_of_record < open_enrollment_end_on
       update_attributes(:open_enrollment_start_on => TimeKeeper.date_of_record)
+    end
+  end
+
+  def schedule_employee_terminations(terminated_on=TimeKeeper.date_of_record.end_of_month)
+    hbx_enrollments.each do |hbx_enrollment|
+      if hbx_enrollment.may_schedule_coverage_termination?
+        hbx_enrollment.schedule_coverage_termination!(terminated_on)
+      end
+    end
+  end
+
+  def set_termination_date(termination_date = TimeKeeper.date_of_record.end_of_month)
+    self.update_attributes({ end_on: termination_date, terminated_on: termination_date })
+  end
+
+  def terminate_application
+    employer_profile.benefit_terminated! if employer_profile.may_benefit_terminated?
+  end
+
+  def cancel_application
+    cancel_employee_enrollments
+    employer_profile.benefit_canceled! if canceled? && employer_profile.may_benefit_canceled?
+  end
+
+  def cancel_employee_enrollments
+    id_list = benefit_groups.pluck(:id)
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    families.each do |family|
+      family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).non_expired_and_non_terminated.each do |en|
+        en.cancel_coverage! if en.may_cancel_coverage?
+      end
     end
   end
 
@@ -1298,7 +1334,8 @@ class PlanYear
                  "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
-    if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+    if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)
+
       if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end

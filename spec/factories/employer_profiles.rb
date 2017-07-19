@@ -22,6 +22,7 @@ FactoryGirl.define do
 
     transient do
       employee_roles []
+      attested true
     end
 
     trait :with_full_inbox do
@@ -41,7 +42,11 @@ FactoryGirl.define do
     end
 
     after(:create) do |employer_profile, evaluator|
-      create(:employer_attestation, employer_profile: employer_profile)
+      if evaluator.attested
+        create(:employer_attestation, employer_profile: employer_profile)
+      else
+        create(:employer_attestation, employer_profile: employer_profile, aasm_state: 'unsubmitted')
+      end
     end
 
     factory :employer_profile_congress,   traits: [:congress]

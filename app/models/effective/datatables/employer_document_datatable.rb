@@ -8,7 +8,7 @@ module Effective
           bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
-        table_column :status, :proc => Proc.new { |row| 
+        table_column "Doc Status", :proc => Proc.new { |row|
           icon = ""
 
           if row.accepted?
@@ -29,9 +29,6 @@ module Effective
         table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| TimeKeeper.local_time(row.created_at).strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
       end
 
-      def generate_invoice_link_type(row)
-        row.current_month_invoice.present? ? 'disabled' : 'post_ajax'
-      end
 
       def collection
         @employer_profile = EmployerProfile.find(attributes[:employer_profile_id])
