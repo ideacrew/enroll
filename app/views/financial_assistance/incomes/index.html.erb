@@ -6,8 +6,9 @@
   </div>
 
   <div>
-    <% if @applicant.incomes.present? %>
-      <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+  <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+     <%= render "income_questions"%>
+     <% if @applicant.incomes.present? %>
       <table class="table">
         <th>Income Type</th>
         <th></th>
@@ -26,10 +27,9 @@
     <%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
   </div>
-</div>
 
 <div class="col-md-2">
-  <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+  <%= link_to find_applicant_path(@application, @applicant, current: 'incomes') do %>
     <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
   <% end %>
 
