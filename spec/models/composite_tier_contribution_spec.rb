@@ -37,4 +37,10 @@ describe CompositeTierContribution, "with validations" do
     subject.valid?
     expect(subject.errors.has_key?(:employer_contribution_percent)).to be_truthy
   end
+
+  it "accepts an employer_contribution percent == 100" do
+    subject.employer_contribution_percent = 100.00
+    subject.valid?
+    expect(subject.errors.has_key?(:employer_contribution_percent)).to be_falsey
+  end
 end
