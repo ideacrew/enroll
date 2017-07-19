@@ -33,6 +33,8 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
 
   def build
     append_data
+    notice.mpi_indicator = self.mpi_indicator
+    notice.notification_type = self.event_name
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
