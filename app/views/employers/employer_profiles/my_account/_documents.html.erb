@@ -1,9 +1,11 @@
   <div class="col-xs-8">
-    <h1>Employer Attestation</h1>
+    <h1>Verification of Employer Eligibility</h1>
   </div>
 
-  <div class="col-xs-10"><h4>Employers who wish to sponsor benefits through the <%= Settings.site.short_name %> must have their primary office located in <%= Settings.aca.state_name %>.  Before submitting an application, upload documentation that verifies eligibility for this employer.  Acceptable documents include: <strong>doc_type_1, doc_type, 2, doc_type_3 (Provide doc types here).</strong></h4></div>
-
+  <div class="col-xs-10">
+    <h4>Before you can complete your application, you will need to submit proof of your eligibility to shop as a small business through the <%= Settings.site.short_name %>. You will need to submit this proof before you are able to finalize your plan year.</h4>
+    <h4> Please review our list of <%= link_to "documents that can be used as proof", "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist" %> and ensure that you have the right documentation available.
+    </h4>
 <div class="col-xs-10">
     <%if @employer_profile.employer_attestation %>
 <!--       <button class = "btn btn-danger" ><%#= @employer_profile.employer_attestation.aasm_state %></button> -->
