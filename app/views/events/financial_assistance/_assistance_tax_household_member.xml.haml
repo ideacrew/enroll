@@ -27,7 +27,8 @@
         - unless assistance_tax_household_member.person.is_disabled.blank?
           %is_disabled= assistance_tax_household_member.person.is_disabled
   - unless assistance_tax_household_member.person.consumer_role.blank?
-    = render :partial => "events/lawful_presence/immigration_information", :object => assistance_tax_household_member.person, as: :person
+    - unless assistance_tax_household_member.person.consumer_role.lawful_presence_determination.citizen_status == "us_citizen"
+      = render :partial => "events/lawful_presence/immigration_information", :object => assistance_tax_household_member.person, as: :person
     = render :partial => "events/financial_assistance/applicant_information", :object => assistance_tax_household_member, as: :applicant
   %incomes
     - if assistance_tax_household_member.incomes.size > 0
