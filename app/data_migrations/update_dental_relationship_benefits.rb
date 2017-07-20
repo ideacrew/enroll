@@ -1,6 +1,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class UpdateDentalRelationShipBenefits< MongoidMigrationTask
+class UpdateDentalRelationshipBenefits< MongoidMigrationTask
 
   def migrate
     begin

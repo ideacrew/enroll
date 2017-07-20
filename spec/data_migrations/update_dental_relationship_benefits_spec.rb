@@ -4,7 +4,7 @@ require File.join(Rails.root, "app", "data_migrations", "update_dental_relations
 describe "UpdateDentalRelationshipBenefits", dbclean: :after_each do
 
   let(:given_task_name) { "update_dental_relationship_benefits" }
-  subject { UpdateDentalRelationShipBenefits.new(given_task_name, double(:current_scope => nil)) }
+  subject { UpdateDentalRelationshipBenefits.new(given_task_name, double(:current_scope => nil)) }
 
 
   describe "given a task name" do
