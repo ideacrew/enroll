@@ -136,12 +136,7 @@
 
 <% notice.individuals.each do |ivl|%>
   <%= render partial: 'notices/shared/info_table', locals: {
-                             rows: [['Household Member:', "#{ivl[:full_name]}  Age: #{ivl[:age]}"],
-                                ['Medicaid', "#{ivl[:first_name]} likely qualifies for Medicaid. Your monthly household income of $123.90 is within the monthly income limit of $9587.00 for this person. Medicaid offers free, comprehensive health coverage."],
-                                ['Private Health Insurance',"#{ivl[:first_name]} qualifies to purchase private health insurance through #{Settings.site.short_name}. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage."],
-                                ['Advance Premium Tax Credit (APTC)', "#{ivl[:first_name]} qualifies for an advance premium tax credit to help pay for the insurance. Your annual household income of $458.00 is within the income limit of $232.00 for this person. The value of the tax credit is based on your household size, income, and the cost of health plans available to those who qualify."],
-                                ['Cost-Sharing Reductions (CSR)', "#{ivl[:full_name]} qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of $234.00 is within the income limit of $334.00. With a silver plan, Person 1 will get a discount on what they pay for medical services."],
-                                ['Ineligible for Medicaid and Private Health Insurance', "#{ivl[:full_name]} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl[:reason_for_ineligibility].join(". In addition, ")}. If #{ivl[:first_name]}’s status changes, we encourage you to update your application, or call DC Health Link at (855) 532-5465."]],
+                             rows: notice.something(ivl),
     col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 
