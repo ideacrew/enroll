@@ -44,18 +44,31 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def append_data
-    recipient.primary_family.family_members.map(&:person).uniq.each do |person|
-      notice.individuals << append_family_members(person)
+    family = recipient.primary_family
+    #temporary fix - in case of mutliple applications
+    latest_application = family.applications.where(:assm_state.nin => ["draft"]).sort_by(&:submitted_at).last
+    notice.assistance_year = latest_application.assistance_year
+
+    family.enrollments.enrolled_and_renewing.each do |enrollment|
+      notice.enrollments << append_enrollment_information(enrollment)
     end
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
-  def append_family_members(person)
-    params = {full_name: person.full_name}
-    if consumer_role = person.consumer_role
-      params.merge!({
-        :age => person.age_on(TimeKeeper.date_of_record)
-        })
-    end
+  def append_enrollment_information(enrollment)
+    plan = PdfTemplates::Plan.new({
+      is_csr: enrollment.plan.is_csr?
+      })
+    params = {
+      aptc_amount: enrollment.applied_aptc_amount,
+      is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
+      coverage_kind: enrollment.coverage_kind,
+      effective_on: enrollment.effective_on,
+      plan: plan
+    }
   end
 
   def append_address(primary_address)
