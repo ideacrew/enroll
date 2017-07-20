@@ -185,13 +185,7 @@
               </td>
               <td>
                 <p>
-                  <% if bg.plan_option_kind == "single_carrier" %>
-                  All Plans From A Single Carrier
-                  <% elsif bg.plan_option_kind == "metal_level" %>
-                  All Plans From A Given Metal Level
-                  <% elsif bg.plan_option_kind == "single_plan" %>
-                  A Single Plan
-                  <% end %>
+                  <%= selected_benefit_plan(bg.plan_option_kind) %>
                 </p>
               </td>
             </tr>

@@ -301,6 +301,19 @@ When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   click_link 'Benefits'
 end
 
+When(/^I go to MY Health Connector tab$/) do
+ find('.interaction-click-control-my-health-connector').click
+ wait_for_ajax
+  expect(page).to have_content('My Health Benefits Program')
+end
+
+And(/^Employer can see the plan information on home tab$/) do
+  sleep 1
+  within('.benefit-group') do
+    expect(page).to have_content('All Plans From A Single Carrier')
+  end
+end
+
 And(/^Employer can see the plan information$/) do
   sleep 1
   within('.benefit-package') do

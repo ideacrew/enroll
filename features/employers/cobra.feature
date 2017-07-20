@@ -19,6 +19,9 @@ Feature: COBRA basic
     Then Employer can see the plan information
     Then Employer clicks on publish plan year
     Then Employer should see a published success message without employee
+    
+    When I go to MY Health Connector tab
+    Then Employer can see the plan information on home tab
 
     When Employer clicks on the Employees tab
     When Employer clicks to add the first employee
