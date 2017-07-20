@@ -1,4 +1,4 @@
-<form action="save_questions" method="get">
+<%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
   <div class="col-md-7">
     <p class="alert alert-error hide"></p>
     <h1 class="darkblue">Other Questions for ksjdf</h1>
@@ -10,11 +10,12 @@
           <span class='span-text'>Has this person applied for an SSN *</span>
         </div>
         <div class='col-md-2'>
-          <%= radio_button_tag "applicant[is_ssn_applied]", true, @applicant.is_ssn_applied, class: "radio-yml", id: "is_ssn_applied_yes", required: true %>
+          <%#= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
+          <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes", required: true) %>
           <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
         </div>
         <div class='col-md-2'>
-          <%= radio_button_tag "applicant[is_ssn_applied]", false, checked_value_for_radio(@applicant, :is_ssn_applied, false), class: "radio-yml", id: "is_ssn_applied_no", required: true %>
+          <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no", required: true) %>
           <label class="radio-yml" for="is_ssn_applied_no">No</label>
         </div>
       </div>
@@ -246,6 +247,6 @@
       </li>
     </ul>
   </div>
-</form>
+<%end%>
 
           
