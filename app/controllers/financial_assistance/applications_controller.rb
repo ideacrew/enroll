@@ -20,7 +20,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application = @person.primary_family.applications.new
     @application.populate_applicants_for(@person.primary_family)
     @application.save!
-    redirect_to edit_financial_assistance_application_path(@application)
+
+    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
   end
 
   def edit
@@ -40,10 +41,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Finish"
-          @model.update_attributes!(workflow: { current_step: 1 })
-          redirect_to edit_financial_assistance_application_path(@application)
-        elsif params[:commit] == "Submit my Application"
+        if params[:commit] == "Submit my Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           @application.submit! if @application.complete?
           publish_application(@application)
