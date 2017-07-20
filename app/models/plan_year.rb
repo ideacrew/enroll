@@ -848,7 +848,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_publish_pending
+      transitions from: :renewing_draft, to: :renewing_publish_pending, :after => :employer_renewal_eligibility_denial_notice
     end
 
     # Employer requests review of invalid application determination
@@ -1084,6 +1084,12 @@ class PlanYear
   def renewal_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     self.employer_profile.trigger_notices("renewal_employer_ineligibility_notice")
+  end
+
+  def employer_renewal_eligibility_denial_notice
+    if application_eligibility_warnings.include?(:primary_office_location)
+      ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
+    end
   end
 
   def record_transition
