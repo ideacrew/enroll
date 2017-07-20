@@ -50,6 +50,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     application = recipient.primary_family.applications.first
     #temporary fix - in case of mutliple applications
     latest_application = family.applications.where(:assm_state.nin => ["draft"]).sort_by(&:submitted_at).last
+    notice.assistance_year = latest_application.assistance_year
     latest_application.applicants.each do |applicant|
       notice.individuals << append_applicant_information(applicant)
     end
@@ -68,7 +69,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
               max_aptc: th.preferred_eligibility_determination.max_aptc.to_i,
               aptc_csr_annual_household_income: th.preferred_eligibility_determination.aptc_csr_annual_household_income.to_i,
               aptc_annual_income_limit: th.preferred_eligibility_determination.aptc_annual_income_limit.to_i,
-              csr_annual_income_limit: th.preferred_eligibility_determination.csr_annual_income_limit.to_i
+              csr_annual_income_limit: th.preferred_eligibility_determination.csr_annual_income_limit.to_i,
               }
   end
 
@@ -83,9 +84,14 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
               age: applicant.person.age_on(TimeKeeper.date_of_record),
               is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,
               is_ia_eligible: applicant.is_ia_eligible,
+              indian_conflict: applicant.person.consumer_role.indian_conflict?,
               is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
               is_without_assistance: applicant.is_without_assistance,
+              no_aptc_because_of_income: (applicant.preferred_eligibility_determination.aptc_csr_annual_household_income > applicant.preferred_eligibility_determination.aptc_annual_income_limit) ? true : false,
+              no_csr_because_of_income: (applicant.preferred_eligibility_determination.aptc_csr_annual_household_income > applicant.preferred_eligibility_determination.csr_annual_income_limit) ? true : false,
               is_totally_ineligible: applicant.is_totally_ineligible,
+              csr_percent_as_integer: applicant.preferred_eligibility_determination.csr_percent_as_integer.to_i,
+              max_aptc_amount: applicant.preferred_eligibility_determination.max_aptc.to_i,
               reason_for_ineligibility: reason_for_ineligibility
               }
   end

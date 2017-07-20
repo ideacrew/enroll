@@ -9,7 +9,8 @@ module PdfTemplates
     attribute :citizenship_verified, Boolean, :default => false
     attribute :citizen_status, String
     # attribute :household_size, String
-
+    attribute :max_aptc_amount, Integer
+    attribute :csr_percent_as_integer, Integer
     attribute :projected_amount, String
     attribute :taxhh_count, String
     attribute :tax_status, String
@@ -26,6 +27,8 @@ module PdfTemplates
     attribute :is_non_magi_medicaid_eligible, Boolean, :default => false
     attribute :is_without_assistance, Boolean, :default => false
     attribute :is_totally_ineligible, Boolean, :default => false
+    attribute :no_aptc_because_of_income, Boolean, :default => false
+    attribute :no_csr_because_of_income, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]
     # attribute :ineligible_members_due_to_residency, Array[String]
