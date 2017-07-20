@@ -121,7 +121,7 @@ class FinancialAssistance::Applicant
   field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-  
+
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -292,7 +292,10 @@ class FinancialAssistance::Applicant
   end
 
   def applicant_validation_complete?
-    is_applicant_valid?
+    self.valid?(:submission) &&
+      self.incomes.all? { |income| income.valid? :submission } &&
+      self.benefits.all? { |benefit| benefit.valid? :submission } &&
+      self.deductions.all? { |deduction| deduction.valid? :submission }
   end
 
   def clean_conditional_params(model_params)
@@ -505,9 +508,5 @@ private
       model_params[:student_status_end_on] = nil
       model_params[:student_kind] = nil
     end
-  end
-
-  def is_applicant_valid?
-    self.valid?(:submission) ? true : false
   end
 end
