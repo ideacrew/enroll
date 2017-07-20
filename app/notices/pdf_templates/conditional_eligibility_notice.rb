@@ -96,6 +96,10 @@ module PdfTemplates
       individuals.select{ |individual| individual[:is_non_magi_medicaid_eligible] == true  }
     end
 
+    def aqhp_enrollments
+      enrollments.select{ |enrollment| enrollment[:is_receiving_assistance] == true}.present?
+    end
+
     #FIX ME
     def tax_hh_with_csr
       tax_households.select { |thh| thh[:csr_percent_as_integer] != 100}

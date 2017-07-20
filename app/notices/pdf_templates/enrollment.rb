@@ -11,5 +11,7 @@ module PdfTemplates
     attribute :aptc_amount, String
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
+    attribute :coverage_kind, String
+    attribute :is_receiving_assistance, Boolean
   end
 end
