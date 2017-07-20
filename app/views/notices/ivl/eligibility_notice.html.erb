@@ -41,30 +41,50 @@
     listing: "<strong>What you need to do next:</strong> You don’t need to do anything right now. The DC Department of Human Services (DHS) has your application. They will make a final decision on whether those listed qualify for Medicaid. They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS by #{TimeKeeper.date_of_record+14.days}, you may want to ask for an update by calling us at #{Settings.contact_center.phone_number}."} %>
 <% end %>
 
-<% if notice.aqhp.present? %>
+<% if notice.aqhp_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "Qualify for Private Health Insurance with Savings:",
-    listings: notice.aqhp} %>
-
-  <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-   contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-     heading: '', sub_heading: 'Advance Premium Tax Credit Savings:'} %>
+    listings: notice.aqhp_individuals} %>
+  <% notice.tax_households.each do |thh|%>
+    <% if thh[:max_aptc] > 0 %>
+      <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
+         heading: '', sub_heading: "Advance Premium Tax Credit Savings: $#{thh[:max_aptc]}/month"} %>
+    <% else %>
+      <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
+         heading: '', sub_heading: "Advance Premium Tax Credit Savings: $#{thh[:max_aptc]}/month"} %>
+    <% end %>
+  <% end %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan</strong>. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider. You won’t pay anything for services you receive from an Indian Health Service provider."} %>
+<% if notice.tax_hh_with_csr.present? %>
+  <% notice.tax_hh_with_csr.each do |hh_csr|%>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: notice.csr_eligibility_notice_text(hh_csr[:csr_percent_as_integer]).join(' ')} %>
+  <% end %>
+<% end %>
 
-<%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+<% if is_under_open_enrollment? %>
+  <%= render partial: 'notices/shared/custom_listing', :locals => {
+  listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan."} %>
+<% else %>
+  <%= render partial: 'notices/shared/custom_listing', :locals => {
+  listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+<% end %>
 
-<% if notice.uqhp.present? %>
+<% if notice.uqhp_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
-    listings: notice.uqhp} %>
+    listings: notice.uqhp_individuals} %>
 
-  <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>What you need to do next:</strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment.
-  "} %>
+  <% if is_under_open_enrollment? %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan."} %>
+  <% else %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+  <% end %>
 <% end %>
 
 <% if notice.ineligible_applicants.present? %>
@@ -76,10 +96,10 @@ listing: "<strong>What you need to do next:<strong> Login to your account at dch
   listing: "<strong>What you need to do next:</strong> Review the section, ‘How We Made Our Decision’, to find out why, and learn about options for those listed."} %>
 <% end %>
 
-<% if notice.aqhp.present? || notice.uqhp.present? %>
+<% if notice.aqhp_individuals.present? || notice.uqhp_individuals.present? %>
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-     contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{TimeKeeper.date_of_record.next_year.year} private health plans began on #{Date.new(2017,11,1)}, and ends on #{Date.new(2018,1,31)}."],
+     contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{notice.assistance_year} private health plans began on #{notice.ivl_open_enrollment_start_on}, and ends on #{notice.ivl_open_enrollment_end_on}."],
        heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -88,13 +108,21 @@ listing: "<strong>What you need to do next:<strong> Login to your account at dch
                  "Login to your account at dchealthlink.com to enroll now."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "If someone in your household had a recent life change, they may still be able to enroll for #{TimeKeeper.date_of_record.year}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at dchealthlink.com or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
+    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.assistance_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at dchealthlink.com or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
+  <% else %>
+
+    <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+     contents: ["Open enrollment for #{notice.assistance_year} ended on #{notice.ivl_open_enrollment_end_on}."],
+       heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "Open enrollment for <coverage year> ended on <coverage year OE end date>.",
+      previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at dchealthlink.com to enroll now."],
-                 after: "To find out if those who qualify can enroll now, login to your account at dchealthlink.com, or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
+                 "Login to your account at dchealthlink.com to enroll now."]} %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "To find out if those who qualify can enroll now, login to your account at dchealthlink.com, or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up."} %>
+
   <% end %>
 
   <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
