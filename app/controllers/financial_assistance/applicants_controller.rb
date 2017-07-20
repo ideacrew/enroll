@@ -18,7 +18,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def save_questions
     @applicant = @application.applicants.find(params[:id])
-    @applicant.update_attributes!(permit_params(params[:applicant]))
+    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
     redirect_to find_application_path(@application)
   end
 
@@ -70,6 +70,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def permit_params(attributes)
+    binding.pry
     attributes.permit!
   end
 end
