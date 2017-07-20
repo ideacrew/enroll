@@ -20,6 +20,9 @@ contact_center:
   tty_number: "1-855-532-5465"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
+  mailing_address: "PO Box 97022"
+  city_state_zip: "Washington, DC 20090"
+
 
 aca:
   state_name: "District of Columbia"
@@ -104,7 +107,7 @@ aca:
       update_transmit_day_of_week: "friday"
 
     employer_profiles:
-      minimum_invoice_display_year: 2015  
+      minimum_invoice_display_year: 2015
 
 
 paper_notice: 'paper-notices'
