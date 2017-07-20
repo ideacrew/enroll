@@ -4,7 +4,15 @@
         <% rows.each do |row| %>
         <tr>
           <% row.size.times do |i| %>
-            <td style="<%= col_styles[i] if defined? col_styles %>"><%= row[i] %></td>
+            <td style="<%= col_styles[i] if defined? col_styles %>">
+              <% if row[i].instance_of? Array %>
+                <% row[i].size.times do |j| %>
+                  <p><%= row[i][j] %></p>
+                <%end%>
+              <% else %>
+                <%= row[i] %>
+              <% end %>
+            </td>
           <% end %>
         </tr>
         <% end %>
