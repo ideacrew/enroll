@@ -20,7 +20,7 @@
     </li>
     <li>Pay by Phone
       <div class="row col-md-offset-1">
-        855-532-LINK, select "Small Business Employer" then "Make a Payment"
+        <%=  Settings.contact_center.alt_phone_number %>, select "Small Business Employer" then "Make a Payment"
       </div>
     </li>
     <li>Pay by Mail
@@ -28,13 +28,15 @@
         <%= Settings.site.short_name %>
       </div>
       <div class="row col-md-offset-1">
-        PO Box 97022
+        <%= Settings.contact_center.mailing_address %>
       </div>
       <div class="row col-md-offset-1">
-        Washington, DC 20090
+        <%= Settings.contact_center.city_state_zip %>
       </div>
     </li>
   </ol>
 </h4>
 <h4>**Please include your account number on your check.</h4>
-<h4>Check that your mailing address is up to date - click on Update Business Info.</h4>
+<h4>Check that your mailing address is up to date - click on
+  <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>.
+</h4>
