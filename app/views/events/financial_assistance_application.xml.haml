@@ -22,12 +22,11 @@
   = render :partial => "events/financial_assistance/benchmark_plan", :locals=> {:financial_assistance_application => financial_assistance_application}
   %has_accepted_medicaid_terms= financial_assistance_application.medicaid_terms
   %has_accepted_medicaid_insurance_collection_terms= financial_assistance_application.medicaid_insurance_collection_terms
-  - unless financial_assistance_application.attestation_terms.blank?
-    %has_accepted_attestation_terms= financial_assistance_application.attestation_terms
+  %has_accepted_attestation_terms= financial_assistance_application.attestation_terms
   %has_accepted_submission_terms= financial_assistance_application.submission_terms
   %has_accepted_parent_living_out_of_home_terms= financial_assistance_application.parent_living_out_of_home_terms
   %has_accepted_report_change_terms= financial_assistance_application.report_change_terms
-  - if financial_assistance_application.request_full_determination
+  - if financial_assistance_application.request_full_determination.present?
     %request_full_determination= financial_assistance_application.request_full_determination
   %assistance_tax_households
     = render :partial => "events/financial_assistance/assistance_tax_household", :collection => financial_assistance_application.tax_households, as: :assistance_tax_household, :locals=> {:financial_assistance_application => financial_assistance_application}
