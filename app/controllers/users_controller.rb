@@ -37,6 +37,11 @@ class UsersController < ApplicationController
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
+  def login_history
+    @user = User.find(params[:id])
+    @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC')
+  end
+
   private
 
   def reset_password_params
@@ -50,5 +55,4 @@ class UsersController < ApplicationController
                 @user.errors.full_messages.join.gsub('(optional) ', '')
               end
   end
-
 end
