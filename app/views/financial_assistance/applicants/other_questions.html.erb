@@ -48,7 +48,7 @@
       </div>
       <div class='col-md-3'>
         <label></label>
-        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3}, selected: @applicant.children_expected_count), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true, required: true}) %>
+        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3}, selected: @applicant.children_expected_count), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
@@ -109,7 +109,7 @@
       </div>
       <div class='col-md-2'>
         <label></label>
-         <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true, required: true}) %>
+         <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
@@ -119,7 +119,7 @@
       </div>
       <div class='col-md-2'>
         <label></label>
-        <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+        <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
