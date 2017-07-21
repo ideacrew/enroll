@@ -2,6 +2,8 @@ class User
   INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE = "acc"
   MIN_USERNAME_LENGTH = 8
   MAX_USERNAME_LENGTH = 60
+  MAX_SAME_CHAR_LIMIT = 4
+
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
@@ -90,7 +92,6 @@ class User
   index({email: 1},  {sparse: true, unique: true})
   index({oim_id: 1}, {sparse: true, unique: true})
   index({created_at: 1 })
-
 
   before_save :strip_empty_fields
 
@@ -381,6 +382,24 @@ class User
     settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA1
 
     settings
+  end
+
+  class << self
+    def password_invalid?(password)
+      ## TODO: oim_id is an explicit dependency to the User class
+      resource = self.new(oim_id: 'example1', password: password)
+      !resource.valid_attribute?('password')
+    end
+
+    def find_for_database_authentication(warden_conditions)
+      #TODO: Another explicit oim_id dependency
+      conditions = warden_conditions.dup
+      if login = conditions.delete(:login).downcase
+        where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
+      else
+        where(conditions).first
+      end
+    end
   end
 
   private

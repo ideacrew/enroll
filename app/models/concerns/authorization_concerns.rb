@@ -100,8 +100,6 @@ module AuthorizationConcerns
   end
 
   class_methods do
-    MAX_SAME_CHAR_LIMIT = 4
-
     def password_invalid?(password)
       ## TODO: oim_id is an explicit dependency to the User class
       resource = self.new(oim_id: 'example1', password: password)
@@ -116,16 +114,6 @@ module AuthorizationConcerns
         password = generate_valid_password
       else
         password
-      end
-    end
-
-    def find_for_database_authentication(warden_conditions)
-      #TODO: Another explicit oim_id dependency
-      conditions = warden_conditions.dup
-      if login = conditions.delete(:login).downcase
-        where(conditions).where('$or' => [ {:oim_id => /^#{Regexp.escape(login)}$/i}, {:email => /^#{Regexp.escape(login)}$/i} ]).first
-      else
-        where(conditions).first
       end
     end
 
