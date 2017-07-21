@@ -6,11 +6,6 @@
     <tr>
       <td class="fssize health-connector-address" align="left"><%= notice.primary_fullname %></td>
     </tr>
-    <% if notice.shop? %>
-    <tr>
-      <td class="fssize1 health-connector-address" align="left"><%= notice.employer_name %></td>
-    </tr>
-    <% end %>
     <tr>
        <td class="fssize1 health-connector-address" align="left"><%= notice.primary_address.street_1 %></td>
     </tr>
@@ -27,8 +22,8 @@
 <br><br><br><br><br>
 
 <h1 class="headers-notice" align="center"><strong>THIS IS A COVER PAGE</strong></h1>
-<p align="center">___________________________________________________________________________________________________________________________________________________</p>
-<p class="notice-font"> The enclosed letter has important information about your health insurance, including steps you need to take to get or keep your insurance. </p> <br><br><br><br><br><br><br><br>
+<p class="notice-font-padding1" align="center">___________________________________________________________________________________________________________________________________________________</p>
+<p class="notice-font-padding1"> The enclosed letter has important information about your health insurance, including steps you need to take to get or keep your insurance. </p> <br><br><br><br><br><br><br><br>
 <p class="mpi_indicator"><%= notice.mpi_indicator %> </p>
 <br>
 </div>
