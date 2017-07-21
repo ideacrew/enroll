@@ -32,7 +32,7 @@ module Insured::FamilyMembersHelper
     else
       if family.application_in_progress.present?
         if family.application_in_progress.incomplete_applicants?
-          [go_to_step_financial_assistance_application_applicant(family.application_in_progress, family.application_in_progress.next_incomplete_applicant, 1), !family.application_in_progress.ready_for_attestation?]
+          [go_to_step_financial_assistance_application_applicant_path(family.application_in_progress, family.application_in_progress.next_incomplete_applicant, 1), !family.application_in_progress.ready_for_attestation?]
         else
           [review_and_submit_financial_assistance_application_path(family.application_in_progress), !family.application_in_progress.ready_for_attestation?]
         end

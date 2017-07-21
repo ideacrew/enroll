@@ -320,19 +320,19 @@ class FinancialAssistance::Applicant
 
   def incomes_complete?
     self.incomes.all? do |income|
-      income.valid?
+      income.valid? :submission
     end
   end
 
   def benefits_complete?
     self.benefits.all? do |benefit|
-      benefit.valid?
+      benefit.valid? :submission
     end
   end
 
   def deductions_complete?
     self.deductions.all? do |deduction|
-      deduction.valid?
+      deduction.valid? :submission
     end
   end
 
