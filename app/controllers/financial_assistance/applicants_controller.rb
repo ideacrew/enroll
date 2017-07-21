@@ -17,8 +17,9 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def save_questions
+    format_date_params params[:financial_assistance_applicant]
     @applicant = @application.applicants.find(params[:id])
-    @applicant.update_attributes!(permit_params(params[:applicant]))
+    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
     redirect_to find_application_path(@application)
   end
 
@@ -56,6 +57,12 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   private
+
+  def format_date_params model_params
+    model_params["pregnancy_due_on"]=Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
+    model_params["pregnancy_end_on"]=Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
+    model_params["student_status_end_on"]=Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+  end
 
   def build_error_messages(model)
     model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
