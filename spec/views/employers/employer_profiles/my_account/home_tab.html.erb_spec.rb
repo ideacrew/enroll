@@ -122,6 +122,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         elected_dental_plan_ids: [],
         elected_dental_plans: [],
         dental_relationship_benefits: [relationship_benefits],
+        sole_source?: false,
         )
     end
 
@@ -146,7 +147,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
         elected_dental_plan_ids: [],
         elected_dental_plans: [],
         dental_relationship_benefits: [relationship_benefits],
-
+        sole_source?: false,
         )
     end
 
