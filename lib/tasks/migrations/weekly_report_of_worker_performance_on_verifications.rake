@@ -16,6 +16,7 @@ namespace :reports do
       Admin_User
       Admin_User_HBX_ID
       Action_Date
+      Action
     )
 
     file_name = "#{Rails.root}/public/worker_performance_report.csv"
@@ -24,33 +25,44 @@ namespace :reports do
 
       row << fiels_names
 
+      count = 0
+
       people = Person.all_consumer_roles.where({:"consumer_role.workflow_state_transitions.user_id"=>{:$exists=>true}, 
-                                                    :"consumer_role.workflow_state_transitions.to_state"=>"fully_verified", 
-                                                      :"consumer_role.workflow_state_transitions.transition_at".gte => start_date.beginning_of_day, 
-                                                        :"consumer_role.workflow_state_transitions.transition_at".lte => end_date.end_of_day})
+                                                  :"consumer_role.workflow_state_transitions.transition_at".gte => start_date.beginning_of_day,
+                                                    :"consumer_role.workflow_state_transitions.transition_at".lte => end_date.end_of_day,
+                                                      :"$or" => [{:"consumer_role.workflow_state_transitions.to_state" => "fully_verified"},
+                                                        {:"consumer_role.workflow_state_transitions.to_state" => "verification_outstanding",
+                                                          :"consumer_role.workflow_state_transitions.event" => "reject!"}]})
 
       people.each do |person|
 
         begin
-          wfst = person.consumer_role.workflow_state_transitions.where({:"user_id"=>{:$exists=>true}, 
-                                                                          :"to_state"=>"fully_verified", 
-                                                                            :"transition_at".gte => start_date.beginning_of_day, 
-                                                                              :"transition_at".lte => end_date.end_of_day}).first
-          if wfst.present?
-            admin_user = User.find(wfst.user_id)
-            row << [
-              person.hbx_id,
-              person.first_name,
-              person.last_name,
-              admin_user.person.full_name,
-              admin_user.person.hbx_id,
-              wfst.transition_at
-            ]
+          wfsts = person.consumer_role.workflow_state_transitions.where({:"user_id"=>{:$exists=>true},
+                                                                          :"transition_at".gte => start_date.beginning_of_day,
+                                                                            :"transition_at".lte => end_date.end_of_day,
+                                                                            :"$or" => [{:"to_state" => "fully_verified"},
+                                                                              {:"to_state" => "verification_outstanding",
+                                                                                :"event" => "reject!"}]})
+          if wfsts.present?
+            wfsts.each do |wfst|
+              count += 1
+              admin_user = User.find(wfst.user_id)
+              row << [
+                person.hbx_id,
+                person.first_name,
+                person.last_name,
+                admin_user.person.full_name,
+                admin_user.person.hbx_id,
+                wfst.transition_at,
+                (wfst.event || "Verify")
+              ]
+            end
           end
         rescue Exception => e
           puts "#{e}"
         end
       end
     end
+    puts "Total count of records: #{count}"
   end
 end
