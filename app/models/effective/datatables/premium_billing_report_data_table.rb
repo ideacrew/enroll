@@ -69,7 +69,11 @@ module Effective
             h.hbx_enrollments.each{|hbx| @hbx_cache[hbx.id] =  hbx if @hbx_enrollment_ids.include?(hbx.id)}.compact
           end
         end
-        super(@hbx_cache)
+        begin
+          super(@hbx_cache)
+        rescue
+          Rails.logger.debug "@hbx_cache error testing is #{@hbx_cache}"
+        end
       end
 
       def hbx_enrollment_ids
