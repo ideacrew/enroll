@@ -126,6 +126,17 @@ class CensusEmployee < CensusMember
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
   }
+  # fixes issue with a employer with no plan year crashing the employee/match page
+  scope :multiple_employers_with_no_plan_years, -> (ssn, dob) {
+    census_employees = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob)
+    employee = []
+    census_employees.each do |ce|
+      if !ce.employer_profile.plan_years.present?
+        employee << ce
+      end
+    end
+    employee
+  }
 
   def initialize(*args)
     super(*args)
