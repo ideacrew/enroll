@@ -65,10 +65,11 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction" if person.is_incarcerated
     reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465" if lawful_presence_outstanding?(person)
 
-    params = {full_name: person.full_name,
-              :age => person.age_on(TimeKeeper.date_of_record),
-              :reason_for_ineligibility =>  reason_for_ineligibility
-            }
+    PdfTemplates::Individual.new({
+      full_name: person.full_name,
+      :age => person.age_on(TimeKeeper.date_of_record),
+      :reason_for_ineligibility =>  reason_for_ineligibility
+    })
   end
 
   def lawful_presence_outstanding?(person)

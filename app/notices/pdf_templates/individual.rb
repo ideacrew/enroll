@@ -7,10 +7,10 @@ module PdfTemplates
     attribute :age, String
     attribute :ssn_verified, Boolean, :default => false
     attribute :citizenship_verified, Boolean, :default => false
+    attribute :immigration_unverified, Boolean
     attribute :citizen_status, String
+    attribute :tax_household, PdfTemplates::TaxHousehold
     # attribute :household_size, String
-    attribute :max_aptc_amount, Integer
-    attribute :csr_percent_as_integer, Integer
     attribute :projected_amount, String
     attribute :taxhh_count, String
     attribute :tax_status, String
@@ -22,13 +22,19 @@ module PdfTemplates
     attribute :indian_conflict, Boolean, :default => false
     attribute :incarcerated, Boolean, :default => false
 
+    attribute :magi_medicaid_monthly_income_limit, Integer
+    attribute :magi_as_percentage_of_fpl, Integer
+
     attribute :is_medicaid_chip_eligible, Boolean, :default => false
     attribute :is_ia_eligible, Boolean, :default => false
     attribute :is_non_magi_medicaid_eligible, Boolean, :default => false
     attribute :is_without_assistance, Boolean, :default => false
     attribute :is_totally_ineligible, Boolean, :default => false
     attribute :no_aptc_because_of_income, Boolean, :default => false
+    attribute :no_aptc_because_of_tax, Boolean, :default => false
     attribute :no_csr_because_of_income, Boolean, :default => false
+    attribute :no_csr_because_of_tax, Boolean, :default => false
+    attribute :has_access_to_affordable_coverage, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]
     # attribute :ineligible_members_due_to_residency, Array[String]

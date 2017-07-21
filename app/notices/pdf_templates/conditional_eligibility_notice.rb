@@ -77,32 +77,32 @@ module PdfTemplates
     end
 
     def magi_medicaid_eligible
-      individuals.select{ |individual| individual[:is_medicaid_chip_eligible] == true }
+      individuals.select{ |individual| individual.is_medicaid_chip_eligible == true }
     end
 
     def aqhp_individuals
-      individuals.select{ |individual| individual[:is_ia_eligible] == true  }
+      individuals.select{ |individual| individual.is_ia_eligible == true  }
     end
 
     def uqhp_individuals
-      individuals.select{ |individual| individual[:is_without_assistance] == true  }
+      individuals.select{ |individual| individual.is_without_assistance == true  }
     end
 
     def ineligible_applicants
-      individuals.select{ |individual| individual[:is_totally_ineligible] == true  }
+      individuals.select{ |individual| individual.is_totally_ineligible == true  }
     end
 
     def non_magi_medicaid_eligible
-      individuals.select{ |individual| individual[:is_non_magi_medicaid_eligible] == true  }
+      individuals.select{ |individual| individual.is_non_magi_medicaid_eligible == true  }
     end
 
     def aqhp_enrollments
-      enrollments.select{ |enrollment| enrollment[:is_receiving_assistance] == true}.present?
+      enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
     end
 
     #FIX ME
     def tax_hh_with_csr
-      tax_households.select { |thh| thh[:csr_percent_as_integer] != 100}
+      tax_households.select { |thh| thh.csr_percent_as_integer != 100}
     end
 
     def csr_eligibility_notice_text(csr_percent_as_integer)
@@ -126,31 +126,32 @@ module PdfTemplates
       rows = []
       household_block = []
       household_block << "Household Member:"
-      household_block << "#{ivl[:full_name]} Age: #{ivl[:age]}"
+      household_block << "#{ivl.full_name} Age: #{ivl.age}"
       rows << household_block
       medicaid_block = []
       medicaid_block << "Medicaid"
       block = []
       flag = false
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.is_medicaid_chip_eligible
         flag = true
-        block << "#{ivl[:first_name]} likely qualifies for Medicaid. Your monthly household income of <$monthly household income> is within the monthly income limit of <$Medicaid monthly income limit 1, 2 or 3 based on age + type of applicant> for this person.  Medicaid offers free, comprehensive health coverage."
+        block << "#{ivl.first_name} likely qualifies for Medicaid. Your monthly household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the monthly income limit of $#{ivl.magi_medicaid_monthly_income_limit} for this person.  Medicaid offers free, comprehensive health coverage."
       end
-      if ivl[:is_non_magi_medicaid_eligible] == false
+      if ivl.is_non_magi_medicaid_eligible
         flag = true
-        block << "#{ivl[:first_name]} may qualify for a special category of Medicaid because you told us on your application that at least one or more of the following apply to <person First Name>: over age 64; blind or has a disability; applying for long term care, community care, nursing care or other similar services; enrolled in Medicare; formerly in foster care in the District; or receives supplemental security income. Medicaid offers free, comprehensive health coverage."
+        block << "#{ivl.first_name} may qualify for a special category of Medicaid because you told us on your application that at least one or more of the following apply to #{ivl.first_name}: over age 64; blind or has a disability; applying for long term care, community care, nursing care or other similar services; enrolled in Medicare; formerly in foster care in the District; or receives supplemental security income. Medicaid offers free, comprehensive health coverage."
         block << "Medicaid offers some additional health services to people who qualify in this category. You may be required to submit additional documents."
-        block <<  "The DC Department of Human Services (DHS) will make a final decision on <Person First Name>’s Medicaid eligibility. We have forwarded your application to them."
-        block <<  "IF DHS determines that <Person First Name> qualifies for Medicaid, DHS will provide information on how to enroll."
+        block << "The DC Department of Human Services (DHS) will make a final decision on #{ivl.first_name}’s Medicaid eligibility. We have forwarded your application to them."
+        block << "IF DHS determines that #{ivl.first_name} qualifies for Medicaid, DHS will provide information on how to enroll."
       end
-      if ivl[:is_dummy1] == false
+      if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && !(ivl.is_totally_ineligible)
         flag = true
-        block << " #{ivl[:first_name]} likely doesn’t qualify for Medicaid. Your monthly household income of <$monthly household income> is over the monthly income limit of <$monthly income limit for Medicaid 1 2 or 3 based on age> for this person."
+        if ivl.immigration_unverified == true
+          block << " #{ivl.first_name} likely doesn’t qualify for Medicaid. Either the person’s immigration status doesn’t meet requirements, or the person has not held the status long enough to qualify for Medicaid."
+        else
+          block << " #{ivl.first_name} likely doesn’t qualify for Medicaid. Your monthly household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is over the monthly income limit of $#{ivl.magi_medicaid_monthly_income_limit} for this person."
+        end
       end
-      if ivl[:is_dummy2] == false
-        flag = true
-        block << " #{ivl[:first_name]} likely doesn’t qualify for Medicaid. Either the person’s immigration status doesn’t meet requirements, or the person has not held the status long enough to qualify for Medicaid."
-      end
+
       medicaid_block << block if flag == true
       rows << medicaid_block if medicaid_block.count > 1
 
@@ -158,40 +159,40 @@ module PdfTemplates
       private_health_block << "Private Health Insurance"
       block = []
       flag = false
-      if ivl[:is_medicaid_chip_eligible] == false
+      if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && !(ivl.is_totally_ineligible)
         flag = true
-        block << "#{ivl[:first_name]} qualifies to purchase private health insurance through DC Health Link. [If MAGI MEDICAID=YES]People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage."
+        block << "#{ivl.first_name} qualifies to purchase private health insurance through #{Settings.site.short_name}. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage."
       end
       private_health_block << block if flag == true
       rows << private_health_block if private_health_block.count > 1
 
       aptc_block = []
-      aptc_block << "Advance Premium Tax Credit (APTC)" 
+      aptc_block << "Advance Premium Tax Credit (APTC)"
       block = []
       flag = false 
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.tax_household.max_aptc > 0
         flag = true
-        block << "#{ivl[:first_name]} qualifies for an advance premium tax credit to help pay for the insurance. Your annual household income of <$annual household income> is within the income limit of <$APTC annual income limit> for this person. The value of the tax credit is based on your household size, income, and the cost of health plans available to those who qualify." 
+        block << "#{ivl.first_name} qualifies for an advance premium tax credit to help pay for the insurance. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the income limit of $#{ivl.tax_household.aptc_annual_income_limit} for this person. The value of the tax credit is based on your household size, income, and the cost of health plans available to those who qualify."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.no_aptc_because_of_income
         flag = true
-        block << "<Person First Name> does not qualify for an advance premium tax credit to help pay for the insurance. Your annual household income of <$annual household income> is over the income limit of <$APTC annual income limit> for this person." 
+        block << "#{ivl.first_name} does not qualify for an advance premium tax credit to help pay for the insurance. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is over the income limit of $#{ivl.tax_household.aptc_annual_income_limit} for this person."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.is_medicaid_chip_eligible
         flag = true
-        block << "<Person First Name> does not qualify for an advance premium tax credit to help pay for private health insurance because this person is likely eligible for Medicaid" 
+        block << "#{ivl.first_name} does not qualify for an advance premium tax credit to help pay for private health insurance because this person is likely eligible for Medicaid."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.no_aptc_because_of_tax
         flag = true
-        block << "to help pay for the insurance for one of the following reasons:
-          Not filing taxes for <coverage year>
-          Filed taxes separately from spouse for <coverage year>
-          Someone in the household did not reconcile the tax credit received in a previous year on their federal tax return
-          Call DC Health Link at (855) 532-5465 to find out if this issue can be resolved. If it can, DC Health Link can check again to see if <Person First Name> would be eligible."
+        block << "#{ivl.first_name} does not qualify for an advance premium tax credit to help pay for the insurance for one of the following reasons:"
+        block << "Not filing taxes for #{assistance_year}
+        Filed taxes separately from spouse for #{assistance_year}
+        Someone in the household did not reconcile the tax credit received in a previous year on their federal tax return"
+        block << "Call #{Settings.site.short_name} at (855) 532-5465 to find out if this issue can be resolved. If it can, #{Settings.site.short_name} can check again to see if #{ivl.first_name} would be eligible."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.has_access_to_affordable_coverage
         flag = true
-        block << "<Person First Name> does not qualify for an advance premium tax credit to help pay for the insurance because this person has access to what the federal government considers affordable coverage. "
+        block << "#{ivl.first_name} does not qualify for an advance premium tax credit to help pay for the insurance because this person has access to what the federal government considers affordable coverage. "
       end
       aptc_block << block if flag == true
       rows << aptc_block if aptc_block.count > 1
@@ -199,38 +200,40 @@ module PdfTemplates
       csr_block = []
       csr_block << "Cost-Sharing Reductions (CSR)"
       block = []
-      flag = false 
-      if ivl[:is_medicaid_chip_eligible] == false
+      flag = false
+      #check CSR condition
+      if (ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100)
         flag = true
-        block << "<Person First Name> qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of <$annual household income> is within the income limit of <$CSR annual income limit>. With a silver plan, <Person First Name> will get a discount on what they pay for medical services."
+        block << "#{ivl.first_name} qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the income limit of $#{ivl.tax_household.csr_annual_income_limit}. With a silver plan, #{ivl.first_name} will get a discount on what they pay for medical services."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.indian_conflict == true
         flag = true
-        block << "<Person First name> qualifies for plans with no cost sharing. Your annual household income of <$annual household income> is within the income limit of <$CSR annual income limit>, and you indicated that <Person First Name> is a member of a federally recognized tribe. This means services covered by a health plan’s network, such as doctor visits, medicines, or emergency care won’t cost anything. Services provided by an Indian Health Service facility are also free."
+
+        if ivl.magi_as_percentage_of_fpl <= 300
+          block << "#{ivl.first_name} qualifies for plans with no cost sharing. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the income limit of $#{ivl.tax_household.csr_annual_income_limit}, and you indicated that #{ivl.first_name} is a member of a federally recognized tribe. This means services covered by a health plan’s network, such as doctor visits, medicines, or emergency care won’t cost anything. Services provided by an Indian Health Service facility are also free."
+        elsif ivl.magi_as_percentage_of_fpl > 300
+          block << "#{ivl.first_name} qualifies for limited cost-sharing. You indicated that #{ivl.first_name} is a member of a federally recognized tribe. This means #{ivl.first_name} won’t have to pay for services covered by a health plan’s network, such as doctor visits, medicines, or emergency care if this person gets care through the Indian Health Service, Tribal Health Providers, or Urban Indian Health Providers (I/T/U). This person must have a referral from an I/T/U provider to receive covered services from another in-network service provider at no cost."
+        end
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.no_csr_because_of_income
         flag = true
-        block << "<Person First Name> qualifies for limited cost-sharing. You indicated that <Person First Name> is a member of a federally recognized tribe. This means <Person First Name> won’t have to pay for services covered by a health plan’s network, such as doctor visits, medicines, or emergency care if this person gets care through the Indian Health Service, Tribal Health Providers, or Urban Indian Health Providers (I/T/U). This person must have a referral from an I/T/U provider to receive covered services from another in-network service provider at no cost."
+        block << "#{ivl.first_name} does not qualify for cost-sharing reductions because your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is over the income limit of $#{ivl.tax_household.csr_annual_income_limit}."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.is_medicaid_chip_eligible
         flag = true
-        block << "<Person First Name> does not qualify for cost-sharing reductions because your annual household income of <$annual household income> is over the income limit of <$CSR annual allowable limit>."
+        block << "#{ivl.first_name} does not qualify for cost-sharing reductions because this person is likely eligible for Medicaid."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.no_csr_because_of_tax
         flag = true
-        block << "<Person First Name> does not qualify for cost-sharing reductions because this person is likely eligible for Medicaid."
-      end
-      if ivl[:is_medicaid_chip_eligible] == false
-        flag = true
-        block << "<Person First Name> does not qualify for cost-sharing reductions for one of the following reasons:
+        block << "#{ivl.first_name} does not qualify for cost-sharing reductions for one of the following reasons:
           Not filing taxes for <coverage year>
           Filed taxes separately from spouse for <coverage year>
           Did not reconcile the tax credit received in a previous year on this person’s federal tax return
-          Call DC Health Link at (855) 532-5465 to find out if this issue can be resolved. If it can, DC Health Link can check again to see if <person first name> would be eligible."
+          Call #{Settings.site.short_name} at (855) 532-5465 to find out if this issue can be resolved. If it can, #{Settings.site.short_name} can check again to see if #{ivl.first_name} would be eligible."
       end
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.tax_household.csr_percent_as_integer.nil? && ivl.has_access_to_affordable_coverage
         flag = true
-        block << "<Person First Name> does not qualify for cost-sharing reductions because this person has access to what the federal government considers affordable coverage."
+        block << "#{ivl.first_name} does not qualify for cost-sharing reductions because this person has access to what the federal government considers affordable coverage."
       end
       csr_block << block if flag == true
       rows << csr_block if csr_block.count > 1
@@ -239,9 +242,9 @@ module PdfTemplates
       ineligible_for_medicaid << "Ineligible for Medicaid and Private Health Insurance"
       block = []
       flag = false
-      if ivl[:is_medicaid_chip_eligible] == false
+      if ivl.is_totally_ineligible
         flag = true
-        block << "<Person First Name> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <insert reason>. [If more than one reason]In addition, <Insert next reason with period at the end> [Insert after reason(s)]If <Dependent First Name>’s status changes, we encourage you to update your application, or call DC Health Link at (855) 532-5465."
+        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{reason_for_ineligibility}.join('In addition, ')If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at (855) 532-5465."
       end
       ineligible_for_medicaid << block if flag == true
       rows << ineligible_for_medicaid if ineligible_for_medicaid.count > 1

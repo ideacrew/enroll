@@ -60,15 +60,23 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def append_enrollment_information(enrollment)
     plan = PdfTemplates::Plan.new({
-      is_csr: enrollment.plan.is_csr?
+      plan_name: enrollment.plan.name,
+      is_csr: enrollment.plan.is_csr?,
+      plan_carrier: enrollment.plan.carrier_profile.organization.legal_name
       })
-    params = {
+    PdfTemplates::Enrollment.new({
+      premium: enrollment.total_premium,
       aptc_amount: enrollment.applied_aptc_amount,
+      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f),
+      phone: enrollment.phone_number,
       is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
       coverage_kind: enrollment.coverage_kind,
       effective_on: enrollment.effective_on,
-      plan: plan
-    }
+      plan: plan,
+      enrollees: enrollment.hbx_enrollment_members.inject([]) do |names, member|
+        names << member.person.full_name.titleize
+      end
+    })
   end
 
   def append_address(primary_address)
