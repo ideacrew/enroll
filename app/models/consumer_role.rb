@@ -409,6 +409,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    #this event rejecting the status if admin rejects any verification type but it DOESN'T work backwards - we don't move all the types to unverified by triggering this event
     event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :verification_outstanding
       transitions from: :ssa_pending, to: :verification_outstanding
@@ -418,7 +419,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :verification_outstanding
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    event :revert, :after => [:revert_ssn, :revert_native, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
@@ -427,7 +428,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :unverified
     end
 
-    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_native, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
@@ -680,7 +681,11 @@ class ConsumerRole
   end
 
   def revert_ssn
-    self.ssn_validation = "pending"
+    update_attributes(:ssn_validation => "pending")
+  end
+
+  def revert_native
+    update_attributes(:native_validation => "pending")
   end
 
   def revert_lawful_presence(*args)

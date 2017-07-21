@@ -354,19 +354,26 @@ context "Verification process and notices" do
   describe "#admin_verification_action private" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "curam" })}
     let(:consumer) { person.consumer_role }
-    shared_examples_for "admin verification actions" do |admin_action, v_type, update_reason, upd_attr, result|
+    shared_examples_for "admin verification actions" do |admin_action, v_type, update_reason, upd_attr, result, rejected_field|
       before do
         consumer.admin_verification_action(admin_action, v_type, update_reason)
       end
       it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
         expect(consumer.send(upd_attr)).to eq result
       end
+
+      if admin_action == "return_for_deficiency"
+        it "marks #{v_type} type as rejected" do
+          expect(consumer.send(rejected_field)).to be_truthy
+        end
+      end
     end
 
     it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding"
+    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
     it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
+    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
+    it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
 
   end
 
