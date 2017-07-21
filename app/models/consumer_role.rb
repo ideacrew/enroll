@@ -17,9 +17,11 @@ class ConsumerRole
   US_CITIZEN_STATUS = "us_citizen"
   NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
+  INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+  VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
   us_citizen
@@ -561,6 +563,12 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
+  def check_for_critical_changes(person_params)
+    if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
+      redetermine!(verification_attr) if Person.person_has_an_active_enrollment?(person)
+    end
+  end
+
   #class methods
   class << self
     #this method will be used to check 90 days verification period for outstanding verification
@@ -748,6 +756,10 @@ class ConsumerRole
     (dhs_pending? || ssa_pending?) && no_changes_24_h?
   end
 
+  def no_changes_24_h?
+    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
+  end
+
   def sensitive_information_changed(field, person_params)
     if field == "dob"
       person.send(field) != Date.strptime(person_params[field], "%Y-%m-%d")
@@ -758,14 +770,11 @@ class ConsumerRole
     end
   end
 
-  def no_changes_24_h?
-    workflow_state_transitions.any? && ((workflow_state_transitions.first.transition_at + 24.hours) > DateTime.now)
-  end
-
   def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 

@@ -16,20 +16,20 @@
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% @family_members.each do |f_member| %>
-        <% person = f_member.person %>
-        <div class="row">
-          <div class="family-member col-md-12">
-            <div class="person">
-              <%= f_member.person.full_name %>
-            </div>
-            <div class="verification-types col-md-12">
-              <% person.verification_types.each do |v_type| %>
-                  <div class="row">
-                    <div class="v-type col-md-12">
-                      <div class="v-type-name col-md-3">
-                        <%= v_type %>
-                      </div>
-                      <div class="v-type-status col-md-3">
+      <% person = f_member.person %>
+      <div class="row">
+        <div class="family-member col-md-12">
+          <div class="person">
+            <%= f_member.person.full_name %>
+          </div>
+          <div class="verification-types col-md-12">
+            <% person.verification_types.each do |v_type| %>
+                <div class="row">
+                  <div class="v-type col-md-12">
+                    <div class="v-type-name col-md-3">
+                      <%= v_type %>
+                    </div>
+                    <div class="v-type-status col-md-3">
                       <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
                         <%= show_v_type(v_type, person) %>
                       </span>&nbsp;
@@ -77,11 +77,11 @@
                       </div>
                       <!-- ==== verification reason ==== -->
 
-                      <!-- ***** Return for Deficiency reason ***** -->
+                      <!-- ***** Reject reason ***** -->
                       <div class="row">
                         <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
                           <div class="col-md-6">
-                            Return for Deficiency reason:
+                            Reject reason:
                           </div>
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
@@ -96,7 +96,7 @@
                           <%end%>
                         </div>
                       </div>
-                      <!-- ==== return for deficiency reason ==== -->
+                      <!-- ==== reject reason ==== -->
 
                       <!-- ***** FEDhub request ***** -->
                       <div class="row">
@@ -126,7 +126,7 @@
                                   <div class="v-doc col-md-11">
                                     <% if vlp_doc.identifier.present? %>
                                         <% key = vlp_doc.identifier.split('#').last %>
-                                        <%= link_to "Document copy for #{vlp_doc.verification_type.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
+                                        <%= link_to "#{vlp_doc.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
                                     <% end %>
                                   </div>
                                   <div class="v-doc col-md-1">
