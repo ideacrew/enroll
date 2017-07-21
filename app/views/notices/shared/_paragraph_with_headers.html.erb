@@ -1,12 +1,9 @@
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
-      <tr>
-        <td></br></td>
-      </tr>
       <% if heading.present? %>
       <tr>
-        <td><h2 style="color:rgb(54,95,145);"><%= heading.html_safe %></h2></td>
+        <td><h2 style="color:rgb(54,95,145); font-size: 14px; font-weight: bold;"><%= heading.html_safe %></h2></td>
       </tr>
     <% end %>
       <% if sub_heading.present? %>
@@ -16,7 +13,7 @@
       <% end %>
       <% contents.each do |para| %>
       <tr>
-        <td><%= para.html_safe %></td>
+        <td class="notice-font"><%= para.html_safe %></td>
       </tr>
       <% end %>
     </tbody>
