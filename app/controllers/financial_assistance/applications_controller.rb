@@ -45,6 +45,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           @application.submit! if @application.complete?
           publish_application(@application)
+          dummy_data_for_demo(params) if @application.complete? #For_Populating_dummy_ED_for_DEMO
           redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
