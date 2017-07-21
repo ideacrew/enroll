@@ -39,7 +39,6 @@
         <li class="notice-font">
           <strong>Employee Enrollments</strong> <br><br>Share our <strong>Employee guide to enrolling</strong> with your eligible employees to help guide them through the enrollment process. You can download this guide from the Business Resource Center on <a href= "#{site_main_web_address}"><%= site_main_web_address %></a>. If you are the point of contact for the group, you may want to follow the <strong>Employer guide to enrolling as an employee</strong>, also available in the Business Resource Center.<br><br><strong><i>Employers should review their roster to ensure that it includes all eligible employees and ensure that any employees who are also owners (owner’s spouses) are identified as owners on their roster.</i></strong> For your group to receive coverage through the Small Business Marketplace, you must have at least one non-owner employee enrolled in a health plan at the end of each annual employee open enrollment period.
         </li>
-        <br>
         <li class="notice-font">
           <strong>First Month’s Premium Payment</strong><br><br>Payments over the phone or online are required for the first month of coverage, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:<br><br>
           <strong>Make a Secure Online Payment</strong><br>
@@ -59,7 +58,7 @@
       <td>
         <ul style="list-style: circle solid;">
         <li class="notice-font">
-            By calling <%=contact_center_phone_number%>,<br>
+            By calling <%=contact_center_phone_number%><br>
         </li>
         <li class="notice-font">
              TTY: <%=contact_center_tty_number%>
@@ -77,7 +76,7 @@
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number} ."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{contact_center_phone_number}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
