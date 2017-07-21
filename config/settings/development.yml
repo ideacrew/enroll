@@ -4,16 +4,13 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://mhc.hbxshop.org/help"
   faqs_url: "https://mhc.hbxshop.org/faqs"
-  main_web_address: "www.MAhealthconnector.org"
+
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "logo.png"
-  s3_prefix: "mhc"
-  broker_quoting_enabled: false
-  use_default_devise_path: true
 
   social_media:
     facebook_url: ""
@@ -23,14 +20,10 @@ site:
 contact_center:
   name: "Health Connector's Customer Care Center"
   alt_name: "Health Connector Customer Service"
-  phone_number: "1-888-813-9220"
-  fax: "1-617-933-3099"
+  phone_number: "1-888-813-9220 "
   tty_number: "711"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@example.com"
-  small_business_email: "smallbusiness@MAhealthconnector.org"
-
-  appeals: "connector-appeals@state.ma.us"
 
   mailing_address:
     name: "Massachusetts Health Connector"
@@ -52,10 +45,7 @@ aca:
   state_name: "Massachusetts"
   state_abbreviation: "MA"
   market_kinds: ["shop"]
-  nationwide_markets: false
   general_agency_enabled: false
-  dental_market_enabled: false
-  sole_source_only_enabled: false
 #
   qle:
     with_in_sixty_days: 60
@@ -94,7 +84,6 @@ aca:
 
     initial_application:
       publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10  
       earliest_start_prior_to_effective_on:
         months: -2
       appeal_period_after_application_denial:
@@ -125,7 +114,6 @@ aca:
 
       minimum_length:
         days: 5
-        adv_days: 10
       maximum_length:
         months: 2
 
@@ -136,19 +124,6 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
-  use_simple_employer_calculation_model: false
-  carrier_special_plan_identifier_namespace: "urn:MA:terms:v1:plan:super_group_id#"
-  offerings_constrained_to_service_areas: true
-  transmit_employers_immediately: true
-  enforce_employer_attestation: true
-  rating_areas:
-    - R-MA001
-    - R-MA002
-    - R-MA003
-    - R-MA004
-    - R-MA005
-    - R-MA006
-    - R-MA007
 
 paper_notice: 'paper-notices'
 

@@ -1178,9 +1178,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                     to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1445,6 +1445,12 @@ class HbxEnrollment
     return nil unless is_shop?
     return nil if benefit_group_id.blank?
     benefit_group.rating_area
+  end
+
+  def ee_select_plan_during_oe
+    if is_shop? && self.census_employee.present? 
+      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe")
+    end
   end
 
   private
