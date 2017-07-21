@@ -65,9 +65,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       plan_carrier: enrollment.plan.carrier_profile.organization.legal_name
       })
     PdfTemplates::Enrollment.new({
-      premium: enrollment.total_premium,
-      aptc_amount: enrollment.applied_aptc_amount,
-      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f),
+      premium: enrollment.total_premium.round(2),
+      aptc_amount: enrollment.applied_aptc_amount.round(2),
+      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
       phone: enrollment.phone_number,
       is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
       coverage_kind: enrollment.coverage_kind,

@@ -62,36 +62,41 @@
  contents: ["On #{TimeKeeper.date_of_record}, you enrolled the people listed in the plan(s) shown below:"],
    heading: 'Your Plan', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/info_table', locals: {
-                             rows: [['Enrolled Individual(s):', "Plan Information"],
-                                ["Person 1 Age: 35", "Insurance Company: Kaiser <br> Phone: 8345834098 <br> Plan Name:"]],
-    col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
-
+<% notice.enrollments.each do |enrollment| %>
+  <%= render partial: 'notices/shared/info_table', locals: {
+                               rows: ["#{enrollment.enrollees}", "#{enrollment.plan.plan_name}, #{enrollment.phone}, #{enrollment.premium}, #{enrollment.aptc_amount}, #{enrollment.effective_on}"],
+      col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+<% end %>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],
    heading: 'What You’ll Pay Each Month', sub_heading: ''} %>
-  <% notice.enrollments do |enrollment|%>
-    <table style='margin: 0px auto;' width='80%'>
+  <% notice.enrollments.each do |enrollment|%>
+    <table style='width: 80%' align="left" >
+      <tr>
+        <td>
+          <%= enrollment.plan.plan_name %>
+        </td>
+      </tr>
       <tr>
         <td>
           Full price monthly premium:
         </td>
-        <td align=right>
-          $ 5984.00
+        <td align="left">
+          $<%= enrollment.premium %>
         </td>
       </tr>
       <tr>
         <td>
           Your tax credit savings:
         </td>
-        <td align=right>
-          – $ 4984.00
+        <td align="left">
+          – $<%= enrollment.aptc_amount.to_f %>
         </td>
       </tr>
       <tr>
         <td>
         </td>
-        <td align=right>
+        <td align="left">
           _________________________
         </td>
       </tr>
@@ -99,8 +104,8 @@
         <td>
           <strong>Your monthly premium payment:</strong>
         </td>
-        <td align=right>
-          <strong>$ 4589.00</strong>
+        <td align="left">
+          <strong> $<%= enrollment.responsible_amount %></strong>
         </td>
       </tr>
     </table>
