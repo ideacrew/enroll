@@ -70,7 +70,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def permit_params(attributes)
-    binding.pry
     attributes.permit!
   end
 end
