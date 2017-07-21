@@ -1,6 +1,6 @@
 - step:
     heading: Your Preferences
-    heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+    heading_text: "Tell us your preferences. When you're finished, select CONTINUE."
     sections:
       - section:
           lines:
@@ -34,12 +34,12 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility.
+                    text: "When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
             - cells:
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: How long would you like your eligibility for help paying for cost saving to be renewed? *
+                    text: "How long would you like your eligibility for help paying for cost saving to be renewed? *"
                   - gutter: 12
                     type: label_radio
                     label: 5 years
@@ -90,13 +90,13 @@
                     attribute: years_to_renew
       - section:
           heading: Voter Registration
-          heading_text: Tell us your preferences. When you're finished, select CONTINUE.
+          heading_text: "Tell us your preferences. When you're finished, select CONTINUE."
           lines:
             - cells:
                   - gutter: 8
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: Would you like to have an application to register to vote mailed to you?
+                    text: "Would you like to have an application to register to vote mailed to you?"
                   - gutter: 2
                     type: label_radio
                     id: 'mailed_yes'
@@ -134,7 +134,7 @@
                     Phone: (202) 727-2525 <br>"
 - step:
     heading: Submit Application
-    heading_text: This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION.
+    heading_text: "This is the last step. Carefully read the information below. Select 'I Agree' after each statement to acknowledge your agreement.Then, enter your name to electronically sign the application.When you're finished, select SUBMIT MY APPLICATION."
     sections:
       - section:
           lines:
@@ -142,7 +142,7 @@
                   - gutter: 12
                     type: raw_html
                     classNames: 'small-padding-top-bottom'
-                    text: <b> I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong.I may also be asked to provide additional information, if found eligible, Medicaid or private health insurance coverage, with or without financial assistance, will be extended for another year for myself and/or members of my application group, child support, veterans payments, or supplemental security income( SSI).
+                    text: <b> I understand that eligibility for Medicaid or private health insurance with or without financial assistance will be reviewed every year. </b> <br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including with my consent information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources and I will be able to correct information that is wrong.I may also be asked to provide additional information if found eligible Medicaid or private health insurance coverage with or without financial assistance will be extended for another year for myself and/or members of my application group child support veterans payments or supplemental security income(SSI).
             - cells:
                   - gutter: 12
                     type: checkbox
@@ -159,8 +159,8 @@
                 - gutter: 12
                   type: raw_html
                   classNames: span-text
-                  text: "<b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
-                        I can report changes by going online and logging into 'My Account', by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
+                  text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
+                        "I can report changes by going online and logging into 'My Account', by calling DC Health Link's Customer Care Center toll-free at 1-855-532-5465,
                         or by submitting information via mail or in-person at one of the Department of Human Services' Service Centers. <br> <br>
 
                         I'm the person whose name appears in the signaature line below. I understand that I'm submitting an application for health insurance and that
@@ -168,90 +168,88 @@
 
                         I ve reviewd the information in this application, and I attest under penalty of perjury, that it is accurate and complete to the best of my knowledge,
                         I understand if Im not truthful, there may be a penalty, including retroactive termination of my coverage and a obligation to repy all medical claims
-                        previouslt covered by the health insurance"
+                        previously covered by the health insurance"
             - cells:
-                  - gutter: 12
-                    type: checkbox
-                    label: I Agree *
-                    value: true
-                    required: true
-                    name: medicaid_terms
-                    model: application
-                    name: report_change_terms
-                    attribute: report_change_terms
+                - gutter: 12
+                  type: checkbox
+                  label: I Agree *
+                  value: true
+                  #required: true
+                  name: medicaid_terms
+                  model: application
+                  name: report_change_terms
+                  attribute: report_change_terms
       - section:
           lines:
-              - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'span-text'
-                    text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any healthcare received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
-              - cells:
-                  - gutter: 12
-                    type: checkbox
-                    label: I Agree *
-                    value: true
-                    required: true
-                    classNames: 'span-text'
-                    model: application
-                    name: medicaid_insurance_collection_terms
-                    attribute: medicaid_insurance_collection_terms
-      - section:
-          lines:
-              - cells:
+            - cells:
                 - gutter: 12
                   type: raw_html
-                  text: "<b>Does any child on this application have a parent living outside of the home?</b>"
-                - gutter: 2
-                  type: label_radio
-                  name: row1
-                  value: false
-                  id: 'living_outside_yes'
-                  label: 'Yes'
                   classNames: 'span-text'
-                  model: application
-                  name: parent_living_out_of_home_terms
-                  attribute: parent_living_out_of_home_terms
-
-                - gutter: 2
-                  type: label_radio
-                  name: row1
+                  text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any healthcare received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I Agree *
                   value: true
-                  id: 'living_outside_no'
-                  label: 'No'
+                  required: true
                   classNames: 'span-text'
                   model: application
-                  name: parent_living_out_of_home_terms
-                  attribute: parent_living_out_of_home_terms
-
-              - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'span-text'
-                    text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my case worker and I may not have to cooperate."
-              - cells:
-                  - gutter: 12
-                    type: checkbox
-                    label: I Agree *
-                    value: true
-                    classNames: 'span-text'
-                    model: application
-                    name: attestation_terms
-                    attribute: attestation_terms
+                  name: medicaid_insurance_collection_terms
+                  attribute: medicaid_insurance_collection_terms
       - section:
           lines:
-              - cells:
-                  - gutter: 12
-                    type: raw_html
-                    classNames: 'small-padding-top-bottom'
-                    text: "I have reviewed the information in this application and I attest under penalty of perjury that it is accurate and complete to the best of my knowledge. I understand if I am not truthful, there may be a penalty."
-              - cells:
-                  - gutter: 12
-                    type: checkbox
-                    label: I Agree *
-                    value: true
-                    required: true
-                    classNames: 'span-text'
-                    model: application
-                    name: submission_terms
-                    attribute: submission_terms
+            - cells:
+              - gutter: 12
+                type: raw_html
+                text: <b>Does any child on this application have a parent living outside of the home?</b>
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: true
+                id: 'living_outside_yes'
+                label: 'Yes'
+                classNames: 'span-text'
+                model: application
+                name: parent_living_out_of_home_terms
+                attribute: parent_living_out_of_home_terms
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: false
+                id: 'living_outside_no'
+                label: 'No'
+                classNames: 'span-text'
+                model: application
+                name: parent_living_out_of_home_terms
+                attribute: parent_living_out_of_home_terms
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'span-text'
+                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my case worker and I may not have to cooperate."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I Agree *
+                  value: true
+                  classNames: 'span-text'
+                  model: application
+                  # name: attestation_terms
+                  attribute: attestation_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'small-padding-top-bottom'
+                  text: "I have reviewed the information in this application and I attest under penalty of perjury that it is accurate and complete to the best of my knowledge. I understand if I am not truthful, there may be a penalty."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I Agree *
+                  value: true
+                  required: true
+                  classNames: 'span-text'
+                  model: application
+                  name: submission_terms
+                  attribute: submission_terms

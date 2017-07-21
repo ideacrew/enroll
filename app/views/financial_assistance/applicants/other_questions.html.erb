@@ -1,0 +1,249 @@
+<%= form_for @applicant, url: {action: "save_questions"}, :html => {method: :get} do |f| %>
+  <div class="col-md-7">
+    <p class="alert alert-error hide"></p>
+    <h1 class="darkblue">Other Questions for ksjdf</h1>
+    <p>Tell us about this person's other questions. When you're finished select CONTINUE.</p>
+    <p class="memo">* = required field</p>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Has this person applied for an SSN *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes", required: true) %>
+          <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no", required: true) %>
+          <label class="radio-yml" for="is_ssn_applied_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Is this person pregnant? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes", required: true) %>
+          <label class="radio-yml" for="is_pregnant_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_pregnant", false, class: "radio-yml", id: "is_pregnant_no", required: true) %>
+          <label class="radio-yml" for="is_pregnant_no">No</label>
+        </div>
+      </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Pregnency Due date</span>
+      </div>
+      <div class='col-md-2'>
+        <%= f.text_field :pregnancy_due_on, class: "jq-datepicker", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>How many children is this person expecting?</span>
+      </div>
+      <div class='col-md-3'>
+        <label></label>
+        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3}, selected: @applicant.children_expected_count), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Was this person pregnant in the last 60 days?</span>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_post_partum_period", true, class: "radio-yml", id: "is_post_partum_period_yes") %>
+        <label class="radio-yml" for="is_post_partum_period_yes">Yes</label>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_post_partum_period", false, class: "radio-yml", id: "is_post_partum_period_no") %>
+          <label class="radio-yml" for="is_post_partum_period_no">No</label>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Pregnency End on date</span>
+      </div>
+      <div class='col-md-2'>
+        <%= f.text_field :pregnancy_end_on, class: "jq-datepicker", id: "applicant_pregnancy_end_on", placeholder: "Due Date" %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Was this person on Medicaid during pregnency?</span>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_enrolled_on_medicaid", true, class: "radio-yml", id: "medicaid_pregnency_yes") %>
+        <label class="radio-yml" for="medicaid_pregnency_yes">Yes</label>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_enrolled_on_medicaid", false, class: "radio-yml", id: "is_post_partum_period_no")%>
+        <label class="radio-yml" for="medicaid_pregnency_no">No</label>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Was this person in foster care at age 18 or older? *</span>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes", required: true) %>
+        <label class="radio-yml" for="former_foster_care_yes">Yes</label>
+      </div>
+      <div class='col-md-2'>
+        <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "former_foster_care_no", required: true) %>
+        <label class="radio-yml" for="former_foster_care_no">No</label>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>Where was this person in foster care?</span>
+      </div>
+      <div class='col-md-2'>
+        <label></label>
+         <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class='col-md-6'>
+        <span class='span-text'>How old was this person when they left foster care?</span>
+      </div>
+      <div class='col-md-2'>
+        <label></label>
+        <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+      </div>
+    </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Was this person enrolled in Medicaid when they left foster care?</span>
+        </div>
+
+        <div class='col-md-2'>
+          <%= f.radio_button("had_medicaid_during_foster_care", true, class: "radio-yml", id: "had_medicaid_during_foster_care_yes", required: true)%>
+
+          <label class="radio-yml" for="had_medicaid_during_foster_care_yes">Yes</label>
+        </div>
+
+        <div class='col-md-2'>
+          <%= f.radio_button("had_medicaid_during_foster_care", false, class: "radio-yml", id: "had_medicaid_during_foster_care_no", required: true) %>
+              <label class="radio-yml" for="had_medicaid_during_foster_care_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Is this person a student? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_student", true, class: "radio-yml", id: "is_student_yes", required: true) %>
+          <label class="radio-yml" for="is_student_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_student", false, class: "radio-yml", id: "is_student_no", required: true) %>
+          <label class="radio-yml" for="is_student_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>What is the type of student?</span>
+        </div>
+        <div class='col-md-3'>
+          <label></label>
+            <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Student status end on date?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.text_field :student_status_end_on, class: "jq-datepicker", id: "applicant_student_status_end_on", placeholder: "End on" %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>What type of school do you go to?</span>
+        </div>
+        <div class='col-md-3'>
+          <label></label>
+          <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "Secondary(High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Is this person blind? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_self_attested_blind", true, class: "radio-yml", id: "is_self_attested_blind_yes", required: true) %>
+          <label class="radio-yml" for="is_self_attested_blind_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_self_attested_blind", false, class: "radio-yml", id: "is_self_attested_blind_no", required: true )%>
+          <label class="radio-yml" for="is_self_attested_blind_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Does this person need help with daily life activities, such as dressing or bathing? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("has_daily_living_help", true, class: "radio-yml", id: "has_daily_living_help_yes", required: true) %>
+          <label class="radio-yml" for="has_daily_living_help_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("has_daily_living_help", false, class: "radio-yml", id: "has_daily_living_no", required: true) %>
+          <label class="radio-yml" for="has_daily_living_help_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Does this person need help paying for any medical bills from the last 3 months? *</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("need_help_paying_bills", true, class: "radio-yml", id: "has_daily_living_help_yes", required: true)%>
+          <label class="radio-yml" for="need_help_paying_bills_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "has_daily_living_help_no", required: true )%>
+          <label class="radio-yml" for="need_help_paying_bills_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-12'>
+          Help may include
+          <span data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>,
+          <span data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>,
+          or <span data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan's metal level." class= "dottedline test">cost-sharing reductions</span>
+        </div>
+      </div>
+      <br><br>
+  </div>
+
+  <div class="col-md-2">
+    <button id="btn-continue" class="button btn btn-lg btn-primary" type="submit">CONTINUE</button>
+    <ul class="list-unstyled list-right-section">
+      <li>
+        <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+        <%= image_tag 'icons/list.png' %> PREVIOUS
+        <% end %>
+      </li>
+    </ul>
+  </div>
+<%end%>

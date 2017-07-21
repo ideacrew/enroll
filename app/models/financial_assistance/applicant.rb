@@ -61,6 +61,14 @@ class FinancialAssistance::Applicant
   field :is_totally_ineligible, type: Boolean, default: false
   field :is_without_assistance, type: Boolean, default: false
 
+  field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+  field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
+
+  field :magi_as_percentage_of_fpl, type: Float, default: 0.0
+  field :magi_medicaid_type, type: String
+  field :magi_medicaid_category, type: String
+  field :medicaid_household_size, type: Integer
+
   # We may not need the following two fields
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
@@ -107,13 +115,21 @@ class FinancialAssistance::Applicant
   field :is_currently_enrolled_in_health_plan, type: Boolean
 
   # Other QNs.
-  field :has_daily_living_help, type: Boolean#, default: false
-  field :need_help_paying_bills, type: Boolean#, default: false
-  field :is_resident_post_092296, type: Boolean, default: false
-  field :is_vets_spouse_or_child, type: Boolean, default: false
+  field :has_daily_living_help, type: Boolean
+  field :need_help_paying_bills, type: Boolean
+  field :is_resident_post_092296, type: Boolean
+  field :is_vets_spouse_or_child, type: Boolean
+
+  # Driver QNs.
+  field :has_job_income, type: Boolean
+  field :has_self_employment_income, type: Boolean
+  field :has_other_income, type: Boolean
+  field :has_deductions, type: Boolean
+  field :has_enrolled_health_coverage, type: Boolean
+  field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-  
+
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -122,6 +138,7 @@ class FinancialAssistance::Applicant
 
   validate :presence_of_attr_step_1, on: :step_1
   validate :presence_of_attr_step_2, on: :step_2
+  validate :presence_of_attr_other_qns, on: :other_qns
   validates :validate_applicant_information, presence: true, on: :submission
 
   validate :strictly_boolean
@@ -134,6 +151,9 @@ class FinancialAssistance::Applicant
   alias_method :is_medicaid_chip_eligible?, :is_medicaid_chip_eligible
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
+
+  after_update :delete_embedded_documents_on_driver_qns_update
+  after_update :create_embedded_documents_on_driver_qns_update
 
   def is_ia_eligible?
     is_ia_eligible
@@ -189,8 +209,12 @@ class FinancialAssistance::Applicant
   end
 
   #### Collect insurance from Benefit model
-  def has_insurance?
-    benefits.present?
+  def is_enrolled_in_insurance?
+    benefits.where(kind: 'is_enrolled').present?
+  end
+
+  def is_eligible_for_insurance?
+    benefits.where(kind: 'is_eligible').present?
   end
 
   def had_prior_insurance?
@@ -280,7 +304,10 @@ class FinancialAssistance::Applicant
   end
 
   def applicant_validation_complete?
-    is_applicant_valid?
+    self.valid?(:submission) &&
+      self.incomes.all? { |income| income.valid? :submission } &&
+      self.benefits.all? { |benefit| benefit.valid? :submission } &&
+      self.deductions.all? { |deduction| deduction.valid? :submission }
   end
 
   def clean_conditional_params(model_params)
@@ -291,12 +318,125 @@ class FinancialAssistance::Applicant
     age_of_applicant
   end
 
+  def other_questions_complete?
+    !has_daily_living_help.nil? &&
+      !need_help_paying_bills.nil? &&
+      !is_resident_post_092296.nil? &&
+      !is_vets_spouse_or_child.nil?
+  end
+
+  def tax_info_complete?
+    !is_required_to_file_taxes.nil? &&
+      !is_claimed_as_tax_dependent.nil?
+  end
+
+  def incomes_complete?
+    self.incomes.all? do |income|
+      income.valid? :submission
+    end
+  end
+
+  def benefits_complete?
+    self.benefits.all? do |benefit|
+      benefit.valid? :submission
+    end
+  end
+
+  def deductions_complete?
+    self.deductions.all? do |deduction|
+      deduction.valid? :submission
+    end
+  end
+
+  def has_income?
+    has_job_income || has_self_employment_income || has_other_income
+  end
+
+
+  def delete_embedded_documents_on_driver_qns_update
+    if !has_job_income
+      incomes.jobs.destroy_all
+    end
+
+    if !has_self_employment_income
+      incomes.self_employment.destroy_all
+    end
+
+    if !has_other_income
+      incomes.other.destroy_all
+    end
+
+    if !has_enrolled_health_coverage
+      benefits.enrolled.destroy_all
+    end
+
+    if !has_eligible_health_coverage
+      benefits.eligible.destroy_all
+    end
+
+    if !has_deductions
+      deductions.destroy_all
+    end
+  end
+
+  def create_embedded_documents_on_driver_qns_update
+    if has_job_income
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::JOB_INCOME_TYPE_KIND)
+    end
+
+    if has_self_employment_income
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
+    end
+
+    if has_other_income
+      incomes.create(kind: nil) if incomes.other.blank?
+    end
+
+    if has_enrolled_health_coverage
+      benefits.find_or_create_by(kind: "is_enrolled") if benefits.where(kind: "is_enrolled").blank?
+    end
+
+    if has_eligible_health_coverage
+      benefits.find_or_create_by(kind: "is_eligible") if benefits.where(kind: "is_eligible").blank?
+    end
+
+    if has_deductions
+      deductions.find_or_create_by(kind: nil) if deductions.blank?
+    end
+  end
+
 private
   def validate_applicant_information
     validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
   end
 
   def presence_of_attr_step_1
+    if has_job_income.nil?
+      errors.add(:has_job_income, "can't be blank")
+    end
+
+    if has_self_employment_income.nil?
+      errors.add(:has_self_employment_income, "can't be blank")
+    end
+
+    if has_other_income.nil?
+      errors.add(:has_other_income, "can't be blank")
+    end
+
+    if has_deductions.nil?
+      errors.add(:has_deductions, "can't be blank")
+    end
+
+    if has_enrolled_health_coverage.nil?
+      errors.add(:has_enrolled_health_coverage, "can't be blank")
+    end
+
+    if has_eligible_health_coverage.nil?
+      errors.add(:has_eligible_health_coverage, "can't be blank")
+    end
+  end
+
+  def presence_of_attr_step_2
     if is_required_to_file_taxes && is_joint_tax_filing.nil?
       errors.add(:is_joint_tax_filing, "can't be blank")
     end
@@ -306,7 +446,7 @@ private
     end
   end
 
-  def presence_of_attr_step_2
+  def presence_of_attr_other_qns
     if is_pregnant
       errors.add(:pregnancy_due_on, "should be answered if you are pregnant") if pregnancy_due_on.nil?
       errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
@@ -376,9 +516,5 @@ private
       model_params[:student_status_end_on] = nil
       model_params[:student_kind] = nil
     end
-  end
-
-  def is_applicant_valid?
-    self.valid?(:submission) ? true : false
   end
 end

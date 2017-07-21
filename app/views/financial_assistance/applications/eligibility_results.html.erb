@@ -15,54 +15,89 @@
             <p ></p>
             
             <div class="focus_effect module">
-              
+              <%if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present?%>
+                <div class="margin-bottom-30">
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12'>
+                      <h3><strong> Medicaid </strong></h3>
+                    </div>
+                  </div>
+
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12'>
+                      These people <strong> appear to be eligible </strong> for medicaid:
+                      <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
+                        <div class='col-md-12'>
+                          <li><%=applicant_name%></li>
+                        </div>
+                      <%end%>
+                    </div>
+                  </div>
+
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12' style="color: #c49a07;">
+                      <strong> NEXT STEP: The DC Department of Human Services(DHS) will make a final determination of Medicaid eligibility. </strong> We have forwarded your application to them. If you havnt heard from DHS after 2 weeks, you may need to check on the status of the final determination by calling us at (855) 532-5465
+                    </div>
+                  </div>
+                  <br><br>
+                </div>
+              <%end%>
+              <%if eligible_applicants(params[:id], :is_ia_eligible).present?%>
+                <div class="margin-bottom-30">
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12'>
+                      <h3> <strong>Help Paying for Private Health Insurance </strong> </h3>
+                    </div>
+                  </div>
+
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12'>
+                        These people <strong> are eligible for savings of <%=total_aptc_sum params[:id]%> per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance. <br> <br> <br> They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans that have this benefit.
+
+                        <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
+                        <div class='col-md-12'>
+                          <li><%=applicant_name%></li>
+                        </div>
+                        <%end%>
+                    </div>
+                  </div>
+
+                  <div class="row row-form-wrapper no-buffer row-height">
+                    <div class='col-md-12' style="color: #54c407;">
+                        <strong> NEXT STEP: </strong> Pick a health insurance plan.
+                    </div>
+                  </div>
+                  <br><br>
+                </div>
+              <%end%>
+
+              <%if eligible_applicants(params[:id], :is_totally_ineligible).present?%>
               <div class="margin-bottom-30">
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
-                    <h3><strong> Medicaid </strong></h3>
+                    <h3> <strong>Does not Qualify</strong> </h3>
                   </div>
                 </div>
 
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
-                    <h3>These people <strong> appear to be eligible </strong> for medicaid:</h3>
-                    <% application = FinancialAssistance::Application.find(params[:id]) %>
-                    <% application.applicants.each do |applicant| %>
-                      <% if applicant.is_medicaid_chip_eligible == true %>
-                        <li><%= applicant.person.full_name.titleize  %></li>
-                      <% end %>
-                    <% end %>
+                    These people do not qualify for Medicaid or private health insurance through DC Health Link:
+                    <%eligible_applicants(params[:id], :is_totally_ineligible).each do |applicant_name| %>
+                      <div class='col-md-12'>
+                        <li><%=applicant_name%></li>
+                      </div>
+                    <%end%>
                   </div>
                 </div>
 
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
-                    <strong> NEXT STEP: The DC Department of Human Services(DHS) will make a final determination of Medicaid eligibility. </strong> We have forwarded your application to them. If you havnt heard from DHS after 2 weeks, you may need to check on the status of the final determination by calling us at (855) 532-5465
+                    Even though it does not look like you qualify for Medicaid, you have the right to request a a full review of your eligibility for Medicaid from the DC Department of Human Services (DHS). You can request this at any time.<br><br>[REQUEST MEDICAID DECISION]
                   </div>
                 </div>
-                <br><br>
               </div>
-          
-              <div class="margin-bottom-30">
-                <div class="row row-form-wrapper no-buffer row-height">
-                  <div class='col-md-12'>
-                    <h3> <strong>Help Paying for Private Health Insurance </strong></h3>
-                  </div>
-                </div>
-                
-                <div class="row row-form-wrapper no-buffer row-height">
-                  <div class='col-md-12'>
-                      These people <strong> are eligible for savings of <%=total_aptc_sum application%> per month </strong> called and advance premium tax credit. This means they wont have to pay full price for health insurance. <br> <br> <br> They also qualify for extra savings called cost-sharing reductions - a benefit that lower other costs like the annual deductable and copayments. This benefit is only available if these people select a silver plan. Look for this check mark on plans thaat have this bebefit
-                  </div>
-                </div>
-
-                <div class="row row-form-wrapper no-buffer row-height">
-                  <div class='col-md-12'>
-                      <strong> NEXT STEP: </strong> Pick a health insurance plan.
-                  </div>
-                </div>
-                <br><br>
-              </div>
+              <br /> <br />
+              <%end%>
 
               <div class="margin-bottom-30">
                 <div class="row row-form-wrapper no-buffer row-height">
@@ -73,7 +108,10 @@
                       <strong>View Eligibility History </strong>
                   </div>
                   <div class='col-md-12'>
-                      <br>If you do not agree with this determination, you have the right to appeal. <br> Find out more about the appeal process or get assistance by contacting us directly. Your application reference number is <strong> 190009446 </strong>
+                      <br>If you do not agree with this determination, you have the right to appeal. <br> Find out more about the appeal process or get assistance by contacting us directly.
+                  </div>
+                  <div class='col-md-12'>
+                      <br>Your application reference number is <strong> 190009446 </strong>
                   </div>
                 </div>
                 <br><br>

@@ -648,11 +648,4 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
-  def total_aptc_sum application
-    sum = 0.0
-    application.tax_households.each do |thh|
-      sum = sum + thh.preferred_eligibility_determination.max_aptc
-    end
-    return sum
-  end
 end

@@ -20,7 +20,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application = @person.primary_family.applications.new
     @application.populate_applicants_for(@person.primary_family)
     @application.save!
-    redirect_to edit_financial_assistance_application_path(@application)
+
+    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
   end
 
   def edit
@@ -31,25 +32,31 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
+    flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
-    @model.update_attributes!(permit_params(model_params)) if model_params.present?
-    if params.key?(model_name)
-     @model.workflow = { current_step: @current_step.to_i + 1}
-     @current_step = @current_step.next_step if @current_step.present?
-    else
-     @model.workflow = { current_step: @current_step.to_i}
-    end
+    @model.clean_conditional_params(model_params) if model_params.present?
+    @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
-    @model.save!
-    if params[:commit] == "Finish"
-      redirect_to edit_financial_assistance_application_path(@application)
-    elsif params[:commit] == "Submit my Application"
-      @application.submit! if @application.complete?
-      publish_application(@application)
-      dummy_data_for_demo(params) if @application.complete? #Dummy_code_for_DEMO
-      #redirect_to eligibility_results_financial_assistance_application_path(@application)
-      redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+    if params.key?(model_name)
+      if @model.save
+        @current_step = @current_step.next_step if @current_step.next_step.present?
+        if params[:commit] == "Submit my Application"
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          @application.submit! if @application.complete?
+          publish_application(@application)
+          dummy_data_for_demo(params) if @application.complete? #For_Populating_dummy_ED_for_DEMO
+          redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+        else
+          @model.update_attributes!(workflow: { current_step: @current_step.to_i })
+          render 'workflow/step', layout: 'financial_assistance'
+        end
+      else
+        @model.assign_attributes(workflow: { current_step: @current_step.to_i })
+        @model.save!(validate: false)
+        flash[:error] = build_error_messages(@model)
+        render 'workflow/step', layout: 'financial_assistance'
+      end
     else
       render 'workflow/step', layout: 'financial_assistance'
     end
@@ -94,9 +101,11 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def wait_for_eligibility_response
+    @family = @person.primary_family
   end
 
   def eligibility_results
+    @family = @person.primary_family
   end
 
   private
@@ -112,6 +121,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       @model.eligibility_determinations.build(max_aptc: 200.00, csr_percent_as_integer: 73, csr_eligibility_kind: "csr_73", determined_on: TimeKeeper.datetime_of_record - 30.days, determined_at: TimeKeeper.datetime_of_record - 30.days, premium_credit_strategy_kind: "allocated_lump_sum_credit", e_pdc_id: "3110344", source: "Admin", tax_household_id: txh.id).save!
       @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true) if txh.applicants.count > 1
     end
+  end
+
+  def build_error_messages(model)
+    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
   end
 
   def hash_to_param param_hash

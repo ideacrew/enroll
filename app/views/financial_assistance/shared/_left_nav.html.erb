@@ -2,40 +2,65 @@
   <ul class="nav nav-stacked" id="leftNavigation">
     <%# We need to turn these links in to actual links or make it so we don't need fake a's %>
     <li class="activer list-box step-tabs">
-      <a href="#">Account Registration</a>
-    </li>
-    <li class="activer list-box step-tabs">
-      <a href="#">Tell Us About Yourself</a>
-    </li>
-    <li class="activer list-box step-tabs">
       <a href="<%=insured_family_members_path%>">Household Info</a>
     </li>
 
-    <li class="activer list-box step-tabs">
-      <%= link_to "Financial Assistance", edit_financial_assistance_application_path(@application) %>
-    </li>
-
     <% if defined?(@applicant) %>
-      <li class="activer list-box step-tabs">
-        <%= link_to @applicant.person.first_name, edit_financial_assistance_application_applicant_path(@application, @applicant) %>
-      </li>
+      <ul class="nav nav-stacked">
+        <li class="list-box step-tabs <%= activer_for("income_and_coverage") %>">
+          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
+            <% if @applicant.other_questions_complete? %>
+              <span class="fa fa-check"></span>
+            <% end %>
+            Income and Coverage
+          <% end %>
+        </li>
 
-      <%# these next 3 li's needs to be indented or styled as sub links from the applicant %>
-      <li class="list-box step-tabs <%= ['benefits', 'deductions'].include?(controller_name) ? 'activer' : '' %>" >
-        <%= link_to "Income", financial_assistance_application_applicant_incomes_path(@application, @applicant) %>
-      </li>
-
-      <li class="list-box step-tabs <%= controller_name == 'benefits' ? 'activer' : '' %>" >
-        <%= link_to "Income Adjustments", financial_assistance_application_applicant_deductions_path(@application, @applicant) %>
-      </li>
+        <li class="list-box step-tabs <%= activer_for("tax_info") %>">
+          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2) do %>
+            <% if @applicant.tax_info_complete? %>
+              <span class="fa fa-check"></span>
+            <% end %>
+            Tax Info
+          <% end %>
+        </li>
+        <% if @applicant.incomes.present? %>
+          <li class="list-box step-tabs <%= activer_for("income") %>">
+            <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant) do %>
+              <% if @applicant.incomes_complete? %>
+                <span class="fa fa-check"></span>
+              <% end %>
+              Income
+            <% end %>
+          </li>
+        <% end %>
+        <% if @applicant.deductions.present? %>
+          <li class="list-box step-tabs <%= activer_for("income_adjustments") %>">
+            <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+              <% if @applicant.deductions_complete? %>
+                <span class="fa fa-check"></span>
+              <% end %>
+              Income Adjustments
+            <% end %>
+          </li>
+        <%end%>
+        <% if @applicant.benefits.present? %>
+          <li class="list-box step-tabs <%= activer_for("health_coverage") %>">
+            <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
+              <% if @applicant.benefits_complete? %>
+                <span class="fa fa-check"></span>
+              <% end %>
+              Health Coverage
+            <% end %>
+          </li>
+        <%end%>
+      <% end %>
+      </ul>
 
       <li class="list-box step-tabs">
-        <%= link_to "Health Coverage", financial_assistance_application_applicant_benefits_path(@application, @applicant) %>
+        <%= link_to review_and_submit_financial_assistance_application_path(@application) do %>
+          Review and Submit
+        <% end %>
       </li>
-    <% end %>
-
-    <li class="list-box step-tabs">
-      <a href="#">Review and Submit</a>
-    </li>
   </ul>
 </nav>

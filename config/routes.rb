@@ -42,6 +42,9 @@ Rails.application.routes.draw do
         post :step, on: :collection
         get 'step/:step', on: :member, action: 'step', as: 'go_to_step'
         get :age_18_to_26
+        get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
+        get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
+
 
         resources :incomes do
           put 'step(/:step)', action: 'step', on: :member

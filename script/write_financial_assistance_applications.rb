@@ -31,17 +31,17 @@ count = 0
 
 family_ids = FinancialAssistance::Application.where(aasm_state: "submitted").map(&:family_id)
 
-family_ids.each do |fid|
+families = Family.where(:_id => {"$in" => family_ids})
+
+families.each do |family|
   count += 1
-  family = Family.find(fid)
-  if family.nil?
-    raise "NO SUCH FAMILY #{fid}"
-  end
   begin
-    properties_slug = PropertiesSlug.new("", {:family_id => fid})
-    controller.resource(ConnectionSlug.new(fid), "", properties_slug, "")
+    properties_slug = PropertiesSlug.new("", {:family_id => family._id})
+    controller.resource(ConnectionSlug.new(family._id), "", properties_slug, "")
   rescue Exception => e
-    puts fid.inspect
+    puts "Application for family #{family._id} failed to generate."
+    puts e.inspect
+    puts "-"*100
     puts e.backtrace.inspect
   end
 end

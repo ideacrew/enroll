@@ -1,20 +1,29 @@
 <div class="col-md-7">
   <div class="row">
-    <div class="col-md-6">
-      <h3 class="title-inline"><b>Add Income Adjustments</b></h3>
+    <div class="col-md-8">
+      <h3 class="title-inline"><b>INCOME ADJUSTMENTS for <%= @applicant.family_member.person.first_name.titleize %></b></h3>
     </div>
   </div>
 
   <div>
-    <% if @applicant.deductions.present? %>
-      <h4>Edit Existing Income Adjustments</h4>
+  <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+    <%= render "income_adjustments_question"%>
+    <% if @applicant.deductions.present?%>
       <table class="table">
-        <th>Deduction Income Type</th>
+        <th>Deduction Type</th>
+        <th>Status</th>
         <th></th>
         <th></th>
         <% @applicant.deductions.each do |deduction| %>
           <tr>
-            <td><%= deduction.kind %></td>
+            <td><%= deduction.kind.nil? ? "--" : deduction.kind.titleize %></td>
+            <td>
+              <% if deduction.valid? :submission %>
+                <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+              <% else %>
+                <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+              <% end %>
+            </td>
             <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
             <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
           </tr>
@@ -22,11 +31,13 @@
       </table>
     <%end%>
   </div>
-  <%= link_to "Add Income Adjustment", new_financial_assistance_application_applicant_deduction_path(@application, @applicant) %>
+  <div class="col-md-4 col-sm-4 col-xs-4">
+  <%= link_to "Add Income Adjustment", new_financial_assistance_application_applicant_deduction_path(@application, @applicant), class: "btn btn-default center-block" %>
+  </div>
 </div>
 
 <div class="col-md-2">
-  <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant) do %>
+  <%= link_to find_applicant_path(@application, @applicant, current: 'deductions') do %>
     <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
   <% end %>
 
