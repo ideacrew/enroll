@@ -21,10 +21,19 @@ class EmployerInvoice
         FileUtils.mkdir_p(invoice_folder_path)
       end
       pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
+      # Please make sure to update the exact file path 
+      join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', 'ma_non_discrimination_and_language_tags.pdf')]
     rescue Exception => e
       @errors << "Unable to create PDF for #{@organization.hbx_id}."
       @errors << e.inspect
     end
+  end
+
+
+  def join_pdfs(pdfs)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    pdf.save invoice_absolute_file_path
   end
 
   def save_to_cloud
@@ -107,6 +116,11 @@ class EmployerInvoice
       Rails.root.join('tmp',current_month)
     end
   end
+  # unwanted
+  # def append_invoice_final_path
+  #    "#{Rails.root}/tmp/#{invoice_file_name}"
+  # end
+
 
   def invoice_absolute_file_path
     "#{invoice_folder_path}/#{invoice_file_name}"
