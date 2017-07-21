@@ -5,7 +5,7 @@
 %tax_filer_type= "urn:openhbx:terms:v1:tax_filer##{applicant.tax_filer_kind}"
 %is_joint_tax_filing= applicant.is_joint_tax_filing
 %is_claimed_as_tax_dependent= applicant.is_claimed_as_tax_dependent
-%has_insurance= applicant.has_insurance?
+%has_insurance= applicant.is_enrolled_in_insurance?
 %had_prior_insurance= applicant.had_prior_insurance?
 %has_state_health_benefit= applicant.has_state_health_benefit?
 %is_medicare_eligible= applicant.is_medicare_eligible

@@ -61,6 +61,14 @@ class FinancialAssistance::Applicant
   field :is_totally_ineligible, type: Boolean, default: false
   field :is_without_assistance, type: Boolean, default: false
 
+  field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+  field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
+
+  field :magi_as_percentage_of_fpl, type: Float, default: 0.0
+  field :magi_medicaid_type, type: String
+  field :magi_medicaid_category, type: String
+  field :medicaid_household_size, type: Integer
+
   # We may not need the following two fields
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
@@ -201,8 +209,12 @@ class FinancialAssistance::Applicant
   end
 
   #### Collect insurance from Benefit model
-  def has_insurance?
-    benefits.present?
+  def is_enrolled_in_insurance?
+    benefits.where(kind: 'is_enrolled').present?
+  end
+
+  def is_eligible_for_insurance?
+    benefits.where(kind: 'is_eligible').present?
   end
 
   def had_prior_insurance?
