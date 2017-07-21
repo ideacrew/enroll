@@ -10,12 +10,20 @@
     <%= render "income_adjustments_question"%>
     <% if @applicant.deductions.present?%>
       <table class="table">
-        <th>Deduction Income Type</th>
+        <th>Deduction Type</th>
+        <th>Status</th>
         <th></th>
         <th></th>
         <% @applicant.deductions.each do |deduction| %>
           <tr>
-            <td><%= deduction.kind %></td>
+            <td><%= deduction.kind.nil? ? "--" : deduction.kind.titleize %></td>
+            <td>
+              <% if deduction.valid? :submission %>
+                <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+              <% else %>
+                <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+              <% end %>
+            </td>
             <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
             <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
           </tr>

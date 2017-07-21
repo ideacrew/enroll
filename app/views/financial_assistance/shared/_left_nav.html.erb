@@ -58,7 +58,9 @@
       </ul>
 
       <li class="list-box step-tabs">
-        <a href="#">Review and Submit</a>
+        <%= link_to review_and_submit_financial_assistance_application_path(@application) do %>
+          Review and Submit
+        <% end %>
       </li>
   </ul>
 </nav>

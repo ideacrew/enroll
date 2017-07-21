@@ -31,7 +31,11 @@ module Insured::FamilyMembersHelper
       [insured_family_relationships_path(:consumer_role_id => consumer_role.id), false]
     else
       if family.application_in_progress.present?
-        [edit_financial_assistance_application_path(family.application_in_progress), !family.application_in_progress.ready_for_attestation?]
+        if family.application_in_progress.incomplete_applicants?
+          [go_to_step_financial_assistance_application_applicant_path(family.application_in_progress, family.application_in_progress.next_incomplete_applicant, 1), !family.application_in_progress.ready_for_attestation?]
+        else
+          [review_and_submit_financial_assistance_application_path(family.application_in_progress), !family.application_in_progress.ready_for_attestation?]
+        end
       else
         [(consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url), false]
       end
