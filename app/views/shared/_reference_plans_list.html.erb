@@ -29,7 +29,8 @@
 
   <div class="health">
     <ul class="nav nav-tabs row">
-	<li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
+      <% if individual_market_is_enabled? %>
+	    <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
         <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
         <i class="fa fa-circle-o"></i>
@@ -43,6 +44,7 @@
         <i class="fa fa-circle-o"></i>
         <i class="fa fa-dot-circle-o"></i>
         By metal level
+      <% end %>
       </li>
       <% end %>
       <% if offer_sole_source? %>
