@@ -144,8 +144,8 @@ class FinancialAssistance::Applicant
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
 
-  after_update :delete_unneccesary_embeds
-  after_update :create_embedded_document_instances
+  after_update :delete_embedded_documents_on_driver_qns_update
+  after_update :create_embedded_documents_on_driver_qns_update
 
   def is_ia_eligible?
     is_ia_eligible
@@ -341,15 +341,7 @@ class FinancialAssistance::Applicant
   end
 
 
-  def delete_unneccesary_embeds
-    if !has_enrolled_health_coverage && !has_eligible_health_coverage
-      benefits.destroy_all
-    end
-
-    if !has_deductions
-      deductions.destroy_all
-    end
-
+  def delete_embedded_documents_on_driver_qns_update
     if !has_job_income
       incomes.jobs.destroy_all
     end
@@ -361,39 +353,43 @@ class FinancialAssistance::Applicant
     if !has_other_income
       incomes.other.destroy_all
     end
+
+    if !has_enrolled_health_coverage
+      benefits.enrolled.destroy_all
+    end
+
+    if !has_eligible_health_coverage
+      benefits.eligible.destroy_all
+    end
+
+    if !has_deductions
+      deductions.destroy_all
+    end
   end
 
-  def create_embedded_document_instances
-    if has_enrolled_health_coverage
-      benefit = benefits.find_or_create_by(kind: "is_enrolled")
-      benefit.save(validate: false) if benefit.new_record?
-    end
-
-    if has_eligible_health_coverage
-      benefit = benefits.find_or_create_by(kind: "is_eligible")
-      benefit.save(validate: false) if benefit.new_record?
-    end
-
-    if has_deductions
-      deduction = deductions.find_or_create_by
-      deduction.save(validate: false) if deduction.new_record?
+  def create_embedded_documents_on_driver_qns_update
+    if has_job_income
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::JOB_INCOME_TYPE_KIND)
     end
 
     if has_self_employment_income
-      income = incomes.find_or_create_by(kind: FinancialAssistance::Income::JOB_INCOME_TYPE_KIND)
-      income.save(validate: false) if income.new_record?
-    end
-
-    if has_job_income
-      income = incomes.find_or_create_by(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
-      income.save(validate: false) if income.new_record?
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
     end
 
     if has_other_income
-      unless incomes.other.exists?
-        income = incomes.create
-        income.save(validate: false) if income.new_record?
-      end
+      incomes.create(kind: nil) if incomes.other.blank?
+    end
+
+    if has_enrolled_health_coverage
+      benefits.find_or_create_by(kind: "is_enrolled") if benefits.where(kind: "is_enrolled").blank?
+    end
+
+    if has_eligible_health_coverage
+      benefits.find_or_create_by(kind: "is_eligible") if benefits.where(kind: "is_eligible").blank?
+    end
+
+    if has_deductions
+      deductions.find_or_create_by(kind: nil) if deductions.blank?
     end
   end
 

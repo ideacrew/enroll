@@ -62,6 +62,9 @@ class FinancialAssistance::Benefit
   embeds_one :employer_address, class_name: "::Address"
   embeds_one :employer_phone, class_name: "::Phone"
 
+  scope :eligible, -> { where(kind: "is_eligible")}
+  scope :enrolled, -> { where(kind: "is_enrolled")}
+
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
