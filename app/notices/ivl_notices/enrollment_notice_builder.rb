@@ -32,7 +32,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def build
-    family = recipient.primary_family
+    notice.mpi_indicator = self.mpi_indicator
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
