@@ -100,12 +100,8 @@ module AuthorizationConcerns
   end
 
   class_methods do
-    def password_invalid?(password)
-      ## TODO: oim_id is an explicit dependency to the User class
-      resource = self.new(oim_id: 'example1', password: password)
-      !resource.valid_attribute?('password')
-    end
-
+    MAX_SAME_CHAR_LIMIT = 4
+    
     def generate_valid_password
       password = Devise.friendly_token.first(16)
       password = password + "aA1!"
