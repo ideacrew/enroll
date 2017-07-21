@@ -38,7 +38,7 @@ module InvoiceHelper
 
     @pdf=Prawn::Document.new
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -232,7 +232,7 @@ module InvoiceHelper
 
   def payment_page_for_renewing_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -323,7 +323,7 @@ module InvoiceHelper
 
   def payment_page_for_conversion_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -411,7 +411,7 @@ module InvoiceHelper
 
   def payment_page_for_initial_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
