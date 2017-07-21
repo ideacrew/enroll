@@ -571,7 +571,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOPDPTNC',
-    title: 'Census Dependent Termination due to Age-Off',
+    title: 'Change to your Insurance Coverage',
     description: 'Dependent EE coverage Termination due to Age-Off on policy when turn 26 except for Non-Congressional',
     resource_name: 'employee_role',
     event_name: 'employee_dependent_age_off_termination',
