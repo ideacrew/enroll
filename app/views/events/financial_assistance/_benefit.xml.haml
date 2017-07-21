@@ -22,7 +22,8 @@
     %is_esi_waiting_period= benefit.is_esi_waiting_period
   - if benefit.is_esi_mec_met.present?
     %is_esi_mec_met= benefit.is_esi_mec_met
-  %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
+  - if benefit.esi_covered.present?
+    %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
   - if benefit.employee_cost.present?
     %employee_cost= benefit.employee_cost.round(2)
   - if benefit.employee_cost_frequency.present?
