@@ -1,9 +1,9 @@
 require "rails_helper"
-require File.join(Rails.root, "app", "data_migrations", "update_carrier_name_for_hne")
+require File.join(Rails.root, "app", "data_migrations", "update_carrier_names")
 
-describe UpdateCarrierNameForHne, dbclean: :after_each do
-  let(:given_task_name) { "update_carrier_name_for_hne" }
-  subject { UpdateCarrierNameForHne.new(given_task_name, double(:current_scope => nil)) }
+describe UpdateCarrierNames, dbclean: :after_each do
+  let(:given_task_name) { "update_carrier_names" }
+  subject { UpdateCarrierNames.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
     it "has the given task name" do
@@ -11,7 +11,7 @@ describe UpdateCarrierNameForHne, dbclean: :after_each do
     end
   end
 
-  describe "changing hne organization's legal name" do
+  describe "changing organization's legal name" do
     let(:organization) { FactoryGirl.create(:organization, fein: "042864973", legal_name: "Health New England, Inc.")}
 
     it "should update legal name for health new england" do
