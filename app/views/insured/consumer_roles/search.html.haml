@@ -1,5 +1,6 @@
 = content_for :horizontal_status do
-  = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
+  - if show_component(request.path)
+    = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
 .container.pd-container
   #new_person_wrapper
     .row
@@ -8,10 +9,11 @@
           = render  partial: 'shared/left_nav.html.erb'
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
           %h1.darkblue Personal Information
-          %h4 First, we need to verify whether you're new to DC Health Link or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE.
+          %h4 myInfo First, we need to verify whether you're new to DC Health Link or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE.
           %p.memo * = required field
 
           = render 'insured/consumer_roles/remote_search_form', f: f
         .col-lg-2.col-md-2.col-sm-2.col-xs-12
           = render  partial: 'shared/individual_progress', locals: {step: '1'}
           /= render  partial: 'shared/right_nav.html.erb'
+
