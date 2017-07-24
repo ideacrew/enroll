@@ -60,12 +60,16 @@ module PdfTemplates
       individuals.select{|individual| individual.incarcerated}
     end
 
-    def current_health_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+    def current_health_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end
 
-    def current_dental_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+    def assisted_enrollments
+      current_health_enrollments.select{|enrollment| enrollment.is_receiving_assistance == true}
+    end
+
+    def current_dental_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end
 
     def renewal_health_enrollment
@@ -105,6 +109,24 @@ module PdfTemplates
       tax_households.select { |thh| thh.csr_percent_as_integer != 100}
     end
 
+    def enrollment_notice_subject
+      if current_health_enrollments.present? && assisted_enrollments.present?
+        if current_dental_enrollments.present?
+          subject = "Your Health Plan, Cost Savings, and Dental Plan"
+        else
+          subject = "Your Health Plan and Cost Savings"
+        end
+      elsif current_health_enrollments.present? && assisted_enrollments.nil?
+        if current_dental_enrollments.present?
+          subject = "Your Health and Dental Plan"
+        else
+          subject = "Your Health Plan"
+        end
+      else
+        subject = "Your Dental Plan"
+      end
+    end
+
     def csr_eligibility_notice_text(csr_percent_as_integer)
       #FIX ME when CSR = NAL
       text = ["<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services."]
@@ -122,7 +144,7 @@ module PdfTemplates
       end
     end
 
-    def something(ivl)
+    def household_information(ivl)
       rows = []
       household_block = []
       household_block << "Household Member:"

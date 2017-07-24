@@ -2,7 +2,7 @@ module PdfTemplates
   class Enrollment
     include Virtus.model
 
-    attribute :enrollees, Array[BasicIndividual]
+    attribute :enrollees, Array[Individual]
     attribute :premium, String
     attribute :employee_cost, String
     attribute :phone, String
