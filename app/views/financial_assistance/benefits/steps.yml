@@ -5,7 +5,7 @@
       - section:
           lines:
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
@@ -31,12 +31,12 @@
                   # checked: false
                   label: 'Enrolled'
                   classNames: 'span-text'
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
-                  model: benefit
-                  attribute: is_enrolled
+                # - gutter: 2
+                #   type: raw_html
+                #   text: '| &nbsp <a href=""> Not Sure? </a>'
+                #   classNames: 'span-text'
+                #   model: benefit
+                #   attribute: is_enrolled
             - cells:
                 - gutter: 6
                   type: input_date
@@ -236,7 +236,7 @@
                   model: benefit
                   attribute: employer_id
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *
                   classNames: 'span-text'
@@ -258,12 +258,12 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_waiting_period
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
+                # - gutter: 2
+                #   type: raw_html
+                #   text: '| &nbsp <a href=""> Not Sure? </a>'
+                #   classNames: 'span-text'
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text:  Does this employer offer a health plan that meets the minimum value standard ? *
                   classNames: 'span-text'
@@ -285,19 +285,19 @@
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_esi_mec_met
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
+                # - gutter: 2
+                #   type: raw_html
+                #   text: '| &nbsp <a href=""> Not Sure? </a>'
+                #   classNames: 'span-text'
             - cells:
                 - gutter: 8
                   type: text
                   text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
                   classNames: 'span-text'
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-                  classNames: 'span-text'
+                # - gutter: 2
+                #   type: raw_html
+                #   text: '| &nbsp <a href=""> Not Sure? </a>'
+                #   classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: input

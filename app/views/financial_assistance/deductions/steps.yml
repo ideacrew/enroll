@@ -5,7 +5,7 @@
       - section:
           lines:
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: Does this person expect to have adjustments to income in 2017 ? *
                 - gutter: 2
@@ -20,9 +20,9 @@
                   value: 'no2'
                   id: 'no2'
                   label: 'No'
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                # - gutter: 2
+                #   type: raw_html
+                #   text: '| &nbsp <a href=""> Not Sure? </a>'
             - cells:
                 - gutter: 6
                   type: text
