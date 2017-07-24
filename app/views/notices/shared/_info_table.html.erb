@@ -2,7 +2,7 @@
     <table align="center" cellpadding="5" class="total_table here" style="margin-top: 10px; margin-bottom: 10px; width: <%= table_width if defined? table_width %>;" border="1">
       <tbody>
         <% rows.each do |row| %>
-        <tr>
+        <tr valign="top">
           <% row.size.times do |i| %>
             <td style="<%= col_styles[i] if defined? col_styles %>">
               <% if row[i].instance_of? Array %>
