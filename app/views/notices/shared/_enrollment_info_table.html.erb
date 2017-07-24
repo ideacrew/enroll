@@ -1,22 +1,28 @@
-  <div style="display:block; page-break-inside: avoid;">
-    <table align="center" cellpadding="5" class="total_table here" style="margin-top: 10px; margin-bottom: 10px; width: <#%= table_width if defined? table_width %>;" border="1">
+<div style="display:block; page-break-inside: avoid;">
+    <table align="center" cellpadding="5" class="total_table here" style="margin-top: 10px; margin-bottom: 10px; width: <%= table_width if defined? table_width %>;">
       <tbody>
-        <tr>
-          <td>
+        <tr style="text-align: left">
+          <th>
+            <b>Enrolled Individual(s):</b>
+          </th>
+          <th>
+            <b>Plan Information</b>
+          </th>
+        </tr>
+        <tr valign="top">
+          <td class="small" style="width: 25%;">
             <% rows[0].each do |enrollee| %>
-              <p><%= enrollee.first_name%></p>
-              <p><%= enrollee.last_name%></p>
+              <p><%= enrollee.full_name%></p>
               <p><b>Age:</b> <%= enrollee.age%></p>
-              <br>
             <%end%>
           </td>
-          <td>
-            <p><b>Insurance Company:</b><%= rows[1]%></p>
-            <p><b>Phone:</b><%= rows[2]%></p>
-            <p><b>Plan Name:</b><%= rows[3]%></p>
-            <p><b>Your monthly premium payment:</b><%= rows[4]%></p>
-            <p><b>Annual Deductable:</b><%= rows[5]%></p>
-            <p><b>Start Date:</b><%= rows[6]%></p>
+          <td class="small">
+            <p><b>Insurance Company: </b><%= rows[1]%></p>
+            <p><b>Phone: </b><%= rows[2]%></p>
+            <p><b>Plan Name: </b><%= rows[3]%></p>
+            <p><b>Your monthly premium payment: </b><%= rows[4]%></p>
+            <p><b>Annual Deductable: </b><%= rows[5]%></p>
+            <p><b>Start Date: </b><%= rows[6]%></p>
           </td>
         </tr>
       </tbody>
@@ -24,7 +30,10 @@
   </div>
 
   <style type="text/css">
-    table.here, tr,td {
-      border-width: 1px;
+    .here td,th {
+      border: 1px solid black;
+    }
+    td.small {
+        line-height: 70%
     }
   </style>
