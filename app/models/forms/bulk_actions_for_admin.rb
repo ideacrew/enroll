@@ -59,7 +59,7 @@ module Forms
       notify(
         "acapi.info.events.hbx_enrollment.terminated",
         {
-          "reply_to" => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+          :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
           "hbx_enrollment_id" => hbx.hbx_id,
           "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#terminate_enrollment",
           "is_trading_partner_publishable" => transmit_flag
