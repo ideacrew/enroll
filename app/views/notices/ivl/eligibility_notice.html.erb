@@ -136,7 +136,7 @@
 
 <% notice.individuals.each do |ivl|%>
   <%= render partial: 'notices/shared/info_table', locals: {
-                             rows: notice.something(ivl),
+                             rows: notice.household_information(ivl),
     col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 

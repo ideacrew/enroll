@@ -62,6 +62,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     plan = PdfTemplates::Plan.new({
       plan_name: enrollment.plan.name,
       is_csr: enrollment.plan.is_csr?,
+      coverage_kind: enrollment.plan.coverage_kind,
       plan_carrier: enrollment.plan.carrier_profile.organization.legal_name
       })
     PdfTemplates::Enrollment.new({
@@ -74,10 +75,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       effective_on: enrollment.effective_on,
       plan: plan,
       enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::BasicIndividual.new({
-          first_name: member.person.first_name,
-          last_name: member.person.last_name,
-          age: "#{member.person.age_on(TimeKeeper.date_of_record)}"
+        enrollee = PdfTemplates::Individual.new({
+          full_name: member.person.full_name,
+          age: member.person.age_on(TimeKeeper.date_of_record)
         })
         enrollees << enrollee
       end
