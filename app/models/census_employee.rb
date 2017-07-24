@@ -112,7 +112,7 @@ class CensusEmployee < CensusMember
   scope :by_benefit_group_assignment_ids, ->(benefit_group_assignment_ids) { any_in("benefit_group_assignments._id" => benefit_group_assignment_ids) }
   scope :by_benefit_group_ids,            ->(benefit_group_ids) { any_in("benefit_group_assignments.benefit_group_id" => benefit_group_ids) }
   scope :by_ssn,                          ->(ssn) { where(encrypted_ssn: CensusMember.encrypt_ssn(ssn)) }
-
+  
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
     benefit_group_assignment_ids = matched.flat_map() do |ee|
@@ -122,22 +122,12 @@ class CensusEmployee < CensusMember
   }
 
   scope :unclaimed_matchable, ->(ssn, dob) {
-   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES})
+   linked_matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": LINKED_STATES}).where("benefit_group_assignments.benefit_group_id" => {"$exists" => true})
    unclaimed_person = Person.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob).detect{|person| person.employee_roles.length>0 && !person.user }
    unclaimed_person ? linked_matched : unscoped.and(id: {:$exists => false})
-  }
-  # fixes issue with a employer with no plan year crashing the employee/match page
-  scope :multiple_employers_with_no_plan_years, -> (ssn, dob) {
-    census_employees = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob)
-    employee = []
-    census_employees.each do |ce|
-      if !ce.employer_profile.plan_years.present?
-        employee << ce
-      end
-    end
-    employee
-  }
 
+  }
+  
   def initialize(*args)
     super(*args)
     write_attribute(:employee_relationship, "self")
