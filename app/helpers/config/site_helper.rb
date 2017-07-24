@@ -10,13 +10,9 @@ module Config::SiteHelper
   def site_website_name
     Settings.site.website_name
   end
-
+  
   def site_website_link
     link_to site_website_name, site_website_name
-  end
-
-  def site_contact_center_phone_number
-    Settings.contact_center.phone_number
   end
 
   def site_find_expert_link
