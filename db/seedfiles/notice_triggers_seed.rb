@@ -353,7 +353,7 @@ shop_notice_triggers = [
         name: 'Initial Employee Open Enrollment Successfully Completed',
         notice_template: 'notices/shop_employer_notices/17_initial_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP17',
+        mpi_indicator: 'SHOP_M017',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
