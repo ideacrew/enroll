@@ -191,7 +191,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def edit
-    #authorize @consumer_role, :edit?
+    authorize @consumer_role, :edit?
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
@@ -240,6 +240,23 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    if current_user.has_consumer_role?
+      respond_to do |format|
+        format.html { redirect_to edit_insured_consumer_role_path(current_user.person.consumer_role.id) }
+      end
+    else
+      flash[:error] = "We're sorry. Due to circumstances out of your control an error has occured."
+      respond_to do |format|
+        format.json { redirect_to destroy_user_session_path }
+        format.html { redirect_to destroy_user_session_path }
+        format.js   { redirect_to destroy_user_session_path }
+      end
+    end
+  end
+
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip] },
@@ -268,12 +285,14 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :no_dc_address_reason,
+      :is_applying_coverage
     ]
   end
 
   def find_consumer_role
     @consumer_role = ConsumerRole.find(params.require(:id))
+    @person = @consumer_role.person
   end
 
 

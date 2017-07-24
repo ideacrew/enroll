@@ -1318,3 +1318,22 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   end
 end
 
+describe "#verification due date" do
+  let(:family) { FactoryGirl.build(:family) }
+  let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
+  let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
+
+  context "for special verification period" do
+    it "returns special verification period" do
+      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
+      expect(family.verification_due_date).to eq Date.new(2016,5,6)
+    end
+  end
+
+  context "with no special verification period" do
+    it "calls determine due date method" do
+      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
+      expect((family.verification_due_date)).to eq TimeKeeper.date_of_record + 95.days
+    end
+  end
+end
