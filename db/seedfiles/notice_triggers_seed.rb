@@ -433,7 +433,7 @@ shop_notice_triggers = [
      title: 'Employee Plan Selection Confirmation',
      description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
      resource_name: 'employee_role',
-     event_name: 'select_plan_year_during_OE',
+     event_name: 'select_plan_year_during_oe',
      notice_triggers: [
        {
          name: 'Notice to employee after they select a plan during Annual Open Enrollment',
