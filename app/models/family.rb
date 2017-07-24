@@ -959,7 +959,7 @@ class Family
     if enrollment.special_verification_period
       enrollment.special_verification_period.to_date
     else
-      enrollment.submitted_at.to_date + 95.days
+      TimeKeeper.date_of_record + 95.days
     end
   end
 
