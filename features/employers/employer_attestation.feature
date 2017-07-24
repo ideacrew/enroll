@@ -1,4 +1,3 @@
-@sole_source_only_enabled
 Feature: Employer Profile
   In order for initial employers to submit application
   Employer Staff should upload attestation document
@@ -89,7 +88,7 @@ Feature: Employer Profile
     When Employer goes to the benefits tab I should see plan year information
     When Employer clicks on publish plan year
     Then Plan Year should be moved to Enrolling
-    
+
     Then I click on log out link
     Given a Hbx admin with read and write permissions exists
     When Hbx Admin logs on to the Hbx Portal
@@ -148,4 +147,3 @@ Feature: Employer Profile
     And Employer Staff clicks documents tab
     Then Employer Staff should see attestation status Rejected
     When Employer goes to the benefits tab I should see plan year information
-
