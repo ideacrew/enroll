@@ -4,11 +4,14 @@ describe Family, "given a primary applicant and a dependent" do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
-  let(:enrollment) { FactoryGirl.create(:hbx_enrollment,
-                           household: household,
-                           coverage_kind: "health",
-                           enrollment_kind: "open_enrollment",
-                           aasm_state: 'shopping') }
+  let(:enrollment) {
+    FactoryGirl.create(:hbx_enrollment,
+                       household: household,
+                       coverage_kind: "health",
+                       enrollment_kind: "open_enrollment",
+                       aasm_state: 'shopping'
+    )
+  }
   let(:family_member_person) { FamilyMember.new(is_primary_applicant: true, is_consent_applicant: true, person: person) }
   let(:family_member_dependent) { FamilyMember.new(person: dependent) }
 

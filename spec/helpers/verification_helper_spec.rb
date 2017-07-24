@@ -243,21 +243,21 @@ RSpec.describe VerificationHelper, :type => :helper do
     let(:hbx_enrollment) { HbxEnrollment.new(:review_status => "ready") }
     context "if verification needed" do
       before :each do
-        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(true)
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
       end
       it "returns true if enrollment has complete review status" do
-        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment_incomplete)
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment_incomplete)
         expect(helper.hbx_enrollment_incomplete).to be_truthy
       end
       it "returns false for not incomplete status" do
-        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.first").and_return(hbx_enrollment)
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.first").and_return(hbx_enrollment)
         expect(helper.hbx_enrollment_incomplete).to be_falsey
       end
     end
 
     context "without enrollments that needs verification" do
       before :each do
-        allow(person).to receive_message_chain("primary_family.ivl_unverified_enrollments.any?").and_return(false)
+        allow_any_instance_of(Person).to receive_message_chain("primary_family.active_household.hbx_enrollments.verification_needed.any?").and_return(false)
       end
 
       it "returns false without enrollments" do
