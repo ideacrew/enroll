@@ -1449,7 +1449,7 @@ class HbxEnrollment
 
   def ee_select_plan_during_oe
     if is_shop? && self.census_employee.present? 
-      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe")
+      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_OE")
     end
   end
 

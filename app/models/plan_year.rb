@@ -1201,12 +1201,6 @@ class PlanYear
     end
   end
 
-  # def ee_select_plan_during_oe
-  #   return true if (benefit_groups.any?{|bg| bg.is_congress?})
-  #   self.employer_profile.census_employees.non_terminated.each do |ce|
-  #  end
-  # end
-
   def renewal_group_notice
     event_name = aasm.current_event.to_s.gsub(/!/, '')
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
