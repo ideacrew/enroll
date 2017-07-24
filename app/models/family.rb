@@ -932,7 +932,7 @@ class Family
       end
     end
 
-    due_dates.min.to_date
+    due_dates.min.to_date if due_dates.present?
   end
 
   def contingent_enrolled_active_family_members

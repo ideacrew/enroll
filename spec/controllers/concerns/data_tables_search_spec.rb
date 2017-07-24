@@ -59,8 +59,8 @@ describe FakesController, dbclean: :after_each do
         end
       end
 
-      it_behaves_like "sorted_results", "4", "asc", :verification_due_date
-      it_behaves_like "sorted_results", "4", "desc", :verification_due_date
+      it_behaves_like "sorted_results", "4", "asc", :min_verification_due_date_on_family
+      it_behaves_like "sorted_results", "4", "desc", :min_verification_due_date_on_family
       it_behaves_like "sorted_results", "6", "asc", :review_status
       it_behaves_like "sorted_results", "6", "desc", :review_status
 
@@ -76,8 +76,8 @@ describe FakesController, dbclean: :after_each do
       expect(subject.sorted_families(nil, nil, @families)).to eq @families
     end
 
-    it "should sort by verification_due_date if received it as attributes" do
-      expect(subject.sorted_families(:verification_due_date, "asc", @families)).to eq @families.sort_by(&:verification_due_date)
+    it "should sort by min_verification_due_date_on_family if received it as attributes" do
+      expect(subject.sorted_families(:min_verification_due_date_on_family, "asc", @families)).to eq @families.sort_by(&:min_verification_due_date_on_family)
     end
 
     it "should sort by review_status if received it as attributes" do
