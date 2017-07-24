@@ -206,6 +206,7 @@
                 type: label_radio
                 name: row1
                 value: true
+                required: true
                 id: 'living_outside_yes'
                 label: 'Yes'
                 classNames: 'span-text'
@@ -216,6 +217,7 @@
                 type: label_radio
                 name: row1
                 value: false
+                required: true
                 id: 'living_outside_no'
                 label: 'No'
                 classNames: 'span-text'
