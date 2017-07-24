@@ -63,8 +63,8 @@
    heading: 'Your Plan', sub_heading: ''} %>
 
 <% notice.enrollments.each do |enrollment| %>
-  <%= render partial: 'notices/shared/info_table', locals: {
-                               rows: ["#{enrollment.enrollees}", "#{enrollment.plan.plan_name}, #{enrollment.phone}, #{enrollment.premium}, #{enrollment.aptc_amount}, #{enrollment.effective_on}"],
+  <%= render partial: 'notices/shared/enrollment_info_table', locals: {
+                               rows: [enrollment.enrollees, "insurance company","#{enrollment.phone}", "#{enrollment.plan.plan_name}", "#{enrollment.premium}", "#{enrollment.aptc_amount}", "#{enrollment.effective_on}"],
       col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
