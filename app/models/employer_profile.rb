@@ -257,6 +257,10 @@ class EmployerProfile
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
+  def dt_display_plan_year
+    plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
+  end
+
   def plan_year_drafts
     plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
   end
@@ -410,7 +414,7 @@ class EmployerProfile
             if qhh.employee.present?
                 quote_employee = qhh.employee
                 ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
-                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s))
+                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
 
                 qhh.dependents.each do |qhh_dependent|
                   ce.census_dependents << CensusDependent.new(
@@ -984,7 +988,8 @@ private
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 

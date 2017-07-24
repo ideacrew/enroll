@@ -3,10 +3,10 @@
     <h4>
       <% if can_show_due_date?(@person) %>
           Document Due Date:&nbsp;&nbsp;
-          <% if min_verification_due_date_on_family(@person.primary_family) <= TimeKeeper.date_of_record %>
-              <span class="label label-danger"><%= min_verification_due_date_on_family(@person.primary_family) %> (Past Due)</span>
+          <% if @person.primary_family.min_verification_due_date_on_family <= TimeKeeper.date_of_record %>
+              <span class="label label-danger"><%= @person.primary_family.min_verification_due_date_on_family %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= min_verification_due_date_on_family(@person.primary_family) %></span>
+              <span class="label label-warning"><%= @person.primary_family.min_verification_due_date_on_family %></span>
           <% end %>
       <% end %>
     </h4>
@@ -37,9 +37,9 @@
                   </div>
 
                   <div class="v-type-due-date col-md-3">
-                    <% if can_show_due_date?(@person) %>
+                    <% if can_show_due_date?(@person, f_member) %>
                       <span class="text-danger">Due Date:</span>
-                      <%= document_due_date(f_member, f_member.family, v_type).to_date %>
+                      <%= f_member.family.document_due_date(f_member, v_type).to_date %>
                     <% end %>
                   </div>
 

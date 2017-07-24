@@ -58,45 +58,20 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    family = person.primary_family
-    contingent_enrolled_active_family_members(family).any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
   end
 
-  def min_verification_due_date_on_family(family)
-    due_dates = []
-    contingent_enrolled_active_family_members(family).each do |family_member|
-      family_member.person.verification_types.each do |v_type|
-        due_dates << document_due_date(family_member, family, v_type)
-      end
-    end
-    
-    due_dates.min.to_date
+  def has_enrolled_policy?(family_member)
+    return true if family_member.blank?
+    family_member.family.enrolled_policy(family_member).present?
   end
 
-  def document_due_date(family_member, family, v_type)
-    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    enrollment = enrolled_policy(family_member, family)
-    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
-  end
-
-  def enrolled_policy(family_member, family)
-    family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
-  end
-
-  def verification_due_date_from_enrollment(enrollment)
-    if enrollment.special_verification_period
-      enrollment.special_verification_period.to_date
-    else
-      enrollment.submitted_at.to_date + 95.days
-    end
-  end
-
-  def can_show_due_date?(person)
-    enrollment_group_unverified?(person) && verification_needed?(person)
+  def can_show_due_date?(person, f_member=nil)
+    enrollment_group_unverified?(person) && verification_needed?(person) && has_enrolled_policy?(f_member)
   end
 
   def documents_uploaded
@@ -163,14 +138,6 @@ module VerificationHelper
     @family_members.all?{|member| member.person.consumer_role.aasm_state == "fully_verified"}
   end
 
-  def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
-    else
-      "no enrollment"
-    end
-  end
-
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
   end
@@ -193,16 +160,6 @@ module VerificationHelper
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
-  end
-
-  def contingent_enrolled_active_family_members(family)
-    enrolled_family_members = []
-    family.family_members.active.each do |family_member|
-      if enrolled_policy(family_member, family).present?
-        enrolled_family_members << family_member
-      end
-    end
-    enrolled_family_members
   end
   
   def admin_actions(v_type, f_member)
