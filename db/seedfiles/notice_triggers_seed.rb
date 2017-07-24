@@ -6,7 +6,7 @@ shop_notice_triggers = [
   
 {
     hbx_id: 'SHOP0',
-    title: 'Welcome Notice to Employer',
+    title: 'Welcome to The Health Connector',
     description: 'ER creates an account in Health',
     resource_name: 'employer',
     event_name: 'application_created',
@@ -88,7 +88,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP2',
-    title: 'Employer Approval Notice',
+    title: 'Approval of Application to Offer Group Health Coverage through the Health Connector',
     description: 'Application to Offer Group Health Coverage in DC Health Link',
     resource_name: 'employer',
     event_name: 'initial_employer_approval',
@@ -439,7 +439,7 @@ shop_notice_triggers = [
          name: 'Notice to employee after they select a plan during Annual Open Enrollment',
          notice_template: 'notices/shop_employee_notices/15_employee_select_plan_during_annual_open_enrollment',
          notice_builder: 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
-         mpi_indicator: 'MPI_SHOP15',
+         mpi_indicator: 'SHOP_M068',
          notice_trigger_element_group: {
            market_places: ['shop'],
            primary_recipients: ["employee"],

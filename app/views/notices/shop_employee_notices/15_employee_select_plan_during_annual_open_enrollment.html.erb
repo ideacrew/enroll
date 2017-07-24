@@ -1,17 +1,10 @@
 <%= render partial: 'notices/shared/cover', :locals => {notice: notice} %>
 <br>
 <%= render partial: 'notices/shared/logo' %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
 
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td><h3><%= notice.subject %> <!-- Employee Plan Selection Confirmation --></h3></td>
-    </tr>
-  </tbody>
-</table>
 
 <table class="total_table" border="0">
   <tbody>
@@ -34,9 +27,9 @@
   { content: "If your employer is unable to meet all eligibility requirement and your coverage cannot go into effect, you will receive a notice informing you of next steps." }%>
 
  <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-    { contents: ["Please contact the #{Settings.site.short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %> 
+    { contents: ["Please contact the #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-                                                                    ["By calling #{Settings.contact_center.phone_number}.","TTY: #{Settings.contact_center.tty_number}","By email: <a href='#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a>." ] } %>
+                                                                    ["By calling #{contact_center_phone_number}.","TTY: #{contact_center_tty_number}","By email: #{small_business_email_link}." ] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "You can also find more information on our website at MAhealthconnector.org." }%>  

@@ -42,4 +42,13 @@ module Config::ContactCenterHelper
   def contact_center_tty_number
     Settings.contact_center.tty_number
   end
+
+  def small_businesss_email
+    Settings.contact_center.small_business_email
+  end
+
+  def small_business_email_link
+    link_to small_businesss_email,small_businesss_email
+  end
+
 end

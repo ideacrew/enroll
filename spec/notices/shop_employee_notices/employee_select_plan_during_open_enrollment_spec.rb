@@ -16,7 +16,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
                             :name =>'Notice to employee after they select a plan during Annual Open Enrollment',
                             :notice_template => 'notices/shop_employee_notices/15_employee_select_plan_during_annual_open_enrollment',
                             :notice_builder => 'ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment',
-                            :mpi_indicator => 'MPI_SHOP15',
+                            :mpi_indicator => 'SHOP_M068',
                             :event_name => 'select_plan_year_during_OE',
                             :title => "Employee Plan Selection Confirmation"})
                           }
