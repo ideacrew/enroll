@@ -1,5 +1,7 @@
 <% content_for :horizontal_status do %>
-  <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if show_component(request.path) %>
+    <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
   <div class="container">
     <div id="new_person_wrapper">
@@ -13,7 +15,7 @@
           <h1 class="darkblue">Application Checklist</h1>
           <p>To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.</p>
           <p class="memo">* = required field</p>
-          <div class="well knowmore rounded-top">
+          <div class="knowmore rounded-top">
             <div class="row">
               <div class="col-lg-3 stacked-icons text-center">
                 <i class="fa fa-arrow-down fa-3x adjustments" aria-hidden="true"></i>
