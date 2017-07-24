@@ -54,6 +54,7 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   dental_market_enabled: false
+  sole_source_only_enabled: false
 #
   qle:
     with_in_sixty_days: 60

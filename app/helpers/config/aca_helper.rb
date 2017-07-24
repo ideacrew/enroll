@@ -31,6 +31,10 @@ module Config::AcaHelper
     !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
   end
 
+  def sole_source_only?
+    Settings.aca.sole_source_only_enabled
+  end
+
   def offers_nationwide_plans?
     Settings.aca.nationwide_markets
   end

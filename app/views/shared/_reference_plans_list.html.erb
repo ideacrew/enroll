@@ -29,7 +29,7 @@
 
   <div class="health">
     <ul class="nav nav-tabs row">
-      <% if individual_market_is_enabled? %>
+      <% if sole_source_only? %>
 	    <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
         <%= f.radio_button :plan_option_kind, "single_carrier" %>
         <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
