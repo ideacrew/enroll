@@ -426,9 +426,9 @@ private
 
   def application_submission_validity
     # Mandatory Fields before submission
-    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified
+    validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
     # User must agree with terms of service check boxes before submission
-    validates_acceptance_of :medicaid_terms, :parent_living_out_of_home_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
+    validates_acceptance_of :medicaid_terms, :submission_terms, :medicaid_insurance_collection_terms, :report_change_terms, accept: true
   end
 
   def before_attestation_validity
