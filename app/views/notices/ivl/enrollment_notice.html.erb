@@ -28,24 +28,27 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
    content: "You recently signed up for insurance through DC Health Link. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the <coverage year> coverage year."} %>
 <% end %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by <plan effective date>. All of your premium payments must be made by the first of the month."],
-   heading: 'Here’s What You Need to Do Now', sub_heading: 'Make Your First Payment'} %>
+   heading: 'Here’s What You Need to Do Now', sub_heading: 'Make Your First Payment', top_margin: '10px'} %>
+
 <% if notice.aqhp_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "Send Us Documents"} %>
+   content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. The deadline to return them is <Document Due Date>. You could lose your insurance or cost savings if you don’t return them by the deadline.",
     listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
 <% else %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "Send Us Documents"} %>
+   content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. The deadline to return them is <Document Due Date>. You could lose your insurance if you don’t return them by the deadline.",
     listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
 <% end %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["On #{TimeKeeper.date_of_record}, you enrolled the people listed in the plan(s) shown below:"],
    heading: 'Your Plan', sub_heading: ''} %>
@@ -55,12 +58,13 @@
                                rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}","#{enrollment.phone}", "#{enrollment.plan.plan_name}", "#{enrollment.premium}", "#{enrollment.aptc_amount}", "#{enrollment.effective_on}"],
       col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],
    heading: 'What You’ll Pay Each Month', sub_heading: ''} %>
   <% notice.current_health_enrollments.each do |enrollment|%>
     <% next if enrollment.aptc_amount < 0 %>
-    <table style='width: 80%' align="left" >
+    <table style='margin-top: 10px; width: 80%; margin-bottom: 10px;' align="left" >
       <tr>
         <td>
           <%= enrollment.plan.plan_name %>
