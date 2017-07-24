@@ -17,6 +17,7 @@ class ConsumerRole
   US_CITIZEN_STATUS = "us_citizen"
   NOT_LAWFULLY_PRESENT_STATUS = "not_lawfully_present_in_us"
   ALIEN_LAWFULLY_PRESENT_STATUS = "alien_lawfully_present"
+  INELIGIBLE_CITIZEN_VERIFICATION = %w(not_lawfully_present_in_us non_native_not_lawfully_present_in_us)
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
@@ -93,6 +94,7 @@ class ConsumerRole
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
@@ -772,7 +774,8 @@ class ConsumerRole
   def record_transition(*args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 

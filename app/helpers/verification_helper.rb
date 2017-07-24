@@ -58,11 +58,20 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
+  end
+
+  def has_enrolled_policy?(family_member)
+    return true if family_member.blank?
+    family_member.family.enrolled_policy(family_member).present?
+  end
+
+  def can_show_due_date?(person, f_member=nil)
+    enrollment_group_unverified?(person) && verification_needed?(person) && has_enrolled_policy?(f_member)
   end
 
   def documents_uploaded
@@ -152,7 +161,7 @@ module VerificationHelper
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
-
+  
   def admin_actions(v_type, f_member)
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
