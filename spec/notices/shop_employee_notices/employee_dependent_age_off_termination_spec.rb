@@ -94,10 +94,11 @@ RSpec.describe ShopEmployeeNotices::EmployeeDependentAgeOffTermination, :dbclean
     end
 
     it "should append data" do
+      enrollment = census_employee.benefit_group_assignments.first.hbx_enrollment
       @employee_notice.append_data
       expect(@employee_notice.notice.enrollment.dependents).to eq family.family_members.where(is_primary_applicant: false).map(&:person).map(&:full_name)
       expect(@employee_notice.notice.enrollment.plan_year).to eq renewal_bcp.start_on.year
-      expect(@employee_notice.notice.enrollment.effective_on).to eq  renewal_bcp.start_on
+      expect(@employee_notice.notice.enrollment.effective_on).to eq renewal_bcp.start_on
       expect(@employee_notice.notice.enrollment.ivl_open_enrollment_start_on).to eq renewal_bcp.open_enrollment_start_on
       expect(@employee_notice.notice.enrollment.ivl_open_enrollment_end_on).to eq renewal_bcp.open_enrollment_end_on
     end

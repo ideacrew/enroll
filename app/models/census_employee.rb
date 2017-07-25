@@ -444,7 +444,7 @@ class CensusEmployee < CensusMember
     end
 
     def advance_day(new_date)
-      CensusEmployee.employee_dependent_age_off_termination
+      CensusEmployee.employee_dependent_age_off_termination(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
@@ -452,22 +452,21 @@ class CensusEmployee < CensusMember
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
-    def employee_dependent_age_off_termination
-      if TimeKeeper.date_of_record.mday == 1
-        CensusEmployee.all.each do |census_employee|
-          if census_employee.employee_role.present?
-            plan_year = census_employee.employee_role.employer_profile.plan_years.where(:aasm_state.nin => PlanYear::INELIGIBLE_FOR_EXPORT_STATES).first
-            next if (plan_year.nil? || plan_year.benefit_groups.any?{|bg| bg.is_congress?})
-            if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.count >= 1
-              census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
-                if PlanCostDecorator.benefit_relationship(dependent.primary_relationship).include? "child_under_26"
-                  dep = dependent.person
-                  now = TimeKeeper.date_of_record
-                  age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
-                  if age >= 25
-                    if (now.month == 12 && now.day == 1) || (now.month == dep.dob.month && now.day == 1)
-                      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_dependent_age_off_termination")
-                    end
+    def employee_dependent_age_off_termination(new_date)
+      if new_date.mday == 1
+        Person.all_employee_roles.each do |person|
+          if person.person_relationships.present?
+            person.person_relationships.each do |relation|
+              if relation.kind == "child"
+                id = relation.relative_id.to_s
+                dep =  Person.where(_id: id).first
+                age = new_date.year - dep.dob.year - ((new_date.month > dep.dob.month || (new_date.month == dep.dob.month && new_date.day >= dep.dob.day)) ? 0 : 1)
+                if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && ((new_date.month == 12) || (new_date.month == dep.dob.month))
+                  hbx_enrollment = dep.families.first.active_household.hbx_enrollments.where(aasm_state: "coverage_selected" || "coverage_enrolled", kind: "employer_sponsored").last
+                  next if (hbx_enrollment.nil? || hbx_enrollment.benefit_group.is_congress?)
+                  employee_role = hbx_enrollment.employee_role 
+                  if hbx_enrollment.hbx_enrollment_members.present? && hbx_enrollment.hbx_enrollment_members.any? {|member| member.person.id.to_s == id}
+                    ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination")
                   end
                 end
               end
