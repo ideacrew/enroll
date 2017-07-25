@@ -61,10 +61,15 @@ $(document).ready(function() {
   if ($("#income_amount").val() == 0){
    $("#income_amount").val("");
   }
+    $("#is_joint_tax_filing_yes").closest(".row").hide();
+    $("#is_claimed_as_tax_dependent_yes").closest(".row").next(".row").hide()
 
   $("body").on("change", "#is_required_to_file_taxes_no", function(){
     if ($('#is_required_to_file_taxes_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
+         $(this).parents(".row").next().each(function () {
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        })
     }
     else{
       $(this).parents(".row").next().next().removeClass('hide');
@@ -73,7 +78,10 @@ $(document).ready(function() {
   $("body").on("change", "#is_required_to_file_taxes_yes", function(){
 
     if ($('#is_required_to_file_taxes_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
+      $(this).closest(".row").next(".row").each( function() {
+          $(this).show();
+          $(this).find("input").prop('required', 'required');
+      });
     }
     else{
       $(this).parents(".row").next().next().addClass('hide');
@@ -82,7 +90,11 @@ $(document).ready(function() {
 
   $("body").on("change", "#is_claimed_as_tax_dependent_no", function(){
     if ($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
+      //$(this).parents(".row").next().addClass('hide');
+        $('#is_claimed_as_tax_dependent_no').closest(".row").next(".row").each( function(){
+            $(this).hide();
+            $(this).find("input").removeAttr('required');
+        });
     }
     else{
       $(this).parents(".row").next().next().removeClass('hide');
@@ -92,7 +104,10 @@ $(document).ready(function() {
   $("body").on("change", "#is_claimed_as_tax_dependent_yes", function(){
 
     if ($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
+      //$(this).parents(".row").next().removeClass('hide');
+        $(this).closest(".row").next(".row").each( function() {
+            $(this).show();
+         });
     }
     else{
       $(this).parents(".row").next().next().addClass('hide');
@@ -192,7 +207,7 @@ $(document).ready(function() {
     $('#living_outside_yes').parents(".row").next().removeClass('hide');
   }
   /* Submit Application Form Related */
-  
+
 
   /* Preference Application Form Related */
 
@@ -226,24 +241,27 @@ $(document).ready(function() {
 
 /* Applicant's Tax Info Form Related */
   if($('#is_required_to_file_taxes_no').is(':checked')) {
-    $('#is_required_to_file_taxes_no').parents(".row").next().addClass('hide');
+    $('#is_required_to_file_taxes_no').closest(".row").next(".row").each( function(){
+      $(this).hide();
+      $(this).find("input").removeAttr('required');
+    });
   }
 
   if($('#is_required_to_file_taxes_yes').is(':checked')) {
-    $('#is_required_to_file_taxes_yes').parents(".row").next().removeClass('hide');
+     $('#is_required_to_file_taxes_yes').closest(".row").next(".row").show();
+     $('#is_required_to_file_taxes_yes').closest(".row").next(".row").find("input").prop('required', true);
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
-    $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
+    //$('#is_claimed_as_tax_dependent_no').closest(".row").hide();
+      $('#is_claimed_as_tax_dependent_no').closest(".row").next(".row").each( function(){
+          $(this).hide();
+       });
   }
 
   if($('#is_claimed_as_tax_dependent_yes').is(':checked')) {
-    $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
+    $('#is_claimed_as_tax_dependent_yes').closest(".row").next(".row").show();
   }
-
-
-  $('#is_required_to_file_taxes_yes').parents(".row").next().addClass('hide');
-  $('#is_required_to_file_taxes_yes').parents(".row").next().next().next().addClass('hide');
 
 /* Applicant's Tax Info Form Related */
 
