@@ -33,6 +33,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def build
     notice.mpi_indicator = self.mpi_indicator
+    check_for_unverified_individuals
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
@@ -42,6 +43,36 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       raise 'mailing address not present'
     end
   end
+
+
+  def check_for_unverified_individuals
+    enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
+        (
+          hbx_en.terminated_on.blank? ||
+          hbx_en.terminated_on >= TimeKeeper.date_of_record
+        )
+    end
+    enrollments.reject!{|e| e.coverage_terminated? }
+    family_members = enrollments.inject([]) do |family_members, enrollment|
+      family_members += enrollment.hbx_enrollment_members.map(&:family_member)
+    end.uniq
+
+    people = family_members.map(&:person).uniq
+    people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
+    people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
+
+    outstanding_people = []
+    people.each do |person|
+      if person.consumer_role.outstanding_verification_types.present?
+        outstanding_people << person
+      end
+    end
+    outstanding_people.uniq!
+    notice.documents_needed = outstanding_people.present? ? true : false
+  end
+
+
 
   def append_data
     family = recipient.primary_family

@@ -21,6 +21,7 @@ module PdfTemplates
     attribute :first_name, String
     attribute :last_name, String
     attribute :due_date, String
+    attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :assistance_year, Date
 
