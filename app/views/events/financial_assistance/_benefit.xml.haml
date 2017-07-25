@@ -25,7 +25,7 @@
   - if benefit.esi_covered.present?
     %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
   - if benefit.employee_cost.present?
-    %employee_cost= benefit.employee_cost.round(2)
+    %employee_cost= benefit.employee_cost.to_f.round(2)
   - if benefit.employee_cost_frequency.present?
-    %employee_cost_frequency= benefit.employee_cost_frequency
+    %employee_cost_frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{benefit.employee_cost_frequency}"
   %submitted_at= benefit.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
