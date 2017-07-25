@@ -28,7 +28,7 @@
                   attribute: has_job_income
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
@@ -53,11 +53,11 @@
                   attribute: has_self_employment_income
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
-                  text: Does this person expect to have other types of income in 2017? *
+                  text: Does this person expect to have other types of income in 2016? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -78,11 +78,11 @@
                   attribute: has_other_income
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
-                  text: Does this person expect to have adjustments to income in 2017 ? *
+                  text: Does this person expect to have adjustments to income in 2016 ? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -103,7 +103,7 @@
                   attribute: has_deductions
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
@@ -128,7 +128,7 @@
                   attribute: has_enrolled_health_coverage
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
@@ -153,7 +153,7 @@
                   attribute: has_eligible_health_coverage
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
 - step:
     heading: Tax Info for <family-member-name-placeholder>
     heading_text: Tell us about this person's tax info. When you're finished select CONTINUE.
@@ -163,7 +163,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person file taxes for 2017? *
+                  text: Will this person file taxes for 2016? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -184,7 +184,7 @@
                   attribute: is_required_to_file_taxes
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
@@ -207,11 +207,11 @@
                   attribute: is_joint_tax_filing
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
+                  text: Will this person be claimed as somebody else’s tax dependent for 2016? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -232,9 +232,9 @@
                   attribute: is_claimed_as_tax_dependent
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: This person will be claimed as a dependent by
                   required: true

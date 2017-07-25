@@ -5,7 +5,7 @@
       - section:
           lines:
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
@@ -17,7 +17,6 @@
                   id: 'is_eligible'
                   model: benefit
                   attribute: kind
-                  # checked: true
                   label: 'Eligible'
                   classNames: 'span-text'
                 - gutter: 2
@@ -28,12 +27,11 @@
                   id: 'is_enrolled'
                   model: benefit
                   attribute: kind
-                  # checked: false
                   label: 'Enrolled'
                   classNames: 'span-text'
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_enrolled
@@ -41,14 +39,12 @@
                 - gutter: 6
                   type: input_date
                   placeholder: Start On *
-                  # required: true
                   id: 'start_on'
                   model: benefit
                   attribute: start_on
                 - gutter: 6
                   type: input_date
                   placeholder: End On
-                  # required: true
                   id: 'end_on'
                   model: benefit
                   attribute: end_on
@@ -56,11 +52,9 @@
                 - gutter: 6
                   type: text
                   text:  Where can this person access coverage ?*
-                  # required: true
                 - gutter: 6
                   type: 'dropdown'
                   name: ''
-                  # required: true
                   values:
                     - acf_refugee_medical_assistance
                     - americorps_health_benefits
@@ -93,7 +87,6 @@
                 - gutter: 6
                   type: 'dropdown'
                   name: who_can_be_covered?
-                  # required: true
                   id: 'esi_covered'
                   values:
                     - employee and spouse
@@ -109,7 +102,6 @@
                   type: input
                   name: employer_name
                   placeholder: EMPLOYER NAME *
-                  # required: true
                   id: 'employer_name'
                   model: benefit
                   attribute: employer_name
@@ -118,7 +110,6 @@
                   type: input
                   name: employer_address_line_1
                   placeholder: EMPLOYER ADDRESS  Line 1 *
-                  # required: true
                   id: 'add1'
                   model: employer_address
                   accessor:
@@ -128,7 +119,6 @@
                   type: input
                   name: employer_address_line_2
                   placeholder: EMPLOYER ADDRESS Line 2(APT, UNIT, ETC)
-                  # required: true
                   id: 'add2'
                   model: employer_address
                   accessor:
@@ -139,7 +129,6 @@
                   type: input
                   name: city
                   placeholder: CITY*
-                  # required: true
                   id: 'city'
                   model: employer_address
                   accessor:
@@ -148,7 +137,6 @@
                 - gutter: 4
                   type: 'dropdown'
                   name: 'STATE'
-                  # required: true
                   id: 'state'
                   values:
                     - Choose State
@@ -210,7 +198,6 @@
                   type: input
                   name: zip
                   placeholder: ZIP *
-                  # required: true
                   id: 'zip'
                   model: employer_address
                   accessor:
@@ -221,7 +208,6 @@
                   type: input
                   name: employer_phone
                   placeholder: EMPLOYER PHONE
-                  # required: true
                   model: employer_phone
                   id: 'phone'
                   accessor:
@@ -231,12 +217,11 @@
                   type: input
                   name: employer_indentification_no.
                   placeholder: EMPLOYER IDENTIFICATION NO.(EIN)
-                  # required: true
                   id: 'fein'
                   model: benefit
                   attribute: employer_id
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text: Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *
                   classNames: 'span-text'
@@ -260,10 +245,10 @@
                   attribute: is_esi_waiting_period
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
             - cells:
-                - gutter: 5
+                - gutter: 6
                   type: text
                   text:  Does this employer offer a health plan that meets the minimum value standard ? *
                   classNames: 'span-text'
@@ -287,7 +272,7 @@
                   attribute: is_esi_mec_met
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 8
@@ -296,21 +281,19 @@
                   classNames: 'span-text'
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
                   type: input
                   name: amount
                   placeholder: AMOUNT*
-                  # required: true
                   id: 'amount'
                   model: benefit
                   attribute: employee_cost
                 - gutter: 6
                   type: 'dropdown'
                   name: 'FREQUENCY'
-                  # required: true
                   id: 'frequency'
                   values:
                     - biweekly 

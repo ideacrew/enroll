@@ -5,26 +5,6 @@
       - section:
           lines:
             - cells:
-                - gutter: 5
-                  type: text
-                  text: Does this person expect to have any income in 2017? *
-                  secondary-text: Does this person expect to have income from other sources in 2017? *
-                - gutter: 2
-                  type: label_radio
-                  name: row2
-                  value: true
-                  id: 'income_yes'
-                  label: 'Yes'
-                - gutter: 2
-                  type: label_radio
-                  name: row2
-                  value: false
-                  id: 'no2'
-                  label: 'No'
-                - gutter: 2
-                  type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
-            - cells:
                 - gutter: 6
                   type: text
                   text: What Kind of income is this?*
