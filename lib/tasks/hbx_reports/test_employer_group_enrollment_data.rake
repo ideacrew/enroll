@@ -1,4 +1,6 @@
 require 'roo'
+# To run: 
+# RAILS_ENV=production bundle exec rake reports:shop:test_employer_group_enrollment_data filename='sample.xlsx'
 
 namespace :reports do
   namespace :shop do
