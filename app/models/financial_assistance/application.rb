@@ -359,7 +359,7 @@ class FinancialAssistance::Application
     end
   end
 
-  def build_or_update_tax_households_applicants_eligibility_determinations(verified_family, primary_person, active_verified_household)
+  def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
     verified_tax_households = active_verified_household.tax_households#.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }
 
     #Saving EDs only if all the tax_households get the EDs from Haven
@@ -413,7 +413,7 @@ class FinancialAssistance::Application
 
           #TODO find the right source Curam/Haven.
           source = "Haven"
-          new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
+          create_new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
           #Eligibility determination end
 
         #When taxhousehold does not exist in your DB
@@ -492,12 +492,13 @@ private
     end
   end
 
-  def new_eligibility_determination(tax_household_id, verified_eligibility_determination, benchmark_plan_id, source)
+  def create_new_eligibility_determination(tax_household_id, verified_eligibility_determination, benchmark_plan_id, source)
     eligibility_determinations.build(
       e_pdc_id: verified_eligibility_determination.id,
       benchmark_plan_id: benchmark_plan_id,
       max_aptc: verified_eligibility_determination.maximum_aptc,
       csr_percent_as_integer: verified_eligibility_determination.csr_percent,
+      csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s ,
       determined_on: verified_eligibility_determination.determination_date,
       source: source
     )

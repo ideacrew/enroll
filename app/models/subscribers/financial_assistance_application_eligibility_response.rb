@@ -77,7 +77,7 @@ module Subscribers
       family.e_case_id = verified_family.integrated_case_id
 
       begin
-        active_approved_application.build_or_update_tax_households_applicants_eligibility_determinations(verified_family, primary_person, active_verified_household)
+        active_approved_application.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
@@ -212,19 +212,20 @@ module Subscribers
     def search_person(verified_family_member)
       ssn = verified_family_member.person_demographics.ssn
       ssn = '' if ssn == "999999999"
-      # dob = verified_family_member.person_demographics.birth_date
+      dob = verified_family_member.person_demographics.birth_date
+      dob = Date.strptime( dob , '%m%d%Y')
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
 
       #Verify how it is comparing the dob string to a date format.
       if !ssn.blank?
         Person.where({
-          :encrypted_ssn => Person.encrypt_ssn(ssn)#,
-          # :dob => dob
+          :encrypted_ssn => Person.encrypt_ssn(ssn),
+          :dob => dob
         }).first
       else
         Person.where({
-          # :dob => dob,
+          :dob => dob,
           :last_name => last_name_regex,
           :first_name => first_name_regex
         }).first
