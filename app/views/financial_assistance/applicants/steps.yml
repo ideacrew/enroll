@@ -1,5 +1,5 @@
 - step:
-    heading: Income and Coverage for Mary
+    heading: Income and Coverage for <family-member-name-placeholder>
     heading_text: "Answer the following questions for this person, when you're finished, select CONTINUE"
     sections:
       - section:
