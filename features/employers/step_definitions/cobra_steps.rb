@@ -354,16 +354,28 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find('.interaction-choice-control-plan-year-start-on', :visible => true).click
   find('li.interaction-choice-control-plan-year-start-on-1').click
 
-  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-  wait_for_ajax
-  find('.carriers-tab a').click
-  wait_for_ajax
-  find('.reference-plans label').click
-  wait_for_ajax
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
-  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
+  ## @TODO: brianweiner - separate into distinct scenarios
+  if Settings.aca.sole_source_only_enabled
+    find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+    wait_for_ajax
+    find('.carriers-tab a').click
+    wait_for_ajax
+    find('.reference-plans label').click
+    wait_for_ajax
+    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
+    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
+    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
+    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
+  else
+    find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_sole_source"]').click
+    wait_for_ajax
+    find('.sole-source-plan-tab a').click
+    wait_for_ajax
+    find('.reference-plans label').click
+    wait_for_ajax
+    fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
+    fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50
+  end
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
 end

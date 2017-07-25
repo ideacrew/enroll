@@ -130,6 +130,7 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
   find('.interaction-choice-control-plan-year-start-on', :visible => true).click
   find('li.interaction-choice-control-plan-year-start-on-1').click
 
+  ## @TODO: brianweiner - separate into distinct scenarios
   if Settings.aca.sole_source_only_enabled
     find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
     wait_for_ajax
