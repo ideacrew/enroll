@@ -29,12 +29,9 @@
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
               <label class="static_label label-floatlabel" for="relation">RELATION</label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
-              <%=
-              link_to personal_insured_families_path, remote: true, class: 'close close-2' do
-                '<i class="fa fa-pencil"></i>'.html_safe
-
-              end
-              %>
+              <%= link_to personal_insured_families_path, remote: true, class: 'close close-2' do %>
+                <i class="fa fa-pencil"></i>
+              <% end %>
             </div>
           </div>
         </div>
