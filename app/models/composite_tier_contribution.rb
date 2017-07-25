@@ -17,11 +17,11 @@ class CompositeTierContribution
   end
 
   def employee_contribution
-    display_premium - (display_premium * contribution_factor)
+    (display_premium - employer_contribution).round(2)
   end
 
   def employer_contribution
-    display_premium * contribution_factor
+    (display_premium * contribution_factor).round(2)
   end
 
   def contribution_factor

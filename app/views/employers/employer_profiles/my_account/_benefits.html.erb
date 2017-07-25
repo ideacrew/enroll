@@ -244,10 +244,10 @@
                         <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
 		                  </td>
 		                  <td>
-			                  <strong><%= number_to_currency(ct.employee_contribution.round(2)) %></strong>
+			                  <strong><%= number_to_currency(ct.employee_contribution) %></strong>
 		                  </td>
 		                  <td>
-                         <strong><%= number_to_currency(ct.employer_contribution.round(2)) %></strong>
+                         <strong><%= number_to_currency(ct.employer_contribution) %></strong>
 		                  </td>
 		                  <td>
 			                  <strong><%= number_to_currency(ct.display_premium) %></strong>
