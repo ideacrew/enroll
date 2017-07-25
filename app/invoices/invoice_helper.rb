@@ -38,7 +38,7 @@ module InvoiceHelper
 
     @pdf=Prawn::Document.new
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -60,11 +60,11 @@ module InvoiceHelper
     @pdf.move_cursor_to @pdf.bounds.height
     @pdf.move_cursor_to last_measured_y
 
-    @pdf.text_box "DC Health Link", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 97022", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "PO Box 780833", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Washington, DC 20090", :at => [address_x_pos,  @pdf.cursor]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [address_x_pos,  @pdf.cursor]
     @pdf.move_down lineheight_y
 
     address = mailing_or_primary_address(@organization)
@@ -73,7 +73,7 @@ module InvoiceHelper
       @pdf.text_box "#{address.address_1}, #{address.address_2}", :at => [address_x_pos, address_y_pos-12]
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x_pos, address_y_pos-24]
     end
-    @pdf.text_box "MPI_SHOPINV", :at => [mpi_x_pos,  mpi_y_pos]
+    @pdf.text_box "SHOP_M031", :at => [mpi_x_pos,  mpi_y_pos]
 
     @pdf.start_new_page
 
@@ -147,7 +147,7 @@ module InvoiceHelper
       @pdf.go_to_page(i+1)
       @pdf.font_size 9
       @pdf.bounding_box([0, @pdf.bounds.bottom + 25], :width => @pdf.bounds.width) {
-        @pdf.text_box "Questions? Call DC Health Link Customer Service at 855-532-5465, go online to http://www.dchealthlink.com/, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
+        @pdf.text_box "Questions? Call the Health Connector Customer Service at 888-813-9220, go online to MAhealthconnector.org, or contact your broker.", :at => [address_x, @pdf.bounds.height], :align => :center
       }
     end
 
@@ -232,7 +232,7 @@ module InvoiceHelper
 
   def payment_page_for_renewing_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -269,25 +269,25 @@ module InvoiceHelper
       @pdf.text_box "#{address.city}, #{address.state} #{address.zip}", :at => [address_x, 596]
     end
     @pdf.move_down 24
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on the Massachusetts Health Connector as of the day before the statement date. You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on the Massachusetts Health Connector. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from the Massachusetts Health Connector. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
 
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "https://www.e-BillExpress.com/ebpp/DCHealthPay", :at => [address_x, @pdf.cursor], :align => :center
+    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "DC Health Link", :at => [240, @pdf.cursor]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
+    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -301,9 +301,9 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
 
-    @pdf.text_box "DC Health Link", :at => [320,  48]
-    @pdf.text_box "PO Box 97022", :at => [320,  36]
-    @pdf.text_box "Washington, DC 20090", :at => [320,  24]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  48]
+    @pdf.text_box "PO Box 780833", :at => [320,  36]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  24]
 
     address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
@@ -323,7 +323,7 @@ module InvoiceHelper
 
   def payment_page_for_conversion_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -361,27 +361,27 @@ module InvoiceHelper
     end
 
     @pdf.move_down 36
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on DC Health Link as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on DC Health Link. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from DC Health Link. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Since your annual employee open enrollment period is still ongoing, this invoice reflects your employees’ enrollment activity on the Massachusetts Health Connector as of the day before the statement date You can view your employee enrollments in your account at any time using the Enrollment Report available in your employer account on the Massachusetts Health Connector. Any adjustments resulting from your employees’ enrollment changes will appear on your next monthly invoice from the Massachusetts Health Connector. Please pay this invoice in full.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 72
-    @pdf.text_box "You will now receive a monthly invoice from DC Health Link. Payments should be directed to DC Health Link for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of DC Health Link. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "You will now receive a monthly invoice from the Massachusetts Health Connector. Payments should be directed to the Massachusetts Health Connector for your health insurance coverage. You may receive one or two invoices from your health insurance company related to your current coverage purchased outside of the Massachusetts Health Connector. If you receive additional bills directly from your current health insurance company, please pay or contact them directly. If you continue to purchase dental or vision coverage directly from a health insurance company, you will continue to pay that company directly.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 72
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "https://www.e-BillExpress.com/ebpp/DCHealthPay", :at => [address_x, @pdf.cursor], :align => :center
+    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "DC Health Link", :at => [240, @pdf.cursor]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
+    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -395,9 +395,9 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 88], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 98]
 
-    @pdf.text_box "DC Health Link", :at => [320,  48]
-    @pdf.text_box "PO Box 97022", :at => [320,  36]
-    @pdf.text_box "Washington, DC 20090", :at => [320,  24]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  48]
+    @pdf.text_box "PO Box 780833", :at => [320,  36]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  24]
 
     address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 48]
@@ -411,7 +411,7 @@ module InvoiceHelper
 
   def payment_page_for_initial_employer
     cheque_amount_path = 'app/assets/images/cheque_amount.png'
-    logopath = 'app/assets/images/logo.png'
+    logopath = 'app/assets/images/health_connector.png'
     initial_y = @pdf.cursor
     initialmove_y = 25
     address_x = 15
@@ -450,23 +450,23 @@ module InvoiceHelper
     end
 
     @pdf.move_down 72
-    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through DC Health Link. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "Please review the billing summary. This is a consolidated bill for all your benefits through the Massachusetts Health Connector. Please pay the Total Amount Due.", :at => [address_x, @pdf.cursor]
     @pdf.move_down 48
     @pdf.text_box "Payment Options", :at => [address_x, @pdf.cursor], :style => :bold
     @pdf.move_down 24
     @pdf.text_box "\u2022 Make a secure online electronic check payment. Use the account number found at the top of your invoice to login at:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "https://www.e-BillExpress.com/ebpp/DCHealthPay", :at => [address_x, @pdf.cursor], :align => :center
+    @pdf.text_box "https://ww2.e-billexpress.com/ebpp/maconnector/", :at => [address_x, @pdf.cursor], :align => :center
     @pdf.move_down 24
     @pdf.text_box "\u2022 Return the attached payment coupon with a personal, business, or cashier’s check for prompt, accurate and timely posting of your payment. Address payments to:", :at => [address_x, @pdf.cursor]
     @pdf.move_down 36
-    @pdf.text_box "DC Health Link", :at => [240, @pdf.cursor]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "PO Box 97022", :at => [240, @pdf.cursor]
+    @pdf.text_box "PO Box 780833", :at => [240, @pdf.cursor]
     @pdf.move_down lineheight_y
-    @pdf.text_box "Washington, DC 20090", :at => [240, @pdf.cursor]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [240, @pdf.cursor]
     @pdf.move_down 24
-    @pdf.text_box "\u2022 Call DC Health Link Customer Service at 855-532-5465", :at => [address_x, @pdf.cursor]
+    @pdf.text_box "\u2022 Call the Massachusetts Health Connector Customer Service at 888-813-9220 (TTY 711)", :at => [address_x, @pdf.cursor]
     @pdf.move_down 24
 
     @pdf.text_box "PLEASE DETACH HERE AND RETURN THE BOTTOM PORTION WITH YOUR PAYMENT", :at => [address_x, @pdf.cursor], :align => :center, :style => :bold
@@ -481,9 +481,9 @@ module InvoiceHelper
     @pdf.text_box "Amount Enclosed:", :at => [address_x, 112], :align => :center, :style => :bold
     @pdf.image cheque_amount_path, :width => 160, :at => [cheque_amount_path_x, 122]
 
-    @pdf.text_box "DC Health Link", :at => [320,  72]
-    @pdf.text_box "PO Box 97022", :at => [320,  60]
-    @pdf.text_box "Washington, DC 20090", :at => [320,  48]
+    @pdf.text_box "Commonwealth Health Insurance", :at => [320,  72]
+    @pdf.text_box "PO Box 780833", :at => [320,  60]
+    @pdf.text_box "Philadelphia, PA 19178-0833", :at => [320,  48]
 
     address = mailing_or_primary_address(@organization)
     @pdf.text_box "#{@employer_profile.legal_name}", :at => [address_x, 72]
