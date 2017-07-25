@@ -698,7 +698,7 @@ class ConsumerRole
       update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
     end
     reject!(verification_attr(authority.first))
-    "#{v_type} was returned for deficiency."
+    "#{v_type} was rejected."
   end
 
   def update_verification_type(v_type, update_reason, *authority)
