@@ -194,7 +194,6 @@
                   name: row2
                   value: true
                   id: 'is_joint_tax_filing_yes'
-                  required: true
                   label: 'Yes'
                   model: applicant
                   attribute: is_joint_tax_filing
@@ -203,7 +202,6 @@
                   name: row2
                   value: false
                   id: 'is_joint_tax_filing_no'
-                  required: true
                   label: 'No'
                   model: applicant
                   attribute: is_joint_tax_filing
