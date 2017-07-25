@@ -432,7 +432,8 @@ class PlanYear
   # All active employees present on the roster with benefit groups belonging to this plan year
   def eligible_to_enroll
     return @eligible if defined? @eligible
-    @eligible ||= find_census_employees.active
+    # @eligible ||= find_census_employees.active
+    @eligible ||= find_census_employees.active.select{|ce| ce.aasm_state != 'employee_termination_pending'}
   end
 
   def waived
