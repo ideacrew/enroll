@@ -5,7 +5,7 @@
       - section:
           lines:
             - cells:
-                - gutter: 6
+                - gutter: 4
                   type: text
                   text: Are you adding a health coverage that you are enrolled in or eligible for? *
                   classNames: 'span-text'
@@ -19,7 +19,7 @@
                   attribute: kind
                   label: 'Eligible'
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 3
                   type: label_radio
                   name: person_enrolled
                   value: is_enrolled
@@ -29,7 +29,7 @@
                   attribute: kind
                   label: 'Enrolled'
                   classNames: 'span-text'
-                - gutter: 2
+                - gutter: 3
                   type: raw_html
                   text: '| &nbsp <a> Not Sure? </a>'
                   classNames: 'span-text'
