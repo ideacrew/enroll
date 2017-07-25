@@ -3,23 +3,29 @@
   - if benefit.title 
     %title= benefit.title
   %benefit_type= "urn:openhbx:terms:v1:financial_assistance_benefit##{benefit.kind}"
-  - if benefit.employer_name
+  %benefit_insurance_type= benefit.insurance_kind
+  - unless benefit.start_on.blank?
+    %start_on= simple_date_for(benefit.start_on)
+  - unless benefit.end_on.blank?
+    %end_on= simple_date_for(benefit.end_on)
+  - unless benefit.employer_name.blank?
     %employer_name= benefit.employer_name
-  - if benefit.employer_id
+  - unless benefit.employer_id.blank?
     %employer_id= benefit.employer_id
-  - if benefit.employer_address
+  - unless benefit.employer_address.blank?
     %employer_address
       = render :partial => "events/addresses/address", :object => benefit.employer_address
-  - if benefit.employer_phone
+  - unless benefit.employer_phone.blank?
     %employer_phone
-      = render :partial => "events/phones/phone", :object => income.employer_phone
-  - if benefit.is_esi_waiting_period
+      = render :partial => "events/phones/phone", :object => benefit.employer_phone
+  - if benefit.is_esi_waiting_period.present?
     %is_esi_waiting_period= benefit.is_esi_waiting_period
-  - if benefit.is_esi_mec_met
+  - if benefit.is_esi_mec_met.present?
     %is_esi_mec_met= benefit.is_esi_mec_met
-  %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
-  - if benefit.employee_cost
+  - if benefit.esi_covered.present?
+    %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
+  - if benefit.employee_cost.present?
     %employee_cost= benefit.employee_cost.round(2)
-  - if benefit.employee_cost_frequency
+  - if benefit.employee_cost_frequency.present?
     %employee_cost_frequency= benefit.employee_cost_frequency
   %submitted_at= benefit.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')

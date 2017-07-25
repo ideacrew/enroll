@@ -1,6 +1,6 @@
 %deduction
   %deduction_id= deduction.id
-  - if deduction.title
+  - if deduction.title.present?
     %title= deduction.title
   %deduction_type= "urn:openhbx:terms:v1:financial_assistance_deduction##{deduction.kind}"
   %amount= deduction.amount.round(2)

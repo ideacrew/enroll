@@ -17,7 +17,7 @@ class FinancialAssistance::Application
   APPLICANT_KINDS   = ["user and/or family", "call center rep or case worker", "authorized representative"]
   SOURCE_KINDS      = %w(paper source in-person)
   REQUEST_KINDS     = %w()
-  MOTIVATION_KINDS  = %w()
+  MOTIVATION_KINDS  = %w(insurance_affordability)
 
   SUBMITTED_STATUS  = %w(submitted verifying_income)
 
@@ -392,7 +392,7 @@ private
 
   def set_motivation_kind
     #TODO: Populate correct motivation kind
-    write_attribute(:motivation_kind, "motivation_kind_placeholder")
+    write_attribute(:motivation_kind, "insurance_affordability")
   end
 
   def set_is_ridp_verified

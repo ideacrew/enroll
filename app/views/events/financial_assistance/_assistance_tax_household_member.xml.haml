@@ -4,14 +4,15 @@
     %is_primary_applicant= assistance_tax_household_member.family_member.is_primary_applicant
     %is_consent_applicant= assistance_tax_household_member.family_member.is_consent_applicant
     %is_coverage_applicant= assistance_tax_household_member.family_member.is_coverage_applicant
-    %is_without_assistance= assistance_tax_household_member.is_without_assistance
-    - if assistance_tax_household_member.is_ia_eligible
+    - if assistance_tax_household_member.is_without_assistance.present?
+      %is_without_assistance= assistance_tax_household_member.is_without_assistance
+    - if assistance_tax_household_member.is_ia_eligible.present?
       %is_insurance_assistance_eligible= assistance_tax_household_member.is_ia_eligible?
-    - if assistance_tax_household_member.is_medicaid_chip_eligible
+    - if assistance_tax_household_member.is_medicaid_chip_eligible.present?
       %is_medicaid_chip_eligible= assistance_tax_household_member.is_medicaid_chip_eligible?
-    - if assistance_tax_household_member.is_non_magi_medicaid_eligible
+    - if assistance_tax_household_member.is_non_magi_medicaid_eligible.present?
       %is_non_magi_medicaid_eligible= assistance_tax_household_member.is_non_magi_medicaid_eligible
-    - if assistance_tax_household_member.is_totally_ineligible
+    - if assistance_tax_household_member.is_totally_ineligible.present?
       %is_totally_ineligible= assistance_tax_household_member.is_totally_ineligible
       / We currently don't have a way to pull this data. 
       / %magi_medicaid_monthly_household_income
@@ -26,7 +27,8 @@
         - unless assistance_tax_household_member.person.is_disabled.blank?
           %is_disabled= assistance_tax_household_member.person.is_disabled
   - unless assistance_tax_household_member.person.consumer_role.blank?
-    = render :partial => "events/lawful_presence/immigration_information", :object => assistance_tax_household_member.person, as: :person
+    - unless assistance_tax_household_member.person.consumer_role.lawful_presence_determination.citizen_status == "us_citizen"
+      = render :partial => "events/lawful_presence/immigration_information", :object => assistance_tax_household_member.person, as: :person
     = render :partial => "events/financial_assistance/applicant_information", :object => assistance_tax_household_member, as: :applicant
   %incomes
     - if assistance_tax_household_member.incomes.size > 0
