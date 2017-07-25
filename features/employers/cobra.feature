@@ -1,5 +1,6 @@
 Feature: COBRA basic
 
+  @more_than_sole_source
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
     Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
