@@ -77,7 +77,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
                                               area_code: office_location.phone.area_code,
                                               number: office_location.phone.number,
                                               extension: office_location.phone.extension)
-        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
+        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension.to_s
         person.phones.first.update_attributes(full_phone_number: full_phone)
       end
     end
