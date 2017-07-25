@@ -241,6 +241,10 @@ $(document).ready(function() {
     $('#is_claimed_as_tax_dependent_yes').parents(".row").next().removeClass('hide');
   }
 
+
+  $('#is_required_to_file_taxes_yes').parents(".row").next().addClass('hide');
+  $('#is_required_to_file_taxes_yes').parents(".row").next().next().next().addClass('hide');
+
 /* Applicant's Tax Info Form Related */
 
 
