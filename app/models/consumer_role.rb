@@ -78,6 +78,11 @@ class ConsumerRole
   field :native_update_reason, type: String
   field :is_applying_coverage, type: Boolean, default: true
 
+  #rejection flags for verification types
+  field :ssn_rejected, type: Boolean, default: false
+  field :native_rejected, type: Boolean, default: false
+  field :lawful_presence_rejected, type: Boolean, default: false
+
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
   delegate :no_ssn,    :no_ssn=,    to: :person, allow_nil: true
@@ -407,6 +412,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
+    #this event rejecting the status if admin rejects any verification type but it DOESN'T work backwards - we don't move all the types to unverified by triggering this event
     event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :verification_outstanding
       transitions from: :ssa_pending, to: :verification_outstanding
@@ -416,7 +422,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :verification_outstanding
     end
 
-    event :revert, :after => [:revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    event :revert, :after => [:revert_ssn, :revert_native, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :unverified
       transitions from: :ssa_pending, to: :unverified
       transitions from: :dhs_pending, to: :unverified
@@ -425,7 +431,7 @@ class ConsumerRole
       transitions from: :verification_period_ended, to: :unverified
     end
 
-    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_lawful_presence, :notify_of_eligibility_change] do
+    event :redetermine, :after => [:invoke_verification!, :revert_ssn, :revert_native, :revert_lawful_presence, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :dhs_pending, :guard => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guard => [:call_ssa?]
       transitions from: :verification_outstanding, to: :dhs_pending, :guard => [:call_dhs?]
@@ -633,6 +639,19 @@ class ConsumerRole
     citizen_status == "indian_tribe_member"
   end
 
+  def mark_doc_type_uploaded(v_type)
+    case v_type
+      when "Social Security Number"
+        update_attributes(:ssn_rejected => false)
+      when "Citizenship"
+        update_attributes(:lawful_presence_rejected => false)
+      when "Immigration status"
+        update_attributes(:lawful_presence_rejected => false)
+      when "American Indian Status"
+        update_attributes(:native_rejected => false)
+    end
+  end
+
   def invoke_ssa
     lawful_presence_determination.start_ssa_process
   end
@@ -671,7 +690,11 @@ class ConsumerRole
   end
 
   def revert_ssn
-    self.ssn_validation = "pending"
+    update_attributes(:ssn_validation => "pending")
+  end
+
+  def revert_native
+    update_attributes(:native_validation => "pending")
   end
 
   def revert_lawful_presence(*args)
@@ -699,12 +722,12 @@ class ConsumerRole
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     if v_type == "Social Security Number"
-      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason)
+      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
     elsif v_type == "American Indian Status"
-      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason)
+      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
     else
       lawful_presence_determination.deny!(verification_attr(authority.first))
-      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
     end
     reject!(verification_attr(authority.first))
     "#{v_type} was returned for deficiency."
