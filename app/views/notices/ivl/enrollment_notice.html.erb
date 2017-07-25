@@ -61,19 +61,18 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],
-   heading: 'What You’ll Pay Each Month', sub_heading: ''} %>
+   heading: 'What You’ll Pay Each Month', sub_heading: '', top_margin: '10px'} %>
+
   <% notice.current_health_enrollments.each do |enrollment|%>
     <% next if enrollment.aptc_amount < 0 %>
-    <table style='margin-top: 10px; width: 80%; margin-bottom: 10px;' align="left" >
-      <tr>
-        <td>
-          <%= enrollment.plan.plan_name %>
-        </td>
-      </tr>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "#{enrollment.plan.plan_name}", top_margin: '5px'} %>
+    <table class="plan_table" align="left">
       <tr>
         <td>
           Full price monthly premium:
         </td>
+        <td></td>
         <td align="left">
           $<%= enrollment.premium %>
         </td>
@@ -82,21 +81,19 @@
         <td>
           Your tax credit savings:
         </td>
-        <td align="left">
-          – $<%= enrollment.aptc_amount.to_f %>
-        </td>
-      </tr>
-      <tr>
-        <td>
+        <td align="right">
+        −
         </td>
         <td align="left">
-          _________________________
+          $<%= enrollment.aptc_amount.to_f %>
+          <hr style="height: 0px;  border-color: black; border-width: 1px 0 0 0;">
         </td>
       </tr>
       <tr>
         <td>
           <strong>Your monthly premium payment:</strong>
         </td>
+        <td></td>
         <td align="left">
           <strong> $<%= enrollment.responsible_amount %></strong>
         </td>
@@ -107,11 +104,12 @@
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for <coverage year> to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "How to Pay Your Monthly Premium"} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment."],
+   heading: 'How to Pay Your Monthly Premium', sub_heading: '', top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment.",
+  previous: "",
   listings: ["You should receive a bill from your insurance company 7-10 days from now. Your bill tells you how to make your monthly payments.",
              "If you haven’t received a bill in 7-10 days, call your insurance company right away so you don’t miss your payment deadline.",
              "You must pay your first monthly premium by <plan effective date> to start your plan. Your premium payments for the rest of the year are also due by the first of the month.",
@@ -125,52 +123,76 @@
    heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment."} %>
+ content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Types of cost-sharing include:"} %>
+ content: "<strong>Types of cost-sharing include:</strong>", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible.<br>
-<strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit).<br>
-<strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200).<br>
-<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."} %>
+ content: "<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "You chose a plan with extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses. [All Recipients]You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at dchealthlink.com."} %>
+ content: "<strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use."} %>
+ content: "<strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200)."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Reporting Life Changes or Making Changes to Your Plan"} %>
+ content: "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance."} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:",
-  listings: ["You move","Your estimated income goes up or down by $150 or more per month ($1,800 annually)","You become eligible for Medicaid, an employer health plan, or other health insurance","The size of your household changes (for example, marriage, divorce, having a baby, adoption)","Your immigration status changes","Your tax filing plans for <coverage year> change (for example, you’re married and file jointly but now plan to file separately)","You’re going to jail or prison"]} %>
-
-<%= render partial: 'notices/shared/paragraph', :locals => {
-content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through DC Health Link. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+<% if notice.csr_enrollments.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "You chose a plan with extra savings called cost-sharing reductions. This means you’ll pay even less for these types of expenses.", top_margin: '5px'} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "To report life changes, login to your account at dchealthlink.com, or call DC Health Link."} %>
+content: "You can learn about the benefits of your plan, and how much you’ll pay, in a document called the Summary of Benefits and Coverage (SBC). You can find it online at dchealthlink.com.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "Call your insurance company if you have questions about services the plan covers, or the doctors, hospitals, and other providers you can use.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Once your plan begins, you must tell us about life changes.  You must tell us within 30 days if:"],
+   heading: 'Reporting Life Changes or Making Changes to Your Plan', sub_heading: '', top_margin: '8px'} %>
+
+<% if notice.assisted_enrollments.present? %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["You move","Your estimated income goes up or down by $150 or more per month ($1,800 annually)","You become eligible for Medicaid, an employer health plan, or other health insurance","The size of your household changes (for example, marriage, divorce, having a baby, adoption)","Your immigration status changes","Your tax filing plans for <coverage year> change (for example, you’re married and file jointly but now plan to file separately)","You’re going to jail or prison"]} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Life changes can impact the cost savings you receive or your eligibility to be enrolled in insurance through DC Health Link. If you have any of these life changes, you may be able to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+<% else %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["You move","Your immigration status changes","You’re going to jail or prison"]} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Life changes can impact your eligibility to be enrolled in insurance through DC Health Link. If have any of these life changes, you may be eligible to add members to your plan or change plans during the year. If you qualify, you’ll have 60 days from the time the change occurred to do it."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To report life changes, login to your account at dchealthlink.com, or call DC Health Link.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You can end your insurance for any reason, but you must tell us at least 2 weeks before you want your plan to end. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call DC Health Link first. We can help you find out if there are other options to make your coverage more affordable."],
-   heading: 'Ending Your Insurance', sub_heading: ''} %>
+   heading: 'Ending Your Insurance', sub_heading: '', top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at dchealthlink.com, or call DC Health Link."} %>
+content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you end your plan, you also won’t be able to sign up again until the next annual open enrollment period, unless you qualify for a special enrollment period. To end your plan, login to your account at dchealthlink.com, or call DC Health Link.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Please call DC Health Link at (855) 532-5465 if you have any questions about this letter, or if you think we made a mistake."],
-   heading: 'Still Have Questions?', sub_heading: ''} %>
+   heading: 'Still Have Questions?', sub_heading: '', top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>Remember, you must pay your monthly premium by <plan effective date> to start and keep your insurance.</strong>"} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>  And don’t forget, the deadline to return the documents we need from you is <Document Due Date></strong>. If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+listing: "<strong>And don’t forget, the deadline to return the documents we need from you is <Document Due Date></strong>. If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
