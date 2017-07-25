@@ -400,7 +400,17 @@ class FinancialAssistance::Application
               #Updating the applicant by finding the right family member.
               verified_family.family_members.each do |verified_family_member|
                 if verified_family_member.person.id == thhm.person_id
-                  applicant.update_attributes({is_without_assistance: verified_family_member.is_without_assistance, is_ia_eligible: verified_family_member.is_insurance_assistance_eligible, is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible, is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible, is_totally_ineligible: verified_family_member.is_totally_ineligible})
+                  applicant.update_attributes({
+                    medicaid_household_size: verified_family_member.medicaid_household_size,
+                    magi_medicaid_category: verified_family_member.magi_medicaid_category,
+                    magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
+                    magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
+                    magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
+                    is_without_assistance: verified_family_member.is_without_assistance,
+                    is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
+                    is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
+                    is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
+                    is_totally_ineligible: verified_family_member.is_totally_ineligible})
                 end
               end
 
@@ -500,6 +510,9 @@ private
       csr_percent_as_integer: verified_eligibility_determination.csr_percent,
       csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s ,
       determined_on: verified_eligibility_determination.determination_date,
+      aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
+      aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
+      csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
       source: source
     )
   end
