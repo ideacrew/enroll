@@ -16,6 +16,14 @@ class CompositeTierContribution
     final_tier_premium.blank? ? estimated_tier_premium : final_tier_premium
   end
 
+  def employee_contribution
+    display_premium - (display_premium * contribution_factor)
+  end
+
+  def employer_contribution
+    display_premium * contribution_factor
+  end
+
   def contribution_factor
     employer_contribution_percent * 0.01
   end

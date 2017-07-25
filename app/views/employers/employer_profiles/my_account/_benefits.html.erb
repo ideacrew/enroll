@@ -232,26 +232,26 @@
                       <th>Member Type</th>
                       <th>Employer
                         <% if bg.is_offering_dental? %>Health
-			<% end %>Contribution</th>
-		      <th>Employee</th>
-		      <th>Employer</th>
-		      <th>Total</th>
+                  			<% end %>Contribution</th>
+            		      <th>Employee</th>
+            		      <th>Employer</th>
+            		      <th>Total</th>
                     </tr>
                     <% bg.composite_tier_contributions.each_with_index do |ct, i| %>
                     <tr>
                       <td><%= ct.composite_rating_tier.try(:humanize) %></td>
                       <td id="pct">
                         <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
-		      </td>
-		      <td>
-			<strong><%= number_to_currency(ct.display_premium - (ct.display_premium * ct.contribution_factor).round(2)) %></strong>
-		      </td>
-		      <td>
-                         <strong><%= number_to_currency(ct.display_premium * ct.contribution_factor) %></strong>
-		      </td>
-		      <td>
-			 <strong><%= number_to_currency(ct.display_premium) %></strong>
-		      </td>
+		                  </td>
+		                  <td>
+			                  <strong><%= number_to_currency(ct.employee_contribution.round(2)) %></strong>
+		                  </td>
+		                  <td>
+                         <strong><%= number_to_currency(ct.employer_contribution.round(2)) %></strong>
+		                  </td>
+		                  <td>
+			                  <strong><%= number_to_currency(ct.display_premium) %></strong>
+		                  </td>
                     </tr>
                     <% end %>
                     <tr></tr>
