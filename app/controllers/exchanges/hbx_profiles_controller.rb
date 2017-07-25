@@ -404,12 +404,13 @@ def employer_poc
 
     sorted_by, order = input_sort_request
 
-    families = sorted_families(sorted_by, order, families)
+    sorted_results = sorted_families(sorted_by, order, dt_query, families)
 
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.drop(dt_query.skip).take(dt_query.take)
+    @families = sorted_results
+    # @families = families.skip(dt_query.skip).limit(dt_query.take)
     render
   end
 

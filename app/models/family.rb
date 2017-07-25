@@ -35,6 +35,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :min_verification_due_date, type: Date, default: nil
 
   belongs_to  :person
 
@@ -931,7 +932,7 @@ class Family
         due_dates << document_due_date(family_member, v_type)
       end
     end
-
+    due_dates.compact!
     due_dates.min.to_date if due_dates.present?
   end
 
@@ -948,7 +949,7 @@ class Family
   def document_due_date(family_member, v_type)
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
     enrollment = enrolled_policy(family_member)
-    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : nil )
   end
 
   def enrolled_policy(family_member)
@@ -959,13 +960,13 @@ class Family
     if enrollment.special_verification_period
       enrollment.special_verification_period.to_date
     else
-      TimeKeeper.date_of_record + 95.days
+      nil
     end
   end
 
   def review_status
     if active_household.hbx_enrollments.verification_needed.any?
-      active_household.hbx_enrollments.verification_needed.first.review_status.gsub(/\s+/, '')
+      active_household.hbx_enrollments.verification_needed.first.review_status
     else
       "no enrollment"
     end

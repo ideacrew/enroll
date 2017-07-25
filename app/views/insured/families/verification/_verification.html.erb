@@ -39,7 +39,7 @@
                   <div class="v-type-due-date col-md-3">
                     <% if can_show_due_date?(@person, f_member) %>
                       <span class="text-danger">Due Date:</span>
-                      <%= f_member.family.document_due_date(f_member, v_type).to_date %>
+                      <%= f_member.family.document_due_date(f_member, v_type).present? ? f_member.family.document_due_date(f_member, v_type).to_date : TimeKeeper.date_of_record + 95.days %>
                     <% end %>
                   </div>
 

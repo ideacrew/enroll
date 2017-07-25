@@ -101,11 +101,11 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    family_member = FamilyMember.find(params[:family_member_id])
+    @family_member = FamilyMember.find(params[:family_member_id])
     v_type = params[:verification_type]
-    enrollment = family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+    enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
-      sv = family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
+      sv = @family_member.person.consumer_role.special_verifications.where(:"verification_type" => v_type).order_by(:"created_at".desc).first
       if sv.present?
         new_date = sv.due_date.to_date + 30.days
         flash[:success] = "Special verification period was extended for 30 days."
@@ -120,8 +120,9 @@ class DocumentsController < ApplicationController
       # special_verification_period is the day we send notices
       # enrollment.update_attributes!(:special_verification_period => new_date)
       sv = SpecialVerification.new(due_date: new_date, verification_type: v_type, updated_by: current_user.id)
-      family_member.person.consumer_role.special_verifications << sv
-      family_member.person.consumer_role.save!
+      @family_member.person.consumer_role.special_verifications << sv
+      @family_member.person.consumer_role.save!
+      set_min_due_date_on_family
     else
       flash[:danger] = "Family Member does not have any unverified Enrollment to extend verification due date."
     end
@@ -183,4 +184,8 @@ class DocumentsController < ApplicationController
                    })
   end
 
+  def set_min_due_date_on_family
+    family = @family_member.family
+    family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+  end
 end
