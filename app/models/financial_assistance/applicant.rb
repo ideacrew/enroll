@@ -61,6 +61,14 @@ class FinancialAssistance::Applicant
   field :is_totally_ineligible, type: Boolean, default: false
   field :is_without_assistance, type: Boolean, default: false
 
+  field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+  field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
+
+  field :magi_as_percentage_of_fpl, type: Float, default: 0.0
+  field :magi_medicaid_type, type: String
+  field :magi_medicaid_category, type: String
+  field :medicaid_household_size, type: Integer
+
   # We may not need the following two fields
   field :is_magi_medicaid, type: Boolean, default: false
   field :is_medicare_eligible, type: Boolean, default: false
@@ -121,7 +129,7 @@ class FinancialAssistance::Applicant
   field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-  
+
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
@@ -143,6 +151,9 @@ class FinancialAssistance::Applicant
   alias_method :is_medicaid_chip_eligible?, :is_medicaid_chip_eligible
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
+
+  after_update :delete_embedded_documents_on_driver_qns_update
+  after_update :create_embedded_documents_on_driver_qns_update
 
   def is_ia_eligible?
     is_ia_eligible
@@ -198,8 +209,12 @@ class FinancialAssistance::Applicant
   end
 
   #### Collect insurance from Benefit model
-  def has_insurance?
-    benefits.present?
+  def is_enrolled_in_insurance?
+    benefits.where(kind: 'is_enrolled').present?
+  end
+
+  def is_eligible_for_insurance?
+    benefits.where(kind: 'is_eligible').present?
   end
 
   def had_prior_insurance?
@@ -289,7 +304,10 @@ class FinancialAssistance::Applicant
   end
 
   def applicant_validation_complete?
-    is_applicant_valid?
+    self.valid?(:submission) &&
+      self.incomes.all? { |income| income.valid? :submission } &&
+      self.benefits.all? { |benefit| benefit.valid? :submission } &&
+      self.deductions.all? { |deduction| deduction.valid? :submission }
   end
 
   def clean_conditional_params(model_params)
@@ -314,19 +332,76 @@ class FinancialAssistance::Applicant
 
   def incomes_complete?
     self.incomes.all? do |income|
-      income.valid?
+      income.valid? :submission
     end
   end
 
   def benefits_complete?
     self.benefits.all? do |benefit|
-      benefit.valid?
+      benefit.valid? :submission
     end
   end
 
   def deductions_complete?
     self.deductions.all? do |deduction|
-      deduction.valid?
+      deduction.valid? :submission
+    end
+  end
+
+  def has_income?
+    has_job_income || has_self_employment_income || has_other_income
+  end
+
+
+  def delete_embedded_documents_on_driver_qns_update
+    if !has_job_income
+      incomes.jobs.destroy_all
+    end
+
+    if !has_self_employment_income
+      incomes.self_employment.destroy_all
+    end
+
+    if !has_other_income
+      incomes.other.destroy_all
+    end
+
+    if !has_enrolled_health_coverage
+      benefits.enrolled.destroy_all
+    end
+
+    if !has_eligible_health_coverage
+      benefits.eligible.destroy_all
+    end
+
+    if !has_deductions
+      deductions.destroy_all
+    end
+  end
+
+  def create_embedded_documents_on_driver_qns_update
+    if has_job_income
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::JOB_INCOME_TYPE_KIND)
+    end
+
+    if has_self_employment_income
+      incomes.find_or_create_by(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
+    end
+
+    if has_other_income
+      incomes.create(kind: nil) if incomes.other.blank?
+    end
+
+    if has_enrolled_health_coverage
+      benefits.find_or_create_by(kind: "is_enrolled") if benefits.where(kind: "is_enrolled").blank?
+    end
+
+    if has_eligible_health_coverage
+      benefits.find_or_create_by(kind: "is_eligible") if benefits.where(kind: "is_eligible").blank?
+    end
+
+    if has_deductions
+      deductions.find_or_create_by(kind: nil) if deductions.blank?
     end
   end
 
@@ -441,9 +516,5 @@ private
       model_params[:student_status_end_on] = nil
       model_params[:student_kind] = nil
     end
-  end
-
-  def is_applicant_valid?
-    self.valid?(:submission) ? true : false
   end
 end

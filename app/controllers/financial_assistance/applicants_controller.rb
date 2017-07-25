@@ -1,6 +1,6 @@
 class FinancialAssistance::ApplicantsController < ApplicationController
   include UIHelpers::WorkflowController
-  include NavigationHelper
+  include FinancialAssistanceHelper
 
   before_filter :find, :find_application, :except => [:age_18_to_26] #except the ajax request
 
@@ -17,9 +17,10 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def save_questions
+    format_date_params params[:financial_assistance_applicant]
     @applicant = @application.applicants.find(params[:id])
-    @applicant.update_attributes!(permit_params(params[:applicant]))
-    redirect_to edit_financial_assistance_application_path(@application)
+    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
+    redirect_to find_application_path(@application)
   end
 
   def step
@@ -34,7 +35,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Finish"
           @model.update_attributes!(workflow: { current_step: 1 })
-          redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+          redirect_to find_applicant_path(@application, @applicant)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
@@ -56,6 +57,12 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   private
+
+  def format_date_params model_params
+    model_params["pregnancy_due_on"]=Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
+    model_params["pregnancy_end_on"]=Date.strptime(model_params["pregnancy_end_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_end_on"].present?
+    model_params["student_status_end_on"]=Date.strptime(model_params["student_status_end_on"].to_s, "%m/%d/%Y") if model_params["student_status_end_on"].present?
+  end
 
   def build_error_messages(model)
     model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize

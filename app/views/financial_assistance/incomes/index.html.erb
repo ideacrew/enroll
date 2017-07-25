@@ -6,15 +6,24 @@
   </div>
 
   <div>
-    <% if @applicant.incomes.present? %>
-      <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+  <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
+     <%= render "income_questions"%>
+     <% if @applicant.incomes.present? %>
       <table class="table">
         <th>Income Type</th>
+        <th>Status</th>
         <th></th>
         <th></th>
         <% @applicant.incomes.each do |income| %>
           <tr>
-            <td><%=income.kind%></td>
+            <td><%= income.kind.nil? ? "Other Income" : income.kind.titleize %></td>
+            <td>
+              <% if income.valid? :submission %>
+                <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+              <% else %>
+                <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+              <% end %>
+            </td>
             <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_income_path(@application, @applicant, income, 1), class: "btn btn-small btn-success" %></td>
             <td><%= link_to "Delete", financial_assistance_application_applicant_income_path(@application, @applicant, income), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
           </tr>
@@ -26,10 +35,9 @@
     <%= link_to "Add Income", new_financial_assistance_application_applicant_income_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
   </div>
-</div>
 
 <div class="col-md-2">
-  <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
+  <%= link_to find_applicant_path(@application, @applicant, current: 'incomes') do %>
     <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
   <% end %>
 
