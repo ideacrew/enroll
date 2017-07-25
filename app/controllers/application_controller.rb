@@ -149,7 +149,11 @@ class ApplicationController < ActionController::Base
         unless request.format.js?
           session[:portal] = url_for(params)
         end
-        redirect_to new_user_registration_path
+        if site_uses_default_devise_path?
+          redirect_to new_user_session_path
+        else
+          redirect_to new_user_registration_path
+        end
       end
     rescue Exception => e
       message = {}

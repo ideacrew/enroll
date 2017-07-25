@@ -13,6 +13,7 @@ site:
   logo_file_name: "logo.png"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
+  use_default_devise_path: true
 
   social_media:
     facebook_url: ""

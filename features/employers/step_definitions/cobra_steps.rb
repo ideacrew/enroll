@@ -222,7 +222,9 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   email_address = person[:email]
   password = person[:password]
 
-  click_link "Sign In Existing Account"
+  unless Settings.site.use_default_devise_path
+    click_link "Sign In Existing Account"
+  end
   expect(page).to have_content('Sign In')
 
   fill_in "user[login]", with: email_address

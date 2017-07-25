@@ -65,7 +65,11 @@
               <br/>
               <br/>
             <span>
-              <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
+              <% if site_uses_default_devise_path? %>
+                <%= link_to "Sign In Existing Account", new_user_session_path %>
+              <% else %>
+                <%= link_to "Sign In Existing Account", new_user_session_path unless Rails.env.production?%>
+              <% end %>
             </span>
           </div>
           <br/>

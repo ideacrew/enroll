@@ -13,8 +13,22 @@ RSpec.describe ApplicationController do
       get :index
     end
 
-    it "redirect to the sign up page" do
-      expect(response).to redirect_to(new_user_registration_path)
+    context "with default sign in behavior" do
+      before do
+        allow_any_instance_of(ApplicationController).to receive(:site_uses_default_devise_path?).and_return(true)
+      end
+      it "redirect to the sign in page" do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context "with overridden sign in behavior" do
+      before do
+        allow_any_instance_of(ApplicationController).to receive(:site_uses_default_devise_path?).and_return(false)
+      end
+      it "redirect to the sign up page" do
+        expect(response).to redirect_to(new_user_registration_path)
+      end
     end
 
     it "should set portal in session" do

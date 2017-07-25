@@ -107,7 +107,9 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   visit '/'
   portal_class = 'interaction-click-control-employer-portal'
   find("a.#{portal_class}").click
-  find("a.interaction-click-control-sign-in-existing-account").click
+  unless Settings.site.use_default_devise_path
+    find("a.interaction-click-control-sign-in-existing-account").click
+  end
   step "#{name} signs in to portal"
 end
 
@@ -175,7 +177,9 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   visit '/'
   portal_class = '.interaction-click-control-hbx-portal'
   find(portal_class).click
-  find('a.interaction-click-control-sign-in-existing-account').click
+  unless Settings.site.use_default_devise_path
+    find('a.interaction-click-control-sign-in-existing-account').click
+  end
   step "Admin signs in to portal"
   tab_class = '.interaction-click-control-employers'
   find(tab_class, wait: 10).click
