@@ -15,7 +15,7 @@ shop_notice_triggers = [
         name: 'Welcome Notice sent to Employer',
         notice_template: 'notices/shop_employer_notices/0_welcome_notice_employer',
         notice_builder: 'ShopEmployerNotices::WelcomeEmployerNotice',
-        mpi_indicator: 'MPI_SHOP0',
+        mpi_indicator: 'SHOP_M001',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -97,7 +97,7 @@ shop_notice_triggers = [
         name: 'Initial Employer SHOP Approval Notice',
         notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOP2A',
+        mpi_indicator: 'SHOP_M002',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -405,54 +405,13 @@ shop_notice_triggers = [
       }
     ]
   },
-  {
-    hbx_id: 'SHOP26',
-    title: 'First Reminder to publish Application',
-    description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
-    resource_name: 'employer',
-    event_name: 'initial_employer_first_reminder_to_publish_plan_year',
-    notice_triggers: [
-      {
-        name: 'Initial Employer Application - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'MPI_SHOP26',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
-  {
-    hbx_id: 'SHOP27',
-    title: 'Final Reminder to publish Application',
-    description: 'All the initial employers with draft plan years will be notified to publish their plan year on 3rd of the month.',
-    resource_name: 'employer',
-    event_name: 'initial_employer_final_reminder_to_publish_plan_year',
-    notice_triggers: [
-      {
-        name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
-        notice_template: 'notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear',
-        mpi_indicator: 'MPI_SHOP27',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
+  
   {
     hbx_id: 'SHOP28',
-    title: 'Second Reminder to publish Application',
+    title: 'Final Reminder to publish Application',
     description: 'All the initial employers with draft plan years will be notified to publish their plan year 1 day prior to soft deadline of 1st.',
     resource_name: 'employer',
-    event_name: 'initial_employer_second_reminder_to_publish_plan_year',
+    event_name: 'initial_employer_final_reminder_to_publish_plan_year',
     notice_triggers: [
       {
         name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
@@ -468,6 +427,7 @@ shop_notice_triggers = [
       }
     ]
   },
+  
 ]
 
 

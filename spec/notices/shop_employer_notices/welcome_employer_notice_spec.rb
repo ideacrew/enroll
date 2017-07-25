@@ -9,7 +9,7 @@ RSpec.describe ShopEmployerNotices::WelcomeEmployerNotice, :dbclean => :after_ea
                             :notice_template => 'notices/shop_employer_notices/0_welcome_notice_employer',
                             :notice_builder => 'ShopEmployerNotices::WelcomeEmployerNotice',
                             :event_name => 'application_created',
-                            :mpi_indicator => 'MPI_SHOP0',
+                            :mpi_indicator => 'SHOP_M001',
                             :title => "Welcome Notice to Employer"})
                           }
 
