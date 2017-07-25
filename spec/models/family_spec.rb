@@ -1341,22 +1341,46 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   end
 end
 
-describe "#verification due date" do
-  let(:family) { FactoryGirl.build(:family) }
-  let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
-  let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
+describe "#document_due_date", dbclean: :after_each do
+  context "when special verifications exists" do
+    let(:special_verification) { FactoryGirl.create(:special_verification)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
-  context "for special verification period" do
-    it "returns special verification period" do
-      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
-      expect(family.verification_due_date).to eq Date.new(2016,5,6)
+    it "should return the due date on the related latest special verification" do
+      expect(family.document_due_date(family.primary_family_member, special_verification.verification_type)).to eq special_verification.due_date.to_date
     end
   end
 
-  context "with no special verification period" do
-    it "calls determine due date method" do
-      allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
-      expect((family.verification_due_date)).to eq TimeKeeper.date_of_record + 95.days
+  context "when special verifications not exist" do
+
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+
+    context "when the family member had an 'enrolled_contingent' policy" do
+
+      let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, household: family.active_household, aasm_state: "enrolled_contingent")}
+
+      before do
+        fm = family.primary_family_member
+        enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
+      end
+      it "should return the special_verification_period on the enrollment if it exists" do
+        enrollment.special_verification_period = TimeKeeper.date_of_record + 45.days
+        enrollment.save!
+        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq enrollment.special_verification_period.to_date
+      end
+
+      it "should return today date + 95 days if special_verification_period on the enrollment is nil" do
+        enrollment.special_verification_period = nil
+        enrollment.save
+        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq TimeKeeper.date_of_record.to_date + 95.days
+      end
+    end
+
+    context "when the family member had no policy" do
+      it "should return the today date + 95 days" do
+        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq TimeKeeper.date_of_record.to_date + 95.days
+      end
     end
   end
 end

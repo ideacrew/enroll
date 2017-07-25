@@ -77,7 +77,7 @@ class VlpDocument < Document
   ]
 
   # admin action list for verification process, dropdown for each verification type
-  ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB"]
+  ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject", "View History", "Call HUB", "Extend"]
 
   # reasons admin can provide when verifying type
   VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]

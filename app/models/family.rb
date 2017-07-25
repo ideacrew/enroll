@@ -942,15 +942,42 @@ class Family
     end
   end
 
-  def verification_due_date
-    if active_household.hbx_enrollments.verification_needed.any?
-      if active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
-      else
-        active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
+  def min_verification_due_date_on_family
+    due_dates = []
+    contingent_enrolled_active_family_members.each do |family_member|
+      family_member.person.verification_types.each do |v_type|
+        due_dates << document_due_date(family_member, v_type)
       end
+    end
+
+    due_dates.min.to_date if due_dates.present?
+  end
+
+  def contingent_enrolled_active_family_members
+    enrolled_family_members = []
+    family_members.active.each do |family_member|
+      if enrolled_policy(family_member).present?
+        enrolled_family_members << family_member
+      end
+    end
+    enrolled_family_members
+  end
+
+  def document_due_date(family_member, v_type)
+    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    enrollment = enrolled_policy(family_member)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
+  end
+
+  def enrolled_policy(family_member)
+    enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+  end
+
+  def verification_due_date_from_enrollment(enrollment)
+    if enrollment.special_verification_period
+      enrollment.special_verification_period.to_date
     else
-      TimeKeeper.date_of_record.to_date + 95.days
+      TimeKeeper.date_of_record + 95.days
     end
   end
 
