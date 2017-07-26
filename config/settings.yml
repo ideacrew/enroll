@@ -119,4 +119,5 @@ aptc_errors:
 view_horizontal_status:
   consumer_roles: false
   interactive_identity_verifications: false
+  applications: false
 
