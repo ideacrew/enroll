@@ -790,14 +790,10 @@ class EmployerProfile
     Organization.where(:"employer_profile.plan_years" => {
       :$elemMatch => {:start_on => start_on.prev_year, :aasm_state => 'active'}
       }).each do |org|
-
-      if org.employer_profile.is_renewal_transmission_eligible?
-        org.employer_profile.transmit_renewal_eligible_event
-      end
-
-      if org.employer_profile.is_renewal_carrier_drop?
-        org.employer_profile.transmit_renewal_carrier_drop_event
-      end
+      
+      employer_profile = org.employer_profile
+      employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
     end
 
     Organization.where(:"employer_profile.plan_years" => { 
