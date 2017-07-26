@@ -13,11 +13,9 @@
   - unless benefit.employer_id.blank?
     %employer_id= benefit.employer_id
   - unless benefit.employer_address.blank?
-    %employer_address
-      = render :partial => "events/addresses/address", :object => benefit.employer_address
+    = render :partial => "events/addresses/employer_address", :object => benefit.employer_address
   - unless benefit.employer_phone.blank?
-    %employer_phone
-      = render :partial => "events/phones/phone", :object => benefit.employer_phone
+    = render :partial => "events/phones/employer_phone", :object => benefit.employer_phone
   - if benefit.is_esi_waiting_period.present?
     %is_esi_waiting_period= benefit.is_esi_waiting_period
   - if benefit.is_esi_mec_met.present?
@@ -25,7 +23,7 @@
   - if benefit.esi_covered.present?
     %esi_covered= "urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered##{benefit.esi_covered}"
   - if benefit.employee_cost.present?
-    %employee_cost= benefit.employee_cost.to_f.round(2)
+    %employee_cost= '%.2f' % (benefit.employee_cost.to_f.round(2))
   - if benefit.employee_cost_frequency.present?
     %employee_cost_frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{benefit.employee_cost_frequency}"
   %submitted_at= benefit.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
