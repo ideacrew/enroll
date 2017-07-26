@@ -786,7 +786,7 @@ class EmployerProfile
     Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
       :start_on => start_on,
       :aasm_state => 'enrolled'
-      }}, :"employer_profile.aasm_state" => ['binder_paid','enrolled']).each do |org|
+      }}, :"employer_profile.aasm_state".in => ['binder_paid','enrolled']).each do |org|
       org.employer_profile.transmit_initial_eligible_event
     end
   end
