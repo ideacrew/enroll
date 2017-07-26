@@ -1,5 +1,9 @@
 class Notice
 
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
+
   attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
 
   Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
