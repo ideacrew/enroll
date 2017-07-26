@@ -550,7 +550,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP36',
-    title: 'EE SEP Requested by Employee Accepted',
+    title: 'Special Enrollment Period Approval',
     description: 'SEP request by Employee accepted when an eligiblity determination is reached',
     resource_name: 'employee_role',
     event_name: 'ee_sep_request_accepted_notice',
