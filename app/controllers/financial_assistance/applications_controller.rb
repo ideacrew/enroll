@@ -74,10 +74,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
-    @old_application = @person.primary_family.applications.find params[:id]
-    @application = @old_application.dup
-
-    @application.save!
+    if @person.primary_family.application_in_progress.blank?
+      old_application = @person.primary_family.applications.find params[:id]
+      application = old_application.dup
+      application.aasm_state = "draft"
+      application.save!
+    end
     redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
   end
 
