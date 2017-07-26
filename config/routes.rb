@@ -25,6 +25,7 @@ Rails.application.routes.draw do
 
   namespace :financial_assistance do
     resources :applications do
+      get :copy, on: :member
       put :step, on: :member
       put ':step/:step', on: :member, action: 'step'
       post :step, on: :collection
