@@ -964,7 +964,7 @@ class HbxEnrollment
     enrollment = HbxEnrollment.new
     enrollment.household = coverage_household.household
 
-    enrollment.submitted_at = submitted_at
+    enrollment.submitted_at = submitted_at || TimeKeeper.datetime_of_record
 
     case
       when employee_role.present?
