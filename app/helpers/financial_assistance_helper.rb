@@ -88,5 +88,6 @@ module FinancialAssistanceHelper
       return Settings.view_horizontal_status.family_members
     else
       return true
+    end
   end
 end
