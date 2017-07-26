@@ -25,14 +25,18 @@ module FinancialAssistanceHelper
 
   def activer_for(target)
     if controller_name == 'applicants'
-      if action_name == 'step'
-        if target == 'income_and_coverage'
-          'activer'
-        else
+      if action_name == 'step' and defined? @current_step
+        if @current_step.to_i == 1
           ''
+        elsif @current_step.to_i == 2 and target == 'income_and_coverage'
+          'activer'
         end
       elsif action_name == 'other_questions'
-        'activer'
+        if target == 'other_questions'
+          ''
+        else
+          'activer'
+        end
       else
         ''
       end
@@ -61,7 +65,7 @@ module FinancialAssistanceHelper
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
-      review_and_submit_financial_assistance_application_path application
+      insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
     end
   end
 
