@@ -144,12 +144,25 @@ class ApplicationController < ActionController::Base
       (controller_name == "saml")
     end
 
+    def check_for_special_path
+      if site_sign_in_routes.include? request.path
+        redirect_to new_user_session_path
+        return
+      elsif site_create_routes.include? request.path
+        redirect_to new_user_registration_path
+        return
+      else
+        return
+      end
+    end
+
     def require_login
       unless current_user
         unless request.format.js?
           session[:portal] = url_for(params)
         end
         if site_uses_default_devise_path?
+          check_for_special_path
           redirect_to new_user_session_path
         else
           redirect_to new_user_registration_path

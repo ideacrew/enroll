@@ -14,6 +14,8 @@ site:
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   use_default_devise_path: true
+  create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
+  sign_in_routes: ['/families/home']
 
   social_media:
     facebook_url: ""
@@ -94,7 +96,7 @@ aca:
 
     initial_application:
       publish_due_day_of_month: 15
-      advertised_deadline_of_month: 10  
+      advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -2
       appeal_period_after_application_denial:
