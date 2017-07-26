@@ -1189,6 +1189,7 @@ class PlanYear
 
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
 
+      #groups terminated for non-payment get 31 more days of coverage from their paid through date
       if end_on != end_on.end_of_month
         errors.add(:end_on, "must be last day of the month")
       end
