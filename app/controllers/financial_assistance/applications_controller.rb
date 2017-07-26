@@ -26,7 +26,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def edit
     @family = @person.primary_family
-    @application = FinancialAssistance::Application.find(params[:id])
+    @application = @person.primary_family.applications.find params[:id]
 
     render layout: 'financial_assistance'
   end
@@ -71,6 +71,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
                 :body => response_payload,
                 :family_id => application.family_id.to_s,
                 :application_id => application._id.to_s})
+  end
+
+  def copy
+    @old_application = @person.primary_family.applications.find params[:id]
+    @application = @old_application.dup
+
+    @application.save!
+    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
   end
 
   def help_paying_coverage
