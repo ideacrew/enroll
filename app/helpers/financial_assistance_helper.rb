@@ -25,14 +25,18 @@ module FinancialAssistanceHelper
 
   def activer_for(target)
     if controller_name == 'applicants'
-      if action_name == 'step'
-        if target == 'income_and_coverage'
-          'activer'
-        else
+      if action_name == 'step' and defined? @current_step
+        if @current_step.to_i == 1
           ''
+        elsif @current_step.to_i == 2 and target == 'income_and_coverage'
+          'activer'
         end
       elsif action_name == 'other_questions'
-        'activer'
+        if target == 'other_questions'
+          ''
+        else
+          'activer'
+        end
       else
         ''
       end
@@ -61,7 +65,11 @@ module FinancialAssistanceHelper
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
-      review_and_submit_financial_assistance_application_path application
+      if action_name == "save_questions"
+        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      else
+        review_and_submit_financial_assistance_application_path application
+      end
     end
   end
 
@@ -75,5 +83,13 @@ module FinancialAssistanceHelper
       (document_flow.index(options[:current]) || -1) < document_flow.index(embeded_document) and applicant.send(embeded_document).present?
     end
     next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_financial_assistance_application_applicant_path(application, applicant)
+  end
+  
+  def show_component(url)
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members"
+      false
+    else
+      true
+    end
   end
 end

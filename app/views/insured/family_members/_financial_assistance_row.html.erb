@@ -1,7 +1,7 @@
 <% applicant = find_applicant(family_member) %>
 <% application = @family.application_in_progress %>
 <% if @family.application_in_progress.present? %>
-  <div class="col-md-10 col-sm-10 no-pd form-group-lg app-status">
+  <div class="col-md-10 col-sm-10 no-pd form-group-lg no-pd app-status white-background">
     <% if applicant.applicant_validation_complete? %>
       <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
     <% else %>
@@ -9,7 +9,7 @@
     <% end %>
   </div>
 
-  <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd">
+  <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd white-background">
       <%= link_to applicant.workflow.present? ? "Edit Info" : "Add Info", go_to_step_financial_assistance_application_applicant_path(application, applicant, 1), class: "btn btn-info" %>
   </div>
 <%end%>

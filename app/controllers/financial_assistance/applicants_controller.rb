@@ -1,4 +1,7 @@
 class FinancialAssistance::ApplicantsController < ApplicationController
+
+  before_action :set_current_person
+
   include UIHelpers::WorkflowController
   include FinancialAssistanceHelper
 
@@ -7,13 +10,12 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def edit
     @applicant = @application.applicants.find(params[:id])
-
     render layout: 'financial_assistance'
   end
 
   def other_questions
-     @applicant = @application.applicants.find(params[:id])
-     render layout: 'financial_assistance'
+    @applicant = @application.applicants.find(params[:id])
+    render layout: 'financial_assistance'
   end
 
   def save_questions

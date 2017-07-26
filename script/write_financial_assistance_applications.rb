@@ -41,7 +41,7 @@ families.each do |family|
   rescue Exception => e
     puts "Application for family #{family._id} failed to generate."
     puts e.inspect
-    puts "-"*100
     puts e.backtrace.inspect
+    puts "-"*100
   end
 end
