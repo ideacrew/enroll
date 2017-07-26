@@ -1070,6 +1070,66 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
   end
 end
 
+describe EmployerProfile, "group transmissions", dbclean: :after_each do
+
+  let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let(:plan_year_status) { 'renewing_enrolled' }
+  let(:renewing_employer) {
+    FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status)
+  }
+  let(:health_plan) { FactoryGirl.create(:plan, active_year: (start_date).year - 1, carrier_profile_id: carrier_1.id) }
+  let(:carrier_1)         { FactoryGirl.create(:carrier_profile) }
+  let(:carrier_2)       { FactoryGirl.create(:carrier_profile) }
+  let(:plan_year) { renewing_employer.published_plan_year }
+  let(:renewal_plan_year) { renewing_employer.renewing_plan_year }
+  let(:benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 1", plan_year: plan_year, reference_plan_id: health_plan.id, plan_option_kind: 'single_carrier')}
+  let(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 2", plan_year: renewal_plan_year, reference_plan_id: new_health_plan.id, plan_option_kind: 'single_carrier')}
+
+  describe '.is_renewal_transmission_eligible?' do 
+    context 'renewing_employer exists in enrolled state' do
+    
+      it 'should return true' do
+        expect(renewing_employer.is_renewal_transmission_eligible?).to be_truthy
+      end
+    end
+
+    context 'renewing employer exists in draft state' do
+      let(:plan_year_status) { 'renewing_draft' }
+
+      it 'should return false' do
+        expect(renewing_employer.is_renewal_transmission_eligible?).to be_falsey
+      end 
+    end
+  end
+
+  describe '.is_renewal_carrier_drop?' do
+    before do
+      plan_year.benefit_groups = [benefit_group]
+      renewal_plan_year.benefit_groups = [renewal_benefit_group]
+    end
+
+    context 'renewing_employer exists with enrolled renewal plan year' do
+
+      context 'when carrier switched' do 
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_2.id) }
+
+        it 'should return carrier drop true' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_truthy
+        end
+      end
+
+      context 'when carrier not switched' do 
+        let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
+
+        it 'should return carrier drop false' do
+          expect(renewing_employer.is_renewal_carrier_drop?).to be_falsey
+        end
+      end
+    end
+  end
+end
+
+
 # describe "#advance_day" do
 #   let(:start_on) { (TimeKeeper.date_of_record + 60).beginning_of_month }
 #   let(:end_on) {start_on + 1.year - 1 }
