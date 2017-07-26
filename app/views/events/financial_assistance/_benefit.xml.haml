@@ -13,11 +13,9 @@
   - unless benefit.employer_id.blank?
     %employer_id= benefit.employer_id
   - unless benefit.employer_address.blank?
-    %employer_address
-      = render :partial => "events/addresses/address", :object => benefit.employer_address
+    = render :partial => "events/addresses/employer_address", :object => benefit.employer_address
   - unless benefit.employer_phone.blank?
-    %employer_phone
-      = render :partial => "events/phones/phone", :object => benefit.employer_phone
+    = render :partial => "events/phones/employer_phone", :object => benefit.employer_phone
   - if benefit.is_esi_waiting_period.present?
     %is_esi_waiting_period= benefit.is_esi_waiting_period
   - if benefit.is_esi_mec_met.present?
