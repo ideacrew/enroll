@@ -121,4 +121,5 @@ view_horizontal_status:
   interactive_identity_verifications: false
   applications: false
   family_members: false
+  applicants: false
 

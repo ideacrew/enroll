@@ -86,6 +86,8 @@ module FinancialAssistanceHelper
       return Settings.view_horizontal_status.applications
     elsif controller_name == "family_members"
       return Settings.view_horizontal_status.family_members
+    elsif controller_name == "applicants"
+      return Settings.view_horizontal_status.applicants
     else
       return true
     end
