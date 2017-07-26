@@ -65,7 +65,11 @@ module FinancialAssistanceHelper
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
-      insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      if action_name == "save_questions"
+        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      else
+        review_and_submit_financial_assistance_application_path application
+      end
     end
   end
 
