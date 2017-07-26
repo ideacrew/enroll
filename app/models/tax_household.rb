@@ -188,7 +188,7 @@ class TaxHousehold
 
   def preferred_eligibility_determination
     return nil unless family.active_approved_application
-    eds = family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
+    eds = application.eligibility_determinations.where(tax_household_id: self.id)
     admin_ed = eds.where(source: "Admin").first
     curam_ed = eds.where(source: "Curam").first
     return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
