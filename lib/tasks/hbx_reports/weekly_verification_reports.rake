@@ -80,7 +80,7 @@ namespace :reports do
       row << fiels_names_2
       
       def uploaded_in_past_week(doc, start_date, end_date)
-        (start_date.beginning_of_day..end_date.end_of_day).cover? doc.created_at && doc.identifier.present?
+        ((start_date.beginning_of_day..end_date.end_of_day).cover? doc.created_at) && doc.identifier.present?
       end
 
       Person.all_consumer_roles.where(:"consumer_role.vlp_documents.identifier" => {:$exists => true}).each do |person|
