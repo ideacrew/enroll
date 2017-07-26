@@ -21,7 +21,7 @@ namespace :reports do
 
       employer_count = 0
       employee_count = 0
-      enrollments_not_found = 0
+      employees_with_no_enrollments_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       filename = "hbx_report/#{ENV['filename']}_results_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
       CSV.open(filename,"w") do |csv|
@@ -38,7 +38,7 @@ namespace :reports do
           employer_profile.census_employees.each do |ce|
             enrollments = find_enrollments(ce,enrollment_statuses)
             if enrollments.blank?
-              enrollments_not_found += 1
+              employees_with_no_enrollments_count += 1
               next
             end
             enrollments.each do |en|
@@ -57,7 +57,7 @@ namespace :reports do
               en.hbx_enrollment_members.each do |hbx_em|
                 name = hbx_em.person.full_name
                 hbx_id = hbx_em.person.hbx_id
-                if hbx_em.is_subscriber
+                if hbx_em.is_subscriber?
                   subdep = "Subscriber"
                 else
                   subdep = "Dependent"
@@ -68,7 +68,7 @@ namespace :reports do
           end
         end
       end
-      puts "#{enrollments_not_found} employees do not have enrollments out of a total of #{employee_count} employees."
+      puts "#{employees_with_no_enrollments_count} employees do not have enrollments out of a total of #{employee_count} employees." unless Rails.env.test?
     end
   end
 end
