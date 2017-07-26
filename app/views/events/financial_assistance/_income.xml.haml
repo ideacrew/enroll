@@ -19,11 +19,9 @@
   - unless income.employer_id.blank?
     %employer_id= income.employer_id
   - if income.employer_address.present?
-    %employer_address
-      = render :partial => "events/addresses/address", :object => income.employer_address, as: :address
+    = render :partial => "events/addresses/employer_address", :object => income.employer_address, as: :address
   - if income.employer_phone.present?
-    %employer_phone
-      = render :partial => "events/phones/phone", :object => income.employer_phone, as: :phone
+    = render :partial => "events/phones/employer_phone", :object => income.employer_phone, as: :phone
   - if income.is_projected.present?
     %is_projected= income.is_projected
   %submitted_at= income.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
