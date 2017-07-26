@@ -12,6 +12,10 @@ class EmployerProfile
 
   BINDER_PREMIUM_PAID_EVENT_NAME = "acapi.info.events.employer.binder_premium_paid"
   EMPLOYER_PROFILE_UPDATED_EVENT_NAME = "acapi.info.events.employer.updated"
+  INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_initial_application_eligible"
+  INITIAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_initial_application_eligible"
+  RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_renewal_application_eligible"
+  RENEWAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
 
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
@@ -671,6 +675,12 @@ class EmployerProfile
           end
         end
 
+        if Settings.aca.shop_market.transmit_employers_immediately == false
+          if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
+            transmit_scheduled_employers(new_date)
+          end
+        end
+
         #Initial employer reminder notices to publish plan year.
         start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
@@ -702,7 +712,6 @@ class EmployerProfile
             end
           end
         end
-
       end
 
       # Employer activities that take place monthly - on first of month
@@ -761,6 +770,24 @@ class EmployerProfile
         plan_year.advance_date! if plan_year && plan_year.may_advance_date?
         plan_year
       end
+    end
+  end
+
+  def transmit_scheduled_employers(new_date)
+    start_on = new_date.next_month.beginning_of_month
+
+    Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
+      :start_on => start_on,
+      :aasm_state => 'renewing_enrolled'
+      }}).each do |org|
+      org.employer_profile.transmit_renewal_eligible_event
+    end
+
+    Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
+      :start_on => start_on,
+      :aasm_state => 'enrolled'
+      }}, :"employer_profile.aasm_state" => ['binder_paid','enrolled']).each do |org|
+      org.employer_profile.transmit_initial_eligible_event
     end
   end
 
@@ -952,6 +979,14 @@ class EmployerProfile
     if changed_fields.present? && changed_fields.include?("start_on")
       notify("acapi.info.events.employer.general_agent_added", {employer_id: self.hbx_id, event_name: "general_agent_added"})
     end
+  end
+
+  def transmit_initial_eligible_event
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
+  def transmit_renewal_eligible_event
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
   end
 
   def conversion_employer?

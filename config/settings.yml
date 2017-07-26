@@ -103,6 +103,8 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    transmit_employers_immediately: false
+    employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
 
