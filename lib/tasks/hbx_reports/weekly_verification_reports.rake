@@ -38,7 +38,11 @@ namespace :reports do
         (start_date.beginning_of_day..end_date.end_of_day).cover? event.transition_at if event.present?
       end
 
-      Person.all_consumer_roles.where(:"consumer_role.lawful_presence_determination.aasm_state" => "verification_successful").each do |person|
+      people = Person.all_consumer_roles.where({:"consumer_role.lawful_presence_determination.aasm_state" => "verification_successful",
+                                                  :"consumer_role.lawful_presence_determination.workflow_state_transitions.transition_at".gte => start_date.beginning_of_day,
+                                                    :"consumer_role.lawful_presence_determination.workflow_state_transitions.transition_at".lte => end_date.end_of_day})
+
+      people.each do |person|
         begin
           consumer_role = person.consumer_role
           lpd = consumer_role.lawful_presence_determination
@@ -76,10 +80,10 @@ namespace :reports do
       row << fiels_names_2
       
       def uploaded_in_past_week(doc, start_date, end_date)
-        (start_date.beginning_of_day..end_date.end_of_day).cover? doc.created_at
+        (start_date.beginning_of_day..end_date.end_of_day).cover? doc.created_at && doc.identifier.present?
       end
 
-      Person.all_consumer_roles.where(:"consumer_role.vlp_documents" => {:$exists => true }).each do |person|
+      Person.all_consumer_roles.where(:"consumer_role.vlp_documents.identifier" => {:$exists => true}).each do |person|
         begin
           documents = person.consumer_role.vlp_documents
           docs_uploaded_in_last_week = documents.select { |doc| uploaded_in_past_week(doc, start_date, end_date) }
