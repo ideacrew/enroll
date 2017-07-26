@@ -84,6 +84,8 @@ module FinancialAssistanceHelper
       return Settings.view_horizontal_status.interactive_identity_verifications
     elsif controller_name == "applications"
       return Settings.view_horizontal_status.applications
+    elsif controller_name == "family_members"
+      return Settings.view_horizontal_status.family_members
     else
       return true
   end
