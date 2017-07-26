@@ -62,7 +62,7 @@ namespace :reports do
           puts "#{e}"
         end
       end
+      puts "Total count of records: #{count}"
     end
-    puts "Total count of records: #{count}"
   end
 end
