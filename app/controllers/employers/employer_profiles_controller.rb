@@ -121,13 +121,15 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       case @tab
       when 'benefits'
         @current_plan_year = @employer_profile.renewing_plan_year || @employer_profile.active_plan_year
-        @current_plan_year.ensure_benefit_group_is_valid if @current_plan_year 
+        @current_plan_year.ensure_benefit_group_is_valid if @current_plan_year
         sort_plan_years(@employer_profile.plan_years)
       when 'documents'
         @datatable = Effective::Datatables::EmployerDocumentDatatable.new({employer_profile_id: params[:id]})
         @documents = []
         if @employer_profile.employer_attestation.present?
           @documents = @employer_profile.employer_attestation.employer_attestation_documents
+        else
+          @employer_profile.build_employer_attestation
         end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year

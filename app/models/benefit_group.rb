@@ -65,15 +65,11 @@ class BenefitGroup
   embeds_many :composite_tier_contributions, cascade_callbacks: true
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
-
   embeds_many :relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
   embeds_many :dental_relationship_benefits, cascade_callbacks: true
   accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
-
-  embeds_many :composite_tier_contributions, cascade_callbacks: true
-  accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
 
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
 
@@ -281,6 +277,11 @@ class BenefitGroup
     CensusEmployee.find_all_by_benefit_group(self)
   end
 
+  def effective_composite_tier(ce)
+    employer_offered_family_benefits = composite_tier_contributions.find_by(composite_rating_tier: 'family').offered?
+    employer_offered_family_benefits ? ce.composite_rating_tier : 'employee_only'
+  end
+
   def assignable_to?(census_employee)
     return !(census_employee.employment_terminated_on < start_on || census_employee.hired_on > end_on)
   end
@@ -309,7 +310,7 @@ class BenefitGroup
 
   def build_composite_tier_contributions
     self.composite_tier_contributions = CompositeRatingTier::NAMES.map do |rating_tier|
-      self.composite_tier_contributions.build(composite_rating_tier: rating_tier)
+      self.composite_tier_contributions.build(composite_rating_tier: rating_tier, offered: true)
     end
   end
 
@@ -360,7 +361,7 @@ class BenefitGroup
     end
     targeted_census_employees.active.collect do |ce|
       if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(plan, self, ce.composite_rating_tier)
+        pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce))
       else
         if plan.coverage_kind == 'dental'
           pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
@@ -376,7 +377,7 @@ class BenefitGroup
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
       if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
       else
         if coverage_kind == 'dental'
           pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
@@ -392,7 +393,7 @@ class BenefitGroup
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
       if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
       else
         if coverage_kind == 'dental'
           pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
@@ -413,7 +414,7 @@ class BenefitGroup
     pcd = if @is_congress
       decorated_plan(plan, ce)
     elsif(plan_option_kind == 'sole_source')
-      CompositeRatedPlanCostDecorator.new(reference_plan, self, ce.composite_rating_tier)
+      CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
     else
       PlanCostDecorator.new(plan, ce, self, reference_plan)
     end
@@ -673,12 +674,14 @@ class BenefitGroup
 
     contribution = family_tier.first.employer_contribution_percent
     estimated_tier_premium = family_tier.first.estimated_tier_premium
+    offered = family_tier.first.offered
 
     (CompositeRatingTier::NAMES - CompositeRatingTier::VISIBLE_NAMES).each do |crt|
       tier = self.composite_tier_contributions.find_or_initialize_by(
         composite_rating_tier: crt
       )
       tier.employer_contribution_percent = contribution
+      tier.offered = offered
     end
   end
 

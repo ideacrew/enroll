@@ -16,6 +16,12 @@ module Insured::EmployeeRolesHelper
     offered_relationship_benefits.include? relationship
   end
 
+  def composite_relationship_check(offered_relationship_benefits=[], family_member, new_effective_on)
+    relationship = CompositeRatedPlanCostDecorator.benefit_relationship(family_member.primary_relationship)
+
+    offered_relationship_benefits.include? relationship
+  end
+
   def show_market_name_by_enrollment(enrollment)
     return '' if enrollment.blank?
 

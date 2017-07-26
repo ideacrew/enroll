@@ -16,15 +16,23 @@ FactoryGirl.define do
     transient do
       benefit_group { build(:benefit_group) }
       renewal_benefit_group { build(:benefit_group) }
+      create_with_spouse false
     end
 
     after(:create) do |census_employee, evaluator|
       census_employee.created_at = TimeKeeper.date_of_record
+      if evaluator.create_with_spouse
+        census_employee.census_dependents.create(employee_relationship: 'spouse')
+      end
     end
 
 
     trait :owner do
       is_business_owner  true
+    end
+
+    trait :with_spouse do
+
     end
 
     trait :blank_email do

@@ -487,7 +487,7 @@ class Employers::PlanYearsController < ApplicationController
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
                                       ],
                                       :composite_tier_contributions_attributes => [
-                                        :id, :composite_rating_tier, :employer_contribution_percent
+                                        :id, :composite_rating_tier, :employer_contribution_percent, :offered
                                       ]
     ]
     )
