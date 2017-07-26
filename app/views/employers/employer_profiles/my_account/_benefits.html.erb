@@ -231,9 +231,10 @@
             		      <th>Employer</th>
             		      <th>Total</th>
                     </tr>
+
                     <% bg.sorted_composite_tier_contributions.each_with_index do |ct, i| %>
                     <tr>
-                      <td><%= ct.composite_rating_tier.try(:humanize) %></td>
+			    <td><%= t("shop.composite_tiers.#{ct.composite_rating_tier}") %></td>
                       <td id="pct">
                         <strong><%= number_to_percentage ct.employer_contribution_percent.ceil, precision: 0 %></strong>
 		                  </td>
