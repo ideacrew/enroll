@@ -72,8 +72,7 @@
         <td>
           Full price monthly premium:
         </td>
-        <td></td>
-        <td align="left">
+        <td align="right">
           $<%= enrollment.premium %>
         </td>
       </tr>
@@ -82,19 +81,15 @@
           Your tax credit savings:
         </td>
         <td align="right">
-        −
-        </td>
-        <td align="left">
-          $<%= enrollment.aptc_amount.to_f %>
-          <hr style="height: 0px;  border-color: black; border-width: 1px 0 0 0;">
+          - $<%= enrollment.aptc_amount.to_f %>
+          <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
         </td>
       </tr>
       <tr>
         <td>
           <strong>Your monthly premium payment:</strong>
         </td>
-        <td></td>
-        <td align="left">
+        <td align="right">
           <strong> $<%= enrollment.responsible_amount %></strong>
         </td>
       </tr>

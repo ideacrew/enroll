@@ -10,6 +10,7 @@ module PdfTemplates
     attribute :immigration_unverified, Boolean
     attribute :citizen_status, String
     attribute :tax_household, PdfTemplates::TaxHousehold
+    attribute :documents_due_date, Date
     # attribute :household_size, String
     attribute :projected_amount, String
     attribute :taxhh_count, String

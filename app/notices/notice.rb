@@ -20,7 +20,7 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({ 
-      :template => template,
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -30,8 +30,8 @@ class Notice
     @random_str ||= rand(10**10).to_s
   end
 
-  def pdf
-    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
+  def pdf(custom_template = nil)
+    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options)
   end
 
   def layout

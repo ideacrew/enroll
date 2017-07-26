@@ -10,10 +10,28 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     super(args)
   end
 
+  def attach_required_documents
+    # attach_blank_page
+    generate_custom_notice('notices/ivl/documents_section')
+    join_pdfs [notice_path, Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")]
+  end
+
+  def generate_custom_notice(custom_template)
+    File.open(custom_notice_path, 'wb') do |file|
+      file << self.pdf(custom_template)
+    end
+    # clear_tmp
+  end
+
+  def custom_notice_path
+    Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
+  end
+
   def deliver
     build
-    generate_pdf_notice
-    attach_blank_page
+    # generate_pdf_notice
+    attach_required_documents
+    # attach_blank_page
     # attach_voter_application
     # prepend_envelope
     upload_and_send_secure_message
@@ -59,8 +77,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end.uniq
 
     people = family_members.map(&:person).uniq
-    people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-    people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
+    # people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
+    # people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
 
     outstanding_people = []
     people.each do |person|
@@ -70,9 +88,28 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
+    append_unverified_individuals(outstanding_people)
   end
 
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  end
 
+  def ssn_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
+  end
+
+  def append_unverified_individuals(people)
+    people.each do |person|
+      if ssn_outstanding?(person)
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: TimeKeeper.date_of_record+95.days, age: person.age_on(TimeKeeper.date_of_record) })
+      end
+
+      if lawful_presence_outstanding?(person)
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: TimeKeeper.date_of_record+95.days, age: person.age_on(TimeKeeper.date_of_record) })
+      end
+    end
+  end
 
   def append_data
     family = recipient.primary_family
@@ -85,8 +122,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    # notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
-    # notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
   def append_enrollment_information(enrollment)
