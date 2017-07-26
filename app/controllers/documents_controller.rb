@@ -34,7 +34,7 @@ class DocumentsController < ApplicationController
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
-    if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
+    if (VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}

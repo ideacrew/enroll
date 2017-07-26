@@ -82,8 +82,13 @@ class VlpDocument < Document
   # reasons admin can provide when verifying type
   VERIFICATION_REASONS = ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
 
-  # reasons admin can provide when returning for deficiency verification type
-  RETURNING_FOR_DEF_REASONS = ["Illegible Document", "Member Data Change", "Document Expired", "Additional Document Required", "Other"]
+  # reasons admin can provide when rejecting verification type. these reasons applied for all verification types
+  ALL_TYPES_REJECT_REASONS = ["Illegible Doc", "Member Data Change", "Document Expired", "Additional Document Required", "Incomplete Doc", "Wrong Type", "Wrong Person", "Other"]
+  #additionla reasons for citizenship and immigartion verification types
+  CITIZEN_IMMIGR_TYPE_ADD_REASONS = ["Expired"]
+  #additional reasons for Income verification types WILL BE IMPLEMENTED LATER
+  INCOME_TYPE_ADD_REASONS = ["4 weeks", "Too old", "All types"]
+
 
   field :alien_number, type: String
   field :i94_number, type: String
