@@ -16,6 +16,8 @@ class EmployerProfile
   INITIAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_initial_application_eligible"
   RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG="benefit_coverage_renewal_application_eligible"
   RENEWAL_EMPLOYER_TRANSMIT_EVENT="acapi.info.events.employer.benefit_coverage_renewal_application_eligible"
+  RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG="benefit_coverage_renewal_carrier_dropped"
+  RENEWAL_EMPLOYER_CARRIER_DROP_EVENT="acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped"
 
   ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
@@ -437,7 +439,16 @@ class EmployerProfile
     end
 
     return false
+  end
 
+  def is_renewal_transmission_eligible?
+    renewing_plan_year.present? && renewing_plan_year.renewing_enrolled?
+  end
+
+  def is_renewal_carrier_drop?
+    if is_renewal_transmission_eligible?
+      (active_plan_year.carriers_offered - renewing_plan_year.carriers_offered).present?
+    end
   end
 
   ## Class methods
@@ -776,17 +787,23 @@ class EmployerProfile
   def transmit_scheduled_employers(new_date)
     start_on = new_date.next_month.beginning_of_month
 
-    Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
-      :start_on => start_on,
-      :aasm_state => 'renewing_enrolled'
-      }}).each do |org|
-      org.employer_profile.transmit_renewal_eligible_event
+    Organization.where(:"employer_profile.plan_years" => {
+      :$elemMatch => {:start_on => start_on.prev_year, :aasm_state => 'active'}
+      }).each do |org|
+
+      if org.employer_profile.is_renewal_transmission_eligible?
+        org.employer_profile.transmit_renewal_eligible_event
+      end
+
+      if org.employer_profile.is_renewal_carrier_drop?
+        org.employer_profile.transmit_renewal_carrier_drop_event
+      end
     end
 
-    Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {
-      :start_on => start_on,
-      :aasm_state => 'enrolled'
-      }}, :"employer_profile.aasm_state".in => ['binder_paid','enrolled']).each do |org|
+    Organization.where(:"employer_profile.plan_years" => { 
+      :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}
+      }, :"employer_profile.aasm_state".in => ['binder_paid','enrolled']).each do |org|
+
       org.employer_profile.transmit_initial_eligible_event
     end
   end
@@ -987,6 +1004,10 @@ class EmployerProfile
 
   def transmit_renewal_eligible_event
     notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+  end
+
+  def transmit_renewal_carrier_drop_event
+    notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG}) 
   end
 
   def conversion_employer?
