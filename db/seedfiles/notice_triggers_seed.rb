@@ -550,7 +550,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP35',
-    title: 'EE SEP Request Denied',
+    title: 'Special Enrollment Period Denial',
     description: 'EE SEP Requested by Employee outside of allowable time frame',
     resource_name: 'employee_role',
     event_name: 'sep_request_denial_notice',
