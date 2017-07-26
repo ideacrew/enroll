@@ -156,6 +156,10 @@ class EmployeeRole
     benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
   end
 
+  def belongs_to_congress?
+    self.benefit_group.present? && self.benefit_group.is_congress?
+  end
+
   class << self
     def klass
       self.to_s.underscore

@@ -454,23 +454,36 @@ class CensusEmployee < CensusMember
 
     def employee_dependent_age_off_termination(new_date)
       if new_date.mday == 1
+        
+        employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
         Person.all_employee_roles.each do |person|
+          begin
+          employee_roles = person.active_employee_roles.reject{|role| employer_ids.include?(role.employer_profile_id) } 
+          next if employee_roles.empty?
           if person.person_relationships.present?
-            person.person_relationships.each do |relation|
-              if relation.kind == "child"
-                id = relation.relative_id.to_s
-                dep =  Person.where(_id: id).first
-                age = new_date.year - dep.dob.year - ((new_date.month > dep.dob.month || (new_date.month == dep.dob.month && new_date.day >= dep.dob.day)) ? 0 : 1)
-                if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && ((new_date.month == 12) || (new_date.month == dep.dob.month))
-                  hbx_enrollment = dep.families.first.active_household.hbx_enrollments.where(aasm_state: "coverage_selected" || "coverage_enrolled", kind: "employer_sponsored").last
-                  next if (hbx_enrollment.nil? || hbx_enrollment.benefit_group.is_congress?)
-                  employee_role = hbx_enrollment.employee_role 
-                  if hbx_enrollment.hbx_enrollment_members.present? && hbx_enrollment.hbx_enrollment_members.any? {|member| member.person.id.to_s == id}
-                    ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination")
+            relations = person.person_relationships.select{|relation| relation.kind == 'child'}
+            aged_off_dependents = []
+            relations.select do |relation|
+              id = relation.relative_id.to_s
+              dep =  Person.where(_id: id).first
+              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26
+                aged_off_dependents << dep
+                next if aged_off_dependents.empty?
+                employee_roles.each do |employee_role|
+                  enrollments = person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id).enrolled
+                  enrollments.each do |en|
+                    covered_members = (en.hbx_enrollment_members.map{|member| member.person} && aged_off_dependents)
+                    if new_date.month == 12 || covered_members.any?{|cm| new_date.month ==  cm.dob.month}
+                      ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "employee_dependent_age_off_termination")
+                      break
+                    end
                   end
                 end
               end
             end
+          end
+          rescue Exception => e
+            puts "#{person.full_name}, #{person.hbx_id} #{e.message}"
           end
         end
       end
