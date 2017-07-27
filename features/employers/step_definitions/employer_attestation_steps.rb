@@ -1,4 +1,3 @@
-
 Then (/^Employer Staff should see dialog with Attestation warning$/) do
   wait_for_ajax(3,2)
   expect(page).to have_content('Force Publish')
@@ -155,4 +154,24 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
+end
+
+Then(/^Employer clicks delete in actions$/) do
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]/div/ul/li[2]/a').click
+end
+
+Then(/^Employer should see disabled delete button in actions$/) do
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]').click
+ find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]/div/ul/li[2]/a')['disabled'] == "disabled"
+end
+
+Then(/^Employer should not see submitted document$/) do
+   find('.interaction-click-control-documents').trigger('click')
+   expect(page).to have_content('No data available in table')
+end
+
+Then(/^Employer should see Accepted document$/) do
+  wait_for_ajax
+  expect(page).to have_content('Accepted')
 end

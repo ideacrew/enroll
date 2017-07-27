@@ -1,23 +1,24 @@
-  <div class="col-xs-8">
-    <h1>Verification of Employer Eligibility</h1>
-  </div>
+<div class="col-xs-8">
+  <h1>Verification of Employer Eligibility</h1>
+</div>
 
-  <div class="col-xs-10">
+<div class="col-xs-12">
     <h4>Before you can complete your application, you will need to submit proof of your eligibility to shop as a small business through the <%= Settings.site.short_name %>. You will need to submit this proof before you are able to finalize your plan year.</h4>
     <h4> Please review our list of <%= link_to "documents that can be used as proof", "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist" %> and ensure that you have the right documentation available.
     </h4>
-<div class="col-xs-10">
+
+  <div class="col-xs-10">
     <%if @employer_profile.employer_attestation %>
 <!--       <button class = "btn btn-danger" ><%#= @employer_profile.employer_attestation.aasm_state %></button> -->
-  <%end%>
-</div>
+    <%end%>
+  </div>
 
-<div class="col-xs-10 upload-document upload-document-location">
-  <div class="row">
-    <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{ (@employer_profile.employer_attestation.aasm_state == 'unsubmitted' or @employer_profile.employer_attestation.aasm_state == 'pending')  ? 'btn-default' : 'btn-default disabled' }" %>
+  <div class="col-xs-10 upload-document upload-document-location">
+    <div class="row">
+      <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{ (@employer_profile.employer_attestation.aasm_state == 'unsubmitted' or @employer_profile.employer_attestation.aasm_state == 'pending')  ? 'btn-default' : 'btn-default disabled' }" %>
+    </div>
   </div>
 </div>
-
 
 <div class= "effectivedatatable">
   <%= render_datatable(@datatable) %>
@@ -28,11 +29,12 @@
           <div class="document-modal-body">
             <h4>MA DOR FORM-X</h4>
             <p class='document-modal-buttons'>
-              <a href="<%= employers_employer_attestation_authorized_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" target="_blank"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+               <% key, bucket = get_key_and_bucket(doc.identifier) %>
+               <a href="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>" ><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
               <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
             </p>
             <p id="print_<%=doc.id%>">
-              <iframe src="<%= employers_employer_attestation_authorized_download_path(doc.id) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
+              <iframe src="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
             </p>
           </div>
         </div>
@@ -45,14 +47,12 @@
     initializeDataTables();
     jQuery('.buttons-csv').hide();
     jQuery('.buttons-excel').hide();
-
     function printDoc(id){
         var window_obj=window.open();
         window_obj.document.write($('#print_'+id).html());
         window_obj.print();
         window_obj.close();
     }
-
     $(".icon_info").tooltip();
     //There is no css scope mentioned which is affecting the entire a[dat-remote=true] please use the scope like $('.upload-document a[data-remote=true]').
     $(function(){

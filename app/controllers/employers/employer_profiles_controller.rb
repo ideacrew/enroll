@@ -347,6 +347,17 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
+def delete_attestation_documents
+    @employer_profile = EmployerProfile.find(params[:id])
+    begin
+      @employer_profile.employer_attestation.employer_attestation_documents.any_in(:_id =>params[:ids],:aasm_state => "submitted").destroy_all
+      @employer_profile.employer_attestation.update_attribute('aasm_state','unsubmitted')
+      render js: "window.location.href = '#{employers_employer_profile_path(:id => @employer_profile) + '?tab=documents'}'"
+    rescue => e
+      render json: { status: 500, message: 'An error occured while deleting the employer attestation' }
+    end
+  end
+
   def counties_for_zip_code
       params.permit([:zip_code])
       @counties = RatingArea.find_counties_for(zip_code: params[:zip_code])

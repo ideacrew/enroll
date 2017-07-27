@@ -5,7 +5,7 @@ module Effective
 
         bulk_actions_column do
           #bulk_action 'Download', download_documents_employers_employer_profile_path, data: {  confirm: 'Do you want to Download?', no_turbolink: true }
-          bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
+          # bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
         end
 
         table_column "Doc Status", :proc => Proc.new { |row|
@@ -20,13 +20,21 @@ module Effective
           raw(icon) + row.aasm_state.humanize 
         }, :filter => false, :sortable => false
         table_column :name, :label => 'Doc Name', :proc => Proc.new { |row|
-          link_to raw('<i class="fa fa-file-text-o pull-left"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", 'class' => 'pull-left'
+          link_to raw('<i class="fa fa-file-text-o pull-left"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", "class" => "word-break-attestation"
         }, :filter => false, :sortable => false
         table_column :type, :label => 'Doc Type',:proc => Proc.new { |row|
            'Employer Attestation'
         }, :filter => false, :sortable => false
         table_column :size, :proc => Proc.new { |row| number_to_human_size(row.size, precision: 2) }, :filter => false, :sortable => false
         table_column :date, :label => 'Submitted At', :proc => Proc.new { |row| TimeKeeper.local_time(row.created_at).strftime('%m/%d/%Y %I:%M%p') }, :filter => false, :sortable => false
+        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+           key, bucket = get_key_and_bucket(row.identifier)
+          dropdown = [
+           ['Download',  document_download_path(bucket, key)+ "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
+           ['Delete', delete_attestation_documents_employers_employer_profile_path(@employer_profile,:ids=>[row.id]), row.aasm_state == 'submitted' ? 'ajax with confirm' : 'disabled',  'Do You want to Delete this document?']
+          ]
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
+        }, :filter => false, :sortable => false
       end
 
 

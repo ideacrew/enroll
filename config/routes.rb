@@ -280,7 +280,7 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
-
+        get 'delete_attestation_documents'
       end
 
       collection do
