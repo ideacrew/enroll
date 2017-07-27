@@ -17,7 +17,6 @@ RSpec.describe "insured/thankyou.html.erb" do
       @reference_plan = @benefit_group.reference_plan
       allow(@enrollment).to receive(:employee_role).and_return(true)
       allow(@enrollment).to receive(:is_shop?).and_return(true)
-      allow(@enrollment).to receive(:benefit_package_name).and_return('benefit_package')
       allow(@plan).to receive(:carrier_profile).and_return(carrier_profile)
       @plan = PlanCostDecorator.new(@plan, @enrollment, @benefit_group, @reference_plan)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
@@ -39,13 +38,6 @@ RSpec.describe "insured/thankyou.html.erb" do
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to match('Market')
       expect(rendered).to match('Employer Sponsored')
-    end
-
-    it "should have benefit_package" do
-      allow(@enrollment).to receive(:is_cobra_status?).and_return(false)
-      render :template => "insured/plan_shoppings/thankyou.html.erb"
-      expect(rendered).to match('Benefit Package:')
-      expect(rendered).to match('benefit_package')
     end
 
     it "should have cobra msg" do

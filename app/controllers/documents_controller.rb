@@ -32,25 +32,18 @@ class DocumentsController < ApplicationController
 
   def update_verification_type
     v_type = params[:verification_type]
-    if v_type == "Social Security Number"
-      @person.consumer_role.update_attributes(:ssn_validation => "valid",
-                                              :ssn_update_reason => params[:verification_reason])
-    elsif v_type == "American Indian Status"
-      @person.consumer_role.update_attributes(:native_validation => "valid",
-                                              :native_update_reason => params[:verification_reason])
+    update_reason = params[:verification_reason]
+    admin_action = params[:admin_action]
+    if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
+      verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
+      message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
+      flash_message = { :success => message}
     else
-      @person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
-      @person.consumer_role.update_attributes(:lawful_presence_update_reason =>
-                                             {:v_type => v_type,
-                                              :update_reason => params[:verification_reason]
-                                             } )
+      flash_message = { :error => "Please provide a verification reason."}
     end
-    @person.consumer_role.verify_ivl_by_admin if @person.all_types_verified?
+
     respond_to do |format|
-      format.html {
-        flash[:notice] = "Verification successfully approved."
-        redirect_to :back
-      }
+      format.html { redirect_to :back, :flash => flash_message }
     end
   end
 
@@ -78,7 +71,7 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    @person.consumer_role.start_individual_market_eligibility!(TimeKeeper.date_of_record)
+    @person.consumer_role.redetermine!(verification_attr)
     respond_to do |format|
       format.html {
         flash[:success] = "Request was sent to FedHub."

@@ -65,8 +65,8 @@ class LawfulPresenceDetermination
     approval_information = args.first
     self.update_attributes!(vlp_verified_at: approval_information.determined_at,
                             vlp_authority: approval_information.vlp_authority)
-    if approval_information.citizen_status
-      self.citizenship_result = approval_information.citizen_status
+    if approval_information.citizenship_result
+      self.citizenship_result = approval_information.citizenship_result
     else
       self.ivl_role.is_native? ? self.citizenship_result = "us_citizen" : self.citizenship_result = "non_native_citizen"
     end
@@ -92,6 +92,7 @@ class LawfulPresenceDetermination
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
+      event: aasm.current_event,
       transition_at: Time.now
     )
   end

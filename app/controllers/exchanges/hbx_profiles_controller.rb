@@ -1,5 +1,7 @@
 class Exchanges::HbxProfilesController < ApplicationController
   include DataTablesAdapter
+  include DataTablesSearch
+  include Pundit
   include SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
@@ -207,6 +209,7 @@ def employer_poc
   end
 
   def add_sep_form
+    authorize HbxProfile, :can_add_sep?
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
   end
@@ -214,6 +217,17 @@ def employer_poc
   def show_sep_history
     getActionParams
     @element_to_replace_id = params[:family_actions_id]
+  end
+
+  def get_user_info
+    @element_to_replace_id = params[:family_actions_id] || params[:employers_action_id]
+    if params[:person_id].present?
+      @person = Person.find(params[:person_id])
+    else
+      @employer_actions = true
+      @people = Person.where(:id => { "$in" => (params[:people_id] || []) })
+      @organization = Organization.find(@element_to_replace_id.split("_").last)
+    end
   end
 
   def update_effective_date
@@ -260,7 +274,7 @@ def employer_poc
           hbx.cancel_coverage! if hbx.may_cancel_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -275,7 +289,7 @@ def employer_poc
   end
 
   def terminate_enrollment
-    @hbxs = Family.find(params[:family]).all_enrollments.cancel_eligible
+    @hbxs = Family.find(params[:family]).all_enrollments.can_terminate
     @row = params[:family_actions_id]
     respond_to do |format|
       format.js { render "datatables/terminate_enrollment" }
@@ -295,7 +309,7 @@ def employer_poc
           hbx.terminate_coverage!(termination_date) if hbx.may_terminate_coverage?
           @result[:success] << hbx
         rescue
-          @result[:error] << hbx
+          @result[:failure] << hbx
         end
       end
       set_transmit_flag(params[key.to_s]) if key.to_s[/transmit_hbx_.*/]
@@ -384,20 +398,18 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    families = []
     all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-    if dt_query.search_string.blank?
-      families = all_families
-    else
-      person_ids = Person.search(dt_query.search_string).pluck(:id)
-      families = all_families.where({
-        "family_members.person_id" => {"$in" => person_ids}
-      })
-    end
+
+    families = search_families(dt_query.search_string, all_families)
+
+    sorted_by, order = input_sort_request
+
+    families = sorted_families(sorted_by, order, families)
+
     @draw = dt_query.draw
     @total_records = all_families.count
     @records_filtered = families.count
-    @families = families.skip(dt_query.skip).limit(dt_query.take)
+    @families = families[dt_query.skip, dt_query.take]
     render
   end
 
@@ -604,19 +616,16 @@ private
       insured_email = insured.emails.last.try(:address) || insured.try(:user).try(:email)
       root = 'http://' + request.env["HTTP_HOST"]+'/exchanges/agents/resume_enrollment?person_id=' + params[:person] +'&original_application_type:'
       body =
-        "Please contact #{insured.first_name} #{insured.last_name}. <br/> " +
-        "Plan Shopping help request from Person Id #{insured.id}, email #{insured_email}.<br/>" +
-        "Additional PII is SSN #{insured.ssn} and DOB #{insured.dob}.<br>" +
+        "Please contact #{insured.first_name} #{insured.last_name}. <br> " +
+        "Plan shopping help has been requested by #{insured_email}<br>" +
         "<a href='" + root+"phone'>Assist Customer</a>  <br>"
     else
       first_name = params[:first_name]
       last_name = params[:last_name]
       name = first_name.to_s + ' ' + last_name.to_s
       insured_email = params[:email]
-      body =  "Please contact #{first_name} #{last_name}. <br/>" +
+      body =  "Please contact #{first_name} #{last_name}. <br>" +
         "Plan shopping help has been requested by #{insured_email}<br>"
-      body += "SSN #{params[:ssn]} <br>" if params[:ssn].present?
-      body += "DOB #{params[:dob]} <br>" if params[:dob].present?
     end
     hbx_profile = HbxProfile.find_by_state_abbreviation('DC')
     message_params = {

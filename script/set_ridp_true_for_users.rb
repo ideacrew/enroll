@@ -1,8 +1,8 @@
 # we still need this commented out code.
 
-# def curam_user?(family)
-#   family.e_case_id.present? && !(family.e_case_id.include? "curam_landing") if family.present?
-# end
+def curam_user?(family)
+  family.e_case_id.present? && !(family.e_case_id.include? "curam_landing") if family.present?
+end
 
 # def user_having_enrollments?(person)
 #   if person.primary_family.present? && person.primary_family.active_household.present?
@@ -29,14 +29,14 @@
 
 # Addressing records imported from curam on 10/11/2015
 
-start_date = Date.new(2015,10,10)
-end_date = Date.new(2015,10,12)
+# start_date = Date.new(2015,10,10)
+start_date = Date.new(2015,10,11)
 count = 0
-Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date, "$lt" => end_date}, :user => {:$exists => true}).each do |person|
+Person.all_consumer_roles.where(:"created_at" => { "$gt" => start_date }, :user => {:$exists => true}).each do |person|
   begin
     if !person.user.identity_verified?
-      if person.primary_family.present? && person.primary_family.active_household.present?
-        person.user.update_attributes(:identity_final_decision_code => User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE, :identity_response_description_text => 'curam_data_migration')
+      if curam_user?(person.primary_family)
+        person.user.ridp_by_payload!
         puts "updated RIDP status for person FirstName: #{person.first_name} LastName: #{person.last_name} Hbx_Id: #{person.hbx_id}"
         count +=1
       end
