@@ -47,6 +47,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
             @application.submit!
             publish_application(@application)
           end
+
           dummy_data_for_demo(params) if @application.complete? #For_Populating_dummy_ED_for_DEMO
           redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
         else
@@ -65,12 +66,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def publish_application(application)
-    response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
-    notify("acapi.info.events.assistance_application.submitted",
-              {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => response_payload,
-                :family_id => application.family_id.to_s,
-                :application_id => application._id.to_s})
+    payload = generate_payload(application)
+    if application.is_schema_valid?(Nokogiri::XML.parse(payload))
+      notify("acapi.info.events.assistance_application.submitted",
+                {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                  :body => payload,
+                  :family_id => application.family_id.to_s,
+                  :application_id => application._id.to_s})
+    else
+      # handle case where schema is invalid
+    end
+  end
+
+  def generate_payload application
+    render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
   end
 
   def copy
