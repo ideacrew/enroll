@@ -17,7 +17,6 @@ class ShopEmployerNotices::InitialEmployerIneligibilityNotice < ShopEmployerNoti
     plan_year = employer_profile.plan_years.first
 
     plan_year_warnings = []
-    binding.pry
     if plan_year
       if plan_year.enrollment_errors.key?(:enrollment_ratio)
         plan_year_warnings << "At least 75% of your eligible employees enrolled in your group health coverage or waive due to having other coverage."
