@@ -28,7 +28,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
       })
 
     hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record) }
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
     notice.enrollment = PdfTemplates::Enrollment.new({
               :effective_on => bc_period.start_on,
               :plan_year => bc_period.start_on.year,
