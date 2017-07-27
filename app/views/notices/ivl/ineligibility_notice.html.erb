@@ -27,7 +27,7 @@
   <% notice.individuals.each do |ivl|%>
     <%= render partial: 'notices/shared/info_table', locals: {
                                  rows: [['Household Member:', "#{ivl.first_name} Age: #{ivl.age}"],
-                                    ['Does not qualify for Medicaid or private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join('In Addition, ')}. If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}."]],
+                                    ['Does not qualify for Medicaid or private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{Settings.contact_center.phone_number}."]],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end %>
 <% else %>
@@ -62,11 +62,11 @@ content: "If you have questions or concerns, we’re here to help.<br></br>The #
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
 "<i>Exchange Regulations</i>",
-"General Eligibility Standards for Exchange Participation and Affordability Programs: 45 CFR § 155.305",
-"Eligibility Appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
+"General Eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
+"Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
 "Requirement to report changes: 45 CFR § 155.3330(b)",
 "<i>Medicaid Regulations</i>",
-"State Residence: 42 CFR § 435.403",
-"Citizenship and Non-Citizenship Eligibility: 42 CFR § 435.406",
-"Medicaid Determination of Eligibility: 42 CFR § 435.911",
-"Eligibility for Medical Assistance Programs: 42 C.F.R. § 435.945(a) and (b)"]} %>
+"State residence: 42 CFR § 435.403",
+"Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+"Medicaid determination of eligibility: 42 CFR § 435.911",
+"Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)"]} %>

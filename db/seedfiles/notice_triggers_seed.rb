@@ -873,8 +873,8 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVL_ELIGA',
-    title: 'Eligibilty notice',
+    hbx_id: 'IVL_ELA',
+    title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
     description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
     resource_name: 'consumer_role',
     event_name: 'eligibility_notice',
@@ -883,7 +883,7 @@ ivl_notice_triggers = [
         name: 'Eligibilty Notice',
         notice_template: 'notices/ivl/eligibility_notice',
         notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
-        mpi_indicator: 'IVL_ELIGA',
+        mpi_indicator: 'IVL_ELA',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -894,8 +894,8 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVL_INELIGA',
-    title: 'Ineligibilty notice',
+    hbx_id: 'IVL_NEL',
+    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
     description: 'Notice will be sent to the household if everyone in the household is ineligible',
     resource_name: 'consumer_role',
     event_name: 'ineligibility_notice',
@@ -904,7 +904,7 @@ ivl_notice_triggers = [
         name: 'Ineligibilty Notice',
         notice_template: 'notices/ivl/ineligibility_notice',
         notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
-        mpi_indicator: 'IVL_INELIGA',
+        mpi_indicator: 'IVL_NEL',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
