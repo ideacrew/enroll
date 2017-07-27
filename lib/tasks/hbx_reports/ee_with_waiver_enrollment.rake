@@ -27,8 +27,8 @@ namespace :reports do
             if person.primary_family.present? && person.primary_family.households.first.hbx_enrollments.count > 1
               hbx_enrollments = person.primary_family.households.first.hbx_enrollments
               aasm_states = hbx_enrollments.map(&:aasm_state)
-              if (aasm_states.include? "coverage_canceled") && (aasm_states.include? "inactive" || "renewing_waived")
-                waived_enrollment = hbx_enrollments.where(aasm_state: "inactive" || "renewing_waived").first
+              if (aasm_states.include? "coverage_canceled") && ((aasm_states.include? "inactive") || (aasm_states.include? "renewing_waived"))
+                waived_enrollment = hbx_enrollments.where(:aasm_state.in => ["inactive", "renewing_waived").first
                 waived_plan_year = waived_enrollment.benefit_group.plan_year.id.to_s
                 hbx_enrollments.where(aasm_state: "coverage_canceled").each do |canceled_enrollment|
                   if waived_plan_year == canceled_enrollment.benefit_group.plan_year.id.to_s
