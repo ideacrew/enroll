@@ -1,8 +1,7 @@
 <% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>" />
-<input type="hidden" id="employerMinFamilyContribution" data-value="<%= aca_shop_market_employer_family_contribution_percent_minimum %>"
+
 <%= form_for @plan_year, url: employers_employer_profile_plan_years_path do |f| %>
   <%= render 'form', f: f %>
 <% end %>

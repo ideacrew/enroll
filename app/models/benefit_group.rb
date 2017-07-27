@@ -739,12 +739,13 @@ class BenefitGroup
     if start_on.month == 1 && start_on.day == 1
     else
       if self.sole_source?
+        pp 'validating?'
         unless composite_tier_contributions.present?
           self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
         else
           employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
 
-          if aca_shop_market_employer_contribution_percent_minimum >= (employee_tier.try(:employer_contribution_percent) || 0)
+          if aca_shop_market_employer_contribution_percent_minimum > (employee_tier.try(:employer_contribution_percent) || 0)
             self.errors.add(:composite_tier_contributions,
             "Employer contribution for employee must be ≥ #{aca_shop_market_employer_contribution_percent_minimum}%")
           else
