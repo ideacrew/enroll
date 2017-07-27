@@ -145,7 +145,7 @@
 
   <ul class="list-unstyled list-right-section">
     <li>
-      <%= link_to financial_assistance_application_path(@application) do %>
+      <%= link_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id) do %>
         <%= image_tag 'icons/list.png' %> PREVIOUS
       <% end %>
     </li>
