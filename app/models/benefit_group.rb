@@ -739,7 +739,6 @@ class BenefitGroup
     if start_on.month == 1 && start_on.day == 1
     else
       if self.sole_source?
-        pp 'validating?'
         unless composite_tier_contributions.present?
           self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
         else
