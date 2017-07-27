@@ -133,6 +133,11 @@ class FinancialAssistance::Application
     SUBMITTED_STATUS.include?(aasm_state)
   end
 
+  def is_family_totally_ineligibile
+    applicants.each { |applicant| return false unless applicant.is_totally_ineligible }
+    return true
+  end
+
   # Whether {User} account for Primary Applicant has succussfully completed
   # Remote Identity Proofing (RIDP) verification process
   # @return [ true, false ] true if RIDP verification is complete, false if not
