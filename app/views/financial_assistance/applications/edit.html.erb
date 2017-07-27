@@ -1,0 +1,22 @@
+<div class='col-md-7'>
+  <% content_for :primary_member_fa do %>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+        <%= render "financial_assistance_row", applicant: @application.primary_applicant %>
+      </div>
+    </div>
+  <% end %>
+
+  <% @application.applicants.each do |applicant| %>
+    <% content_for "person_#{applicant.person.id}" do %>
+      <div class="row row-form-wrapper no-buffer">
+        <%= render "financial_assistance_row", applicant: applicant %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render partial: 'insured/family_members/family_members' %>
+</div>
+<div class='col-md-2'>
+  <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
+</div>

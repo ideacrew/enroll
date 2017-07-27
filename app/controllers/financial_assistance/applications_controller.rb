@@ -1,5 +1,4 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
-
   before_action :set_current_person
 
   include UIHelpers::WorkflowController

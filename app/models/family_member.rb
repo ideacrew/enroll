@@ -151,7 +151,7 @@ class FamilyMember
     end
   end
 
-  private 
+  private
 
   def no_duplicate_family_members
     return unless family
