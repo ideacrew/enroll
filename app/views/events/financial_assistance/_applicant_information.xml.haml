@@ -6,7 +6,8 @@
 - if applicant.is_required_to_file_taxes.present?
   %is_required_to_file_taxes= applicant.is_required_to_file_taxes
 %tax_filer_type= "urn:openhbx:terms:v1:tax_filer##{applicant.tax_filer_kind}"
-%is_joint_tax_filing= applicant.is_joint_tax_filing
+- if applicant.is_joint_tax_filing.present?
+  %is_joint_tax_filing= applicant.is_joint_tax_filing
 %is_claimed_as_tax_dependent= applicant.is_claimed_as_tax_dependent
 %has_insurance= applicant.is_enrolled_in_insurance?
 - if (applicant.had_prior_insurance?).present?
