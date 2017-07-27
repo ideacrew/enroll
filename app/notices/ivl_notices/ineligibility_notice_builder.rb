@@ -14,6 +14,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_taglines
     # attach_voter_application
     # prepend_envelope
     upload_and_send_secure_message
@@ -67,8 +68,8 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465." if lawful_presence_outstanding?(person)
 
     PdfTemplates::Individual.new({
-      first_name: person.first_name,
-      full_name: person.full_name,
+      first_name: person.first_name.titleize,
+      full_name: person.full_name.titleize,
       :age => person.age_on(TimeKeeper.date_of_record),
       :reason_for_ineligibility =>  reason_for_ineligibility
     })
