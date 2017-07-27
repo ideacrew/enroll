@@ -24,9 +24,9 @@ Rails.application.routes.draw do
   resources :users do
     resources :security_question_responses, controller: "users/security_question_responses"
     member do
+      get :reset_password, :lockable, :confirm_lock
+      put :confirm_reset_password
       post :unlock
-      get :lockable
-      get :confirm_lock
     end
   end
 
