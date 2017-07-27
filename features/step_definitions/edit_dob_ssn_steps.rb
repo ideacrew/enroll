@@ -1,5 +1,11 @@
 Then(/^Hbx Admin should see the list of primary applicants and an Action button$/) do
   within('.effective-datatable') do
+    expect(page).to have_css('.dropdown-toggle', count: 1)
+  end
+end
+
+Then(/^Hbx Admin should see the list of user accounts and an Action button$/) do
+  within('.effective-datatable') do
     expect(page).to have_css('.dropdown-toggle', count: 2)
   end
 end

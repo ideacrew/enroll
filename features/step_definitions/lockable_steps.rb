@@ -11,11 +11,11 @@ Then(/^there are (\d+) preloaded user accounts without email$/) do |num|
   end
 end
 
-Then(/^Hbx Admin should see (.*?) link$/) do |text|
+Then(/^Hbx Admin should see (.*?) link on user accounts page$/) do |text|
   find_link(text).visible?
 end
 
-When(/^Hbx Admin clicks on (.*?) link$/) do |link|
+When(/^Hbx Admin clicks on (.*?) link on user accounts page$/) do |link|
   click_link(link)
   wait_for_ajax
 end

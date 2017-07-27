@@ -654,6 +654,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # TODO: fix this bombing issue
   wait_for_ajax
   page.evaluate_script("window.location.reload()")
+  wait_for_ajax
   person = people[named_person]
   screenshot("before modal")
   # find('.interaction-click-control-click-here').click

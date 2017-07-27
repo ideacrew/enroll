@@ -7,10 +7,10 @@ Feature: Reset password of user
     When Hbx Admin logs on to the Hbx Portal
     Then there are 1 preloaded unlocked user accounts
     When Hbx Admin clicks on the User Accounts tab
-    Then Hbx Admin should see the list of primary applicants and an Action button
+    Then Hbx Admin should see the list of user accounts and an Action button
     When Hbx Admin clicks on the Action button
-    Then Hbx Admin should see Reset Password link
-    When Hbx Admin clicks on Reset Password link
+    Then Hbx Admin should see Reset Password link on user accounts page
+    When Hbx Admin clicks on Reset Password link on user accounts page
     Then there is a confirm button should be visible
     When I click on the confirm button
     Then the reset password email should be sent to the user
@@ -21,10 +21,10 @@ Feature: Reset password of user
     When Hbx Admin logs on to the Hbx Portal
     Then there are 1 preloaded user accounts without email
     When Hbx Admin clicks on the User Accounts tab
-    Then Hbx Admin should see the list of primary applicants and an Action button
+    Then Hbx Admin should see the list of user accounts and an Action button
     When Hbx Admin clicks on the Action button
-    Then Hbx Admin should see Reset Password link
-    When Hbx Admin clicks on Reset Password link
+    Then Hbx Admin should see Reset Password link on user accounts page
+    When Hbx Admin clicks on Reset Password link on user accounts page
     Then there is a text field should be visible
     When I click on the confirm button
     Then an error Please enter a valid email should be raised
