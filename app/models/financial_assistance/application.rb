@@ -21,6 +21,7 @@ class FinancialAssistance::Application
 
   SUBMITTED_STATUS  = %w(submitted verifying_income)
 
+  FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
   # TODO: Need enterprise ID assignment call for Assisted Application
   field :hbx_id, type: String
@@ -333,6 +334,18 @@ class FinancialAssistance::Application
     is_application_valid? # && check for the validity of applicants too.
   end
 
+  def is_schema_valid?(faa_doc)
+    return false if faa_doc.blank?
+    faa_xsd = Nokogiri::XML::Schema(File.open FAA_SCHEMA_FILE_PATH)
+    if faa_xsd.valid?(faa_doc)
+      true
+    else
+      false
+      #faa_doc.present? ? message = "FAA doc - #{faa_doc.to_xml}" : message = "FAA doc is nil"
+      #raise "#{faa_xsd.validate(faa_doc)}"
+    end
+  end
+
   def ready_for_attestation?
     application_valid = is_application_ready_for_attestation?
     # && chec.k for the validity of all applicants too.
@@ -529,7 +542,7 @@ private
 
   def set_request_kind
     #TODO: Populate correct request kind
-    write_attribute(:request_kind, "request_kind_placeholder")
+    write_attribute(:request_kind, "placeholder")
   end
 
   def set_motivation_kind
