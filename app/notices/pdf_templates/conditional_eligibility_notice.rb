@@ -231,7 +231,7 @@ module PdfTemplates
       #check CSR condition
       if (ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100)
         flag = true
-        block << "#{ivl.first_name} qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the income limit of $#{ivl.tax_household.csr_annual_income_limit}. With a silver plan, #{ivl.first_name} will get a discount on what they pay for medical services."
+        block << "#{ivl.first_name} qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of $#{ivl.tax_household.aptc_csr_annual_household_income} is within the income limit of $#{ivl.tax_household.csr_annual_income_limit}. With a silver plan, #{ivl.first_name} will get a discount on out-of-pocket costs for medical services."
       end
       if ivl.indian_conflict == true
         flag = true
@@ -271,7 +271,7 @@ module PdfTemplates
       flag = false
       if ivl.is_totally_ineligible
         flag = true
-        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{reason_for_ineligibility}.join('In addition, ')If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at (855) 532-5465."
+        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl.reason_for_ineligibility}.join('In addition, ')If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at (855) 532-5465."
       end
       ineligible_for_medicaid << block if flag == true
       rows << ineligible_for_medicaid if ineligible_for_medicaid.count > 1
