@@ -29,7 +29,7 @@ class EmployeeTerminatingCoverage < Notice
     terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
       :terminated_on => terminated_enrollment.set_coverage_termination_date,
-      :dependents_count => terminated_enrollment.humanized_dependent_summary
+      :enrolled_count => terminated_enrollment.humanized_dependent_summary
       })
   end
 
@@ -88,7 +88,7 @@ class EmployeeTerminatingCoverage < Notice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
-    
+
     notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,
