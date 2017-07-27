@@ -351,7 +351,7 @@ class BrokerRole
     @employers.each do |e|
       e.fire_broker_agency
       # Remove General Agency
-      e.fire_general_agency!
+      e.fire_general_agency!(TimeKeeper.datetime_of_record)
     end
     # Remove broker from families
     if has_broker_agency_profile?
