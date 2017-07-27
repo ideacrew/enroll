@@ -738,9 +738,26 @@ class BenefitGroup
     # all employee contribution < 50% for 1/1 employers
     if start_on.month == 1 && start_on.day == 1
     else
-      if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < Settings.aca.shop_market.employer_contribution_percent_minimum
-        unless self.sole_source?
-          self.errors.add(:relationship_benefits, "Employer contribution must be ≥ 50% for employee")
+      if self.sole_source?
+        unless composite_tier_contributions.present?
+          self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
+        else
+          employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
+
+          if aca_shop_market_employer_contribution_percent_minimum >= (employee_tier.try(:employer_contribution_percent) || 0)
+            self.errors.add(:composite_tier_contributions,
+            "Employer contribution for employee must be ≥ #{aca_shop_market_employer_contribution_percent_minimum}%")
+          else
+            family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
+            if family_tier.offered? &&
+              (family_tier.try(:employer_contribution_amount) || 0) < aca_shop_market_employer_family_contribution_percent_minimum
+                self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{aca_shop_market_employer_family_contribution_percent_minimum}")
+            end
+          end
+        end
+      else
+        if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < aca_shop_market_employer_contribution_percent_minimum
+          self.errors.add(:relationship_benefits, "Employer contribution must be ≥ #{aca_shop_market_employer_contribution_percent_minimum}% for employee")
         end
       end
     end

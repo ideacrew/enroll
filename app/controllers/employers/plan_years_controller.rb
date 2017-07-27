@@ -140,7 +140,16 @@ class Employers::PlanYearsController < ApplicationController
         if benefit_group.composite_tier_contributions.empty?
           benefit_group.build_composite_tier_contributions
         end
-        benefit_group.estimate_composite_rates
+        begin
+          benefit_group.estimate_composite_rates
+        rescue => e
+          flash[:error] = ""
+          benefit_group.errors[:composite_tier_contributions].each do |err|
+            flash[:error] << err
+          end
+          render action: 'new'
+          return
+        end
       end
     end
 
