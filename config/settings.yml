@@ -54,6 +54,7 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   dental_market_enabled: false
+  sole_source_only_enabled: false
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
 #
