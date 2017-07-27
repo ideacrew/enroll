@@ -20,7 +20,7 @@ module Subscribers
         Rails.logger.info "==================="
         Rails.logger.info "Enroll received nfp_statement_summary_success"
         Rails.logger.info xml.to_s
-        Rails.logger.info header.to_s
+        Rails.logger.info stringed_key_payload.to_s
         Rails.logger.info "==================="
 
         # ep = Organization.where("hbx_id" = > header[:customer_id]).first.employer_profile
