@@ -39,7 +39,7 @@
 
         </div>
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+          <div class="col-md-12 col-sm-12 col-xs-12 no-pd app_progress_bar">
             <%= render "financial_assistance_row", family_member: @family.primary_applicant %>
           </div>
         </div>
@@ -104,3 +104,10 @@
     </div>
   </div>
 </div>
+
+<script>
+  $("body").on("click", ".close_member_form", function () {
+      $(".append_consumer_info").html("");
+      $(".app_progress_bar").removeClass('hide');
+  });
+</script>
