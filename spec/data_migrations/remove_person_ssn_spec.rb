@@ -2,6 +2,7 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "remove_person_ssn")
 
 describe RemovePersonSsn do
+
   let(:given_task_name) { "remove_person_ssn" }
   subject { RemovePersonSsn.new(given_task_name, double(:current_scope => nil)) }
 
