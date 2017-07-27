@@ -232,9 +232,6 @@ var EmployerProfile = ( function( window, undefined ) {
     bgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     bgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     //TODO: brianweiner
-
-    //load family premium contribution sliders
-    //check similar to bgemployeepremiums except no need for dental
     //dont check if family premium contribution isnt offered
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
