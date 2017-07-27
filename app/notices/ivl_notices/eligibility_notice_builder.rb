@@ -14,6 +14,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_taglines
     # attach_voter_application
     # prepend_envelope
     upload_and_send_secure_message
@@ -80,8 +81,8 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
 
     PdfTemplates::Individual.new({
       tax_household: append_tax_households(applicant.tax_household),
-      first_name: applicant.person.first_name,
-      full_name: applicant.person.full_name,
+      first_name: applicant.person.first_name.titleize,
+      full_name: applicant.person.full_name.titleize,
       age: applicant.person.age_on(TimeKeeper.date_of_record),
       is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,
       is_ia_eligible: applicant.is_ia_eligible,

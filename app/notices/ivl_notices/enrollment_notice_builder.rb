@@ -29,9 +29,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def deliver
     build
-    # generate_pdf_notice
+    generate_pdf_notice
     attach_required_documents
-    # attach_blank_page
+    attach_blank_page
+    attach_taglines
     # attach_voter_application
     # prepend_envelope
     upload_and_send_secure_message
@@ -144,7 +145,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       plan: plan,
       enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
         enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name,
+          full_name: member.person.full_name.titleize,
           age: member.person.age_on(TimeKeeper.date_of_record)
         })
         enrollees << enrollee
