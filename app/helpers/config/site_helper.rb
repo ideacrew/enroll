@@ -27,6 +27,10 @@ module Config::SiteHelper
     Settings.site.help_url
   end
 
+  def site_faqs_url
+    Settings.site.faqs_url
+  end
+
   def site_short_name
     Settings.site.short_name
   end
