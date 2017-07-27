@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe EeSepRequestAcceptedNotice do
+RSpec.describe ShopEmployeeNotices::EeSepRequestAcceptedNotice do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -18,10 +18,10 @@ RSpec.describe EeSepRequestAcceptedNotice do
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'EE SEP Requested Accepted',
                             :notice_template => 'notices/ee_sep_request_accepted_notice',
-                            :notice_builder => 'EeSepRequestAcceptedNotice',
+                            :notice_builder => 'ShopEmployeeNotices::EeSepRequestAcceptedNotice',
                             :event_name => 'ee_sep_request_accepted_notice',
                             :mpi_indicator => 'MPI_SHOP36',
-                            :title => "EE SEP Requested by Employee Accepted"})
+                            :title => "Special Enrollment Period Approval"})
                           }
 
   let(:valid_params) {{
@@ -34,11 +34,11 @@ RSpec.describe EeSepRequestAcceptedNotice do
   describe "New" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = EeSepRequestAcceptedNotice.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.not_to raise_error
+        expect{ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe EeSepRequestAcceptedNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -55,29 +55,40 @@ RSpec.describe EeSepRequestAcceptedNotice do
   describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = EeSepRequestAcceptedNotice.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
     end
 
     it "should build notice with all necessory info" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq census_employee.employer_profile.staff_roles.first.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
-      expect(@employee_notice.notice.employee_fullname).to eq census_employee.full_name.titleize
     end
   end
 
   describe "append data" do
+    let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
+    let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 15)}
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+    let(:sep1) {family.special_enrollment_periods.new}
+    let(:sep2) {family.special_enrollment_periods.new}
+    let(:order) {[sep1,sep2]}
+
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = EeSepRequestAcceptedNotice.new(census_employee, valid_params)
+      allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
+      @employee_notice = ShopEmployeeNotices::EeSepRequestAcceptedNotice.new(census_employee, valid_params)
+      sep1.qle_on = qle_on
+      sep1.end_on = end_on
+      sep1.title = "rspec"
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
 
     it "should append data" do
       sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
       @employee_notice.append_data
-      expect(@employee_notice.notice.sep.qle_on).to eq sep.qle_on
-      expect(@employee_notice.notice.sep.end_on).to eq sep.end_on
-      expect(@employee_notice.notice.sep.title).to eq sep.title
+      expect(@employee_notice.notice.sep.qle_on).to eq qle_on
+      expect(@employee_notice.notice.sep.end_on).to eq end_on
+      expect(@employee_notice.notice.sep.title).to eq "rspec"
+    end
   end
 end
