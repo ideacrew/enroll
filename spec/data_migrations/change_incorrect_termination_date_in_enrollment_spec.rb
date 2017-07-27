@@ -46,10 +46,10 @@ describe ChangeIncorrectTerminationDateInEnrollment do
       subject.migrate
     end
 
-    it "should not modify hbx_enrollment not in terminated state" do
+    it "should modify hbx_enrollment not in terminated state" do
       enrollment = HbxEnrollment.by_hbx_id(enrollment_1.hbx_id).first
-      expect(enrollment.aasm_state).to eq "shopping"
-      expect(enrollment.terminated_on).to eq nil
+      expect(enrollment.aasm_state).to eq "coverage_terminated"
+      expect(enrollment.terminated_on).to eq TimeKeeper.date_of_record.next_month.beginning_of_month + 2.days
     end
 
   end
