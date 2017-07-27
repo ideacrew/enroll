@@ -67,6 +67,8 @@
 
           <%= f.hidden_field :invitation_id %>
           <br/>
+          <div class="recaptcha-error"></div>
+          <div class="recaptcha" id="captcha-widget"></div>
           <div class="actions text-center">
               <%= f.submit "Create account", class: "btn btn-primary btn-lg" %>
               <br/>
