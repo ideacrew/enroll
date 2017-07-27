@@ -33,11 +33,11 @@ module Config::AcaModelConcern
     end
 
     def aca_shop_market_employer_family_contribution_percent_minimum
-      @@aca_shop_market_family_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
+      @@aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
     end
 
     def aca_shop_market_employer_contribution_percent_minimum
-      @@aca_shop_market_employee_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
+      @@aca_shop_market_employer_contribution_percent_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
     end
 
     def individual_market_is_enabled?
