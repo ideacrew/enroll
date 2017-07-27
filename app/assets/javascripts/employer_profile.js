@@ -102,7 +102,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgfamilypremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
               editvalidatedbgfamilypremiums = false;
               editvalidated = false;
               return false;
@@ -113,7 +113,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -127,7 +127,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least 50%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -147,7 +147,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgfamilypremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
               editvalidatedbgfamilypremiums = false;
               editvalidated = false;
               return false;
@@ -158,7 +158,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -170,11 +170,11 @@ var EmployerProfile = ( function( window, undefined ) {
             if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               editvalidatedbgemployeepremiums = true
               validatedbgfamilypremiums = true
-              
+
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least 50%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
