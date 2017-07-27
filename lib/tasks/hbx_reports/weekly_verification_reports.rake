@@ -33,20 +33,19 @@ namespace :reports do
 
       row << fiels_names_1
 
-      def verified_succesfully_in_past_week(lpd, start_date, end_date)
-        event = lpd.workflow_state_transitions.where(from_state: "verification_pending", to_state: "verification_successful").first
+      def verified_succesfully_in_past_week(role, start_date, end_date)
+        event = role.workflow_state_transitions.where(to_state: "fully_verified").first
         (start_date.beginning_of_day..end_date.end_of_day).cover? event.transition_at if event.present?
       end
 
-      people = Person.all_consumer_roles.where({:"consumer_role.lawful_presence_determination.aasm_state" => "verification_successful",
-                                                  :"consumer_role.lawful_presence_determination.workflow_state_transitions.transition_at".gte => start_date.beginning_of_day,
-                                                    :"consumer_role.lawful_presence_determination.workflow_state_transitions.transition_at".lte => end_date.end_of_day})
+      people = Person.all_consumer_roles.where({:"consumer_role.workflow_state_transitions.transition_at".gte => start_date.beginning_of_day,
+                                                    :"consumer_role.workflow_state_transitions.transition_at".lte => end_date.end_of_day,
+                                                      :"consumer_role.workflow_state_transitions.to_state" => "fully_verified"})
 
       people.each do |person|
         begin
           consumer_role = person.consumer_role
-          lpd = consumer_role.lawful_presence_determination
-          if verified_succesfully_in_past_week(lpd, start_date, end_date)
+          if verified_succesfully_in_past_week(consumer_role, start_date, end_date)
             verified_count += 1
             verification_reasons = []
             person.verification_types.each do |v_type|
