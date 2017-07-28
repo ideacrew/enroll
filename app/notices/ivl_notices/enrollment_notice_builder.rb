@@ -11,16 +11,20 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def attach_required_documents
-    # attach_blank_page
     generate_custom_notice('notices/ivl/documents_section')
-    join_pdfs [notice_path, Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")]
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
   end
 
   def generate_custom_notice(custom_template)
     File.open(custom_notice_path, 'wb') do |file|
       file << self.pdf(custom_template)
     end
-    # clear_tmp
+    clear_tmp
+  end
+
+  def clear_tmp
+    File.delete(custom_notice_path)
   end
 
   def custom_notice_path
@@ -30,11 +34,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def deliver
     build
     generate_pdf_notice
+    attach_blank_page(notice_path)
     attach_required_documents
-    attach_blank_page
     attach_taglines
     # attach_voter_application
-    # prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -52,8 +55,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def build
     notice.mpi_indicator = self.mpi_indicator
-    check_for_unverified_individuals
+    notice.primary_identifier = recipient.hbx_id
     append_data
+    check_for_unverified_individuals
     notice.primary_fullname = recipient.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
@@ -63,6 +67,17 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
+  def append_data
+    family = recipient.primary_family
+    #temporary fix - in case of mutliple applications
+    latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
+    notice.assistance_year = latest_application.assistance_year
+    end
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+  end
 
   def check_for_unverified_individuals
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
@@ -78,8 +93,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end.uniq
 
     people = family_members.map(&:person).uniq
-    # people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-    # people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
 
     outstanding_people = []
     people.each do |person|
@@ -87,6 +100,11 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         outstanding_people << person
       end
     end
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    enrollments.each do |enrollment|
+      notice.enrollments << append_enrollment_information(enrollment)
+    end
+    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
@@ -110,21 +128,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: TimeKeeper.date_of_record+95.days, age: person.age_on(TimeKeeper.date_of_record) })
       end
     end
-  end
-
-  def append_data
-    family = recipient.primary_family
-    #temporary fix - in case of mutliple applications
-    latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
-    notice.assistance_year = latest_application.assistance_year
-
-    family.enrollments.enrolled_and_renewing.each do |enrollment|
-      notice.enrollments << append_enrollment_information(enrollment)
-    end
-    hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
-    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
   def append_enrollment_information(enrollment)

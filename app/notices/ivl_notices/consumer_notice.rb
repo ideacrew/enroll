@@ -75,7 +75,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
+    person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  end
+
+  def citizenship_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship')
   end
 
   def append_unverified_individuals(people)
@@ -86,6 +90,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
       if lawful_presence_outstanding?(person)
         notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
+      end
+
+      if citizenship_outstanding?(person)
+        notice.citizenship_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
       end
     end
   end

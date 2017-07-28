@@ -1,33 +1,44 @@
-<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
-
-<%= render partial: 'notices/shared/ivl_logo', :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>ACTION NEEDED</td>
-    </tr>
-    <tr>
-      <td><h3>Submit Documents to DC Health Link</h3></td>
-      <hr>
+      <td colspan="2" align="right"><a href=
+                                    "https://dchealthlink.com/"
+                                    target=
+                                    "_blank">
+                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top;", width: "100"  %>
+                                  </a></td>
     </tr>
   </tbody>
 </table>
-<% binding.pry %>
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Why am I being asked to submit documents to DC Health Link?"} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h1><b>ACTION NEEDED<b><h1></td>
+    </tr>
+    <tr>
+      <td><h1 style="margin-top: -15px">Submit Documents to <%= Settings.site.short_name %></h1>
+      <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through DC Health Link are eligible. [If APTC or CSR = YES]We’re also required to be sure that people who receive help paying for insurance are eligible for the help they’re receiving."} %>
+  content: "<strong>Why am I being asked to submit documents to #{Settings.site.short_name}?</strong>", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "When is the deadline to submit documents?", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "We need documents from you to verify what you told us on your application. We’re required by federal law to be sure that people who enroll in health insurance through #{Settings.site.short_name} are eligible. [If APTC or CSR = YES]We’re also required to be sure that people who receive help paying for insurance are eligible for the help they’re receiving.", top_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+ content: "<strong>When is the deadline to submit documents?</strong>", top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
    content: "The first deadline is <Soonest Document Due Date among household members>. Different people may have different deadlines. You should submit all your documents as soon as possible. If you do not return the documents by the deadline, you could lose your insurance or cost savings.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "How can I submit documents to DC Health Link?", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "<strong>How can I submit documents to #{Settings.site.short_name}?</strong>", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "There are 3 ways for you to submit the documents we need to make a final decision on your eligibility:", top_margin: '5px', bottom_margin: '5px'} %>
@@ -49,178 +60,184 @@
       Login to your account at dchealthlink.com. You can upload scanned copies of the documents directly to your account.
     </td>
     <td>
-      DC Health Link
+      <%= Settings.site.short_name%>
       Exchange Contact Center
       PO Box 44018
       Washington, DC 20026
-      <i>Be sure to write your DC Health Link ID (<HBX ID>) on each of the documents.</i>
+      <i>Be sure to write your <%= Settings.site.short_name%> ID <%= notice.primary_identifier %> on each of the documents.</i>
     </td>
     <td>
-      Bring the document(s) to any Economic Security Administration Office for help. You can call DC Health Link at (855) 532-5465 to find a location near you.
+      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name%> at (855) 532-5465 to find a location near you.
     </td>
   </tr>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "What if I have questions?", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "<strong>What if I have questions?</strong>", top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Call DC Health Link at (855) 532-5465.", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "Call #{Settings.site.short_name} at (855) 532-5465.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Which documents do I need to submit? ", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "<strong>Which documents do I need to submit?</strong>", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "We need documents for each person listed. Please scan or make a copy of the document you send to us. Do not give us the original.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <!-- SSN -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "<strong>Social Security Number:</strong> The Social Security Administration could not confirm that the social security number provided for the following applicant(s) is correct:", top_margin: '5px', bottom_margin: '5px'} %>
+<% if notice.ssa_unverified.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "<strong>Social Security Number:</strong> The Social Security Administration could not confirm that the social security number provided for the following applicant(s) is correct:", top_margin: '5px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '2px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "You must use a social security card to verify the social security number(s) you provided to us. If you do not have a social security number, or cannot find your card, we can help you obtain one. You may not need to provide a social security number if you have a confirmed religious objection.", top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "You must use a social security card to verify the social security number(s) you provided to us. If you do not have a social security number, or cannot find your card, we can help you obtain one. You may not need to provide a social security number if you have a confirmed religious objection."} %>
+<% end %>
 <!-- SSN -->
 
 <!-- Citizneship -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "Citizenship: We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+<% if notice.citizenship_unverified.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "Citizenship: We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.citizenship_unverified], top_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "There are two types of documents you can use to prove citizenship status. We call the two types “primary” and “secondary”. If you provide primary documentation, no other documents are needed. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must include a copy of an identification card that has a recent photo and other identifying information.", top_margin: '5px', bottom_margin: '5px'} %>
-<%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "Primary documentation: (Only one (1) is needed)", top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "There are two types of documents you can use to prove citizenship status. We call the two types “primary” and “secondary”. If you provide primary documentation, no other documents are needed. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must include a copy of an identification card that has a recent photo and other identifying information.", bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "PRIMARY DOCUMENTATION: (Only one (1) is needed)", top_margin: '5px'} %>
 
-<div style="display:block;">
-  <table class="total_table" border="0">
-    <tbody>
-      <tr>
-        <td>
-          <ul style="list-style: circle solid;">
-            <li>
-              US passport (expired passports are acceptable)
-            </li>
-          </ul>
-          <ul style="list-style: circle solid;">
-            <li>
-              Certificate of naturalization
-            </li>
-          </ul>
-          <ul style="list-style: circle solid;">
-            <li>
-              Certificate of citizenship
-            </li>
-          </ul>
-          <ul style="list-style: circle solid;">
-            <li>
-              Consular report of birth abroad of US citizen
-            </li>
-          </ul>
-          <ul style="list-style: circle solid;">
-            <li>
-              A valid driver’s license from a state that requires proof of citizenship and verification of social security number prior to issuance of the license
-            </li>
-          </ul>
-          <ul style="list-style: circle solid;">
-            <li>
-              A Tribal document issued by a federally recognized Tribe - for example, a Tribal enrollment card, certificate of degree of American Indian blood, or a Tribal census document, which must:
-              <ul>
-                <li>
-                  Identify the Tribe issuing the document;
-                </li>
-                <li>
-                  Identify the individual by name; and
-                </li>
-                <li>
-                  Confirm the individual’s enrollment in, or affiliation with the Tribe.
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <div style="display:block;">
+    <table class="total_table" border="0">
+      <tbody>
+        <tr>
+          <td>
+            <ul>
+              <li>
+                US passport (expired passports are acceptable)
+              </li>
+              <li>
+                Certificate of naturalization
+              </li>
+              <li>
+                Certificate of citizenship
+              </li>
+              <li>
+                Consular report of birth abroad of US citizen
+              </li>
+              <li>
+                A valid driver’s license from a state that requires proof of citizenship and verification of social security number prior to issuance of the license
+              </li>
+              <li>
+                A Tribal document issued by a federally recognized Tribe - for example, a Tribal enrollment card, certificate of degree of American Indian blood, or a Tribal census document, which must:
+                <ul>
+                  <li>
+                    Identify the Tribe issuing the document;
+                  </li>
+                  <li>
+                    Identify the individual by name; and
+                  </li>
+                  <li>
+                    Confirm the individual’s enrollment in, or affiliation with the Tribe.
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Secondary documentation: (Must present one (1) of the following, along with ID)",
-  listings: ["A US birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in Puerto Rico, the Virgin Islands, or Commonwealth of the Northern Mariana Islands prior to the time these areas became part of the US, the individual will satisfy the citizenship requirement if he or she is a collectively naturalized citizen."," A Northern Mariana ID card, issued to a collectively naturalized citizen, who was born in the Commonwealth of the Northern Mariana Islands before November 4, 1986"," A certification of report of birth, issued to US citizens born outside the US"," A report of birth abroad of a US citizen"," A birth certificate"," A US citizen ID card"," A final adoption decree showing the child’s name and US place of birth, or if an adoption is not final, a statement from a state approved adoption agency that shows the child’s name and US place of birth"," Evidence of US civil service employment before June 1, 1976"," US military record showing a US place of birth"," Documentation that a child meets the requirements of §101 of the Child Citizenship Act "," Medical records that indicate a US place of birth"," Life, health, or other insurance record that indicates a US place of birth"," Official religious record recorded in the US showing that the birth occurred in the US"," School records showing a US place of birth"," Federal or state census record showing US citizenship or a US place of birth"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "SECONDARY DOCUMENTATION: (Must present one (1) of the following, along with ID)",
+    listings: ["A US birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in Puerto Rico, the Virgin Islands, or Commonwealth of the Northern Mariana Islands prior to the time these areas became part of the US, the individual will satisfy the citizenship requirement if he or she is a collectively naturalized citizen."," A Northern Mariana ID card, issued to a collectively naturalized citizen, who was born in the Commonwealth of the Northern Mariana Islands before November 4, 1986"," A certification of report of birth, issued to US citizens born outside the US"," A report of birth abroad of a US citizen"," A birth certificate"," A US citizen ID card"," A final adoption decree showing the child’s name and US place of birth, or if an adoption is not final, a statement from a state approved adoption agency that shows the child’s name and US place of birth"," Evidence of US civil service employment before June 1, 1976"," US military record showing a US place of birth"," Documentation that a child meets the requirements of §101 of the Child Citizenship Act "," Medical records that indicate a US place of birth"," Life, health, or other insurance record that indicates a US place of birth"," Official religious record recorded in the US showing that the birth occurred in the US"," School records showing a US place of birth"," Federal or state census record showing US citizenship or a US place of birth"]} %>
+<% end %>
 <!-- Citizenship -->
 
 <!-- Immigration -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Immigration Status: We need proof of the immigration status for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
+<% if notice.dhs_unverified.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "Immigration Status: We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
 
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.dhs_unverified], bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Secondary documentation: (Must present one (1) of the following, along with ID)",
-  listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "Documents you may be able to use to verify your immigration status include:",
+    listings: ["Permanent resident card (I-551, also known as a “green card”)","Temporary I-551 stamp (on passport or I-94, I-94A)","Immigrant visa (with temporary I-551 language)","Employment authorization card (EAD or I-766)","Arrival/departure record (I-94 or I-94A)","Arrival/departure record in foreign passport (I-94)","Foreign passport","Country of issuance reentry permit (I-327)","Refugee travel document (I-571)","Certificate of eligibility for nonimmigrant (F-1) student status (I-20)","Certificate of eligibility for exchange visitor (J-1) status (DS2019)","Notice of action (I-797)"]} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Secondary documentation: (Must present one (1) of the following, along with ID)",
-  listings: ["Document indicating a member of a federally recognized American Indian Tribe or Alaska Native born in Canada. (This is considered an eligible immigration status for Medicaid, but not for a Qualified Health Plan [QHP])","Office of Refugee Resettlement (ORR) eligibility letter (if under 18)","Document indicating withholding of removal","Administrative order staying removal issued by the Department of Homeland Security (DHS)","Certification from the US Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)","Cuban/Haitian entrant","Resident of American Samoa"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "You can also list these documents or statuses:",
+    listings: ["Document indicating a member of a federally recognized American Indian Tribe or Alaska Native born in Canada. (This is considered an eligible immigration status for Medicaid, but not for a Qualified Health Plan [QHP])","Office of Refugee Resettlement (ORR) eligibility letter (if under 18)","Document indicating withholding of removal","Administrative order staying removal issued by the Department of Homeland Security (DHS)","Certification from the US Department of Health and Human Services (HHS) Office of Refugee Resettlement (ORR)","Cuban/Haitian entrant","Resident of American Samoa"]} %>
+<% end %>
 <!-- Immigration -->
 
 <!-- Income Verification -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Household Income: We need proof of annual income for:"} %>
+<% notice.income_unverifieda.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
 
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Secondary documentation: (Must present one (1) of the following, along with ID)",
-  listings: ["A copy of your most recent tax return, if you expect the income for <coverage year> to be the same as the income reported in that tax return"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, social security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in <coverage year>"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "These documents can include:",
+    listings: ["A copy of your most recent tax return, if you expect the income for <coverage year> to be the same as the income reported in that tax return"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, social security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in <coverage year>"]} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show."} %>
-<!-- Income Verification -->
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px'} %>
+<% end %>
 
 <!-- Residency Verification -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>DC Residency:</strong> A document that shows that the following household members live in the District of Columbia:"} %>
+<% if notice.residency_inconsistency.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "<strong>DC Residency:</strong> A document that shows that the following household members live in the District of Columbia:", top_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.residency_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "This can include any of the following that is in the person’s name:",
-  listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with DC address", "A phone or utility bill from within the past two months","DC voter registration card","A valid District of Columbia motor vehicle registration or DC DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a DC address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s DC residency address","A signed DC Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: https://dmv.dc.gov/page/proof-dc-residency-certifications)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "This can include any of the following that is in the person’s name:",
+    listings: ["A copy of an active lease agreement, certified deed, or mortgage statement with DC address", "A phone or utility bill from within the past two months","DC voter registration card","A valid District of Columbia motor vehicle registration or DC DMV identification card","Cancelled checks or receipts for mortgage or rental payments on a residential property within the past 2 months","Utility bills with a DC address, and payment receipts within the past 2 months","Proof of automobile insurance showing the person’s DC residency address","A signed DC Department of Motor Vehicles proof of residency form from another District resident stating that the applicant lives at their address in the District. (available at: https://dmv.dc.gov/page/proof-dc-residency-certifications)","Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence"]} %>
+<% end %>
 <!-- Residency Verification -->
 
 <!-- MEC Conflict -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to <MEC Data Match Type 1>:"} %>
+<% if notice.mec_conflict.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "<strong>Access to Other Health Insurance:</strong> Our records indicate that the people listed below have access to <MEC Data Match Type 1>:", top_margin: '-5px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Our records indicate that the following individual(s) have access to <MEC Data Match Type 2>:"} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "Our records indicate that the following individual(s) have access to <MEC Data Match Type 2>:"} %>
+
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended."} %>
+<% end %>
 <!-- MEC Conflict -->
 
 <!-- Indian Inconsistency -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>American Indian Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:"} %>
+<% if notice.indian_inconsistency.any? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "<strong>American Indian Status:</strong> On your application or renewal form, you indicated that the following people are American Indian or Alaska Native:", top_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/household_member_details', :locals => {
- rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/household_member_details', :locals => {
+   rows: [notice.indian_inconsistency], top_margin: '5px', bottom_margin: '5px'} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:",
-  listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian."]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "You can provide any formal documentation from a federally recognized Tribe, Indian Health Services, or the Bureau of Indian Affairs that verifies American Indian status. Examples of such verifications include, but are not limited to the following:",
+    listings: ["A document issued by a federally recognized American Indian/Alaska Native Tribe, such as an enrollment or membership card, a Tribal passport, a Tribal census document, or a document issued by a Tribe indicating the person’s affiliation with the Tribe;", "A document issued by the Indian Health Services indicating that the person is eligible for Indian Health Services as an American Indian; or","A document obtained from the Bureau of Indian Affairs recognizing the person as an American Indian."]} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "For American Indians born outside of the United States, we will accept the following documents:",
-  listings: ["A Form I-94 with a notation of “S1-3”;", "I-551 permanent resident card stamped “S1-3”;", "Temporary I-551 stamp coded “S1-3” in a Canadian passport;", "A Tribal record or document certifying at least 50 percent American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as a birth certificate or baptismal certificate issued on a reservation; a letter from the Canadian Department of Indigenous and Northern Affairs; or school records."]} %>
-
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "For American Indians born outside of the United States, we will accept the following documents:",
+    listings: ["A Form I-94 with a notation of “S1-3”;", "I-551 permanent resident card stamped “S1-3”;", "Temporary I-551 stamp coded “S1-3” in a Canadian passport;", "A Tribal record or document certifying at least 50 percent American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as a birth certificate or baptismal certificate issued on a reservation; a letter from the Canadian Department of Indigenous and Northern Affairs; or school records."]} %>
+<% end %>
 <!-- Indian Inconsistency -->
+
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call DC Health Link at (855) 532-5465. If you need help, we’ll work with you.</strong>"} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at (855) 532-5465. If you need help, we’ll work with you.</strong>", top_margin: '-5px'} %>

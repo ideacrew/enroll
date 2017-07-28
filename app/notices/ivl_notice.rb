@@ -9,7 +9,7 @@ class IvlNotice < Notice
   def deliver
     build
     generate_pdf_notice
-    attach_blank_page
+    attach_blank_page(notice_path)
     attach_dchl_rights
     prepend_envelope
     upload_and_send_secure_message
@@ -27,7 +27,7 @@ class IvlNotice < Notice
     envelope = Envelope.new
     envelope.fill_envelope(notice, mpi_indicator)
     envelope.render_file(envelope_path)
-    join_pdfs [envelope_path, notice_path]
+    join_pdfs_with_path [envelope_path, notice_path]
   end
 
   def attach_dchl_rights
@@ -38,12 +38,18 @@ class IvlNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope.pdf')]
   end
 
-  def attach_blank_page
-    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+  def join_pdfs_with_path(pdfs, path = nil)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    path_to_save = path.nil? ? notice_path : path
+    pdf.save path_to_save
+  end
 
-    page_count = Prawn::Document.new(:template => notice_path).page_count
+  def attach_blank_page(template_path)
+    blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+    page_count = Prawn::Document.new(:template => template_path).page_count
     if (page_count % 2) == 1
-      join_pdfs [notice_path, blank_page]
+      join_pdfs_with_path([template_path, blank_page], template_path)
     end
   end
 
