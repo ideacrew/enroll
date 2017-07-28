@@ -66,12 +66,21 @@ module FinancialAssistanceHelper
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
       if action_name == "save_questions"
-        insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-      elsif action_name == "application_publish_error"
-        find_sep_insured_families_path(consumer_role_id: @person.consumer_role.try(:id))
+        edit_financial_assistance_application_path(application)
       else
         review_and_submit_financial_assistance_application_path application
       end
+    end
+  end
+
+  def find_previous_from_step_one
+    model_name = @model.class.to_s.split('::').last.downcase
+    if  model_name == "applicant"
+      edit_financial_assistance_application_path(@application)
+    elsif model_name == "application"
+      review_and_submit_financial_assistance_application_path(@application)
+    else
+      send("financial_assistance_application_applicant_#{model_name.pluralize}_path", @application, @applicant)
     end
   end
 

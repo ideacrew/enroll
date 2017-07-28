@@ -40,7 +40,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Submit my Application"
+        if params[:commit] == "Submit Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
 
           @application.submit! if @application.complete?
@@ -73,6 +73,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
+    @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
     if @person.primary_family.application_in_progress.blank?
       old_application = @person.primary_family.applications.find params[:id]
       application = old_application.dup
@@ -102,6 +103,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def application_checklist
+    @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit

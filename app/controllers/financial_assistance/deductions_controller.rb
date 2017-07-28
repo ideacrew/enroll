@@ -27,7 +27,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
     begin
       @model.update_attributes!(permit_params(model_params)) if model_params.present?
-      if params[:commit] == "Finish"
+      if params.key? :last_step
         flash[:notice] = "Deduction Added - (#{@model.kind})"
         redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
       else
