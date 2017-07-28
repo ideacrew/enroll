@@ -205,4 +205,12 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def selected_benefit_plan(plan)
+    case plan 
+      when 'single_carrier' then 'All Plans From A Single Carrier'
+      when 'metal_level' then 'All Plans From A Given Metal Level'
+      when 'single_plan' then 'A Single Plan'
+      when 'sole_source' then 'A Sole Soure Plan'
+    end
+  end
 end

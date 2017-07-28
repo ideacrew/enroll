@@ -301,6 +301,12 @@ When(/^.+ go[es]+ to the benefits tab I should see plan year information$/) do
   click_link 'Benefits'
 end
 
+And(/^Employer can see the plan information$/) do
+  sleep 1
+  within('.benefit-package') do
+    expect(page).to have_content('All Plans From A Single Carrier')
+  end
+end
 
 And(/^.+ should see a button to create new plan year$/) do
   screenshot("employer_plan_year")
