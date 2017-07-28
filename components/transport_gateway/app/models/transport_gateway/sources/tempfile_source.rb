@@ -4,6 +4,9 @@ module TransportGateway
       attr_reader :stream, :size
 
       def initialize(stream)
+        if stream.closed?
+          stream.open
+        end
         @size = stream.size
         @stream = stream
         @stream.rewind

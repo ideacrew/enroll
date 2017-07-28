@@ -23,7 +23,7 @@ module TransportGateway
       adapter = adapter_from(message)
       adapter.assign_providers(self, credential_provider)
       adapter.add_observer(LoggingObserver.new(logger))
-      adapter.receive(message)
+      adapter.receive_message(message)
     end
 
     def send_message(message)
