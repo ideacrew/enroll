@@ -20,7 +20,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application.populate_applicants_for(@person.primary_family)
     @application.save!
 
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def edit
@@ -80,7 +80,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.submitted_at = nil
       application.save!
     end
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def help_paying_coverage
@@ -97,7 +97,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.save!
       redirect_to application_checklist_financial_assistance_applications_path
     else
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to edit_financial_assistance_application_path(@application)
     end
   end
 
