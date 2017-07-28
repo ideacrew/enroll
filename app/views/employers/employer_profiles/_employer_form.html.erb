@@ -53,8 +53,9 @@
              </thead>
             <% @staff.each do |staff| %>
               <tr style='border: 1px solid #d5d5d5; height: 50px; '>
+                <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                 <td style='padding: 10px'><%= check_box_tag('primary_poc', {}, checked = staff.is_primary_poc, data: {id:
-                  staff.id, emp_id:@employer_profile.id}) %>
+                  staff.id, emp_id:@employer_profile.id} , :disabled => (role && role.is_applicant? ? true : false)) %>
                 </td>
                 <td style='padding: 10px'><%= staff.first_name %></td>
                 <td><%= staff.last_name %></td>
@@ -65,7 +66,6 @@
                   <% phone = staff.phones.detect{|phone| phone.kind == 'work'} %>
                   <%= phone && (phone.area_code.to_s + phone.number + (phone.extension? ? ' x'+phone.extension : '')) %>
                 <td>
-                  <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                   <%= role && role.current_state %>
                   <% if role.is_applicant? %>
                     <%=  link_to(approve_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
