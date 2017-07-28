@@ -29,7 +29,8 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
       :date_of_termination => census_employee.employment_terminated_on,
       :coverage_terminated_on => census_employee.coverage_terminated_on
       })
-    enrollments.each do |enr|
+
+    enrollments.compact.each do |enr|
       notice.census_employee.enrollments << build_enrollment(enr)
     end
   end
