@@ -949,7 +949,7 @@ class Family
         due_dates << document_due_date(family_member, v_type)
       end
     end
-
+    due_dates.compact!
     due_dates.min.to_date if due_dates.present?
   end
 
@@ -964,6 +964,7 @@ class Family
   end
 
   def document_due_date(family_member, v_type)
+    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
     enrollment = enrolled_policy(family_member)
     sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)

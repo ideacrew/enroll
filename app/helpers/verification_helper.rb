@@ -71,8 +71,13 @@ module VerificationHelper
     family_member.family.enrolled_policy(family_member).present?
   end
 
-  def can_show_due_date?(person, f_member=nil)
-    enrollment_group_unverified?(person) && verification_needed?(person) && has_enrolled_policy?(f_member)
+  def is_not_verified?(family_member, v_type)
+    return true if family_member.blank?
+    !family_member.person.consumer_role.is_type_verified?(v_type)
+  end
+
+  def can_show_due_date?(person, options ={})
+    enrollment_group_unverified?(person) && verification_needed?(person) && (has_enrolled_policy?(options[:f_member]) && is_not_verified?(options[:f_member], options[:v_type]))
   end
 
   def documents_uploaded
