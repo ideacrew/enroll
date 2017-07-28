@@ -1,0 +1,11 @@
+module Notifier
+  class MergeDataModels::Address
+    include Virtus.model
+
+    attribute :street_1, String
+    attribute :street_2, String
+    attribute :city, String
+    attribute :state, String
+    attribute :zip, String
+  end
+end
