@@ -1,34 +1,35 @@
 module Notifier
   class Notice
 
-    def initialize(notice_id, attribute_hash, options={})
+    def initialize(template_id, attribute_hash, options={})
     end
 
-    def output_notice
-      output_cover_page
-      output_head
-      output_body_start
-      output_body
-      output_body_end
-      output_end
+    def compose_notice
+      compose_cover_page
+      compose_head
+      compose_body_start
+      compose_body
+      compose_body_end
+      compose_end
     end
 
-    def output_cover_page
+    def compose_cover_page
     end
 
-    def output_head
+    def compose_head
     end
 
-    def output_body_start
+    def compose_body_start
     end
 
-    def output_body
+    def compose_body
+      raise "Called abstract method: compose_body"
     end
 
-    def output_body_end
+    def compose_body_end
     end
 
-    def output_end
+    def compose_end
     end
 
   end
