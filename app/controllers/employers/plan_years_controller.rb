@@ -289,7 +289,6 @@ class Employers::PlanYearsController < ApplicationController
       benefit_group.elected_dental_plans = ax if ax
       benefit_group.build_estimated_composite_rates
     end
-    pp @plan_year
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."
       redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits")
