@@ -384,7 +384,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
 {
   hbx_id: 'SHOP20_A',
     title: 'Initial Ineligible to Obtain Coverage',
