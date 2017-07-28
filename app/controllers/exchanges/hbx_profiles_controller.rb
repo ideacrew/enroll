@@ -398,19 +398,16 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    query = ::Queries::VerificationsDatatableQuery.new(dt_query)
 
-    families = search_families(dt_query.search_string, all_families)
+    order = params[:order]["0"][:dir] if params[:order].present?
 
-    sorted_by, order = input_sort_request
-
-    sorted_results = sorted_families(sorted_by, order, dt_query, families)
+    sorted_results = sorted_families(order, dt_query, query)
 
     @draw = dt_query.draw
-    @total_records = all_families.count
-    @records_filtered = families.count
+    @total_records = query.all_families.count
+    @records_filtered = query.search.count
     @families = sorted_results
-    # @families = families.skip(dt_query.skip).limit(dt_query.take)
     render
   end
 
