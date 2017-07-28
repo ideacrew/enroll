@@ -43,13 +43,17 @@ class FinancialAssistance::ApplicationsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Submit my Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-          if @application.complete?
-            @application.submit!
-            publish_application(@application)
+
+          @application.submit! if @application.complete?
+          payload = generate_payload(@application)
+          unless @application.publish(payload)
+            @application.unsubmit!
+            redirect_to application_publish_error_financial_assistance_application_path(@application)
+          else
+            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           end
 
-          dummy_data_for_demo(params) if @application.complete? #For_Populating_dummy_ED_for_DEMO
-          redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
@@ -65,19 +69,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
   end
 
-  def publish_application(application)
-    payload = generate_payload(application)
-    if application.is_schema_valid?(Nokogiri::XML.parse(payload))
-      notify("acapi.info.events.assistance_application.submitted",
-                {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                  :body => payload,
-                  :family_id => application.family_id.to_s,
-                  :application_id => application._id.to_s})
-    else
-      # handle case where schema is invalid
-    end
-  end
-
   def generate_payload application
     render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
   end
@@ -87,6 +78,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       old_application = @person.primary_family.applications.find params[:id]
       application = old_application.dup
       application.aasm_state = "draft"
+      application.submitted_at = nil
       application.save!
     end
     redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
@@ -126,6 +118,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def eligibility_results
+    @family = @person.primary_family
+  end
+
+  def application_publish_error
     @family = @person.primary_family
   end
 

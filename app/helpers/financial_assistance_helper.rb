@@ -67,6 +67,8 @@ module FinancialAssistanceHelper
     else
       if action_name == "save_questions"
         insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      elsif action_name == "application_publish_error"
+        find_sep_insured_families_path(consumer_role_id: @person.consumer_role.try(:id))
       else
         review_and_submit_financial_assistance_application_path application
       end

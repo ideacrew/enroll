@@ -3,6 +3,8 @@ class FinancialAssistance::Application
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
+  include Acapi::Notifiers
+  require 'securerandom'
 
   belongs_to :family, class_name: "::Family"
 
@@ -175,6 +177,15 @@ class FinancialAssistance::Application
       end
     end
 
+    event :unsubmit, :after => :record_transition do
+      transitions from: :submitted, to: :draft, :after => :unsubmit_application do
+        guard do
+          true # add appropriate guard here
+        end
+      end
+      #transitions :from => :submitted, :to => :draft, :after => :unsubmit_application
+    end
+
   end
 
   # def applicant
@@ -337,13 +348,24 @@ class FinancialAssistance::Application
   def is_schema_valid?(faa_doc)
     return false if faa_doc.blank?
     faa_xsd = Nokogiri::XML::Schema(File.open FAA_SCHEMA_FILE_PATH)
-    if faa_xsd.valid?(faa_doc)
-      true
+    faa_xsd.valid?(faa_doc)
+  end
+
+  def is_submitted?
+    self.aasm_state == "submitted"
+  end
+
+  def publish(payload)
+    if validity = self.is_schema_valid?(Nokogiri::XML.parse(payload))
+      notify("acapi.info.events.assistance_application.submitted",
+                {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                  :body => payload,
+                  :family_id => self.family_id.to_s,
+                  :application_id => self._id.to_s})
     else
       false
-      #faa_doc.present? ? message = "FAA doc - #{faa_doc.to_xml}" : message = "FAA doc is nil"
-      #raise "#{faa_xsd.validate(faa_doc)}"
     end
+    validity
   end
 
   def ready_for_attestation?
@@ -579,6 +601,18 @@ private
     write_attribute(:benchmark_plan_id, benchmark_plan_id)
   end
 
+  def unset_submission_date
+    update_attribute(:submitted_at, nil)
+  end
+
+  def unset_assistance_year
+    update_attribute(:assistance_year, nil)
+  end
+
+  def unset_effective_date
+    update_attribute(:assistance_year, nil)
+  end
+
   def application_submission_validity
     # Mandatory Fields before submission
     validates_presence_of :hbx_id, :applicant_kind, :request_kind, :motivation_kind, :us_state, :is_ridp_verified, :parent_living_out_of_home_terms
@@ -611,14 +645,17 @@ private
   end
 
   def submit_application
-    # precondition: sucessful state transition after application.submit. (draft -> submitted)
     set_submission_date
     set_assistance_year
     set_effective_date
-
     create_tax_households
+  end
 
-    # Trigger the CV generation process here.
+  def unsubmit_application
+    unset_submission_date
+    unset_assistance_year
+    unset_effective_date
+    delete_tax_households
   end
 
   def create_tax_households
@@ -641,5 +678,9 @@ private
       applicants.map(&:tax_household).exclude?(th)
     end
     empty_th.each &:destroy
+  end
+
+  def delete_tax_households
+    tax_households.destroy_all
   end
 end
