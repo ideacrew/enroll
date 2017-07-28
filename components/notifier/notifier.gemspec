@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 4.2.3"
   s.add_dependency "slim", "3.0.8" 
   s.add_dependency "mongoid", "~> 5.0.1" 
+  s.add_dependency "virtus", "1.0.5"
 
   s.add_development_dependency 'rspec-rails' 
   s.add_development_dependency 'shoulda-matchers'
