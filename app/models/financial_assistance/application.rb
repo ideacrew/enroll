@@ -164,7 +164,7 @@ class FinancialAssistance::Application
     state :denied
 
     event :submit, :after => :record_transition do
-      transitions from: :draft, to: :submitted, :after => :submit_application do
+      transitions from: :draft, to: :submitted, :after => :set_submit do
         guard do
           is_application_valid?
         end
@@ -178,12 +178,11 @@ class FinancialAssistance::Application
     end
 
     event :unsubmit, :after => :record_transition do
-      transitions from: :submitted, to: :draft, :after => :unsubmit_application do
+      transitions from: :submitted, to: :draft, :after => :unset_submit do
         guard do
           true # add appropriate guard here
         end
       end
-      #transitions :from => :submitted, :to => :draft, :after => :unsubmit_application
     end
 
   end
@@ -610,7 +609,7 @@ private
   end
 
   def unset_effective_date
-    update_attribute(:assistance_year, nil)
+    update_attribute(:effective_date, nil)
   end
 
   def application_submission_validity
@@ -644,14 +643,14 @@ private
     )
   end
 
-  def submit_application
+  def set_submit
     set_submission_date
     set_assistance_year
     set_effective_date
     create_tax_households
   end
 
-  def unsubmit_application
+  def unset_submit
     unset_submission_date
     unset_assistance_year
     unset_effective_date

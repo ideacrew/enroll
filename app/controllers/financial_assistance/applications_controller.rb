@@ -46,12 +46,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
-          unless @application.publish(payload)
-            @application.unsubmit!
-            redirect_to application_publish_error_financial_assistance_application_path(@application)
-          else
+          if @application.publish(payload)
             dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+          else
+            @application.unsubmit!
+            redirect_to application_publish_error_financial_assistance_application_path(@application)
           end
 
         else
@@ -129,7 +129,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def dummy_data_for_demo(params)
     #Dummy_ED
-    @model.update_attributes!(aasm_state: "approved", assistance_year: TimeKeeper.date_of_record.year)
+    @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year)
     @model.applicants.each do |applicant|
       applicant.update_attributes!(is_ia_eligible: true)
     end
