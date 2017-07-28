@@ -43,6 +43,11 @@ $("input[name='other_reason']").on('change keydown paste input', function(){
     }
 });
 
+$('select#reason_for_rejection').on('selectric-init', function(event, element, selectric) {
+   $('.employer_attestation_fields .selectric-wrapper').css({'width': '315px'});
+   $("input[name='other_reason']").css({'margin-top': '8px'})
+});
+
 $('#attestation_submit').click(function() {
     var confirmation = confirm('Are You Sure? Changing Employer Attestation Documentation status from '+ $("input[name='prev_status']").val() + ' to ' + $("input[name='status']:checked").val());
     if (confirmation != true) {
