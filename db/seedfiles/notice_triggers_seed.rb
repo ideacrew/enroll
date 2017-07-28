@@ -416,7 +416,7 @@ shop_notice_triggers = [
         name: 'Initial Employer first invoice available in the account',
         notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-        mpi_indicator: 'MPI_SHOP20',
+        mpi_indicator: 'SHOP_M022',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
