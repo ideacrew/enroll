@@ -26,7 +26,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def edit
     @family = @person.primary_family
     @application = @person.primary_family.applications.find params[:id]
-
+    matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(matrix)
     render layout: 'financial_assistance'
   end
 

@@ -20,7 +20,7 @@
 <div class='col-md-2'>
   <%= render partial: 'financial_assistance/shared/right_nav', locals: {
     previous_url: @application.ready_for_attestation? ? other_questions_financial_assistance_application_applicant_path(@application, @application.applicants.last) : application_checklist_financial_assistance_applications_path,
-    next_url: find_application_path(@application)
+    next_url: @missing_relationships.present? ? insured_family_relationships_path(@person.consumer_role.id) : find_application_path(@application)
   } %>
 </div>
 

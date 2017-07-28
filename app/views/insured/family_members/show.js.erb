@@ -11,3 +11,8 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
 $("#dependent_buttons").removeClass('hidden');
+
+<% if @family.application_in_progress.present? %>
+	$(".container > .col-md-2").replaceWith("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: financial_assistance_applications_path, 
+		next_url:  go_to_step_financial_assistance_application_applicant_path(@family.application_in_progress, @family.application_in_progress.applicants.first, 1)}) %>");
+<% end %>
