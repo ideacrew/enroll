@@ -13,7 +13,7 @@
       col_styles: ['margin-bottom: 0px']} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-    listings: ["<strong>Log in to your #{site_main_web_link} account.</strong>",
+    listings: ["<strong>Log in to your #{site_main_web_address} account.</strong>",
 
                "<strong>Click on the “Billing” tab on the menu on the left side of your account.</strong>",
 
@@ -46,7 +46,7 @@
     listings: ["By calling #{contact_center_phone_number}",
                "TTY: #{contact_center_tty_number}",
                "By email: #{small_business_email_link}"],
-    after:"You can also find more information on our website at MAhealthconnector.org" }%>
+    after:"You can also find more information on our website at #{site_main_web_address} " }%>
 
 <% if notice.broker.present? %>
     <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
