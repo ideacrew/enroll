@@ -471,6 +471,28 @@ shop_notice_triggers = [
        }
      ]
    },
+
+{
+  hbx_id: 'SHOP_M038',
+  title: 'Termination of Employer’s Health Coverage Offered through the Massachusetts Health Connector',
+  description: 'Notification to employees regarding their Employer’s ineligibility.',
+  resource_name: 'employee_role',
+  event_name: 'notify_employee_of_initial_employer_ineligibility',
+  notice_triggers: [
+    {
+      name: 'Notification to employees regarding their Employer’s ineligibility.',
+      notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
+      notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
+      mpi_indicator: 'SHOP_M038',
+      notice_trigger_element_group: {
+        market_places: ['shop'],
+        primary_recipients: ["employee"],
+        primary_recipient_delivery_method: ["secure_message"],
+        secondary_recipients: []
+      }
+    }
+  ]
+},   
 ]
 
 
