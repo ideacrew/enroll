@@ -66,7 +66,7 @@ gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'mas
 #For Background jobs
 gem 'resque'
 
-gem 'aasm', '~> 4.8.0'
+gem 'aasm', '~> 4.12.0'
 gem 'haml'
 # gem 'bh'
 
@@ -105,12 +105,17 @@ gem 'wicked_pdf', '1.0.6'
 # provide recaptcha services
 gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
 
-gem 'jquery-datatables-rails', '3.4.0'
+# gem 'jquery-datatables-rails', '3.4.0'
+gem 'jquery-datatables-rails', '3.3.0'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 gem 'chosen-rails'
+
+gem 'rocketjob_mission_control', '~> 3.0'
+gem 'rails_semantic_logger'
+gem 'rocketjob', '~> 3.0'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
