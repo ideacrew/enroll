@@ -13,13 +13,13 @@
       col_styles: ['margin-bottom: 0px']} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-    listings: ["<strong>Log in to your #{site_main_web_address} account.</strong>",
+    listings: ["<strong>Log in to your #{site_main_web_link} account.</strong>",
 
                "<strong>Click on the “Billing” tab on the menu on the left side of your account.</strong>",
 
                "<strong>Your invoice is available for download in PDF form on the “Invoices” section of this page.</strong>",
 
-               "<strong>Make your first month’s premium payment online or by phone.</strong>Payments over the phone or online are <strong><i>required</i></strong> for the first month of coverage,
+               "<strong>Make your first month’s premium payment online or by phone.</strong>Payments over the phone or online are <strong>required</strong> for the first month of coverage,
                as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in
                time for your group’s enrollments to be transmitted to your health insurance company.<br>
                <p class=""left-align-footer""><strong>Make a Secure Online Payment</strong><br>
@@ -46,7 +46,7 @@
     listings: ["By calling #{contact_center_phone_number}",
                "TTY: #{contact_center_tty_number}",
                "By email: #{small_business_email_link}"],
-    after:"You can also find more information on our website at #{site_main_web_address} " }%>
+    after:"You can also find more information on our website at MAhealthconnector.org" }%>
 
 <% if notice.broker.present? %>
     <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
