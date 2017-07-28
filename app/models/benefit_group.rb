@@ -750,7 +750,7 @@ class BenefitGroup
           else
             family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
             if family_tier.offered? &&
-              (family_tier.try(:employer_contribution_amount) || 0) < aca_shop_market_employer_family_contribution_percent_minimum
+              (family_tier.try(:employer_contribution_percent) || 0) < aca_shop_market_employer_family_contribution_percent_minimum
                 self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{aca_shop_market_employer_family_contribution_percent_minimum}")
             end
           end
