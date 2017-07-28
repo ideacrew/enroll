@@ -17,6 +17,11 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
+    attribute :citizenship_unverified, Array[PdfTemplates::Individual]
+    attribute :residency_inconsistency, Array[PdfTemplates::Individual]
+    attribute :income_unverified, Array[PdfTemplates::Individual]
+    attribute :indian_inconsistency, Array[PdfTemplates::Individual]
+    attribute :mec_conflict, Array[PdfTemplates::Individual]
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
     attribute :last_name, String
