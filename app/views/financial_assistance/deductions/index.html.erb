@@ -36,16 +36,9 @@
   </div>
 </div>
 
-<div class="col-md-2">
-  <%= link_to find_applicant_path(@application, @applicant, current: 'deductions') do %>
-    <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
-  <% end %>
-
-  <ul class="list-unstyled list-right-section">
-    <li>
-      <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant) do %>
-        <%= image_tag 'icons/list.png' %> PREVIOUS
-      <% end %>
-    </li>
-  </ul>
+<div class='col-md-2'>
+  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+    previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant),
+    next_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
+  } %>
 </div>

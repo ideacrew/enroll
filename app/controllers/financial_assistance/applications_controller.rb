@@ -1,5 +1,4 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
-
   before_action :set_current_person
 
   include UIHelpers::WorkflowController
@@ -21,7 +20,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application.populate_applicants_for(@person.primary_family)
     @application.save!
 
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def edit
@@ -41,7 +40,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Submit my Application"
+        if params[:commit] == "Submit Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
 
           @application.submit! if @application.complete?
@@ -74,6 +73,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
+    @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
     if @person.primary_family.application_in_progress.blank?
       old_application = @person.primary_family.applications.find params[:id]
       application = old_application.dup
@@ -81,7 +81,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.submitted_at = nil
       application.save!
     end
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def help_paying_coverage
@@ -98,11 +98,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.save!
       redirect_to application_checklist_financial_assistance_applications_path
     else
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to edit_financial_assistance_application_path(@application)
     end
   end
 
   def application_checklist
+    @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit

@@ -2,7 +2,11 @@
   <ul class="nav nav-stacked" id="leftNavigation">
     <%# We need to turn these links in to actual links or make it so we don't need fake a's %>
     <li class="activer list-box step-tabs">
-      <a href="<%=insured_family_members_path%>">Household Info</a>
+      <a href="<%= financial_assistance_applications_path %>">Applications</a>
+    </li>
+
+    <li class="activer list-box step-tabs">
+      <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
     </li>
 
     <% if defined?(@applicant) %>

@@ -236,14 +236,13 @@
       <br><br>
   </div>
 
-  <div class="col-md-2">
-    <button id="btn-continue" class="button btn btn-lg btn-primary" type="submit">CONTINUE</button>
-    <ul class="list-unstyled list-right-section">
-      <li>
-        <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
-        <%= image_tag 'icons/list.png' %> PREVIOUS
-        <% end %>
-      </li>
-    </ul>
+  <%= content_for :submit_button do %>
+    <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary" %>
+  <% end %>
+
+  <div class='col-md-2'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
+    } %>
   </div>
 <%end%>

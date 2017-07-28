@@ -31,7 +31,7 @@
         @model.workflow = { current_step: @current_step.to_i + 1 }
         @current_step = @current_step.next_step if @current_step.next_step.present?
       end
-      if params[:commit] == "Finish"
+      if params.key? :last_step
         flash[:notice] = "Income Added - (#{@model.kind})"
         redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
       else

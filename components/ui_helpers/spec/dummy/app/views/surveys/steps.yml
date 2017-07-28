@@ -1841,7 +1841,7 @@
     sections:
       - section:
           heading: Submit Your Application
-          heading_text: You're almost there! Please review the information below and check the boxes to indicate that you agree. You must also provide an electronic signature at the bottom of the page. When you’ve finished, select SUBMIT MY APPLICATION. 
+          heading_text: You're almost there! Please review the information below and check the boxes to indicate that you agree. You must also provide an electronic signature at the bottom of the page. When you’ve finished, select SUBMIT APPLICATION.
           lines:
               - cells:
                   - gutter: 12
