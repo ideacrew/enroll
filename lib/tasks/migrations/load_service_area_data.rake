@@ -71,7 +71,7 @@ namespace :load_service_reference do
       puts e.backtrace
     end
 
-    puts "created #{count} service areas"
+    puts "created #{count} service areas" unless Rails.env.test?
   end
 
 
