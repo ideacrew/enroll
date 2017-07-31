@@ -14,27 +14,28 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
+    consumer = member.consumer_role
     case type
       when 'Social Security Number'
-        if member.consumer_role.ssn_verified?
+        if consumer.ssn_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
           "in review"
         else
           "outstanding"
         end
       when 'American Indian Status'
-        if member.consumer_role.native_verified?
+        if consumer.native_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
           "in review"
         else
           "outstanding"
         end
       else
-        if member.consumer_role.lawful_presence_verified?
+        if consumer.lawful_presence_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
           "in review"
         else
           "outstanding"
@@ -151,5 +152,21 @@ module VerificationHelper
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+  end
+
+  def admin_actions(v_type, f_member)
+    options_for_select(build_admin_actions_list(v_type, f_member))
+  end
+
+  def build_admin_actions_list(v_type, f_member)
+    if verification_type_status(v_type, f_member) == "outstanding"
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
+    else
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
+    end
+  end
+
+  def type_unverified?(v_type, person)
+    verification_type_status(v_type, person) != "verified"
   end
 end
