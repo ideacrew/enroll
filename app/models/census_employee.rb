@@ -455,7 +455,7 @@ class CensusEmployee < CensusMember
     def congress_employee_dependent_age_off_termination_notice(new_date)
       if new_date.mday == 1
         
-        employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
+        employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => false).map{|org| org.employer_profile.id}
         Person.all_employee_roles.each do |person|
           begin
           employee_roles = person.active_employee_roles.reject{|role| employer_ids.include?(role.employer_profile_id) } 
@@ -474,7 +474,7 @@ class CensusEmployee < CensusMember
                   enrollments.each do |en|
                     covered_members = (en.hbx_enrollment_members.map{|member| member.person} && aged_off_dependents)
                     if new_date.month == 12 || covered_members.any?{|cm| new_date.month ==  cm.dob.month}
-                      ShopNoticesNotifierJob.perform(employee_role.census_employee.id.to_s, "congress_employee_dependent_age_off_termination_notice")
+                      ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "congress_employee_dependent_age_off_termination_notice")
                       break
                     end
                   end
