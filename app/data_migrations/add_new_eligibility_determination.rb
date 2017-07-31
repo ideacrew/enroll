@@ -2,7 +2,6 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddNewEligibilityDetermination < MongoidMigrationTask
     def migrate
-
       person = Person.where(hbx_id:ENV['hbx_id'])
       if person.size==0
         puts "No person was found with the given hbx_id" #unless Rails.env.test?
@@ -41,6 +40,6 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
                                                                 "e_pdc_id"                      => latest_eligibility_determination.e_pdc_id,
                                                                 "source"                        => "Admin"
                                                                 }).save!
-      puts "Create eligibility_determinations for person with the given hbx_id #{hbx_id}" unless Rails.env.test?
+      puts "Create eligibility_determinations for person with the given hbx_id #{ENV['hbx_id']}" unless Rails.env.test?
     end
 end
