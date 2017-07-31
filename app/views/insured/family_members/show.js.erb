@@ -1,3 +1,10 @@
+<% if @family.application_in_progress.present? %>
+  <% content_for "person_#{@dependent.family_member.person.id}" do %>
+    <div class="row row-form-wrapper no-buffer">
+      <%= render "financial_assistance/applications/financial_assistance_row", applicant: @family.application_in_progress.applicants.find_by(family_member_id: @dependent.family_member.id) %>
+    </div>
+  <% end %>
+<% end %>
 if ($("#add_member_list_<%= @dependent.id %>").length) {
   $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent.family_member,person: @person) %>");
 

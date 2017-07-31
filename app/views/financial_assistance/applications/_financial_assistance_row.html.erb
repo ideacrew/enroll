@@ -7,5 +7,5 @@
 </div>
 
 <div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd white-background">
-  <%= link_to applicant.workflow.present? ? "Edit Info" : "Add Info", go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1), class: "btn btn-info" %>
+  <%= link_to applicant.workflow.present? ? "Edit Info" : "Add Info", go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-info" %>
 </div>
