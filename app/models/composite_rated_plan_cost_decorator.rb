@@ -6,30 +6,26 @@ class CompositeRatedPlanCostDecorator < SimpleDelegator
     @composite_rating_tier = composite_rating_tier
   end
 
+  def sole_source?
+    @benefit_group.sole_source?
+  end
+
   def employer_contribution_for(member)
     member_family_size = member.family.family_members.count
     return contribution_for_subscriber(member_family_size) if member.is_subscriber?
-
-    (0...(member_family_size-1)).inject(total_employer_contribution) do |contribution, n|
-      contribution - contribution_for_subscriber(member_family_size)
-    end
+    return total_employer_contribution - (member_family_size - 1) * contribution_for_subscriber(member_family_size)
   end
 
   def employee_cost_for(member)
     member_family_size = member.family.family_members.count
     return cost_for_subscriber(member_family_size) if member.is_subscriber?
-
-    (0...(member_family_size-1)).inject(total_employee_cost) do |dependent_cost, n|
-      dependent_cost - cost_for_subscriber(member_family_size)
-    end
+    return total_employee_cost - (member_family_size - 1) * cost_for_subscriber(member_family_size)
   end
 
   def premium_for(member)
     member_family_size = member.family.family_members.count
     return premium_for_subscriber(member_family_size) if member.is_subscriber?
-    (0...(member_family_size-1)).inject(total_premium) do |dependent_share, n|
-      dependent_share - premium_for_subscriber(member_family_size)
-    end
+    return total_premium - (member_family_size - 1) * premium_for_subscriber(member_family_size)
   end
 
   def premium_for_subscriber(member_family_size)

@@ -14,6 +14,10 @@ class PlanCostDecorator < SimpleDelegator
     @multiple_rating_areas = multiple_market_rating_areas?
   end
 
+  def sole_source?
+    @benefit_group.sole_source?
+  end
+
   def plan_year_start_on
     #FIXME only for temp ivl
     if @benefit_group.present?
@@ -87,7 +91,7 @@ class PlanCostDecorator < SimpleDelegator
   def reference_premium_for(member)
     # FIXME: I've just fixed this to use the plan rate cache - it seems there
     #        multiple areas where this isn't being used - we need to correct this.
-    reference_plan_member_premium(member) 
+    reference_plan_member_premium(member)
   rescue
     0.00
   end
@@ -96,7 +100,7 @@ class PlanCostDecorator < SimpleDelegator
     rate_value = if @multiple_rating_areas
       Caches::PlanDetails.lookup_rate_with_area(the_plan.id, start_on_date, age, benefit_group.rating_area)
     else
-      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age) 
+      Caches::PlanDetails.lookup_rate(the_plan.id, start_on_date, age)
     end
     (rate_value * large_family_factor(member) * benefit_group.sic_factor_for(the_plan).to_f * benefit_group.group_size_factor_for(the_plan).to_f).round(2)
   end
