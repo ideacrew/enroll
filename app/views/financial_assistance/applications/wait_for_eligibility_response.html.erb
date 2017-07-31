@@ -1,26 +1,20 @@
-<% content_for :horizontal_status do %>
-  <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
-<% end %>
-  <div class="container">
-    <div id="new_person_wrapper">
-      <div class="row">
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-          <%= render :partial => 'shared/left_nav.html.erb' %>
-        </div>
-        <div class="col-md-7">
-          <div class="">
-            <p class="alert alert-error hide"></p>
-            <h1 class="darkblue">Waiting for your Eligibility results...</h1>
-          </div>
-        </div>
-
-        <div class='col-md-2'>
-          <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-            previous_url: financial_assistance_applications_path,
-            next_url: eligibility_results_financial_assistance_application_path
-          } %>
+<div class="container">
+  <div id="new_person_wrapper">
+    <div class="row">
+      <div class="col-md-7">
+        <div class="">
+          <p class="alert alert-error hide"></p>
+          <h1 class="darkblue">Waiting for your Eligibility results...</h1>
         </div>
       </div>
+
+      <div class='col-md-2'>
+        <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+          previous_url: financial_assistance_applications_path,
+          next_url: eligibility_results_financial_assistance_application_path
+        } %>
+      </div>
     </div>
-    <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
   </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+</div>

@@ -118,10 +118,16 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def wait_for_eligibility_response
     @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def eligibility_results
     @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   def application_publish_error
