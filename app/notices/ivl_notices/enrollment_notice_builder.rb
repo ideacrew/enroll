@@ -72,7 +72,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     #temporary fix - in case of mutliple applications
     latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
     notice.assistance_year = latest_application.assistance_year
-    end
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
