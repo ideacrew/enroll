@@ -360,7 +360,6 @@ ready = function() {
         if ( $(this).is(':contains("By carrier")') ) {
           $(this).closest('.reference-steps').find('.elected-plans-continue').hide();
         }
-
       }
       $(this).closest('.benefit-group-fields').find(nav+' .nav-tabs li').removeClass('active');
       $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', false);
@@ -375,6 +374,7 @@ ready = function() {
         $(this).closest('.benefit-group-fields').find(nav+' .plan-options > * input, '+nav+' .reference-plans > * input').prop('checked', 0);
         $(this).closest('.benefit-group-fields').find('.loading-container').html("<div class=\'col-xs-12 loading\'><i class=\'fa fa-spinner fa-spin fa-2x\'></i></div>");
       }
+      $('.nav-tabs li input').trigger('change');
 
       });
 
