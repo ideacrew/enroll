@@ -236,7 +236,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def sep_request_denial_notice
-    ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
   end
 
   private
