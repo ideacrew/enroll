@@ -299,6 +299,11 @@ class FinancialAssistance::Application
     total_incomes
   end
 
+  def is_family_totally_ineligibile
+    applicants.each { |applicant| return false unless applicant.is_totally_ineligible }
+    return true
+  end
+
   def all_tax_households
     tax_households = []
     applicants.each do |applicant|

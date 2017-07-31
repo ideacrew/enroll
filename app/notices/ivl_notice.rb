@@ -45,11 +45,12 @@ class IvlNotice < Notice
     pdf.save path_to_save
   end
 
-  def attach_blank_page(template_path)
+  def attach_blank_page(template_path = nil)
+    path = template_path.nil? ? notice_path : template_path
     blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
-    page_count = Prawn::Document.new(:template => template_path).page_count
+    page_count = Prawn::Document.new(:template => path).page_count
     if (page_count % 2) == 1
-      join_pdfs_with_path([template_path, blank_page], template_path)
+      join_pdfs_with_path([path, blank_page], path)
     end
   end
 
