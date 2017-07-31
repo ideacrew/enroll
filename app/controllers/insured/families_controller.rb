@@ -104,6 +104,7 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
+    ee_sep_request_accepted_notice
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -386,6 +387,14 @@ class Insured::FamiliesController < FamiliesController
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def ee_sep_request_accepted_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
   end
 
   def calculate_dates
