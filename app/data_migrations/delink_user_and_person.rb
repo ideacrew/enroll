@@ -14,7 +14,7 @@ class DelinkUserAndPerson< MongoidMigrationTask
       puts "More than one person was found with the given fein" unless Rails.env.test?
       return
     else
-      person.first.unset(:user)
+      person.first.unset(:user_id)
       puts "The user account has been delinked from person with hbx_id: #{hbx_id}" unless Rails.env.test?
     end
   end
