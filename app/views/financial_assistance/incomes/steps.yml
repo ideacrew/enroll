@@ -52,8 +52,9 @@
                   attribute: amount
                 - gutter: 3
                   type: dropdown
-                  name: frequency
+                  name: How Often *
                   required: true
+                  prompt: Select One
                   values:
                     - biweekly 
                     - daily 
@@ -124,10 +125,10 @@
                   attribute: city
                 - gutter: 4
                   type: 'dropdown'
-                  name: 'check'
+                  name: 'STATE *'
+                  prompt: Choose State
                   #required: true
                   values:
-                    - Choose State
                     - AL
                     - AK
                     - AZ

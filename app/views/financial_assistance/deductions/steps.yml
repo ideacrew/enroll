@@ -42,7 +42,7 @@
                 - gutter: 3
                   type: dropdown
                   id: 'frequency_kind'
-                  name: frequency_kind
+                  name: How Often
                   required: true
                   values:
                     - biweekly
