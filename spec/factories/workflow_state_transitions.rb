@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :workflow_state_transition do
-    end_state     "approved"
+    end_state     "determined"
     transition_on TimeKeeper.date_of_record
     reason        "met minimum criteria"
     comment       "consumer provided proper documentation"

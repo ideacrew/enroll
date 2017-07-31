@@ -38,7 +38,7 @@
 
 <div class='col-md-2'>
   <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-    previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant),
-    next_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
+    previous_url: find_previous_applicant_path(@application, @applicant, current: 'deductions'),
+    next_url: find_applicant_path(@application, @applicant, current: 'deductions')
   } %>
 </div>

@@ -61,7 +61,7 @@ module FinancialAssistanceHelper
     end
   end
 
-  def find_application_path(application)
+  def find_next_application_path(application)
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
@@ -96,11 +96,27 @@ module FinancialAssistanceHelper
     next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_financial_assistance_application_applicant_path(application, applicant)
   end
 
+  def find_previous_applicant_path(application, applicant, options={})
+    reverse_document_flow = ['benefits', 'deductions', 'incomes']
+    previous_path = reverse_document_flow.find do |embeded_document|
+      # this is a complicated condition but we need to make sure we don't work backwards in the flow from incomes to deductions to benefits
+      # so if a current option is passed in we won't consider anything before it
+      # if a current option is not passed then .index will return nil
+      # and instead we'll short circuit by checking that -1 is less then i, which always would be true
+      (reverse_document_flow.index(options[:current]) || -1) < reverse_document_flow.index(embeded_document) and applicant.send(embeded_document).present?
+    end
+    previous_path ? send("financial_assistance_application_applicant_#{previous_path}_path", application, applicant) : go_to_step_financial_assistance_application_applicant_path(application, applicant, 2)
+  end
+
   def show_component(url)
     if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
       false
     else
       true
     end
+  end
+
+  def left_nav_css(conditional)
+    'cna disabled' unless conditional
   end
 end

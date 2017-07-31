@@ -3,6 +3,6 @@ FactoryGirl.define do
     family
     assistance_year 2017
     submitted_at {2.months.ago}
-    aasm_state "approved"
+    aasm_state "determined"
   end
 end

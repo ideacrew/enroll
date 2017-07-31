@@ -125,6 +125,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def application_publish_error
     @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
   end
 
   private
