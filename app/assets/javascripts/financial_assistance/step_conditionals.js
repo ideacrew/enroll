@@ -85,6 +85,8 @@ $(document).ready(function() {
     }
   });
 
+  $('#is_claimed_as_tax_dependent_no').parents(".row").next().addClass('hide');
+
   $("body").on("change", "#is_claimed_as_tax_dependent_no", function(){
     if ($('#is_claimed_as_tax_dependent_no').is(':checked')) {
       $(this).parents(".row").next().addClass('hide');
