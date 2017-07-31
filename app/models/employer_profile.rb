@@ -369,7 +369,7 @@ class EmployerProfile
   end
 
   def is_primary_office_local?
-    organization.primary_office_location.address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
+    (organization.primary_office_location.address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase)
   end
 
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
@@ -933,7 +933,7 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    ShopNoticesNotifierJob.perform_now(self.id.to_s, event)
   end
 
   def rating_area
@@ -1006,6 +1006,12 @@ class EmployerProfile
   def is_attestation_eligible?
     return true unless enforce_employer_attestation?
     employer_attestation.present? && employer_attestation.is_eligible?
+  end
+
+  def validate_and_send_denial_notice
+    if !is_primary_office_local? || !(RatingArea.all.pluck(:zip_code).include? organization.primary_office_location.address.zip)
+      self.trigger_notices('initial_employer_denial')
+    end
   end
 
   def terminate(termination_date)

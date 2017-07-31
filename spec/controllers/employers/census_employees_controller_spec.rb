@@ -142,7 +142,8 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
       sign_in @user
       census_employee.census_dependents << child1
-      allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
+      allow(EmployerProfile).to receive(:find).and_return(employer_profile)
+      allow(employer_profile).to receive(:validate_and_send_denial_notice).and_return("")
       allow(controller).to receive(:benefit_group_id).and_return(benefit_group.id)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       allow(BenefitGroup).to receive(:find).and_return(benefit_group)
