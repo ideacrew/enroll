@@ -319,6 +319,7 @@ ready = function() {
       if ( $(this).hasClass('slider') ) {
         $(this).on("slideStop", function(slideEvt) {
           var data = $(this).val();
+
           $(this).closest('.form-group').find('input').val(data);
           $(this).closest('.form-group').find('.slide-label').text(data + "%");
           if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("plan_years") > -1) {
@@ -337,11 +338,16 @@ ready = function() {
         });
       } else if ( $(this).hasClass('hidden-param') )  {
         var hidden = parseInt($(this).val());
+        if (hidden < 0) {
+          hidden = 0;
+        } else if (hidden > 100) {
+          hidden = 100;
+        }
         var mySlider = $(this).closest('.form-group').find('input.slider');
         mySlider.bootstrapSlider('setValue', hidden);
         $(this).closest('.form-group').find('input.slider').attr('value', hidden).attr('data-slider-value', hidden);
         $(this).closest('.form-group').find('.slide-label').text(hidden + "%");
-
+        $(this).val(hidden);
       }
     });
 
@@ -575,7 +581,10 @@ function calcEmployerContributions(url, location, coverage_type) {
 
       var reference_plan_id = $('#'+location+' '+ coverage_type +' .ref-plan').val();
       var premium_pcts = $('#'+location+' '+ coverage_type +' .enabled .benefits-fields input.hidden-param').map(function() {
-        return $(this).val();
+        var input_val = parseInt($(this).val());
+        var not_greater_than_one_hundred = Math.min(100,input_val);
+        var not_less_than_zero = Math.max(0,not_greater_than_one_hundred);
+        return not_less_than_zero;
       }).get();
       var is_offered = $('#'+location+' '+ coverage_type +' .enabled .benefits-fields .checkbox label > input[type=checkbox]').map(function() {
         return $(this).is(":checked");

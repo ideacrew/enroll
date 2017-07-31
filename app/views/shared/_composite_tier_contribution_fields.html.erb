@@ -1,7 +1,7 @@
 <% if CompositeRatingTier::VISIBLE_NAMES.include?(f.object.composite_rating_tier) %>
   <div class="row row-form-wrapper no-buffer">
     <fieldset>
-      <div class="col-xs-6 form-group form-group-lg">
+      <div class="col-xs-5 form-group form-group-lg">
         <div class="checkbox">
           <label>
             <%= f.check_box :offered, {class: "contribution_handler", disabled: (f.object.composite_rating_tier == 'employee_only' ? true : false)}, "true", "false" %>
@@ -18,10 +18,10 @@
         </div>
       </div>
 
-      <div class="col-xs-6 form-group form-group-lg">
+      <div class="col-xs-7 form-group form-group-lg">
         <div class="col-xs-12 row">
           <div class="col-xs-3">
-            <%= f.number_field :employer_contribution_percent, class: "hidden-param contribution_handler premium-storage-input", value: f.object.employer_contribution_percent.try(:to_i) %>
+            <%= f.number_field :employer_contribution_percent, class: "hidden-param contribution_handler premium-storage-input", value: f.object.employer_contribution_percent.try(:to_i), min: 0, max: 100 %>
 
           </div>
           <div class="col-xs-9" style="padding-top: 10px;">
