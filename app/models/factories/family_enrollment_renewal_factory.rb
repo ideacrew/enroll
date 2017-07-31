@@ -72,7 +72,7 @@ module Factories
     def find_renewal_enrollments(coverage_kind)
       renewal_enrollments = family.active_household.hbx_enrollments.shop_market.by_coverage_kind(coverage_kind)
       renewal_enrollments.where({
-        :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id), 
+        :benefit_group_id.in => renewing_plan_year.benefit_groups.pluck(:_id),
         :effective_on => renewing_plan_year.start_on,
         :aasm_state.nin => ['shopping', 'coverage_canceled']
         })
@@ -92,10 +92,10 @@ module Factories
 
     def renew_enrollment(enrollment: nil, waiver: false, coverage_kind:)
       ShopEnrollmentRenewalFactory.new({
-        family: family, 
-        census_employee: census_employee, 
-        employer: employer, 
-        renewing_plan_year: renewing_plan_year, 
+        family: family,
+        census_employee: census_employee,
+        employer: employer,
+        renewing_plan_year: renewing_plan_year,
         enrollment: enrollment,
         is_waiver: waiver,
         coverage_kind: coverage_kind

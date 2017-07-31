@@ -16,7 +16,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     when "revert_cancel"
       # When Enrollment with given policy ID is active in Glue & canceled in Enroll(Mostly you will see this with passive enrollments)
       revert_cancel(enrollment)
+    when "cancel", "cancel_enrollment"
+      cancel_enr(enrollment)
     end
+
   end
 
   def get_enrollment
@@ -51,5 +54,10 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def revert_cancel(enrollment)
     enrollment.update_attributes(aasm_state: "coverage_enrolled")
     puts "Moved enrollment to Enrolled status from canceled state" unless Rails.env.test?
+  end
+
+  def cancel_enr(enrollment)
+    enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
   end
 end
