@@ -1,5 +1,4 @@
 class FinancialAssistance::ApplicationsController < ApplicationController
-
   before_action :set_current_person
 
   include UIHelpers::WorkflowController
@@ -21,13 +20,14 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application.populate_applicants_for(@person.primary_family)
     @application.save!
 
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def edit
     @family = @person.primary_family
     @application = @person.primary_family.applications.find params[:id]
-
+    matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(matrix)
     render layout: 'financial_assistance'
   end
 
@@ -41,14 +41,19 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Submit my Application"
+        if params[:commit] == "Submit Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-          if @application.complete?
-            @application.submit!
-            publish_application(@application)
+
+          @application.submit! if @application.complete?
+          payload = generate_payload(@application)
+          if @application.publish(payload)
+            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+          else
+            @application.unsubmit!
+            redirect_to application_publish_error_financial_assistance_application_path(@application)
           end
-          dummy_data_for_demo(params) if @application.complete? #For_Populating_dummy_ED_for_DEMO
-          redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
@@ -64,23 +69,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
   end
 
-  def publish_application(application)
-    response_payload = render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
-    notify("acapi.info.events.assistance_application.submitted",
-              {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => response_payload,
-                :family_id => application.family_id.to_s,
-                :application_id => application._id.to_s})
+  def generate_payload application
+    render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
   end
 
   def copy
+    @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
     if @person.primary_family.application_in_progress.blank?
       old_application = @person.primary_family.applications.find params[:id]
       application = old_application.dup
       application.aasm_state = "draft"
+      application.submitted_at = nil
       application.save!
     end
-    redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def help_paying_coverage
@@ -97,11 +99,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.save!
       redirect_to application_checklist_financial_assistance_applications_path
     else
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to edit_financial_assistance_application_path(@application)
     end
   end
 
   def application_checklist
+    @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit
@@ -120,11 +123,15 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @family = @person.primary_family
   end
 
+  def application_publish_error
+    @family = @person.primary_family
+  end
+
   private
 
   def dummy_data_for_demo(params)
     #Dummy_ED
-    @model.update_attributes!(aasm_state: "approved", assistance_year: TimeKeeper.date_of_record.year)
+    @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year)
     @model.applicants.each do |applicant|
       applicant.update_attributes!(is_ia_eligible: true)
     end

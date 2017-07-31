@@ -179,7 +179,7 @@
         </div>
         <div class='col-md-3'>
           <label></label>
-          <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "Secondary(High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+          <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
         </div>
       </div>
 
@@ -236,14 +236,13 @@
       <br><br>
   </div>
 
-  <div class="col-md-2">
-    <button id="btn-continue" class="button btn btn-lg btn-primary" type="submit">CONTINUE</button>
-    <ul class="list-unstyled list-right-section">
-      <li>
-        <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant) do %>
-        <%= image_tag 'icons/list.png' %> PREVIOUS
-        <% end %>
-      </li>
-    </ul>
+  <%= content_for :submit_button do %>
+    <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary" %>
+  <% end %>
+
+  <div class='col-md-2'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
+    } %>
   </div>
 <%end%>

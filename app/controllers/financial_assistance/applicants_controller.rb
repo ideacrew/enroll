@@ -35,7 +35,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     if params.key?(model_name)
       if @model.save(context: "step_#{@current_step.to_i}".to_sym)
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Finish"
+        if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })
           redirect_to find_applicant_path(@application, @applicant)
         else

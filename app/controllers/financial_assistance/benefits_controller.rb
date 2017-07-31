@@ -27,7 +27,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     if params.key?(model_name)
       if @model.save
         @current_step = @current_step.next_step if @current_step.next_step.present?
-        if params[:commit] == "Finish"
+        if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })
           flash[:notice] = 'Benefit Info Added.'
           redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)

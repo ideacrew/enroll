@@ -42,16 +42,6 @@ module Insured::FamilyMembersHelper
     end
   end
 
-  def find_applicant family_member
-    if family_member.class == Forms::FamilyMember
-      # AJAX add of family member
-      #family_member dutring ajax call is a Form::FamilyMemeber which has a FamilyMember
-      family_member.family_member.applicant
-    else
-      family_member.applicant
-    end
-  end
-
   def is_applying_coverage_value_dependent(dependent)
     first_checked = true
     second_checked = false

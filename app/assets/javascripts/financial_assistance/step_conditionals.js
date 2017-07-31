@@ -1,5 +1,10 @@
 $(document).ready(function() {
 
+  /* attestations */
+  $('#living_outside_yes, #living_outside_no').change(function(e) {
+    $('#application_attestation_terms').attr('required', e.target.value == 'true');
+  });
+
   if ($('#medicaid_pregnency_yes').length) {
     $.ajax({
       type: "GET",

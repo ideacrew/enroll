@@ -138,16 +138,10 @@
     <%end%>
   </div>
 </div>
-<div class="col-md-2">
-  <%= link_to go_to_step_financial_assistance_application_path(@application, 1) do %>
-    <div id="btn-continue" class="button btn btn-lg btn-primary">CONTINUE</div>
-  <% end %>
 
-  <ul class="list-unstyled list-right-section">
-    <li>
-      <%= link_to financial_assistance_application_path(@application) do %>
-        <%= image_tag 'icons/list.png' %> PREVIOUS
-      <% end %>
-    </li>
-  </ul>
+<div class='col-md-2'>
+  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+    previous_url: edit_financial_assistance_application_path(@application),
+    next_url: go_to_step_financial_assistance_application_path(@application, 1)
+  } %>
 </div>

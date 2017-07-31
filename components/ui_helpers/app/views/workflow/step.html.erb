@@ -22,6 +22,49 @@
     </div>
   </div>
   <div class="col-md-2">
-    <%= render '/financial_assistance/shared/right_nav'%>
+    <% if @model.class.name == "FinancialAssistance::Application" and @steps.last_step?(@current_step) %>
+        <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
+    <% else %>
+      <% if  @steps.last_step?(@current_step) %>
+        <%= hidden_field_tag 'last_step', true %>
+      <% end %>
+      <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary" %>
+    <% end %>
+    <p class="small-left-margin very-small-margin-top faded">
+      <ul class='list-unstyled list-right-section'>
+        <li>
+          <% if @current_step.to_i == 1 %>
+            <%= link_to find_previous_from_step_one do %>
+              <%= image_tag 'icons/list.png' %>
+              PREVIOUS
+            <% end %>
+          <% else %>
+            <%= link_to previous_step_for do %>
+              <%= image_tag 'icons/list.png' %>
+              PREVIOUS
+            <% end %>
+          <% end %>
+        </li>
+        <li>
+          <a href="#">
+            <%= image_tag 'icons/list.png' %>
+            SAVE &amp; EXIT
+          </a>
+          <br>
+          <br>
+        </li>
+        <li>
+          <p>
+            If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+          </p>
+        </li>
+        <br class="clear">
+      </ul>
+    </p>
+
+    <div class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+      Help me sign up
+    </div>
+    <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
   </div>
 <% end %>
