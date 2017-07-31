@@ -4,13 +4,14 @@ module DataTablesSearch
     if order.present?
       order == "asc" ? asc_due_date(query) : desc_due_date(query)
     else
-      query.search.skip(dt_query.skip).limit(dt_query.take)
+      query.search_and_filter.skip(dt_query.skip).limit(dt_query.take)
     end
   end
 
   def asc_due_date(query)
     results = query.query_families
                    .sort_with_search_key
+                   .sort_with_filter
                    .query_on_min_verification_due_date
                    .sort_asc
                    .skip
@@ -24,6 +25,7 @@ module DataTablesSearch
   def desc_due_date(query)
     results = query.query_families
                    .sort_with_search_key
+                   .sort_with_filter
                    .query_on_min_verification_due_date
                    .sort_desc
                    .skip

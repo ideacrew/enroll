@@ -1,10 +1,11 @@
 module Queries
   class VerificationsDatatableQuery < ShopMonthlyEnrollments
 
-    def initialize(dt_query)
+    def initialize(dt_query, filter_param=nil)
       @skip = dt_query.skip
       @take = dt_query.take
       @search_str = dt_query.search_string
+      @filter = filter_param
       @pipeline = []
     end
 
@@ -47,14 +48,28 @@ module Queries
       self
     end
 
-    def search
-      return all_families if @search_str.blank?
-      all_families.where({"family_members.person_id" => {"$in" => get_person_ids}})
+    def search_and_filter
+      return all_families if (@search_str.blank? && @filter.blank?)
+      return all_families.send("with_#{@filter}_verifications") if (@search_str.blank? && @filter.present? )
+      return all_families.where({"family_members.person_id" => {"$in" => get_person_ids}}) if (@search_str.present? && @filter.blank?)
+      return all_families.send("with_#{@filter}_verifications").where({"family_members.person_id" => {"$in" => get_person_ids}})
     end
 
     def sort_with_search_key
       return self if @search_str.blank?
       add({ "$match" => {"family_members.person_id" => {"$in" => get_person_ids}}})
+      self
+    end
+
+    def sort_with_filter
+      return self if @filter.blank?
+      status = @filter == "partial" ? "in review" : (@filter == "all" ? "ready" : "incomplete")
+
+      add({"$unwind" => '$households'})
+      add({"$unwind" => '$households.hbx_enrollments'})
+      add({"$match" => {"households.hbx_enrollments.aasm_state" => "enrolled_contingent" }})
+      add({"$match" => {"households.hbx_enrollments.review_status" => status}})
+
       self
     end
 

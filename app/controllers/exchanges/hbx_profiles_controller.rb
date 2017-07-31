@@ -398,7 +398,7 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    query = ::Queries::VerificationsDatatableQuery.new(dt_query)
+    query = ::Queries::VerificationsDatatableQuery.new(dt_query, params["filter"])
 
     order = params[:order]["0"][:dir] if params[:order].present?
 
@@ -406,7 +406,7 @@ def employer_poc
 
     @draw = dt_query.draw
     @total_records = query.all_families.count
-    @records_filtered = query.search.count
+    @records_filtered = query.search_and_filter.count
     @families = sorted_results
     render
   end
