@@ -22,7 +22,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     format_date_params params[:financial_assistance_applicant]
     @applicant = @application.applicants.find(params[:id])
     @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
-    redirect_to find_application_path(@application)
+    redirect_to find_next_application_path(@application)
   end
 
   def step
