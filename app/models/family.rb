@@ -192,8 +192,8 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
-  scope :approved_applications, ->{ where(:"applications.aasm_state".in => ["approved"]) }
-  scope :approved_applications_for_year, ->(year) { where(:"applications.aasm_state".in => ["approved"]).and(:"applications.assistance_year" => year) }
+  scope :approved_applications, ->{ where(:"applications.aasm_state".in => ["determined"]) }
+  scope :approved_applications_for_year, ->(year) { where(:"applications.aasm_state".in => ["determined"]).and(:"applications.assistance_year" => year) }
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -723,17 +723,17 @@ class Family
 
   def active_approved_application
     # Returns the most recent application that is approved (has eligibility determination) for the current year.
-    applications.where(aasm_state: "approved", assistance_year: TimeKeeper.date_of_record.year).order_by(:submitted_at => 'desc').first
+    applications.where(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year).order_by(:submitted_at => 'desc').first
   end
 
   def approved_applications_for_year(year)
     # Returns the last application that is approved (has eligibility determination) for a given year.
-    applications.where(aasm_state: "approved", assistance_year: year)
+    applications.where(aasm_state: "determined", assistance_year: year)
   end
 
   def approved_applications
     # Returns all approved applications
-    applications.where(aasm_state: "approved")
+    applications.where(aasm_state: "determined")
   end
 
   class << self
