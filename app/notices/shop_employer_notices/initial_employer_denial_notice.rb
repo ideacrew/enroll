@@ -14,16 +14,16 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
     plan_year = employer_profile.plan_years.first
     plan_year_warnings = []
     if plan_year
-      plan_year.application_eligibility_warnings.each do |k, v|
+      plan_year.application_eligibility_warnings.each do |k, _|
         case k.to_s
         when "fte_count"
           plan_year_warnings << "Full Time Equivalent must be 1-50"
         when "primary_office_location"
-          plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+          plan_year_warnings << "primary business address not located in #{site_short_name}"
         end
       end      
     else
-      plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+      plan_year_warnings << "primary business address not located in #{site_short_name}"
     end
     
     notice.plan_year = PdfTemplates::PlanYear.new({
