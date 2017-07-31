@@ -2,42 +2,7 @@
 <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
 <%= form_for @census_employee, url: employers_employer_profile_census_employee_path(@employer_profile, @census_employee.id), method: :put do |f| %>
-<% if @census_employee.errors.any? %>
-<div class="alert alert-error">
-  <h4>
-    <%= "#{pluralize(@census_employee.errors.size, "error")} prohibited this person from being saved:" %>
-  </h4>
-  <ul>
-    <% @census_employee.errors.delete(:address) %>
-    <% @census_employee.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% @census_employee.census_dependents.each do |dep| %>
-    <% dep.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-    <% if @census_employee.address.present? %>
-    <% @census_employee.address.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-    <% @census_employee.benefit_group_assignments.each do |bg| %>
-    <% bg.errors.full_messages.each do |msg| %>
-    <li>
-      <%= msg %>
-    </li>
-    <% end %>
-    <% end %>
-  </ul>
-</div>
-<% end %>
+ <%= render 'errors_if_any' %>
 <%= hidden_field_tag 'status', "#{@status}" %>
 <div class="census-employee module content-bottom" data-census-employee-id="<%= @census_employee.id %>" data-rehire-url="<%= employers_employer_profile_census_employee_rehire_path(@employer_profile.id, @census_employee.id) %>" data-status="<%= @status %>" data-terminate-url="<%= employers_employer_profile_census_employee_terminate_path(@employer_profile.id, @census_employee.id) %>">
   <div class="vertically-aligned-row">
@@ -128,25 +93,9 @@
         </div>
       </div>
     </div>
-    
-  <div class="row">
-    <div class="col-xs-12">
-      <h3>
-        <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
-      </h3>
-      <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
-        <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
-          <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
-          <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>
-        <% end %>
-      <% else %>
-      <div class="vertically-aligned-row">
-        <h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>
-      <%= render 'shared/add_dependents', { f: f } %>
-      </div>
-      <% end %>
-    </div>
-  </div>
+
+    <%# It is been moved since we are using this page in edit action as well. %>
+  <%= render 'dependents_fields', f: f %>
 
   <div class="row">
     <% @census_employee.enrollments_for_display.compact.each do |enrollment| %>
@@ -177,7 +126,7 @@
   </div>
   <% end %>
 </div>
-
+</div>
 <script>
   $(document).on('ready page:load', function () {
     // FormHelpers.preventUnload();
