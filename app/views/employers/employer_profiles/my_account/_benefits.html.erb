@@ -229,7 +229,7 @@
             		              <th>Employer</th>
             		              <th>Total</th>
                     </tr>
-                    <% bg.composite_tier_contributions.each_with_index do |ct, i| %>
+                    <% bg.sorted_composite_tier_contributions.each_with_index do |ct, i| %>
                     <tr class="<% if ct.offered %>offered<% else %>not-offered <% end %>">
                       <td><%= ct.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= t("shop.composite_tiers.#{ct.composite_rating_tier}") %></td>
                       <td id="pct">
