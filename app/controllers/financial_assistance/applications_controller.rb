@@ -80,6 +80,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application = old_application.dup
       application.aasm_state = "draft"
       application.submitted_at = nil
+      application.created_at = TimeKeeper.datetime_of_record
       application.save!
     end
     redirect_to edit_financial_assistance_application_path(@application)
