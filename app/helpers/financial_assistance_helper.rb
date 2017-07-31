@@ -103,4 +103,8 @@ module FinancialAssistanceHelper
       true
     end
   end
+
+  def left_nav_css(conditional)
+    'cna disabled' unless conditional
+  end
 end
