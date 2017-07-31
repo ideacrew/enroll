@@ -261,6 +261,7 @@ Rails.application.routes.draw do
     resources :employer_attestations do 
        get 'authorized_download'
        get 'verify_attestation'
+       delete 'delete_attestation_documents'
        #get 'revert_attestation'
     end
     resources :inboxes, only: [:new, :create, :show, :destroy]
@@ -280,7 +281,6 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
-        get 'delete_attestation_documents'
       end
 
       collection do

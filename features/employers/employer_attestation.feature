@@ -153,7 +153,7 @@ Feature: Employer Profile
     And Employer clicks delete in actions
     Then Employer should not see submitted document
 
-  Scenario: Employer should not delete submitted documents
+  Scenario: Employer should not be allowed to delete a document which is not in 'submitted' state. i.e, accepted, rejected or info needed
     Then Employer uploads an attestation document
     Then I click on log out link
     Given a Hbx admin with read and write permissions exists
