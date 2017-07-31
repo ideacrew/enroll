@@ -192,8 +192,18 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
-  scope :approved_applications, ->{ where(:"applications.aasm_state".in => ["determined"]) }
-  scope :approved_applications_for_year, ->(year) { where(:"applications.aasm_state".in => ["determined"]).and(:"applications.assistance_year" => year) }
+
+  def self.approved_applications
+    where :_id.in => FinancialAssistance::Application.where('aasm_state' => 'determined').map(&:family_id)
+  end
+
+  def self.submitted_applications
+    where :_id.in => FinancialAssistance::Application.where('aasm_state' => 'submitted').map(&:family_id)
+  end
+
+  def self.approved_applications_for_year(year)
+    where :_id.in => FinancialAssistance::Application.where('aasm_state' => 'determined', 'assistance_year' => year).map(&:family_id)
+  end
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
