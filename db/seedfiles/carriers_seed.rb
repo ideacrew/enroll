@@ -16,9 +16,5 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000037", abbrev: "FCHP", 
 org = Organization.new(fein: "042864973", legal_name: "Health New England", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000045", abbrev: "HNE", hbx_carrier_id: 20007, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['34484'])
 
-org = Organization.new(fein: "453596033", legal_name: "Minuteman Health", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000053", abbrev: "MHI", hbx_carrier_id: 20009, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['73331'])
-
-
 puts "::: Generated MA Carriers :::"
 puts "*"*80
