@@ -23,41 +23,40 @@ module FinancialAssistanceHelper
     age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def activer_for(target)
-    if controller_name == 'applicants'
-      if action_name == 'step' and defined? @current_step
-        if @current_step.to_i == 1
-          ''
-        elsif @current_step.to_i == 2 and target == 'income_and_coverage'
-          'activer'
-        end
+  def determine_current
+  end
+
+  def li_nav_classes_for(target)
+    current = if controller_name == 'applications'
+      if action_name == 'edit'
+        :household_info
+      end
+    elsif controller_name == 'applicants'
+      if action_name == 'step' and @current_step.try(:to_i) == 1
+        :income_and_coverage
+      elsif action_name == 'step' and @current_step.try(:to_i) == 2
+        :tax_info
       elsif action_name == 'other_questions'
-        if target == 'other_questions'
-          ''
-        else
-          'activer'
-        end
-      else
-        ''
+        :other_questions
       end
     elsif controller_name == 'incomes'
-      if ['income_and_coverage', 'tax_info'].include?(target)
-        'activer'
-      else
-        ''
-      end
-    elsif controller_name == "deductions"
-      if ['income_and_coverage', 'tax_info', 'income'].include?(target)
-        'activer'
-      else
-        ''
-      end
-    elsif controller_name == "benefits"
-      if ['income_and_coverage', 'tax_info', 'income', 'income_adjustments'].include?(target)
-        'activer'
-      else
-        ''
-      end
+      :income
+    elsif controller_name == 'deductions'
+      :income_adjustments
+    elsif controller_name == 'benefits'
+      :health_coverage
+    end
+
+    puts action_name
+    puts controller_name
+    puts current.inspect
+    order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions]
+    if target == current
+      'activer active'
+    elsif order.index(target) < order.index(current)
+      'activer'
+    else
+      ''
     end
   end
 

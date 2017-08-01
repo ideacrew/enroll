@@ -1,17 +1,17 @@
 <nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
-  <ul class="nav nav-stacked" id="leftNavigation">
+  <ul class="nav nav-stacked" id="left-navigation">
     <%# We need to turn these links in to actual links or make it so we don't need fake a's %>
     <li class="activer list-box step-tabs">
       <a href="<%= financial_assistance_applications_path %>">Applications</a>
     </li>
 
-    <li class="activer list-box step-tabs">
+    <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %>">
       <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
     </li>
 
     <% if defined?(@applicant) %>
       <ul class="nav nav-stacked">
-        <li class="list-box step-tabs <%= activer_for("income_and_coverage") %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income_and_coverage) %>">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
             <% if @applicant.other_questions_complete? %>
               <span class="fa fa-check"></span>
@@ -20,7 +20,7 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= activer_for("tax_info") %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %>">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2) do %>
             <% if @applicant.tax_info_complete? %>
               <span class="fa fa-check"></span>
@@ -29,7 +29,7 @@
           <% end %>
         </li>
 
-      <li class="list-box step-tabs <%= activer_for("income") %>">
+      <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
           <%= link_to @applicant.incomes.present? ? financial_assistance_application_applicant_incomes_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.incomes.present?)}" do %>
             <% if @applicant.incomes_complete? %>
               <span class="fa fa-check"></span>
@@ -38,7 +38,7 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= activer_for("income_adjustments") %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %>">
           <%= link_to @applicant.deductions.present? ? financial_assistance_application_applicant_deductions_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.deductions.present?)}" do %>
             <% if @applicant.deductions_complete? %>
               <span class="fa fa-check"></span>
@@ -47,7 +47,7 @@
           <%end%>
         </li>
 
-        <li class="list-box step-tabs <%= activer_for("health_coverage") %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %>">
           <%= link_to @applicant.benefits.present? ? financial_assistance_application_applicant_benefits_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.benefits.present?)}" do %>
             <% if @applicant.benefits_complete? %>
               <span class="fa fa-check"></span>
@@ -56,7 +56,7 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= activer_for("other_questions") %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %>">
           <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant) do %>
             <% if @applicant.other_questions_complete? %>
               <span class="fa fa-check"></span>
