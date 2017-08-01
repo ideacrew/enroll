@@ -562,7 +562,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
   end
 
-  describe "POST force publish" do
+  describe "POST Publish Anyways" do
     let(:plan_year_id) { "plan_year_id"}
     let(:plan_year_proxy) { instance_double("PlanYear", publish: double)}
 

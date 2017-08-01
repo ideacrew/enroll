@@ -93,7 +93,7 @@ describe "ScheduledEventService"  do
 
   end
 
-  context "Shop market renewal application force publish day of month" do
+  context "Shop market renewal application Publish Anyways day of month" do
 
     it "should return settings day" do
       expect(ScheduledEvent.shop_market_renewal_application_force_publish_day_of_month).to eq Settings.aca.shop_market.renewal_application.force_publish_day_of_month
