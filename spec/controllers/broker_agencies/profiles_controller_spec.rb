@@ -307,55 +307,55 @@ RSpec.describe BrokerAgencies::ProfilesController do
     end
   end
 
-  describe "GET assign" do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
-    let(:person) { broker_role.person }
-    let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    context "when general agency is enabled via settings" do
-      before :each do
-        Settings.aca.general_agency_enabled = true
-        sign_in user
-        xhr :get, :assign, id: broker_agency_profile.id, format: :js
-      end
-
-      it "should return http success" do
-        expect(response).to have_http_status(:success)
-      end
-
-      it "should get general_agency_profiles" do
-        expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
-      end
-
-      it "should get employers" do
-        expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
-      end
-    end
-
-    context "when general agency is disabled via settings" do
-      before :each do
-        Settings.aca.general_agency_enabled = false
-        sign_in user
-        xhr :get, :assign, id: broker_agency_profile.id, format: :js
-      end
-
-      it "should return http redirect" do
-        expect(response).to have_http_status(:redirect)
-      end
-
-      it "should redirect to broker_agency_profile" do
-        expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
-      end
-
-      it "general_agency_profiles should be nil" do
-        expect(assigns(:general_agency_profiles)).to be_nil
-      end
-
-      it "employers should be nil" do
-        expect(assigns(:employers)).to be_nil
-      end
-    end
-  end
+  # describe "GET assign" do
+  #   let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+  #   let(:broker_role) { FactoryGirl.create(:broker_role, aasm_state: 'active', broker_agency_profile: broker_agency_profile) }
+  #   let(:person) { broker_role.person }
+  #   let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
+  #   context "when general agency is enabled via settings" do
+  #     before :each do
+  #       Settings.aca.general_agency_enabled = true
+  #       sign_in user
+  #       xhr :get, :assign, id: broker_agency_profile.id, format: :js
+  #     end
+  #
+  #     it "should return http success" do
+  #       expect(response).to have_http_status(:success)
+  #     end
+  #
+  #     it "should get general_agency_profiles" do
+  #       expect(assigns(:general_agency_profiles)).to eq GeneralAgencyProfile.all_by_broker_role(broker_role)
+  #     end
+  #
+  #     it "should get employers" do
+  #       expect(assigns(:employers)).to eq Organization.by_broker_agency_profile(broker_agency_profile.id).map(&:employer_profile).first(20)
+  #     end
+  #   end
+  #
+  #   context "when general agency is disabled via settings" do
+  #     before :each do
+  #       Settings.aca.general_agency_enabled = false
+  #       sign_in user
+  #       xhr :get, :assign, id: broker_agency_profile.id, format: :js
+  #     end
+  #
+  #     it "should return http redirect" do
+  #       expect(response).to have_http_status(:redirect)
+  #     end
+  #
+  #     it "should redirect to broker_agency_profile" do
+  #       expect(response).to redirect_to(broker_agencies_profile_path(broker_agency_profile))
+  #     end
+  #
+  #     it "general_agency_profiles should be nil" do
+  #       expect(assigns(:general_agency_profiles)).to be_nil
+  #     end
+  #
+  #     it "employers should be nil" do
+  #       expect(assigns(:employers)).to be_nil
+  #     end
+  #   end
+  # end
 
   describe "GET assign_history" do
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
