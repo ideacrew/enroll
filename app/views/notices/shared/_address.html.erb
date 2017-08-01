@@ -24,7 +24,8 @@
     <% end %>
     <tr>
     <td><%= notice.primary_address.city %> <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
-    <% unless notice.shop? %>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% if (display_mpi_indicator.nil? && !notice.shop?) %>
       <td style="text-align: right;">Notice No: <%= notice.mpi_indicator %></td>
     <% end %>
     </tr>
