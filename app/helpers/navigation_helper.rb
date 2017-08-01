@@ -1,7 +1,11 @@
 module NavigationHelper
-  TABS_WITH_TITLE = {"accountRegistration" => { "title" => "Account Registration", "id" => "accountRegistration", active: true}, "moreAboutYou" => { "title" => "Tell us About Yourself", "id" => "moreAboutYou", active: true }, "householdinfo" => { "title" => "Household Info", "id" => "householdInfo" } }
+  def tell_us_about_yourself_active?
+    return true if controller_name == "consumer_roles" && ['edit', 'ridp_agreement'].include?(action_name)
+    return true if controller_name == "interactive_identity_verifications"
+    return true if ["help_paying_coverage", "application_checklist"].include?(action_name)
+  end
 
-  def self.getAllTabs
-    TABS_WITH_TITLE.map {|tab, tabValue| {"title" => tabValue["title"], "id"=> tabValue["id"], active: tabValue[:active]}}
+  def account_registration_active?
+    ["search", "match"].include?(action_name)
   end
 end
