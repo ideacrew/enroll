@@ -32,7 +32,7 @@ module TransportGateway
         end
         Sources::TempfileSource.new(source_stream)
       rescue Exception => e
-        log(:error, "transport_gateway.sftp_adapter") { e }
+        logger.error("transport_gateway.sftp_adapter") { e }
         source_stream.close
         source_stream.unlink
         raise e
