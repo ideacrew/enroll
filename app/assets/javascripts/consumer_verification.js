@@ -46,7 +46,7 @@ var Verification = (function(){
              hideAllActions($selected_id);
              showVerifyType($selected_id);
              break;
-         case 'Return for Deficiency':
+         case 'Reject':
              hideAllActions($selected_id);
              showReturnForDef($selected_id);
              break;
