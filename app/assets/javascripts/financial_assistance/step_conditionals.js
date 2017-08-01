@@ -21,6 +21,8 @@ $(document).ready(function() {
     if ($('#is_pregnant_yes')) {
       if (age == "false"){
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+        $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
+        $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
       } else {
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
       }
