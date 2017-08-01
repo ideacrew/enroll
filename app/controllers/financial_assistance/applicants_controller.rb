@@ -19,10 +19,17 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def save_questions
-    format_date_params params[:financial_assistance_applicant]
+    format_date_params params[:financial_assistance_applicant] if params[:financial_assistance_applicant].present?
     @applicant = @application.applicants.find(params[:id])
-    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
-    redirect_to edit_financial_assistance_application_path(@application)
+    @applicant.assign_attributes(permit_params(params[:financial_assistance_applicant])) if params[:financial_assistance_applicant].present?
+    if @applicant.save(context: :other_qns)
+      redirect_to edit_financial_assistance_application_path(@application)
+    else
+      @applicant.save(validate: false)
+      @applicant.valid?(:other_qns)
+      flash[:error] = build_error_messages_for_other_qns(@applicant)
+      redirect_to other_questions_financial_assistance_application_applicant_path(@application, @applicant)
+    end
   end
 
   def step
@@ -68,6 +75,10 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def build_error_messages(model)
     model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+  end
+
+  def build_error_messages_for_other_qns(model)
+    model.valid?(:other_qns) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
   end
 
   def find_application

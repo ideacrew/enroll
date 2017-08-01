@@ -92,7 +92,7 @@ class FinancialAssistance::Applicant
   field :is_former_foster_care, type: Boolean
   field :age_left_foster_care, type: Integer, default: 0
   field :foster_care_us_state, type: String
-  field :had_medicaid_during_foster_care, type: Boolean, default: false
+  field :had_medicaid_during_foster_care, type: Boolean
 
   field :is_pregnant, type: Boolean
   field :is_enrolled_on_medicaid, type: Boolean
@@ -465,7 +465,7 @@ private
       end
 
       if is_former_foster_care
-        errors.add(:foster_care_us_state, "should be answered") if foster_care_us_state.nil?
+        errors.add(:foster_care_us_state, "should be answered") if foster_care_us_state.blank?
         errors.add(:age_left_foster_care, "should be answered") if age_left_foster_care.nil?
       end
     end

@@ -47,6 +47,7 @@ module FinancialAssistanceHelper
     end
 
     order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
+
     if target == current
       'activer active'
     elsif order.index(target) < order.index(current)
@@ -60,11 +61,7 @@ module FinancialAssistanceHelper
     if application.incomplete_applicants?
       go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
     else
-      if action_name == "save_questions"
-        edit_financial_assistance_application_path(application)
-      else
-        review_and_submit_financial_assistance_application_path application
-      end
+      review_and_submit_financial_assistance_application_path application
     end
   end
 
