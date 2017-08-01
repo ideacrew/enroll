@@ -1028,8 +1028,4 @@ class Person
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
-
-  def family_member
-    primary_family.family_members.find_by(person_id: id)
-  end
 end
