@@ -379,6 +379,20 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     end
   end
 
+  describe "GET verifications_index_datatable" do
+
+    let(:user) { double("User", :has_hbx_staff_role? => true)}
+    
+    before :each do
+      sign_in(user)
+    end
+
+    it "should render json template" do
+      get :verifications_index_datatable, {format: :json}
+      expect(response).to render_template("exchanges/hbx_profiles/verifications_index_datatable")
+    end
+  end
+
   describe "POST" do
     let(:user) { FactoryGirl.create(:user)}
     let(:person) { FactoryGirl.create(:person, user: user) }
