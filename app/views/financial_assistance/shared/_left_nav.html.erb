@@ -14,7 +14,7 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_and_coverage) %>">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
             <% if @applicant.other_questions_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Income and Coverage
           <% end %>
@@ -23,7 +23,7 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %>">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2) do %>
             <% if @applicant.tax_info_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Tax Info
           <% end %>
@@ -32,7 +32,7 @@
       <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
           <%= link_to @applicant.incomes.present? ? financial_assistance_application_applicant_incomes_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.incomes.present?)}" do %>
             <% if @applicant.incomes_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Income
           <% end %>
@@ -41,7 +41,7 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %>">
           <%= link_to @applicant.deductions.present? ? financial_assistance_application_applicant_deductions_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.deductions.present?)}" do %>
             <% if @applicant.deductions_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Income Adjustments
           <%end%>
@@ -50,7 +50,7 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %>">
           <%= link_to @applicant.benefits.present? ? financial_assistance_application_applicant_benefits_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.benefits.present?)}" do %>
             <% if @applicant.benefits_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Health Coverage
           <% end %>
@@ -59,7 +59,7 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %>">
           <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant) do %>
             <% if @applicant.other_questions_complete? %>
-              <span class="fa fa-check"></span>
+              <span class="fa fa-check applicant-check"></span>
             <% end %>
             Other Questions
           <% end %>
