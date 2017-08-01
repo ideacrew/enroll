@@ -283,6 +283,7 @@ $(document).ready(function() {
   $("body").on("change", "#is_former_foster_care_no", function(){
     if ($('#is_former_foster_care_no').is(':checked')) {
       $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
     };
   });
 
@@ -296,6 +297,7 @@ $(document).ready(function() {
     $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
   } else {
     $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
   }
 
   $("body").on("change", "#is_student_no", function(){
