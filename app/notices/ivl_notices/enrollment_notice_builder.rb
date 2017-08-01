@@ -14,13 +14,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     generate_custom_notice('notices/ivl/documents_section')
     attach_blank_page(custom_notice_path)
     join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
   end
 
   def generate_custom_notice(custom_template)
     File.open(custom_notice_path, 'wb') do |file|
       file << self.pdf(custom_template)
     end
-    clear_tmp
   end
 
   def clear_tmp
