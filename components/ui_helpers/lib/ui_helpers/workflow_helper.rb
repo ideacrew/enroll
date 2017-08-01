@@ -14,7 +14,7 @@ module UIHelpers
     end
 
     def previous_step_for
-      controller.request.path + "/#{@current_step.to_i - 1}"
+      controller.request.path.gsub(/step(?:\/\d)?$/, "step/#{@current_step.to_i - 1}")
     end
 
     # The following helper methods are for populating the persisted values of each
