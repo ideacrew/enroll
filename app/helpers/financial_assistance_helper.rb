@@ -23,13 +23,12 @@ module FinancialAssistanceHelper
     age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
-  def determine_current
-  end
-
   def li_nav_classes_for(target)
     current = if controller_name == 'applications'
       if action_name == 'edit'
         :household_info
+      elsif action_name == 'review_and_submit'
+        :review_and_submit
       end
     elsif controller_name == 'applicants'
       if action_name == 'step' and @current_step.try(:to_i) == 1
@@ -47,7 +46,7 @@ module FinancialAssistanceHelper
       :health_coverage
     end
 
-    order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions]
+    order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
     if target == current
       'activer active'
     elsif order.index(target) < order.index(current)
