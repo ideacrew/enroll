@@ -50,6 +50,8 @@ class Plan
   field :deductible, type: String # Deductible
   field :family_deductible, type: String
 
+  field :network_information, type: String
+
   field :nationwide, type: Boolean # Nationwide
   field :dc_in_network, type: Boolean # DC In-Network or not
 

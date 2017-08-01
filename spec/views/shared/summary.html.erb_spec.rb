@@ -14,6 +14,7 @@ describe "shared/_summary.html.erb" do
       :metal_level => "Silver",
       :plan_type => "A plan type",
       :nationwide => true,
+      :network_information => "This is a test",
       :deductible => 0,
       :total_premium => 0,
       :total_employer_contribution => 0,

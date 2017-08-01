@@ -66,7 +66,7 @@
                 </span>
                 <br/>
                 <span class="ttu dg fourteen">
-                  <%= @plan.nationwide ? "Nationwide" : @plan.service_area_id %>
+                  <%= render partial: "shared/network_data", locals: {plan: @plan} %>
                 </span>
               </td>
               <td>

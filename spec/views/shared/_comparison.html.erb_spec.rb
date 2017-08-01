@@ -16,6 +16,7 @@ describe "shared/_comparison.html.erb" do
       :metal_level => "Silver",
       :plan_type => "A plan type",
       :nationwide => true,
+      :network_information => "This is a test",
       :deductible => 0,
       :total_premium => 100,
       :rx_formulary_url => "http://www.example.com",
@@ -83,7 +84,7 @@ describe "shared/_comparison.html.erb" do
     end
 
     it "should contain some readable text" do
-      ["$30.00", "Nationwide", "A Plan Name", "A PLAN TYPE"].each do |t|
+      ["$30.00", "A Plan Name", "A PLAN TYPE"].each do |t|
         expect(rendered).to have_content(t)
       end
     end

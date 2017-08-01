@@ -36,7 +36,7 @@
       </td>
       <td style="padding-left: 0;">
         <p style="text-transform: capitalize;">
-          <%= @plan.nationwide ? 'Nationwide' : @plan.service_area_id %>
+          <%= render partial: "shared/network_data", locals: {plan: @plan} %>
         </p>
       </td>
 

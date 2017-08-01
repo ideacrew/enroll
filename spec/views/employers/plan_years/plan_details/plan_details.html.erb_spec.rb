@@ -24,6 +24,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       carrier_profile: carrier_profile,
       metal_level: "bronze",
       coverage_kind: "health",
+      network_information: "This is a plan",
       active_year: 2016,
       nationwide: true
       )
@@ -37,6 +38,7 @@ RSpec.describe "employers/plan_years/plan_selection/_plan_details.html.erb" do
       carrier_profile: carrier_profile,
       metal_level: "high",
       coverage_kind: "dental",
+      network_information: "This is a plan",
       active_year: 2016,
       dental_level: "high",
       nationwide: true
