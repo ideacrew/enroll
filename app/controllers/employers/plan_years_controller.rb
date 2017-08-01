@@ -3,6 +3,8 @@ class Employers::PlanYearsController < ApplicationController
   before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
 
+  layout "two_column"
+  
   def new
     @plan_year = build_plan_year
     if @employer_profile.service_areas.any?

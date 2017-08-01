@@ -12,7 +12,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
 
-  # layout 'single_column'
+  layout 'single_column'
 
   def index
     @organizations = Organization.exists(hbx_profile: true)

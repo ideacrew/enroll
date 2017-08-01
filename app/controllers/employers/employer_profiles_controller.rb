@@ -13,6 +13,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
 
+  layout "two_column",  except: [:new]
+
   def link_from_quote
     claim_code = params[:claim_code].upcase
     import_roster = params[:import_roster] == "yes" ? true : false

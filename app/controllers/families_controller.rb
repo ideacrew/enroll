@@ -1,6 +1,7 @@
 class FamiliesController < ApplicationController
   include Acapi::Notifiers
-
+  layout "two_column"
+  
   before_action :set_family #, only: [:index, :show, :new, :create, :edit, :update]
   # before_action :check_hbx_staff_role, except: [:welcome]
 
