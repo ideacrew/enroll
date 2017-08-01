@@ -332,13 +332,13 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     ssn: person[:ssn],
     dob: person[:dob_date]
 
-  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
+  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month.next_day
   open_enrollment_end_on = open_enrollment_start_on + 12.days
-  start_on = open_enrollment_start_on + 1.months
-  end_on = start_on + 1.year - 1.day
+  start_on = open_enrollment_start_on.next_month
+  end_on = start_on.next_year.prev_day
 
-  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months).year, hios_id: "11111111122302-01", csr_variant_id: "01")
-  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: (start_on + 3.months - 1.year).year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
+  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.prev_year.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
   [renewal_plan, plan].each do |plan|
     sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: plan.carrier_profile).tap do |factor_set|
