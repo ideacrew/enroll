@@ -1,19 +1,38 @@
 <div class="col-md-7">
   <div class="row">
     <div class="col-md-10">
-      <h1 class="title-text">Income Adjustments for <%= @applicant.family_member.person.first_name.titleize %></h1>
+      <h1 class="darkblue">Income Adjustments for <%= @applicant.family_member.person.first_name.titleize %></h1>
     </div>
   </div>
 
   <div>
-  <h4>Allow the following questions for this person. When you're finished, select CONTINUE</h4>
-    <%= render "income_adjustments_question"%>
+    <% if @applicant.has_deductions %>
+      <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+        <div class="col-md-11 form-heading">TAX INFO</div>
+        <div class="col-md-1">
+          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
+            <i class="glyphicon glyphicon-pencil grey-font"></i>
+          <% end %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+        <div class="col-md-8">Does this person expect to have adjustments to income in 2017?</div>
+        <div class="col-md-4">Yes</div>
+      </div>
+    <% end %>
+
+    <br>
+    <p>Income deductions were created for you below based on your answers above, complete each deduction and then click CONTINUE.</p>
+    <br>
+
     <% if @applicant.deductions.present?%>
-      <table class="table">
-        <th>Deduction Type</th>
-        <th>Status</th>
-        <th></th>
-        <th></th>
+      <table class="deductions-table table">
+        <tr>
+          <th>Deduction Type</th>
+          <th>Status</th>
+          <th></th>
+          <th></th>
+        </tr>
         <% @applicant.deductions.each do |deduction| %>
           <tr>
             <td><%= deduction.kind.nil? ? "--" : deduction.kind.titleize %></td>
@@ -25,7 +44,11 @@
               <% end %>
             </td>
             <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-small btn-success"  %></td>
-            <td><%= link_to "Delete", financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+            <td>
+              <%= link_to financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, data: { confirm: "Are you sure?" } do %>
+                <span class='fa fa-trash-o'></span>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </table>

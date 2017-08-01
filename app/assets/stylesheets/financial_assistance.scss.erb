@@ -45,6 +45,21 @@ input[type="radio"]:checked + label span {
   }
 }
 
+.incomes-table, .deductions-table, .benefits-table {
+  tr {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+
+    &:last-child {
+      border-bottom: 1px solid #ddd;
+    }
+  }
+
+  td {
+    vertical-align: middle !important;
+  }
+}
+
 .nav-align {
   margin-right:10px;
   margin-top:25px;

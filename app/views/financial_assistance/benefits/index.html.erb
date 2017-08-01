@@ -1,23 +1,50 @@
 <div class="col-md-7 ">
   <div class="row">
     <div class="col-md-10">
-      <h1 class="title-text">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
+      <h1 class="darkblue">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
     </div>
   </div>
 
   <div>
-  <h4>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</h4>
-    <%= render "health_coverage_questions"%>
-      <% if @applicant.has_enrolled_health_coverage || @applicant.has_eligible_health_coverage %>
-      <table class="table">
-        <th>Benefit Type</th>
-        <th>Benefit Insurance Type</th>
-        <th>Status</th>
-        <th></th>
-        <th></th>
+    <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+      <div class="col-md-11 form-heading"> TAX INFO </div>
+      <div class="col-md-1">
+        <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
+          <i class="glyphicon glyphicon-pencil grey-font"></i>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @applicant.has_enrolled_health_coverage%>
+      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+        <div class="col-md-8">Is this person currently enrolled in health coverage?</div>
+        <div class="col-md-4">Yes</div>
+      </div>
+    <% end %>
+
+    <% if @applicant.has_eligible_health_coverage%>
+      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+        <div class="col-md-8">Does this person currently have access to other health coverage, including through another person?</div>
+        <div class="col-md-4">Yes</div>
+      </div>
+    <% end %>
+
+    <br>
+    <p>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</p>
+    <br>
+
+    <% if @applicant.has_enrolled_health_coverage || @applicant.has_eligible_health_coverage %>
+      <table class="benefits-table table">
+        <tr>
+          <th>Benefit Type</th>
+          <th>Benefit Insurance Type</th>
+          <th>Status</th>
+          <th></th>
+          <th></th>
+        </tr>
         <% @applicant.benefits.each do |benefit| %>
           <tr>
-            <td><%= benefit.kind.split('_').second.capitalize!%></td>
+            <td><%= benefit.kind.split('_').second.capitalize! %></td>
             <td><%= benefit.insurance_kind.titleize if benefit.insurance_kind.present? %></td>
             <td>
               <% if benefit.valid? :submission %>
@@ -27,7 +54,11 @@
               <% end %>
             </td>
             <td><%= link_to "Edit", go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-small btn-success" %></td>
-            <td><%= link_to "Delete", financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, class: "btn btn-small btn-warning", data: { confirm: "Are you sure?" }%></td>
+            <td>
+              <%= link_to financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, data: { confirm: "Are you sure?" } do %>
+                <span class='fa fa-trash-o'></span>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </table>
