@@ -95,12 +95,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     family.is_applying_for_assistance = params["is_applying_for_assistance"]
     family.save!
     if family.is_applying_for_assistance
-      application = family.applications.build(aasm_state: "draft")
-      application.applicants.build(family_member_id: family.primary_applicant.id)
-      application.save!
+      if family.applications.where(aasm_state: "draft").blank?
+        application = family.applications.build(aasm_state: "draft")
+        application.applicants.build(family_member_id: family.primary_applicant.id)
+        application.save!
+      end
       redirect_to application_checklist_financial_assistance_applications_path
     else
-      redirect_to edit_financial_assistance_application_path(@application)
+      if params["is_applying_for_assistance"].nil?
+        flash[:notice] = "Please choose an option before you proceed."
+        redirect_to help_paying_coverage_financial_assistance_applications_path
+      else
+        family.applications.where(aasm_state: "draft").destroy_all
+        redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+      end
     end
   end
 
