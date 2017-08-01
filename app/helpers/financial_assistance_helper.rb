@@ -27,7 +27,7 @@ module FinancialAssistanceHelper
     current = if controller_name == 'applications'
       if action_name == 'edit'
         :household_info
-      elsif action_name == 'review_and_submit'
+      else
         :review_and_submit
       end
     elsif controller_name == 'applicants'

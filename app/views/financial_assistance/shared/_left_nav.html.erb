@@ -66,8 +66,12 @@
         </li>
       </ul>
     <% else %>
-      <li class="list-box step-tabs <%= 'activer' if action_name == 'review_and_submit' %>">
-        <a href="<%= review_and_submit_financial_assistance_application_path(@application) %>">Review and Submit</a>
+      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %>">
+        <% if @application.ready_for_attestation? %>
+          <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
+        <% else %>
+          <a>Review and Submit</a>
+        <% end %>
       </li>
     <% end %>
   </ul>
