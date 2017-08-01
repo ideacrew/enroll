@@ -3,23 +3,14 @@ module TransportGateway
     include ::TransportGateway::Adapters::Base
     
     def receive_message(message)
-      if message.from.blank?
-        log(:error, "transport_gateway.file_adapter") { "source file not provided" }
-        raise ArgumentError.new "source file not provided" 
-      end
+      raise ArgumentError.new "source file not provided" if message.from.blank?
       Sources::FileSource.new(message.from.path)
     end
 
     def send_message(message)
-      if message.to.blank?
-        log(:error, "transport_gateway.file_adapter") { "destination not provided" }
-        raise ArgumentError.new "destination not provided"
-      end
+      raise ArgumentError.new "destination not provided" if message.to.blank?
       # Allow empty string sources
-      if (message.from.blank? && (message.body == nil))
-        log(:error, "transport_gateway.file_adapter") { "source file not provided" }
-        raise ArgumentError.new "source file not provided"
-      end
+      raise ArgumentError.new "source file not provided" if (message.from.blank? && (message.body == nil))
       to_path = message.to.path
 
       ensure_directory_for(to_path)

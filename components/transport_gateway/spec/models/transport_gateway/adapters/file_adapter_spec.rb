@@ -7,10 +7,6 @@ module TransportGateway
   describe Adapters::FileAdapter, "#send_message" do
     let(:message) { ::TransportGateway::Message.new(to: to, from: from, body: body) }
 
-    before :each do
-      subject.assign_providers(nil, nil)
-    end
-
     subject { Adapters::FileAdapter.new }
 
     it_behaves_like "a transport gateway adapter, sending a message"
@@ -25,12 +21,8 @@ module TransportGateway
       let(:to) { URI.parse("file:///somewhere") }
       let(:from) { nil }
 
-      before :each do
-        subject.assign_providers(nil, nil)
-      end
-
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /source file not provided/)
+        expect{ Adapters::FileAdapter.new.send_message(message) }.to raise_error(ArgumentError, /source file not provided/)
       end
     end
 
@@ -132,41 +124,18 @@ module TransportGateway
 
   describe Adapters::FileAdapter, "#receive_message" do
     let(:message) { ::TransportGateway::Message.new(to: to, from: from, body: body) }
-    let(:gateway) { double }
 
     subject { Adapters::FileAdapter.new }
 
-    before :each do
-      subject.assign_providers(gateway, nil)
-    end
-
     describe "given:
       - no 'from'
-      - a log observer
     " do
-      let(:log_observer) { double }
       let(:body) { nil }
       let(:to) { URI.parse("file:///somewhere") }
       let(:from) { nil }
 
-      before :each do
-        allow(log_observer).to receive(:update) do |level,tag,blk|
-        end 
-        subject.assign_providers(nil, nil)
-        subject.add_observer(log_observer)
-      end
-
       it "raises an error" do
         expect{ subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/)
-      end
-
-      it "logs the error" do
-        expect(log_observer).to receive(:update) do |level,tag,blk|
-          expect(level).to eq :error
-          expect(tag).to eq "transport_gateway.file_adapter"
-          expect(blk.call).to eq "source file not provided"
-        end 
-        expect { subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/)
       end
     end
 

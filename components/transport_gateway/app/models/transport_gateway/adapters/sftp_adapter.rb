@@ -10,17 +10,13 @@ module TransportGateway
     attr_accessor :credential_options
 
     def receive_message(message)
-      if message.from.blank?
-        log(:error, "transport_gateway.sftp_adapter") { "source file not provided" }
-        raise ArgumentError.new "source file not provided"
-      end
+      raise ArgumentError.new "source file not provided" if message.from.blank?
 
       target_uri = message.from
 
       parse_credentials(target_uri)
       check_credential_provider(target_uri)
       if @user.blank? || @credential_options.blank?
-        log(:error, "transport_gateway.sftp_adapter") { "source server credentials not found" }
         raise ArgumentError.new("source server username:password not provided")
       end
       
@@ -31,30 +27,21 @@ module TransportGateway
           sftp.download!(target_uri.path, source_stream)
         end
         Sources::TempfileSource.new(source_stream)
-      rescue Exception => e
-        logger.error("transport_gateway.sftp_adapter") { e }
+      rescue
         source_stream.close
         source_stream.unlink
-        raise e
       end
     end
 
     def send_message(message)
-      if (message.from.blank? && message.body.blank?)
-        log(:error, "transport_gateway.sftp_adapter") { "source data not provided" }
-        raise ArgumentError.new "source data not provided" if (message.from.blank? && message.body.blank?)
-      end
-      unless message.to.present?
-        log(:error, "transport_gateway.sftp_adapter") { "destination not provided" }
-        raise ArgumentError.new "destination not provided" unless message.to.present?
-      end
+      raise ArgumentError.new "source data not provided" if (message.from.blank? && message.body.blank?)
+      raise ArgumentError.new "destination not provided" unless message.to.present?
 
       target_uri = message.to
 
       parse_credentials(target_uri)
       check_credential_provider(target_uri)
       if @user.blank? || @credential_options.blank?
-        log(:error, "transport_gateway.sftp_adapter") { "target server credentials not found" }
         raise ArgumentError.new("target server username:password not provided")
       end
 
@@ -66,9 +53,6 @@ module TransportGateway
 
           sftp.upload!(source.stream, target_uri.path)
         end
-      rescue Exception => e
-        log(:error, "transport_gateway.sftp_adapter") { e }
-        raise e
       ensure
         source.cleanup
       end

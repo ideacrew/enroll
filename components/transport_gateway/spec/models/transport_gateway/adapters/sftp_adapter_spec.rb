@@ -17,10 +17,6 @@ module TransportGateway
 
     subject { Adapters::SftpAdapter.new }
 
-    before :each do
-      subject.assign_providers(nil, nil)
-    end
-
     it_behaves_like "a transport gateway adapter, sending a message"
 
     describe "given:
@@ -31,12 +27,8 @@ module TransportGateway
       let(:from)      { nil }
       let(:to)        { URI::FTP.build({ host: target_host, path: target_path, scheme: "sftp" }) }
 
-      before :each do
-        subject.assign_providers(nil, nil)
-      end
-
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/ ) 
+        expect{ Adapters::SftpAdapter.new.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/ ) 
       end
     end
 
@@ -71,12 +63,8 @@ module TransportGateway
       let(:from)      { nil }
       let(:to)        { URI::FTP.build({ host: target_host, path: target_path, scheme: "sftp" }) }
 
-      before :each do
-        subject.assign_providers(nil, nil)
-      end
-
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /source data not provided/) 
+        expect{ Adapters::SftpAdapter.new.send_message(message) }.to raise_error(ArgumentError, /source data not provided/) 
       end
     end
 
@@ -196,8 +184,6 @@ module TransportGateway
   end
 
   describe Adapters::SftpAdapter, "#receive_message" do
-    let(:credential_provider) { double }
-    let(:gateway) { double }
     let(:message) { Message.new(from: from, to: to, body: body) }
     let(:user_name) { "A user name" }
     let(:user_password) { "someC#*($&DERAZY pwd" }
@@ -218,12 +204,8 @@ module TransportGateway
     " do
       let(:from)      { nil }
 
-      before :each do
-        subject.assign_providers(gateway, credential_provider)
-      end
-
       it "raises an error" do
-        expect{ subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/) 
+        expect{ Adapters::SftpAdapter.new.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/) 
       end
     end
 
