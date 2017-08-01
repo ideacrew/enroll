@@ -933,7 +933,7 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform_now(self.id.to_s, event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
   def rating_area
