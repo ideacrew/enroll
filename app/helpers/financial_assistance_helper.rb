@@ -47,9 +47,6 @@ module FinancialAssistanceHelper
       :health_coverage
     end
 
-    puts action_name
-    puts controller_name
-    puts current.inspect
     order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions]
     if target == current
       'activer active'
