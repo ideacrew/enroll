@@ -48,7 +48,7 @@
       </div>
       <div class='col-md-3'>
         <label></label>
-        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+        <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "NONE"}, {:id => 'children_expected_count', :class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
@@ -95,11 +95,11 @@
       </div>
       <div class='col-md-2'>
         <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes", required: true) %>
-        <label class="radio-yml" for="former_foster_care_yes">Yes</label>
+        <label class="radio-yml" for="is_former_foster_care_yes">Yes</label>
       </div>
       <div class='col-md-2'>
-        <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "former_foster_care_no", required: true) %>
-        <label class="radio-yml" for="former_foster_care_no">No</label>
+        <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "is_former_foster_care_no", required: true) %>
+        <label class="radio-yml" for="is_former_foster_care_no">No</label>
       </div>
     </div>
 
@@ -109,7 +109,7 @@
       </div>
       <div class='col-md-2'>
         <label></label>
-         <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+        <%= f.select(:foster_care_us_state, options_for_select(State::NAME_IDS, selected: @applicant.foster_care_us_state), {:include_blank => "NONE"}, {:id => 'foster_care_us_state', :class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
@@ -119,7 +119,7 @@
       </div>
       <div class='col-md-2'>
         <label></label>
-        <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, {:class => "form-control", :prompt => true}) %>
+        <%= f.select(:age_left_foster_care, options_for_select([*1..applicant_age(@applicant)],selected: @applicant.age_left_foster_care), {:include_blank => "NONE"}, {:id => 'age_left_foster_care', :class => "form-control", :prompt => true}) %>
       </div>
     </div>
 
@@ -160,7 +160,7 @@
         </div>
         <div class='col-md-3'>
           <label></label>
-            <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+          <%= f.select(:student_kind, options_for_select(["Dropout", "Full Time", "Graduated", "Half Time", "Part Time", "Not In Schoool"], selected: @applicant.student_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_kind', :class => "form-control", :prompt => true}) %>
         </div>
       </div>
 
@@ -179,7 +179,7 @@
         </div>
         <div class='col-md-3'>
           <label></label>
-          <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:class => "form-control", :prompt => true}) %>
+          <%= f.select(:student_school_kind, options_for_select(["Pre School", "Graduate School", "English Language Institute", "Open University", "Primary", "Elementary", "GED", "Junior School", "High School", "Equivalent Vocational/Tech", "Vocational", "Technical", "Undergraduate"], selected: @applicant.student_school_kind), {:include_blank => "SELECT TYPE"}, {:id => 'student_school_kind', :class => "form-control", :prompt => true}) %>
         </div>
       </div>
 
