@@ -1,6 +1,7 @@
 class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
-
+  include ApplicationHelper
+  
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
@@ -24,6 +25,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
+    ee_sep_request_accepted_notice(@person)
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])

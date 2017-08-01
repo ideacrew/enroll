@@ -542,6 +542,14 @@ module ApplicationHelper
     end
   end
 
+  def ee_sep_request_accepted_notice(person)
+    begin
+      ShopNoticesNotifierJob.perform(person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
+  end
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
