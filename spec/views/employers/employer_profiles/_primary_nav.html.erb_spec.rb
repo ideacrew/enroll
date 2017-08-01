@@ -24,6 +24,7 @@ RSpec.describe "employers/employer_profiles/_primary_nav AS BROKER AGENCY STAFF"
     expect(rendered).to match(/tab=benefits/)
     expect(rendered).to match(/tab=documents/)
     expect(rendered).to match(/tab=brokers/)
+    expect(rendered).to match(/tab=inbox/)
     expect(rendered).to match(/tab=families/)
   end
   it "should show different tabs when Broker not employer" do
