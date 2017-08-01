@@ -41,6 +41,7 @@ class EmployerProfile
 
 
   field :profile_source, type: String, default: "self_serve"
+  field :contact_method, type: String, default: "Only Electronic communications"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
   field :xml_transmitted_timestamp, type: DateTime
 
@@ -73,6 +74,7 @@ class EmployerProfile
 
   validates_presence_of :entity_kind
   validates_presence_of :sic_code
+  validates_presence_of :contact_method
 
   validates :profile_source,
     inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
