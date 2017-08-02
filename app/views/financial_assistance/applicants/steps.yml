@@ -1,6 +1,6 @@
 - step:
     heading: Income and Coverage for <family-member-name-placeholder>
-    heading_text: "Answer the following questions for this person, when you're finished, select CONTINUE"
+    heading_text: "Answer the following questions for this person. When you're finished, select CONTINUE"
     sections:
       - section:
           lines:
@@ -32,7 +32,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Is this person self employed ? *
+                  text: Is this person self employed? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -57,7 +57,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Does this person expect to have other types of income in 2016? *
+                  text: Does this person expect to have other types of income in 2017? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -82,7 +82,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Does this person expect to have adjustments to income in 2016 ? *
+                  text: Does this person expect to have adjustments to income in 2017? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -163,7 +163,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person file taxes for 2016? *
+                  text: Will this person file taxes for 2017? *
                 - gutter: 2
                   type: label_radio
                   name: row2
@@ -211,7 +211,7 @@
             - cells:
                 - gutter: 5
                   type: text
-                  text: Will this person be claimed as somebody else’s tax dependent for 2016? *
+                  text: Will this person be claimed as somebody else’s tax dependent for 2017? *
                 - gutter: 2
                   type: label_radio
                   name: row2

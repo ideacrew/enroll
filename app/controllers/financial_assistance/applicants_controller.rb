@@ -41,6 +41,8 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
     if params.key?(model_name)
       if @model.save(context: "step_#{@current_step.to_i}".to_sym)
+        @applicant.reload
+        @application.reload
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })

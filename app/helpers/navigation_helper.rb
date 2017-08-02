@@ -4,6 +4,7 @@ module NavigationHelper
     return true if controller_name == "interactive_identity_verifications"
     return true if ["help_paying_coverage", "application_checklist"].include?(action_name)
     return true if controller_name == "family_members" && action_name == "index"
+    return true if controller_name == "family_relationships" && action_name == "index"
   end
 
   def account_registration_active?
@@ -17,6 +18,12 @@ module NavigationHelper
   end
 
   def family_members_index_active?
+	return true if controller_name == "family_members" && action_name == "index"
+	return true if controller_name == "family_relationships" && action_name == "index"
+  end
+
+  def family_members_index_current_step?
+	return true if controller_name == "family_relationships" && action_name == "index"
 	return true if controller_name == "family_members" && action_name == "index"
   end
 end
