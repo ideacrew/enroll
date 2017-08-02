@@ -5,5 +5,6 @@ $(document).ready(function() {
 
   $("body").on("click", ".close_member_form", function () {
     $(".append_consumer_info").html("");
+    $(".faa-row").removeClass('hide');
   });
 });
