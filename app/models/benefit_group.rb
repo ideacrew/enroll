@@ -263,7 +263,7 @@ class BenefitGroup
     if is_congress
       PlanCostDecoratorCongress.new(plan, member_provider, self, max_contribution_cache)
     elsif self.sole_source? && (!plan.dental?)
-      CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier)
+      CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier, member_provider.is_cobra_status?)
     else
       PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
     end
