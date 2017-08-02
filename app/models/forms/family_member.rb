@@ -60,7 +60,7 @@ module Forms
         end
 
         if @is_physically_disabled.nil?
-          self.errors.add(:base, "Physically disable status is required")
+          self.errors.add(:base, "Physically disabled status is required")
         end
       end
     end
