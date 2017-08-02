@@ -76,11 +76,11 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   def build_error_messages(model)
-    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def build_error_messages_for_other_qns(model)
-    model.valid?(:other_qns) ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?(:other_qns) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def find_application

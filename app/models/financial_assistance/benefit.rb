@@ -146,24 +146,24 @@ private
 
   def start_on_must_precede_end_on(start_on, end_on)
     return unless start_on.present? && end_on.present?
-    errors.add(:end_on, "can't occur before start on date") if end_on < start_on
+    errors.add(:end_on, "End On Date can't occur before Start On Date") if end_on < start_on
   end
 
   def presence_of_dates_if_enrolled
     if is_enrolled?
-      errors.add(:start_on, "must be present") if start_on.blank?
+      errors.add(:start_on, " Start On Date must be present") if start_on.blank?
       start_on_must_precede_end_on(start_on, end_on)
     end
   end
 
   def presence_of_esi_details_if_esi
     if insurance_kind == "employer_sponsored_insurance"
-      errors.add(:employer_name, " can't be blank ") if employer_name.blank?
-      errors.add(:esi_covered, " can't be blank ") if esi_covered.blank?
-      errors.add(:start_on, " date can't be blank ") if start_on.blank?
-      errors.add(:employer_id, " employer id can't be blank ") if employer_id.blank?
-      errors.add(:employee_cost_frequency, " can't be blank ") if employee_cost_frequency.blank?
-      errors.add(:employee_cost, " can't be blank ") if employee_cost.blank?
+      errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
+      errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
+      errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?
+      errors.add(:employer_id, "' EMPLOYER IDENTIFICATION NO.(EIN)' employer id can't be blank ") if employer_id.blank?
+      errors.add(:employee_cost_frequency, "' How Often' can't be blank ") if employee_cost_frequency.blank?
+      errors.add(:employee_cost, "' AMOUNT' can't be blank ") if employee_cost.blank?
     end
   end
 end

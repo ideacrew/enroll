@@ -25,7 +25,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     update_employer_contact(@model, params) if @model.insurance_kind == "employer_sponsored_insurance"
 
     if params.key?(model_name)
-      if @model.save
+      if @model.save(context: "step_#{@current_step.to_i}".to_sym)
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })
@@ -68,7 +68,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def build_error_messages(model)
-    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def find_application_and_applicant
