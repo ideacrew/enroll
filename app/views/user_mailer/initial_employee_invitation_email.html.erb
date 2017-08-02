@@ -1,6 +1,8 @@
 <html>
 <body>
-  Dear <%= census_employee.full_name.humanize.titleize %>,
+  <% fname = census_employee.full_name %>
+  <% fname.slice! census_employee.last_name
+  Dear <%= fname.humanize.titleize %>,
 <br/>
 <br/>
 <div>
