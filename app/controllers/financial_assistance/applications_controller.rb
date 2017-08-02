@@ -103,7 +103,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       redirect_to application_checklist_financial_assistance_applications_path
     else
       if params["is_applying_for_assistance"].nil?
-        flash[:notice] = "Please choose an option before you proceed."
+        flash[:error] = "Please choose an option before you proceed."
         redirect_to help_paying_coverage_financial_assistance_applications_path
       else
         family.applications.where(aasm_state: "draft").destroy_all
