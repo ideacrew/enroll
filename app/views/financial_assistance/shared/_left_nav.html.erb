@@ -29,7 +29,7 @@
           <% end %>
         </li>
 
-      <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
           <%= link_to @applicant.incomes.present? ? financial_assistance_application_applicant_incomes_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.incomes.present?)}" do %>
             <% if @applicant.incomes_complete? %>
               <span class="fa fa-check applicant-check"></span>
