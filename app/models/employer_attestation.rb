@@ -32,6 +32,10 @@ class EmployerAttestation
     event :deny, :after => :record_transition do
       transitions from: [:submitted, :pending], to: :denied, :after => :terminate_employer
     end
+
+    event :revert, :after => :record_transition do
+      transitions from: [:submitted], to: :unsubmitted
+    end
   end
 
   def under_review?
