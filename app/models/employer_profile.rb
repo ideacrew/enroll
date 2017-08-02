@@ -446,6 +446,8 @@ class EmployerProfile
   end
 
   def is_renewal_carrier_drop?
+    return true if renewing_plan_year.blank? || !renewing_plan_year.renewing_enrolled?
+
     if is_renewal_transmission_eligible?
       (active_plan_year.carriers_offered - renewing_plan_year.carriers_offered).present?
     end
@@ -686,7 +688,7 @@ class EmployerProfile
           end
         end
 
-        if Settings.aca.shop_market.transmit_employers_immediately == false
+        if Settings.aca.shop_market.transmit_employers_immediately.present?
           if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
@@ -798,7 +800,7 @@ class EmployerProfile
 
     Organization.where(:"employer_profile.plan_years" => { 
       :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}
-      }, :"employer_profile.aasm_state".in => ['binder_paid','enrolled']).each do |org|
+      }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
       org.employer_profile.transmit_initial_eligible_event
     end
