@@ -32,4 +32,42 @@
       <h4> Please click continue to proceed.</h4>
     <% end %>
   </div>
+
+  <style>
+    #matrix { border:1px solid #959392; }
+    #matrix td {
+    background:#fff;
+    background:-moz-linear-gradient(top, #fff, #eee);
+    background:-webkit-gradient(linear,0 0, 0 100%, from(#fff), to(#eee));
+    box-shadow:inset 0 0 0 1px #fff;
+    -moz-box-shadow:inset 0 0 0 1px #fff;
+    -webkit-box-shadow:inset 0 0 0 1px #fff;
+    height:60px;
+    text-align:center;
+    vertical-align:middle;
+    width:60px;
+    }
+  </style>
+  <br />
+  <div>
+    <table id = "matrix">
+      <thead>
+        <th></th> 
+        <%@people.each do |person|%>
+          <th><%=person.full_name%></th>
+        <%end%>
+      </thead>
+      <tbody>
+        <%@matrix.each_with_index do |relationships_row, index_x|%>
+          <tr>
+            <td><b><%=@people[index_x].full_name%></b></td>
+            <%relationships_row.each_with_index do |rel, index_y|%>
+              <td><small><%= rel.titleize if rel.present?%></small></td>
+            <%end%>
+          </tr>
+        <%end%>
+      </tbody>
+    </table>
+  </div>
 <%end%>
+
