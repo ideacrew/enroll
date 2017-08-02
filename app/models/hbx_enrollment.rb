@@ -809,7 +809,7 @@ class HbxEnrollment
       if benefit_group.is_congress
         PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
       elsif self.composite_rated?
-        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier)
+        CompositeRatedPlanCostDecorator.new(qhp_plan, benefit_group, self.composite_rating_tier, is_cobra_status?)
       else
         reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
         PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
@@ -1448,7 +1448,7 @@ class HbxEnrollment
   end
 
   def ee_select_plan_during_oe
-    if is_shop? && self.census_employee.present? 
+    if is_shop? && self.census_employee.present?
       ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_oe")
     end
   end
