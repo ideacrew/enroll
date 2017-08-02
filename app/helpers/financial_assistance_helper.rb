@@ -44,9 +44,11 @@ module FinancialAssistanceHelper
       :income_adjustments
     elsif controller_name == 'benefits'
       :health_coverage
+    elsif controller_name == 'family_relationships'
+      :relationships
     end
 
-    order = [:applications, :household_info, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
+    order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
 
     if target == current
       'activer active'

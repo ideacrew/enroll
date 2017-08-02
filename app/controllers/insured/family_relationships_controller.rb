@@ -1,6 +1,4 @@
 class Insured::FamilyRelationshipsController < ApplicationController
-	
-
 	before_action :set_current_person, :set_family
 
 	def index
@@ -22,10 +20,13 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
+    @application = @family.application_in_progress
+
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships
 
+    render layout: 'financial_assistance'
 	end
 
   def create

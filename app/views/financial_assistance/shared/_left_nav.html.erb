@@ -9,6 +9,12 @@
       <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
     </li>
 
+    <% if defined?(@matrix) %>
+      <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %>'>
+        <%= link_to 'Household Relationships', insured_family_relationships_path %>
+      </li>
+    <% end %>
+
     <% if defined?(@applicant) %>
       <ul class="nav nav-stacked">
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_and_coverage) %>">
