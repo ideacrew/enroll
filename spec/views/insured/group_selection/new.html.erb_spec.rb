@@ -5,6 +5,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:person) { FactoryGirl.create(:person, is_incarcerated: false, us_citizen: true) }
     let(:employee_role) { FactoryGirl.build_stubbed(:employee_role) }
     let(:census_employee) { FactoryGirl.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
+    let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) { FactoryGirl.build_stubbed(:benefit_group_assignment) }
     let(:family_member1) { double("family member 1", id: "family_member", primary_relationship: "self", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member2) { double("family member 2", id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
@@ -18,6 +19,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     before(:each) do
       assign(:person, person)
       assign(:employee_role, employee_role)
+      assign(:benefit_group, benefit_group)
       assign(:coverage_household, coverage_household)
       assign(:market_kind, 'shop')
       assign(:hbx_enrollment, hbx_enrollment)
@@ -568,6 +570,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :coverage_household, coverage_household
       assign :market_kind, 'individual'
       assign :change_plan, true
+      assign :benefit_group, benefit_group
       assign :hbx_enrollment, hbx_enrollment
       allow(hbx_enrollment).to receive(:effective_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
       allow(hbx_enrollment).to receive(:coverage_selected?).and_return(true)
