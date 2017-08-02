@@ -210,7 +210,7 @@ module Employers::EmployerHelper
       when 'single_carrier' then 'All Plans From A Single Carrier'
       when 'metal_level' then 'All Plans From A Given Metal Level'
       when 'single_plan' then 'A Single Plan'
-      when 'sole_source' then 'A Sole Soure Plan'
+      when 'sole_source' then 'A Sole Source Plan'
     end
   end
 end
