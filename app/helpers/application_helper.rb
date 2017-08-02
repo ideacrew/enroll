@@ -544,7 +544,7 @@ module ApplicationHelper
 
   def ee_sep_request_accepted_notice(person)
     begin
-      ShopNoticesNotifierJob.perform(person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
+      ShopNoticesNotifierJob.perform_later(person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.id}")
     end
