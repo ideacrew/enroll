@@ -16,6 +16,9 @@ Given /(\w+) is a person who has not logged on$/ do |name|
 end
 
 Then  /(\w+) signs in to portal/ do |name|
+  if page.has_link? 'Sign In Existing Account'
+    find('.interaction-click-control-sign-in-existing-account').click
+  end
   person = Person.where(first_name: name).first
   fill_in "user[login]", :with => person.user.email
   find('#user_login').set(person.user.email)
@@ -107,9 +110,7 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   visit '/'
   portal_class = 'interaction-click-control-employer-portal'
   find("a.#{portal_class}").click
-  unless Settings.site.use_default_devise_path
-    find("a.interaction-click-control-sign-in-existing-account").click
-  end
+
   step "#{name} signs in to portal"
 end
 
@@ -177,9 +178,7 @@ Given /Admin accesses the Employers tab of HBX portal/ do
   visit '/'
   portal_class = '.interaction-click-control-hbx-portal'
   find(portal_class).click
-  unless Settings.site.use_default_devise_path
-    find('a.interaction-click-control-sign-in-existing-account').click
-  end
+
   step "Admin signs in to portal"
   tab_class = '.interaction-click-control-employers'
   find(tab_class, wait: 10).click

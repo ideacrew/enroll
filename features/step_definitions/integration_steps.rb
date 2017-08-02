@@ -578,11 +578,6 @@ end
 
 When(/^(.*) creates an HBX account$/) do |named_person|
   screenshot("start")
-  if Settings.site.use_default_devise_path
-    click_link "Create account"
-  else
-    find(".btn[value='Create account']").click
-  end
 
   person = people[named_person]
 
