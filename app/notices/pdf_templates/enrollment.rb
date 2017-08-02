@@ -14,6 +14,7 @@ module PdfTemplates
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
     attribute :dependents, Array[String]
+    attribute :dependent_dob, Date
     attribute :plan_year, Date
   end
 end
