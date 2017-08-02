@@ -97,7 +97,9 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     if family.is_applying_for_assistance
       if family.applications.where(aasm_state: "draft").blank?
         application = family.applications.build(aasm_state: "draft")
-        application.applicants.build(family_member_id: family.primary_applicant.id)
+        family.active_family_members.each do |family_member|
+          application.applicants.build(family_member_id: family_member.id)
+        end
         application.save!
       end
       redirect_to application_checklist_financial_assistance_applications_path
