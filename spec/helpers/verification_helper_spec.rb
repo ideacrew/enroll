@@ -243,6 +243,11 @@ RSpec.describe VerificationHelper, :type => :helper do
       allow(helper).to receive(:get_person_v_type_status).and_return(['in review'])
       expect(helper.review_button_class(family)).to eq('success')
     end
+
+    it 'returns sucsess when the status is verified and in review but no outstanding' do
+      allow(helper).to receive(:get_person_v_type_status).and_return(['in review', 'verified'])
+      expect(helper.review_button_class(family)).to eq('success')
+    end
   end
 
   describe '#get_person_v_types' do

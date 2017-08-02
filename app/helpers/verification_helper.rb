@@ -93,7 +93,7 @@ module VerificationHelper
     if family.active_household.hbx_enrollments.verification_needed.any?
       persons = family.family_members.map(&:person)
       v_types_list = get_person_v_type_status(persons)
-      if v_types_list.all? {|v| v == 'in review'}
+      if v_types_list.all? {|v| v == 'in review'} || !v_types_list.include?('outstanding')
         'success'
       elsif v_types_list.include?('in review') && v_types_list.include?('outstanding')
         'info'
