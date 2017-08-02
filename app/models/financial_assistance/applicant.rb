@@ -412,68 +412,68 @@ private
 
   def presence_of_attr_step_1
     if has_job_income.nil?
-      errors.add(:has_job_income, "can't be blank")
+      errors.add(:has_job_income, "' Does this person have income from an employer?' can't be blank")
     end
 
     if has_self_employment_income.nil?
-      errors.add(:has_self_employment_income, "can't be blank")
+      errors.add(:has_self_employment_income, "' Is this person self employed?' can't be blank")
     end
 
     if has_other_income.nil?
-      errors.add(:has_other_income, "can't be blank")
+      errors.add(:has_other_income, "' Does this person expect to have other types of income in 2017?' can't be blank")
     end
 
     if has_deductions.nil?
-      errors.add(:has_deductions, "can't be blank")
+      errors.add(:has_deductions, "' Does this person expect to have adjustments to income in 2017?' can't be blank")
     end
 
     if has_enrolled_health_coverage.nil?
-      errors.add(:has_enrolled_health_coverage, "can't be blank")
+      errors.add(:has_enrolled_health_coverage, "' Is this person currently enrolled in health coverage?' can't be blank")
     end
 
     if has_eligible_health_coverage.nil?
-      errors.add(:has_eligible_health_coverage, "can't be blank")
+      errors.add(:has_eligible_health_coverage, "' Does this person currently have access to other health coverage, including through another person?' can't be blank")
     end
   end
 
   def presence_of_attr_step_2
     if is_required_to_file_taxes && is_joint_tax_filing.nil?
-      errors.add(:is_joint_tax_filing, "can't be blank")
+      errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank")
     end
 
     if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
-      errors.add(:claimed_as_tax_dependent_by, "can't be blank")
+      errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
     end
   end
 
   def presence_of_attr_other_qns
     if is_pregnant
-      errors.add(:pregnancy_due_on, "should be answered if you are pregnant") if pregnancy_due_on.nil?
-      errors.add(:children_expected_count, "should be answered") if children_expected_count.nil?
+      errors.add(:pregnancy_due_on, "' Pregnency Due date' should be answered if you are pregnant") if pregnancy_due_on.nil?
+      errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.nil?
 
       if is_post_partum_period
-        errors.add(:is_enrolled_on_medicaid, "should be answered") if is_enrolled_on_medicaid.nil?
+        errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnency?' should be answered") if is_enrolled_on_medicaid.nil?
       end
     else
-      errors.add(:is_post_partum_period, "should be answered") if is_post_partum_period.nil?
-      errors.add(:pregnancy_end_on, "should be answered") if is_post_partum_period.nil?
+      errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.nil?
+      errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
     end
 
     if (18..26).include?(age_of_applicant)
       if is_former_foster_care.nil?
-        errors.add(:is_former_foster_care, "should be answered")
+        errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered")
       end
 
       if is_former_foster_care
-        errors.add(:foster_care_us_state, "should be answered") if foster_care_us_state.blank?
-        errors.add(:age_left_foster_care, "should be answered") if age_left_foster_care.nil?
+        errors.add(:foster_care_us_state, "' Where was this person in foster care?' should be answered") if foster_care_us_state.blank?
+        errors.add(:age_left_foster_care, "' How old was this person when they left foster care?' should be answered") if age_left_foster_care.nil?
       end
     end
 
     if is_student
-      errors.add(:student_kind, "should be answered") if student_kind.blank?
-      errors.add(:student_status_end_on, "should be answered") if student_status_end_on.blank?
-      errors.add(:student_school_kind, "should be answered") if student_school_kind.blank?
+      errors.add(:student_kind, "' What is the type of student?' should be answered") if student_kind.blank?
+      errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
+      errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
     end
   end
 

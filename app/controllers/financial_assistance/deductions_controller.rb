@@ -18,23 +18,27 @@ class FinancialAssistance::DeductionsController < ApplicationController
   def step
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
-    format_date_params model_params
+    format_date_params model_params if model_params.present?
+    @model.assign_attributes(permit_params(model_params)) if model_params.present?
 
     if params.key?(model_name)
       @model.workflow = { current_step: @current_step.to_i}
       @current_step = @current_step.next_step if @current_step.next_step.present?
     end
 
-    begin
-      @model.update_attributes!(permit_params(model_params)) if model_params.present?
-      if params.key? :last_step
-        flash[:notice] = "Deduction Added - (#{@model.kind})"
-        redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
+    if params.key?(model_name)
+      if @model.save(context: "step_#{@current_step.to_i}".to_sym)
+        if params.key? :last_step
+          flash[:notice] = "Deduction Added - (#{@model.kind})"
+          redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
+        else
+          render 'workflow/step', layout: 'financial_assistance'
+        end
       else
+        flash[:error] = build_error_messages(@model)
         render 'workflow/step', layout: 'financial_assistance'
       end
-    rescue
-      flash[:error] = build_error_messages(@model)
+    else
       render 'workflow/step', layout: 'financial_assistance'
     end
   end
@@ -50,11 +54,11 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   def format_date_params model_params
     model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
-    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present?
+    model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
   end
 
   def build_error_messages(model)
-    model.valid? ? nil : model.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
   end
 
   def find_application_and_applicant
