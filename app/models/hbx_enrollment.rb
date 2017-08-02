@@ -1447,12 +1447,6 @@ class HbxEnrollment
     benefit_group.rating_area
   end
 
-  def ee_select_plan_during_oe
-    if is_shop? && self.census_employee.present?
-      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "select_plan_year_during_oe")
-    end
-  end
-
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
