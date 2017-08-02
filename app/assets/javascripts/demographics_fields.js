@@ -223,6 +223,16 @@ var PersonValidations = (function(window, undefined) {
     }
   }
 
+  function validationForPhysicallyDisable(e) {
+    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+    if ($('input[name="person[is_physically_disable]"]').not(":checked").length == 2) {
+      alert('Please provide an answer for question: Does this person have a disability?');
+      PersonValidations.restoreRequiredAttributes(e);
+    }
+  }
+
   function validationForNaturalizedCitizen(e) {
     if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
@@ -331,6 +341,7 @@ var PersonValidations = (function(window, undefined) {
     validationForEligibleImmigrationStatuses: validationForEligibleImmigrationStatuses,
     validationForVlpDocuments: validationForVlpDocuments,
     validationForIncarcerated: validationForIncarcerated,
+    validationForPhysicallyDisable: validationForPhysicallyDisable,
     restoreRequiredAttributes: restoreRequiredAttributes
 
   };
@@ -346,6 +357,7 @@ $(document).ready(function() {
     PersonValidations.validationForNaturalizedCitizen(e);
     PersonValidations.validationForEligibleImmigrationStatuses(e);
     PersonValidations.validationForIncarcerated(e);
+    PersonValidations.validationForPhysicallyDisable(e);
     PersonValidations.validationForVlpDocuments(e);
   });
 

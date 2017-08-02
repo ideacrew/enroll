@@ -186,6 +186,7 @@ class Exchanges::ResidentsController < ApplicationController
       :language_code,
       :is_incarcerated,
       :is_disabled,
+      :is_physically_disable,
       :race,
       :is_consumer_role,
       :is_resident_role,
