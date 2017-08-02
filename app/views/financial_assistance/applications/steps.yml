@@ -255,3 +255,22 @@
                   model: application
                   name: submission_terms
                   attribute: submission_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: "<h5><b>Electronic Signature * (enter your name)</b></h5>"
+            - cells:
+                - gutter: 6
+                  type: signature_inputs
+                  id: 'first_name_thank_you'
+                  name: first_name_thank_you
+                  placeholder: First Name *
+                  required: true
+                - gutter: 6
+                  type: signature_inputs
+                  id: 'last_name_thank_you'
+                  name: last_name_thank_you
+                  placeholder: Last Name *
+                  required: true

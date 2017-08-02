@@ -50,10 +50,14 @@ module FinancialAssistanceHelper
 
     order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
 
-    if target == current
-      'activer active'
-    elsif order.index(target) < order.index(current)
-      'activer'
+    unless current.blank?
+      if target == current
+        'activer active'
+      elsif order.index(target) < order.index(current)
+        'activer'
+      else
+        ''
+      end
     else
       ''
     end
