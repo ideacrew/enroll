@@ -39,6 +39,8 @@ class FinancialAssistance::Benefit
     is_enrolled
   )
 
+  ESI_COVERED_KINDS = %w(self self_and_spouse family)
+
   field :title, type: String
   field :esi_covered, type: String
   field :kind, type: String
