@@ -71,7 +71,7 @@
       <p><i>Be sure to write your <%= Settings.site.short_name%> ID (<%= notice.primary_identifier %>) on each of the documents.</i></p>
     </td>
     <td>
-      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name%> at (855) 532-5465 to find a location near you.
+      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name%> at <%= notice.hbe.phone %> to find a location near you.
     </td>
   </tr>
 </table>
@@ -80,7 +80,7 @@
  content: "<strong>What if I have questions?</strong>", top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Call #{Settings.site.short_name} at (855) 532-5465.", top_margin: '5px', bottom_margin: '5px'} %>
+ content: "Call #{Settings.site.short_name} at #{notice.hbe.phone}.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "<strong>Which documents do I need to submit?</strong>", top_margin: '5px'} %>
@@ -244,10 +244,10 @@
 <!-- Indian Inconsistency -->
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at (855) 532-5465. If you need help, we’ll work with you.</strong>", top_margin: '-5px'} %>
+  content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at #{notice.hbe.phone}. If you need help, we’ll work with you.</strong><br></br>_____________________________________________________________________________________________________________", top_margin: '-5px'} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
 "Eligibility standards:  45 CFR §155.305",
 "Social security number requests/use:  45 CFR §155.305(f)(6)",
 "Eligibility process:  45 CFR §155.310",

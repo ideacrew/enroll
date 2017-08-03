@@ -1,5 +1,7 @@
 class IvlNotice < Notice
 
+  include ActionView::Helpers::NumberHelper
+
   Required= Notice::Required + []
 
   def initialize(options ={})
@@ -8,6 +10,7 @@ class IvlNotice < Notice
 
   def deliver
     build
+    append_hbe
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_dchl_rights
@@ -28,6 +31,25 @@ class IvlNotice < Notice
     envelope.fill_envelope(notice, mpi_indicator)
     envelope.render_file(envelope_path)
     join_pdfs_with_path [envelope_path, notice_path]
+  end
+
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+      url: Settings.site.home_url,
+      phone: phone_number_format(Settings.contact_center.phone_number),
+      email: "#{Settings.contact_center.email_address}",
+      address: PdfTemplates::NoticeAddress.new({
+        street_1: "100 K ST NE",
+        street_2: "Suite 100",
+        city: "Washington DC",
+        state: "DC",
+        zip: "20005"
+      })
+    })
+  end
+
+  def phone_number_format(number)
+    number_to_phone(number.gsub(/^./, "").gsub('-',''), area_code: true)
   end
 
   def attach_dchl_rights

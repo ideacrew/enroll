@@ -11,6 +11,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
     attach_blank_page
@@ -36,6 +37,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     append_data
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.primary_firstname = recipient.first_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else
@@ -65,7 +67,7 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     reason_for_ineligibility = []
     reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." if !person.is_dc_resident?
     reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." if person.is_incarcerated
-    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465." if lawful_presence_outstanding?(person)
+    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance. For more information, please contact #{Settings.site.short_name} at #{notice.hbe.phone}." if lawful_presence_outstanding?(person)
 
     PdfTemplates::Individual.new({
       first_name: person.first_name.titleize,

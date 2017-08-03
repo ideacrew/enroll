@@ -79,7 +79,8 @@ class Notice
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
           template: "notices/shared/footer_ivl.html.erb",
-          layout: false 
+          layout: false,
+          locals: {notice: notice}
         })
       }})
     end

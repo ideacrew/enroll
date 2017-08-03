@@ -33,6 +33,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def deliver
     build
+    append_hbe
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_required_documents if notice.documents_needed
