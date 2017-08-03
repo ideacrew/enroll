@@ -5,6 +5,8 @@ module TransportGateway
 
     attr_accessor :from, :to, :body
 
+    attr_accessor :source_credentials, :destination_credentials
+
     #  @from
     #  @to 
     #  @body
