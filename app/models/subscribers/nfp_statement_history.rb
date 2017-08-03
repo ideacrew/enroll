@@ -15,33 +15,31 @@ module Subscribers
       begin
         stringed_key_payload = payload.stringify_keys
         xml = stringed_key_payload['body']
-        header = stringed_key_payload['header']
+        eid = stringed_key_payload['employer_id']
 
-        Rails.logger.info "==================="
+
+        Rails.logger.info "@@@@@@@@@@===================@@@@@@@@@@@@@"
         Rails.logger.info "Enroll received nfp_statement_summary_success"
-        Rails.logger.info xml.to_s
-        Rails.logger.info stringed_key_payload.to_s
-        Rails.logger.info "==================="
+        Rails.logger.info xml
+        Rails.logger.info stringed_key_payload
+        Rails.logger.info eid
 
-        ep = Organization.where("hbx_id" = > header["employer_id"]).first
+        response = eval(xml)
+
+        ep = Organization.where("hbx_id" => eid).first
+
+
 
         if ep.employer_profile && ep.employer_profile.employer_profile_account
-          ep.employer_profile.employer_profile_account.update_attributes!(previous_balance: xml[:previous_balance], past_due: xml[:past_due])
+          ep.employer_profile.employer_profile_account.update_attributes!(:next_premium_due_on => Date.today, :next_premium_amount => response[:new_charges].to_f)
         end
 
-
-
-        # ep.employer_profile_account.next_premium_amount = 9999
-
-        #TODO change response handler
-        if "503" == return_status.to_s
-
-          return
-        end
 
         xml_hash = xml_to_hash(xml)
 
       rescue => e
+        puts "ERROR ERROR ERROR"
+        puts e
         notify("acapi.error.application.enroll.remote_listener.nfp_statement_history_responses", {
           :body => JSON.dump({
              :error => e.inspect,
