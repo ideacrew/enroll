@@ -7,6 +7,23 @@
         <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
         <% end %>
       </li>
+<<<<<<< Updated upstream
+=======
+      <li role="presentation"<%= menu_tab_class(active_tab, "families-tab") %>>
+       <%= link_to(family_index_dt_exchanges_hbx_profiles_path, "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
+        <span class="hidden-xs">Families</span>
+        <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
+       <% end %>
+      </li>
+
+      <li role="presentation"<%= menu_tab_class(active_tab, "employers-invoice") %>>
+        <%= link_to(employer_invoice_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do  %>
+          <span class="hidden-xs">Employers</span>
+          <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
+        <% end %>
+      </li>
+
+>>>>>>> Stashed changes
 
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
@@ -17,6 +34,7 @@
                   }
                   %>
 
+<<<<<<< Updated upstream
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'employers-invoice',
@@ -110,6 +128,66 @@
         </ul>
     </li>
 
+=======
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                      tab_name: 'calendar',
+                                                                      link_path: exchanges_scheduled_events_path,
+                                                                      display_name: 'Calendar',
+                                                                      active_tab: active_tab
+                                                                    } %>
+
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                      tab_name: 'products',
+                                                                      link_path: product_index_exchanges_hbx_profiles_path,
+                                                                      display_name: 'Products',
+                                                                      active_tab: active_tab
+                                                                    } %>
+
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                      tab_name: 'products',
+                                                                      link_path: product_index_exchanges_hbx_profiles_path,
+                                                                      display_name: 'Products',
+                                                                      active_tab: active_tab
+                                                                    } %>
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                      tab_name: 'users-orphans',
+                                                                      link_path: users_orphans_path,
+                                                                      display_name: 'Orphan Accounts',
+                                                                      active_tab: active_tab
+                                                                    } %>
+      <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                      tab_name: 'configuration',
+                                                                      link_path: configuration_exchanges_hbx_profiles_path,
+                                                                      display_name: 'Config',
+                                                                      active_tab: active_tab
+                                                                    } %>
+
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Brokers <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+          <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                          tab_name: 'brokers',
+                                                                          link_path: exchanges_broker_applicants_path,
+                                                                          display_name: 'Brokers',
+                                                                          active_tab: active_tab
+                                                                        } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'broker-agencies',
+                                                                            link_path: broker_agency_index_exchanges_hbx_profiles_path,
+                                                                            display_name: 'Broker Agencies',
+                                                                            active_tab: active_tab
+                                                                          } %>
+            <% if general_agency_enabled? %>
+              <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+                                                                            tab_name: 'general-agencies',
+                                                                            link_path: general_agency_index_exchanges_hbx_profiles_path,
+                                                                            display_name: 'General Agencies',
+                                                                            active_tab: active_tab
+                                                                          } %>
+            <% end %>
+          </ul>
+      </li>
+>>>>>>> Stashed changes
 
       <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>  class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
         <%= link_to(inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
