@@ -1,7 +1,7 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 
 <div id="consumer_fields" class="focus_effect">
-  <div class="row row-form-wrapper no-buffer">
+  <div class="row row-form-wrapper no-buffer" id="us_citizen_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
       <label>Are you a US Citizen or US National? *</label>
     </div>
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
+  <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="eligible_immigration_status_container">
     <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
       <label>Do you have eligible immigration status? *</label>
     </div>
@@ -70,7 +70,7 @@
     <%= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f} %>
   <% end %>
 
-  <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
+  <div class="row row-form-wrapper no-buffer" id='indian_tribe_member_container'>
     <div class="row no-buffer">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
@@ -101,7 +101,7 @@
     </div>
   </div>
 
-  <div class="row row-form-wrapper no-buffer">
+  <div class="row row-form-wrapper no-buffer" id="is_incarcerated_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
       <label class="required no-pd">Are you currently incarcerated? *</label>
     </div>
