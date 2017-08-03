@@ -43,5 +43,18 @@ describe EmployerAttestationDocument, dbclean: :after_each do
         expect(document.employer_attestation.pending?).to be_truthy
       end
     end
+    
+    context 'when employer attestation is already denied' do
+      context 'admin approves second attestation document ' do 
+
+        it 'should not change doc status and attestation status' do
+          attestation.update(aasm_state: 'denied')
+          document.submit_review({status: 'accepted'})
+          employer_profile.reload
+          expect(document.submitted?).to be_truthy
+          expect(document.employer_attestation.denied?).to be_truthy
+        end
+      end
+    end
   end
 end

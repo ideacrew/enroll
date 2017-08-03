@@ -20,8 +20,8 @@ class EmployerAttestationDocument < Document
   aasm do
     state :submitted, initial: true
     state :accepted, :after_enter => :approve_attestation
-    state :rejected
-    state :info_needed
+    state :rejected, :after_enter => :deny_attestation
+    state :info_needed, :after_enter => :set_attestation_pending
 
     event :accept, :after => :record_transition do
       transitions from: :submitted, to: :accepted
@@ -50,27 +50,19 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-      if self.aasm_state == 'submitted' && ["submitted", "pending"].include?(employer_attestation.aasm_state)
-        if [:info_needed, :rejected].include?(params[:status].to_sym)
-
-          if params[:status].to_sym == :rejected
-            self.reject!
-          elsif params[:status].to_sym == :info_needed
-            self.info_needed!
-          end
-
-          if params[:status].to_sym == :info_needed
-            employer_attestation.set_pending! if employer_attestation.may_set_pending?
-          else
-            employer_attestation.deny! if employer_attestation.may_deny?
-          end
-          
-          add_reason_for_rejection(params)
-        elsif params[:status].to_sym == :accepted
-          self.accept! if self.may_accept?
-        end
+    if submitted? && employer_attestation.editable?
+      case params[:status].to_sym
+      when :rejected
+        self.reject! if self.may_reject?
+        add_reason_for_rejection(params)
+      when :info_needed
+        self.info_needed! if self.may_info_needed?
+        add_reason_for_rejection(params)
+      when :accepted
+        self.accept! if self.may_accept?
       end
     end
+  end
 
   def add_reason_for_rejection(params)
     if params[:reason_for_rejection].present?
@@ -80,9 +72,15 @@ class EmployerAttestationDocument < Document
   end
 
   def approve_attestation
-    if self.employer_attestation.may_approve?
-      self.employer_attestation.approve!
-    end
+    employer_attestation.approve! if employer_attestation.may_approve?
+  end
+
+  def set_attestation_pending
+    employer_attestation.set_pending! if employer_attestation.may_set_pending?
+  end
+
+  def deny_attestation
+    employer_attestation.deny! if employer_attestation.may_deny?
   end
 
   private
