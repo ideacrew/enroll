@@ -89,7 +89,9 @@
                   name: who_can_be_covered?
                   id: 'esi_covered'
                   values:
-                    - employee and spouse
+                    - self
+                    - self_and_spouse
+                    - family
                   model: benefit
                   attribute: esi_covered
             - cells:
