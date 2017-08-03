@@ -465,14 +465,14 @@ class CensusEmployee < CensusMember
             relations.select do |relation|
               id = relation.relative_id.to_s
               dep =  Person.where(_id: id).first
-              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26
+              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && dep.age_on(TimeKeeper.date_of_record.end_of_month) < 27 
                 aged_off_dependents << dep
                 next if aged_off_dependents.empty?
                 employee_roles.each do |employee_role|
                   enrollments = person.primary_family.active_household.hbx_enrollments.where(employee_role_id: employee_role.id).enrolled
                   enrollments.each do |en|
                     covered_members = (en.hbx_enrollment_members.map{|member| member.person} && aged_off_dependents)
-                    if new_date.month == 12 || covered_members.any?{|cm| new_date.month ==  cm.dob.month}
+                    if covered_members.any?{|cm| new_date.month ==  cm.dob.month}
                       ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "congress_employee_dependent_age_off_termination_notice")
                       break
                     end

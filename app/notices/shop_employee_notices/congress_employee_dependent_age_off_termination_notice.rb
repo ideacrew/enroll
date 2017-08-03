@@ -22,7 +22,7 @@ class ShopEmployeeNotices::CongressEmployeeDependentAgeOffTerminationNotice < Sh
         census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
           dep = dependent.person
           age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
-          if (dep.age_on(now.end_of_month) >= 26 && age < 27) && (now.month == 12 || now.month == dep.dob.month)
+          if (dep.age_on(now.end_of_month) >= 26 && age < 27) && (now.month == dep.dob.month)
             names << dep.full_name
             notice.enrollment = PdfTemplates::Enrollment.new({
               :dependents => names,
