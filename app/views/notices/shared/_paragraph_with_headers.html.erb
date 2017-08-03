@@ -3,7 +3,7 @@
     <tbody>
       <% if heading.present? %>
         <tr>
-          <td><h2><%= heading.html_safe %></h2></td>
+          <td style="font-size: 14px; padding-bottom: 8px;"><%= heading.html_safe %></td>
         </tr>
       <% end %>
       <% if sub_heading.present? %>
@@ -13,7 +13,7 @@
       <% end %>
       <% contents.each do |para| %>
         <tr>
-          <td><%= para.html_safe %></td>
+          <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= para.html_safe %></td>
         </tr>
       <% end %>
     </tbody>
