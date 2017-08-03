@@ -175,14 +175,14 @@ content: "If you end your plan, you also won’t be able to sign up again until 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Please call DC Health Link at (855) 532-5465 if you have any questions about this letter, or if you think we made a mistake."],
-   heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px'} %>
+   heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>"} %>
+listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
 
 <% if notice.documents_needed == true %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date}</strong>. If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page.", top_margin: '300px'} %>
+  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date}</strong>. If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
