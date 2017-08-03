@@ -14,27 +14,28 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
+    consumer = member.consumer_role
     case type
       when 'Social Security Number'
-        if member.consumer_role.ssn_verified?
+        if consumer.ssn_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
           "in review"
         else
           "outstanding"
         end
       when 'American Indian Status'
-        if member.consumer_role.native_verified?
+        if consumer.native_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
           "in review"
         else
           "outstanding"
         end
       else
-        if member.consumer_role.lawful_presence_verified?
+        if consumer.lawful_presence_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
           "in review"
         else
           "outstanding"
@@ -63,18 +64,6 @@ module VerificationHelper
 
   def verification_needed?(person)
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
-  end
-
-  def verification_due_date(family)
-    if family.try(:active_household).try(:hbx_enrollments).verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.special_verification_period
-        family.active_household.hbx_enrollments.verification_needed.first.special_verification_period.to_date
-      else
-        family.active_household.hbx_enrollments.verification_needed.first.submitted_at.to_date + 95.days
-      end
-    else
-      TimeKeeper.date_of_record.to_date + 95.days
-    end
   end
 
   def documents_uploaded
@@ -141,14 +130,6 @@ module VerificationHelper
     @family_members.all?{|member| member.person.consumer_role.aasm_state == "fully_verified"}
   end
 
-  def review_status(family)
-    if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.first.review_status
-    else
-      "no enrollment"
-    end
-  end
-
   def show_doc_status(status)
     ["verified", "rejected"].include?(status)
   end
@@ -179,7 +160,7 @@ module VerificationHelper
 
   def build_admin_actions_list(v_type, f_member)
     if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
