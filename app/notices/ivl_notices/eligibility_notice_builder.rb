@@ -11,6 +11,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
     attach_blank_page
@@ -37,6 +38,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.primary_firstname = recipient.first_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else
@@ -75,9 +77,9 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
 
   def append_applicant_information(applicant)
     reason_for_ineligibility = []
-    reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state" if !applicant.person.is_dc_resident?
-    reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction" if applicant.person.is_incarcerated
-    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance.  For more information, please contact DC Health Link at (855) 532-5465" if lawful_presence_outstanding?(applicant.person)
+    reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." if !applicant.person.is_dc_resident?
+    reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." if applicant.person.is_incarcerated
+    reason_for_ineligibility << "this person doesn’t have an eligible immigration status, but may be eligible for a local medical assistance program called the DC Health Care Alliance. For more information, please contact #{Settings.site.short_name} at #{notice.hbe.phone}." if lawful_presence_outstanding?(applicant.person)
 
     PdfTemplates::Individual.new({
       tax_household: append_tax_households(applicant.tax_household),

@@ -11,6 +11,7 @@ module PdfTemplates
     attribute :is_family_totally_ineligibile, Boolean, :default => false
     attribute :has_applied_for_assistance, Boolean, :default => false
     attribute :notice_date, Date
+    attribute :hbe, PdfTemplates::Hbe
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
@@ -276,7 +277,7 @@ module PdfTemplates
       flag = false
       if ivl.is_totally_ineligible
         flag = true
-        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl.reason_for_ineligibility}.join('In addition, ')If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at (855) 532-5465."
+        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."
       end
       ineligible_for_medicaid << block if flag == true
       rows << ineligible_for_medicaid if ineligible_for_medicaid.count > 1
