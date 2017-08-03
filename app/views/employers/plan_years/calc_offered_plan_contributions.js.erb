@@ -92,6 +92,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
       $(this).closest('.select-dental-plan').find('.edit-offering').show();
       $(this).closest('.select-dental-plan').find('.nav-tabs').show();
     } else {
+      $(".nav-tabs li label").first().trigger('click')
       $('#<%= @location_id %>').find('.reference-steps:first').show();
       $('#<%= @location_id %> <%= @coverage_type %>').find('.health').find('.nav-tabs').show();
     }
