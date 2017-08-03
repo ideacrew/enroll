@@ -56,7 +56,7 @@
       <% if individual_market_is_enabled? %>
 
       <li role="presentation"<%= menu_tab_class(active_tab, "calendar-tab") %> class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-       <%= link_to(exchanges_scheduled_events_path, "aria-expanded" => "true", "aria-controls" => "calendar", "role" => "tab" ) do  %>
+       <%= link_to(exchanges_scheduled_events_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "calendar", "role" => "tab" ) do  %>
         <span class="hidden-xs">Calendar</span>
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Calendar"></span>
        <% end %>
