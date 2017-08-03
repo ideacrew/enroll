@@ -283,6 +283,11 @@ class FinancialAssistance::Application
     (alternate_benefit.start_date.year..alternate_benefit.end_date.year).include? TimeKeeper.date_of_record.year
   end
 
+  # def status_complete?
+  #   self.applicants.each { |applicant| return false unless applicant.applicant_validation_complete? }
+  #   return true
+  # end
+
   def total_incomes_by_year
     incomes_by_year = compute_yearwise(incomes)
     deductions_by_year = compute_yearwise(deductions)
