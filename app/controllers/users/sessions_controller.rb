@@ -18,7 +18,7 @@ class Users::SessionsController < Devise::SessionsController
     return unless failed_login?
     attempted_user = User.where(email: request.filtered_parameters["user"]["login"])
     if attempted_user.present?
-      SessionIdHistory.create(session_user_id: attempted_user.first.id, sign_in_outcome: "Failed")
+      SessionIdHistory.create(session_user_id: attempted_user.first.id, sign_in_outcome: "Failed", ip_address: request.remote_ip)
     end
   end
 

@@ -5,6 +5,7 @@ class SessionIdHistory
   field :session_user_id,  type: String
   field :session_id, type: String
   field :sign_in_outcome, type: String
+  field :ip_address, type: String
 
   index({ session_user_id: 1})
   index({ session_id: 1})

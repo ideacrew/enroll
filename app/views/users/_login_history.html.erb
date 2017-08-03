@@ -8,7 +8,7 @@
       <div class="modal-body">
         <ul>
           <% login_history.each do |login| %>
-            <li><%= login.sign_in_outcome || "Successful" %> login on: <%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %></li>
+            <li><%= login.sign_in_outcome || "Successful" %> login on: <%= TimeKeeper.local_time(login.created_at).strftime('%D %r') %> from: <%= login.ip_address || "IP NOT FOUND" %></li>
           <% end %>
         </ul>
       </div>
