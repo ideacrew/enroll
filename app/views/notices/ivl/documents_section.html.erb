@@ -104,7 +104,7 @@
 <!-- Citizneship -->
 <% if notice.dhs_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "Citizenship: We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
+     content: "<strong>Citizenship:</strong> We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.dhs_unverified], top_margin: '5px'} %>
 
@@ -164,7 +164,7 @@
 <!-- Immigration -->
 <% if notice.dhs_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "Immigration Status: We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
+   content: "<strong>Immigration Status:</strong> We need proof of the immigration status for the following applicant(s):", top_margin: '-5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.dhs_unverified], bottom_margin: '5px'} %>
@@ -245,3 +245,16 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>These are all the documents we need at this time. If you think you will not be able to submit your documents because of circumstances outside of your control, please call #{Settings.site.short_name} at (855) 532-5465. If you need help, we’ll work with you.</strong>", top_margin: '-5px'} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+"Eligibility standards:  45 CFR §155.305",
+"Social security number requests/use:  45 CFR §155.305(f)(6)",
+"Eligibility process:  45 CFR §155.310",
+"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
+"Document requests:  45 CFR §155.315(f)(2)(ii)",
+"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
+"Annual open enrollment period:  45 CFR §155.410(e)",
+"Special enrollment periods: 45 CFR §155.420",
+"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
+"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
