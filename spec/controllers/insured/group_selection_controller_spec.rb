@@ -84,7 +84,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should get hbx_enrollment when has active hbx_enrollments and in qle flow" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop'
@@ -110,7 +110,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     end
 
     it "should get hbx_enrollment when has enrolled hbx_enrollments and in shop qle flow but user has both employee_role and consumer_role" do
-      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
@@ -125,11 +125,30 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
     it "should disable individual market kind if selected market kind is shop in dual role SEP" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-      allow(Insured::GroupSelectionHelper).to receive(:selected_enrollment).and_return hbx_enrollment
+      allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
 
       sign_in user
       get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id
       expect(assigns(:disable_market_kind)).to eq "individual"
+    end
+
+    context "it should set the instance variables" do
+
+      before do
+        controller.instance_variable_set(:@hbx_enrollment, hbx_enrollment)
+        allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
+        allow(hbx_enrollment).to receive(:kind).and_return "individual"
+        sign_in user
+        get :new, person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_plan'
+      end
+
+      it "should set market kind when user select to make changes in open enrollment" do
+        expect(assigns(:mc_market_kind)).to eq hbx_enrollment.kind
+      end
+
+      it "should set the coverage kind when user click on make changes in open enrollment" do
+        expect(assigns(:mc_coverage_kind)).to eq hbx_enrollment.coverage_kind
+      end
     end
 
     context "individual" do
@@ -210,6 +229,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
     let(:census_employee) {FactoryGirl.create(:census_employee)}
+
     before do
       allow(coverage_household).to receive(:household).and_return(household)
       allow(household).to receive(:new_hbx_enrollment_from).and_return(hbx_enrollment)
@@ -220,6 +240,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(family).to receive(:latest_household).and_return(household)
       allow(hbx_enrollment).to receive(:benefit_group_assignment).and_return(benefit_group_assignment)
       allow(hbx_enrollment).to receive(:inactive_related_hbxs).and_return(true)
+      allow(hbx_enrollment).to receive(:effective_on).and_return(benefit_group.start_on)
+      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       sign_in
     end
 
@@ -298,7 +320,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-
+    
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user
@@ -307,6 +329,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       allow(employee_role).to receive(:is_cobra_status?).and_return(true)
       allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
+      allow(census_employee).to receive(:cobra_begin_date).and_return(TimeKeeper.date_of_record + 1.day)
       post :create, person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to match /You may not enroll for cobra after/

@@ -106,8 +106,17 @@ class BenefitGroupAssignment
       end
       enrollments
     end
+
+    if census_employee.cobra_begin_date.present?
+      coverage_terminated_on = census_employee.cobra_begin_date.prev_day
+      hbx_enrollments = hbx_enrollments.select do |e| 
+        e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
+      end
+    end
+
     health_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'health' && !hbx.is_cobra_status? }
     dental_hbx = hbx_enrollments.detect{ |hbx| hbx.coverage_kind == 'dental' && !hbx.is_cobra_status? }
+
     [health_hbx, dental_hbx].compact
   end
 
@@ -130,7 +139,7 @@ class BenefitGroupAssignment
 
       families.each do |family|
         family.households.each do |household|
-          household.hbx_enrollments.each do |enrollment|
+          household.hbx_enrollments.show_enrollments_sans_canceled.each do |enrollment|
             if enrollment.benefit_group_assignment_id == self.id
               @hbx_enrollment = enrollment
             end
@@ -217,7 +226,8 @@ class BenefitGroupAssignment
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
-      to_state: aasm.to_state
+      to_state: aasm.to_state,
+      event: aasm.current_event
     )
   end
 
