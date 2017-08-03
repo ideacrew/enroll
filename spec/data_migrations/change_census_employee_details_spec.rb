@@ -33,7 +33,7 @@ describe ChangeCensusEmployeeDetails, dbclean: :after_each do
 
     before do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return(benefit_group_assignment)
-      allow(HbxEnrollment).to receive(:find_enrollments_by_benefit_group_assignment).and_return([hbx_enrollment])
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     end
 
     it "should change the terminated_on date" do
