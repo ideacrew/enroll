@@ -23,7 +23,14 @@ module Subscribers
         Rails.logger.info stringed_key_payload.to_s
         Rails.logger.info "==================="
 
-        # ep = Organization.where("hbx_id" = > header[:customer_id]).first.employer_profile
+        ep = Organization.where("hbx_id" = > header["employer_id"]).first
+
+        if ep.employer_profile && ep.employer_profile.employer_profile_account
+          ep.employer_profile.employer_profile_account.update_attributes!(previous_balance: xml[:previous_balance], past_due: xml[:past_due])
+        end
+
+
+
         # ep.employer_profile_account.next_premium_amount = 9999
 
         #TODO change response handler
