@@ -58,6 +58,8 @@ aca:
   general_agency_enabled: false
   dental_market_enabled: false
   sole_source_only_enabled: false
+  minimum_primary_contribution_percentage: 50
+  minimum_family_contribution_percentage: 30
 #
   qle:
     with_in_sixty_days: 60
@@ -80,6 +82,7 @@ aca:
   shop_market:
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
+    employer_family_contribution_percent_minimum: 30
     employee_participation_ratio_minimum: <%= 3 / 4.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 23

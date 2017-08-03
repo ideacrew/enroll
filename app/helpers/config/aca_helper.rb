@@ -11,6 +11,15 @@ module Config::AcaHelper
     Settings.aca.market_kinds.first
   end
 
+  def aca_shop_market_employer_family_contribution_percent_minimum
+    @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
+  end
+
+  def aca_shop_market_employer_contribution_percent_minimum
+    @aca_shop_market_employer_contribution_percent_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
+  end
+
+
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
   # @return { True } if Settings.aca.general_agency_enabled
@@ -24,11 +33,11 @@ module Config::AcaHelper
   end
 
   def individual_market_is_enabled?
-    Settings.aca.market_kinds.include?("individual")
+    @individual_market_is_enabled ||= Settings.aca.market_kinds.include?("individual")
   end
 
   def offer_sole_source?
-    !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
+    @offer_sole_source ||= !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
   end
 
   def sole_source_only?
@@ -36,7 +45,7 @@ module Config::AcaHelper
   end
 
   def offers_nationwide_plans?
-    Settings.aca.nationwide_markets
+    @offers_nationwide_plans ||= Settings.aca.nationwide_markets
   end
 
   def carrier_special_plan_identifier_namespace
