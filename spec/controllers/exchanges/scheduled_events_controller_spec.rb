@@ -20,7 +20,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
   describe "GET new" do
 	it "should render the new template" do
-	  get :new
+	  xhr :get, :new, format: :js
       expect(response).to have_http_status(:success)
     end
   end
@@ -31,12 +31,12 @@ RSpec.describe Exchanges::ScheduledEventsController do
   	it "returns http status" do
   	  allow(scheduled_event).to receive(:save).and_return true
       post :create, scheduled_event: event_params
-      expect(response).to redirect_to exchanges_scheduled_events_path
+      expect(response).to redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
     end
     it "should render new template when invalid params" do
       allow(scheduled_event).to receive(:save).and_return false
       post :create, scheduled_event: event_params
-      expect(response).to redirect_to exchanges_scheduled_events_path
+      expect(response).to redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
     end
   end
 

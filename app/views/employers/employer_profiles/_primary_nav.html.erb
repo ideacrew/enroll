@@ -5,7 +5,7 @@
         <%= link_to "My #{site_short_name}", employers_employer_profile_path(@employer_profile.id, :tab=>'home'), "aria-expanded" => "true" %>
       </li>
       <li <%= menu_tab_class(active_tab, "employees") %>>
-        <%= link_to 'Employees', employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), "aria-expanded" => "true" %>
+      <%= link_to 'Employees', employers_employer_profile_path(@employer_profile.id, :tab=>'employees'), "aria-expanded" => "true" %>
       </li>
       <li <%= menu_tab_class(active_tab, "benefits") %>>
         <%= link_to 'Benefits', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), "aria-expanded" => "true" %>

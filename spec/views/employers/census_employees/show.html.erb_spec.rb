@@ -81,6 +81,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     expect(view.content_for(:main)).to match /CITY/
     expect(view.content_for(:main)).to match /SELECT STATE/
     expect(view.content_for(:main)).to match /ZIP/
+    expect(view.content_for(:main)).to match /Add Dependent/
   end
 
   it "should not show the plan" do
