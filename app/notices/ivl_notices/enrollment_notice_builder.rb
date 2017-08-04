@@ -33,7 +33,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def deliver
     build
-    append_hbe
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_required_documents if notice.documents_needed
@@ -57,7 +56,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def build
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = recipient.hbx_id
-    append_data
+    append_hbe
+    append_open_enrollment_data
     check_for_unverified_individuals
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.primary_firstname = recipient.first_name.titleize || ""
@@ -69,15 +69,12 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
-  def append_data
-    family = recipient.primary_family
-    #temporary fix - in case of mutliple applications
-    latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
-    notice.assistance_year = latest_application.assistance_year
+  def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    notice.coverage_year = bc_period.start_on.year
   end
 
   def check_for_unverified_individuals

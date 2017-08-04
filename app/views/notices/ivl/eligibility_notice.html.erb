@@ -33,7 +33,7 @@
 
 <% if notice.magi_medicaid_eligible.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
-    previous: "<b>Likely Qualify for Medicaid:</b>",
+    previous: "<strong>Likely Qualify for Medicaid:</strong>",
     listings: notice.magi_medicaid_eligible} %>
 
   <%= render partial: 'notices/shared/custom_listing', locals: {
@@ -42,7 +42,7 @@
 
 <% if notice.aqhp_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
-    previous: "Qualify for Private Health Insurance with Savings:",
+    previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
     listings: notice.aqhp_individuals} %>
   <% notice.tax_households.each do |thh|%>
     <% if thh.max_aptc > 0 %>
@@ -52,7 +52,7 @@
     <% else %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
        contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-         heading: '', sub_heading: "Advance Premium Tax Credit Savings: $#{thh.max_aptc}/month"} %>
+         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:<strong> $#{thh.max_aptc}/month"} %>
     <% end %>
   <% end %>
 <% end %>
@@ -64,12 +64,14 @@
   <% end %>
 <% end %>
 
-<% if is_under_open_enrollment? %>
-  <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan."} %>
-<% else %>
-  <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+<% if notice.aqhp_individuals.present? %>
+  <% if is_under_open_enrollment? %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+  <% else %>
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+  <% end %>
 <% end %>
 
 <% if notice.uqhp_individuals.present? %>
@@ -79,10 +81,10 @@
 
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan."} %>
+    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at dchealthlink.com to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
   <% end %>
 <% end %>
 
@@ -98,34 +100,34 @@
 <% if notice.aqhp_individuals.present? || notice.uqhp_individuals.present? %>
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-     contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{notice.assistance_year} private health plans began on #{notice.ivl_open_enrollment_start_on}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+     contents: ["<strong>Don’t miss the deadline!</strong> Open enrollment for #{notice.coverage_year} private health plans began on #{notice.ivl_open_enrollment_start_on}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
        heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at dchealthlink.com to enroll now."]} %>
+                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.assistance_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at dchealthlink.com or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+    content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
   <% else %>
 
     <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-     contents: ["Open enrollment for #{notice.assistance_year} ended on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
+     contents: ["Open enrollment for #{notice.coverage_year} ended on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
        heading: 'Enrolling in Private Health Insurance', sub_heading: ''} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at dchealthlink.com to enroll now."]} %>
+                 "Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to enroll now."]} %>
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "To find out if those who qualify can enroll now, login to your account at dchealthlink.com, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
+    content: "To find out if those who qualify can enroll now, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
 
   <% end %>
 
   <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-   contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."],
+   contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
      heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '12px'} %>
 <% end %>
 
@@ -154,7 +156,7 @@
    heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>The deadline to request an appeal is</strong> #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}. Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>

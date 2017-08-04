@@ -37,7 +37,8 @@ class IvlNotice < Notice
     notice.hbe = PdfTemplates::Hbe.new({
       url: Settings.site.home_url,
       phone: phone_number_format(Settings.contact_center.phone_number),
-      email: "#{Settings.contact_center.email_address}",
+      email: Settings.contact_center.email_address,
+      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
       address: PdfTemplates::NoticeAddress.new({
         street_1: "100 K ST NE",
         street_2: "Suite 100",
