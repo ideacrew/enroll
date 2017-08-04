@@ -28,6 +28,37 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
+  remote: components/notifier
+  specs:
+    notifier (0.0.1)
+      ckeditor
+      mongoid (~> 5.0.1)
+      rails (~> 4.2.3)
+      redcarpet (~> 3.4.0)
+      slim (= 3.0.8)
+      virtus (~> 1.0.5)
+      wicked_pdf (= 1.0.6)
+      wkhtmltopdf-binary-edge (~> 0.12.3.0)
+
+PATH
+  remote: components/transport_gateway
+  specs:
+    transport_gateway (0.0.1)
+      aws-sdk (~> 2)
+      net-sftp (~> 2.1, >= 2.1.2)
+      rails (>= 4.2.0)
+
+PATH
+  remote: components/transport_profiles
+  specs:
+    transport_profiles (0.0.1)
+      acapi
+      mongoid (= 5.0.1)
+      rails (>= 4.2.0)
+      symmetric-encryption (~> 3.6.0)
+      transport_gateway
+
+PATH
   remote: project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
@@ -162,7 +193,20 @@ GEM
       timers (>= 4.1.1)
     childprocess (0.5.9)
       ffi (~> 1.0, >= 1.0.11)
+<<<<<<< HEAD
+=======
+    chosen-rails (1.5.2)
+      coffee-rails (>= 3.2)
+      railties (>= 3.0)
+      sass-rails (>= 3.2)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
+>>>>>>> e512aae0e6... Refs #17404 initial commit ckeditor
     cliver (0.3.2)
+    cocaine (0.5.8)
+      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -436,6 +480,7 @@ GEM
       json (~> 1.4)
     recaptcha (1.1.0)
       json
+    redcarpet (3.4.0)
     redis (3.3.0)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -609,6 +654,12 @@ DEPENDENCIES
   capybara (= 2.6.2)
   capybara-screenshot
   carrierwave-mongoid
+<<<<<<< HEAD
+=======
+  certified
+  chosen-rails
+  ckeditor
+>>>>>>> e512aae0e6... Refs #17404 initial commit ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)

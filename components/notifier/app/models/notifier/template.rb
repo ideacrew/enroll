@@ -9,6 +9,7 @@ module Notifier
     field :raw_body, type: String
     field :raw_header, type: String
     field :raw_footer, type: String
+    field :template_key, type: String
 
     def to_s
       [raw_header, raw_body, raw_footer].join('\n\n')

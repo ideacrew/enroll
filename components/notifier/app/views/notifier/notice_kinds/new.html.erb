@@ -1,0 +1,5 @@
+<div class='container'>
+<%= form_for notice_kinds_path(:id => @notice_kind), :method => :post do |form| %>
+  <%= form.cktext_area :description, class: 'someclass' %>
+<% end %>
+</div>
