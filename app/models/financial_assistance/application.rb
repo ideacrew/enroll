@@ -663,11 +663,7 @@ private
     applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
     ##
     applicants.each do |applicant|
-      if applicant.is_primary_applicant?
-        # Create THH for the primary applicant.
-        primary_applicant.tax_household = tax_households.create!
-        applicant.update_attributes!(tax_filer_kind: 'tax_filer')
-      elsif applicant.is_claimed_as_tax_dependent?
+      if applicant.is_claimed_as_tax_dependent?
         # Assign applicant to the same THH that the person claiming this dependent belongs to.
         thh_of_claimer = applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
         applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
