@@ -1,4 +1,4 @@
-#  RAILS_ENV=production bundle exec rake update_service_reference:update_service_areas["SHOP_SA_FCHP.xlsx",2017,"88806"]  The params are file_name, active_year and issuer_hios_id
+#  RAILS_ENV=production bundle exec rake update_service_reference:update_service_areas["UPDATED_SHOP_SA_FCHP.xlsx",2017,"88806"]  The params are file_name, active_year and issuer_hios_id
 
 namespace :update_service_reference do
   desc "load service regions from xlsx file"
