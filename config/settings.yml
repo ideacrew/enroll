@@ -70,6 +70,7 @@ aca:
       # After submitting an ineligible plan year application, time period an Employer must wait
       ineligible_period_after_application_denial:
         days: 90
+      quiet_period: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -80,6 +81,7 @@ aca:
       open_enrollment:
         minimum_length:
           days: 3
+      quiet_period: 15
 
     benefit_period:
       length_minimum:

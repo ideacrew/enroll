@@ -11,6 +11,16 @@ module Queries
       enroll_pol_ids
     end
 
+    def quiet_period_enrollment(hbx_id)
+      enrollment = HbxEnrollment.by_hbx_id(hbx_id)[0]
+      plan_year = enrollment.benefit_group.plan_year
+      last_day = plan_year.is_renewing? ? Settings.aca.shop_market.renewal_application.quiet_period : Settings.aca.shop_market.initial_application.quiet_period
+      start_day = [plan_year.open_enrollment_end_on, plan_year.start_on.prev_month].max
+      end_day = plan_year.start_on.prev_month + (last_day - 1).days
+
+      (start_day.beginning_of_day..end_day.end_of_day).cover?(enrollment.submitted_at)
+    end
+
     def self.shop_monthly_enrollments(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
       qs.query_families_with_active_enrollments
@@ -20,7 +30,7 @@ module Queries
         .group_enrollments
         .project_enrollment_ids
 
-      qs.evaluate.collect{|r| r['enrollment_hbx_id']}
+      qs.evaluate.reject{|r| quiet_period_enrollment(r['enrollment_hbx_id'])}.collect{|r| r['enrollment_hbx_id']}
     end
 
 
