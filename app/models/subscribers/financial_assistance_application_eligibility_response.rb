@@ -25,8 +25,8 @@ module Subscribers
     def haven_import_from_xml(xml)
       verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
       verified_family.parse(xml)
-      verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
-      verified_dependents = verified_family.family_members.reject{ |fm| fm.id == verified_family.primary_family_member_id }
+      verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+      verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       primary_person = search_person(verified_primary_family_member)
       throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless primary_person.present?
       family = primary_person.primary_family
@@ -41,17 +41,18 @@ module Subscribers
       active_approved_application = family.applications.find(verified_family.fin_app_id)
 
 
-      #Find the right household or Create one.
-      households_ids = []
-      family.households.each { |th| households_ids << th.id.to_s}
-      active_verified_household = nil
-      active_verified_households = verified_family.households
+      # #Find the right household or Create one.
+      # households_ids = []
+      # family.households.each { |th| households_ids << th.id.to_s}
+      # active_verified_household = nil
+      # active_verified_households = verified_family.households
 
-      active_verified_households.each do |vhh|
-        if households_ids.include?(vhh.id)
-          active_verified_household = vhh
-        end
-      end
+      # active_verified_households.each do |vhh|
+      #   if households_ids.include?(vhh.id)
+      #     active_verified_household = vhh
+      #   end
+      # end
+      active_verified_household = verified_family.households.max_by(&:start_date)
 
       # active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.e_case_id}.first
 
@@ -213,7 +214,7 @@ module Subscribers
       ssn = verified_family_member.person_demographics.ssn
       ssn = '' if ssn == "999999999"
       dob = verified_family_member.person_demographics.birth_date
-      dob = Date.strptime( dob , '%m%d%Y')
+      dob = Date.strptime( dob , '%Y%m%d')
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
 

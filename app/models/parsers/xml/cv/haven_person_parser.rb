@@ -6,7 +6,7 @@ module Parsers::Xml::Cv
 
     tag 'person'
 
-    element :id, String, tag: "id/ridp:id"
+    element :hbx_id, String, tag: "id/ridp:id"
 
     element :person_surname, String,  tag: "person_surname/ridp:person_surname"
 
@@ -14,7 +14,7 @@ module Parsers::Xml::Cv
 
     element :name_last, String, tag: "person_name/ridp:person_surname"
 
-    element :name_first, String, tag: "person_name/ridp:person_full_name"
+    element :name_first, String, tag: "person_name/ridp:person_given_name"
 
     element :name_full, String, tag: "person_name/ridp:person_full_name"
 
