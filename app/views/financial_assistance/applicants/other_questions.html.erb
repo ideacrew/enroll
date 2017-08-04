@@ -32,7 +32,7 @@
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class='col-md-6'>
-          <span class='span-text'>Is this person pregnant ? *</span>
+          <span class='span-text'>Is this person pregnant? *</span>
         </div>
         <div class='col-md-2'>
           <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes", required: true) %>
@@ -234,7 +234,6 @@
           <label class="radio-yml" for="need_help_paying_bills_no">No</label>
         </div>
       </div>
-      <% binding.pry %>
       <% if @person.citizen_status.present? %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class='col-md-6'>
@@ -267,7 +266,7 @@
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class='col-md-6'>
-          <span class='span-text'>Are you the spouse or dependent child of such a veteran or individual in active duty status ?</span>
+          <span class='span-text'>Are you the spouse or dependent child of such a veteran or individual in active duty status?</span>
         </div>
         <div class='col-md-2'>
           <%= f.radio_button("is_spouse_or_dep_child_of_veteran_or_active_military", true, class: "radio-yml", id: "is_spouse_or_dep_child_of_veteran_or_active_military_yes", required: true) %>
