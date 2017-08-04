@@ -60,10 +60,14 @@ PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
+      ckeditor
       mongoid (~> 5.0.1)
       rails (~> 4.2.3)
+      redcarpet (~> 3.4.0)
       slim (= 3.0.8)
-      virtus (= 1.0.5)
+      virtus (~> 1.0.5)
+      wicked_pdf (= 1.0.6)
+      wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 PATH
   remote: components/transport_gateway
@@ -229,7 +233,13 @@ GEM
       coffee-rails (>= 3.2)
       railties (>= 3.0)
       sass-rails (>= 3.2)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
     cliver (0.3.2)
+    cocaine (0.5.8)
+      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -504,6 +514,7 @@ GEM
       json (~> 1.4)
     recaptcha (4.3.1)
       json
+    redcarpet (3.4.0)
     redis (3.3.0)
     redis-actionpack (4.0.1)
       actionpack (~> 4)
@@ -710,6 +721,7 @@ DEPENDENCIES
   carrierwave-mongoid
   certified
   chosen-rails
+  ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)

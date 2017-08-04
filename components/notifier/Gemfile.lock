@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     notifier (0.0.1)
+      ckeditor
       mongoid (~> 5.0.1)
       rails (~> 4.2.3)
       redcarpet (~> 3.4.0)
@@ -63,6 +64,12 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
+    cocaine (0.5.8)
+      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -102,6 +109,7 @@ GEM
     nokogiri (1.8.0)
       mini_portile2 (~> 2.2.0)
     origin (2.3.1)
+    orm_adapter (0.5.0)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
