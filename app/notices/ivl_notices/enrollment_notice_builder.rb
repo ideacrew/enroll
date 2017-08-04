@@ -19,8 +19,45 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def generate_custom_notice(custom_template)
     File.open(custom_notice_path, 'wb') do |file|
-      file << self.pdf(custom_template)
+      file << self.pdf_custom(custom_template)
     end
+  end
+
+  def pdf_custom(custom_template)
+    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options_custom)
+  end
+
+  def pdf_options_custom
+    options = {
+      margin:  {
+        top: 15,
+        bottom: 20,
+        left: 22,
+        right: 22
+      },
+      disable_smart_shrinking: true,
+      dpi: 96,
+      page_size: 'Letter',
+      formats: :html,
+      encoding: 'utf8',
+      header: {
+        content: ApplicationController.new.render_to_string({
+          template: 'notices/shared/header_for_documents.html.erb',
+          layout: false,
+          locals: { recipient: recipient, notice: notice}
+          }),
+        }
+    }
+    if market_kind == 'individual'
+      options.merge!({footer: {
+        content: ApplicationController.new.render_to_string({
+          template: "notices/shared/footer_ivl.html.erb",
+          layout: false,
+          locals: {notice: notice}
+        })
+      }})
+    end
+    options
   end
 
   def clear_tmp

@@ -30,8 +30,8 @@ class Notice
     @random_str ||= rand(10**10).to_s
   end
 
-  def pdf(custom_template = nil)
-    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options)
+  def pdf
+    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
   end
 
   def layout
