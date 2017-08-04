@@ -28,11 +28,6 @@ class EmployerProfileAccount
 
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 
-  def nfp_process
-    # if past_due > 0
-    #   #trans to past_due
-    #   self.
-  end
 
   def last_premium_payment
     return premium_payments.first if premium_payments.size == 1
