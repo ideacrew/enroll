@@ -6,6 +6,7 @@ module PdfTemplates
     attribute :mpi_indicator, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
+    attribute :employee_fullname, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
@@ -29,6 +30,7 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
 
     def shop?
       return true

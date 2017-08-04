@@ -653,6 +653,27 @@ shop_notice_triggers = [
         }
       }
     ]
+  }
+  {
+    hbx_id: 'SHOP37',
+    title: 'Employee mid year plan change congressional',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
+    resource_name: 'employer',
+    event_name: 'ee_mid_year_plan_change_notice_congressional',
+    notice_triggers: [
+      {
+        name: 'Employee mid year plan change notice - congressional',
+        notice_template: 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
+        notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional',
+        mpi_indicator: 'MPI_SHOP37',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   },
   {
     hbx_id: 'SHOP10066',
