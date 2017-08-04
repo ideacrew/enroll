@@ -9,22 +9,27 @@ $(document).ready(function() {
     $.ajax({
       type: "GET",
       data:{},
-      url: window.location.href.replace(/other_questions/, "age_18_to_26"),
+      url: window.location.href.replace(/other_questions/, "age_of_applicant"),
       success: function (age) {
         hide_show_foster_care_related_qns(age);
       }
     });
   }
 
-  // To hide/show the foster care related questions based on the age_of_the_applicant.
+  // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
     if ($('#is_pregnant_yes')) {
-      if (age == "false"){
+      if (age >= 18 && age <= 26){
+        $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
+        if (age == 18 || age == 19){
+          $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
+        } else {
+          $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
+        }
+      } else {
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
         $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
         $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
-      } else {
-        $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
       }
     }
   }
@@ -62,17 +67,17 @@ $(document).ready(function() {
 
   $("body").on("change", "#is_required_to_file_taxes_no", function(){
     if ($('#is_required_to_file_taxes_no').is(':checked')) {
-      $(this).parents(".row").next().addClass('hide');
+      $('#is_joint_tax_filing_no').parents('.row-form-wrapper').addClass('hide');
     } else{
-      $(this).parents(".row").next().next().removeClass('hide');
+      $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').removeClass('hide');
     }
   });
 
   $("body").on("change", "#is_required_to_file_taxes_yes", function(){
     if ($('#is_required_to_file_taxes_yes').is(':checked')) {
-      $(this).parents(".row").next().removeClass('hide');
+      $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
     } else{
-      $(this).parents(".row").next().next().addClass('hide');
+      $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').addClass('hide');
     }
   });
 
@@ -220,12 +225,15 @@ $(document).ready(function() {
   }
 
 /* Applicant's Tax Info Form Related */
+
+  $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').addClass('hide');
+
   if($('#is_required_to_file_taxes_no').is(':checked')) {
-    $('#is_required_to_file_taxes_no').parents(".row").next().addClass('hide');
+    $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   if($('#is_required_to_file_taxes_yes').is(':checked')) {
-    $('#is_required_to_file_taxes_yes').parents(".row").next().removeClass('hide');
+    $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').removeClass('hide');
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
@@ -240,45 +248,87 @@ $(document).ready(function() {
 
 
 /* Applicant's Other Questions Form Related */
-  $("body").on("change", "#is_pregnant_no", function(){
-    if ($('#is_pregnant_no').is(':checked')) {
-      $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
-      $('#is_post_partum_period_yes').parents('.row-form-wrapper').removeClass('hide');
+
+  if ($('#is_ssn_applied_yes').is(':checked')) {
+    $('#no_ssn_reason').parents('.row-form-wrapper').addClass('hide');
+  } else {
+    $('#no_ssn_reason').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  $("body").on("change", "#is_ssn_applied_yes", function(){
+    if ($('#is_ssn_applied_yes').is(':checked')) {
+      $('#no_ssn_reason').parents('.row-form-wrapper').addClass('hide');
+    };
+  });
+
+  if ($('#is_ssn_applied_no').is(':checked')) {
+    $('#no_ssn_reason').parents('.row-form-wrapper').removeClass('hide');
+  } else {
+    $('#no_ssn_reason').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  $("body").on("change", "#is_ssn_applied_no", function(){
+    if ($('#is_ssn_applied_no').is(':checked')) {
+      $('#no_ssn_reason').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
   $("body").on("change", "#is_pregnant_yes", function(){
     if ($('#is_pregnant_yes').is(':checked')) {
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').removeClass('hide');
-      $('#is_post_partum_period_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
+      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
   if($('#is_pregnant_yes').is(':checked')) {
     $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').removeClass('hide');
-    $('#is_post_partum_period_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
   } else {
     $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
-    $('#is_post_partum_period_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  $("body").on("change", "#is_pregnant_no", function(){
+    if ($('#is_pregnant_no').is(':checked')) {
+      $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').removeClass('hide');
+      $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
+      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+    };
+  });
+
+  if($('#is_pregnant_no').is(':checked')) {
+    $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').removeClass('hide');
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+  } else {
+    $('#is_post_partum_period_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  if($('#is_post_partum_period_yes').is(':checked')) {
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
+  } else {
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_post_partum_period_yes", function(){
     if ($('#is_post_partum_period_yes').is(':checked')) {
-      $('#applicant_pregnancy_end_on, #medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
+      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
     };
   });
+
+  if($('#is_post_partum_period_no').is(':checked')) {
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+  } else {
+    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+  }
 
   $("body").on("change", "#is_post_partum_period_no", function(){
     if ($('#is_post_partum_period_no').is(':checked')) {
-      $('#applicant_pregnancy_end_on, #medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
-  if($('#is_post_partum_period_yes').is(':checked')) {
-    $('#applicant_pregnancy_end_on, #medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
-  } else {
-    $('#applicant_pregnancy_end_on, #medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
-  }
 
   $("body").on("change", "#is_former_foster_care_no", function(){
     if ($('#is_former_foster_care_no').is(':checked')) {
@@ -317,6 +367,32 @@ $(document).ready(function() {
   } else {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
+
+
+  if($('#is_veteran_or_active_military_yes').is(':checked')) {
+    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+  } else {
+    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  $("body").on("change", "#is_veteran_or_active_military_yes", function(){
+    if ($('#is_veteran_or_active_military_yes').is(':checked')) {
+      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    };
+  });
+
+  if($('#is_veteran_or_active_military_no').is(':checked')) {
+    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+  } else {
+    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+  }
+
+  $("body").on("change", "#is_veteran_or_active_military_no", function(){
+    if ($('#is_veteran_or_active_military_no').is(':checked')) {
+      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+    };
+  });
+
 /* Applicant's Other Questions Form Related */
 
   /* Submit Application Form Related */

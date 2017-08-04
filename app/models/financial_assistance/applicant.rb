@@ -407,7 +407,7 @@ class FinancialAssistance::Applicant
 
 private
   def validate_applicant_information
-    validates_presence_of :is_ssn_applied, :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
+    validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
   end
 
   def presence_of_attr_step_1
@@ -459,7 +459,7 @@ private
       errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
     end
 
-    if (18..26).include?(age_of_applicant)
+    if (age_of_applicant >= 18 && age_of_applicant <= 26)
       if is_former_foster_care.nil?
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered")
       end

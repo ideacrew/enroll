@@ -5,19 +5,30 @@
     <p>Tell us about this person's other questions. When you're finished select CONTINUE.</p>
     <p class="memo">* = required field</p>
 
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class='col-md-6'>
-          <span class='span-text'>Has this person applied for an SSN *</span>
+      <% if @applicant.present? && @applicant.person.no_ssn == "1" %>
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class='span-text'>Has this person applied for an SSN *</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes") %>
+            <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no") %>
+            <label class="radio-yml" for="is_ssn_applied_no">No</label>
+          </div>
         </div>
-        <div class='col-md-2'>
-          <%= f.radio_button("is_ssn_applied", true, class: "radio-yml", id: "is_ssn_applied_yes", required: true) %>
-          <label class="radio-yml" for="is_ssn_applied_yes">Yes</label>
+
+        <div class="row row-form-wrapper no-buffer row-height">
+          <div class='col-md-6'>
+            <span class='span-text'>Reason, why you dont have an SSN?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.text_field :non_ssn_apply_reason, class: "floatlabel", id: "no_ssn_reason", placeholder: "reason" %>
+          </div>
         </div>
-        <div class='col-md-2'>
-          <%= f.radio_button("is_ssn_applied", false, class: "radio-yml", id: "is_ssn_applied_no", required: true) %>
-          <label class="radio-yml" for="is_ssn_applied_no">No</label>
-        </div>
-      </div>
+      <% end %>
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class='col-md-6'>
@@ -130,7 +141,6 @@
 
         <div class='col-md-2'>
           <%= f.radio_button("had_medicaid_during_foster_care", true, class: "radio-yml", id: "had_medicaid_during_foster_care_yes", required: true)%>
-
           <label class="radio-yml" for="had_medicaid_during_foster_care_yes">Yes</label>
         </div>
 
@@ -222,6 +232,49 @@
         <div class='col-md-2'>
           <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "has_daily_living_help_no", required: true )%>
           <label class="radio-yml" for="need_help_paying_bills_no">No</label>
+        </div>
+      </div>
+      <% if @person.citizen_status.present? %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Did you move to the U.S. on or after August 22, 1996?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes", required: true) %>
+          <label class="radio-yml" for="is_resident_post_092296_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no", required: true) %>
+          <label class="radio-yml" for="is_resident_post_092296_no">No</label>
+        </div>
+      </div>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Are you an honorably discharged veteran or active duty member of the military?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_veteran_or_active_military", true, class: "radio-yml", id: "is_veteran_or_active_military_yes", required: true) %>
+          <label class="radio-yml" for="is_veteran_or_active_military_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_veteran_or_active_military", false, class: "radio-yml", id: "is_veteran_or_active_military_no", required: true) %>
+          <label class="radio-yml" for="is_veteran_or_active_military_no">No</label>
+        </div>
+      </div>
+      <% end %>
+
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class='col-md-6'>
+          <span class='span-text'>Are you the spouse or dependent child of such a veteran or individual in active duty status?</span>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_spouse_or_dep_child_of_veteran_or_active_military", true, class: "radio-yml", id: "is_spouse_or_dep_child_of_veteran_or_active_military_yes", required: true) %>
+          <label class="radio-yml" for="is_spouse_or_dep_child_of_veteran_or_active_military_yes">Yes</label>
+        </div>
+        <div class='col-md-2'>
+          <%= f.radio_button("is_spouse_or_dep_child_of_veteran_or_active_military", false, class: "radio-yml", id: "is_spouse_or_dep_child_of_veteran_or_active_military_no", required: true) %>
+          <label class="radio-yml" for="is_spouse_or_dep_child_of_veteran_or_active_military_no">No</label>
         </div>
       </div>
 
