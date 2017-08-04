@@ -4,7 +4,7 @@ module Parsers::Xml::Cv
     register_namespace 'n1', 'http://openhbx.org/api/terms/1.0'
     tag 'tax_household'
 
-    element :id, String, tag: 'id/n1:id'
+    element :hbx_assigned_id, String, tag: 'id/n1:id'
     element :primary_applicant_id, String, tag: 'primary_applicant_id/n1:id'
     # has_many :allocated_aptcs, Parsers::Xml::Cv::AllocatedAptcsParser, tag: 'allocated_aptc', namespace: 'n1'
     has_many :tax_household_members, Parsers::Xml::Cv::HavenTaxHouseholdMembersParser, tag: 'tax_household_member', namespace: 'n1'
