@@ -26,10 +26,10 @@ module PdfTemplates
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
     attribute :last_name, String
-    attribute :due_date, String
+    attribute :due_date, Date
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
-    attribute :assistance_year, Date
+    attribute :coverage_year, String
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
@@ -145,9 +145,9 @@ module PdfTemplates
       when 73
         text << "For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>"
       when 87
-        text << "For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs.  <strong>To get these savings, you must select a silver plan.</strong>"
+        text << "For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>"
       when 94
-        text << "For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs.  <strong>To get these savings, you must select a silver plan.</strong>"
+        text << "For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>"
       when 100
         text << "You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider."
       else
@@ -218,8 +218,8 @@ module PdfTemplates
       if ivl.no_aptc_because_of_tax
         flag = true
         block << "#{ivl.first_name} does not qualify for an advance premium tax credit to help pay for the insurance for one of the following reasons:"
-        block << "Not filing taxes for #{assistance_year}
-        Filed taxes separately from spouse for #{assistance_year}
+        block << "Not filing taxes for #{coverage_year}
+        Filed taxes separately from spouse for #{coverage_year}
         Someone in the household did not reconcile the tax credit received in a previous year on their federal tax return"
         block << "Call #{Settings.site.short_name} at (855) 532-5465 to find out if this issue can be resolved. If it can, #{Settings.site.short_name} can check again to see if #{ivl.first_name} would be eligible."
       end
@@ -259,8 +259,8 @@ module PdfTemplates
       if ivl.no_csr_because_of_tax
         flag = true
         block << "#{ivl.first_name} does not qualify for cost-sharing reductions for one of the following reasons:
-          Not filing taxes for <coverage year>
-          Filed taxes separately from spouse for <coverage year>
+          Not filing taxes for #{coverage_year}
+          Filed taxes separately from spouse for #{coverage_year}
           Did not reconcile the tax credit received in a previous year on this person’s federal tax return
           Call #{Settings.site.short_name} at (855) 532-5465 to find out if this issue can be resolved. If it can, #{Settings.site.short_name} can check again to see if #{ivl.first_name} would be eligible."
       end
@@ -277,7 +277,7 @@ module PdfTemplates
       flag = false
       if ivl.is_totally_ineligible
         flag = true
-        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."
+        block << "#{ivl.first_name} does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{hbe.phone}."
       end
       ineligible_for_medicaid << block if flag == true
       rows << ineligible_for_medicaid if ineligible_for_medicaid.count > 1
