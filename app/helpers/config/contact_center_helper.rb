@@ -8,7 +8,7 @@ module Config::ContactCenterHelper
   end
 
   def contact_center_alt_phone_number
-    Settings.contact_center.phone_number
+    Settings.contact_center.alt_phone_number
   end
 
   def contact_center_city
