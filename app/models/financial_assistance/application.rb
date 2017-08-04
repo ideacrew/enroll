@@ -13,7 +13,7 @@ class FinancialAssistance::Application
   validates :before_attestation_validity, presence: true, on: :before_attestation
   validate :attestation_terms_on_parent_living_out_of_home
 
-  YEARS_TO_RENEW_RANGE = 0..4
+  YEARS_TO_RENEW_RANGE = 0..5
   RENEWAL_BASE_YEAR_RANGE = 2013..TimeKeeper.date_of_record.year + 1
 
   APPLICANT_KINDS   = ["user and/or family", "call center rep or case worker", "authorized representative"]
