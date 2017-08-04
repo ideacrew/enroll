@@ -91,23 +91,17 @@ describe ChangeEnrollmentDetails do
 
     end
 
-    context "cancel enrollment" do
+    context "it should cancel the enrollment" do
       before do
         allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
-        allow(ENV).to receive(:[]).with("action").and_return "cancel_enrollment"
-        allow(ENV).to receive(:[]).with("terminated_on").and_return(hbx_enrollment.effective_on.strftime("%m/%d/%Y"))
+        allow(ENV).to receive(:[]).with("action").and_return "cancel"
         subject.migrate
         hbx_enrollment.reload
       end
 
-      shared_examples_for "cancellation" do |val, result|
-        it "should equal #{result}" do
-          expect(actual_result(hbx_enrollment, val)).to eq result
-        end
+      it "should cancel the enrollment" do
+        expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
       end
-
-      it_behaves_like "cancellation", "aasm_state", "coverage_canceled"
-      # it_behaves_like "cancellation", "terminated_on", (hbx_enrollment.effective_on)
     end
   end
 end
