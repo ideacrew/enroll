@@ -8,6 +8,15 @@ class EmployerProfileAccount
 
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
+  # temp fields
+  field :message, type: String
+  field :past_due, type: String
+  field :previous_balance, type: String
+  field :new_charges, type: String
+  field :adjustments, type: String
+  field :payments, type: String
+  field :total_due, type: String
+
   field :aasm_state, type: String, default: "binder_pending"
 
   embeds_many :premium_payments
@@ -60,6 +69,12 @@ class EmployerProfileAccount
     event :allocate_binder_payment, :after => :record_transition do
       transitions from: :binder_pending, to: :binder_paid
     end
+
+    event :invoice  do
+      transitions from: :binder_pending, to: :invoiced
+    end
+
+
 
     # A new billing period begins the first day of each month
     event :advance_billing_period, :guard => :first_day_of_month?, :after => :record_transition do
