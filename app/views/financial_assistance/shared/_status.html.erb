@@ -1,0 +1,17 @@
+<% if application.ready_for_attestation? %>
+  <div class = "review-note">
+    <span class="top-sec">Your Applicaton <br> for Help Paying <br> for Coverage</span>
+    <div class="review-middle-sec">
+      <span class="glyphicon glyphicon-ok ready-review-icon"></span> Ready For Review
+    </div>
+    <span class="review-bottom-sec">You may continue or review your application, or keep adding persons </span>
+  </div> 
+<% else %>
+  <div class = "note">
+    <span class="top-sec">Your Applicaton <br> for Help Paying <br> for Coverage</span>
+    <div class="middle-sec">
+      <span class="glyphicon glyphicon-refresh info-needed-icon"></span> Info Needed
+    </div>
+    <span class="bottom-sec">You must enter all required information for every one in your household </span>
+  </div> 
+<% end %>
