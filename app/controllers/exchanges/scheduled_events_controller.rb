@@ -13,11 +13,14 @@ class Exchanges::ScheduledEventsController < ApplicationController
     scheduled_event = ScheduledEvent.new(scheduled_event_params)
     if scheduled_event.save
       scheduled_event.update_attributes!(one_time: false) if scheduled_event.recurring_rules.present?
-      redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
+      @flash_message = 'Event successfully created'
+      @flash_type = 'success'
+      @calendar_events = load_calendar_events
     else
-      flash[:error] = scheduled_event.errors.values.flatten.to_sentence
+      @flash_message = scheduled_event.errors.values.flatten.to_sentence
+      @flash_type = 'error'
       @scheduled_event = scheduled_event
-      redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
+      render :new
     end
   end
 
@@ -46,20 +49,18 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def index
-    @calendar_events = scheduled_events.flat_map do |e|
-      if params.key?("start_date")
-        e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date, e.offset_rule)
-      else
-        e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date, e.offset_rule)
-      end
-    end
+    @calendar_events = load_calendar_events
   end
 
   def destroy
-    scheduled_event.destroy
-    respond_to do |format|
-      format.html { redirect_to exchanges_scheduled_events_path, notice: 'Event was successfully destroyed.' }
+    if scheduled_event.destroy
+      @flash_message = 'Current Event was successfully destroyed.'
+      @flash_type = 'success'
+    else
+      @flash_message = "We encountered an error trying to remove this occurence"
+      @flash_type = 'alert'
     end
+    @calendar_events = load_calendar_events
   end
 
   def current_events
@@ -71,17 +72,30 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def delete_current_event
-    if @exception = scheduled_event.event_exceptions.create(time: params[:time])
-      redirect_to exchanges_scheduled_events_path, notice: 'Current Event was successfully destroyed.'
+    unless @exception = scheduled_event.event_exceptions.create(time: params[:time])
+      @flash_message = 'Current Event was successfully destroyed.'
+      @flash_type = 'success'
     else
-      flash.alert = "Unable to add exception"
-      redirect_to exchanges_scheduled_events_path
+      pp @exception
+      @flash_message = "We encountered an error trying to remove this occurence"
+      @flash_type = 'alert'
     end
+    @calendar_events = load_calendar_events
   end
 
   private
 
     helper_method :scheduled_event, :scheduled_events
+
+    def load_calendar_events
+      scheduled_events.flat_map do |e|
+        if params.key?("start_date")
+          e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date, e.offset_rule)
+        else
+          e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date, e.offset_rule)
+        end
+      end
+    end
 
     def scheduled_event_params
       params.require(:scheduled_event).permit(:type, :event_name, :start_time, :recurring_rules, :one_time, :offset_rule)
