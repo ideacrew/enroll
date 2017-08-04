@@ -147,11 +147,13 @@ Feature: Employer Profile
     And Employer Staff clicks documents tab
     Then Employer Staff should see attestation status Rejected
     When Employer goes to the benefits tab I should see plan year information
+    Then I click on log out link
 
   Scenario: Employer Deletes submitted documents
     Then Employer uploads an attestation document
     And Employer clicks delete in actions
     Then Employer should not see submitted document
+    Then I click on log out link
 
   Scenario: Employer should not be allowed to delete a document which is not in 'submitted' state. i.e, accepted, rejected or info needed
     Then Employer uploads an attestation document
