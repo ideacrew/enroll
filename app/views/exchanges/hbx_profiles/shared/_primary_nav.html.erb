@@ -97,7 +97,7 @@
       <% if individual_market_is_enabled? %>
       <li role="presentation"<%= menu_tab_class(active_tab, "user-account-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
         <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "users", "role" => "tab" ) do  %>
-          <span class="hidden-xs">Users</span>
+          <span class="hidden-xs">User Accounts</span>
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Accounts"></span>
         <% end %>
       </li>
