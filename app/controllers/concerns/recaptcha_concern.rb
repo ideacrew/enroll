@@ -8,14 +8,15 @@ module RecaptchaConcern
 
     def check_captcha
       unless verify_recaptcha
-        current_controller = self.class.to_s
-        case current_controller
+        case self.class.to_s
         when 'Users::RegistrationsController'
           self.resource = resource_class.new sign_up_params
+          resource.oim_id = params[:user][:oim_id]
           respond_with_navigational(resource) { render :new }
         when 'Users::SessionsController'
           if User.login_captcha_required?(params[:user][:login])
             self.resource = resource_class.new
+            resource.login = params[:user][:login]
             respond_with_navigational(resource) { render :new }
           end
         end
