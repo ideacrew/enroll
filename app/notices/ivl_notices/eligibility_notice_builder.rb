@@ -51,7 +51,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     #Family has many applications - Pull the right application.
     family = recipient.primary_family
     #temporary fix - in case of mutliple applications
-    latest_application = family.applications.where(:assm_state.nin => ["draft"]).sort_by(&:submitted_at).last
+    latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
     notice.coverage_year = latest_application.assistance_year
     latest_application.applicants.each do |applicant|
       notice.individuals << append_applicant_information(applicant)
