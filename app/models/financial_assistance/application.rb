@@ -658,17 +658,29 @@ private
   end
 
   def create_tax_households
-    # Create THH for the primary applicant.
-    primary_applicant.tax_household = tax_households.create!
-
+    ## Remove  when copy method is fixed to exclude copying Tax Household
+    tax_households.destroy_all
+    applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
+    ##
     applicants.each do |applicant|
-      if applicant.is_claimed_as_tax_dependent?
-        # Assign this applicant to the same THH that the person claiming this dependent belongs to.
+      if applicant.is_primary_applicant?
+        # Create THH for the primary applicant.
+        primary_applicant.tax_household = tax_households.create!
+        applicant.update_attributes!(tax_filer_kind: 'tax_filer')
+      elsif applicant.is_claimed_as_tax_dependent?
+        # Assign applicant to the same THH that the person claiming this dependent belongs to.
         thh_of_claimer = applicants.find(applicant.claimed_as_tax_dependent_by).tax_household
         applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
+        applicant.update_attributes!(tax_filer_kind: 'dependent')
+      elsif applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
+        # Assign joint filer to THH of Spouse.
+        applicant.tax_household = applicant.tax_household_of_spouse
+        applicant.update_attributes!(tax_filer_kind: 'tax_filer')
       else
-        # Create a new THH and assign to the applicant.
+        # Create a new THH and assign it to the applicant
+        # Need THH for Medicaid cases too
         applicant.tax_household = tax_households.create!
+        applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
       end
     end
 

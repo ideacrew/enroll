@@ -185,6 +185,20 @@ class FinancialAssistance::Applicant
     is_claimed_as_tax_dependent
   end
 
+  def is_not_in_a_tax_household?
+    self.tax_household.blank?
+  end
+
+  def tax_household_of_spouse
+    spouse_relationship  = self.person.person_relationships.where(kind: 'spouse').first
+    if spouse_relationship.present?
+      spouse = Person.find(spouse_relationship.successor_id)
+      spouse_applicant = application.applicants.detect {|applicant| spouse == applicant.person }
+      return spouse_applicant.tax_household
+    end
+    return nil
+  end
+
   #### Use Person.consumer_role values for following
   def is_us_citizen?
   end
