@@ -33,13 +33,13 @@
 
     <%= render 'layouts/header' %>
     <%= yield :horizontal_menu %>
-    <%= yield :top_navigation %>
+    <%= render_flash %>
 
     <div class="content <%= controller_name %> content-bottom">
         <%= yield %>
     </div>
 
-    <%= render 'layouts/application_footer' %>
+    <%= render 'layouts/footer' %>
 
   </body>
-</html>
+ </html>
