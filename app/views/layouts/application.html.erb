@@ -7,20 +7,12 @@
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
 
-    <%= favicon_link_tag 'favicon.png', :rel => 'shortcut icon', :type => 'image/png', :sizes => '32x32' %>
-
-    <%= content_for?(:page_title) ? content_tag(:title, yield(:page_title)) :
-                                    content_tag(:title, "Welcome to #{Settings.site.short_name}") %>
-
-    <%= content_tag(:description, yield(:page_description)) if content_for?(:page_description) %>
-
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
       <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
       <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
-
 
 
         <script>
@@ -32,62 +24,21 @@
                 ga('send', 'pageview');
         </script>
 
-    <%= stylesheet_link_tag "application", :media => "all" %>
-    <%= csrf_meta_tags %>
   </head>
-  <body class="<%= controller_name %> <%= action_name %>">
-    <header aria-label="header content"> <%= render 'layouts/application_brand' %></header>
+  <body class="font">
 
-    <% if content_for?(:left_navigation) %>
+    <%= render 'layouts/header' %>
+
+    <div class="content <%= controller_name %> content-bottom">
+      <%= render_flash %>
       <div class="container">
-        <div class="row">
-          <!-- Navigation Column -->
-          <div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 sidebar">
-            <div class="left_navigation" role="navigation" aria-label="main navigation">
-              <%= yield(:left_navigation) %>
-            </div>
-          </div>
+        <%= yield :horizontal_status %>
 
-          <!-- Main Content -->
-          <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
-            <main>
-              <div class="flash_message"><%= flash_messages %></div>
-              <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
-              <%= content_for?(:main) ? yield(:main) : 'Provide Content for Main' %>
-            </main>
-          </div>
-        </div>
       </div>
-     </div>
-    <% elsif content_for?(:top_navigation) %>
-        <!-- Default is top navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" aria-label="main navigation">
-            <%= content_for?(:top_navigation) ? yield(:top_navigation) : "Provide content for :top_navigation" %>
-        </nav>
-    <% else %>
-      <!-- Default is top navigation -->
-      <% if content_for?(:top_navigation) %>
-        <nav class="navbar navbar-default navbar-static-top nav-list" role="navigation" aria-label="main navigation">
-          <div class="container">
-            <%= content_for?(:top_navigation) ? yield(:top_navigation) : "Provide content for :top_navigation" %>
-          </div>
-        </nav>
-      <% end %>
-      <!-- Main Content -->
-      <div class="container">
-        <main role="main" aria-label="main content">
-          <div class="flash_message"><%= flash_messages %></div>
-          <div class="breadcrumbs"><%= yield(:breadcrumbs) if content_for?(:breadcrumbs) %></div>
-          <%= content_for?(:main) ? yield(:main) : yield %>
-        </main>
-      </div>
-    <% end %>
+        <%= yield %>
+    </div>
 
-    <%= render 'layouts/application_footer' %>
-    <%= render 'layouts/application_script' %>
-    
-    <% if content_for?(:additional_scripts) %>
-      <%= yield(:additional_scripts) %>
-    <% end %>
+    <%= render 'layouts/footer' %>
+
   </body>
  </html>
