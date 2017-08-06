@@ -1,12 +1,12 @@
 class QhpBuilder
-  INVALID_PLAN_IDS = ["43849DC0060001", "92479DC0020003"] # These plan ids are suppressed and we dont save these while importing.
+  INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051", "88806MA0040051"] # These plan ids are suppressed and we dont save these while importing.
   BEST_LIFE_HIOS_IDS = ["95051DC0020003", "95051DC0020006", "95051DC0020004", "95051DC0020005"]
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_plans_#{Time.now.to_s.gsub(' ', '')}.log"
 
   def initialize(qhp_hash)
-    log_path = LOG_PATH
-    FileUtils.mkdir_p(File.dirname(log_path)) unless File.directory?(File.dirname(log_path))
-    @logger = Logger.new(log_path)
+    @log_path = LOG_PATH
+    FileUtils.mkdir_p(File.dirname(@log_path)) unless File.directory?(File.dirname(@log_path))
+    @logger = Logger.new(@log_path)
 
     @qhp_hash = qhp_hash
     @qhp_array = []
@@ -130,9 +130,11 @@ class QhpBuilder
 
   def validate_and_persist_qhp
     begin
-      associate_plan_with_qhp
-      @qhp.save!
-      @success_plan_counter += 1
+      if !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
+        associate_plan_with_qhp
+        @qhp.save!
+        @success_plan_counter += 1
+      end
       @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.hios_product_id} \n"
     rescue Exception => e
       @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.hios_product_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
@@ -145,10 +147,10 @@ class QhpBuilder
     @qhp.plan_effective_date = effective_date.beginning_of_year
     @qhp.plan_expiration_date = effective_date.end_of_year
     @plan_year = effective_date.year
-    if @plan_year > 2015 && !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
-      @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
-      create_plan_from_serff_data
-    end
+
+    @dental_metal_level = @qhp.metal_level.downcase if @qhp.dental_plan_only_ind.downcase == "yes"
+    create_plan_from_serff_data
+
     candidate_plans = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
     plan = candidate_plans.sort_by do |plan| plan.hios_id.gsub('-','').to_i end.first
     plans_to_update = Plan.where(active_year: @plan_year, hios_id: /#{@qhp.standard_component_id.strip}/).to_a
