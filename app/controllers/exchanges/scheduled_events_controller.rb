@@ -44,7 +44,15 @@ class Exchanges::ScheduledEventsController < ApplicationController
       else
         scheduled_event.update_attributes!(one_time: true)
       end
-      redirect_to exchanges_scheduled_events_path
+      @scheduled_event = scheduled_event
+      @flash_message = "Event successfully updated"
+      @flash_type = 'success'
+      render :list
+    else
+      @flash_message = scheduled_event.errors.values.flatten.to_sentence
+      @flash_type = 'error'
+      @scheduled_event = scheduled_event
+      render :edit
     end
   end
 
@@ -76,7 +84,6 @@ class Exchanges::ScheduledEventsController < ApplicationController
       @flash_message = 'Current Event was successfully destroyed.'
       @flash_type = 'success'
     else
-      pp @exception
       @flash_message = "We encountered an error trying to remove this occurence"
       @flash_type = 'alert'
     end
