@@ -43,7 +43,7 @@ class FinancialAssistance::Application
 
   field :assistance_year, type: Integer
 
-  field :is_renewal_authorized, type: Boolean
+  field :is_renewal_authorized, type: Boolean, default: true
   field :renewal_base_year, type: Integer
   field :years_to_renew, type: Integer
 
@@ -527,6 +527,7 @@ private
 
   def clean_params(model_params)
     model_params[:attestation_terms] = nil if model_params[:parent_living_out_of_home_terms].present? && model_params[:parent_living_out_of_home_terms] == 'false'
+    model_params[:years_to_renew] = "5" if model_params[:is_renewal_authorized].present? && model_params[:is_renewal_authorized] == "true"
   end
 
   def attestation_terms_on_parent_living_out_of_home
