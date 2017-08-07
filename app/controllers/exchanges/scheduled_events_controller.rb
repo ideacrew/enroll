@@ -80,8 +80,8 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def delete_current_event
-    unless @exception = scheduled_event.event_exceptions.create(time: params[:time])
-      @flash_message = 'Current Event was successfully destroyed.'
+    if scheduled_event.event_exceptions.create!(time: params[:time])
+      @flash_message = "#{scheduled_event.event_name.humanize} on #{params[:time]} was successfully removed"
       @flash_type = 'success'
     else
       @flash_message = "We encountered an error trying to remove this occurence"
