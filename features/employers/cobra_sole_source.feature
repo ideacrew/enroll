@@ -2,7 +2,7 @@ Feature: COBRA basic
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
     Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
-    Given vertical and horizontal plan choices are offered
+    Given only sole source plans are offered
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
     Then I should see a successful sign up message
@@ -11,16 +11,16 @@ Feature: COBRA basic
     When I go to the Profile tab
     When Employer goes to the benefits tab I should see plan year information
     And Employer should see a button to create new plan year
-    And Employer should be able to enter single carrier plan year, benefits, relationship benefits for cobra
+    And Employer should be able to enter sole source plan year, benefits, relationship benefits for cobra
     And Employer should see a success message after clicking on create plan year button
     Then Employer uploads an attestation document
     When Employer goes to the benefits tab I should see plan year information
-    Then Employer can see the plan information
+    Then Employer can see the sole source plan information
     Then Employer clicks on publish plan year
     Then Employer should see a published success message without employee
 
     When I go to MY Health Connector tab
-    Then Employer can see the plan information on home tab
+    Then Employer can see the sole source plan information on home tab
 
     When Employer clicks on the Employees tab
     When Employer clicks to add the first employee

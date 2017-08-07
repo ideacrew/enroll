@@ -13,6 +13,7 @@ Feature: Create Employer
 
     Scenario: An Employer Representative has not signed up on the HBX
       Given Employer has not signed up as an HBX user
+      Given vertical and horizontal plan choices are offered
       When I visit the Employer portal
       Then John Doe creates an HBX account
       Then I should see a successful sign up message
