@@ -13,6 +13,10 @@ site:
   logo_file_name: "logo.png"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
+  use_default_devise_path: true
+  create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
+  sign_in_routes: ['/families/home']
+  shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
 
   social_media:
     facebook_url: ""
