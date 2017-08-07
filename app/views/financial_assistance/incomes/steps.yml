@@ -75,8 +75,7 @@
                 - gutter: 3
                   type: input_date
                   name: end_on
-                  placeholder: TO *
-                  required: true
+                  placeholder: TO
                   model: income
                   attribute: end_on
             - cells:
