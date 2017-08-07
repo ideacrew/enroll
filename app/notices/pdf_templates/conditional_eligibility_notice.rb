@@ -6,6 +6,9 @@ module PdfTemplates
     attribute :notification_type, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
+    attribute :request_full_determination, Boolean, :default => false
+    attribute :is_family_totally_ineligibile, Boolean, :default => false
+    attribute :has_applied_for_assistance, Boolean, :default => false
     attribute :notice_date, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
