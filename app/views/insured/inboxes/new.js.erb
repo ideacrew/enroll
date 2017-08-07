@@ -11,7 +11,8 @@ if ( $parent_row.next().hasClass('child-row') ) {
 //
 } 
 else {
-  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "shared/inboxes/form", f: @family, formats: [:html] %></td></tr>');
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "shared/inboxes/form", 
+  f: @family, formats: [:html] %></td></tr>');
   $('.dropdown.pull-right').removeClass('open');
   $("li>a:contains('Collapse Form')").eq(containing_row.index()).removeClass('disabled');
 }

@@ -42,18 +42,7 @@
           <% end %>
         </tr>
 
-        <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
-          <tr>
-            <th></th>
-            <% qhps.each do |qhp|%>
-              <th colspan="2">
-                <% if qhp.plan.nationwide %>
-                  <%= link_to "#{l10n('.provider_directory')}", qhp.plan.provider_directory_url, target: "_blank" %>
-                <% end %>
-              </th>
-            <% end %>
-          </tr>
-        <% end %>
+        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
 
         <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
           <tr>
@@ -68,7 +57,7 @@
           </tr>
         <% end %>
         <tr>
-          <th><%= l10n("plan_benefits")%> <br> <%= l10n("in_network")%></th>
+          <th>PLAN BENEFITS <br> (In Network)</th>
           <% qhps.each do |qhp|%>
             <th colspan="1"> <%= l10n("co_pay")%> </th>
             <th colspan="1"> <%= l10n("coinsurance")%> </th>

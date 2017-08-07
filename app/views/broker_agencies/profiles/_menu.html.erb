@@ -1,4 +1,4 @@
-<% content_for :top_navigation do %>
+<% content_for :horizontal_menu do %>
   <div class="mainmenu">
     <div class="container">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
@@ -48,10 +48,12 @@
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Assign"></span>
           <% end %>
         </li>
-        <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab").present? || "class=hide" %>>
-          <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
-            <span class="hidden-xs"><%= l10n("broker_agencies.profiles.roster_quoting_tool")%></span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Roster Quoting Tool"></span>
+        <!--TODO : Functionality wise we are disabling because quoting tool needs little more work -->
+        <% unless site_broker_quoting_enabled? %>
+        <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
+         <%= link_to my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
+            <span class="hidden-xs">Quoting Tool</span>
+            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
           <% end %>
         </li>
         <!--
@@ -74,10 +76,9 @@
           <% if individual_market_is_enabled? %>
           <li role="presentation" class="multi-line">
             <%= link_to url_for(SamlInformation.curam_broker_dashboard) do %>
-              <%= l10n("broker_agencies.profiles.first_time_applications_for_medicaid")%>
+              First Time Applications for Medicaid
               <br/>
-              <%= l10n("broker_agencies.profiles.and_premium_tax_credits")%>
-          </li>
+              and Premium Tax Credits
             <% end %>
           </li>
           <% end %>

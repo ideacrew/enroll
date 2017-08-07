@@ -1,9 +1,7 @@
-<% content_for :left_navigation do %>
+<% content_for :navigation do %>
   <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab], :employer_profile_id=>params[:employer_profile_id]} %>
 <% end %>
 
-<% content_for :main do %>
-  <%= form_for @census_employee, url: {action: "create", employer_id: @employer_profile.id} do |f| %>
-    <%= render 'form', f: f %>
-  <% end %>
+<%= form_for @census_employee, url: {action: "create", employer_id: @employer_profile.id} do |f| %>
+  <%= render 'form', f: f %>
 <% end %>

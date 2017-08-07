@@ -1,9 +1,8 @@
 require 'csv'
 require 'prawn/table'
 class Employers::PremiumStatementsController < ApplicationController
-  include Employers::PremiumStatementHelper
-
   layout "two_column", only: [:show]
+  include Employers::PremiumStatementHelper
 
   def show
     @employer_profile = EmployerProfile.find(params.require(:id))

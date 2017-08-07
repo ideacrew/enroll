@@ -1,15 +1,25 @@
-<div class="jumbotron">
-
-  <h1><%= l10n('.welcome_to_site_name', short_name: Settings.site.short_name) %></h1>
-  <h2><%= l10n('.byline') %></h2>
-
+<div class="container home module welcome">
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+  <h1 class="no-buffer">
+    <strong>
+      <%= l10n('.welcome_to_site_name', short_name: Settings.site.short_name) %>
+    </strong>
+  </h1>
+  <h3 class="darkblue no-buffer">
+    <%= l10n('.byline') %>
+  </h3>
+  <br/>
   <% if user_signed_in? %>
-    <p>
+    <strong>
       <%= l10n(".signed_in_as", current_user: current_user.oim_id) %>
       <%= link_to(l10n('.sign_out'), destroy_user_session_path, class: 'btn btn-primary', :method => :delete) %>
-    </p>
+    </strong>
+    <br/>
+    <br/>
   <% end %>
-
   <%= link_to l10n(".employee_portal"), privacy_insured_employee_index_path, class: "btn btn-default" %>
   <% if individual_market_is_enabled? %>
     <%= link_to l10n(".consumer_family_portal"), privacy_insured_consumer_role_index_path(uqhp: true), class: "btn btn-default" %>

@@ -16,4 +16,6 @@
     .col-md-12.col-sm-12.col-xs-12
       %p
         %br
-        = l10n("insured.employee_roles.select_employer_site_help_html", link: link_to(l10n('here'), site_help_url, class: '', target: '_blank'))
+        If you don't see your employer listed above, click
+        = link_to 'here', site_help_url, class: '', target: '_blank'
+        for help.

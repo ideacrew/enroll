@@ -1,7 +1,6 @@
-<% content_for :left_navigation do %>
+<% content_for :navigation do %>
 <%= render :partial => 'employers/employer_profiles/primary_nav', :locals => {:active_tab=>params[:tab]} %>
 <% end %>
-<% content_for :main do %>
 <%= form_for @census_employee, url: employers_employer_profile_census_employee_path(@employer_profile, @census_employee.id), method: :put do |f| %>
  <%= render 'errors_if_any' %>
 <%= hidden_field_tag 'status', "#{@status}" %>

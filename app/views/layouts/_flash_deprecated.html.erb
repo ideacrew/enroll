@@ -1,6 +1,0 @@
-<% flash.each do |type, message| %>
-  <div class="alert <%= bootstrap_class_for(type) %> fade in">
-    <button class="close" data-dismiss="alert"><i class="glyphicon glyphicon-remove-circle"></i></button>
-    <i class="glyphicon glyphicon-<%= bootstrap_icon_for(type) %>"></i> <%= message.html_safe %>
-  </div>
-<% end %>

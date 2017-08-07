@@ -12,8 +12,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
-
-  layout "two_column",  except: [:new]
+  layout "two_column", except: [:new]
 
   def link_from_quote
     claim_code = params[:claim_code].upcase

@@ -1,5 +1,4 @@
 class Exchanges::ScheduledEventsController < ApplicationController
-  layout "two_column"
 
   def new
   	@scheduled_event = ScheduledEvent.new
@@ -13,11 +12,11 @@ class Exchanges::ScheduledEventsController < ApplicationController
     scheduled_event = ScheduledEvent.new(scheduled_event_params)
     if scheduled_event.save
       scheduled_event.update_attributes!(one_time: false) if scheduled_event.recurring_rules.present?
-      redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
+      redirect_to exchanges_scheduled_events_path
     else
       flash[:error] = scheduled_event.errors.values.flatten.to_sentence
       @scheduled_event = scheduled_event
-      redirect_to exchanges_hbx_profiles_path(tab: 'calendar')
+      render action: :new
     end
   end
 

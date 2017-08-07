@@ -6,7 +6,7 @@
 
         <p><%= l10n("quote")%>: "<%=@q.quote_name %>" effective <b><%=@q.start_on %></b></p>
 
-        <p><%= l10n("costs_based_on_roster")%> <b><%= @q.quote_households.count %></b> <%= l10n("fam_ily")%>:</p>
+        <p>Costs are based on the roster associated with this quote of <b><%= @q.quote_households.count %></b> families:</p>
         <br>
         <% @q.quote_benefit_groups.each do |benefit_group| %>
           <%  unless benefit_group.plan.nil? %>
@@ -51,9 +51,9 @@
                 <p>
                  <%= @q.start_on.strftime("%m/%d/%Y") %> - <%= (@q.start_on.next_year - 1.day).strftime("%m/%d/%Y") %>
                 </p>
+                </div>
               </div>
             </div>
-          </div>
           <div class="published-quote-table">
                 <table>
                   <tr>
@@ -113,111 +113,113 @@
                   <td><%= member.dob%></td>
                 </tr>
                 <% end %>
-                <tr>
-                  <td colspan="4">&nbsp;</td>
-                </tr>
-                 <% end %>
-              <% end %>
-            </table>
-          </div>
-          <div class="quote-benefit-group">
-            <div class="benefit-package">
-              <div id="collapse-health-<%=benefit_group.id.to_s%>" class="collapse" >
-                <div class="col-xs-1">
-                  &nbsp;
-                </div>
-                <div class="col-xs-12 quote-details">
-                  <div class="col-xs-12 quote-health-details">
-                    <p><%= l10n("below_is_your")%><strong><%= l10n("health")%></strong> <%= l10n("plan_offering_spectrum")%> <%=benefit_group.plan_option_kind.titleize%>.</p>
-                    <% if benefit_group.plan %>
-                      <table class = "employer-health-contribution">
-                        <tr>
-                          <th><%= l10n("offered")%></th>
-                          <th><%= l10n("employer_contribution")%></th>
-                        </tr>
-                        <% benefit_group.quote_relationship_benefits.each do|rb| %>
+              </table>
+            </div>
+            <div class="quote-benefit-group">
+              <div class="benefit-package">
+                <div id="collapse-health-<%=benefit_group.id.to_s%>" class="collapse" >
+                  <div class="col-xs-1">
+                    &nbsp;
+                  </div>
+                  <div class="col-xs-12 quote-details">
+                    <div class="col-xs-12 quote-health-details">
+                      <p>Below is your Employer's <strong>Health</strong> Plan offering Spectrum. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
+                      <% if benefit_group.plan %>
+                        <table class = "employer-health-contribution">
                           <tr>
                             <th>Offered</th>
                             <th>Employer Contribution</th>
                           </tr>
-                        <% end %>
-                      </table>
-                      <div class="col-xs-12">
-                        <div class="col-xs-1">
-                          &nbsp;
-                        </div>
-                        <div class="quote-est-month col-xs-11">
-                          <div class="row">
-                            <div class="col-xs-4">
-                              <div class="row">
-                                <span><%= l10n("employer_estimated_maximum_monthly_cost")%></span>
-                                <h2><%= number_to_currency(benefit_group.published_employer_cost)%></h2>
+                          <% benefit_group.quote_relationship_benefits.each do|rb| %>
+                            <% next if rb.relationship == "child_26_and_over" %>
+                            <tr>
+                              <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
+                              <td>
+                                <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
+                              </td>
+                            </tr>
+                          <% end %>
+                        </table>
+                        <div class="col-xs-12">
+                          <div class="col-xs-1">
+                            &nbsp;
+                          </div>
+                          <div class="quote-est-month col-xs-11">
+                            <div class="row">
+                              <div class="col-xs-4">
+                                <div class="row">
+                                  <span>Employer Estimated Maximum Monthly Cost</span>
+                                  <h2><%= number_to_currency(benefit_group.published_employer_cost)%></h2>
+                                </div>
                               </div>
-                            </div>
-                            <div class="col-xs-8">
-                              <div class="row">
-                                <table>
-                                  <tr>
-                                    <th colspan ="2" ></th>
-                                    <th><%= l10n("min")%></th>
-                                    <th><%= l10n("max")%></th>
-                                  </tr>
-                                  <tr>
-                                    <td colspan="2"><%= l10n("total_estimated_monthly_cost_for_plan_participants")%></td>
-                                <% cost_range = benefit_group.employee_cost_min_max %>
-                                <td><%= number_to_currency(cost_range[0])%></td>
-                                <td><%= number_to_currency(cost_range[1])%></td>
-                                  </tr>
-                                </table>
+                              <div class="col-xs-8">
+                                <div class="row">
+                                  <table>
+                                    <tr>
+                                      <th colspan ="2" ></th>
+                                      <th>Min</th>
+                                      <th>Max</th>
+                                    </tr>
+                                    <tr>
+                                      <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                  <% cost_range = benefit_group.employee_cost_min_max %>
+                                  <td><%= number_to_currency(cost_range[0])%></td>
+                                  <td><%= number_to_currency(cost_range[1])%></td>
+                                    </tr>
+                                  </table>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    <%end%>
-                  </div>
-                  <div class="col-xs-12 quote-dental-details">
-                    <p><%= l10n("emplyer_dental_plan_offering")%> <%=benefit_group.plan_option_kind.titleize%>.</p>
-                    <% if benefit_group.dental_plan %>
-                      <table class = "employer-dental-contribution">
-                        <tr>
-                          <th><%= l10n("offered")%></th>
-                          <th><%= l10n("employer_contribution")%></th>
-                        </tr>
-                        <% benefit_group.quote_dental_relationship_benefits.each do|rb| %>
+                      <%end%>
+                    </div>
+                    <div class="col-xs-12 quote-dental-details">
+                      <p>Below is your Employer's Dental Plan offering Spectrum. Your offerings are based on <%=benefit_group.plan_option_kind.titleize%>.</p>
+                      <% if benefit_group.dental_plan %>
+                        <table class = "employer-dental-contribution">
                           <tr>
                             <th>Offered</th>
                             <th>Employer Contribution</th>
                           </tr>
-                        <% end %>
-                      </table>
-                      <div class="col-xs-12">
-                        <div class="col-xs-1">
-                          &nbsp;
-                        </div>
-                        <div class="quote-est-month col-xs-11">
-                          <div class="row">
-                            <div class="col-xs-4">
-                              <div class="row">
-                                <span><%= l10n("employer_estimated_maximum_monthly_cost")%></span>
-                                <h2><%= number_to_currency(benefit_group.published_dental_employer_cost)%></h2>
+                          <% benefit_group.quote_dental_relationship_benefits.each do|rb| %>
+                            <% next if rb.relationship == "child_26_and_over" %>
+                            <tr>
+                              <td><%=raw("<i class='fa fa-check-square-o fa-lg'></i>")%><%=rb.relationship.humanize %></td>
+                              <td>
+                                <strong><%= number_to_percentage rb.premium_pct, precision: 0 %></strong>
+                              </td>
+                            </tr>
+                          <% end %>
+                        </table>
+                        <div class="col-xs-12">
+                          <div class="col-xs-1">
+                            &nbsp;
+                          </div>
+                          <div class="quote-est-month col-xs-11">
+                            <div class="row">
+                              <div class="col-xs-4">
+                                <div class="row">
+                                  <span>Employer Estimated Maximum Monthly Cost</span>
+                                  <h2><%= number_to_currency(benefit_group.published_dental_employer_cost)%></h2>
+                                </div>
                               </div>
-                            </div>
-                            <div class="col-xs-8">
-                              <div class="row">
-                                <table>
-                                  <tr>
-                                    <th colspan ="2" ></th>
-                                    <th><%= l10n("min")%></th>
-                                    <th><%= l10n("max")%></th>
-                                  </tr>
-                                  <tr>
-                                    <td colspan="2"><%= l10n("total_estimated_monthly_cost_for_plan_participants")%></td>
-                                <% cost_range = benefit_group.employee_cost_min_max('dental') %>
-                                <td><%= number_to_currency(cost_range[0])%></td>
-                                <td><%= number_to_currency(cost_range[1])%></td>
-                                  </tr>
-                                </table>
+                              <div class="col-xs-8">
+                                <div class="row">
+                                  <table>
+                                    <tr>
+                                      <th colspan ="2" ></th>
+                                      <th>Min</th>
+                                      <th>Max</th>
+                                    </tr>
+                                    <tr>
+                                      <td colspan="2">Total Estimated Monthly Cost for Plan Participants</td>
+                                  <% cost_range = benefit_group.employee_cost_min_max('dental') %>
+                                  <td><%= number_to_currency(cost_range[0])%></td>
+                                  <td><%= number_to_currency(cost_range[1])%></td>
+                                    </tr>
+                                  </table>
+                                </div>
                               </div>
                             </div>
                           </div>

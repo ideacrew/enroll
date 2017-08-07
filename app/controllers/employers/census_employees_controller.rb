@@ -2,9 +2,7 @@ class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
   before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :benefit_group]
-
   layout "two_column"
-  
   def new
     @census_employee = build_census_employee
     if params[:modal].present?

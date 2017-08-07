@@ -100,23 +100,21 @@
 
 <%= render :partial => "insured/plan_shoppings/help_with_plan", :locals => {:enrollment => @hbx_enrollment } %>
 
-<% content_for :additional_scripts do %>
-  <script type="text/javascript">
-  $(document).ready(function() {
+<script type="text/javascript">
+$(document).ready(function() {
 
-    // if coverage_kind is dental, disabled metal level options as it's not applicable.
-    <%
-      if @hbx_enrollment.coverage_kind == "dental"
-    %>
-      $(".plan-metal-level-selection-filter").attr("disabled", true);
-    <% end %>
+  <%
+    #if coverage_kind is dental, disabled metal level options as it's not applicable.
+    if @hbx_enrollment.coverage_kind == "dental"
+  %>
+    $(".plan-metal-level-selection-filter").attr("disabled", true);
+  <% end %>
 
-    $.ajax({
-      url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
-      type: "GET"
-    });
+  $.ajax({
+    url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
+    type: "GET"
   });
+});
 
 
   </script>
-<% end %>

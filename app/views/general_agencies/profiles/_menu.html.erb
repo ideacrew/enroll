@@ -1,6 +1,8 @@
-<% content_for :top_navigation do %>
-    <ul class="nav navbar-nav">
-       <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab")
+<% content_for :horizontal_menu do %>
+<div class="mainmenu">
+  <div class="container">
+    <ul role="tablist" class="list-unstyled list-inline" id="myTab">
+      <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
         <%= link_to(general_agencies_profile_path(@general_agency_profile), "aria-expanded" => "true", :remote => true, "aria-controls" => "home", "role" => "tab" ) do  %>
           <span class="hidden-xs">Home</span>
           <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
@@ -39,4 +41,6 @@
       </li>
       <% end %>
     </ul>
+  </div>
+</div>
 <% end %>

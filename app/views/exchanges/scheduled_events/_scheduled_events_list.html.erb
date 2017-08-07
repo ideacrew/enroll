@@ -1,4 +1,10 @@
-<div class="container content-bottom scheduled-event-list-wrapper">
+<div class="content landing">
+  <%= render "exchanges/scheduled_events/primary_nav", :active_tab => "home-tab" %>
+  <div class="home">
+    <%= render 'shared/tab_panel' %>
+  </div>
+</div>
+<div class="container content-bottom">
   <div class='container'>
     <div class="row">
       <h3 class="title-inline">List Of Custom and System Events</h3>

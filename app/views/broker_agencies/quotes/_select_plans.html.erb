@@ -39,16 +39,28 @@
             <% end %>
         </div>
         <div id='dc_in_network'>
-             <b><%= l10n("dc_network")%></b> <br>
-          <%- @health_selectors[:dc_network].each do |choice| %>
-            <div  id="<%=choice%>" class="criteria <%=choice=='any' && 'active'%>"> <%= choice %> </div>
-          <% end %>
+             <b>DC Network</b> <br>
+             <%- @health_selectors[:dc_network].each do |choice| %>
+                 <div class='criteria_style'>
+                     <%- if choice == 'any' %>
+                     <input type='checkbox'  id="<%=choice%>" class='criteria interaction-choice-control-value-any' checked> <%= choice %> </input>
+                     <%- else %>
+                     <input type='checkbox'  id="<%=choice%>" class='criteria'> <%= choice %> </input>
+                     <%- end %>
+                 </div>
+            <% end %>
         </div>
         <div id='nationwide'>
-            <b><%= l10n("nationwide")%></b> <br>
-          <%- @health_selectors[:nationwide].each do |choice| %>
-            <div id="<%=choice%>" class="criteria <%=choice=='any' && 'active'%>"><%= choice %> </div>
-          <% end %>
+            <b>Nationwide</b> <br>
+            <%- @health_selectors[:nationwide].each do |choice| %>
+                <div class='criteria_style'>
+                    <%- if choice == 'any' %>
+                    <input type='checkbox' id="<%=choice%>"  class='criteria interaction-choice-control-value-any' checked><%= choice %> </input>
+                    <%- else %>
+                    <input type='checkbox' id="<%=choice%>"  class='criteria'><%= choice %> </input>
+                    <%- end %>
+                </div>
+            <% end %>
         </div>
     </div>
 

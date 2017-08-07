@@ -45,10 +45,11 @@ module Effective
 
       def nested_filter_definition
 
+
         filters = {
         broker_agencies:
          [
-           {scope:'all', label: 'All'}
+           {scope:'all', label: 'All'},
          ],
         top_scope: :broker_agencies
         }
