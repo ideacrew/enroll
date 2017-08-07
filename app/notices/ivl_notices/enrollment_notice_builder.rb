@@ -46,7 +46,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def append_data
     family = recipient.primary_family
     #temporary fix - in case of mutliple applications
-    latest_application = family.applications.where(:assm_state.nin => ["draft"]).sort_by(&:submitted_at).last
+    latest_application = family.applications.where(:aasm_state.nin => ["draft"]).sort_by(&:submitted_at).last
     notice.assistance_year = latest_application.assistance_year
 
     family.enrollments.enrolled_and_renewing.each do |enrollment|
@@ -54,8 +54,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
-    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
-    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+    # notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    # notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
   end
 
   def append_enrollment_information(enrollment)
@@ -73,8 +73,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       coverage_kind: enrollment.coverage_kind,
       effective_on: enrollment.effective_on,
       plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |names, member|
-        names << member.person.full_name.titleize
+      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+        enrollee = PdfTemplates::BasicIndividual.new({
+          first_name: member.person.first_name,
+          last_name: member.person.last_name,
+          age: "#{member.person.age_on(TimeKeeper.date_of_record)}"
+        })
+        enrollees << enrollee
       end
     })
   end
