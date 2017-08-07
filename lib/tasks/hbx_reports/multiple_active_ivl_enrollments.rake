@@ -41,14 +41,14 @@ namespace :reports do
             
             if (active_ivl_health_enrollments.size > 1)
               active_ivl_health_enrollments.each do |enr|
-                enr.hbx_enrollment_members.reject(&:is_subscriber).each do |dep|
-                  dependent = dep.person
-                  csv << [enr.subscriber.person.hbx_id,
-                          enr.subscriber.person.first_name, 
-                          enr.subscriber.person.last_name,
-                          dependent.hbx_id,
-                          dependent.first_name,
-                          dependent.last_name,
+                enr.hbx_enrollment_members.each do |dep|
+                  primary = dep.person.families.first.primary_applicant.person
+                  csv << [enr.subscriber.present? ? enr.subscriber.person.hbx_id : primary.hbx_id,
+                          enr.subscriber.present? ? enr.subscriber.person.first_name : primary.first_name, 
+                          enr.subscriber.present? ? enr.subscriber.person.last_name : primary.last_name,
+                          dep.is_subscriber ? '---' : dep.person.hbx_id,
+                          dep.is_subscriber ? '---' : dep.person.first_name,
+                          dep.is_subscriber ? '---' : dep.person.last_name,
                           enr.hbx_id,
                           enr.coverage_kind,
                           enr.aasm_state,
@@ -63,14 +63,14 @@ namespace :reports do
             
             if (active_ivl_dental_enrollments.size > 1)
               active_ivl_dental_enrollments.each do |enr|
-                enr.hbx_enrollment_members.reject(&:is_subscriber).each do |dep|
-                  dependent = dep.person
-                  csv << [enr.subscriber.person.hbx_id,
-                          enr.subscriber.person.first_name, 
-                          enr.subscriber.person.last_name,
-                          dependent.hbx_id,
-                          dependent.first_name,
-                          dependent.last_name,
+                enr.hbx_enrollment_members.each do |dep|
+                  primary = dep.person.families.first.primary_applicant.person
+                  csv << [enr.subscriber.present? ? enr.subscriber.person.hbx_id : primary.hbx_id,
+                          enr.subscriber.present? ? enr.subscriber.person.first_name : primary.first_name, 
+                          enr.subscriber.present? ? enr.subscriber.person.last_name : primary.last_name,
+                          dep.is_subscriber ? '---' : dep.person.hbx_id,
+                          dep.is_subscriber ? '---' : dep.person.first_name,
+                          dep.is_subscriber ? '---' : dep.person.last_name,
                           enr.hbx_id,
                           enr.coverage_kind,
                           enr.aasm_state,
