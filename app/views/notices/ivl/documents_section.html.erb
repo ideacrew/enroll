@@ -176,7 +176,7 @@
 <!-- Immigration -->
 
 <!-- Income Verification -->
-<% notice.income_unverifieda.any? %>
+<% if notice.income_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "<strong>Household Income:</strong> We need proof of annual income for:", top_margin: '-5px'} %>
 

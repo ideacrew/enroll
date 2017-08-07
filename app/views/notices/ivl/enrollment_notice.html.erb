@@ -1,5 +1,5 @@
 <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
-
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/ivl_logo', :locals => {notice: notice} %>
 <br>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
@@ -8,7 +8,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>PAYMENT DEADLINE: <% notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y") %> - <%= notice.enrollment_notice_subject.upcase %></h3></td>
+      <td><h3>PAYMENT DEADLINE: <%= notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y") %> - <%= notice.enrollment_notice_subject.upcase %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -31,7 +31,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
-   heading: 'Here’s What You Need to Do Now', sub_heading: 'Make Your First Payment', top_margin: '10px'} %>
+   heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px'} %>
 
 <% if notice.aqhp_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -87,10 +87,10 @@
       </tr>
       <tr>
         <td>
-          <strong>Your monthly premium payment:</strong>
+          Your monthly premium payment:
         </td>
         <td align="right">
-          <strong> $<%= enrollment.responsible_amount %></strong>
+          $<%= enrollment.responsible_amount %>
         </td>
       </tr>
     </table>
@@ -118,7 +118,7 @@
    heading: 'What You’ll Pay When You Receive Services', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment.", top_margin: '5px'} %>
+ content: "Most services covered by your plan – like doctor visits, medicines you need, or emergency care – may have cost-sharing. This means you’ll pay some of the costs for these services. These costs are in addition to your monthly premium payment.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<strong>Types of cost-sharing include:</strong>",
@@ -173,14 +173,14 @@ content: "If you end your plan, you also won’t be able to sign up again until 
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Please call DC Health Link at (855) 532-5465 if you have any questions about this letter, or if you think we made a mistake."],
-   heading: 'Still Have Questions?', sub_heading: '', top_margin: '5px'} %>
+   heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>"} %>
 
 <% if notice.documents_needed == true %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is <Document Due Date></strong>. If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is <Document Due Date></strong>. If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page.", top_margin: '-5px'} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
