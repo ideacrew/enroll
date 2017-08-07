@@ -1,0 +1,44 @@
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+
+<br><br><br>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>YOU SELECTED A BROKER ON DC HEALTH LINK</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear <%= notice.primary_fullname %>: </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Congratulations! This notice is to confirm you successfully selected <strong>#{notice.broker.primary_fullname}</strong> from <strong>#{notice.broker.organization}</strong> as the broker for <strong>#{notice.employer_name}</strong> as of <strong>#{notice.broker.assignment_date}</strong>."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "Your broker now has full access to your #{Settings.site.short_name} account. They can update your information, change your plan offerings, manage your employee roster, and enroll your employees into your medical and dental insurance offerings."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "If you would like to remove your broker at anytime you may do so by going to the “Broker” tab in your account and clicking “Change Broker”, then “Terminate Broker”. You can also follow the outlined steps in this <a href='https://dchealthlink.com/sites/default/files/v2/forms/assigning_a_broker.pdf'>guide</a>."} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
+  { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<%= render partial: 'notices/shared/paragraph', locals: {
+ content: "Please contact your broker for further assistance. You can contact #{Settings.site.short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+  ["By calling #{notice.hbe.phone}.",
+    "TTY: 711",
+    "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"]} %>
+
+<% if notice.broker.present? %>
+  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+<% end %>
