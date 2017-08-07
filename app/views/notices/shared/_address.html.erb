@@ -1,6 +1,12 @@
 <table class="total_table address" border="0">
   <tbody>
     <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
       <td><%= notice.primary_fullname %></td>
     </tr>
     <% if notice.shop? %>
@@ -21,6 +27,11 @@
     <% unless notice.shop? %>
       <td style="text-align: right;">Notice No: <%= notice.mpi_indicator %></td>
     <% end %>
+    </tr>
+    <tr>
+      <td>
+        <br>
+      </td>
     </tr>
   </tbody>
 </table>

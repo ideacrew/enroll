@@ -35,7 +35,7 @@ class IvlNotice < Notice
   end
 
   def attach_taglines
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates'), 'envelope.pdf']
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope.pdf')]
   end
 
   def attach_blank_page
