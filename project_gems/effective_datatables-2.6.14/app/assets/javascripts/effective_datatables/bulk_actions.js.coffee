@@ -11,9 +11,16 @@ $(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
   $resources = $wrapper.find("input[data-role='bulk-actions-resource']")
 
   if $(event.currentTarget).is(':checked')
-    $resources.prop('checked', true)
+    if ($resources.data("status") == "Ineligible" && $('*[data-key *="employer_profiles_binder_pending"]').hasClass('active'))
+      console.log("Not Eligible")
+    else
+      $resources.prop('checked', true)
   else
-    $resources.prop('checked', false)
+      if ($resources.data("status") == "Ineligible" && $('*[data-key *="employer_profiles_binder_pending"]').hasClass('active'))
+        console.log("Not Eligible")
+      else
+        $resources.prop('checked', false)
+
 
   toggleClosestBulkActionsButton($wrapper)
 
