@@ -1,32 +1,20 @@
-# This rake task imports provider and rxformulary urls into 2016 plans from master xlsx file.
-# Dev note: Some rx formulary urls in the master xlsx file does not have http in the urls,
-#           which is causing a routing issue as the rx formulary urls without http are getting appended
-#           to the current url. (Ex: http://localhost:3000/plans/plan_id/www.carrier_name.com)
-#           So including http at the start of each rx formulary urls that does not have http.
+# This rake task will do the following:
+# 1. Mark plans as standard or not-standard(true/false)
+# 2. Updates provider directory and rx formulary urls.
+# 3. Updates network information(network notes) for plans
 
 namespace :import do
-  task :provider_and_rx_formulary_url => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
+  task :common_data_from_master_xml => :environment do
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
     files.each do |file|
       year = file.split("/")[-2].to_i
       puts "*"*80
-      puts "Importing provider and formulary url's from #{file}..."
+      puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..."
       if file.present?
         result = Roo::Spreadsheet.open(file)
-        sheets = ["IVL", "SHOP Q1", "Dental SHOP"]
-        sheets << "IVL Dental" if year > 2016
+        sheets = ["MA SHOP QHP"]
         sheets.each do |sheet_name|
-          sheet_data = if year == 2017
-            if sheet_name == "IVL"
-              result.sheet(0)
-            elsif sheet_name == "SHOP Q1"
-              result.sheet(4)
-            else
-              result.sheet(sheet_name)
-            end
-          else
-            result.sheet(sheet_name)
-          end
+          sheet_data = result.sheet(sheet_name)
 
           @header_row = sheet_data.row(1)
           assign_headers
@@ -35,14 +23,14 @@ namespace :import do
           (2..last_row).each do |row_number| # data starts from row 2, row 1 has headers
             row_info = sheet_data.row(row_number)
             hios_id = row_info[@headers["hios/standard component id"]].squish
-            provider_directory_url = row_info[@headers["provider directory url"] || @headers["provider network url"]]
+            provider_directory_url = row_info[@headers["provider directory url"]].strip
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
-              if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
-                rx_formulary_url = row_info[@headers["rx formulary url"]]
-                plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
-              end
+              rx_formulary_url = row_info[@headers["rx formulary url"]].strip
+              plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+              plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
+              plan.network_information = row_info[@headers["network notes"]]
               plan.save
             end
           end

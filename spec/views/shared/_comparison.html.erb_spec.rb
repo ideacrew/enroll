@@ -137,7 +137,7 @@ describe "shared/_comparison.html.erb" do
     it "should have rx formulary url coverage_kind = health" do
       render "shared/comparison", :qhps => mock_qhps
       expect(rendered).to match(/#{mock_plan.rx_formulary_url}/)
-      expect(rendered).to match("DOCTOR DIRECTORY")
+      expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
     it "should not have rx_formulary_url coverage_kind = dental" do
@@ -153,6 +153,7 @@ describe "shared/_comparison.html.erb" do
     end
 
     it "should not have provider directory url if nationwide = false" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_plan).to receive(:nationwide).and_return(false)
       allow(mock_plan).to receive(:service_area_id).and_return('XX-111')
       render "shared/comparison", :qhps => mock_qhps
