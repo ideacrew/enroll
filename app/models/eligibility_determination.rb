@@ -6,7 +6,7 @@ class EligibilityDetermination
 
   embedded_in :application, class_name: "FinancialAssistance::Application"
 
-  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
+  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0)
 
   SOURCE_KINDS  = %w(Admin Curam Haven)
 
