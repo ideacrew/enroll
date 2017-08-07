@@ -38,8 +38,8 @@ module Subscribers
       #        active_household = family.active_household
 
       #TODO find the right application.
-      active_approved_application = family.applications.where(aasm_state: "submitted").find(verified_family.fin_app_id)
-      throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless active_approved_application.present?
+      application_in_context = family.applications.find(verified_family.fin_app_id)
+      throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless application_in_context.present?
 
       # #Find the right household or Create one.
       # households_ids = []
@@ -57,7 +57,7 @@ module Subscribers
       # active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.e_case_id}.first
 
       # active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.e_case_id}.first
-      # active_verified_tax_households = active_approved_application.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id}
+      # active_verified_tax_households = application_in_context.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id}
       new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
 
       # verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
@@ -78,7 +78,7 @@ module Subscribers
       family.e_case_id = verified_family.integrated_case_id
 
       begin
-        active_approved_application.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
+        application_in_context.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
@@ -102,8 +102,8 @@ module Subscribers
           # end
         end
 
-        if active_approved_application.latest_active_tax_household.present?
-          unless active_approved_application.eligibility_determinations.present?
+        if application_in_context.latest_active_tax_household.present?
+          unless application_in_context.eligibility_determinations.present?
             log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
           end
         end
