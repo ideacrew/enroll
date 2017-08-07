@@ -35,7 +35,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents
+    attach_required_documents if notice.documents_needed
     attach_taglines
     # attach_voter_application
     upload_and_send_secure_message
@@ -59,6 +59,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     append_data
     check_for_unverified_individuals
     notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.primary_firstname = recipient.first_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else
@@ -79,7 +80,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def check_for_unverified_individuals
-    enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+    family = recipient.primary_family
+    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -99,11 +101,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         outstanding_people << person
       end
     end
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days) if e.aasm_state}
+    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+
     enrollments.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
-    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
+    notice.due_date = enrollments.first.special_verification_period.strftime("%B %d, %Y")
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
@@ -120,11 +124,11 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   def append_unverified_individuals(people)
     people.each do |person|
       if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: TimeKeeper.date_of_record+95.days, age: person.age_on(TimeKeeper.date_of_record) })
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
 
       if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: TimeKeeper.date_of_record+95.days, age: person.age_on(TimeKeeper.date_of_record) })
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
     end
   end

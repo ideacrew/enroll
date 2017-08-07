@@ -4,6 +4,7 @@ module PdfTemplates
 
     attribute :mpi_indicator, String
     attribute :notification_type, String
+    attribute :primary_firstname, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
     attribute :request_full_determination, Boolean, :default => false
@@ -17,7 +18,6 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual]
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
-    attribute :citizenship_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
     attribute :indian_inconsistency, Array[PdfTemplates::Individual]
