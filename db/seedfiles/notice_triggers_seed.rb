@@ -592,17 +592,17 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP33',
-    title: 'Employer Annual Renewal - Denial of Eligibility',
-    description: 'denial of eligibility for employer as failed resindency',
+    hbx_id: 'SHOP40',
+    title: 'Employee Made Mid-Year Plan Change-Non-Congressional',
+    description: 'Employee mid year plan change when an eligiblity determination is reached',
     resource_name: 'employer',
-    event_name: 'employer_renewal_eligibility_denial_notice',
+    event_name: 'employee_made_mid_year_plan_change_non_congressional',
     notice_triggers: [
       {
-        name: 'Employer Annual Renewal - Denial of Eligibility',
-        notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
-        notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
-        mpi_indicator: 'MPI_SHOP33',
+        name: 'Employee Made Mid-Year Plan',
+        notice_template: 'notices/shop_employer_notices/employee_made_mid_year_plan_change_non_congressional',
+        notice_builder: 'ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional',
+        mpi_indicator: 'MPI_SHOP40',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
