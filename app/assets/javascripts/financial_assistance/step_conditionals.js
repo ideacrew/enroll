@@ -19,17 +19,19 @@ $(document).ready(function() {
   // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
     if ($('#is_pregnant_yes')) {
-      if (age >= 18 && age <= 26){
+      if (age > 18 && age < 26){
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
-        if (age == 18 || age == 19){
-          $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
-        } else {
-          $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
-        }
       } else {
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+        $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
         $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
         $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
+      }
+      if (age == 18 || age == 19){
+        $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
+      } else {
+        $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
+        $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
       }
     }
   }
