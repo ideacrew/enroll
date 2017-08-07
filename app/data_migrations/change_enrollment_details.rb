@@ -40,7 +40,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def revert_termination(enrollment)
-    enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_selected")
+    enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
     enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
     puts "Reverted Enrollment termination" unless Rails.env.test?
   end
