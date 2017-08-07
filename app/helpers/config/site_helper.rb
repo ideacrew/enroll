@@ -34,4 +34,8 @@ module Config::SiteHelper
   def site_broker_quoting_enabled?
     Settings.site.broker_quoting_enabled
   end
+
+  def find_your_doctor_url
+    Settings.site.shop_find_your_doctor_url
+  end
 end
