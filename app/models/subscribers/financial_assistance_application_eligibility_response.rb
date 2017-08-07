@@ -38,8 +38,8 @@ module Subscribers
       #        active_household = family.active_household
 
       #TODO find the right application.
-      active_approved_application = family.applications.find(verified_family.fin_app_id)
-
+      active_approved_application = family.applications.where(aasm_state: "submitted").find(verified_family.fin_app_id)
+      throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless active_approved_application.present?
 
       # #Find the right household or Create one.
       # households_ids = []
