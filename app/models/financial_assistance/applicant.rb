@@ -473,7 +473,7 @@ private
       errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
     end
 
-    if (age_of_applicant >= 18 && age_of_applicant <= 26)
+    if (age_of_applicant > 18 && age_of_applicant < 26)
       if is_former_foster_care.nil?
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered")
       end
