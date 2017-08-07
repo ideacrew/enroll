@@ -29,7 +29,6 @@ module Queries
         .sort_enrollments
         .group_enrollments
         .project_enrollment_ids
-
       qs.evaluate.reject{|r| Queries::NamedPolicyQueries.new.quiet_period_enrollment(r['enrollment_hbx_id'])}.collect{|r| r['enrollment_hbx_id']}
     end
 

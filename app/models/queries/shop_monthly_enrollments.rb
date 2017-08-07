@@ -90,7 +90,7 @@ module Queries
       add({
         "$match" => {
           "$or" => [
-            new_coverage_expression, 
+            new_coverage_expression.merge!("households.hbx_enrollments.enrollment_kind" => "open_enrollment"),
             existing_coverage_expression
           ]
         }
