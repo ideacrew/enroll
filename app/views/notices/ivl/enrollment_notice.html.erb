@@ -33,20 +33,23 @@
  contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
    heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px'} %>
 
+<%= render partial: 'notices/shared/unordered_list', locals: {
+      listings: ["Make your premium payment directly to the insurance company - not #{Settings.site.short_name}.","We’ve included information in this letter on the amount you owe, and how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
+
 <% if notice.documents_needed %>
   <% if notice.aqhp_enrollments.present? %>
     <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
+     content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date}. You could lose your insurance or cost savings if you don’t submit them by the deadline.",
+      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by the deadline.",
       listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
   <% else %>
     <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "<strong>Send Us Documents</strong>", top_margin: '5px', bottom_margin: '5px'} %>
+     content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date}. You could lose your insurance if you don’t submit them by the deadline.",
+      previous: "You need to send documents to #{Settings.site.short_name}. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by the deadline.",
       listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
   <% end %>
 <% end %>
@@ -183,7 +186,7 @@ listing: "<strong>Remember, you must pay your monthly premium by #{notice.curren
 
 <% if notice.documents_needed == true %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

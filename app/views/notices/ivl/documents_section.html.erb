@@ -39,7 +39,7 @@
  content: "<strong>When is the deadline to submit documents?</strong>", top_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "The first deadline is #{notice.due_date}. Different people may have different deadlines. You should submit all your documents as soon as possible. If you do not return the documents by the deadline, you could lose your insurance or cost savings.", top_margin: '5px', bottom_margin: '5px'} %>
+   content: "The first deadline is #{notice.due_date.strftime("%B %d, %Y")}. Different people may have different deadlines. You should submit all your documents as soon as possible. If you do not return the documents by the deadline, you could lose your insurance or cost savings.", top_margin: '5px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "<strong>How can I submit documents to #{Settings.site.short_name}?</strong>", top_margin: '5px'} %>

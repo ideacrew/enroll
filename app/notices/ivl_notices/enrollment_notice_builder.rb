@@ -136,10 +136,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         outstanding_people << person
       end
     end
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days) if e.aasm_state}
+    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
     # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
 
-    enrollments.each do |enrollment|
+    enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
     notice.due_date = enrollments.first.special_verification_period.strftime("%B %d, %Y")
