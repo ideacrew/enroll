@@ -30,13 +30,15 @@
                       <%= v_type %>
                     </div>
                     <div class="v-type-status col-md-3">
-                      <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
-                        <%= show_v_type(v_type, person) %>
-                      </span>&nbsp;
-                        <%= pundit_span Family, :updateable? %>
-                      </div>
+                      <% if f_member.is_applying_coverage %>
+                        <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
+                          <%= show_v_type(v_type, person) %>
+                        </span>&nbsp;
+                          <%= pundit_span Family, :updateable? %>
+                      <% end %>
+                    </div>
                       <div class="v-type-upload col-md-3">
-                        <% if type_unverified?(v_type, person) %>
+                        <% if type_unverified?(v_type, person) && f_member.is_applying_coverage %>
                             <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                           <span class="btn btn-default btn-file">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
@@ -77,11 +79,11 @@
                       </div>
                       <!-- ==== verification reason ==== -->
 
-                      <!-- ***** Return for Deficiency reason ***** -->
+                      <!-- ***** Reject reason ***** -->
                       <div class="row">
                         <div class="return-for-def-reason col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-return"%>>
                           <div class="col-md-6">
-                            Return for Deficiency reason:
+                            Reject reason:
                           </div>
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
@@ -96,7 +98,7 @@
                           <%end%>
                         </div>
                       </div>
-                      <!-- ==== return for deficiency reason ==== -->
+                      <!-- ==== reject reason ==== -->
 
                       <!-- ***** FEDhub request ***** -->
                       <div class="row">
