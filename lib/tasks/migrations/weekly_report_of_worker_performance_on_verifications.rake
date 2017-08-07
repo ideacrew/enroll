@@ -17,6 +17,7 @@ namespace :reports do
       Admin_User_HBX_ID
       Action_Date
       Action
+      Types-Reasons
     )
 
     file_name = "#{Rails.root}/public/worker_performance_report.csv"
@@ -44,6 +45,18 @@ namespace :reports do
                                                                               {:"to_state" => "verification_outstanding",
                                                                                 :"event" => "reject!"}]})
           if wfsts.present?
+            types_reasons = []
+            role = person.consumer_role
+            person.verification_types.each do |v_type|
+              types_reasons <<  case v_type
+                                when "Social Security Number"
+                                  { v_type => role.ssn_update_reason } if role.ssn_update_reason.present?
+                                when "American Indian Status"
+                                  { v_type => role.native_update_reason } if role.native_update_reason.present?
+                                else
+                                  role.lawful_presence_update_reason if role.lawful_presence_update_reason.present?
+                                end
+            end
             wfsts.each do |wfst|
               count += 1
               admin_user = User.find(wfst.user_id)
@@ -54,7 +67,8 @@ namespace :reports do
                 admin_user.person.full_name,
                 admin_user.person.hbx_id,
                 wfst.transition_at,
-                (wfst.event || "Verify")
+                (wfst.event || "Verify"),
+                types_reasons.compact.uniq
               ]
             end
           end
