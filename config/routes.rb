@@ -130,6 +130,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
+    resources :questions
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
