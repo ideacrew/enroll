@@ -130,7 +130,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :questions
+    resources :security_questions
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -259,7 +259,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :employer_attestations do 
+    resources :employer_attestations do
        get 'authorized_download'
        get 'verify_attestation'
        delete 'delete_attestation_documents'

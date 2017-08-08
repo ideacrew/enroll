@@ -1,4 +1,4 @@
-class Question
+class SecurityQuestion
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -8,7 +8,7 @@ class Question
   validates_presence_of :title
 
   def status
-    visible?? 'Visible' : 'Invisible'
+    visible? ? 'Visible' : 'Invisible'
   end
 
 end

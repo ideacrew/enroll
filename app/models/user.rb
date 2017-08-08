@@ -14,6 +14,8 @@ class User
   devise :database_authenticatable, :registerable, :lockable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
+  embeds_many :security_question_responses
+  
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity

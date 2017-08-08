@@ -29,11 +29,11 @@ Then(/^Hbx Admin should see (.*?) Question form$/) do |text|
 end
 
 Then(/^Hbx Admin fill out New Question form detail$/) do
-  fill_in 'question_title', :with => 'First security question'
+  fill_in 'security_question_title', :with => 'First security question'
 end
 
 Then(/^Hbx Admin update the question title$/) do
-  fill_in 'question_title', :with => question_attrs[:title]
+  fill_in 'security_question_title', :with => question_attrs[:title]
 end
 
 When(/^Hbx Admin submit the question form$/) do
@@ -42,7 +42,7 @@ end
 
 Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
   (0...num.to_i).each do |int|
-    FactoryGirl.create(:question, title: "Security Question #{int.to_i}")
+    FactoryGirl.create(:security_question, title: "Security Question #{int.to_i}")
   end
 end
 
