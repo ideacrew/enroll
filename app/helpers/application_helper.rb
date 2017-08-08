@@ -542,16 +542,16 @@ module ApplicationHelper
     end
   end
 
-  def employee_made_mid_year_plan_change_non_congressional(person)
+  def employee_mid_year_plan_change_non_congressional(census_employee)
   
-    employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => false).map{|org| org.employer_profile.id}
-     begin
-       employee_roles = person.active_employee_roles.select{|role| employer_ids.include?(role.employer_profile_id) }
+    employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
+     begin 
+       employee_roles = employer_ids.exclude?(census_employee.employee_role.employer_profile_id)
        if employee_roles.present?
-         ShopNoticesNotifierJob.perform_later(person.active_employee_roles.first.census_employee.id.to_s, "employee_made_mid_year_plan_change_non_congressional")
+         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change_non_congressional")
        end
      rescue Exception => e
-       log("#{e.message}; person_id: #{person.id}")
+       log("#{e.message}; person_id: #{census_employee.employee_role.person.hbx_id}")
      end
   end
 
