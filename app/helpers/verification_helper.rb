@@ -105,14 +105,26 @@ module VerificationHelper
 
   def review_button_class(family)
     if family.active_household.hbx_enrollments.verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.review_status == "ready"
-        "success"
-      elsif family.active_household.hbx_enrollments.verification_needed.first.review_status == "in review"
-        "info"
+      people = family.family_members.map(&:person)
+      v_types_list = get_person_v_type_status(people)
+      if !v_types_list.include?('outstanding')
+        'success'
+      elsif v_types_list.include?('in review') && v_types_list.include?('outstanding')
+        'info'
       else
-        "default"
+        'default'
       end
     end
+  end
+
+  def get_person_v_type_status(people)
+    v_type_status_list = []
+    people.each do |person|
+      person.verification_types.each do |v_type|
+        v_type_status_list << verification_type_status(v_type, person)
+      end
+    end
+    v_type_status_list
   end
 
   def show_send_button_for_consumer?

@@ -224,6 +224,46 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
+  describe '#review button class' do
+    let(:obj) { double }
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    before :each do
+      family.active_household.hbx_enrollments << HbxEnrollment.new(:aasm_state => "enrolled_contingent")
+      allow(obj).to receive_message_chain("family.active_household.hbx_enrollments.verification_needed.any?").and_return(true)
+    end
+
+    it 'returns default when the status is verified' do
+       allow(helper).to receive(:get_person_v_type_status).and_return(['outstanding'])
+       expect(helper.review_button_class(family)).to eq('default')
+    end
+
+    it 'returns info when the status is in review and outstanding' do
+      allow(helper).to receive(:get_person_v_type_status).and_return(['in review', 'outstanding'])
+      expect(helper.review_button_class(family)).to eq('info')
+    end
+
+    it 'returns success when the status is in review ' do
+      allow(helper).to receive(:get_person_v_type_status).and_return(['in review'])
+      expect(helper.review_button_class(family)).to eq('success')
+    end
+
+    it 'returns sucsess when the status is verified and in review but no outstanding' do
+      allow(helper).to receive(:get_person_v_type_status).and_return(['in review', 'verified'])
+      expect(helper.review_button_class(family)).to eq('success')
+    end
+  end
+
+  describe '#get_person_v_types' do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    it 'returns verification types of the person' do
+      status = 'verified'
+      allow(helper).to receive(:verification_type_status).and_return(status)
+      persons = family.family_members.map(&:person)
+
+      expect(helper.get_person_v_type_status(persons)).to eq([status])
+    end
+  end
+
   describe "#show_v_type" do
     context "SSN" do
       it "returns in review if documents for ssn uploaded" do
