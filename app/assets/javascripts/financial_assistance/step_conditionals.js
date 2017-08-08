@@ -36,6 +36,19 @@ $(document).ready(function() {
     }
   }
 
+  function hide_show_person_flling_jointly_question_by_spouse_present(){
+    $.ajax({
+      type: "GET",
+      data:{},
+      url: window.location.href.replace('step/2', 'primary_applicant_has_spouse'),
+      success: function (has_spouse) {
+        if(has_spouse == 'true'){
+          $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
+        }
+      }
+    });
+  }
+
   $('#income_kind').on('selectric-change', function(e){
     if ($(this).val() == 'wages_and_salaries')
       toggle_employer_contact_divs('show');
@@ -77,7 +90,7 @@ $(document).ready(function() {
 
   $("body").on("change", "#is_required_to_file_taxes_yes", function(){
     if ($('#is_required_to_file_taxes_yes').is(':checked')) {
-      $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
+      hide_show_person_flling_jointly_question_by_spouse_present();
     } else{
       $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').addClass('hide');
     }
@@ -235,7 +248,7 @@ $(document).ready(function() {
   }
 
   if($('#is_required_to_file_taxes_yes').is(':checked')) {
-    $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').removeClass('hide');
+    hide_show_person_flling_jointly_question_by_spouse_present();
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
