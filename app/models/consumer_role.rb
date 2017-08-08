@@ -534,8 +534,8 @@ class ConsumerRole
     end
   end
 
-  def latest_active_tax_household_with_year(year)
-    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+  def latest_active_tax_household_with_year(year, family)
+    family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
