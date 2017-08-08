@@ -7,7 +7,7 @@ class TerminateACensusEmployee < MongoidMigrationTask
     if census_employee.nil?
       puts "No census employee was found by the given id" unless Rails.env.test?
     else
-      census_employee.terminate_employee_role!
+      census_employee.update(aasm_state:"eligible")
       puts "Terminated the census employee" unless Rails.env.test?
     end
   end
