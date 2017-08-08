@@ -47,9 +47,10 @@ class ChangeCensusEmployeeDetails < MongoidMigrationTask
 
 
   def update_enrollments(census_employee, terminated_on)
-    census_employee.coverage_terminated_on = terminated_on
+    census_employee.update_attributes!({:coverage_terminated_on => terminated_on})
+
     [census_employee.active_benefit_group_assignment, census_employee.renewal_benefit_group_assignment].compact.each do |assignment|
-      enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
+      enrollments = assignment.hbx_enrollments
       enrollments.each do |enrollment|
         if enrollment.coverage_terminated?
           enrollment.terminated_on = terminated_on
