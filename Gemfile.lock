@@ -61,6 +61,7 @@ PATH
   specs:
     notifier (0.0.1)
       ckeditor
+      curl
       mongoid (~> 5.0.1)
       rails (~> 4.2.3)
       redcarpet (~> 3.4.0)
@@ -149,6 +150,7 @@ GEM
     arel (6.0.3)
     autoprefixer-rails (7.1.2.3)
       execjs
+    awesome_print (1.8.0)
     aws-sdk (2.2.4)
       aws-sdk-resources (= 2.2.4)
     aws-sdk-core (2.2.4)
@@ -277,6 +279,9 @@ GEM
       nokogiri (~> 1.5)
       railties (>= 3, < 5)
     cucumber-wire (0.0.1)
+    curl (0.0.9)
+      awesome_print (>= 0.2.1)
+      unidecoder (>= 1.1.1)
     database_cleaner (1.5.3)
     debug_inspector (0.0.2)
     deep_merge (1.0.1)
@@ -664,6 +669,7 @@ GEM
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    unidecoder (1.1.2)
     vegas (0.1.11)
       rack (>= 1.0.0)
     virtus (1.0.5)

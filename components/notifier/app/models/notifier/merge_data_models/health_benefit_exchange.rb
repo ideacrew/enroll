@@ -7,6 +7,6 @@ module Notifier
     attribute :phone, String
     attribute :fax, String
     attribute :email, String
-    attribute :address, MergeDataModels::NoticeAddress
+    attribute :address, MergeDataModels::Address
   end
 end

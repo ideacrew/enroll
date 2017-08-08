@@ -1,3 +1,8 @@
+# require 'ckeditor'
+
+require "wkhtmltopdf-binary-edge"
+require "wicked_pdf"
+
 module Notifier
   class Engine < ::Rails::Engine
     isolate_namespace Notifier
