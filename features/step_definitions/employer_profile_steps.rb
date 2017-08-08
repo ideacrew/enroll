@@ -95,6 +95,13 @@ Given(/^Sarh is the staff person for an organization with employer profile and b
   broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
 end
 
+Then /he should have an option to select paper or electronic notice option/ do
+  expect(page).to have_content("Please indicate preferred method to receive notices (OPTIONAL)")
+  find(:xpath, '//*[@id="new_organization"]/div/div[4]/div/div[4]/div[2]/div/div/div/div[2]/b').click
+  expect(page).to have_content("Only Electronic communications")
+  expect(page).to have_content("Paper and Electronic communications")
+end
+
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)

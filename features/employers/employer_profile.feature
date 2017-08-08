@@ -146,3 +146,7 @@ Scenario: A company  at least one active linked employer staff can delete pendin
     Then Point of Contact count is 2
     When Fred removes EmployerStaffRole from Sam
     Then Point of Contact count is 1
+
+Scenario: A employer should have an option to select paper or electronic notices
+    Given NewGuy is a user with no person who goes to the Employer Portal
+    Then he should have an option to select paper or electronic notice optioninformation
