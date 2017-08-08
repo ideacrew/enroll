@@ -185,6 +185,10 @@ class FinancialAssistance::Application
       end
     end
 
+    event :determine, :after => :record_transition do
+      transitions from: :submitted, to: :determined
+    end
+
   end
 
   # def applicant
