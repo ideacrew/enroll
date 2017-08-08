@@ -67,6 +67,7 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
+          locals: {notice: notice, recipient: recipient}
           }),
         }
     }
@@ -74,6 +75,7 @@ class Notice
       content: ApplicationController.new.render_to_string({
         template: "notices/shared/footer.html.erb",
         layout: false
+        locals: {notice: notice}
       })
     }})
     
