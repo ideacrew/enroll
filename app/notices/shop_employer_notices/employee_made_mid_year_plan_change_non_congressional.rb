@@ -1,4 +1,4 @@
-class ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional < Notice
+class ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional < Notice
 
   Required= Notice::Required + []
   attr_accessor :census_employee
@@ -16,7 +16,6 @@ class ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional < Notic
   end
 
   def deliver
-    binding.pry
     build
     append_data
     generate_pdf_notice
