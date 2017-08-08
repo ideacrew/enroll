@@ -364,7 +364,7 @@ Rails.application.routes.draw do
         end
         get :manage_employers
         post :clear_assign_for_employer
-        # get :assign
+        get :assign
         post :update_assign
         post :employer_datatable
         post :family_datatable
@@ -408,7 +408,7 @@ Rails.application.routes.draw do
           get :export_to_pdf
           get :download_pdf
           get :dental_plans_data
-          # get :my_quotes
+          get :my_quotes
           get :employees_list
           get :employee_type
         end

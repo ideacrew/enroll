@@ -115,13 +115,13 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
       @quote = FactoryGirl.create(:quote,:with_household_and_members)
     end
     context "#delete_quote" do
-      xit "should delete quote" do
+      it "should delete quote" do
         expect{
           delete :delete_quote,  broker_role_id: person.broker_role.id , :id => @quote.id
           }.to change(Quote,:count).by(-1)
       end
 
-      xit "should redirect to my quote index page" do
+      it "should redirect to my quote index page" do
         delete :delete_quote, broker_role_id: person.broker_role.id, :id => @quote.id
         expect(response).to redirect_to(my_quotes_broker_agencies_broker_role_quotes_path)
       end
@@ -154,13 +154,13 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :af
     end
   end
 
-  # describe "GET my_quotes" do
-  #
-  #   it "returns http success" do
-  #     get :my_quotes, broker_role_id: person.broker_role.id
-  #     expect(response).to have_http_status(:success)
-  #   end
-  # end
+  describe "GET my_quotes" do
+
+    it "returns http success" do
+      get :my_quotes, broker_role_id: person.broker_role.id
+      expect(response).to have_http_status(:success)
+    end
+  end
 
   describe "GET edit" do
 
