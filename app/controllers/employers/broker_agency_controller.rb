@@ -49,9 +49,14 @@ class Employers::BrokerAgencyController < ApplicationController
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
+      
+      
       @employer_profile.save!(validate: false)
+      # binding.pry
+      broker_hired
+      
     end
-
+    
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -93,6 +98,10 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   private
+  
+  def broker_hired
+    ShopNoticesNotifierJob.perform(@employer_profile.id.to_s, "broker_hired")
+  end
 
   def updateable?
     authorize @employer_profile, :updateable?
