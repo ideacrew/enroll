@@ -18,7 +18,7 @@ class ShopEmployeeNotices::CongressEmployeeDependentAgeOffTerminationNotice < Sh
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(now.next_year) }
     names = []
     if bc_period.present?
-      if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.count >= 1
+      if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.size >= 1
         census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
           dep = dependent.person
           age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
