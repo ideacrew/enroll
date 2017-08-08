@@ -5,12 +5,12 @@
 "<%= json_escape person.last_name %>",
 "<%= documents_count(person) %>",
 <% verification_due_info = capture do %>
-	<%= outstanding_verification_family.min_verification_due_date_on_family %>
+	<%= (outstanding_verification_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) %>
 <% end %>
 <%= raw verification_due_info.to_json %>,
 <% review_status_info = capture do %>
-	<%= outstanding_verification_family.review_status.gsub(/r/, " r").strip %><br>
-	<% if outstanding_verification_family.min_verification_due_date_on_family <= TimeKeeper.date_of_record %>
+	<%= outstanding_verification_family.review_status %><br>
+	<% if (outstanding_verification_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
 		<span class="label label-danger">Past Due</span>
 	<% end %>
 <% end %>
