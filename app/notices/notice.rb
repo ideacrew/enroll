@@ -67,19 +67,17 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-           locals: { notice: notice }
+          locals: {notice: notice, recipient: recipient}
           }),
         }
     }
-
-    # if market_kind == 'individual'
-      options.merge!({footer: { 
-        content: ApplicationController.new.render_to_string({ 
-          template: "notices/shared/footer.html.erb", 
-          layout: false 
-        })
-      }})
-    # end
+    options.merge!({footer: {
+      content: ApplicationController.new.render_to_string({
+        template: "notices/shared/footer.html.erb",
+        layout: false,
+        locals: {notice: notice}
+      })
+    }})
     
     options
   end
