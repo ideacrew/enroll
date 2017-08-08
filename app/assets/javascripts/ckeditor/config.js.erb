@@ -1,0 +1,30 @@
+<% 
+  # tokens = [["Choose your token", ""]]
+
+  # Notifier::NoticeKindsHelper.public_instance_methods.each do |method|
+  #   tokens << [method.to_s.humanize, method.to_s]
+  # end
+%>
+
+CKEDITOR.editorConfig = function( config )
+{
+
+
+
+  // Configure available tokens
+config.availableTokens = <%= [["Choose your token", ""]] + Notifier::MergeDataModels::EmployerProfile.new.editor_tokens %>;
+
+// [
+//   ["Choose your token", ""],
+//   ["Site short name", "site_short_name"],
+//   ["Home Page URL", "site_home_link"],
+//   ["Employer Name", "employer_name"],
+// ];
+
+// Configure token string
+config.tokenStart = '#{';
+config.tokenEnd = '}';
+
+  config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token';
+  config.language = 'en';
+};

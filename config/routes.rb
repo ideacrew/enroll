@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  mount Ckeditor::Engine => '/ckeditor'  
+  mount Ckeditor::Engine => '/ckeditor'
   mount TransportGateway::Engine, at: "/transport_gateway"
   mount TransportProfiles::Engine, at: "/transport_profiles"
   mount Notifier::Engine, at: "/notifier" 

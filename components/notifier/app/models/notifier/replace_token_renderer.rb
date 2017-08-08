@@ -12,7 +12,7 @@ module Notifier
 
     # Assumes document attribute tokens are in form: @attribute
     def merge_data_attributes(template)
-      @attributes.each_pair { |token, value| template.gsub!("@#{token}", value) }
+      @attributes.each_pair { |token, value| template.gsub!("<% #{token} %>", value) }
       template
     end
 

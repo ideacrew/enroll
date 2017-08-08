@@ -3,7 +3,7 @@ module Notifier
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :notice
+    embedded_in :notice_kind
 
     field :markup_kind, type: String, default: "markdown"
     field :raw_body, type: String
