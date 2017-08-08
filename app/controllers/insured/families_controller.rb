@@ -94,7 +94,9 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
-    ee_sep_request_accepted_notice(@person)
+    emp_role_id = params.require(:employee_role_id)
+    @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+    ee_sep_request_accepted_notice(@employee_role)
     redirect_to new_insured_group_selection_path(action_params)
   end
 
