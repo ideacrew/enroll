@@ -71,6 +71,7 @@ module Forms
         :dba => dba,
         :employer_profile => ::EmployerProfile.new({
           :entity_kind => entity_kind,
+          :contact_method => contact_method,
           :sic_code => sic_code,
           :employer_attestation => ::EmployerAttestation.new()
         }),
