@@ -70,6 +70,7 @@ class Employers::BrokerAgencyController < ApplicationController
       @employer_profile.fire_broker_agency(termination_date)
       @employer_profile.fire_general_agency!(termination_date)
       @fa = @employer_profile.save!(validate: false)
+      employer_broker_fired
     end
 
     respond_to do |format|
@@ -90,6 +91,10 @@ class Employers::BrokerAgencyController < ApplicationController
         end
       }
     end
+  end
+
+  def employer_broker_fired
+    ShopNoticesNotifierJob.perform(@employer_profile.id.to_s, "employer_broker_fired")
   end
 
   private

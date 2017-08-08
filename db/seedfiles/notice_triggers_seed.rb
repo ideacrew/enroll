@@ -568,7 +568,28 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
+      hbx_id: 'SHOP_D052',
+      title: 'Broker Fired',
+      description: 'Broker fired',
+      resource_name: 'employer',
+      event_name: 'employer_broker_fired',
+      notice_triggers: [
+          {
+              name: 'Broker fired',
+              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice.html.erb',
+              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
+              mpi_indicator: 'MPI_SHOP52',
+              notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["employer"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
 ]
 
 
