@@ -31,8 +31,8 @@
                     </div>
                     <div class="v-type-status col-md-3">
                       <% if f_member.is_applying_coverage %>
-                        <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
-                          <%= show_v_type(v_type, person) %>
+                        <span class="label lb-md label-<%=verification_type_class(v_type, person, current_user.has_hbx_staff_role?)%>">
+                          <%= show_v_type(v_type, person, current_user.has_hbx_staff_role?) %>
                         </span>&nbsp;
                           <%= pundit_span Family, :updateable? %>
                       <% end %>
