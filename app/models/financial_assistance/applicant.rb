@@ -189,6 +189,10 @@ class FinancialAssistance::Applicant
     self.tax_household.blank?
   end
 
+  def has_spouse
+    application.family.primary_applicant.person.person_relationships.where(kind: 'spouse').first.present? ? true : false
+  end
+
   def tax_household_of_spouse
     spouse_relationship  = self.person.person_relationships.where(kind: 'spouse').first
     if spouse_relationship.present?
@@ -451,7 +455,7 @@ private
   end
 
   def presence_of_attr_step_2
-    if is_required_to_file_taxes && is_joint_tax_filing.nil?
+    if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
       errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank")
     end
 
@@ -488,6 +492,10 @@ private
       errors.add(:student_kind, "' What is the type of student?' should be answered") if student_kind.blank?
       errors.add(:student_status_end_on, "' Student status end on date?'  should be answered") if student_status_end_on.blank?
       errors.add(:student_school_kind, "' What type of school do you go to?' should be answered") if student_school_kind.blank?
+    end
+
+    if age_of_applicant.between?(18,19) && is_student.nil?
+      errors.add(:is_student, "' Is this person a student?' should be answered")
     end
   end
 
