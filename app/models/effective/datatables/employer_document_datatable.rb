@@ -12,7 +12,7 @@ module Effective
             icon = "<span class='glyphicon glyphicon-exclamation-sign text-danger' aria-hidden='true' title='#{row.reason_for_rejection}'></span> "
           end
 
-          raw(icon) + row.aasm_state.humanize 
+          raw(icon) + row.aasm_state.humanize
         }, :filter => false, :sortable => false
         table_column :name, :label => 'Doc Name', :proc => Proc.new { |row|
           link_to raw('<i class="fa fa-file-text-o pull-left"></i> ') + row.title, "", 'target' => "iframe_#{row.id}", 'data-target' => "#employeeModal_#{row.id}", "data-toggle" => "modal", "class" => "word-break-attestation"
@@ -26,7 +26,7 @@ module Effective
            key, bucket = get_key_and_bucket(row.identifier)
           dropdown = [
            ['Download',  document_download_path(bucket, key)+ "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
-           ['Delete', employers_employer_attestation_delete_attestation_documents_path(row.id), row.aasm_state == 'submitted' ? 'delete ajax with confirm' : 'disabled',  'Do you want to delete this document?']
+           ['Delete', employers_employer_attestation_delete_attestation_documents_path(row.id), (@employer_profile.employer_attestation.editable? && row.submitted?) ? 'delete ajax with confirm' : 'disabled',  'Do you want to Delete this document?']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
         }, :filter => false, :sortable => false
