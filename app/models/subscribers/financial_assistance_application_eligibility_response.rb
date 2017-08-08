@@ -3,7 +3,7 @@ module Subscribers
     include Acapi::Notifiers
 
     def self.subscription_details
-      ["acapi.info.events.assistance_application.submitted"]
+      ["acapi.info.events.assistance_application.application_processed"]
     end
 
     def call(event_name, e_start, e_end, msg_id, payload)
@@ -102,7 +102,7 @@ module Subscribers
           # end
         end
 
-        if application_in_context.latest_active_tax_household.present?
+        if application_in_context.tax_households.present?
           unless application_in_context.eligibility_determinations.present?
             log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
           end
@@ -110,7 +110,7 @@ module Subscribers
       rescue
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
-      family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
+      # family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
     end
 

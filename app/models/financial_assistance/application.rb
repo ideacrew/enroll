@@ -397,7 +397,7 @@ class FinancialAssistance::Application
     verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
     verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
     #Saving EDs only if all the tax_households get the EDs from Haven
-    if verified_tax_households.present? && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+    if verified_tax_households.present?# && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
 
       # verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
       # primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
@@ -406,11 +406,11 @@ class FinancialAssistance::Application
         # latest_tax_household = tax_households.where(effective_ending_on: nil).last
         # latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       # end
+
       tax_households_hbx_assigned_ids = []
       tax_households.each { |th| tax_households_hbx_assigned_ids << th.hbx_assigned_id.to_s}
 
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-
       verified_tax_households.each do |vthh|
         #If taxhousehold exists in our DB
         if tax_households_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
@@ -422,7 +422,6 @@ class FinancialAssistance::Application
           #Applicant/TaxHouseholdMember block start
           applicants_persons_hbx_ids = []
           applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
-
           vthh.tax_household_members.each do |thhm|
             #If applicant exisits in our db.
             if applicants_persons_hbx_ids.include?(thhm.person_id)
@@ -452,11 +451,13 @@ class FinancialAssistance::Application
           #Applicant/TaxHouseholdMember block end
 
           #Eligibility determination start.
-          verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
+          if !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+            verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
 
-          #TODO find the right source Curam/Haven.
-          source = "Haven"
-          create_new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
+            #TODO find the right source Curam/Haven.
+            source = "Haven"
+            create_new_eligibility_determination(tax_household.id, verified_eligibility_determination, benchmark_plan_id, source) #Creating Eligibility Determination
+          end
           #Eligibility determination end
 
         #When taxhousehold does not exist in your DB
@@ -538,6 +539,7 @@ private
 
   def create_new_eligibility_determination(tax_household_id, verified_eligibility_determination, benchmark_plan_id, source)
     eligibility_determinations.build(
+      tax_household_id: tax_household_id,
       # e_pdc_id: verified_eligibility_determination.id,
       benchmark_plan_id: benchmark_plan_id,
       max_aptc: verified_eligibility_determination.maximum_aptc,
