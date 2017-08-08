@@ -16,7 +16,6 @@ class Notice
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
     self.name = params[:name] || recipient.first_names
-    self.footer = params[:footer]
   end
 
   def html(options = {})
@@ -72,23 +71,15 @@ class Notice
           }),
         }
     }
-    if footer.present?
-      options.merge!({footer: { 
-        content: ApplicationController.new.render_to_string({ 
-          template: footer,
-          layout: false 
-        })
-      }})
-    end
 
-    if market_kind == 'individual'
+    # if market_kind == 'individual'
       options.merge!({footer: { 
         content: ApplicationController.new.render_to_string({ 
           template: "notices/shared/footer.html.erb", 
           layout: false 
         })
       }})
-    end
+    # end
     
     options
   end

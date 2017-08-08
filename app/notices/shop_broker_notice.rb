@@ -6,7 +6,6 @@ class ShopBrokerNotice < Notice
   attr_accessor :employer_profile
 
   def initialize(employer_profile, args = {})
-    # binding.pry
     self.employer_profile = employer_profile
     self.broker_profile = employer_profile.broker_agency_profile
     args[:recipient] = broker_profile
@@ -16,7 +15,6 @@ class ShopBrokerNotice < Notice
     args[:name] = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
     args[:recipient_document_store] = employer_profile.broker_agency_profile.primary_broker_role.person
     self.header = "notices/shared/broker_header_with_page_numbers.html.erb"
-    args[:footer] = "notices/shared/broker_footer.html.erb"
     super(args)
   end
 
@@ -30,7 +28,7 @@ class ShopBrokerNotice < Notice
   end
 
   def build
-    # binding.pry
+    notice.mpi_indicator = self.mpi_indicator
     notice.broker = PdfTemplates::Broker.new({
       full_name: broker_profile.primary_broker_role.person.full_name.titleize,
       hbx_id: broker_profile.primary_broker_role.person.hbx_id,
@@ -43,7 +41,8 @@ class ShopBrokerNotice < Notice
     notice.er_last_name = employer_profile.staff_roles.first.last_name
     # notice.er_fullname = employer_profile.full_name.titleize
     notice.broker_agency = broker_profile.legal_name.titleize
-    address = broker_profile.primary_broker_role.person.mailing_address if broker_profile.primary_broker_role.person.mailing_address.present?
+    append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
+    # address = broker_profile.primary_broker_role.person.mailing_address if broker_profile.primary_broker_role.person.mailing_address.present?
     #append_address(address)
     append_hbe
 
@@ -74,13 +73,13 @@ class ShopBrokerNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
   end
 
-  # def append_address(primary_address)
-  #   notice.primary_address = PdfTemplates::NoticeAddress.new({
-  #                                                                street_1: primary_address.address_1.titleize,
-  #                                                                street_2: primary_address.address_2.titleize,
-  #                                                                city: primary_address.city.titleize,
-  #                                                                state: primary_address.state,
-  #                                                                zip: primary_address.zip
-  #                                                            })
-  # end
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+                                                                 street_1: primary_address.address_1.titleize,
+                                                                 street_2: primary_address.address_2.titleize,
+                                                                 city: primary_address.city.titleize,
+                                                                 state: primary_address.state,
+                                                                 zip: primary_address.zip
+                                                             })
+  end
 end

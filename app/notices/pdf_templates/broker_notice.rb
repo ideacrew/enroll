@@ -13,7 +13,8 @@ module PdfTemplates
     attribute :er_fullname, String
     attribute :er_legal_name, String
     attribute :employer_name, String
-    attribute  :broker_agency, String
+    attribute :broker_agency, String
+    attribute :mpi_indicator, String
 
     def shop?
       return true
