@@ -801,7 +801,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => :initial_employer_ineligibility_notice
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -1043,6 +1043,13 @@ class PlanYear
     end
   end
 
+  def notify_employee_of_initial_employer_ineligibility
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
+    end
+  end
+
   def initial_employer_approval_notice
     return true if (benefit_groups.any?{|bg| bg.is_congress?} || (fte_count < 1))
     self.employer_profile.trigger_notices("initial_employer_approval")
@@ -1140,10 +1147,6 @@ class PlanYear
       errors.add(:start_on, "must be first day of the month")
     end
 
-    if end_on != end_on.end_of_month
-      errors.add(:end_on, "must be last day of the month")
-    end
-
     if end_on > start_on.years_since(Settings.aca.shop_market.benefit_period.length_maximum.year)
       errors.add(:end_on, "benefit period may not exceed #{Settings.aca.shop_market.benefit_period.length_maximum.year} year")
     end
@@ -1170,6 +1173,12 @@ class PlanYear
     end
 
     if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+
+      #groups terminated for non-payment get 31 more days of coverage from their paid through date
+      if end_on != end_on.end_of_month
+        errors.add(:end_on, "must be last day of the month")
+      end
+
       if end_on != (start_on + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
