@@ -5,7 +5,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   include UIHelpers::WorkflowController
   include FinancialAssistanceHelper
 
-  before_filter :find, :find_application, :except => [:age_of_applicant] #except the ajax request
+  before_filter :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
 
 
   def edit
@@ -65,6 +65,11 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   def age_of_applicant
     applicant = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id])
     render :text => "#{applicant.age_of_the_applicant}"
+  end
+
+  def primary_applicant_has_spouse
+    has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
+    render :text => "#{has_spouse}"
   end
 
   private

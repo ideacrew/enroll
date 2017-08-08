@@ -19,19 +19,34 @@ $(document).ready(function() {
   // To hide/show the foster care related questions based on the age_of_applicant.
   function hide_show_foster_care_related_qns(age) {
     if ($('#is_pregnant_yes')) {
-      if (age >= 18 && age <= 26){
+      if (age > 18 && age < 26){
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').removeClass('hide');
-        if (age == 18 || age == 19){
-          $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
-        } else {
-          $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
-        }
       } else {
         $('#is_former_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
+        $('#foster_care_us_state, #age_left_foster_care, #had_medicaid_during_foster_care_yes').parents('.row-form-wrapper').addClass('hide');
         $('#is_former_foster_care_yes, #is_former_foster_care_no').prop('required', false);
         $('#had_medicaid_during_foster_care_yes, #had_medicaid_during_foster_care_no').prop('required', false);
       }
+      if (age == 18 || age == 19){
+        $('#is_student_yes').parents('.row-form-wrapper').removeClass('hide');
+      } else {
+        $('#is_student_yes').parents('.row-form-wrapper').addClass('hide');
+        $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
+      }
     }
+  }
+
+  function hide_show_person_flling_jointly_question(){
+    $.ajax({
+      type: "GET",
+      data:{},
+      url: window.location.href.replace(/step(\/2)?/, 'primary_applicant_has_spouse'),
+      success: function (has_spouse) {
+        if(has_spouse == 'true'){
+          $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
+        }
+      }
+    });
   }
 
   $('#income_kind').on('selectric-change', function(e){
@@ -75,7 +90,7 @@ $(document).ready(function() {
 
   $("body").on("change", "#is_required_to_file_taxes_yes", function(){
     if ($('#is_required_to_file_taxes_yes').is(':checked')) {
-      $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
+      hide_show_person_flling_jointly_question();
     } else{
       $('#is_claimed_as_tax_dependent_no').parents('.row-form-wrapper').addClass('hide');
     }
@@ -233,7 +248,7 @@ $(document).ready(function() {
   }
 
   if($('#is_required_to_file_taxes_yes').is(':checked')) {
-    $('#is_joint_tax_filing_yes').parents('.row-form-wrapper').removeClass('hide');
+    hide_show_person_flling_jointly_question();
   }
 
   if($('#is_claimed_as_tax_dependent_no').is(':checked')) {
