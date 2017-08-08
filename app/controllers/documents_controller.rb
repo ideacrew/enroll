@@ -49,7 +49,7 @@ class DocumentsController < ApplicationController
 
   def enrollment_verification
      family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+     if family.active_household.hbx_enrollments.verification_needed.any?
        family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
          enrollment.evaluate_individual_market_eligiblity
        end
