@@ -1,4 +1,4 @@
-<% if @family.application_in_progress.present? %>
+<% if @family.application_in_progress.present? && request.env['HTTP_REFERER'].include?('financial_assistance') %>
   <% content_for "person_#{@dependent.family_member.person.id}" do %>
     <div class="row row-form-wrapper no-buffer">
       <%= render "financial_assistance/applications/financial_assistance_row", applicant: @family.application_in_progress.applicants.find_by(family_member_id: @dependent.family_member.id) %>
