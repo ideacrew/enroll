@@ -17,7 +17,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
     it "should not have right navigation section" do
       render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-      expect(view.content_for(:top_navigation)).not_to include('multi-line')
+      expect(view.content_for(:horizontal_menu)).not_to include('multi-line')
     end
 
     context "with general agency disabled" do
@@ -26,7 +26,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
       end
       it "does not show general agency related links" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
-        expect(rendered).not_to match /General Agencies/
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
       end
     end
   end
@@ -42,7 +42,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
       it "should have include Medicaid application" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:top_navigation)).to include('multi-line')
+        expect(view.content_for(:horizontal_menu)).to include('multi-line')
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
 
       it "should not include Medicaid application" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab"}
-        expect(view.content_for(:top_navigation)).to_not include('multi-line')
+        expect(view.content_for(:horizontal_menu)).to_not include('multi-line')
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe "broker_agencies/profiles/_menu.html.erb" do
         render partial: 'broker_agencies/profiles/menu', locals: {active_tab: "home-tab" }
       end
       it "does not show general agency related links" do
-        expect(rendered).not_to match /General Agencies/
+        expect(view.content_for(:horizontal_menu)).not_to match /General Agencies/
       end
     end
   end

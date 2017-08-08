@@ -22,6 +22,6 @@ RSpec.describe "employers/plan_years/new.html.erb" do
   end
 
   it "should have the link of reference_plan_options_link" do
-    expect(view.content_for(:main)).to match("a[href='/employers/employer_profiles/#{employer_profile.id}/plan_years/reference_plan_options']")
+    expect(rendered).to match("a[href='/employers/employer_profiles/#{employer_profile.id}/plan_years/reference_plan_options']")
   end
 end

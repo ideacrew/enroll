@@ -22,13 +22,13 @@ RSpec.describe "employers/employer_profiles/_show_profile" do
   it "should display the dashboard content" do
     @tab = 'home'
     render template: "employers/employer_profiles/show"
-    expect(view.content_for(:main)).to have_selector('h1', text: 'My Health Benefits Program')
+    expect(rendered).to have_selector('h1', text: 'My Health Benefits Program')
   end
 
   it "should display premium billing reports widget" do
     @tab = 'home'
     render template: "employers/employer_profiles/show"
-    expect(view.content_for(:main)).to have_selector('h3', text: 'Enrollment Report')
+    expect(rendered).to have_selector('h3', text: 'Enrollment Report')
   end
 
   it "shouldn't display premium billing reports widget" do

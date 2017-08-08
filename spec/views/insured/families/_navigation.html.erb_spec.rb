@@ -55,30 +55,30 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
+        expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
       it "should display the info under my account in the side bar" do
-        expect(view.content_for(:left_navigation)).to have_selector('h4', 'My Account')
-        expect(view.content_for(:left_navigation)).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_selector('h4', 'My Account')
+        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
+        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
         family_members.each do |family_member|
-          expect(view.content_for(:left_navigation)).to match(/#{family_member.first_name} #{family_member.last_name}/)
+          expect(rendered).to match(/#{family_member.first_name} #{family_member.last_name}/)
         end
       end
 
       it "should have a link to manage family button" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
+        expect(rendered).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
       end
 
       it "shows action needed label" do
-        expect(view.content_for(:left_navigation)).to match(/Action Needed/)
+        expect(rendered).to match(/Action Needed/)
       end
     end
     describe "no unverified enrollments" do
@@ -89,26 +89,26 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
+        expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
       it "should display the info under my account in the side bar" do
-        expect(view.content_for(:left_navigation)).to have_selector('h4', 'My Account')
-        expect(view.content_for(:left_navigation)).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_selector('h4', 'My Account')
+        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
+        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
         family_members.each do |family_member|
-          expect(view.content_for(:left_navigation)).to match(/#{family_member.first_name} #{family_member.last_name}/)
+          expect(rendered).to match(/#{family_member.first_name} #{family_member.last_name}/)
         end
       end
 
       it "should have a link to manage family button" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
+        expect(rendered).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
       end
 
       it "doesn't show action needed label" do
@@ -125,26 +125,26 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       end
 
       it "should match the side bar tabs info on family home page" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
+        expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
       it "should display the info under my account in the side bar" do
-        expect(view.content_for(:left_navigation)).to have_selector('h4', 'My Account')
-        expect(view.content_for(:left_navigation)).to have_selector('span', "#{person.first_name} #{person.last_name}")
-        expect(view.content_for(:left_navigation)).to have_selector('span', "Your household of #{family_members.count}")
+        expect(rendered).to have_selector('h4', 'My Account')
+        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
+        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
       end
 
       it "should display the list of active household" do
         family_members.each do |family_member|
-          expect(view.content_for(:left_navigation)).to match(/#{family_member.first_name} #{family_member.last_name}/)
+          expect(rendered).to match(/#{family_member.first_name} #{family_member.last_name}/)
         end
       end
 
       it "should have a link to manage family button" do
-        expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
+        expect(rendered).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
       end
 
       it "doesn't show action needed label" do
@@ -161,26 +161,26 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     end
 
     it "should match the side bar tabs info on family home page" do
-      expect(view.content_for(:left_navigation)).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
-      expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
-      expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
-      expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
+      expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+      expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
+      expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+      expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
     end
 
     it "should display the info under my account in the side bar" do
-      expect(view.content_for(:left_navigation)).to have_selector('h4', 'My Account')
-      expect(view.content_for(:left_navigation)).to have_selector('span', "#{person.first_name} #{person.last_name}")
-      expect(view.content_for(:left_navigation)).to have_selector('span', "Your household of #{family_members.count}")
+      expect(rendered).to have_selector('h4', 'My Account')
+      expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
+      expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
     end
 
     it "should display the list of active household" do
       family_members.each do |family_member|
-        expect(view.content_for(:left_navigation)).to match(/#{family_member.first_name} #{family_member.last_name}/)
+        expect(rendered).to match(/#{family_member.first_name} #{family_member.last_name}/)
       end
     end
 
     it "should have a link to manage family button" do
-      expect(view.content_for(:left_navigation)).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
+      expect(rendered).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
     end
 
     it "shows action needed label" do

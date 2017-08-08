@@ -32,24 +32,24 @@ RSpec.describe "insured/families/home.html.erb" do
 
   it "should display the title" do
     allow(family).to receive(:active_admin_seps).and_return(false)
-    expect(view.content_for(:main)).to have_selector('h1', text: "My #{Settings.site.short_name}")
+    expect(rendered).to have_selector('h1', text: "My #{Settings.site.short_name}")
   end
 
   it "should have plan-summary area" do
     allow(family).to receive(:active_admin_seps).and_return(false)
-    expect(view.content_for(:main)).to have_selector('div#plan-summary')
+    expect(rendered).to have_selector('div#plan-summary')
   end
 
   it "should display 'existing SEP - Eligible to enroll' partial if there is an active admin SEP" do
     assign(:active_admin_sep, sep)
     render file: "insured/families/home.html.erb"
-    expect(view.content_for(:main)).to have_selector('div#qle-details-for-existing-sep')
+    expect(rendered).to have_selector('div#qle-details-for-existing-sep')
   end
 
   it "should not display 'existing SEP - Eligible to enroll' partial if there is no active admin SEP" do
     assign(:active_admin_sep, [])
     render file: "insured/families/home.html.erb"
-    expect(view.content_for(:main)).to_not have_selector('div#qle-details-for-existing-sep')
+    expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
   end
 
 end

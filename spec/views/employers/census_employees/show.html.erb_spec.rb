@@ -65,23 +65,23 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   it "should show the address of census employee" do
     allow(census_employee).to receive(:address).and_return(address)
     render template: "employers/census_employees/show.html.erb"
-    expect(view.content_for(:main)).to match /#{address.address_1}/
-    expect(view.content_for(:main)).to match /#{address.address_2}/
-    expect(view.content_for(:main)).to match /#{address.city}/
-    expect(view.content_for(:main)).to match /#{address.state}/i
-    expect(view.content_for(:main)).to match /#{address.zip}/
+    expect(rendered).to match /#{address.address_1}/
+    expect(rendered).to match /#{address.address_2}/
+    expect(rendered).to match /#{address.city}/
+    expect(rendered).to match /#{address.state}/i
+    expect(rendered).to match /#{address.zip}/
   end
 
   it "should show the address feild of census employee if address not present" do
     allow(census_employee).to receive(:address).and_return([])
     render template: "employers/census_employees/show.html.erb"
-    expect(view.content_for(:main)).to match /Address/
-    expect(view.content_for(:main)).to match /ADDRESS LINE 2/
-    expect(view.content_for(:main)).to match /ADDRESS LINE 1/
-    expect(view.content_for(:main)).to match /CITY/
-    expect(view.content_for(:main)).to match /SELECT STATE/
-    expect(view.content_for(:main)).to match /ZIP/
-    expect(view.content_for(:main)).to match /Add Dependent/
+    expect(rendered).to match /Address/
+    expect(rendered).to match /ADDRESS LINE 2/
+    expect(rendered).to match /ADDRESS LINE 1/
+    expect(rendered).to match /CITY/
+    expect(rendered).to match /SELECT STATE/
+    expect(rendered).to match /ZIP/
+    expect(rendered).to match /Add Dependent/
   end
 
   it "should not show the plan" do
@@ -97,21 +97,21 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     allow(hbx_enrollment).to receive(:plan).and_return(nil)
     render template: "employers/census_employees/show.html.erb"
-    expect(view.content_for(:main)).to match /Waived Date/i
-    expect(view.content_for(:main)).to match /#{hbx_enrollment.waiver_reason}/
+    expect(rendered).to match /Waived Date/i
+    expect(rendered).to match /#{hbx_enrollment.waiver_reason}/
   end
 
   it "should show plan name" do
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     render template: "employers/census_employees/show.html.erb"
-    expect(view.content_for(:main)).to match /#{hbx_enrollment.plan.name}/
+    expect(rendered).to match /#{hbx_enrollment.plan.name}/
   end
 
   it "should show plan cost" do
     allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return([hbx_enrollment])
     render template: "employers/census_employees/show.html.erb"
-    expect(view.content_for(:main)).to match /Employer Contribution/
-    expect(view.content_for(:main)).to match /You Pay/
+    expect(rendered).to match /Employer Contribution/
+    expect(rendered).to match /You Pay/
   end
 
   it "should not show the health enrollment if it is external" do
@@ -133,8 +133,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
   context  'drop down menu at different cases' do
     it "should have BENEFIT PACKAGE and benefit plan" do
       render template: "employers/census_employees/show.html.erb"
-      expect(view.content_for(:main)).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
-      expect(view.content_for(:main)).to have_selector('div', text: benefit_group.title)
+      expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+      expect(rendered).to have_selector('div', text: benefit_group.title)
     end
     context "when both ee and er have no benefit group assignment" do
       #to make sure census_employee.benefit_group_assignments.last
@@ -145,8 +145,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
       it "should only have BENIFIT PACKAGE" do
         render template: "employers/census_employees/show.html.erb"
-        expect(view.content_for(:main)).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
-        expect(view.content_for(:main)).to_not have_selector('div', text: benefit_group.title)
+        expect(rendered).to have_selector('div', text: 'SELECT BENEFIT PACKAGE')
+        expect(rendered).to_not have_selector('div', text: benefit_group.title)
       end
     end
    end
@@ -201,19 +201,19 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     it "should get dependents title" do
       render template: "employers/census_employees/show.html.erb"
-      expect(view.content_for(:main)).to match /Dependents/
+      expect(rendered).to match /Dependents/
     end
 
     it "should get child relationship when child_under_26" do
       allow(view).to receive(:link_to_add_fields).and_return(true)
       allow(census_employee).to receive(:census_dependents).and_return([census_dependent1])
       render template: "employers/census_employees/show.html.erb"
-      expect(view.content_for(:main)).to match /child/
+      expect(rendered).to match /child/
     end
 
     it "should get the Owner info" do
       render template: "employers/census_employees/show.html.erb"
-      expect(view.content_for(:main)).to match /Owner?/i
+      expect(rendered).to match /Owner?/i
     end
   end
 
@@ -247,9 +247,9 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
     it "should display past enrollments" do
       render template: "employers/census_employees/show.html.erb"
-      expect(view.content_for(:main)).to match /#{hbx_enrollment.coverage_year} health Coverage/i
-      expect(view.content_for(:main)).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
-      expect(view.content_for(:main)).to match /Past Enrollments/i
+      expect(rendered).to match /#{hbx_enrollment.coverage_year} health Coverage/i
+      expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+      expect(rendered).to match /Past Enrollments/i
     end
 
     context "with not health, but dental and past enrollments" do
@@ -258,9 +258,9 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
       it "should display past enrollments" do
         render template: "employers/census_employees/show.html.erb"
-        expect(view.content_for(:main)).not_to match /#{hbx_enrollment.coverage_year} health Coverage/i
-        expect(view.content_for(:main)).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
-        expect(view.content_for(:main)).to match /Past Enrollments/i
+        expect(rendered).not_to match /#{hbx_enrollment.coverage_year} health Coverage/i
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+        expect(rendered).to match /Past Enrollments/i
       end
     end
 
@@ -271,8 +271,8 @@ RSpec.describe "employers/census_employees/show.html.erb" do
       end
       it "should not display past enrollments" do
         render template: "employers/census_employees/show.html.erb"
-        expect(view.content_for(:main)).to match /#{hbx_enrollment.coverage_year} health Coverage/i
-        expect(view.content_for(:main)).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} health Coverage/i
+        expect(rendered).to match /#{hbx_enrollment.coverage_year} dental Coverage/i
       end
     end
 
@@ -288,7 +288,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
 
       it "should display the rehired date and not the hired date" do
         render template: "employers/census_employees/show.html.erb"
-        expect(view.content_for(:main)).to match /Rehired/i
+        expect(rendered).to match /Rehired/i
       end
 
       it "if rehired then it shouldnot display the termination date" do
