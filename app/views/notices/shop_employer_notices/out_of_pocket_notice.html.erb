@@ -13,7 +13,7 @@
   content: "For eligible employees of:   #{notice.legal_name.capitalize.titleize}"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Plan year  :    #{benefit_group.first.start_on} "} %>
+  content: "Plan year state date :  #{benefit_group.first.start_on} "} %>
 
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -23,7 +23,7 @@
   content: "<strong>WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?</strong>"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Plan Match, DC HEALTH LINK's health plan comparison tool powered by Consumers' CHECKBOOK takes you through a few simple steps to find the best health plan for you, or you and your family."} %>
+  content: "Plan Match, DC Health Link's health plan comparison tool powered by Consumers' CHECKBOOK takes you through a few simple steps to find the best health plan for you, or you and your family."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "The health information you provide is anonymous and isn't  shared with DC Health Link. With this tool, you can find every plan available to you through DC Health Link, and compare on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans."} %>
@@ -47,11 +47,10 @@
     end %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "2.Your employer's plan offerings: #{plan_offering.capitalize.titleize}"} %>
-
+  content: "2.Your employer's plan offerings: <strong>#{plan_offering.capitalize.titleize}</strong>"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums:#{benefit_group.first.reference_plan.name} "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums: #{benefit_group.first.reference_plan.name} "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
