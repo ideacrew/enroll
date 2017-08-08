@@ -15,9 +15,9 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_appeals
+    attach_non_discrimination
     attach_taglines
-    # attach_voter_application
-    # prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?

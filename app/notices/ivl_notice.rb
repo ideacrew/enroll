@@ -58,7 +58,15 @@ class IvlNotice < Notice
   end
 
   def attach_taglines
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope.pdf')]
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
+  end
+
+  def attach_appeals
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')]
+  end
+
+  def attach_non_discrimination
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_non_discrimination.pdf')]
   end
 
   def join_pdfs_with_path(pdfs, path = nil)

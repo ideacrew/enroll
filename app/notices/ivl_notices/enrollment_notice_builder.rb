@@ -73,8 +73,8 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_required_documents if notice.documents_needed
+    attach_non_discrimination
     attach_taglines
-    # attach_voter_application
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?

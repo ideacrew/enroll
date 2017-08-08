@@ -158,11 +158,11 @@ module PdfTemplates
     def household_information(ivl)
       rows = []
       household_block = []
-      household_block << "Household Member:"
-      household_block << "#{ivl.full_name} Age: #{ivl.age}"
+      household_block << "<strong>Household Member:</strong>"
+      household_block << "#{ivl.full_name} &nbsp;&nbsp;&nbsp;&nbsp; Age: #{ivl.age}"
       rows << household_block
       medicaid_block = []
-      medicaid_block << "Medicaid"
+      medicaid_block << "<strong>Medicaid</strong>"
       block = []
       flag = false
       if ivl.is_medicaid_chip_eligible
@@ -189,7 +189,7 @@ module PdfTemplates
       rows << medicaid_block if medicaid_block.count > 1
 
       private_health_block = []
-      private_health_block << "Private Health Insurance"
+      private_health_block << "<strong>Private Health Insurance</strong>"
       block = []
       flag = false
       if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && !(ivl.is_totally_ineligible)
@@ -200,7 +200,7 @@ module PdfTemplates
       rows << private_health_block if private_health_block.count > 1
 
       aptc_block = []
-      aptc_block << "Advance Premium Tax Credit (APTC)"
+      aptc_block << "<strong>Advance Premium Tax Credit (APTC)</strong>"
       block = []
       flag = false 
       if ivl.tax_household.max_aptc > 0
@@ -231,7 +231,7 @@ module PdfTemplates
       rows << aptc_block if aptc_block.count > 1
 
       csr_block = []
-      csr_block << "Cost-Sharing Reductions (CSR)"
+      csr_block << "<strong>Cost-Sharing Reductions (CSR)</strong>"
       block = []
       flag = false
       #check CSR condition
@@ -272,7 +272,7 @@ module PdfTemplates
       rows << csr_block if csr_block.count > 1
 
       ineligible_for_medicaid = []
-      ineligible_for_medicaid << "Ineligible for Medicaid and Private Health Insurance"
+      ineligible_for_medicaid << "<strong>Ineligible for Medicaid and Private Health Insurance</strong>"
       block = []
       flag = false
       if ivl.is_totally_ineligible

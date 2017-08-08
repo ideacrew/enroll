@@ -15,9 +15,9 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_appeals
+    attach_non_discrimination
     attach_taglines
-    # attach_voter_application
-    # prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -91,6 +91,7 @@ class IvlNotices::EligibilityNoticeBuilder < IvlNotice
       indian_conflict: applicant.person.consumer_role.indian_conflict?,
       is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
       is_without_assistance: applicant.is_without_assistance,
+      magi_medicaid_monthly_income_limit: applicant.magi_medicaid_monthly_income_limit,
       has_access_to_affordable_coverage: applicant.benefits.where(:kind => "is_eligible").present?,
       immigration_unverified: applicant.person.consumer_role.outstanding_verification_types.include?("Immigration status"),
       no_aptc_because_of_income: (applicant.preferred_eligibility_determination.aptc_csr_annual_household_income > applicant.preferred_eligibility_determination.aptc_annual_income_limit) ? true : false,

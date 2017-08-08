@@ -48,11 +48,11 @@
     <% if thh.max_aptc > 0 %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
        contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
-         heading: '', sub_heading: "Advance Premium Tax Credit Savings: $#{thh.max_aptc}/month"} %>
+         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
     <% else %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
        contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:<strong> $#{thh.max_aptc}/month"} %>
+         heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
     <% end %>
   <% end %>
 <% end %>
@@ -67,10 +67,10 @@
 <% if notice.aqhp_individuals.present? %>
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
   <% end %>
 <% end %>
 
@@ -81,10 +81,10 @@
 
   <% if is_under_open_enrollment? %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan."} %>
   <% else %>
     <%= render partial: 'notices/shared/custom_listing', :locals => {
-    listing: "<strong>What you need to do next:<strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
+    listing: "<strong>What you need to do next:</strong> Login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> to shop for a plan. We’ll need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."} %>
   <% end %>
 <% end %>
 
