@@ -19,7 +19,6 @@ Given /(\w+) has already provided security question responses/ do |name|
     end
     u.save!
   end
-  page.evaluate_script("window.location.reload()")
 end
 
 And /(\w+) also has a duplicate person with different DOB/ do |name|

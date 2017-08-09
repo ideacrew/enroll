@@ -13,7 +13,8 @@ Feature: Employee with current date of hire
     And Employee has not signed up as an HBX user
     And Soren White visits the employee portal
     When Soren White creates an HBX account
-    Given Soren White has already provided security question responses
+    And I select the all security question and give the answer
+    When I submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Soren White
