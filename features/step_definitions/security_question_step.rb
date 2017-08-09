@@ -2,6 +2,10 @@ def question_attrs
   { title: 'Updated security question', visible: false }
 end
 
+Given 'There are preloaded security question on the system' do
+  step "there are 3 preloaded security questions"
+end
+
 Then(/^Hbx Admin should see Security Question link$/) do
   find_link('Security Question').visible?
 end
@@ -42,7 +46,7 @@ end
 
 Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
   (0...num.to_i).each do |int|
-    FactoryGirl.create(:security_question, title: "Security Question #{int.to_i}")
+    FactoryGirl.create(:security_question, title: "Security Question #{int.to_i + 1}")
   end
 end
 
@@ -52,4 +56,24 @@ end
 
 Then 'I confirm the delete question popup' do
   page.evaluate_script('window.confirm = function() { return true; }')
+end
+
+Then 'I can see the security modal dialog' do
+  page.should(have_css('#securityQuestionModalLabel', visible: true, wait: 5))
+end
+
+Then(/I select the all security question and give the answer$/) do
+  (0..2).each do |num|
+    page.all('.security-question-select')[num].set("Security Question #{num + 1}")
+    page.all('.interaction-field-control-security-question-response-question-answer')[num].set("Answer #{num+1}")
+  end
+end
+
+When(/I submit the security questions$/) do
+  screenshot("group_selection")
+  find('.interaction-click-control-save-responses').click
+end
+
+Then 'I have landed on employer profile page' do
+  page.should(have_content('Thank you for logging into your Health Connector employer account.'))
 end
