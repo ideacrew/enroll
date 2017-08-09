@@ -27,7 +27,7 @@
    content: "You recently applied for help paying for coverage through #{Settings.site.short_name} on #{(TimeKeeper.date_of_record).strftime("%B %d, %Y")}. Based on the information you told us about who needs coverage, your results are listed below."} %>
   <% notice.individuals.each do |ivl|%>
     <%= render partial: 'notices/shared/info_table', locals: {
-                                 rows: [['Household Member:', "#{ivl.first_name} Age: #{ivl.age}"],
+                                 rows: [['Household Member:', "#{ivl.full_name} Age: #{ivl.age}"],
                                     ['Does not qualify for Medicaid or private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."]],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end %>
@@ -36,7 +36,7 @@
    content: "You recently applied for private insurance through #{Settings.site.short_name} on #{(TimeKeeper.date_of_record).strftime("%B %d, %Y")}. Based on the information you told us on your application about who needs coverage in your household, your results are listed below."} %>
   <% notice.individuals.each do |ivl| %>
     <%= render partial: 'notices/shared/info_table', locals: {
-                                 rows: [['Household Member:', "#{ivl.first_name} Age: #{ivl.age}"],
+                                 rows: [['Household Member:', "#{ivl.full_name} Age: #{ivl.age}"],
                                     ['Does not qualify for private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In Addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."]],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
     <% end %>
@@ -55,7 +55,7 @@
    heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>The deadline to request an appeal is#{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>

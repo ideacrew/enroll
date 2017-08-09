@@ -13,5 +13,7 @@ module PdfTemplates
     attribute :hsa_plan, Boolean
     attribute :renewal_plan_type, String
     attribute :is_csr, Boolean
+    attribute :deductible, String
+    attribute :family_deductible, String
   end
 end

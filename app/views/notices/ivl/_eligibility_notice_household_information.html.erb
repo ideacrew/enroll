@@ -10,7 +10,7 @@
         </td>
       </tr>
 
-      <% if eligibility_notice_display_medicaid(ivl) %>
+      <% if notice.eligibility_notice_display_medicaid(ivl) %>
         <tr valign="top">
           <td style="width: 25%;">
             <b>Medicaid</b>
@@ -51,7 +51,7 @@
         </tr>
       <% end %>
 
-      <% if eligibility_notice_display_aptc(ivl) %>
+      <% if notice.eligibility_notice_display_aptc(ivl) %>
         <tr valign="top">
           <td style="width: 25%;">
             <b>Advance Premium Tax Credit (APTC)</b>
@@ -73,7 +73,7 @@
         </tr>
       <% end %>
 
-      <% if eligibiltiy_notice_display_csr(ivl) %>
+      <% if notice.eligibiltiy_notice_display_csr(ivl) %>
         <tr valign="top">
           <td style="width: 25%;">
             <b>Cost-Sharing Reductions (CSR)</b>

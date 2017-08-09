@@ -31,7 +31,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["You need to make your first monthly payment to start your insurance. This is called a premium payment. It’s due by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")}. All of your premium payments must be made by the first of the month."],
-   heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px'} %>
+   heading: 'Here’s What You Need to Do Now', sub_heading: '<strong>Make Your First Payment</strong>', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
       listings: ["Make your premium payment directly to the insurance company - not #{Settings.site.short_name}.","We’ve included information in this letter on the amount you owe, and how to make your payment.","If you don’t make your payments on time, you could lose your insurance."]} %>
@@ -60,7 +60,7 @@
 
 <% notice.enrollments.each do |enrollment| %>
   <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                               rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "$#{enrollment.aptc_amount}", "#{enrollment.effective_on.strftime("%B %d, %Y")}"],
+                               rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
       col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 

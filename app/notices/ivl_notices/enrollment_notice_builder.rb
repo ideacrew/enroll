@@ -163,7 +163,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       plan_name: enrollment.plan.name,
       is_csr: enrollment.plan.is_csr?,
       coverage_kind: enrollment.plan.coverage_kind,
-      plan_carrier: enrollment.plan.carrier_profile.organization.legal_name
+      plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
+      family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
+      deductible: enrollment.plan.deductible
       })
     PdfTemplates::Enrollment.new({
       premium: enrollment.total_premium.round(2),
