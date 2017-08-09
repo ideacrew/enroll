@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>
+    <%= content_for?(:title) ? yield(:title) : "Broker Termination Letter" %>
+  </title>
+</head>
+<%= wicked_pdf_stylesheet_link_tag "application", media: "all", "data-turbolinks-track" => true %>
+<%= wicked_pdf_javascript_include_tag "application", "data-turbolinks-track" => true %>
+<div class="module broker_quote_tool">
+  <div class="pdf-body">
+    <div class="row">
+      <div class="col-md-12">
+        <p>SUBJECT: <%= @employer_profile.try(:legal_name) %> HAS REMOVED YOU AS THEIR BROKER </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<body class="pdf">
+<p><%= Date.today %></p>
+Dear <%= @broker_agency_profile.try(:legal_name) %>,<br/><br/>
+
+<p>This notice is to inform you that <%= @broker.first_name %> <%= @broker.last_name %> is no longer the broker of
+  record for <%= @employer_profile.try(:legal_name) %> as of <%= @terminated_broker_acocunt.end_on %>. You will no
+  longer be authorized to access <%= @employer_profile.try(:legal_name) %>'s DC Health Link Account or take action on
+  behalf of <%= @employer_profile.try(:legal_name) %> or any employees of <%= @employer_profile.try(:legal_name) %>.</p>
+<br/>
+<p>For Questions or Assistance:<br/>
+
+  Please contact DC Health Link with any questions:</p>
+<ul>
+  <li>By calling 855-532-5465</li>
+  <li>TTY: 711</li>
+  <li>Online at www.DCHealthLink.com</li>
+</ul>
+
+</body>
+</html>

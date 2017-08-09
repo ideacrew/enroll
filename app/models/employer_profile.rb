@@ -140,6 +140,7 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    send_broker_terminated_notification(active_broker_agency_account, active_broker_agency_account.broker_agency_profile)
     notify_broker_terminated
   end
 
@@ -1024,5 +1025,31 @@ private
 
   def plan_year_publishable?
     !published_plan_year.is_application_unpublishable?
+  end
+
+  def send_broker_terminated_notification(active_broker_agency_account, broker_agency_profile)
+    body = build_pdf_link(self, broker_agency_profile, active_broker_agency_account)
+    message_params = {
+        sender_id: self.try(:id),
+        parent_message_id: broker_agency_profile.id,
+        from: self.try(:legal_name),
+        to: broker_agency_profile.try(:full_name),
+        body: body,
+        subject: "You have been removed as a Broker by #{self.try(:legal_name)}"
+    }
+    message = Message.new(message_params)
+    message.folder = Message::FOLDER_TYPES[:inbox]
+    msg_box = broker_agency_profile.inbox
+    msg_box.post_message(message)
+    msg_box.save
+  end
+
+  def build_pdf_link(employer, broker_agency, active_broker_agency_account)
+    html = "<p> You have been removed as a broker by #{employer.try(:legal_name)}"
+    html << "<br/>"
+    html << "View Termination status - "
+    html << "<a href='#{url_helpers.employers_employer_profile_broker_agency_generate_termination_pdf_path({:employer_profile_id => employer.id, :broker_agency_id => broker_agency.id, :terminated_broker_agency_account => active_broker_agency_account.id})}' target='_blank' > View Termination Details</a>"
+    html << "</p>"
+    return html.html_safe
   end
 end
