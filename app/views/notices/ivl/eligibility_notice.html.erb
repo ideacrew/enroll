@@ -59,8 +59,23 @@
 
 <% if notice.tax_hh_with_csr.present? %>
   <% notice.tax_hh_with_csr.each do |hh_csr|%>
-    <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: notice.csr_eligibility_notice_text(hh_csr.csr_percent_as_integer).join(' '), bottom_margin: '5px'} %>
+    <% case hh_csr.csr_percent_as_integer %>
+    <% when 73 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 87 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 94 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+    <% when 100 %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+    <% else %>
+      <%= render partial: 'notices/shared/paragraph', :locals => {
+      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+    <% end %>
   <% end %>
 <% end %>
 
@@ -136,6 +151,7 @@
    heading: 'How We Made Our Decision', sub_heading: '', top_margin: '12px'} %>
 
 <% notice.individuals.each do |ivl|%>
+  <%= render partial: 'notices/shared/eligibility_notice_household_information', :locals => { ivl: ivl } %>
   <%= render partial: 'notices/shared/info_table', locals: {
                              rows: notice.household_information(ivl),
     col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
