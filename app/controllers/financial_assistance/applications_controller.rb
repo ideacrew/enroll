@@ -83,7 +83,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       application.created_at = TimeKeeper.datetime_of_record
       application.save!
     end
-    redirect_to edit_financial_assistance_application_path(@application)
+    redirect_to edit_financial_assistance_application_path(application)
   end
 
   def help_paying_coverage
