@@ -1,7 +1,5 @@
 <%notice.benefit_group_assignments.each do |benefit_group_id,benefit_group| %>
-  <%= render partial: 'notices/shared/logo' %>
-  
-  <table class="total_table" border="0">
+<table class="total_table" border="0">
     <tbody>
       <tr>
         <td><h3>Employee Plan Match </h3></td>
@@ -9,15 +7,33 @@
     </tbody>
   </table>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "For eligible employees of:   #{notice.legal_name.capitalize.titleize}"} %>
+  <table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+         <%= render partial: 'notices/shared/paragraph', :locals => {
+         content: "For eligible employees of:   #{notice.legal_name.capitalize.titleize}"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Plan year state date :  #{benefit_group.first.start_on} "} %>
+        <%= render partial: 'notices/shared/paragraph', :locals => {
+        content: "Plan year state date :  #{benefit_group.first.start_on} "} %>
 
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Benefit Package:    #{benefit_group.first.title.capitalize.titleize}"} %>
+        <%= render partial: 'notices/shared/paragraph', :locals => {
+        content: "Benefit Package:    #{benefit_group.first.title.capitalize.titleize}"} %>
+      </td>
+      <td colspan="2" align="right"><a href=
+                                    "https://dchealthlink.com/"
+                                    target=
+                                    "_blank">
+                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top; margin-top: -70px;", width: "100"  %>
+                                  </a></td>
+    </tr>
+    <tr>
+      <td><br></td>
+    </tr>
+  </tbody>
+</table>
+  
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?</strong>"} %>
@@ -35,7 +51,8 @@
   content: "Click this link to access the Plan Match Tool and enter your employer’s information using the details below: <br> <a target='_blank' <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "1.Your employer's plan year start date: #{benefit_group.first.start_on}"} %>
+  content: "1.Your employer's plan year start date:<strong style='color: red'> #{benefit_group.first.start_on} </strong>"} %>
+
 
 
   <% plan_offering = if benefit_group.first.plan_option_kind == "single_carrier"
@@ -47,19 +64,29 @@
     end %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "2.Your employer's plan offerings: <strong>#{plan_offering.capitalize.titleize}</strong>"} %>
+  content: "2.Your employer's plan offerings: <strong style='color: red'>#{plan_offering.capitalize.titleize}</strong>"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums: #{benefit_group.first.reference_plan.name} "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums: <strong style='color: red'>#{benefit_group.first.reference_plan.name}</strong> "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
   <%family_benefits = benefit_group.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
-
-  <% premium_benefit_contributions = "" ; family_benefits.each do |relationship_benefit| %>
-		<% premium_benefit_contributions << "#{relationship_benefit.relationship.capitalize.titleize}: #{(relationship_benefit.premium_pct)} %<br></br>" %>
-  <%end%>
-  <%= render partial: 'notices/shared/paragraph', :locals => { content:  premium_benefit_contributions } %>
+  <table class="total_table">
+    <tbody>
+      <tr>
+        <% family_benefits.map(&:relationship).each do |relationship| %>
+          <td><h3><%=relationship.capitalize.titleize%></h3></td>
+        <%end%>
+      </tr>
+      <tr>
+        <% family_benefits.map(&:premium_pct).each do |premium_pct| %>
+          <td><%=premium_pct%></td>
+        <%end%>
+      </tr>
+    </tbody>
+  </table>
+  
   <div class="page-break-before"/>
 <%end%>

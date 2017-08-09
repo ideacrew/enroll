@@ -144,7 +144,6 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
       Then Soren White should see the 1st ER name
       And Soren White should see New Hire Badges for 2st ER
 
-      When 2st ER for Soren White published renewing plan year
       When Soren White click the button of new hire badge for 2st ER
       Then Employee should see the group selection page
       When Employee clicks continue on the group selection page

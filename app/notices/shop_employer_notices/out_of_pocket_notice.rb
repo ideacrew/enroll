@@ -17,6 +17,7 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
     build
     generate_pdf_notice
     attach_envelope
+    non_discrimination_attachment
     upload_and_send_secure_message
   end
 
