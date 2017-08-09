@@ -111,7 +111,6 @@ class FinancialAssistance::Applicant
   # 5 Yr. Bar QNs.
   field :moved_on_or_after_welfare_reformed_law, type: Boolean
   field :is_veteran_or_active_military, type: Boolean
-  field :is_spouse_or_dep_child_of_veteran_or_active_military, type: Boolean
   field :is_currently_enrolled_in_health_plan, type: Boolean
 
   # Other QNs.
@@ -460,11 +459,7 @@ private
     end
 
     if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
-      if person.person_relationships.blank?
-        errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank. There are no household members, please add household members or select NO to 'will this person be claimed as somebody else’s tax dependent for 2017?' ")
-      else
-        errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
-      end
+      errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
     end
   end
 
