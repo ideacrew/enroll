@@ -58,18 +58,22 @@ Then 'I confirm the delete question popup' do
   page.evaluate_script('window.confirm = function() { return true; }')
 end
 
-Then 'I can see the security modal dialog' do
-  page.should(have_css('#securityQuestionModalLabel', visible: true, wait: 5))
+Then(/^I can(not)? see the security modal dialog$/) do |negate|
+  if negate
+    page.should(have_no_css('#securityQuestionModalLabel', visible: true, wait: 5))
+  else
+    page.should(have_css('#securityQuestionModalLabel', visible: true, wait: 5))
+  end
 end
 
-Then(/I select the all security question and give the answer$/) do
+Then(/^I select the all security question and give the answer$/) do
   (0..2).each do |num|
     page.all('.security-question-select')[num].set("Security Question #{num + 1}")
     page.all('.interaction-field-control-security-question-response-question-answer')[num].set("Answer #{num+1}")
   end
 end
 
-When(/I submit the security questions$/) do
+When(/I have submit the security questions$/) do
   screenshot("group_selection")
   find('.interaction-click-control-save-responses').click
 end

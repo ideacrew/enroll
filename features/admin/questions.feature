@@ -47,5 +47,9 @@ Feature: Add, Edit and Delete security questions
     And I should see a successful sign up message
     And I can see the security modal dialog
     And I select the all security question and give the answer
-    When I submit the security questions
+    When I have submit the security questions
     Then I have landed on employer profile page
+    And I click on log out link
+    And I visit the Employer portal
+    When Jack Doe logs on to the Employer portal
+    Then I cannot see the security modal dialog
