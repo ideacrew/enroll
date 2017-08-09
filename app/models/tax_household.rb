@@ -193,7 +193,7 @@ class TaxHousehold
     curam_ed = eds.where(source: "Curam").first
     return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
     return curam_ed if curam_ed.present?
-    return eds.first
+    return eds.max_by(&:determined_at)
   end
 
   def eligibility_determinations
