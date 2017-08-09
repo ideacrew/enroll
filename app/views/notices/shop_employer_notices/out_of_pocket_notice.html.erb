@@ -7,7 +7,7 @@
     </tbody>
   </table>
 
-  <table class="total_table" border="0">
+  <table class="total_table" border="0" style= "margin-top: -20px;">
   <tbody>
     <tr>
       <td>
@@ -25,11 +25,8 @@
                                     "https://dchealthlink.com/"
                                     target=
                                     "_blank">
-                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top; margin-top: -70px;", width: "100"  %>
+                                    <%= image_tag "#{Rails.root}/app/assets/images/dchealthlink.jpg", style: "height: auto; vertical-align: top; margin-top: -60px;", width: "100"  %>
                                   </a></td>
-    </tr>
-    <tr>
-      <td><br></td>
     </tr>
   </tbody>
 </table>
@@ -51,42 +48,61 @@
   content: "Click this link to access the Plan Match Tool and enter your employer’s information using the details below: <br> <a target='_blank' <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "1.Your employer's plan year start date:<strong style='color: red'> #{benefit_group.first.start_on} </strong>"} %>
-
-
+  content: "1.Your employer's plan year start date:<strong> #{benefit_group.first.start_on} </strong>"} %>
 
   <% plan_offering = if benefit_group.first.plan_option_kind == "single_carrier"
-      'All Plans From A Single Carrier'
+      "All Plans From #{benefit_group.first.reference_plan.carrier_profile.legal_name}"
     elsif benefit_group.first.plan_option_kind  == "metal_level"
-     'All Plans From A Given Metal Level'
+      'Metal Level'
     elsif benefit_group.first.plan_option_kind == "single_plan"
-      'A Single Plan'
+      "#{benefit_group.first.reference_plan.carrier_profile.legal_name}-#{benefit_group.first.reference_plan.name}"
     end %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "2.Your employer's plan offerings: <strong style='color: red'>#{plan_offering.capitalize.titleize}</strong>"} %>
+  content: "2.Your employer's plan offerings: <strong>#{plan_offering.capitalize.titleize}</strong>"} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums: <strong style='color: red'>#{benefit_group.first.reference_plan.name}</strong> "} %>
+  content: "3.Your employer's reference plan which determines how much your employer contributes to your premiums: <strong>#{benefit_group.first.reference_plan.carrier_profile.legal_name} #{benefit_group.first.reference_plan.name}</strong> "} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
   <%family_benefits = benefit_group.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
-  <table class="total_table">
+  <table class="total_table" border="0" style= "margin-top: 10px; width: 100%;">
     <tbody>
       <tr>
         <% family_benefits.map(&:relationship).each do |relationship| %>
-          <td><h3><%=relationship.capitalize.titleize%></h3></td>
+          <td style='width: 25%; text-align: center;'><%=relationship.capitalize.titleize%></td>
         <%end%>
       </tr>
       <tr>
         <% family_benefits.map(&:premium_pct).each do |premium_pct| %>
-          <td><%=premium_pct%></td>
+          <td style='width: 25%; text-align: center;'> <strong><%=premium_pct%></strong></td>
         <%end%>
       </tr>
     </tbody>
   </table>
-  
-  <div class="page-break-before"/>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+  contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>
+        <ul style="list-style: circle solid;">
+        <li style="margin-top: 2px;">
+          By calling <%=Settings.contact_center.phone_number%>
+        </li>
+        <li style="margin-top: 2px;">
+          TTY: 711
+        </li>
+        <li style="margin-top: 2px;">
+          Online at <a href="#{Settings.site.home_url}">www.DCHealthLink.com</a>
+        </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <%end%>
