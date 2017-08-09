@@ -14,7 +14,7 @@ $(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
     $resources.each (index, element) ->
       status = $(element).data("status")
       
-      if (status != "Ineligible")
+      if (status == "Eligible")
         $(element).prop('checked', true)
   else
     $resources.prop('checked', false)
