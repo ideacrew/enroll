@@ -8,7 +8,7 @@
       <div class="modal-body">
         <% if plan_year.no_documents_uploaded? %>
           <p>
-            Before you can complete your application, you will need to submit proof of your eligibility as a Massachusetts small business to shop through the Health Connector. You will need to submit this proof before you are able to publish your plan year. <%= link_to "View our list of documents that can be submitted as proof.", "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist" %>
+            Before you can complete your application, you will need to submit proof of your eligibility as a <%= aca_state_name %> small business to shop through the <%= site_short_name %>. You will need to submit this proof before you are able to publish your plan year. <%= link_to "View our list of documents that can be submitted as proof.", "#{site_document_verification_checklist_url}" %>
             <br>
             <ul>
               <li>
@@ -27,9 +27,12 @@
     <% end %>
       </div>
       <div class="modal-footer">
-        <%= link_to 'Go Back', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+        
         <% unless plan_year.no_documents_uploaded? %>
-            <%= link_to 'Force Publish', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
+          <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+          <%= link_to 'Publish Anyways', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
+        <% else %>
+          <%= link_to 'Go Back', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
         <% end %>
         <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
       </div>

@@ -483,7 +483,7 @@ class PlanYear
 
     # Maximum company size at time of initial registration on the HBX
     if fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
-      warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time or equivalent employees" })
+      warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time equivalent employees" })
     end
 
     # Exclude Jan 1 effective date from certain checks

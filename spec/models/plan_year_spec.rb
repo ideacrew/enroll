@@ -636,7 +636,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Has its principal business address in/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:primary_office_location]).to match(/Is a small business located in Massachusetts/)
         end
       end
 
@@ -652,7 +652,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Has 1 -50 full time equivalent employees/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -1614,16 +1614,18 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "map binder_payment_due_date" do
-    it "in interval of map" do
+    it "in interval of map using shop_enrollment_timetable" do
       binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2015,9,1))
       expect(binder_payment_due_date).to eq Date.new(2015,8,12)
-      binder_payment_due_date_1 = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
-      expect(binder_payment_due_date_1).to eq Date.new(2017,8,23)
+    end
+
+    it "interval map using existing specified key values" do
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2017,9,1))
+      expect(binder_payment_due_date).to eq Date.new(2017,8,23)
     end
 
     it "out of map" do
       binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2019,9,1))
-
       expect(binder_payment_due_date).to eq PlanYear.shop_enrollment_timetable(Date.new(2019,9,1))[:binder_payment_due_date]
     end
   end
@@ -2362,7 +2364,7 @@ describe PlanYear, "plan year schedule changes" do
       end
     end
 
-    context 'on force publish date' do
+    context 'on Publish Anyways date' do
 
       before do
         TimeKeeper.set_date_of_record_unprotected!(Date.new(2016, 10, Settings.aca.shop_market.renewal_application.force_publish_day_of_month))
@@ -2445,7 +2447,7 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
       expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_termination_pending"
     end
 
-  end 
+  end
 
   context 'should not terminate inactive enrollment' do
 
@@ -2456,7 +2458,7 @@ describe PlanYear, '.schedule_employee_terminations', type: :model, dbclean: :af
     it "enrollemnt should not be in coverage_termination_pending state" do
       expect(plan_year.schedule_employee_terminations.first.aasm_state).to eq "coverage_canceled"
     end
-  end 
+  end
 end
 
 
@@ -2478,5 +2480,5 @@ describe PlanYear, '.schedule_termination', type: :model, dbclean: :after_all do
       expect(plan_year.hbx_enrollments.first.aasm_state).to eq "coverage_termination_pending"
       expect(plan_year.hbx_enrollments.first.terminated_on).to eq  TimeKeeper.date_of_record.end_of_month
     end
-  end 
+  end
 end
