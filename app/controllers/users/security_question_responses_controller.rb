@@ -1,11 +1,9 @@
 class Users::SecurityQuestionResponsesController < ApplicationController
-  require 'bcrypt'
 
   def create
     responses = params[:security_question_responses]
     responses.each do |response|
-      response_sha =  BCrypt::Password.create(response[:question_answer])
-      user.security_question_responses << SecurityQuestionResponse.new(security_question_id: response[:security_question_id], question_answer: response_sha)
+      user.security_question_responses << SecurityQuestionResponse.new(security_question_id: response[:security_question_id], question_answer: response[:question_answer])
     end
     unless user.save!
       #handle error
@@ -13,8 +11,7 @@ class Users::SecurityQuestionResponsesController < ApplicationController
   end
 
   def authenticate
-    reverse_hash = BCrypt::Password.new(@security_question_response.question_answer)
-    if reverse_hash == params[:security_question_response][:question_answer]
+    if @security_question.matching_response? params[:security_question_response][:question_answer]
       ## success
       ## respond with a hashed token and save to compare with reset pw form ?
     else

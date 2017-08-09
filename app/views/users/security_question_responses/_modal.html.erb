@@ -15,7 +15,7 @@
               <% 3.times do |num| %>
                 <div class="question-wrapper" data-question-index=<%= num %>>
 
-                  <select class="security-question-select" name="security_question_responses[][security_question_id]">
+                  <select class="security-question-select" name="security_question_responses[][security_question_id]" required="true" >
                     <option name="id" value="">Please Select A Question</option>
                     <% @security_question_options.each do |question| %>
                       <option name="id" value=<%= question.id %> data-question-number=<%= num %>><%= question.title %></option>
@@ -23,7 +23,7 @@
                   </select>
 
                   <div class="input-wrapper">
-                    <%= f.text_field :question_answer, name: "security_question_responses[][question_answer]" %>
+                    <%= f.text_field :question_answer, name: "security_question_responses[][question_answer]", required: true %>
                   </div>
                 </div>
               <% end %>
