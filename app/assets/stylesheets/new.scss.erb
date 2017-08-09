@@ -402,9 +402,6 @@
       padding: 0 2%;
       margin: auto;
       table-layout: fixed;
-      tr.offered {
-
-      }
 
       tr.not-offered {
         opacity: 0.35;
@@ -412,6 +409,9 @@
 
       tr:first-of-type {
         border-top: none;
+        th:first-of-type {
+          width: 28%;
+        }
         th {
           font-weight: normal;
           text-transform: uppercase;
@@ -426,6 +426,7 @@
           padding: 15px 0;
           font-size: 16px;
           i {
+            margin-left: -15%;
             color: #69A30D;
             margin-right: 10px;
             cursor: default;
