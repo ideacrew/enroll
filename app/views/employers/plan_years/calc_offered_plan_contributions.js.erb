@@ -10,6 +10,18 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .row:first").hide();
 $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 
+var d = new Date($("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val())
+d.setDate(d.getDate()-5);
+$("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "maxDate", d);
+
+$("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
+  var d = new Date($("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val())
+  d.setDate(d.getDate()-5);
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "maxDate", d);
+});
+
+
+
 //unbind checkbox handlers
 //$('#<%= @location_id %> <%= @coverage_type %> .checkbox label input[type="checkbox"]').unbind();
 //$('#<%#= @location_id %> .dental-benefits-fields .col-xs-6.form-group.form-group-lg label > input').attr('disabled', 'disabled');
