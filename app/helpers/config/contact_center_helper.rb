@@ -66,4 +66,25 @@ module Config::ContactCenterHelper
   def contact_center_appeals_link
     link_to contact_center_appeals,contact_center_appeals
   end
+
+  def non_discrimination_email
+    Settings.contact_center.non_discrimination.email
+  end
+
+  def non_discrimination_phone_1
+    Settings.contact_center.non_discrimination.phone_1
+  end
+
+  def non_discrimination_phone_2
+    Settings.contact_center.non_discrimination.phone_2
+  end
+
+  def non_discrimination_phone_3
+    Settings.contact_center.non_discrimination.phone_3
+  end
+
+  def non_discrimination_complaint_url
+    Settings.contact_center.non_discrimination.complaint_url
+  end
+
 end

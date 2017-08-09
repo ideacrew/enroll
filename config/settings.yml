@@ -6,6 +6,8 @@ site:
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   main_web_address_url: "https://www.MAhealthconnector.org"
+  business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
+  nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address: "www.MAhealthconnector.org"
   main_web_address_url: "https://www.MAhealthconnector.org"
   website_name: "MAhealthconnector.org"
@@ -42,6 +44,7 @@ contact_center:
   ivl_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
+  non_discrimination_email: "Nondiscrimination@state.ma.us"
 
   appeals: "connector-appeals@state.ma.us"
 
@@ -60,6 +63,13 @@ contact_center:
     city: "Boston"
     state: "MA"
     zip_code: "02196"
+
+  non_discrimination:
+    email: "Nondiscrimination@state.ma.us"
+    phone_1: "617-936-1037"
+    phone_2: "1-800-368-1019"
+    phone_3: "800-537-7697"
+    complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
 notices:
   mailing_address:
