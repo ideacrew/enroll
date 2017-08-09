@@ -1,7 +1,10 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/address_and_mpi_indicator', :locals => {notice: notice} %>
-<br><br>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+  { content: "SUBJECT: YOU HAVE BEEN HIRED AS A BROKER" } %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -10,9 +13,6 @@
     </tr>
   </tbody>
 </table>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "SUBJECT: YOU HAVE BEEN HIRED AS A BROKER" } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Congratulations! You have been selected as the broker for <strong>#{notice.er_legal_name }</strong> as of #{notice.broker.assignment_date}, with #{notice.broker_agency} as the assigned agency. The primary contact at <strong>#{notice.er_legal_name}</strong> is #{notice.er_first_name} #{notice.er_last_name}."} %>
