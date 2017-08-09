@@ -16,6 +16,8 @@ Rails.application.routes.draw do
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
+    post :challenge, controller: 'security_question_responses', action: 'challenge'
+    post :authenticate, controller: 'security_question_responses', action: 'authenticate'
   end
 
   resources :users do

@@ -125,6 +125,7 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+  field :identity_confirmed_token, type: String
 
   ##RIDP
   field :identity_verified_date, type: Date
