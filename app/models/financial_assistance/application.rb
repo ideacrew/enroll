@@ -412,7 +412,6 @@ class FinancialAssistance::Application
       # end
       tax_households_hbx_assigned_ids = []
       tax_households.each { |th| tax_households_hbx_assigned_ids << th.hbx_assigned_id.to_s}
-
       benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
       verified_tax_households.each do |vthh|
         #If taxhousehold exists in our DB
@@ -445,8 +444,6 @@ class FinancialAssistance::Application
                     is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
                     is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
-                else
-                  throw(:processing_issue, "ERROR: Failed to match the Person hbx_id of a particular Applicant in our DB with the person hbx_id in xml")
                 end
               end
             else

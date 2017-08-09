@@ -76,7 +76,6 @@ module Subscribers
 
       #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       family.e_case_id = verified_family.integrated_case_id
-
       begin
         application_in_context.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
       rescue
@@ -153,8 +152,9 @@ module Subscribers
       if verified_dependents.present?
         verified_dependents.each do |verified_family_member|
           existing_person = search_person(verified_family_member)
-
-          relationship = Person.find(verified_primary_family_member.person.id).person_relationships.where(successor_id: verified_family_member.person.id).first.kind
+          successor_id = Person.where(hbx_id: verified_family_member.person.hbx_id).first.id
+          primary_person = Person.where(hbx_id: verified_primary_family_member.person.hbx_id).first
+          relationship = primary_person.person_relationships.where(successor_id: successor_id).first.kind
 
           # #Person Relationships
           # relationship = verified_primary_family_member.person_relationships.select do |pr|
