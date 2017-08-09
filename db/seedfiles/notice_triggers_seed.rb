@@ -571,14 +571,14 @@ shop_notice_triggers = [
   },
   {
       hbx_id: 'SHOP_D052',
-      title: 'Broker Fired',
-      description: 'Broker fired',
+      title: 'Confirmation of Broker Fired to Employer',
+      description: ' Broker gets terminated after employer selects change broker',
       resource_name: 'employer',
       event_name: 'employer_broker_fired',
       notice_triggers: [
           {
               name: 'Broker fired',
-              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice.html.erb',
+              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
               notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
               mpi_indicator: 'MPI_SHOP52',
               notice_trigger_element_group: {

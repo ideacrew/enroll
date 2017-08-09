@@ -140,7 +140,12 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
+  end
+
+  def employer_broker_fired
+    self.trigger_notices("employer_broker_fired")
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency

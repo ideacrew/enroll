@@ -1,4 +1,8 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
+
+<br><br><br><br><br>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <table class="total_table" border="0">
   <tbody>
@@ -9,10 +13,13 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "This notice is to confirm that you successfully removed <strong>#{notice.broker.first_name}#{notice.broker.last_name}</strong> from <strong>#{notice.broker.organization}</strong> as the broker for <strong>#{notice.employer_name}</strong> as of<strong>#{notice.broker.terminated_on}</strong>"} %>
+    { content: "SUBJECT: YOU REMOVED YOUR BROKER ON DC HEALTH LINK" } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "This  broker no will longer have access to your DC Health Link account, effective #{notice.broker.terminated_on}"} %>
+    { content: "This notice is to confirm that you successfully removed <strong>#{notice.broker.first_name} #{notice.broker.last_name}</strong> from <strong> #{notice.broker.organization} </strong> as the broker for <strong> #{notice.employer_name} </strong> as of<strong> #{notice.broker.terminated_on} </strong>"} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "This  broker no will longer have access to your DC Health Link account, effective  #{notice.broker.terminated_on}"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     { content: "If you would like to select a new broker, you may do so at anytime by  Login to your DC Health Link Employer account, click “Broker” and then select a new broker by clicking on “BROWSE BROKERS”."} %>
