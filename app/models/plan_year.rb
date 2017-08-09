@@ -473,7 +473,7 @@ class PlanYear
     end
 
     unless employer_profile.is_primary_office_local?
-      warnings.merge!({primary_office_location: "Has a principal business address outside #{Settings.aca.state_name}"})
+      warnings.merge!({primary_office_location: "Is a small business located in #{Settings.aca.state_name}"})
     end
 
     # Application is in ineligible state from prior enrollment activity
@@ -483,7 +483,7 @@ class PlanYear
 
     # Maximum company size at time of initial registration on the HBX
     if fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum
-      warnings.merge!({ fte_count: "Total number of full time employees exceeds #{Settings.aca.shop_market.small_market_employee_count_maximum} or is zero" })
+      warnings.merge!({ fte_count: "Has 1 -#{Settings.aca.shop_market.small_market_employee_count_maximum} full time or equivalent employees" })
     end
 
     # Exclude Jan 1 effective date from certain checks
