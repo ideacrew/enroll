@@ -455,6 +455,9 @@ class PlanYear
     errors
   end
 
+  def no_documents_uploaded?
+    employer_profile.employer_attestation.blank? || employer_profile.employer_attestation.unsubmitted?
+  end
 
   # Check plan year application for regulatory compliance
   def application_eligibility_warnings
@@ -470,7 +473,7 @@ class PlanYear
     end
 
     unless employer_profile.is_primary_office_local?
-      warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
+      warnings.merge!({primary_office_location: "Has a principal business address outside #{Settings.aca.state_name}"})
     end
 
     # Application is in ineligible state from prior enrollment activity
