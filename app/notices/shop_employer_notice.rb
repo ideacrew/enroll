@@ -35,6 +35,7 @@ class ShopEmployerNotice < Notice
     append_address(employer_profile.organization.primary_office_location.address)
     append_hbe
     append_broker(employer_profile.broker_agency_profile)
+    notice.mpi_indicator = self.mpi_indicator
   end
 
   def append_hbe

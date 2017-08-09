@@ -1,6 +1,6 @@
 module PdfTemplates
   class EmployerNotice
-    include Virtus.model
+   include Virtus.model
 
     attribute :notification_type, String
     attribute :mpi_indicator, String
