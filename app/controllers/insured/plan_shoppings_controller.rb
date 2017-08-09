@@ -21,7 +21,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
-
+    binding.pry
     if !plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
       if plan_selection.hbx_enrollment.errors.present?
         flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
@@ -59,6 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     @census_employee = @enrollment.census_employee
+    binding.pry
     employee_mid_year_plan_change_non_congressional(@census_employee) if @change_plan.present? or @enrollment_kind.present?
 
     send_receipt_emails if @person.emails.first

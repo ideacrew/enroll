@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional do
+RSpec.describe ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -17,11 +17,11 @@ RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressiona
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employee Made Mid-Year Plan',
-                            :notice_template => 'notices/employee_made_mid_year_plan_change_non_congressional',
-                            :notice_builder => 'ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional',
-                            :event_name => 'employee_made_mid_year_plan_change_non_congressional',
+                            :notice_template => 'notices/employee_mid_year_plan_change_non_congressional',
+                            :notice_builder => 'ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional',
+                            :event_name => 'employee_mid_year_plan_change_non_congressional',
                             :mpi_indicator => 'MPI_SHOP40',
-                            :title => "Employee Made Mid-Year Plan Change-Non-Congressional"})
+                            :title => "Employee_Mid-Year Plan Change-Non-Congressional"})
                           }
 
   let(:valid_params) {{
@@ -34,11 +34,11 @@ RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressiona
   describe "New" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
+      @employer_notice = ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)}.not_to raise_error
+        expect{ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressiona
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -55,7 +55,7 @@ RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressiona
   describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
+      @employer_notice = ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
     end
 
     it "should build notice with all necessory info" do
@@ -74,7 +74,7 @@ RSpec.describe ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressiona
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
-      @employer_notice = ShopEmployerNotices::EmployeeMadeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
+      @employer_notice = ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional.new(census_employee, valid_params)
       sep.effective_on = effective_on
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
