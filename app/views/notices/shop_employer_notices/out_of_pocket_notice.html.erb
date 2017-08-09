@@ -68,7 +68,7 @@
   content: "4.The percentage of your employer contributes towards your premiums: "} %>
 
   <%family_benefits = benefit_group.first.relationship_benefits.select{|r| r.relationship != "child_26_and_over" }%>
-  <table class="total_table" border="0" style= "margin-top: 10px; width: 100%;">
+  <table class="total_table" border="0" style= "margin-top: 0px; width: 100%;">
     <tbody>
       <tr>
         <% family_benefits.map(&:relationship).each do |relationship| %>
@@ -86,7 +86,7 @@
   contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
-<table class="total_table" border="0">
+<table class="total_table" border="1" style="margin-top: -10px;">
   <tbody>
     <tr>
       <td>
