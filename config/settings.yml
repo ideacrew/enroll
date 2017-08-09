@@ -24,6 +24,8 @@ site:
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   main_web_address_text: "MAhealthconnector.org"
+  curam_enabled: false
+  document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
 
   social_media:
     facebook_url: ""

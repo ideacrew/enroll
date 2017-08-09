@@ -126,4 +126,8 @@ module Config::SiteHelper
   def site_non_discrimination_complaint_url
     link_to non_discrimination_complaint_url, non_discrimination_complaint_url
   end
+    
+  def site_document_verification_checklist_url
+    Settings.site.document_verification_checklist_url
+  end
 end
