@@ -19,6 +19,10 @@ class SecurityQuestionResponse
     security_question.title
   end
 
+  def success_token
+    BCrypt::Password.create(question_answer + original_question)
+  end
+
   private
 
   def security_question

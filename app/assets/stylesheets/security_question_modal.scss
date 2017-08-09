@@ -24,3 +24,16 @@
     width: 90%;
   }
 }
+
+#securityChallengeModal {
+  .modal-questions-container {
+    h5 {
+      padding: 2%;
+      font-weight: 600;
+    }
+    input {
+      padding: 2%;
+      width: 80%;
+    }
+  }
+}

@@ -23,7 +23,7 @@
 </div>
 
 <script>
-	$('.forgot-password form').submit(function(event){
+	$('.forgot-password form .btn-primary').click(function(event){
 		event.preventDefault();
 		$.post(
 			"<%= users_challenge_path %>.js",
