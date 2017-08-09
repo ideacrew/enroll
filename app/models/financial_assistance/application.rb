@@ -410,7 +410,6 @@ class FinancialAssistance::Application
         # latest_tax_household = tax_households.where(effective_ending_on: nil).last
         # latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
       # end
-
       tax_households_hbx_assigned_ids = []
       tax_households.each { |th| tax_households_hbx_assigned_ids << th.hbx_assigned_id.to_s}
 
@@ -419,7 +418,6 @@ class FinancialAssistance::Application
         #If taxhousehold exists in our DB
         if tax_households_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
           tax_household = tax_households.where(hbx_assigned_id: vthh.hbx_assigned_id).first
-
           #Update required attributes for that particular TaxHouseHold
           tax_household.update_attributes(effective_starting_on: vthh.start_date)
 
@@ -433,7 +431,6 @@ class FinancialAssistance::Application
 
               # verified_family_member = verified_family.family_members.detect { |vfm| vfm.person.id == thhm.person_id }
               # applicant.update_attributes({is_without_assistance: verified_family_member.is_without_assistance, is_ia_eligible: verified_family_member.is_insurance_assistance_eligible, is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible, is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible, is_totally_ineligible: verified_family_member.is_totally_ineligible})
-
               #Updating the applicant by finding the right family member.
               verified_family.family_members.each do |verified_family_member|
                 if verified_family_member.person.hbx_id == thhm.person_id
@@ -448,8 +445,12 @@ class FinancialAssistance::Application
                     is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
                     is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
+                else
+                  throw(:processing_issue, "ERROR: Failed to match the Person hbx_id of a particular Applicant in our DB with the person hbx_id in xml")
                 end
               end
+            else
+              throw(:processing_issue, "ERROR: Failed to find Applicants in our DB with the ids in xml")
             end
           end
           #Applicant/TaxHouseholdMember block end
@@ -466,6 +467,7 @@ class FinancialAssistance::Application
 
         #When taxhousehold does not exist in your DB
         else
+          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
         end
       end
 
