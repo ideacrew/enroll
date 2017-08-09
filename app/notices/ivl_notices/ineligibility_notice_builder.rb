@@ -10,29 +10,6 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
     super(args)
   end
 
-  def deliver
-    append_hbe
-    build
-    generate_pdf_notice
-    attach_blank_page
-    attach_appeals
-    attach_non_discrimination
-    attach_taglines
-    upload_and_send_secure_message
-
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
-
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
-  end
-
-  def attach_voter_application
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
-  end
-
   def build
     append_data
     notice.mpi_indicator = self.mpi_indicator
@@ -75,26 +52,6 @@ class IvlNotices::IneligibilityNoticeBuilder < IvlNotice
       :age => person.age_on(TimeKeeper.date_of_record),
       :reason_for_ineligibility =>  reason_for_ineligibility
     })
-  end
-
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x|
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
   end
 
 end

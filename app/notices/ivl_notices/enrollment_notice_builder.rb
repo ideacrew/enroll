@@ -48,15 +48,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
           }),
         }
     }
-    if market_kind == 'individual'
-      options.merge!({footer: {
-        content: ApplicationController.new.render_to_string({
-          template: "notices/shared/footer_ivl.html.erb",
-          layout: false,
-          locals: {notice: notice}
-        })
-      }})
-    end
+    options.merge!({footer: {
+      content: ApplicationController.new.render_to_string({
+        template: "notices/shared/footer_ivl.html.erb",
+        layout: false,
+        locals: {notice: notice}
+      })
+    }})
     options
   end
 
@@ -69,6 +67,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
   end
 
   def deliver
+    append_hbe
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
@@ -86,14 +85,9 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
-  def attach_voter_application
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
-  end
-
   def build
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = recipient.hbx_id
-    append_hbe
     append_open_enrollment_data
     check_for_unverified_individuals
     notice.primary_fullname = recipient.full_name.titleize || ""
@@ -148,10 +142,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     append_unverified_individuals(outstanding_people)
   end
 
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
-  end
-
   def ssn_outstanding?(person)
     person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
@@ -192,22 +182,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         enrollees << enrollee
       end
     })
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x|
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
   end
 
 end

@@ -9,12 +9,13 @@ class IvlNotice < Notice
   end
 
   def deliver
-    build
     append_hbe
+    build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_dchl_rights
-    prepend_envelope
+    attach_appeals
+    attach_non_discrimination
+    attach_taglines
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -24,13 +25,6 @@ class IvlNotice < Notice
     if recipient.consumer_role.can_receive_paper_communication?
       store_paper_notice
     end
-  end
-
-  def prepend_envelope
-    envelope = Envelope.new
-    envelope.fill_envelope(notice, mpi_indicator)
-    envelope.render_file(envelope_path)
-    join_pdfs_with_path [envelope_path, notice_path]
   end
 
   def append_hbe
@@ -83,6 +77,26 @@ class IvlNotice < Notice
     if (page_count % 2) == 1
       join_pdfs_with_path([path, blank_page], path)
     end
+  end
+
+  def lawful_presence_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  end
+
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
+  end
+
+  def capitalize_quadrant(address_line)
+    address_line.split(/\s/).map do |x|
+      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
+    end.join(' ')
   end
 
   # def join_pdfs(pdfs)
