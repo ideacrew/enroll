@@ -148,13 +148,10 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["We reviewed what you told us on your application about your household, and each person who needs health coverage. We checked to see who qualifies for coverage, and if they qualify for savings. The results below tell you how we made our decision."],
-   heading: 'How We Made Our Decision', sub_heading: '', top_margin: '12px'} %>
+   heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
 
 <% notice.individuals.each do |ivl|%>
-  <%= render partial: 'notices/shared/eligibility_notice_household_information', :locals => { ivl: ivl } %>
-  <%= render partial: 'notices/shared/info_table', locals: {
-                             rows: notice.household_information(ivl),
-    col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
+  <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
 <% end %>
 
 <% if (notice.magi_medicaid_eligible.nil? || notice.non_magi_medicaid_eligible.nil?) && (notice.request_full_determination == false) %>
