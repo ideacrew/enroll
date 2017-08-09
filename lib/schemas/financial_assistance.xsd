@@ -39,7 +39,7 @@
 			<xs:element name="is_trafficking_victim" type="xs:boolean"/>
 			<xs:element name="is_former_foster_care" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="age_left_foster_care" type="xs:integer" minOccurs="0"/>
-			<xs:element name="foster_care_us_state" type="UsStateNameType" minOccurs="0"/>
+			<xs:element name="foster_care_us_state" type="xs:string" minOccurs="0"/>
 			<xs:element name="had_medicaid_during_foster_care" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_pregnant" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_enrolled_on_medicaid" type="xs:boolean" minOccurs="0"/>
