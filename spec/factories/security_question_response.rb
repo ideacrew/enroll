@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :security_question_response do
-    answer 'First security question'
-    question_id { create(:security_question).id }
+    question_answer 'First security question'
+    security_question_id { create(:security_question).id }
   end
 end

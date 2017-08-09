@@ -15,7 +15,7 @@ class User
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
   embeds_many :security_question_responses
-  
+
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
@@ -387,7 +387,7 @@ class User
   end
 
   def needs_to_provide_security_questions?
-    true
+    security_question_responses.length < 3
   end
 
   class << self

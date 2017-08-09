@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   end
 
   resources :users do
+    resources :security_question_responses, controller: "users/security_question_responses"
     member do
       post :unlock
       get :lockable
