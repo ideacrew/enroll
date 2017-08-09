@@ -385,26 +385,26 @@ $(document).ready(function() {
 
 
   if($('#is_veteran_or_active_military_yes').is(':checked')) {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   } else {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_veteran_or_active_military_yes", function(){
     if ($('#is_veteran_or_active_military_yes').is(':checked')) {
-      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
   if($('#is_veteran_or_active_military_no').is(':checked')) {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').removeClass('hide');
   } else {
-    $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_veteran_or_active_military_no", function(){
     if ($('#is_veteran_or_active_military_no').is(':checked')) {
-      $('#is_spouse_or_dep_child_of_veteran_or_active_military_yes').parents('.row-form-wrapper').removeClass('hide');
+      $('#is_vets_spouse_or_child_yes').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
