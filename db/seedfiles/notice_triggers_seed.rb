@@ -570,7 +570,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP40',
+    hbx_id: 'SHOP_D049',
     title: 'Broker Hired Confirmation Notice',
     description: 'Confirmation of Broker Hired Sent to Employer',
     resource_name: 'employer',
@@ -580,7 +580,7 @@ shop_notice_triggers = [
         name: 'Boker Hired Confirmation',
         notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
         notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-        mpi_indicator: 'MPI_SHOP40',
+        mpi_indicator: 'MPI_D049',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

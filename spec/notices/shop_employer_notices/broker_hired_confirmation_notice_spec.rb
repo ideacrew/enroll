@@ -27,7 +27,7 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
                             :name =>'Boker Hired Confirmation',
                             :notice_template => 'notices/shop_employer_notices/broker_hired_confirmation_notice',
                             :notice_builder => 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-                            :mpi_indicator => 'MPI_SHOP40',
+                            :mpi_indicator => 'MPI_D049',
                             :event_name => 'broker_hired_confirmation',
                             :title => "Broker Hired Confirmation Notice"})
                           }
