@@ -58,7 +58,8 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
-    ee_mid_year_plan_change_notice_congressional(@person) if @change_plan.present? or @enrollment_kind.present?
+    @census_employee = @enrollment.census_employee
+    ee_mid_year_plan_change_notice_congressional(@census_employee)
 
     send_receipt_emails if @person.emails.first
   end
@@ -115,6 +116,10 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
+
+      @census_employee = @enrollment.census_employee
+    ee_mid_year_plan_change_notice_congressional(@census_employee)
+
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
     end
