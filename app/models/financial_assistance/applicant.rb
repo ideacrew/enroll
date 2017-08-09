@@ -111,6 +111,7 @@ class FinancialAssistance::Applicant
   # 5 Yr. Bar QNs.
   field :moved_on_or_after_welfare_reformed_law, type: Boolean
   field :is_veteran_or_active_military, type: Boolean
+  field :is_spouse_or_dep_child_of_veteran_or_active_military, type: Boolean #remove redundant field
   field :is_currently_enrolled_in_health_plan, type: Boolean
 
   # Other QNs.
