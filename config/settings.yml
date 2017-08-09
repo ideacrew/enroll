@@ -5,6 +5,8 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
+  business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
+  nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address: "www.MAhealthconnector.org"
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
@@ -35,6 +37,7 @@ contact_center:
   alt_phone_number: "1-888-813-9220"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
+  non_discrimination_email: "Nondiscrimination@state.ma.us"
 
   appeals: "connector-appeals@state.ma.us"
 
@@ -45,6 +48,13 @@ contact_center:
     city: "Philadelphia"
     state: "PA"
     zip_code: "19178-0833"
+
+  non_discrimination:
+    email: "Nondiscrimination@state.ma.us"
+    phone_1: "617-936-1037"
+    phone_2: "1-800-368-1019"
+    phone_3: "800-537-7697"
+    complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
 notices:
   mailing_address:

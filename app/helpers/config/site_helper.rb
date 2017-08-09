@@ -27,6 +27,14 @@ module Config::SiteHelper
     Settings.site.help_url
   end
 
+  def site_business_resource_center_url
+    Settings.site.business_resource_center_url
+  end
+
+  def site_nondiscrimination_notice_url
+    Settings.site.nondiscrimination_notice_url
+  end
+
   def site_faqs_url
     Settings.site.faqs_url
   end
