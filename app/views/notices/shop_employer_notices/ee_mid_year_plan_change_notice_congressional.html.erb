@@ -1,7 +1,8 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
-<%= render partial: 'notices/shared/logo' %>
+<%= render partial: 'notices/shared/address_and_mpi_indicator', :locals => {notice: notice} %>
+
+<br><br>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -29,7 +30,7 @@ heading: 'Why was the Change Made?', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
-  listings: ["<strong>New Hire Open Enrollment:</strong> A new hire may have chosen to enroll in employer-sponsored health insurance. Once added to the employer’s roster, a new hire’s 30-day new hire open enrollment period is triggered. Newly-hired employees have 30 days from the date they are added to the roster OR their date of hire, whichever is later, to enroll in employer-sponsored insurance or waive coverage.", "<strong Qualifying Event:</strong> Your employee may have experienced a qualifying event that made them eligible to make changes to their enrollment. Employees who experience a qualifying event during the plan year may be eligible for a Special Enrollment Period (SEP) which allows them to enroll in a plan, make changes to their plan selection, add or drop family members, or drop coverage altogether. ", "<strong>Dependent Aged Off of Coverage:</strong> Your employee may have had a dependent on their policy that is no longer eligible for coverage. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."
+  listings: ["<strong>New Hire Open Enrollment:</strong> A new hire may have chosen to enroll in employer-sponsored health insurance. Once added to the employer’s roster, a new hire’s 30-day new hire open enrollment period is triggered. Newly-hired employees have 30 days from the date they are added to the roster OR their date of hire, whichever is later, to enroll in employer-sponsored insurance or waive coverage.", "<strong> Qualifying Event:</strong> Your employee may have experienced a qualifying event that made them eligible to make changes to their enrollment. Employees who experience a qualifying event during the plan year may be eligible for a Special Enrollment Period (SEP) which allows them to enroll in a plan, make changes to their plan selection, add or drop family members, or drop coverage altogether. ", "<strong>Dependent Aged Off of Coverage:</strong> Your employee may have had a dependent on their policy that is no longer eligible for coverage. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."
    ]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -62,4 +63,4 @@ heading: 'Why was the Change Made?', sub_heading: ''} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice is being provided in accordance with 45 CFR 155.715(e)."} %>
+  content: "This notice is being provided in accordance with 45 CFR 155.720(h)."} %>
