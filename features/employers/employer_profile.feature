@@ -53,7 +53,7 @@ Feature: Employer Profile
     Given Hannah is the staff person for an employer
     Given NewGuy is a user with no person who goes to the Employer Portal
     And I select the all security question and give the answer
-    When I submit the security questions
+    When I have submit the security questions
     Given NewGuy enters first, last, dob and contact info
     Given NewGuy enters data for Turner Agency, Inc
     Then NewGuy is notified about Employer Staff Role application is pending
@@ -91,7 +91,7 @@ Scenario: A new person asks for a staff role at an existing company with employe
 Scenario: A new person creates a new company
     Given NewGuy is a user with no person who goes to the Employer Portal
     And I select the all security question and give the answer
-    When I submit the security questions
+    When I have submit the security questions
     Given NewGuy enters first, last, dob and contact info
     Given a FEIN for a new company
     Given NewGuy enters Employer Information
@@ -102,7 +102,7 @@ Scenario: A new person creates a new company
 Scenario: A new person claims an existing unclaimed company
    Given NewGuy is a user with no person who goes to the Employer Portal
    And I select the all security question and give the answer
-   When I submit the security questions
+   When I have submit the security questions
     Given NewGuy enters first, last, dob and contact info
     Given a FEIN for an existing company
     Given NewGuy enters Employer Information
@@ -117,7 +117,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
    Given Josh is the staff person for an existing employer
    Given NewGuy is a user with no person who goes to the Employer Portal
    And I select the all security question and give the answer
-   When I submit the security questions
+   When I have submit the security questions
     Given NewGuy enters first, last, dob and contact info
     Given NewGuy enters Employer Information
     Then NewGuy becomes an Employer
@@ -132,7 +132,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
    Given Josh is the staff person for an existing employer
    Given Josh is a user with no person who goes to the Employer Portal
    And I select the all security question and give the answer
-   When I submit the security questions
+   When I have submit the security questions
     Given Josh enters info matching the employer staff role
     Given Josh enters Employer Information
     Then Josh becomes an Employer
@@ -146,7 +146,7 @@ Scenario: A new person claims an existing company where the Conversion POC has n
    Given Josh is the staff person for an existing employer
    Given Josh is a user with no person who goes to the Employer Portal
    And I select the all security question and give the answer
-   When I submit the security questions
+   When I have submit the security questions
     Given Josh matches with different DOB from employer staff role
     Given Josh enters Employer Information
     Then Josh becomes an Employer
