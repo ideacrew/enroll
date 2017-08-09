@@ -2,21 +2,22 @@
 
 $(document).on 'change', "input[data-role='bulk-actions-resource']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
-
+  
   $wrapper.find("input[data-role='bulk-actions-all']").prop('checked', false)
   toggleClosestBulkActionsButton($wrapper)
 
 $(document).on 'change', "input[data-role='bulk-actions-all']", (event) ->
   $wrapper = $(event.currentTarget).closest('.dataTables_wrapper')
   $resources = $wrapper.find("input[data-role='bulk-actions-resource']")
-
+  
   if $(event.currentTarget).is(':checked')
-    if ($resources.data("status") != "Ineligible")
-      $resources.prop('checked', true)
+    $resources.each (index, element) ->
+      status = $(element).data("status")
+      
+      if (status != "Ineligible")
+        $(element).prop('checked', true)
   else
-    if ($resources.data("status") != "Ineligible")
-      $resources.prop('checked', false)
-
+    $resources.prop('checked', false)
 
   toggleClosestBulkActionsButton($wrapper)
 
