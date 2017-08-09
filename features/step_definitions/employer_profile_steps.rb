@@ -103,7 +103,7 @@ Then(/(\w+) is the staff person for an employer$/) do |name|
 end
 
 Given(/^Sarah is the staff person for an organization with employer profile and broker agency profile$/) do
-  person = Person.where(first_name: "Sarh").first
+  person = Person.where(first_name: "Sarah").first
   organization = FactoryGirl.create(:organization)
   employer_profile = FactoryGirl.create(:employer_profile, organization: organization)
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
