@@ -15,7 +15,7 @@ FactoryGirl.define do
 
     after(:create) do |user, evaluator|
       if evaluator.with_security_questions
-        create(:security_question_response, user: user)
+        3.times { create(:security_question_response, user: user) }
       end
     end
   end

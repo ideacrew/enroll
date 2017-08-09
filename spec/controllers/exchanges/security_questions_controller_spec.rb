@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Exchanges::SecurityQuestionsController do
 
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryGirl.create(:user, with_security_questions: false) }
   let(:person) { FactoryGirl.create(:person, user: user) }
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
   let(:question) { FactoryGirl.create(:security_question) }
