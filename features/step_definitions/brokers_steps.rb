@@ -74,14 +74,14 @@ And(/^.+ should see the list of broker applicants$/) do
 end
 
 Then(/^.+ clicks? on the current broker applicant show button$/) do
-  find('.interaction-click-control-broker-show').click
+  find('.interaction-click-control-broker-show').trigger('click')
 end
 
 And(/^.+ should see the broker application$/) do
 end
 
 And(/^.+ clicks? on approve broker button$/) do
-  find('.interaction-click-control-broker-approve').click
+  find('.interaction-click-control-broker-approve').trigger('click')
 end
 
 Then(/^.+ should see the broker successfully approved message$/) do
