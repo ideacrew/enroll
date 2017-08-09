@@ -208,6 +208,10 @@ def non_dc_office_location
   }
 end
 
+Given(/^User has existing security questions/) do
+
+end
+
 Given(/^Hbx Admin exists$/) do
   p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
       send_broker_agency_message: true, approve_broker: true, approve_ga: true,
