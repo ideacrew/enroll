@@ -6,8 +6,9 @@
   $("input#jq_datepicker_ignore_plan_year_end_on").val("<%= @schedule[:plan_year_end_on].to_s %>").trigger("change");
   $("input#plan_year_end_on_jq_datepicker_plain_field").val("<%= @schedule[:plan_year_end_on].to_s(:db) %>");
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s %>").trigger("change");
-  
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "minDate", "<%= @open_enrollment_dates[:open_enrollment_start_on]%>");
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "maxDate", "<%= @open_enrollment_dates[:open_enrollment_end_on] - 5.days %>");
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").datepicker( "option", "minDate", "<%= @open_enrollment_dates[:open_enrollment_end_on]%>");
   $("input#plan_year_open_enrollment_start_on_jq_datepicker_plain_field").val("<%= @open_enrollment_dates[:open_enrollment_start_on].to_s(:db) %>");
 
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val("<%= @open_enrollment_dates[:open_enrollment_end_on].to_s %>").trigger("change");
@@ -19,3 +20,9 @@
 <% else %>
   $('.recommend #notice').html("<div class='alert-plan-year alert-error'><h4><%= @result[:msg] %></h4></div>")
 <% end %>
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
+    var d = new Date($("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").val())
+    d.setDate(d.getDate()-5);
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_start_on").datepicker( "option", "maxDate", d);
+    
+  });
