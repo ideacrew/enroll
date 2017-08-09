@@ -11,12 +11,12 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: active_benefit_group.id, census_employee: census_employee, start_on: active_benefit_group.start_on) }
   let(:application_event){ double("ApplicationEventKind",{
-                            name: 'Initial Employer Application, Deadline Extended - Reminder to publish',
+                            name: 'Notice to employee after they select a plan Annual Open Enrollment',
                             notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
                             notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
-                            mpi_indicator: 'MPI_SHOP29',
+                            mpi_indicator: 'SHOP_M070',
                             event_name: 'initial_employee_plan_selection_confirmation',
-                            title: "Final Reminder to publish Application"})
+                            title: "Employee Enrollment Confirmation"})
                           }
 
   let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year, plan: plan)}  

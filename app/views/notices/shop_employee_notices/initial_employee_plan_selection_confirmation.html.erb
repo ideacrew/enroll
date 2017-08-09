@@ -1,6 +1,7 @@
 <%= render partial: 'notices/shared/cover', :locals => {notice: notice}%>
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/address', :locals => {notice: notice} %>
+<br><br><br><br><br>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -37,7 +38,7 @@
           By calling <%=contact_center_phone_number%>. TTY: <%=contact_center_tty_number%> <br>
         </li>
         <li class="notice-font">
-          Online at <%=site_main_web_link%>
+          Online at <a href= "#{site_main_web_address}"> <%= site_main_web_address %></a>
         </li>
       </ul>
     </td>
