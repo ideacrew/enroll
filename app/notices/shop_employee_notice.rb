@@ -12,7 +12,7 @@ class ShopEmployeeNotice < Notice
     args[:to] = census_employee.employee_role.person.work_email_or_best
     args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
