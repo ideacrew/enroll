@@ -1,9 +1,8 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def self.perform(id, event)
+  def perform(id, event)
     Resque.logger.level = Logger::DEBUG
-    # binding.pry
     profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
     notice_trigger = event_kind.notice_triggers.first

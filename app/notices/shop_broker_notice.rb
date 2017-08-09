@@ -14,7 +14,7 @@ class ShopBrokerNotice < Notice
     args[:to] = employer_profile.broker_agency_profile.primary_broker_role.email_address
     args[:name] = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
     args[:recipient_document_store] = employer_profile.broker_agency_profile.primary_broker_role.person
-    self.header = "notices/shared/broker_header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
 
@@ -35,11 +35,11 @@ class ShopBrokerNotice < Notice
       assignment_date: employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
     })
 
-
+    notice.primary_fullname = broker_profile.primary_broker_role.person.full_name
     notice.er_legal_name = employer_profile.legal_name.titleize
     notice.er_first_name = employer_profile.staff_roles.first.first_name
     notice.er_last_name = employer_profile.staff_roles.first.last_name
-    # notice.er_fullname = employer_profile.full_name.titleize
+    
     notice.broker_agency = broker_profile.legal_name.titleize
     append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
     # address = broker_profile.primary_broker_role.person.mailing_address if broker_profile.primary_broker_role.person.mailing_address.present?

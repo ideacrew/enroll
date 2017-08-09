@@ -52,9 +52,7 @@ class Employers::BrokerAgencyController < ApplicationController
       
       
       @employer_profile.save!(validate: false)
-      # binding.pry
       broker_hired
-      
     end
     
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
@@ -97,12 +95,12 @@ class Employers::BrokerAgencyController < ApplicationController
     end
   end
 
+  def broker_hired
+    ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
+  end
+  
   private
   
-  def broker_hired
-    ShopNoticesNotifierJob.perform(@employer_profile.id.to_s, "broker_hired")
-  end
-
   def updateable?
     authorize @employer_profile, :updateable?
   end
