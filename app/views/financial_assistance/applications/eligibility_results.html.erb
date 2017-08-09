@@ -19,6 +19,7 @@
                 <div class="row row-form-wrapper no-buffer row-height">
                   <div class='col-md-12'>
                     These people <strong> appear to be eligible </strong> for medicaid:
+                    <br><br>
                     <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
                       <div class='col-md-12'>
                         <li><%=applicant_name%></li>

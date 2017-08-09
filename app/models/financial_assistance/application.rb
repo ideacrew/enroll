@@ -548,7 +548,7 @@ private
       max_aptc: verified_eligibility_determination.maximum_aptc,
       csr_percent_as_integer: verified_eligibility_determination.csr_percent,
       csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s ,
-      determined_on: verified_eligibility_determination.determination_date,
+      determined_at: verified_eligibility_determination.determination_date,
       aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
       aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
       csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,

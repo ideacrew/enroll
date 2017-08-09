@@ -157,8 +157,16 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     end
     @model.tax_households.each do |txh|
       txh.update_attributes!(allocated_aptc: 200.00)
-      @model.eligibility_determinations.build(max_aptc: 200.00, csr_percent_as_integer: 73, csr_eligibility_kind: "csr_73", determined_on: TimeKeeper.datetime_of_record - 30.days, determined_at: TimeKeeper.datetime_of_record - 30.days, premium_credit_strategy_kind: "allocated_lump_sum_credit", e_pdc_id: "3110344", source: "Haven", tax_household_id: txh.id).save!
-      @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true) if txh.applicants.count > 1
+      @model.eligibility_determinations.build(max_aptc: 200.00,
+                                              csr_percent_as_integer: 73,
+                                              csr_eligibility_kind: "csr_73",
+                                              determined_on: TimeKeeper.datetime_of_record - 30.days,
+                                              determined_at: TimeKeeper.datetime_of_record - 30.days,
+                                              premium_credit_strategy_kind: "allocated_lump_sum_credit",
+                                              e_pdc_id: "3110344",
+                                              source: "Haven",
+                                              tax_household_id: txh.id).save!
+      @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.applicants.count > 1
     end
   end
 
