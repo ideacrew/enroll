@@ -11,7 +11,7 @@ class Exchanges::ScheduledEventsController < ApplicationController
   def create
     params.permit!
     scheduled_event = ScheduledEvent.new(scheduled_event_params)
-    if scheduled_event.save
+    if scheduled_event.save!
       scheduled_event.update_attributes!(one_time: false) if scheduled_event.recurring_rules.present?
       @flash_message = 'Event successfully created'
       @flash_type = 'success'
