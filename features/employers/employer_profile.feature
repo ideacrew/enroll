@@ -73,7 +73,8 @@ Scenario: A new person asks for a staff role at an existing company with employe
     Given Sarah has already provided security question responses
     Given Sarah is the staff person for an organization with employer profile and broker agency profile
     Given JohnSmith is a user with no person who goes to the Employer Portal
-    Given JohnSmith has already provided security question responses
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Given JohnSmith enters first, last, dob and contact info
     Given JohnSmith enters data for Turner Agency, Inc
     Then JohnSmith is notified about Employer Staff Role application is pending
