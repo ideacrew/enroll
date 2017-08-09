@@ -92,7 +92,6 @@ class Employers::BrokerAgencyController < ApplicationController
     end
   end
 
-
   private
 
   def updateable?

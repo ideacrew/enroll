@@ -94,20 +94,21 @@ class ShopEmployerNotice < Notice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
+
     notice.broker = PdfTemplates::Broker.new({
-                                                 primary_fullname: person.full_name,
-                                                 organization: broker.legal_name,
-                                                 phone: location.phone.try(:to_s),
-                                                 email: (person.home_email || person.work_email).try(:address),
-                                                 web_address: broker.home_page,
-                                                 address: PdfTemplates::NoticeAddress.new({
-                                                                                              street_1: location.address.address_1,
-                                                                                              street_2: location.address.address_2,
-                                                                                              city: location.address.city,
-                                                                                             state: location.address.state,
-                                                                                              zip: location.address.zip
-                                                                                          })
-                                             })
+      primary_fullname: person.full_name,
+      organization: broker.legal_name,
+      phone: location.phone.try(:to_s),
+      email: (person.home_email || person.work_email).try(:address),
+      web_address: broker.home_page,
+      address: PdfTemplates::NoticeAddress.new({
+        street_1: location.address.address_1,
+        street_2: location.address.address_2,
+        city: location.address.city,
+        state: location.address.state,
+        zip: location.address.zip
+      })
+    })
   end
 
 end

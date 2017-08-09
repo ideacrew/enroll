@@ -145,7 +145,7 @@ class EmployerProfile
   end
 
   def employer_broker_fired
-    self.trigger_notices("employer_broker_fired")
+    trigger_notices('employer_broker_fired')
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
