@@ -1,0 +1,2 @@
+class ShopBrokerNotices::BrokerHiredNotice< ShopBrokerNotice
+end
