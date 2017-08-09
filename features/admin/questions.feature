@@ -39,3 +39,13 @@ Feature: Add, Edit and Delete security questions
     When Hbx Admin clicks on Delete Question link
     And I confirm the delete question popup
     Then there is 0 questions available in the list
+
+  Scenario: User should select security questions after signup/login if not selected previously
+    Given There are preloaded security question on the system
+    When I visit the Employer portal
+    Then Jack Doe create a new account for employer
+    And I should see a successful sign up message
+    And I can see the security modal dialog
+    And I select the all security question and give the answer
+    When I submit the security questions
+    Then I have landed on employer profile page
