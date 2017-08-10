@@ -21,7 +21,7 @@ RSpec.describe "employers/employer_profiles/_employer_form.html.erb" do
 
   it "should show person info" do
     expect(rendered).to match /Employer Information/
-    expect(rendered).to match /Point of Contact - Employer Staff/
+    expect(rendered).to match /Employer Staff Points-of-Contact/
     expect(rendered).to match  /Last Name/
 
   end

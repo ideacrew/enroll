@@ -110,11 +110,11 @@ Given(/^Sarah is the staff person for an organization with employer profile and 
   broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
 end
 
-Then /he should have an option to select paper or electronic notice option/ do
-  expect(page).to have_content("Please indicate preferred method to receive notices (OPTIONAL)")
-  find(:xpath, '//*[@id="new_organization"]/div/div[4]/div/div[4]/div[2]/div/div/div/div[2]/b').click
-  expect(page).to have_content("Only Electronic communications")
-  expect(page).to have_content("Paper and Electronic communications")
+Then(/he should have an option to select paper or electronic notice option/) do
+  expect(page).to have_content("Please indicate preferred method to receive notices (optional)")
+  find('.selectric-interaction-choice-control-organization-contact-method').click
+  expect(page).to have_content(/Only Electronic communications/i)
+  expect(page).to have_content(/Paper and Electronic communications/i)
 end
 
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
@@ -146,7 +146,8 @@ end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
-  click_link 'Add Employer Staff Role'
+
+  click_link 'Add Employer Contact'
   fill_in 'first_name', with: person.first_name
   fill_in 'last_name', with: person.last_name
   fill_in  'dob', with: person.dob

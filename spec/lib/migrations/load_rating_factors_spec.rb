@@ -1,4 +1,5 @@
 require 'rails_helper'
+Rake.application.rake_require "tasks/migrations/load_rating_factors"
 
 RSpec.shared_examples "a rate factor" do |attributes|
   attributes.each do |attribute, value|
@@ -10,13 +11,11 @@ end
 
 RSpec.describe 'Load Rate Factors Task', :type => :task do
 
-  context "rate_reference:load_rating_factors" do
-    before :all do
+  context "rate_reference:load_rating_factors", :dbclean => :after_each do
+    before :each do
       ['82569','88806','34484','73331'].each do |hios_id|
         carrier_profile = FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
       end
-      Rake.application.rake_require "tasks/migrations/load_rating_factors"
-      Rake::Task.define_task(:environment)
 
       invoke_task
     end
@@ -42,7 +41,13 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     end
 
     context "it creates EmployerGroupSizeRatingFactorSet correctly" do
-      subject { EmployerGroupSizeRatingFactorSet.all.third }
+      subject do
+        carrier_profile = Organization.where(
+          "carrier_profile.issuer_hios_ids" => '34484'
+        ).first.carrier_profile
+        EmployerGroupSizeRatingFactorSet.where(carrier_profile_id: carrier_profile.id).first
+      end
+
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
                                               }
@@ -55,10 +60,10 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
       end
 
       it "assigns the correct factor key and value" do
-        expect(subject.rating_factor_entries.first.factor_key).to eq('1')
-        expect(subject.rating_factor_entries.first.factor_value).to be(1.101)
-        expect(subject.rating_factor_entries.last.factor_key).to eq('50')
-        expect(subject.rating_factor_entries.last.factor_value).to be(1.070)
+        first_entry = subject.rating_factor_entries.detect { |rfe| rfe.factor_key == '1' }
+        last_entry = subject.rating_factor_entries.detect { |rfe| rfe.factor_key == '50' }
+        expect(first_entry.factor_value).to be(1.101)
+        expect(last_entry.factor_value).to be(1.070)
       end
     end
 
@@ -106,9 +111,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     private
 
     def invoke_task
-      Rake.application.invoke_task("load_rating_factors:update_factor_sets[SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx]")
-
-      Rake::Task["load_rating_factors:update_factor_sets"].invoke
+      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
     end
   end
 end

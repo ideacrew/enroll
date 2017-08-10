@@ -26,7 +26,7 @@ RSpec.describe "insured/thankyou.html.erb" do
     it 'should display the correct plan selection text' do
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
-      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
+      expect(rendered).to have_selector('p', text: /Please review your current plan selection. Select PREVIOUS if /)
     end
 
     it 'should render coverage_information partial' do
@@ -70,8 +70,8 @@ RSpec.describe "insured/thankyou.html.erb" do
       allow(@enrollment).to receive(:is_cobra_status?).and_return(false)
       render :template => "insured/plan_shoppings/thankyou.html.erb"
       expect(rendered).to have_selector('h1', text: 'Confirm Your Plan Selection')
-      expect(rendered).to have_selector('h4', text: /Please review your current plan selection. Select PREVIOUS if /)
-      expect(rendered).to have_selector('h4', text: /You must complete these steps to enroll/)
+      expect(rendered).to have_selector('p', text: /Please review your current plan selection. Select PREVIOUS if /)
+      expect(rendered).to have_content(/You must complete these steps to enroll/i)
     end
 
     it 'should render agreement partial' do

@@ -5,7 +5,7 @@
     .row
       = form_for @person, { :as => :person, :url => match_exchanges_residents_path, :method => :post } do |f|
         .col-lg-7.col-md-7.col-sm-8.col-xs-12
-          %h1.darkblue Personal Information
+          %h1 Personal Information
           %h4 First, we need to verify whether you're new to #{site_short_name} or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE.
           %p.memo * = required field
           = render 'exchanges/residents/remote_search_form', f: f

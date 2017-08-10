@@ -3,7 +3,7 @@ FactoryGirl.define do
     plan_year
     composite_tier_contributions { [
       FactoryGirl.build(:composite_tier_contribution, benefit_group: self),
-      FactoryGirl.build(:composite_tier_contribution, benefit_group: self, composite_rating_tier: 'family', employer_contribution_percent: 30.0)
+      FactoryGirl.build(:composite_tier_contribution, benefit_group: self, composite_rating_tier: 'family', employer_contribution_percent: 40.0)
 
     ] }
     relationship_benefits { [

@@ -74,7 +74,7 @@ Then (/^Admin should see preview and attestation form$/) do
 end
 
 When (/^Admin clicks submit in employer attestation form$/) do
-  first('#attestation_documents_table .btn-primary',:text=>"SUBMIT").trigger('click')
+  first('#attestation_documents_table .btn-primary',:text=>/SUBMIT/i).trigger('click')
 end
 
 Then (/^Admin should see attestation updated message$/) do
