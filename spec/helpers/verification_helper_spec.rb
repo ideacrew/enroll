@@ -132,15 +132,19 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe "#enrollment_group_verified?" do
+  describe "#enrollment_group_unverified?" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+
+    before do
+      allow_any_instance_of(Person).to receive_message_chain("primary_family").and_return(family)
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return family.family_members
+    end
     it "returns true if any family members has outstanding verification state" do
       family.family_members.each do |member|
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.person.consumer_role.aasm_state="verification_outstanding"
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq true
     end
 
@@ -149,7 +153,6 @@ RSpec.describe VerificationHelper, :type => :helper do
         member.person = FactoryGirl.create(:person, :with_consumer_role)
         member.save
       end
-      allow_any_instance_of(Person).to receive_message_chain("primary_family.active_family_members").and_return(family.family_members)
       expect(helper.enrollment_group_unverified?(person)).to eq false
     end
   end
@@ -320,8 +323,8 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
     end
 
-    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB"]
-    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "outstanding", ["Verify", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "verified", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
+    it_behaves_like "admin actions dropdown list", "Citizenship", "in review", ["Verify", "Reject", "View History", "Call HUB", "Extend"]
   end
 end
