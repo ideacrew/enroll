@@ -68,14 +68,14 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">Income</div>
                 <div class="col-md-1">
-                  <% if applicant.incomes.present? %> 
-                  <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
-                  <i class="glyphicon glyphicon-pencil grey-font"></i>
-                  <% end %>
+                  <% if applicant.incomes.present? %>
+                      <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
                   <% else %>
-                  <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                      <i class="glyphicon glyphicon-pencil grey-font"></i>
-                  <% end %>
+                      <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
                   <% end %>
                 </div>
               </div>
@@ -105,14 +105,14 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">Deductions</div>
                 <div class="col-md-1">
-                <% if applicant.deductions.present? %>
-                <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %> 
-                <i class="glyphicon glyphicon-pencil grey-font"></i>
-                <% end %>
-                <% else %>
-                  <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                      <i class="glyphicon glyphicon-pencil grey-font"></i>
-                  <% end %>
+                  <% if applicant.deductions.present? %>
+                      <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
+                  <% else %>
+                      <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
                   <% end %>
                 </div>
               </div>
@@ -130,14 +130,14 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">Health Coverage</div>
                 <div class="col-md-1">
-                <% if applicant.benefits.present? %>
-                <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
-                <i class="glyphicon glyphicon-pencil grey-font"></i>
-                  <% end %>
-                  <%else %>
-                  <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
-                      <i class="glyphicon glyphicon-pencil grey-font"></i>
-                  <% end %>
+                  <% if applicant.benefits.present? %>
+                      <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
+                  <% else %>
+                      <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                          <i class="glyphicon glyphicon-pencil grey-font"></i>
+                      <% end %>
                   <% end %>
                 </div>
               </div>
