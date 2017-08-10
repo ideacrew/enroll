@@ -31,7 +31,6 @@ module PdfTemplates
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
     attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
-    attribute :mpi_indicator, String
 
     def shop?
       return true
