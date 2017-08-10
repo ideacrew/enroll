@@ -13,7 +13,7 @@ class ShopEmployerNotice < Notice
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
     self.key = args[:key]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
@@ -27,6 +27,7 @@ class ShopEmployerNotice < Notice
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
