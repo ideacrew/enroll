@@ -172,4 +172,6 @@ Scenario: A company  at least one active linked employer staff can delete pendin
 
 Scenario: A employer should have an option to select paper or electronic notices
     Given NewGuy is a user with no person who goes to the Employer Portal
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then he should have an option to select paper or electronic notice optioninformation

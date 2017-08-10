@@ -101,6 +101,8 @@ Feature: COBRA basic
     When I visit the Employer portal
     Then John Doe creates an HBX account
     Then I should see a successful sign up message
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then I should click on employer portal
     Then John Doe creates a new employer profile with default_office_location
     Then Employer can see the important documents needed
