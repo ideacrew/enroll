@@ -26,12 +26,12 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
 
   #add person to broker agency profile
   let(:application_event){ double("ApplicationEventKind",{
-      :name =>'Boker Hired Confirmation',
-      :notice_template => 'notices/shop_employer_notices/broker_hired_confirmation_notice',
+      :name =>'Broker fired',
+      :notice_template => 'notices/shop_employer_notices/employer_broker_fired_notice',
       :notice_builder => 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-      :mpi_indicator => 'SHOP_M046',
-      :event_name => 'broker_hired_confirmation',
-      :title => "Broker Hired Confirmation Notice"})
+      :mpi_indicator => 'MPI_SHOP52',
+      :event_name => 'employer_broker_fired',
+      :title => "Confirmation of Broker Fired to Employer"})
   }
   let(:valid_parmas) {{
       :subject => application_event.title,
@@ -74,20 +74,26 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
   end
 
   describe "append_data" do
+    let(:employer_profile)      { FactoryGirl.create(:employer_profile)}
+    let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)
     end
 
     it "should append necessary" do
+      FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile, employer_profile: employer_profile, is_active: 'true')
+      employer_profile.fire_broker_agency
+      employer_profile.save
       broker = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile
       broker_role = broker.primary_broker_role
       person = broker_role.person
       @employer_notice.append_data
-      expect(broker).to eq(@organization.broker_agency_profile)
-      expect(broker_role).to eq(@organization.broker_agency_profile.primary_broker_role)
+      expect(broker).to eq(broker_agency_profile)
+      expect(broker_role).to eq(broker_agency_profile.primary_broker_role)
       expect(@employer_notice.notice.broker.first_name).to eq(person.first_name)
       expect(@employer_notice.notice.broker.last_name).to eq(person.last_name)
+      expect(@employer_notice.notice.broker.terminated_on).to eq(employer_profile.broker_agency_accounts.unscoped.last.end_on)
       expect(@employer_notice.notice.broker.organization).to eq (broker.legal_name)
     end
   end
