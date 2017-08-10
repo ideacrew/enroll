@@ -139,7 +139,6 @@
                   <h5 class="title no-buffer">Health</h5>
                 </div>
                 <br/>
-
                 <table class="benefit-group">
                   <tr>
                     <th>
@@ -200,27 +199,10 @@
 
                 <!--Health plan collapsible: start -->
                 <div id="collapse-health-<%=bg.id%>" style="display:none">
+                  <div>
+                    <%= render partial: 'employers/plan_years/benefit_group_summary', locals: { bg: bg } %>
 
-                  <!--Health Contributions: start-->
-                  <div class="col-xs-12 package-offering">
-                    <table>
-                      <tr>
-                        <th>Offered</th>
-                        <th>Employer
-                          <% if bg.dental_reference_plan_id.present? %>Health
-                          <% end %>Contribution</th>
-                      </tr>
-                      <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                        <tr>
-                          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                          <td>
-                            <strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong>
-                          </td>
-                        </tr>
-                      <% end %>
-                    </table>
-                  </div>
-                  <!--Health Contributions: end-->
+                <!--Health Contributions: end-->
 
                   <!--Health Estimated Cost: start-->
                   <div class="panel benefitgroup col-xs-12 referenceplan home est">
@@ -250,10 +232,8 @@
                     </div>
                   </div>
                   <!--Health Estimated Cost: end-->
-
-                </div>
               </div>
-
+            </div>
               <!--Health plan collapsible: end -->
 
               <% if bg.dental_reference_plan_id.present? %>
