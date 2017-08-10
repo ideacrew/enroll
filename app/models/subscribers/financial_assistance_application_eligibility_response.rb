@@ -9,6 +9,9 @@ module Subscribers
     def call(event_name, e_start, e_end, msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
+      puts '--logging payload for debugging purposes --'
+      log(stringed_key_payload, {:severity => "info"})
+      puts '--logging payload for debugging purposes --'
       sc = ShortCircuit.on(:processing_issue) do |err|
         log(xml, {:severity => "critical", :error_message => err})
       end
