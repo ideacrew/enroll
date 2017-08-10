@@ -374,6 +374,13 @@ class EmployerProfile
     (organization.primary_office_location.address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase)
   end
 
+  # It will provide whether employer_profile zip code is inside MA or not
+  # @return boolean
+  # if zip_code is inside MA returns true else returns false
+  def is_zip_outside?
+    (RatingArea.all.pluck(:zip_code).include? organization.primary_office_location.address.zip)
+  end
+
   def build_plan_year_from_quote(quote_claim_code, import_census_employee=false)
     quote = Quote.where("claim_code" => quote_claim_code, "aasm_state" => "published").first
 
@@ -1011,7 +1018,7 @@ class EmployerProfile
   end
 
   def validate_and_send_denial_notice
-    if !is_primary_office_local? || !(RatingArea.all.pluck(:zip_code).include? organization.primary_office_location.address.zip)
+    if !is_primary_office_local? || !(is_zip_outside?)
       self.trigger_notices('initial_employer_denial')
     end
   end

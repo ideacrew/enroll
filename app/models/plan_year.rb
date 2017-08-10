@@ -469,7 +469,7 @@ class PlanYear
       end
     end
 
-    unless employer_profile.is_primary_office_local?
+    unless employer_profile.is_primary_office_local? || employer_profile.is_zip_outside?
       warnings.merge!({primary_office_location: "Has its principal business address in the #{Settings.aca.state_name} and offers coverage to all full time employees through #{Settings.site.short_name} or Offers coverage through #{Settings.site.short_name} to all full time employees whose Primary worksite is located in the #{Settings.aca.state_name}"})
     end
 
