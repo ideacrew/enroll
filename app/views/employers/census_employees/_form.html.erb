@@ -5,10 +5,10 @@
     <%= render 'errors_if_any' %>
 
     <% unless @census_employee.persisted? %>
-        <h4 class="pull-left">
+        <p class="twenty">
           Enter employee information. Select 'Add Family Member' if applicable. When you're finished, select 'Create
           Employee' to continue.
-        </h4>
+        </p>
     <% end %>
 
     <%= render 'member_fields', f: f %>
@@ -23,9 +23,9 @@
     <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
         <%= render 'email_fields', f: email %>
     <% end %>
-    <br/>
+    <div class="row">
     <%= render 'dependents_fields', f:f %>
-    <br/>
+    </div>
     <div class="vertically-aligned-row">
       <div>
         <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile, :tab => "employees"), class: 'btn btn-default btn-lg return_to_employee_roster' %>
