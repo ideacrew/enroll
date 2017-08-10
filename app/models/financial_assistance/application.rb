@@ -446,8 +446,6 @@ class FinancialAssistance::Application
                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
                 end
               end
-            else
-              throw(:processing_issue, "ERROR: Failed to find Applicants in our DB with the ids in xml")
             end
           end
           #Applicant/TaxHouseholdMember block end
