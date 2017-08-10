@@ -3,11 +3,6 @@ module Effective
     class EmployerDocumentDatatable < Effective::MongoidDatatable
       datatable do
 
-        bulk_actions_column do
-          #bulk_action 'Download', download_documents_employers_employer_profile_path, data: {  confirm: 'Do you want to Download?', no_turbolink: true }
-          # bulk_action 'Delete', delete_documents_employers_employer_profile_path, data: {  confirm: 'Are you sure?', no_turbolink: true }
-        end
-
         table_column "Doc Status", :proc => Proc.new { |row|
           icon = ""
 
@@ -31,7 +26,7 @@ module Effective
            key, bucket = get_key_and_bucket(row.identifier)
           dropdown = [
            ['Download',  document_download_path(bucket, key)+ "?id=#{@employer_profile.id}&content_type=#{row.format}&filename=#{row.title.gsub(/[^0-9a-z]/i,'')}",'static'],
-           ['Delete', employers_employer_attestation_delete_attestation_documents_path(row.id), row.aasm_state == 'submitted' ? 'delete ajax with confirm' : 'disabled',  'Do You want to Delete this document?']
+           ['Delete', employers_employer_attestation_delete_attestation_documents_path(row.id), row.aasm_state == 'submitted' ? 'delete ajax with confirm' : 'disabled',  'Do you want to delete this document?']
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "employer_actions_#{@employer_profile.id}"}, formats: :html
         }, :filter => false, :sortable => false
