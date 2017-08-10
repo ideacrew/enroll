@@ -74,7 +74,7 @@ Then (/^Admin should see preview and attestation form$/) do
 end
 
 When (/^Admin clicks submit in employer attestation form$/) do
-  first('#attestation_documents_table .btn-primary',:text=>"SUBMIT").trigger('click')
+  first('#attestation_documents_table .btn-primary',:text=>/SUBMIT/i).trigger('click')
 end
 
 Then (/^Admin should see attestation updated message$/) do
@@ -86,8 +86,19 @@ When (/^Admin clicks employer in employers_attestation filter$/) do
   find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[1]').click()
 end
 
+
 Then (/^Employer Staff should see attestation status (.*)$/) do |state|
+  wait_for_ajax
+
   expect(page).to have_content state
+end
+
+And(/^Employer should still see attestation upload button enabled$/) do
+  expect(find('.interaction-click-control-upload')[:class].split.include?('disabled')).to be_falsey
+end
+
+And(/^Employer should see attestation upload button disabled$/) do
+  expect(find('.interaction-click-control-upload')[:class].split.include?('disabled')).to be_truthy
 end
 
 When(/^Admin choose (.*)$/) do |state|
@@ -107,7 +118,8 @@ Then (/^Employer staff should employees coverage status as canceled$/) do
 end
 
 When (/^Employer Staff clicks documents tab$/) do
-  find('.interaction-click-control-documents').trigger('click')
+  wait_for_ajax
+  find('.interaction-click-control-documents').click
 end
 
 
@@ -158,13 +170,13 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 end
 
 Then(/^Employer clicks delete in actions$/) do
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]').click
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]/div/ul/li[2]/a').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]').click
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]/div/ul/li[2]/a').click
 end
 
 Then(/^Employer should see disabled delete button in actions$/) do
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]').click
- find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[7]/div/ul/li[2]/a')['disabled'] == "disabled"
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]').click
+ find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]/div/ul/li[2]/a')['disabled'] == "disabled"
 end
 
 Then(/^Employer should not see submitted document$/) do

@@ -7,7 +7,7 @@
 </div>
 
 <div class="upload-document upload-document-location">
-  <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{ (@employer_profile.employer_attestation.aasm_state == 'unsubmitted' or @employer_profile.employer_attestation.aasm_state == 'pending')  ? 'btn-default' : 'btn-default disabled' }" %>
+  <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
 </div>
 
 <div class= "effectivedatatable">

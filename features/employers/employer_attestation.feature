@@ -23,6 +23,7 @@ Feature: Employer Profile
 
   Scenario: Initial employer tries to submit application after submitting the attestation
     Then Employer uploads an attestation document
+    And Employer should still see attestation upload button enabled
     When Employer goes to the benefits tab I should see plan year information
     When Employer clicks on publish plan year
     Then Plan Year should be moved to Enrolling
@@ -53,6 +54,8 @@ Feature: Employer Profile
     When Jack Doe logs on to the Employer portal
     And Employer Staff clicks documents tab
     Then Employer Staff should see attestation status Accepted
+    And Employer should see attestation upload button disabled
+    Then I click on log out link
 
   Scenario: Admin requests more information
     Then Employer uploads an attestation document

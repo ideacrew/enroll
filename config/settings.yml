@@ -37,12 +37,12 @@ contact_center:
   appeals: "connector-appeals@state.ma.us"
 
   mailing_address:
-    name: "Massachusetts Health Connector"
-    address_1: "PO Box 44018"
+    name: "Commonwealth Health Insurance"
+    address_1: "PO Box 780833"
     address_2:
-    city: "Washington"
-    state: "DC"
-    zip: "20026"
+    city: "Philadelphia"
+    state: "PA"
+    zip_code: "19178-0833"
 
 notices:
   mailing_address:
