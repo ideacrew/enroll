@@ -76,7 +76,7 @@ class UserMailer < ApplicationMailer
 
   def broker_invitation_email(email, person_name, invitation)
     if email.present?
-      mail({to: email, subject: "Invitation to create your Broker account on #{site_short_name}"}) do |format|
+      mail({to: email, subject: " Congratulations! You’re Broker Application for #{site_short_name} for Business has been Approved!"}) do |format|
         format.html { render "broker_invitation_email", :locals => { :person_name => person_name, :invitation => invitation }}
       end
     end
@@ -129,7 +129,7 @@ class UserMailer < ApplicationMailer
 
   def broker_application_confirmation(person)
     if person.emails.find_by(kind: 'work').address.present?
-      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: "Thank you for submitting your broker application to #{site_short_name}"}) do |format|
+      mail({to: person.emails.find_by(kind: 'work').try(:address) , subject: " Welcome! You've Submitted a Broker Application on the #{site_short_name} for Business"}) do |format|
         format.html { render "broker_application_confirmation", :locals => { :person => person }}
       end
     end
@@ -137,7 +137,7 @@ class UserMailer < ApplicationMailer
 
   def broker_pending_notification(broker_role,unchecked_carriers)
     subject_sufix = unchecked_carriers.present? ? ", missing carrier appointments" : ", has all carrier appointments"
-    subject_prefix = broker_role.training || broker_role.training == true ? "Completed NAHU Training" : "Needs to Complete NAHU training"
+    subject_prefix = broker_role.training || broker_role.training == true ? "Action Needed - Broker License for #{site_short_name} for Business" : "Action Needed - Complete Broker Training for #{site_short_name} for Business"
     subject="#{subject_prefix}#{subject_sufix}"
     mail({to: broker_role.email_address, subject: subject}) do |format|
       if broker_role.training && unchecked_carriers.present?
