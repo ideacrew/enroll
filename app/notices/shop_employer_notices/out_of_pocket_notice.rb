@@ -55,13 +55,5 @@ def create_secure_inbox_message(notice)
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
   end
-
-
-
-
-  #TODO remove of not used
-  def send_email_notice
-    attachments={"#{subject}": notice_path}
-    UserMailer.generic_notice_alert(@notice.primary_fullname,subject,to,attachments).deliver_now
-  end
+  
 end
