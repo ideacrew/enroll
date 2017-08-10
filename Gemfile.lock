@@ -39,7 +39,7 @@ GIT
       ttfunk (~> 1.0.3)
 
 PATH
-  remote: project_gems/effective_datatables-2.6.14
+  remote: ./project_gems/effective_datatables-2.6.14
   specs:
     effective_datatables (2.6.14)
       coffee-rails
@@ -294,18 +294,9 @@ GEM
     jquery-ui-rails (6.0.1)
       railties (>= 3.2.16)
     json (1.8.6)
-    kaminari (1.0.1)
-      activesupport (>= 4.1.0)
-      kaminari-actionview (= 1.0.1)
-      kaminari-activerecord (= 1.0.1)
-      kaminari-core (= 1.0.1)
-    kaminari-actionview (1.0.1)
-      actionview
-      kaminari-core (= 1.0.1)
-    kaminari-activerecord (1.0.1)
-      activerecord
-      kaminari-core (= 1.0.1)
-    kaminari-core (1.0.1)
+    kaminari (0.17.0)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
     kgio (2.11.0)
     language_list (1.1.0)
     launchy (2.4.3)
@@ -443,7 +434,7 @@ GEM
       activesupport (= 4.2.3)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    raindrops (0.18.0)
+    raindrops (0.19.0)
     rake (12.0.0)
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
@@ -588,7 +579,7 @@ GEM
       equalizer (~> 0.0, >= 0.0.9)
     warden (1.2.7)
       rack (>= 1.0)
-    watir (6.6.2)
+    watir (6.6.3)
       selenium-webdriver (~> 3.4, >= 3.4.1)
     web-console (2.3.0)
       activemodel (>= 4.0)
@@ -647,7 +638,7 @@ DEPENDENCIES
   jquery-rails (= 4.0.5)
   jquery-turbolinks
   jquery-ui-rails
-  kaminari
+  kaminari (= 0.17.0)
   language_list (~> 1.1.0)
   less-rails-bootstrap (~> 3.3.1.0)
   mail (= 2.6.3)
