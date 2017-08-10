@@ -197,7 +197,7 @@ class CensusEmployeeImport
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
     # is_business_owner blank or false based on it checkbox value will be set
-    if ["no",""].include? record[:is_business_owner].to_s
+    if ["0",""].include? record[:is_business_owner].to_s
       member.is_business_owner = false
     else
       member.is_business_owner = true
@@ -228,6 +228,7 @@ class CensusEmployeeImport
   end
 
   def parse_row(row)
+    binding.pry
     employer_assigned_family_id = parse_text(row["employer_assigned_family_id"])
     employee_relationship = parse_relationship(row["employee_relationship"])
     last_name = parse_text(row["last_name"])
