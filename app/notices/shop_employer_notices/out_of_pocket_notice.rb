@@ -1,18 +1,5 @@
 class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
 
-  # def initialize(employer_profile, args = {})
-  #   self.employer_profile = employer_profile
-  #   args[:template] =  "notices/shop_employer_notices/out_of_pocket_notice.html.erb"
-  #   args[:market_kind] = 'shop'
-  #   args[:notice] = PdfTemplates::EmployerNotice.new
-  #   args[:recipient] = employer_profile
-  #   args[:recipient_document_store] = employer_profile
-  #   args[:name] = employer_profile.organization.legal_name
-  #   self.header = "notices/shared/header.html.erb"
-  #   super(args)
-  #   self.subject=  "#{args[:subject]}"
-  # end
-
   def deliver
     build
     generate_pdf_notice
@@ -29,8 +16,6 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
   def build
       published_plan_years = @recipient.plan_years.published_or_renewing_published      
       @notice.benefit_group_assignments = published_plan_years.collect{|py| py.benefit_groups}.flatten.group_by(&:id)
-      # bg_ids = @recipient.active_and_renewing_published.first.benefit_groups.map(&:id)
-      # @notice.benefit_group_assignments.delete_if{|bg_id, assignments| !bg_ids.include?(bg_id)}
       @notice.legal_name= @recipient.organization.legal_name
       @notice.data = {:url => url}
   end
@@ -42,7 +27,6 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
 def create_secure_inbox_message(notice)
     body = "<p><br><strong>Plan Match:  Help your employees find the right health plan based on their needs and budget!</strong></p>" +
             "<p><br>To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions.  Click here to download a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them:</p>" +
-            # "<br><p><u>Employee Plan Match – Instructions for Your Eligible Employees</u></p>" +
             "<br><a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + "Employee Plan Match – Instructions for Your Eligible Employees"  + "</a>" +
             "<br></p><strong>What is Plan Match? </strong> " +
