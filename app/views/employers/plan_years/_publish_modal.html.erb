@@ -20,19 +20,18 @@
             </ul>
           </p>
      <% else %>
-      <p>If you submit this application as is, the small business application may be ineligible for coverage through the <%= Settings.site.short_name %> because it does not meet the eligibility reason(s) identified below:
-       <p><ul class="application-warnings"></ul></p>
-
-      </p>
+      <p>If you submit this application as is, the small business application may be ineligible for coverage through the <%= Settings.site.short_name %> because it does not meet the eligibility reason(s) identified below: </p>
+      <p><ul class="application-warnings"></ul></p>
+      <p>Click Cancel if you want to go back and review your application information for accuracy. If the information provided on your application is accurate, you may click Publish Anyways to proceed. If you choose to proceed and the application is determined to be ineligible, you will be notified with the reason for the eligibility determination along with what your options are to appeal this determination.</p>
     <% end %>
       </div>
       <div class="modal-footer">
-        
+
         <% unless plan_year.no_documents_uploaded? %>
           <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
           <%= link_to 'Publish Anyways', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
         <% else %>
-          <%= link_to 'Go Back', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
+          <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
         <% end %>
         <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
       </div>
