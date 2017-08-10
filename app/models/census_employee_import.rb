@@ -228,7 +228,6 @@ class CensusEmployeeImport
   end
 
   def parse_row(row)
-    binding.pry
     employer_assigned_family_id = parse_text(row["employer_assigned_family_id"])
     employee_relationship = parse_relationship(row["employee_relationship"])
     last_name = parse_text(row["last_name"])
