@@ -88,7 +88,6 @@
           </div>
         </div>
         <% @current_plan_year.benefit_groups.each do |bg| %>
-
           <div class="module hbx-panel panel panel-default employer-benefit-groups">
             <div class="panel-heading">
               <h3 class="no-buffer"><%= bg.title.capitalize %></h3>
@@ -185,13 +184,7 @@
                     </td>
                     <td>
                       <p>
-                        <% if bg.plan_option_kind == "single_carrier" %>
-                          All Plans From A Single Carrier
-                        <% elsif bg.plan_option_kind == "metal_level" %>
-                          All Plans From A Given Metal Level
-                        <% elsif bg.plan_option_kind == "single_plan" %>
-                          A Single Plan
-                        <% end %>
+                        <%= selected_benefit_plan(bg.plan_option_kind) %>
                       </p>
                     </td>
                   </tr>
@@ -200,27 +193,7 @@
 
                 <!--Health plan collapsible: start -->
                 <div id="collapse-health-<%=bg.id%>" style="display:none">
-
-                  <!--Health Contributions: start-->
-                  <div class="col-xs-12 package-offering">
-                    <table>
-                      <tr>
-                        <th>Offered</th>
-                        <th>Employer
-                          <% if bg.dental_reference_plan_id.present? %>Health
-                          <% end %>Contribution</th>
-                      </tr>
-                      <% bg.relationship_benefits.each_with_index do |rb, i| %>
-                        <tr>
-                          <td><%= rb.offered ? raw("<i class='fa fa-check-square-o fa-lg'></i>") : raw("<i class='fa fa-square-o fa-lg'></i>") %><%= rb.relationship.try(:humanize) %></td>
-                          <td>
-                            <strong><%= number_to_percentage rb.premium_pct.try(:ceil), precision: 0 %></strong>
-                          </td>
-                        </tr>
-                      <% end %>
-                    </table>
-                  </div>
-                  <!--Health Contributions: end-->
+                 <%= render partial: 'employers/plan_years/benefit_group_summary', locals: { bg: bg } %>
 
                   <!--Health Estimated Cost: start-->
                   <div class="panel benefitgroup col-xs-12 referenceplan home est">
@@ -337,7 +310,7 @@
                   </tr>
                 </table>
                 <!--Dental Plan Summary: end-->
-                <!—Dental plan collapsible: start -->
+                <!--Dental plan collapsible: start -->
                 <div id="collapse-dental-<%=bg.id%>" style="display:none">
                   <!--Dental Contributions: start -->
                   <div class="col-xs-12 package-offering">
