@@ -197,7 +197,7 @@ class CensusEmployeeImport
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
     # is_business_owner blank or false based on it checkbox value will be set
-    if ["false",""].include? record[:is_business_owner].to_s
+    if ["no",""].include? record[:is_business_owner].to_s
       member.is_business_owner = false
     else
       member.is_business_owner = true
