@@ -1,6 +1,5 @@
 module Subscribers
   class FinancialAssistanceApplicationEligibilityResponse < ::Acapi::Subscription
-    puts "----- Eligibility Response ----"
     include Acapi::Notifiers
 
     def self.subscription_details
@@ -11,7 +10,7 @@ module Subscribers
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
       puts '--logging payload for debugging purposes--'
-      puts payload.inspect
+      log(stringed_key_payload, {:severity => "critical", "ERROR: Testing Purpose"})
       puts '--logging payload for debugging purposes--'
       sc = ShortCircuit.on(:processing_issue) do |err|
         log(xml, {:severity => "critical", :error_message => err})
