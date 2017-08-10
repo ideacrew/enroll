@@ -577,7 +577,7 @@ shop_notice_triggers = [
       event_name: 'employer_broker_fired',
       notice_triggers: [
           {
-              name: 'Broker fired',
+              name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
               notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
               notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
               mpi_indicator: 'MPI_SHOP52',
