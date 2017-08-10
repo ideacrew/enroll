@@ -11,6 +11,7 @@ $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 
 $(document).ready(function(){
+  $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").datepicker( "option", "maxDate", "<%= @plan_year.start_on.prev_day %>");
   setOpenEnrollmentDatePicker();
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").change(function(){
     setOpenEnrollmentDatePicker();
