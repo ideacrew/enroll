@@ -222,7 +222,7 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   email_address = person[:email]
   password = person[:password]
 
-  unless Settings.site.use_default_devise_path
+  if page.has_link?('Sign In Existing Account')
     click_link "Sign In Existing Account"
   end
   expect(page).to have_content('Sign In')
@@ -337,7 +337,7 @@ Then(/^.+ should not see individual on enrollment title/) do
   expect(page).not_to have_content("Individual & Family")
 end
 
-And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+def enter_plan_year_info
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
   find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
 
@@ -355,29 +355,38 @@ And(/^.+ should be able to enter plan year, benefits, relationship benefits for 
 
   find('.interaction-choice-control-plan-year-start-on', :visible => true).click
   find('li.interaction-choice-control-plan-year-start-on-1').click
+end
 
-  ## @TODO: brianweiner - separate into distinct scenarios
-  if Settings.aca.sole_source_only_enabled
-    find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
-    wait_for_ajax
-    find('.carriers-tab a').click
-    wait_for_ajax
-    find('.reference-plans label').click
-    wait_for_ajax
-    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
-    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
-    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
-    fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
-  else
-    find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_sole_source"]').click
-    wait_for_ajax
-    find('.sole-source-plan-tab a').click
-    wait_for_ajax
-    find('.reference-plans label').click
-    wait_for_ajax
-    fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
-    fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50
-  end
+And(/^.+ should be able to enter sole source plan year, benefits, relationship benefits for cobra$/) do
+  enter_plan_year_info
+
+  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_sole_source"]').click
+  wait_for_ajax
+  find('.sole-source-plan-tab a').click
+  wait_for_ajax
+  find('.reference-plans label').click
+  wait_for_ajax
+  fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50
+
+  wait_for_ajax
+  find('.interaction-click-control-create-plan-year').trigger('click')
+end
+
+And(/^.+ should be able to enter single carrier plan year, benefits, relationship benefits for cobra$/) do
+  enter_plan_year_info
+
+  find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
+  wait_for_ajax
+  find('.carriers-tab a').click
+  wait_for_ajax
+  find('.reference-plans label').click
+  wait_for_ajax
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][0][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][1][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][2][premium_pct]", :with => 50
+  fill_in "plan_year[benefit_groups_attributes][0][relationship_benefits_attributes][3][premium_pct]", :with => 50
+
   wait_for_ajax
   find('.interaction-click-control-create-plan-year').trigger('click')
 end

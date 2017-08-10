@@ -323,10 +323,24 @@ And(/^Employer can see the plan information on home tab$/) do
   end
 end
 
+And(/^Employer can see the sole source plan information on home tab$/) do
+  sleep 1
+  within('.benefit-group') do
+    expect(page).to have_content('A Sole Source Plan')
+  end
+end
+
 And(/^Employer can see the plan information$/) do
   sleep 1
   within('.benefit-package') do
     expect(page).to have_content('All Plans From A Single Carrier')
+  end
+end
+
+And(/^Employer can see the sole source plan information$/) do
+  sleep 1
+  within('.benefit-package') do
+    expect(page).to have_content('A Sole Source Plan')
   end
 end
 
