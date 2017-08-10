@@ -1,4 +1,5 @@
 require 'rails_helper'
+Rake.application.rake_require "tasks/migrations/load_rating_factors"
 
 RSpec.shared_examples "a rate factor" do |attributes|
   attributes.each do |attribute, value|
@@ -10,13 +11,11 @@ end
 
 RSpec.describe 'Load Rate Factors Task', :type => :task do
 
-  context "rate_reference:load_rating_factors" do
-    before :all do
+  context "rate_reference:load_rating_factors", :dbclean => :after_each do
+    before :each do
       ['82569','88806','34484','73331'].each do |hios_id|
         carrier_profile = FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
       end
-      Rake.application.rake_require "tasks/migrations/load_rating_factors"
-      Rake::Task.define_task(:environment)
 
       invoke_task
     end
@@ -106,9 +105,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     private
 
     def invoke_task
-      Rake.application.invoke_task("load_rating_factors:update_factor_sets[SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx]")
-
-      Rake::Task["load_rating_factors:update_factor_sets"].invoke
+      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
     end
   end
 end
