@@ -36,7 +36,9 @@ Rails.application.routes.draw do
       get :review_and_submit, on: :member
       get :eligibility_results, on: :member
       get :wait_for_eligibility_response, on: :member
+      get :check_eligibility_results_received, on: :member
       get :application_publish_error, on: :member
+      get :eligibility_response_error, on: :member
 
       resources :applicants do
         put :step, on: :member

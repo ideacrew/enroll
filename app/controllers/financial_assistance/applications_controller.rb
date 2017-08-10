@@ -129,8 +129,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   def wait_for_eligibility_response
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
-
-    render layout: 'financial_assistance'
   end
 
   def eligibility_results
@@ -145,6 +143,18 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @application = @person.primary_family.applications.find(params[:id])
 
     render layout: 'financial_assistance'
+  end
+
+  def eligibility_response_error
+    @family = @person.primary_family
+    @application = @person.primary_family.applications.find(params[:id])
+
+    render layout: 'financial_assistance'
+  end
+
+  def check_eligibility_results_received
+    application = @person.primary_family.applications.find(params[:id])
+    render :text => "#{application.eligibility_determinations.present?}"
   end
 
   private

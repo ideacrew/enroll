@@ -4,17 +4,12 @@
       <div class="col-md-7">
         <div class="">
           <p class="alert alert-error hide"></p>
-          <h1 class="darkblue">Waiting for your Eligibility results...</h1>
+          <div align = "center">
+            <h1 class="darkblue">Waiting for your Eligibility results...</h1>
+            <i class="fa fa-spinner fa-4x" aria-hidden="true"></i>
+          </div>
         </div>
-      </div>
-
-      <div class='col-md-2'>
-        <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-          previous_url: financial_assistance_applications_path,
-          next_url: eligibility_results_financial_assistance_application_path
-        } %>
       </div>
     </div>
   </div>
-  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>
