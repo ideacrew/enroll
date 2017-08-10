@@ -28,11 +28,11 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
                             :notice_template => 'notices/shop_employer_notices/broker_hired_confirmation_notice',
                             :notice_builder => 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
                             :mpi_indicator => 'MPI_D049',
-                            :event_name => 'broker_hired_confirmation',
+                            :event_name => 'broker_hired_confirmation_notice',
                             :title => "Broker Hired Confirmation Notice"})
                           }
                           
-  let(:valid_parmas) {{
+  let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
@@ -45,15 +45,15 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_params)}.not_to raise_error
       end
     end
 
     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
-          valid_parmas.delete(key)
-          expect{ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          valid_params.delete(key)
+          expect{ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -62,7 +62,7 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_params)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
