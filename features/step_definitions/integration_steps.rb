@@ -200,7 +200,7 @@ def non_dc_office_location
   address1: "623a Spalding Ct",
   address2: "Suite 200",
   city: "Falls Church",
-  state: "VA",
+  state: "MA",
   zip: "22045",
   phone_area_code: "202",
   phone_number: "1110000",

@@ -41,11 +41,19 @@ module Config::AcaHelper
   end
 
   def offer_sole_source?
-    @offer_sole_source ||= !(Settings.aca.use_simple_employer_calculation_model.to_s == "true")
+    @offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
   end
 
-  def sole_source_only?
-    Settings.aca.sole_source_only_enabled
+  def offers_metal_level?
+    @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
+  end
+
+  def offers_single_carrier?
+    @offer_single_carrier ||= Settings.aca.plan_options_available.include?("single_carrier")
+  end
+
+  def offers_single_plan?
+    @offer_single_plan ||= Settings.aca.plan_options_available.include?("single_plan")
   end
 
   def offers_nationwide_plans?

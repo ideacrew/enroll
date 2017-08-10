@@ -27,42 +27,45 @@
 
   <div class="health">
     <ul class="nav nav-tabs row">
-      <% if sole_source_only? %>
-	    <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
-        <%= f.radio_button :plan_option_kind, "single_carrier" %>
-        <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        By carrier
-        <% end %>
-      </li>
-      <li role="presentation" class="col-xs-4 <%= f.object.id %>" data-offering-id="<%= f.object.id %>">
-        <%= f.radio_button :plan_option_kind, "metal_level" %>
-        <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        By metal level
+      <% if offers_single_carrier? %>
+  	    <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "single_carrier" %>
+          <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            By carrier
+          <% end %>
+        </li>
       <% end %>
-      </li>
+      <% if offers_metal_level? %>
+        <li role="presentation" class="col-xs-4 <%= f.object.id %>" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "metal_level" %>
+          <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            By metal level
+          <% end %>
+        </li>
       <% end %>
       <% if offer_sole_source? %>
-      <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>" data-offering-kind="sole_source">
-        <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
-        <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        Sole Source
-        <% end %>
-      </li>
-      <% else %>
-      <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
-        <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
-        <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
-        <i class="fa fa-circle-o"></i>
-        <i class="fa fa-dot-circle-o"></i>
-        Single plan
-        <% end %>
-      </li>
+        <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>" data-offering-kind="sole_source">
+          <%= f.radio_button :plan_option_kind, "sole_source", selected: f.object.plan_option_kind %>
+          <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            Sole Source
+          <% end %>
+        </li>
+      <% end %>
+      <% if offers_single_plan? %>
+        <li role="presentation" class="col-xs-4" data-offering-id="<%= f.object.id %>">
+          <%= f.radio_button :plan_option_kind, "single_plan", selected: f.object.plan_option_kind %>
+          <%= f.label :plan_option_kind_single_plan, class: "elected_plan" do %>
+            <i class="fa fa-circle-o"></i>
+            <i class="fa fa-dot-circle-o"></i>
+            Single plan
+          <% end %>
+        </li>
       <% end %>
     </ul>
 
