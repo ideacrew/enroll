@@ -474,7 +474,7 @@ class PlanYear
     end
 
     # Application is in ineligible state from prior enrollment activity
-    if aasm_state == "application_ineligible" || aasm_state == "renewing_application_ineligible"
+    if aasm_state == "application_ineligible" && aasm_state == "renewing_application_ineligible"
       warnings.merge!({ineligible: "Application did not meet eligibility requirements for enrollment"})
     end
 
