@@ -88,7 +88,6 @@
           </div>
         </div>
         <% @current_plan_year.benefit_groups.each do |bg| %>
-
           <div class="module hbx-panel panel panel-default employer-benefit-groups">
             <div class="panel-heading">
               <h3 class="no-buffer"><%= bg.title.capitalize %></h3>
@@ -139,6 +138,7 @@
                   <h5 class="title no-buffer">Health</h5>
                 </div>
                 <br/>
+
                 <table class="benefit-group">
                   <tr>
                     <th>
@@ -184,13 +184,7 @@
                     </td>
                     <td>
                       <p>
-                        <% if bg.plan_option_kind == "single_carrier" %>
-                          All Plans From A Single Carrier
-                        <% elsif bg.plan_option_kind == "metal_level" %>
-                          All Plans From A Given Metal Level
-                        <% elsif bg.plan_option_kind == "single_plan" %>
-                          A Single Plan
-                        <% end %>
+                        <%= selected_benefit_plan(bg.plan_option_kind) %>
                       </p>
                     </td>
                   </tr>
@@ -199,10 +193,7 @@
 
                 <!--Health plan collapsible: start -->
                 <div id="collapse-health-<%=bg.id%>" style="display:none">
-                  <div>
-                    <%= render partial: 'employers/plan_years/benefit_group_summary', locals: { bg: bg } %>
-
-                <!--Health Contributions: end-->
+                 <%= render partial: 'employers/plan_years/benefit_group_summary', locals: { bg: bg } %>
 
                   <!--Health Estimated Cost: start-->
                   <div class="panel benefitgroup col-xs-12 referenceplan home est">
@@ -232,8 +223,10 @@
                     </div>
                   </div>
                   <!--Health Estimated Cost: end-->
+
+                </div>
               </div>
-            </div>
+
               <!--Health plan collapsible: end -->
 
               <% if bg.dental_reference_plan_id.present? %>
@@ -317,7 +310,7 @@
                   </tr>
                 </table>
                 <!--Dental Plan Summary: end-->
-                <!—Dental plan collapsible: start -->
+                <!--Dental plan collapsible: start -->
                 <div id="collapse-dental-<%=bg.id%>" style="display:none">
                   <!--Dental Contributions: start -->
                   <div class="col-xs-12 package-offering">
