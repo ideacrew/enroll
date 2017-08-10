@@ -4,18 +4,18 @@ puts "::: Creating Security Questions:::"
 created_count = 0
 
 DEFAULT_QUESTIONS = [
-  "What is your all time favorite singer?",
-  "What was the frist street you lived on? ",
+  "Who is your favorite singer?",
+  "What was the first street you lived on? ",
   "What was you first sweetheart's first name?",
   "Who is you favorite athlete?",
-  "What was the color of first cat?",
-  "What is the first name mother's oldest sibling?",
+  "What was the color of your first pet?",
+  "What is the first name of your mother's oldest sibling?",
   "What was the name of your favorite teacher?",
-  "What is the first name of first famous person you met?",
+  "What is the first name of the first famous person you met?",
   "What is your youngest child's nickname?",
   "What was your first job?",
-  "What is your all time favorite autmobile?",
-  "What is the name of your favorite musical group?",
+  "What is your favorite automobile?",
+  "What is the name of your favorite band?",
   "What was your father's profession when you were born?",
   "What was your first sweetheart's last name?",
   "What city was your favorite Olympic games played in?"
