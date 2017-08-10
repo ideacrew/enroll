@@ -12,7 +12,7 @@ RSpec.describe ShopBrokerNotice do
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Broker Hired',
-                            :notice_template => 'notices/shop_broker_notices/1_broker_hired.html.erb',
+                            :notice_template => 'notices/shop_broker_notices/broker_hired.html.erb',
                             :notice_builder => 'ShopBrokerNotice',
                             :event_name => 'broker_hired',
                             :mpi_indicator => 'SHOP_D048',
@@ -32,7 +32,7 @@ RSpec.describe ShopBrokerNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopBrokerNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopBrokerNotices::BrokerHiredNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -40,7 +40,7 @@ RSpec.describe ShopBrokerNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopBrokerNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopBrokerNotices::BrokerHiredNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -51,7 +51,7 @@ RSpec.describe ShopBrokerNotice do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
       allow(employer_profile).to receive_message_chain("broker_agency_accounts.detect").and_return(broker_agency_account)
-      @broker_notice = ShopBrokerNotice.new(employer_profile, valid_parmas)
+      @broker_notice = ShopBrokerNotices::BrokerHiredNotice.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessory info" do
       @broker_notice.build

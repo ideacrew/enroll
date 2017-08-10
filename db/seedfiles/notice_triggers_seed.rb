@@ -881,8 +881,8 @@ ivl_notice_triggers = [
      notice_triggers: [
        {
          name: 'Broker Hired',
-         notice_template: 'notices/shop_broker_notices/1_broker_hired.html.erb',
-         notice_builder: 'ShopBrokerNotice',
+         notice_template: 'notices/shop_broker_notices/broker_hired_notice.html.erb',
+         notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
          mpi_indicator: 'SHOP_D048',
          notice_trigger_element_group: {
            market_places: ['shop'],

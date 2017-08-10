@@ -92,7 +92,7 @@ class Employers::BrokerAgencyController < ApplicationController
   end
 
   def broker_hired
-    ShopNoticesNotifierJob.perform(@employer_profile.id.to_s, "broker_hired")
+    ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
   end
   
   private
