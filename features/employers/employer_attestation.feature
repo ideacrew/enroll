@@ -3,6 +3,7 @@ Feature: Employer Profile
   Employer Staff should upload attestation document
   Background:
     Given shop health plans exist for both last and this year
+    Given vertical and horizontal plan choices are offered
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
     Then I should see a successful sign up message
