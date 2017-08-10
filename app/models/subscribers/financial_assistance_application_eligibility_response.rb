@@ -38,31 +38,14 @@ module Subscribers
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
 
-      #TODO find the right application.
       application_in_context = family.applications.find(verified_family.fin_app_id)
       throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless application_in_context.present?
 
-      # #Find the right household or Create one.
-      # households_ids = []
-      # family.households.each { |th| households_ids << th.id.to_s}
-      # active_verified_household = nil
-      # active_verified_households = verified_family.households
-
-      # active_verified_households.each do |vhh|
-      #   if households_ids.include?(vhh.id)
-      #     active_verified_household = vhh
-      #   end
-      # end
       active_verified_household = verified_family.households.max_by(&:start_date)
 
-      # active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.e_case_id}.first
-
-      # active_verified_household = verified_family.households.select{|h| h.integrated_case_id == verified_family.e_case_id}.first
-      # active_verified_tax_households = application_in_context.tax_households.select{|th| th.primary_applicant_id == verified_primary_family_member.id}
-      new_dependents = find_or_create_new_members(verified_dependents, verified_primary_family_member)
-
-      # verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
-      # import_home_address(primary_person, verified_new_address)
+      verified_dependents.each do |verified_family_member|
+        throw(:processing_issue, "Failed to find dependent from xml") unless search_person(verified_family_member).present?
+      end
 
       if verified_family.broker_accounts.present?
         newest_broker = verified_family.broker_accounts.max_by{ |broker| broker.start_on}
@@ -75,33 +58,14 @@ module Subscribers
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
 
-      #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       family.e_case_id = verified_family.integrated_case_id
       begin
         application_in_context.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
-      # update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
 
       begin
-        new_dependents.each do |p|
-          new_family_member = family.relate_new_member(p[0], p[1])
-          unless new_family_member.is_active?
-            new_family_member.is_active = true
-            new_family_member.save!
-            active_household.add_household_coverage_member(new_family_member)
-          end
-
-          # if active_verified_tax_households.present?
-          #   active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
-          #   if active_verified_tax_household.present?
-          #     new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-          #     active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
-          #   end
-          # end
-        end
-
         if application_in_context.tax_households.present?
           unless application_in_context.eligibility_determinations.present?
             log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
@@ -110,7 +74,6 @@ module Subscribers
       rescue
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
-      # family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
     end
 
