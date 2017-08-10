@@ -41,7 +41,13 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     end
 
     context "it creates EmployerGroupSizeRatingFactorSet correctly" do
-      subject { EmployerGroupSizeRatingFactorSet.all.third }
+      subject do
+        carrier_profile = Organization.where(
+          "carrier_profile.issuer_hios_ids" => '34484'
+        ).first.carrier_profile
+        EmployerGroupSizeRatingFactorSet.where(carrier_profile_id: carrier_profile.id).first
+      end
+
       it_should_behave_like "a rate factor", {    active_year: 2017,
                                                   default_factor_value: 1.0
                                               }
