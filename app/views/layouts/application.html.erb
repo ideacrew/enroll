@@ -36,12 +36,15 @@
     <%= render 'layouts/header' %>
 
     <div class="content <%= controller_name %> content-bottom">
+      <%= render 'users/security_question_responses/modal' %>
+
       <%= render_flash %>
       <div class="container">
         <%= yield :horizontal_status %>
 
       </div>
         <%= yield %>
+
     </div>
 
     <%= render 'layouts/footer' %>

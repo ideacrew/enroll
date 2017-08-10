@@ -6,6 +6,21 @@ Given /(\w+) is a person$/ do |name|
   email = Forgery('email').address
   user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
+
+Given /(\w+) has already provided security question responses/ do |name|
+  security_questions = []
+  3.times do
+    security_questions << FactoryGirl.create(:security_question)
+  end
+  User.all.each do |u|
+    next if u.security_question_responses.count == 3
+    security_questions.each do |q|
+      u.security_question_responses << FactoryGirl.build(:security_question_response, security_question_id: q.id, question_answer: 'answer')
+    end
+    u.save!
+  end
+end
+
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
   FactoryGirl.create(:person, first_name: person.first_name,
@@ -87,8 +102,8 @@ Then(/(\w+) is the staff person for an employer$/) do |name|
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
 end
 
-Given(/^Sarh is the staff person for an organization with employer profile and broker agency profile$/) do
-  person = Person.where(first_name: "Sarh").first
+Given(/^Sarah is the staff person for an organization with employer profile and broker agency profile$/) do
+  person = Person.where(first_name: "Sarah").first
   organization = FactoryGirl.create(:organization)
   employer_profile = FactoryGirl.create(:employer_profile, organization: organization)
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)

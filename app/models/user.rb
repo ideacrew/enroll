@@ -14,6 +14,8 @@ class User
   devise :database_authenticatable, :registerable, :lockable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
+  embeds_many :security_question_responses
+
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
@@ -123,6 +125,7 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+  field :identity_confirmed_token, type: String
 
   ##RIDP
   field :identity_verified_date, type: Date
@@ -382,6 +385,10 @@ class User
     headless_users.each do |headless|
       headless.destroy if !headless.person.present?
     end
+  end
+
+  def needs_to_provide_security_questions?
+    security_question_responses.length < 3
   end
 
   class << self

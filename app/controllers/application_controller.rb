@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
+    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
     authenticate_user!
   end
 
@@ -141,7 +141,8 @@ class ApplicationController < ActionController::Base
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
       (controller_name == "invitations") ||
-      (controller_name == "saml")
+      (controller_name == "saml") ||
+      (controller_name == 'security_question_responses')
     end
 
     def check_for_special_path
