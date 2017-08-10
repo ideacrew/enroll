@@ -14,7 +14,7 @@
 </div>
 <br/>
 <div>
-If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.published_benefit_group_assignment.employer_name%> at this time, you should still “waive” coverage. Instructions for how to waive coverage are included in our <strong>Employee guide to waiving coverage,</strong> which you can find in the online <a href="#{site_business_resource_center_url}">Business Resource Center</a>.
+If you have other insurance coverage and do not wish to enroll into the plan(s) offered to you by <%= census_employee.employer_profile.legal_name%> at this time, you should still “waive” coverage. Instructions for how to waive coverage are included in our <strong>Employee guide to waiving coverage,</strong> which you can find in the online <a href="#{site_business_resource_center_url}">Business Resource Center</a>.
 
 </div>
 <br/>
@@ -50,6 +50,6 @@ If you have other insurance coverage and do not wish to enroll into the plan(s) 
 </body>
 </html>
 <br><br>
-<%= render "non_discrimination_language" %>
+<%= render "user_mailer/shared/non_discrimination_language" %>
 <br><br>
-<%= render "_non_discrimination_taglines" %>
+<%= render "user_mailer/shared/non_discrimination_taglines" %>
