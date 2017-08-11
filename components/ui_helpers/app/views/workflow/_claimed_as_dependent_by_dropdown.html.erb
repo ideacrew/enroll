@@ -1,5 +1,15 @@
 <%= label_tag cell.name.titleize.upcase%>
 <%tax_filing_applicants = @application.applicants.select{|applicant| (applicant != @applicant and applicant.is_required_to_file_taxes?)}%>
+<% if !tax_filing_applicants.collect.map(&:is_claimed_as_tax_dependent).all? {|i| i.nil?}%>
+    <% arr = []%>
+    <% tax_filing_applicants.each do |a| %>
+        <% if a.claimed_as_tax_dependent_by==@applicant.id %>
+            <% arr << a %>
+        <% end %>
+    <% end  %>
+    <% tax_filing_applicants =  tax_filing_applicants - arr%>
+<% end %>
+
 <%options_hash = {}; tax_filing_applicants.each { |applicant| options_hash[applicant.person.full_name] = applicant.id.to_s}%>
 
 <%= select_tag(cell.name_attribute, options_for_select(options_hash, selected: selected_value(@model, cell)), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>
