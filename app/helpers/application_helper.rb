@@ -549,7 +549,7 @@ module ApplicationHelper
         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_mid_year_plan_change_notice_congressional")
       end
     rescue Exception => e
-      log("#{e.message}; person_id: #{census_employee.employee_role.person.hbx_id}")
+      log("#{e.message}; person_id: #{census_employee.employee_role.present? ? census_employee.employee_role.person.hbx_id : nil }")
     end
   end
 
