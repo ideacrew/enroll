@@ -1,12 +1,22 @@
 
 Then (/^Employer Staff should see dialog with Attestation warning$/) do
   wait_for_ajax(3,2)
-  expect(page).to have_content('Force Publish')
+  expect(page).to have_content('Publish Anyways')
+  expect(page).to have_content('Cancel')
+end
+
+Then (/^Employer Staff should not see force publish$/) do
+  wait_for_ajax(3,2)
+  expect(page).not_to have_content('Force Publish')
   expect(page).to have_content('Cancel')
 end
 
 Then (/^Employer Staff clicks cancel button in Attestation warning dialog$/) do
   find('#publishPlanYear .interaction-click-control-cancel').trigger('click')
+end
+
+Then (/^Employer Staff clicks go back button in Attestation warning dialog$/) do
+  find('#publishPlanYear .interaction-click-control-go-back').trigger('click')
 end
 
 Then (/^Employer Staff should redirect to plan year edit page$/) do

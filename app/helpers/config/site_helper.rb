@@ -54,4 +54,8 @@ module Config::SiteHelper
   def find_your_doctor_url
     Settings.site.shop_find_your_doctor_url
   end
+
+  def site_document_verification_checklist_url
+    Settings.site.document_verification_checklist_url
+  end
 end
