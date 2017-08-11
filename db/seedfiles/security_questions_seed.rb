@@ -4,21 +4,19 @@ puts "::: Creating Security Questions:::"
 created_count = 0
 
 DEFAULT_QUESTIONS = [
-  "Who is your favorite singer?",
-  "What was the first street you lived on? ",
-  "What was you first sweetheart's first name?",
-  "Who is you favorite athlete?",
-  "What was the color of your first pet?",
-  "What is the first name of your mother's oldest sibling?",
+  "Who is your favorite actor, musician, or artist?",
+  "What is the name of your favorite pet?",
+  "What was your first phone number?",
+  "In what city were you born?",
+  "What was the first street you lived on?",
   "What was the name of your favorite teacher?",
-  "What is the first name of the first famous person you met?",
-  "What is your youngest child's nickname?",
-  "What was your first job?",
-  "What is your favorite automobile?",
-  "What is the name of your favorite band?",
-  "What was your father's profession when you were born?",
-  "What was your first sweetheart's last name?",
-  "What city was your favorite Olympic games played in?"
+  "What high school did you attend?",
+  "What is the name of your first school?",
+  "What is your favorite movie?",
+  "What street did you grow up on?",
+  "What was the make of your first car?",
+  "What was your high school mascot?",
+  "What is your father’s middle name?",
 ]
 
 DEFAULT_QUESTIONS.each do |question|
