@@ -5,6 +5,8 @@ Feature: Employer Profile
     Given shop health plans exist for both last and this year
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then I should see a successful sign up message
     Then I should click on employer portal
     Then Jack Doe creates a new employer profile with default_office_location
