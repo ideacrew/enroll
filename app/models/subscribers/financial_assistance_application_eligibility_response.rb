@@ -9,7 +9,21 @@ module Subscribers
     def call(event_name, e_start, e_end, msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
+
+      application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
+      if application.present?
+        payload_http_status_code = stringed_key_payload["return_status"]
+        unless application.success_status_codes?(payload_http_status_code)
+          error_message = stringed_key_payload["body"]
+          application.set_determination_response_error!
+        end
+        application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
+      else
+        log(stringed_key_payload, {:severity => "critical", :error_message => "Failed to find the Application in XML"})
+      end
+
       log(stringed_key_payload, {:severity => "critical", :error_message => "Testing Purpose"})
+
       sc = ShortCircuit.on(:processing_issue) do |err|
         log(xml, {:severity => "critical", :error_message => err})
       end
@@ -75,6 +89,7 @@ module Subscribers
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
       family.save!
+      application_in_context.determine!
     end
 
     def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )

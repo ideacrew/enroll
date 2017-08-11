@@ -62,6 +62,8 @@ class FinancialAssistance::Application
   field :request_full_determination, type: Boolean
 
   field :is_ridp_verified, type: Boolean
+  field :determination_http_status_code, type: Integer
+  field :determination_error_message, type: String
 
   field :workflow, type: Hash, default: { }
 
@@ -160,6 +162,7 @@ class FinancialAssistance::Application
   aasm do
     state :draft, initial: true
     state :submitted
+    state :determination_response_error
     state :determined
     state :denied
 
@@ -183,6 +186,10 @@ class FinancialAssistance::Application
           true # add appropriate guard here
         end
       end
+    end
+
+    event :set_determination_response_error, :after => :record_transition do
+      transitions from: :submitted, to: :determination_response_error
     end
 
     event :determine, :after => :record_transition do
@@ -523,6 +530,10 @@ class FinancialAssistance::Application
 
   def clean_conditional_params(model_params)
     clean_params(model_params)
+  end
+
+  def success_status_codes?(payload_http_status_code)
+    [200, 203].include?(payload_http_status_code)
   end
 
 private
