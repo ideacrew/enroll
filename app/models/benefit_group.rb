@@ -386,12 +386,17 @@ class BenefitGroup
   def carriers_offered
     case plan_option_kind
     when "single_plan"
-      [Plan.where(id: reference_plan_id).first.carrier_profile_id]
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
     when "single_carrier"
-      [Plan.where(id: reference_plan_id).first.carrier_profile_id]
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
     when "metal_level"
       Plan.where(:id => {"$in" => elected_plan_ids}).pluck(:carrier_profile_id).uniq
     end
+  end
+  
+  def dental_carriers_offered
+    return [] unless is_offering_dental?
+    Plan.where(id: dental_reference_plan_id).pluck(:carrier_profile_id)
   end
 
   def elected_plans_by_option_kind

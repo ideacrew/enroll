@@ -446,10 +446,10 @@ class EmployerProfile
   end
 
   def is_renewal_carrier_drop?
-    return true if renewing_plan_year.blank? || !renewing_plan_year.renewing_enrolled?
-
     if is_renewal_transmission_eligible?
-      (active_plan_year.carriers_offered - renewing_plan_year.carriers_offered).present?
+      (active_plan_year.carriers_offered - renewing_plan_year.carriers_offered).any? || (active_plan_year.dental_carriers_offered - renewing_plan_year.dental_carriers_offered).any?
+    else
+      true
     end
   end
 
@@ -786,19 +786,21 @@ class EmployerProfile
     end
   end
 
-  def transmit_scheduled_employers(new_date)
+  def transmit_scheduled_employers(new_date, feins=[])
     start_on = new_date.next_month.beginning_of_month
+    employer_collection = Organization
+    employer_collection = Organization.where(:fein.in => feins) if feins.any?
 
-    Organization.where(:"employer_profile.plan_years" => {
+    employer_collection.where(:"employer_profile.plan_years" => {
       :$elemMatch => {:start_on => start_on.prev_year, :aasm_state => 'active'}
       }).each do |org|
-      
+
       employer_profile = org.employer_profile
       employer_profile.transmit_renewal_eligible_event if employer_profile.is_renewal_transmission_eligible?
-      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop?
+      employer_profile.transmit_renewal_carrier_drop_event if employer_profile.is_renewal_carrier_drop? 
     end
 
-    Organization.where(:"employer_profile.plan_years" => { 
+    employer_collection.where(:"employer_profile.plan_years" => { 
       :$elemMatch => {:start_on => start_on, :aasm_state => 'enrolled'}
       }, :"employer_profile.aasm_state".in => ['binder_paid']).each do |org|
 
