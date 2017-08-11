@@ -1164,9 +1164,9 @@ class HbxEnrollment
 
     event :select_coverage, :after => :record_transition do
       transitions from: :shopping,
-                  to: :coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing,
-                  to: :renewing_coverage_selected, after: :propagate_selection, :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, after: [:propagate_selection, :ee_select_plan_during_oe], :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                     to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
@@ -1383,18 +1383,24 @@ class HbxEnrollment
    if submitted_at.blank?
       write_attribute(:submitted_at, TimeKeeper.date_of_record)
    end
- end
+  end
 
   def plan_year_check(employee_role)
-  covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
- end
+    covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
+   end
 
   def covered_plan_year(employee_role)
     employee_role.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(family.current_sep.try(:effective_on))} if employee_role.present?
- end
+  end
 
   def event_submission_date
     submitted_at.blank? ? Time.now : submitted_at
+  end
+
+  def ee_select_plan_during_oe
+    if is_shop? && self.census_employee.present? && self.enrollment_kind == "open_enrollment"
+      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "ee_select_plan_during_oe")
+    end
   end
 
   private
