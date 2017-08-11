@@ -688,7 +688,7 @@ class EmployerProfile
           end
         end
 
-        if Settings.aca.shop_market.transmit_employers_immediately.present?
+        if Settings.aca.shop_market.transmit_employers_immediately
           if new_date.day == Settings.aca.shop_market.employer_transmission_day_of_month
             transmit_scheduled_employers(new_date)
           end
