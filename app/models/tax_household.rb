@@ -13,8 +13,9 @@ class TaxHousehold
 
   before_create :set_effective_starting_on
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :household
 
+  field :application_id, type: BSON::ObjectId
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
 
@@ -25,18 +26,23 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  #accepts_nested_attributes_for :tax_household_members
+  embeds_many :tax_household_members
+  accepts_nested_attributes_for :tax_household_members
+
+  embeds_many :eligibility_determinations
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
-  # def latest_eligibility_determination
-  #   eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
-  # end
+  def latest_eligibility_determination
+    preferred_eligibility_determination
+    # eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  end
 
-  # def current_csr_eligibility_kind
-  #   eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
-  # end
+  def current_csr_eligibility_kind
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_eligibility_kind : "csr_100"
+    # eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
+  end
 
   def current_csr_percent
     preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_percent : 0
@@ -47,7 +53,12 @@ class TaxHousehold
   end
 
   def aptc_members
-    applicants.find_all(&:is_ia_eligible?)
+    #Review split brain
+    if application_id.present?
+      applicants.find_all(&:is_ia_eligible?)
+    else
+      tax_household_members.find_all(&:is_ia_eligible?)
+    end
   end
 
   def aptc_ratio_by_member
@@ -64,24 +75,20 @@ class TaxHousehold
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
-    aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false && thm.is_without_assistance == false && thm.is_totally_ineligible == false}.each do |member|
+    aptc_members.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.family_member.id.to_s] = premium
     end
-
     # Sum premium total for aptc_members
     sum_premium_total = benchmark_member_cost_hash.values.sum.to_f
-
     # Compute the ratio
     ratio_hash = {}
     benchmark_member_cost_hash.each do |member_id, cost|
       ratio_hash[member_id] = cost/sum_premium_total
     end
-
     ratio_hash
   rescue => e
     log(e.message, {:severity => 'critical'})
@@ -92,7 +99,7 @@ class TaxHousehold
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
     hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
+      sum + ( aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
     end
   end
 
@@ -162,43 +169,35 @@ class TaxHousehold
   end
 
   def family
-    return nil unless application
-    application.family
-  end
-
-  def is_eligibility_determined?
-    if self.elegibility_determinizations.size > 0
-      true
-    else
-      false
-    end
+    return nil unless household
+    household.family
   end
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    applicants.each do |applicant|
-      return applicant if applicant.family_member.is_primary_applicant?
-    end
+    application_id.present? ? application.applicants.detect{ |applicant| applicant.family_member.is_primary_applicant?} : tax_household_members.detect { |tax_household_member| tax_household_member.is_subscriber }
+  end
+
+  def application
+    FinancialAssistance::Application.find(application_id)
   end
 
   def applicants
-    return nil unless application.applicants
-    application.applicants.where(tax_household_id: self.id)
+    return nil unless application
+    application.applicants.where(tax_household_id: self.id) if application.applicants.present?
   end
 
   def preferred_eligibility_determination
-    return nil unless family.active_approved_application
-    eds = application.eligibility_determinations.where(tax_household_id: self.id)
-    admin_ed = eds.where(source: "Admin").first
-    curam_ed = eds.where(source: "Curam").first
-    return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
-    return curam_ed if curam_ed.present?
-    return eds.max_by(&:determined_at)
-  end
-
-  def eligibility_determinations
-    return nil unless family.active_approved_application
-    family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
+    return nil unless eligibility_determinations.present?
+    if application_id.present?
+      admin_ed = eligibility_determinations.where(source: "Admin").first
+      curam_ed = eligibility_determinations.where(source: "Curam").first
+      return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
+      return curam_ed if curam_ed.present?
+      return eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    end
   end
 
   def set_effective_starting_on

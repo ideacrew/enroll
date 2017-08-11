@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Applicant, type: :model do
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
 
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:application) { FactoryGirl.create(:application, family: family) }
@@ -31,9 +34,10 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
     let!(:person2) { FactoryGirl.create(:person, dob: "1972-04-04".to_date) }
     let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person2) }
     let!(:application) { FactoryGirl.create(:application, family: family) }
-    let!(:tax_household1) {FactoryGirl.create(:tax_household, application: application, effective_ending_on: nil)}
-    let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, application: application, tax_household_id: tax_household1.id, source: "Curam", csr_eligibility_kind: "csr_87")}
-    let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, application: application, tax_household_id: tax_household1.id, source: "Haven")}
+    let!(:household) {family.households.first}
+    let!(:tax_household1) {FactoryGirl.create(:tax_household,  application_id: application.id, household: household, effective_ending_on: nil)}
+    let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Curam", csr_eligibility_kind: "csr_87")}
+    let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Haven")}
     let!(:applicant1) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member1.id) }
     let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id) }
 
@@ -82,3 +86,4 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
     end
   end
 end
+

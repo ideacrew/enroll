@@ -648,7 +648,10 @@ module ApplicationHelper
     else
       'N/A'
     end
-    # boolean ? 'Yes' : 'No'
+  end
+
+  def current_year
+    Time.now.utc.year
   end
 
   def is_new_paper_application?(current_user, app_type)

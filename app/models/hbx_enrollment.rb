@@ -792,7 +792,7 @@ class HbxEnrollment
     end
   end
 
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_households: nil, apply_aptc: nil)
     qhp_plan ||= self.plan
 
     if self.is_shop?
@@ -804,26 +804,7 @@ class HbxEnrollment
       end
     else
       if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
-      else
-        UnassistedPlanCostDecorator.new(qhp_plan, self)
-      end
-    end
-  end
-
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
-    qhp_plan ||= self.plan
-
-    if self.is_shop?
-      if benefit_group.is_congress
-        PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
-      else
-        reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
-        PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
-      end
-    else
-      if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_households)
       else
         UnassistedPlanCostDecorator.new(qhp_plan, self)
       end
@@ -841,7 +822,7 @@ class HbxEnrollment
     end
 
     application = family.active_approved_application
-    tax_households = application.latest_active_tax_households_with_year(effective_on.year) if application.present?
+    tax_households = application.present? ? application.latest_active_tax_households_with_year(effective_on.year) : family.active_household.latest_active_tax_households_with_year(effective_on.year)
     elected_plans = benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_households, family_member_ids)
     elected_plans.collect {|plan| UnassistedPlanCostDecorator.new(plan, self)}
   end
