@@ -6,8 +6,12 @@
     </li>
 
     <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %>">
+  <% if  @application.complete? %>
+      <a href="javascript:void(0);" class="cna">Household Info</a>
+  <% else %>
       <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
-    </li>
+  <% end %>          
+</li>
 
     <% if defined?(@matrix) %>
       <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %>'>
@@ -73,11 +77,11 @@
       </ul>
     <% else %>
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %>">
-        <% if @application.ready_for_attestation? %>
-          <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
-        <% else %>
-          <a>Review and Submit</a>
-        <% end %>
+       <% if @application.ready_for_attestation? and !@application.complete? %>
+    <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
+  <% else %>
+  <a href="javascript:void(0);" class="cna">Review and Submit</a>
+<% end %>
       </li>
     <% end %>
   </ul>
