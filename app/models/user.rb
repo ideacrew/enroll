@@ -10,16 +10,6 @@ class User
 
   attr_accessor :login
 
-<<<<<<< HEAD
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable, :lockable,
-         :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
-
-  embeds_many :security_question_responses
-
-=======
->>>>>>> ref#16011 refactor devise related auth behaviors into separated concern
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :oim_id_rules
