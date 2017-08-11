@@ -676,17 +676,29 @@ shop_notice_triggers = [
     ]
   }
   {
+<<<<<<< HEAD
     hbx_id: 'SHOP37',
     title: 'Employee mid-year plan change',
+=======
+    hbx_id: 'SHOP40',
+    title: 'Employee Mid-Year Plan Change',
+>>>>>>> # This is a combination of 10 commits.
     description: 'Employee mid year plan change when an eligiblity determination is reached',
     resource_name: 'employer',
     event_name: 'ee_mid_year_plan_change_notice_congressional',
     notice_triggers: [
       {
+<<<<<<< HEAD
         name: 'Employee mid year plan change notice',
         notice_template: 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
         notice_builder: 'ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional',
         mpi_indicator: 'MPI_SHOP37',
+=======
+        name: 'Employee Mid-Year Plan change',
+        notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change_non_congressional',
+        notice_builder: 'ShopEmployerNotices::EmployeeMidYearPlanChangeNonCongressional',
+        mpi_indicator: 'MPI_SHOP40',
+>>>>>>> # This is a combination of 10 commits.
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
