@@ -1,40 +1,45 @@
-class ShopEmployerNotice < Notice
+class ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional < Notice
 
   Required= Notice::Required + []
+  attr_accessor :census_employee
 
-  attr_accessor :employer_profile, :key
-
-  def initialize(employer_profile, args = {})
-    self.employer_profile = employer_profile
-    args[:recipient] = employer_profile
+  def initialize(census_employee, args = {})
+    self.census_employee = census_employee
+    args[:recipient] = census_employee.employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
-    args[:to] = employer_profile.staff_roles.first.work_email_or_best
-    args[:name] = employer_profile.staff_roles.first.full_name.titleize
-    args[:recipient_document_store]= employer_profile
-    self.key = args[:key]
-    self.header = "notices/shared/shop_header.html.erb"
+    args[:to] = census_employee.employer_profile.staff_roles.first.work_email_or_best
+    args[:name] = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    args[:recipient_document_store]= census_employee.employer_profile
+    self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
 
   def deliver
     build
+    append_data
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
-    send_generic_notice_alert
-    send_generic_notice_alert_to_broker_and_ga
+  end
+
+  def append_data
+  	sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
+  	notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
+      :effective_on => sep.effective_on,
+      })
   end
 
   def build
-    notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
-    notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
+    notice.primary_fullname = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    notice.employee_fullname = census_employee.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
-    notice.primary_identifier = employer_profile.hbx_id
-    append_address(employer_profile.organization.primary_office_location.address)
+    notice.primary_identifier = census_employee.employer_profile.hbx_id
+    append_address(census_employee.employer_profile.organization.primary_office_location.address)
     append_hbe
-    append_broker(employer_profile.broker_agency_profile)
+    append_broker(census_employee.employer_profile.broker_agency_profile)
     notice.mpi_indicator = self.mpi_indicator
   end
 
@@ -76,19 +81,6 @@ class ShopEmployerNotice < Notice
       })
   end
 
-  def send_generic_notice_alert_to_broker_and_ga
-    if employer_profile.broker_agency_profile.present?
-      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
-      broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
-      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
-    end
-    if employer_profile.general_agency_profile.present?
-      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
-      ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
-      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
-    end
-  end
-
   def append_broker(broker)
     return if broker.blank?
     location = broker.organization.primary_office_location
@@ -111,5 +103,4 @@ class ShopEmployerNotice < Notice
       })
     })
   end
-
 end

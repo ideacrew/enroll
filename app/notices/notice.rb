@@ -19,7 +19,7 @@ class Notice
   end
 
   def html(options = {})
-    ApplicationController.new.render_to_string({ 
+    ApplicationController.new.render_to_string({
       :template => template,
       :layout => layout,
       :locals => { notice: notice }
@@ -56,7 +56,7 @@ class Notice
         top: 15,
         bottom: 28,
         left: 22,
-        right: 22 
+        right: 22
       },
       disable_smart_shrinking: true,
       dpi: 96,
@@ -74,12 +74,12 @@ class Notice
     footer = (market_kind == "individual") ? "notices/shared/footer.html.erb" : "notices/shared/shop_footer.html.erb"
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
-        template: footer,
+        template: "notices/shared/footer.html.erb",
         layout: false,
         locals: {notice: notice}
       })
     }})
-    
+
     options
   end
 
@@ -97,7 +97,7 @@ class Notice
     begin
       File.open(notice_path, 'wb') do |file|
         file << self.pdf
-      end      
+      end
     rescue Exception => e
       puts "#{e} #{e.backtrace}"
     end
@@ -116,7 +116,7 @@ class Notice
     notice  = create_recipient_document(doc_uri)
     create_secure_inbox_message(notice)
   end
-  
+
   def upload_to_amazonS3
     Aws::S3Storage.save(notice_path, 'notices')
   rescue => e
@@ -146,7 +146,7 @@ class Notice
 
   def create_recipient_document(doc_uri)
     notice = recipient_document_store.documents.build({
-      title: notice_filename, 
+      title: notice_filename,
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
@@ -163,7 +163,7 @@ class Notice
 
   def create_secure_inbox_message(notice)
     body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
     message.save!
