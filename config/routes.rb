@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   mount TransportGateway::Engine, at: "/transport_gateway"
 
+
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
@@ -285,6 +286,7 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
+        get "show_invoice"
       end
 
       collection do
