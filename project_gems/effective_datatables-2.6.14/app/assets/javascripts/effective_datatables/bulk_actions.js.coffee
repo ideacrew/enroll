@@ -1,3 +1,14 @@
+$(document).on 'ready page:load', ->
+  $(".interaction-click-control-employers").click ->
+    disableCheckbox = () ->
+      $(".individual_checkbox:checkbox").each (i, e) ->
+        if ($(this).data("status") == "Ineligible")
+          $(this).addClass("disabled")
+          $(this).attr("disabled", true)
+    setTimeout(disableCheckbox, 900)
+
+  
+
 #### Checkbox toggling and Bulk Actions dropdown disabling
 
 $(document).on 'change', "input[data-role='bulk-actions-resource']", (event) ->
