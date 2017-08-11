@@ -51,4 +51,12 @@ module Config::ContactCenterHelper
     link_to small_businesss_email,small_businesss_email
   end
 
+  def contact_center_appeals
+    Settings.contact_center.appeals
+  end
+
+  def contact_center_appeals_link
+    link_to contact_center_appeals,contact_center_appeals
+  end
+
 end
