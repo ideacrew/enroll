@@ -3,7 +3,7 @@
 "<%= json_escape person.hbx_id %>",
 "<%= json_escape person.first_name%>",
 "<%= json_escape person.last_name %>",
-"<%= documents_count(person) %>",
+"<%= documents_count(outstanding_verification_family) %>",
 <% verification_due_info = capture do %>
 	<%= outstanding_verification_family.min_verification_due_date_on_family %>
 <% end %>
