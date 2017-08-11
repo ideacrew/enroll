@@ -6,8 +6,8 @@ class User
   include Mongoid::Document
   include Mongoid::Timestamps
   include Acapi::Notifiers
-  include AuthorizationConcerns
-
+  include AuthorizationConcern
+  include PermissionsConcern
   attr_accessor :login
 
   validates_presence_of :oim_id
@@ -84,31 +84,8 @@ class User
 
   before_save :strip_empty_fields
 
-  ROLES = {
-    employee: "employee",
-    resident: "resident",
-    consumer: "consumer",
-    broker: "broker",
-    system_service: "system_service",
-    web_service: "web_service",
-    hbx_staff: "hbx_staff",
-    employer_staff: "employer_staff",
-    broker_agency_staff: "broker_agency_staff",
-    general_agency_staff: "general_agency_staff",
-    assister: 'assister',
-    csr: 'csr',
-  }
-
   # Enable polymorphic associations
   belongs_to :profile, polymorphic: true
-
-  has_one :person
-  accepts_nested_attributes_for :person, :allow_destroy => true
-
-  # after_initialize :instantiate_person
-  #  after_create :send_welcome_email
-
-  delegate :primary_family, to: :person, allow_nil: true
 
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create
@@ -129,11 +106,6 @@ class User
     end
   end
 
-  def person_id
-    return nil unless person.present?
-    person.id
-  end
-
   def idp_verified?
     idp_verified
   end
@@ -141,75 +113,6 @@ class User
   def send_welcome_email
     UserMailer.welcome(self).deliver_now
     true
-  end
-
-  def has_role?(role_sym)
-    return false if person_id.blank?
-    roles.any? { |r| r == role_sym.to_s }
-  end
-
-  def has_employee_role?
-    person && person.active_employee_roles.present?
-  end
-
-  def has_consumer_role?
-    person && person.consumer_role
-  end
-
-  def has_resident_role?
-    person && person.resident_role
-  end
-
-  def has_employer_staff_role?
-    person && person.has_active_employer_staff_role?
-  end
-
-  def has_broker_agency_staff_role?
-    has_role?(:broker_agency_staff)
-  end
-
-  def has_general_agency_staff_role?
-    has_role?(:general_agency_staff)
-  end
-
-  def has_insured_role?
-    has_employee_role? || has_consumer_role?
-  end
-
-  def has_broker_role?
-    has_role?(:broker)
-  end
-
-  def has_hbx_staff_role?
-    has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
-  end
-
-  def has_csr_role?
-    has_role?(:csr)
-  end
-
-  def has_csr_subrole?
-    person && person.csr_role && !person.csr_role.cac
-  end
-
-  def has_cac_subrole?
-    person && person.csr_role && person.csr_role.cac
-  end
-
-  def has_assister_role?
-    has_role?(:assister)
-  end
-
-  def has_agent_role?
-    has_role?(:csr) || has_role?(:assister)
-  end
-
-  def can_change_broker?
-    if has_employer_staff_role? || has_hbx_staff_role?
-      true
-    elsif has_general_agency_staff_role? || has_broker_role? || has_broker_agency_staff_role?
-      false
-    end
   end
 
   def agent_title
@@ -228,63 +131,12 @@ class User
     person == employer_profile.active_broker if employer_profile.active_broker
   end
 
-  def instantiate_person
-    self.person = Person.new
-  end
-
-  # Instances without a matching Person model
-  # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
-  #   ID in a has_one association
-  def self.orphans
-    user_ids = Person.where(:user_id => { "$ne" => nil }).pluck(:user_id)
-    User.where("_id" => { "$nin" => user_ids }).order(email: :asc).entries
-  end
-
   def handle_headless_records
     headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
     headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
     headless_users = headless_with_email + headless_with_oim_id
     headless_users.each do |headless|
       headless.destroy if !headless.person.present?
-    end
-  end
-
-  def needs_to_provide_security_questions?
-    security_question_responses.length < 3
-  end
-
-  class << self
-
-    def by_email(email)
-      where(email: /^#{email}$/i).first
-    end
-
-    def current_user=(user)
-      Thread.current[:current_user] = user
-    end
-
-    def logins_before_captcha
-      4
-    end
-
-    def login_captcha_required?(login)
-      begin
-        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
-      rescue => e
-        true
-      end
-    end
-
-    def current_user
-      Thread.current[:current_user]
-    end
-
-    def logins_before_captcha
-      4
-    end
-
-    def has_answered_question? security_question_id
-      where(:'security_question_responses.security_question_id' => security_question_id).any?
     end
   end
 
@@ -341,38 +193,6 @@ class User
     announcements.uniq
   end
 
-  def self.get_saml_settings
-    settings = OneLogin::RubySaml::Settings.new
-
-    # When disabled, saml validation errors will raise an exception.
-    settings.soft = true
-
-    # SP section
-    settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
-    settings.assertion_consumer_logout_service_url = SamlInformation.assertion_consumer_logout_service_url
-    settings.issuer                         = SamlInformation.issuer
-
-    # IdP section
-    settings.idp_entity_id                  = SamlInformation.idp_entity_id
-    settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
-    settings.idp_slo_target_url             = SamlInformation.idp_slo_target_url
-    settings.idp_cert                       = SamlInformation.idp_cert
-    # or settings.idp_cert_fingerprint           = "3B:05:BE:0A:EC:84:CC:D4:75:97:B3:A2:22:AC:56:21:44:EF:59:E6"
-    #    settings.idp_cert_fingerprint_algorithm = XMLSecurity::Document::SHA1
-
-    settings.name_identifier_format         = SamlInformation.name_identifier_format
-
-    # Security section
-    settings.security[:authn_requests_signed] = false
-    settings.security[:logout_requests_signed] = false
-    settings.security[:logout_responses_signed] = false
-    settings.security[:metadata_signed] = false
-    settings.security[:digest_method] = XMLSecurity::Document::SHA1
-    settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA1
-
-    settings
-  end
-
   class << self
     def password_invalid?(password)
       ## TODO: oim_id is an explicit dependency to the User class
@@ -388,6 +208,54 @@ class User
       else
         where(conditions).first
       end
+    end
+
+    def by_email(email)
+      where(email: /^#{email}$/i).first
+    end
+
+    def current_user=(user)
+      Thread.current[:current_user] = user
+    end
+
+    def get_saml_settings
+      settings = OneLogin::RubySaml::Settings.new
+
+      # When disabled, saml validation errors will raise an exception.
+      settings.soft = true
+
+      # SP section
+      settings.assertion_consumer_service_url = SamlInformation.assertion_consumer_service_url
+      settings.assertion_consumer_logout_service_url = SamlInformation.assertion_consumer_logout_service_url
+      settings.issuer                         = SamlInformation.issuer
+
+      # IdP section
+      settings.idp_entity_id                  = SamlInformation.idp_entity_id
+      settings.idp_sso_target_url             = SamlInformation.idp_sso_target_url
+      settings.idp_slo_target_url             = SamlInformation.idp_slo_target_url
+      settings.idp_cert                       = SamlInformation.idp_cert
+      # or settings.idp_cert_fingerprint           = "3B:05:BE:0A:EC:84:CC:D4:75:97:B3:A2:22:AC:56:21:44:EF:59:E6"
+      #    settings.idp_cert_fingerprint_algorithm = XMLSecurity::Document::SHA1
+
+      settings.name_identifier_format         = SamlInformation.name_identifier_format
+
+      # Security section
+      settings.security[:authn_requests_signed] = false
+      settings.security[:logout_requests_signed] = false
+      settings.security[:logout_responses_signed] = false
+      settings.security[:metadata_signed] = false
+      settings.security[:digest_method] = XMLSecurity::Document::SHA1
+      settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA1
+
+      settings
+    end
+
+    # Instances without a matching Person model
+    # This suboptimal query approach is necessary, as the belongs_to side of the association holds the
+    #   ID in a has_one association
+    def orphans
+      user_ids = Person.where(:user_id => { "$ne" => nil }).pluck(:user_id)
+      User.where("_id" => { "$nin" => user_ids }).order(email: :asc).entries
     end
   end
 
