@@ -58,8 +58,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
     @census_employee = @enrollment.census_employee
-    employee_mid_year_plan_change_non_congressional(@census_employee) if @change_plan.present? or @enrollment_kind.present?
-
+    if (@change_plan.present? || @enrollment_kind.present?) && @census_employee.present?
+      employee_mid_year_plan_change_non_congressional(@census_employee)
+    end
     send_receipt_emails if @person.emails.first
   end
 
