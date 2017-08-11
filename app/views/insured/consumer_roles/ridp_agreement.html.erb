@@ -50,6 +50,9 @@
 </div>
 <script type="text/javascript">
   $(document).ready(function(){
+    $(".interaction-choice-control-value-agreement-agree").prop("checked", true)
+    $(".interaction-click-control-continue").attr("disabled", false);
+
     $(".interaction-choice-control-value-agreement-agree").click(function(){
       $(".interaction-click-control-continue").attr("disabled", false);
         // $(".disagree_placeholder_text").hide();
@@ -57,7 +60,8 @@
     $(".interaction-choice-control-value-agreement-disagree").click(function(){
       $(".interaction-click-control-continue").attr("disabled", true);
         // $(".disagree_placeholder_text").show();
-        alert("Please contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %> for more info");
+        // alert("Please contact <%= Settings.site.short_name %> at <%= Settings.contact_center.phone_number %> for more info");
+        alert("We are required by Federal law to verify your identity before you continue with your application. If you do not want to continue with identity verification through Experian, you can apply by completing and sending us a paper application or going to a Department of Human Services service center to apply in person.");
       });
   });
 </script>
