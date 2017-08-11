@@ -610,6 +610,27 @@ shop_notice_triggers = [
         }
       }
     ]
+  },
+  {
+      hbx_id: 'SHOP_D050',
+      title: 'Broker Terminated by Employer',
+      description: 'PDF Generation for Broker after Termination',
+      resource_name: 'employer',
+      event_name: 'broker_termination_notice',
+      notice_triggers: [
+          {
+              name: 'Employee mid year plan change notice - congressional',
+              notice_template: 'notices/shop_employer_notices/broker_termination_notice.html.erb',
+              notice_builder: 'TerminatedBrokerNotice',
+              mpi_indicator: 'MPI_SHOP_D050',
+              notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["broker_agencies"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+              }
+          }
+      ]
   }
 ]
 

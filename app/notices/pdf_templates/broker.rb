@@ -3,6 +3,8 @@ module PdfTemplates
     include Virtus.model
 
     attribute :primary_fullname, String
+    attribute :first_name, String
+    attribute :last_name, String
     attribute :organization, String
     attribute :address, PdfTemplates::NoticeAddress
     attribute :phone, String

@@ -1,0 +1,18 @@
+<table class="total_table address" border="0">
+  <tbody>
+  <tr class="fssize mar20">
+    <td><%= notice.broker_agency_profile.legal_name %></td>
+  </tr>
+  <tr class="fssize1">
+    <td><%= notice.address.try(:street_1) %></td>
+  </tr>
+  <% if notice.address.try(:street_2).present? %>
+      <tr class="fssize1">
+        <td><%= notice.address.try(:street_2) %></td>
+      </tr>
+  <% end %>
+  <tr class="fssize">
+    <td><%= notice.address.try(:city) %> <%= notice.address.try(:state) %> <%= notice.address.try(:zip) %></td>
+  </tr>
+  </tbody>
+</table>

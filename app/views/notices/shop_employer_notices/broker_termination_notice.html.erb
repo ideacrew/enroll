@@ -1,0 +1,73 @@
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <br></br>
+  </tr>
+  <tr>
+    <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+      <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 18px; text-align: center;">
+      The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+    </td>
+  </tr>
+  <tr>
+    <br></br>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0" style="margin-top: 260px;">
+  <tbody>
+  <tr>
+    <td>Notice No: <%= notice.mpi_indicator %></td>
+  </tr>
+  </tbody>
+</table>
+<%= render partial: "notices/shared/broker_address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td><h3>SUBJECT: <%= notice.employer_profile.try(:legal_name) %> HAS REMOVED YOU AS THEIR BROKER</h3></td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td>Dear <%= notice.broker_agency_profile.try(:legal_name) %>:</td>
+  </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is to inform you that #{notice.broker.first_name} #{notice.broker.last_name } is no longer the broker of record for  #{notice.employer_profile.try(:legal_name)} as of #{notice.terminated_broker_account.end_on.to_s}. You will nolonger be authorized to access #{notice.employer_profile.try(:legal_name)} 's DC Health Link Account or take action on behalf of #{notice.employer_profile.try(:legal_name)} or any employees of #{notice.employer_profile.try(:legal_name)}"} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
+    heading: 'For Questions or Assistance:', sub_heading: ''} %>
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+    <td>
+      <ul style="list-style: circle solid;">
+        <li style="margin-top: 5px;">
+          By calling <%= Settings.contact_center.phone_number %>
+        </li>
+        <li style="margin-top: 5px;">
+          TTY: 711
+        </li>
+        <li style="margin-top: 5px;">
+          Online at <a href="www.DCHealthLink.com">www.DCHealthLink.com</a>
+        </li>
+      </ul>
+    </td>
+  </tr>
+  </tbody>
+</table>
