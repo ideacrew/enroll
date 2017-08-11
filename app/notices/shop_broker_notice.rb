@@ -10,6 +10,7 @@ class ShopBrokerNotice < Notice
     self.broker = employer_profile.broker_agency_profile.primary_broker_role.person
     args[:recipient] = broker
     args[:market_kind]= 'shop'
+    #args[:notice] = PdfTemplates::Broker.new
     args[:notice] = PdfTemplates::BrokerNotice.new
     args[:to] = broker.work_email_or_best
     args[:name] = broker.full_name
@@ -19,15 +20,14 @@ class ShopBrokerNotice < Notice
   end
 
    def build
-    notice.primary_fullname = broker.full_name.titleize
     notice.first_name = broker.first_name.titleize
     notice.last_name = broker.last_name.titleize
     notice.hbx_id = broker.hbx_id
     notice.assignment_date = employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
     notice.mpi_indicator = self.mpi_indicator
     notice.employer_name = employer_profile.legal_name.titleize
-    notice.employer_first_name = employer_profile.staff_roles.first.first_name.titleize
-    notice.employer_last_name = employer_profile.staff_roles.first.last_name.titleize
+    notice.er_first_name = employer_profile.staff_roles.first.first_name.titleize
+    notice.er_last_name = employer_profile.staff_roles.first.last_name.titleize
     notice.broker_agency = employer_profile.broker_agency_profile.legal_name.titleize
     append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
     append_hbe
