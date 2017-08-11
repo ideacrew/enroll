@@ -13,7 +13,7 @@ module Subscribers
       application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
-        unless application.success_status_codes?(payload_http_status_code)
+        unless application.success_status_codes?(payload_http_status_code.to_i)
           error_message = stringed_key_payload["body"]
           application.set_determination_response_error!
         end
