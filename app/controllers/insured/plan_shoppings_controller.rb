@@ -56,10 +56,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
-    @census_employee = @enrollment.census_employee
-    employee_mid_year_plan_change_non_congressional(@census_employee) if @change_plan.present? or @enrollment_kind.present?
-
     send_receipt_emails if @person.emails.first
   end
 
@@ -135,7 +131,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      
       redirect_to family_account_path
     else
       redirect_to :back
