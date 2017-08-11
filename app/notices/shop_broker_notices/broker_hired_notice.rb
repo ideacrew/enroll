@@ -30,3 +30,4 @@ class ShopBrokerNotices::BrokerHiredNotice < ShopBrokerNotice
   end
 
 end
+

@@ -873,7 +873,7 @@ ivl_notice_triggers = [
     ]
   },
   {
-     hbx_id: 'SHOP48',
+     hbx_id: 'DB0048',
      title: 'You have been Hired as a Broker',
      description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
      resource_name: 'broker_role',
@@ -883,7 +883,28 @@ ivl_notice_triggers = [
          name: 'Broker Hired',
          notice_template: 'notices/shop_broker_notices/broker_hired_notice.html.erb',
          notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
-         mpi_indicator: 'SHOP_D048',
+         mpi_indicator: 'SHOP_DB0048',
+         notice_trigger_element_group: {
+           market_places: ['shop'],
+           primary_recipients: ["broker"],
+           primary_recipient_delivery_method: ["secure_message"],
+           secondary_recipients: []
+          }
+        }
+      ]
+    },
+    {
+     hbx_id: 'DY0047',
+     title: 'You have been Hired as a Broker',
+     description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
+     resource_name: 'broker_role',
+     event_name: 'broker_agency_hired',
+     notice_triggers: [
+       {
+         name: 'Broker Agency Hired',
+         notice_template: 'notices/shop_broker_notices/broker_agency_hired_notice.html.erb',
+         notice_builder: 'ShopBrokerNotices::BrokerAgencyHiredNotice',
+         mpi_indicator: 'SHOP_DY0047',
          notice_trigger_element_group: {
            market_places: ['shop'],
            primary_recipients: ["broker"],

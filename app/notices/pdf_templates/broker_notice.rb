@@ -11,6 +11,8 @@ module PdfTemplates
     attribute :er_first_name, String
     attribute :er_last_name, String
     attribute :er_fullname, String
+    attribute :er_address, String
+    attribute :er_phone, String
     attribute :er_legal_name, String
     attribute :employer_name, String
     attribute :broker_agency, String
