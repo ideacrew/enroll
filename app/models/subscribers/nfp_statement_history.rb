@@ -39,8 +39,6 @@ module Subscribers
            )
         end
 
-        xml_hash = xml_to_hash(xml)
-
       rescue => e
         puts "ERROR ERROR ERROR"
         puts e
