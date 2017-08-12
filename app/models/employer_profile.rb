@@ -140,7 +140,7 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, "broker_termination_notice")
+    send_broker_notice
     notify_broker_terminated
   end
 
@@ -1028,5 +1028,9 @@ class EmployerProfile
 
   def plan_year_publishable?
     !published_plan_year.is_application_unpublishable?
+  end
+
+  def send_broker_notice
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "broker_termination_notice")
   end
 end

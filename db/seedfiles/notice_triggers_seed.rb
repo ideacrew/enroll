@@ -619,7 +619,7 @@ shop_notice_triggers = [
       event_name: 'broker_termination_notice',
       notice_triggers: [
           {
-              name: 'Employee mid year plan change notice - congressional',
+              name: 'Employee termination notice by employer',
               notice_template: 'notices/shop_employer_notices/broker_termination_notice.html.erb',
               notice_builder: 'TerminatedBrokerNotice',
               mpi_indicator: 'MPI_SHOP_D050',

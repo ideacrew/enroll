@@ -1,13 +1,14 @@
 class TerminatedBrokerNotice < Notice
   Required= Notice::Required + []
   attr_accessor :employer_profile, :broker_agency_profile, :terminated_broker_account
+
   def initialize(employer_profile,args = {} )
     self.employer_profile = employer_profile
     self.broker_agency_profile = employer_profile.broker_agency_accounts.unscoped.select{|a| a.end_on.present?}.last.broker_agency_profile
     self.terminated_broker_account = employer_profile.broker_agency_accounts.unscoped.select{|a| a.end_on.present?}.last
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
-    args[:notice] = PdfTemplates::BrokerTerminatedNotice.new
+    args[:notice] = PdfTemplates::Broker.new
     args[:to] = broker_agency_profile.try(:legal_name)
     args[:name] = broker_agency_profile.try(:legal_name)
     args[:recipient_document_store]= broker_agency_profile.try(:primary_broker_role).try(:person)
