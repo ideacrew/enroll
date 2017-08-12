@@ -22,7 +22,6 @@ module Subscribers
           return
         end
 
-        xml_hash = xml_to_hash(xml)
 
       rescue => e
         notify("acapi.error.application.enroll.remote_listener.nfp_payment_history_responses", {
