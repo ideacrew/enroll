@@ -154,7 +154,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def check_eligibility_results_received
     application = @person.primary_family.applications.find(params[:id])
-    render :text => "#{application.eligibility_determinations.present?}"
+    render :text => "#{application.success_status_codes?(application.determination_http_status_code)}"
   end
 
   private
