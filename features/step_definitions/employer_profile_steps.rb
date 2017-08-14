@@ -243,7 +243,7 @@ Given(/^(\w+) enters Employer Information/) do |name|
   fill_in 'organization[office_locations_attributes][0][phone_attributes][area_code]', :with => '202'
   fill_in 'organization[office_locations_attributes][0][phone_attributes][number]', :with => '5551212'
   fill_in 'organization[office_locations_attributes][0][phone_attributes][extension]', :with => '22332'
-  find('.interaction-click-control-confirm').click
+  find('.interaction-click-control-save').click
 end
 
 Then /(\w+) becomes an Employer/ do |name|

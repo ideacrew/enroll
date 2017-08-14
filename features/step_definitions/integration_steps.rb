@@ -477,7 +477,7 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
 
-  find('.interaction-click-control-confirm').click
+  find('.interaction-click-control-save').click
 end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
