@@ -641,7 +641,17 @@ module ApplicationHelper
   end
 
   def human_boolean(boolean)
-    boolean ? 'Yes' : 'No'
+    if boolean
+      'Yes'
+    elsif boolean == false
+      'No'
+    else
+      'N/A'
+    end
+  end
+
+  def current_year
+    Time.now.utc.year
   end
 
   def is_new_paper_application?(current_user, app_type)
