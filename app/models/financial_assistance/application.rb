@@ -309,6 +309,22 @@ class FinancialAssistance::Application
     total_incomes
   end
 
+  def tax_households
+    tax_households = []
+    family.active_household.tax_households.each do |tax_household|
+      tax_households << tax_household unless tax_household.application_id.nil?
+    end
+    tax_households
+  end
+
+  def eligibility_determinations
+    eligibility_determinations = []
+    tax_households.each do |tax_household|
+      eligibility_determinations << tax_household.preferred_eligibility_determination
+    end
+    eligibility_determinations
+  end
+
   def all_tax_households
     tax_households = []
     applicants.each do |applicant|
@@ -329,14 +345,14 @@ class FinancialAssistance::Application
   end
 
   def eligibility_determination_for_tax_household(tax_household_id)
-    eligibility_determinations.where(tax_household_id: tax_household_id).first
+    family.active_household.tax_households.where(id: tax_household_id).first.preferred_eligibility_determination
+    # eligibility_determinations.where(tax_household_id: tax_household_id).first
   end
 
   def tax_household_for_family_member(family_member_id)
     tax_households.select {|th| th if th.applicants.where(family_member_id: family_member_id).present? }.first
   end
 
-  # TODO: Move to Aplication model and refactor accordingly.
   def latest_active_tax_households_with_year(year)
     tax_households = self.tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year

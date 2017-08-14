@@ -85,7 +85,7 @@ class EligibilityDetermination
   end
 
   def family
-    application.family
+    tax_household.family
   end
 
   def benchmark_plan=(benchmark_plan_instance)
@@ -122,9 +122,9 @@ class EligibilityDetermination
     end
   end
 
-  def tax_household
-    return nil unless tax_household_id
-    family.active_approved_application.tax_households.where(id: tax_household_id).first
+  def application
+    return nil unless tax_household.application_id.present?
+    family.applications.where(id: tax_household.application_id).first
   end
 
 private
@@ -135,6 +135,10 @@ private
   def set_determined_at
     if application && application.submitted_at.present?
       self.determined_at ||= application.submitted_at
+    else
+      if tax_household && tax_household.submitted_at.present?
+        self.determined_at ||= tax_household.submitted_at
+      end
     end
   end
 end

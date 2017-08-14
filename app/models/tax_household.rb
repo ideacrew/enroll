@@ -34,13 +34,15 @@ class TaxHousehold
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
-  # def latest_eligibility_determination
-  #   eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
-  # end
+  def latest_eligibility_determination
+    preferred_eligibility_determination
+    # eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+  end
 
-  # def current_csr_eligibility_kind
-  #   eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
-  # end
+  def current_csr_eligibility_kind
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_eligibility_kind : "csr_100"
+    # eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
+  end
 
   def current_csr_percent
     preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_percent : 0
@@ -51,7 +53,12 @@ class TaxHousehold
   end
 
   def aptc_members
-    applicants.find_all(&:is_ia_eligible?)
+    #Review split brain
+    if application_id.present?
+      applicants.find_all(&:is_ia_eligible?)
+    else
+      tax_household_members.find_all(&:is_ia_eligible?)
+    end
   end
 
   def aptc_ratio_by_member
@@ -170,30 +177,32 @@ class TaxHousehold
     household.family
   end
 
-
-  def is_eligibility_determined?
-    if self.elegibility_determinizations.size > 0
-      true
-    else
-      false
-    end
-  end
-
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    applicants.each do |applicant|
-      return applicant if applicant.family_member.is_primary_applicant?
+    #Review split brain
+    if application_id.present?
+      applicants.each do |applicant|
+        return applicant if applicant.family_member.is_primary_applicant?
+      end
+    else
+      tax_household_members.detect do |tax_household_member|
+        tax_household_member.is_subscriber == true
+      end
     end
   end
 
   def preferred_eligibility_determination
-    return nil unless family.active_approved_application
-    eds = application.eligibility_determinations.where(tax_household_id: self.id)
-    admin_ed = eds.where(source: "Admin").first
-    curam_ed = eds.where(source: "Curam").first
-    return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
-    return curam_ed if curam_ed.present?
-    return eds.max_by(&:determined_at)
+    #Review split brain
+    return nil unless eligibility_determinations.present?
+    if application_id.present?
+      admin_ed = eligibility_determinations.where(source: "Admin").first
+      curam_ed = eligibility_determinations.where(source: "Curam").first
+      return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
+      return curam_ed if curam_ed.present?
+      return eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    end
   end
 
   def set_effective_starting_on
