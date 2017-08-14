@@ -49,12 +49,21 @@ input[type="radio"]:checked + label span {
     color:#C3C3C3;
   }
 
+  li:not(.activer) a:not(.disabled) {
+    color:#0088cc;
+  }
+
   .active {
-    border-left: 6px solid #92aae0
+    border-left: 6px solid #92aae0;
   }
 
   .disabled {
-    background-color: #717171;
+    background-color: white;
+  }
+
+  .active a {
+    font-weight: bolder;
+    color: white;
   }
 
   li {
