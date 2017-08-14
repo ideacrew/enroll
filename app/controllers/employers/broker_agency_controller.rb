@@ -48,7 +48,7 @@ class Employers::BrokerAgencyController < ApplicationController
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
       end
-      send_broker_assigned_msg(@employer_profile, broker_agency_profile)
+      # send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
       broker_hired_confirmation_notice
     end
