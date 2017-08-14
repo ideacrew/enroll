@@ -36,7 +36,7 @@ module Config::SiteHelper
   end
 
   def site_registration_path(resource_name, params)
-    Settings.site.registration_path || new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+    Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
   end
 
   def site_broker_quoting_enabled?
