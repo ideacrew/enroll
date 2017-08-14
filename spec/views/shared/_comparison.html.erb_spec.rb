@@ -157,7 +157,7 @@ describe "shared/_comparison.html.erb" do
       allow(mock_plan).to receive(:nationwide).and_return(false)
       allow(mock_plan).to receive(:service_area_id).and_return('XX-111')
       render "shared/comparison", :qhps => mock_qhps
-      expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
+      expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
     end
 
   end
