@@ -17,6 +17,7 @@ site:
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
+  main_web_address_text: "MAhealthconnector.org"
 
   social_media:
     facebook_url: ""
@@ -42,6 +43,14 @@ contact_center:
     city: "Washington"
     state: "DC"
     zip: "20026"
+
+  appeal_center:
+    name: "Appeals Unit"
+    address_1: "PO Box 960189"
+    address_2:
+    city: "Boston"
+    state: "MA"
+    zip_code: "02196"
 
 notices:
   mailing_address:

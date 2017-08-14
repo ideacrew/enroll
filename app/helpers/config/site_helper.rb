@@ -54,4 +54,8 @@ module Config::SiteHelper
   def find_your_doctor_url
     Settings.site.shop_find_your_doctor_url
   end
+
+  def site_main_web_address_text
+    Settings.site.main_web_address_text
+  end
 end
