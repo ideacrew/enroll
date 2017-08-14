@@ -1,6 +1,7 @@
 site:
   aca_market_kinds: ["individual", "shop"]
   general_agency_enabled: true
+  registration_path: ""
 
 aca:
 

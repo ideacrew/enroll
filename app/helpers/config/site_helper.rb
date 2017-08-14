@@ -35,6 +35,10 @@ module Config::SiteHelper
     Settings.site.short_name
   end
 
+  def site_registration_path(resource_name, params)
+    Settings.site.registration_path || new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+  end
+
   def site_broker_quoting_enabled?
     Settings.site.broker_quoting_enabled
   end

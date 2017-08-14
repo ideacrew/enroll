@@ -181,7 +181,11 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
-      session[:portal] || request.referer || root_path
+      if request.referrer =~ /sign_in/
+        session[:portal] || resource.try(:last_portal_visited) || root_path
+      else
+        session[:portal] || request.referer || root_path
+      end
     end
 
     def after_sign_out_path_for(resource_or_scope)
