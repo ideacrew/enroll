@@ -9,14 +9,13 @@
   <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td class="notice-font"><br>Dear <%= notice.broker_agency_profile%>,</td>
+      <td class="notice-font"><br>Dear <%= notice.broker_agency %>,</td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! <strong>#{notice.broker.full_name}</strong>  has been selected as the broker for <strong>#{notice.er_legal_name}</strong> as of <broker assignment date>. The primary contact for <strong>#{notice.er_legal_name}
-    </strong>  is #{notice.er_first_name} #{notice.er_last_name}, #{notice.er_address} #{notice.er_phone}."} %>
+  { content: "Congratulations! <strong>#{notice.broker.full_name}</strong>  has been selected as the broker for <strong>#{notice.er_legal_name}</strong> as of #{notice.broker.assignment_date}, The primary contact for <strong>#{notice.er_legal_name}</strong>  is #{notice.er_first_name} #{notice.er_last_name}, #{notice.er_phone}, #{notice.er_email}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Please remember that as a registered broker with #{Settings.site.short_name}, you are agreeing to the #{Settings.site.short_name} Statement of Producer Attestations when logging into <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a> "} %>

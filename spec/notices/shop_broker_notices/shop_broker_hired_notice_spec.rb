@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopBrokerNotice do
+RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let!(:employer_profile){ create :employer_profile}
   let!(:broker_agency_profile) { create :broker_agency_profile }
@@ -13,7 +13,7 @@ RSpec.describe ShopBrokerNotice do
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Broker Hired',
                             :notice_template => 'notices/shop_broker_notices/broker_hired.html.erb',
-                            :notice_builder => 'ShopBrokerNotice',
+                            :notice_builder => 'ShopBrokerNotices::BrokerHiredNotice',
                             :event_name => 'broker_hired',
                             :mpi_indicator => 'SHOP_D048',
                             :title => "You have been Hired as a Broker"})

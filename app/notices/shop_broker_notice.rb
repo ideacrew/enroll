@@ -5,16 +5,7 @@ class ShopBrokerNotice < Notice
   attr_accessor :broker
   attr_accessor :employer_profile
 
-  def initialize(employer_profile, args = {})
-    self.employer_profile = employer_profile
-    self.broker = employer_profile.broker_agency_profile.primary_broker_role.person
-    args[:recipient] = broker
-    args[:market_kind]= 'shop'
-    args[:notice] = PdfTemplates::BrokerNotice.new
-    args[:to] = broker.work_email_or_best
-    args[:name] = broker.full_name
-    args[:recipient_document_store] = broker
-    self.header = "notices/shared/shop_header.html.erb"
+  def initialize(args = {})
     super(args)
   end
 
