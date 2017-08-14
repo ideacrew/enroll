@@ -7,12 +7,13 @@
 # And E2 has the same subscriber
 # E2 effective date > E1 effective date > E2 submitted on date.
 # Then E1 is Canceled
+#RAILS_ENV=production bundle exec rake reports:list_of_ivl_enrollments_in_cancel_state_erroneously
 
 
 require 'csv'
 namespace :reports do
   desc "Report of ivl_enrollments placed in to the cancel state erroneously"
-  task :list_of_vl_ienrollments_in_cancel_state_erroneously => :environment do
+  task :list_of_ivl_enrollments_in_cancel_state_erroneously => :environment do
     file_name = "#{Rails.root}/ivl_enrollments_in_cancel_state_erroneously.csv"
     field_names  = ["HBX Subscriber ID",
                     "Cancel_enrollment_hbx_id",
