@@ -58,8 +58,8 @@ RSpec.describe ShopBrokerNotice do
       expect(@broker_notice.notice.first_name).to eq broker_agency_profile.primary_broker_role.person.first_name
       expect(@broker_notice.notice.last_name).to eq broker_agency_profile.primary_broker_role.person.last_name
       expect(@broker_notice.notice.employer_name).to eq employer_profile.legal_name.titleize
-      expect(@broker_notice.notice.er_first_name).to eq employer_profile.staff_roles.first.first_name
-      expect(@broker_notice.notice.er_last_name).to eq employer_profile.staff_roles.first.last_name
+      expect(@broker_notice.notice.employer_first_name).to eq employer_profile.staff_roles.first.first_name
+      expect(@broker_notice.notice.employer_last_name).to eq employer_profile.staff_roles.first.last_name
       expect(@broker_notice.notice.broker_agency).to eq employer_profile.broker_agency_profile.legal_name.titleize
     end
   end
