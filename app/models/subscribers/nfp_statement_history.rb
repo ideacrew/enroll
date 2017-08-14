@@ -18,11 +18,12 @@ module Subscribers
         eid = stringed_key_payload['employer_id']
 
 
-        Rails.logger.info "**********===================**********"
+        Rails.logger.info "BEGIN **********===================**********"
         Rails.logger.info "Enroll received nfp_statement_summary_success"
         Rails.logger.info xml
         Rails.logger.info stringed_key_payload
         Rails.logger.info eid
+        Rails.logger.info "END **********===================**********"
 
         response = eval(xml)
 
@@ -39,12 +40,8 @@ module Subscribers
            )
         end
 
-        xml_hash = xml_to_hash(xml)
-
       rescue => e
-        puts "ERROR ERROR ERROR"
-        puts e
-        Rails.logger.info e
+        Rails.logger.error e
         notify("acapi.error.application.enroll.remote_listener.nfp_statement_history_responses", {
           :body => JSON.dump({
              :error => e.inspect,
