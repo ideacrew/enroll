@@ -1,11 +1,12 @@
 class ShopEmployerNotices::ZeroEmployeesOnRoster < ShopEmployerNotice
 
-  def deliver
+   def deliver
     build
     append_data
     generate_pdf_notice
-    non_discrimination_attachment
+    employer_appeal_rights_attachment
     attach_envelope
+    non_discrimination_attachment
     upload_and_send_secure_message
     send_generic_notice_alert
   end
