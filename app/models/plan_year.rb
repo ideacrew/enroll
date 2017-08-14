@@ -881,6 +881,11 @@ class PlanYear
       transitions from: [:active, :suspended], to: :terminated
     end
 
+    # Coverage reinstated
+    event :reinstate_plan_year, :after => :record_transition do
+      transitions from: :terminated, to: :active
+    end
+
     event :renew_plan_year, :after => :record_transition do
       transitions from: :draft, to: :renewing_draft
     end
