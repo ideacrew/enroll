@@ -568,6 +568,48 @@ shop_notice_triggers = [
         }
       }
     ]
+  },
+  {
+    hbx_id: 'SHOP35',
+    title: 'Special Enrollment Period Denial',
+    description: 'EE SEP Requested by Employee outside of allowable time frame',
+    resource_name: 'employee_role',
+    event_name: 'sep_request_denial_notice',
+    notice_triggers: [
+      {
+        name: 'Denial of SEP Requested by EE outside of allowable time frame',
+        notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
+        notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
+        mpi_indicator: 'MPI_SHOP35',
+                notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP10047',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'Notification to employees regarding their Employer’s ineligibility.',
+    resource_name: 'employee_role',
+    event_name: 'notify_employee_of_initial_employer_ineligibility',
+    notice_triggers: [
+      {
+        name: 'Notification to employees regarding their Employer’s ineligibility.',
+        notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
+        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
+        mpi_indicator: 'MPI_SHOP10047',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
   }
 ]
 
