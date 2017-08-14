@@ -31,7 +31,8 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/brokers_list_#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv"
+      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+      file_name = File.expand_path("#{Rails.root}/brokers_list_#{time_stamp}.csv")
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -61,6 +62,9 @@ namespace :reports do
            processed_count += 1
         end
       end
+
+      pubber = Publishers::Legacy::ShopBrokersReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} Brokers to output file: #{file_name}"
     end

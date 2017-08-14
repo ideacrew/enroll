@@ -16,7 +16,9 @@ namespace :reports do
           Unique_URL
         )
       processed_count = 0
-      file_name = "#{Rails.root}/brokers_list_with_URL_from_admin_approval.csv"
+
+      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+      file_name = File.expand_path("#{Rails.root}/public/brokers_list_with_URL_from_admin_approval_#{time_stamp}.csv")
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
         invitations.each do |invitation|
@@ -37,6 +39,8 @@ namespace :reports do
           end
         end
       end
+      pubber = Publishers::Legacy::ShopBrokersWithAdminUrlReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
       puts "#{processed_count} Brokers to output file: #{file_name}"
     end
   end
