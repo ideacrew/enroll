@@ -120,8 +120,6 @@ class ApplicationController < ActionController::Base
     end
 
     def update_url
-      pp controller_name
-      pp action_name
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
           (controller_name == "profiles" && action_name == "new") ||
