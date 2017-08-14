@@ -13,8 +13,9 @@ class TaxHousehold
 
   before_create :set_effective_starting_on
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :household
 
+  field :application_id, type: BSON::ObjectId
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
 
@@ -25,7 +26,10 @@ class TaxHousehold
   field :effective_ending_on, type: Date
   field :submitted_at, type: DateTime
 
-  #accepts_nested_attributes_for :tax_household_members
+  embeds_many :tax_household_members
+  accepts_nested_attributes_for :tax_household_members
+
+  embeds_many :eligibility_determinations
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
@@ -162,9 +166,10 @@ class TaxHousehold
   end
 
   def family
-    return nil unless application
-    application.family
+    return nil unless household
+    household.family
   end
+
 
   def is_eligibility_determined?
     if self.elegibility_determinizations.size > 0
@@ -181,11 +186,6 @@ class TaxHousehold
     end
   end
 
-  def applicants
-    return nil unless application.applicants
-    application.applicants.where(tax_household_id: self.id)
-  end
-
   def preferred_eligibility_determination
     return nil unless family.active_approved_application
     eds = application.eligibility_determinations.where(tax_household_id: self.id)
@@ -194,11 +194,6 @@ class TaxHousehold
     return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
     return curam_ed if curam_ed.present?
     return eds.max_by(&:determined_at)
-  end
-
-  def eligibility_determinations
-    return nil unless family.active_approved_application
-    family.active_approved_application.eligibility_determinations.where(tax_household_id: self.id)
   end
 
   def set_effective_starting_on

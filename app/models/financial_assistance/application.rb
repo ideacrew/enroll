@@ -67,9 +67,8 @@ class FinancialAssistance::Application
 
   field :workflow, type: Hash, default: { }
 
-  embeds_many :tax_households, class_name: "::TaxHousehold"
   embeds_many :applicants, class_name: "::FinancialAssistance::Applicant"
-  embeds_many :eligibility_determinations, class_name: "::EligibilityDetermination"
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :applicants, :workflow_state_transitions

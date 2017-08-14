@@ -4,7 +4,7 @@ class EligibilityDetermination
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :tax_household
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0)
 
@@ -24,7 +24,6 @@ class EligibilityDetermination
 
   field :e_pdc_id, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
-  field :tax_household_id, type: BSON::ObjectId
 
   # Premium tax credit assistance eligibility.
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
