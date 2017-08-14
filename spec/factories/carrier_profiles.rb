@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :carrier_profile do
-    organization  { FactoryGirl.create(:organization, legal_name: "United Health Care", dba: "United") }
+    organization  { FactoryGirl.create(:organization, legal_name: "Boston Medical Center HealthNet Plan", dba: "Boston Medical Center HealthNet Plan") }
     abbrev        "UHIC"
     offers_sole_source false
     issuer_hios_ids ['11111']
