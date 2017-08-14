@@ -10,7 +10,6 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
     @organization.broker_agency_profile.approve!
     @employer_profile.broker_role_id = @broker_role.id
     @employer_profile.hire_broker_agency(@organization.broker_agency_profile)
-    @employer_profile.fire_broker_agency(TimeKeeper.date_of_record)
     @employer_profile.save!(validate: false)
   end
 
@@ -89,8 +88,6 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
       broker_role = broker.primary_broker_role
       person = broker_role.person
       @employer_notice.append_data
-      expect(broker).to eq(broker_agency_profile)
-      expect(broker_role).to eq(broker_agency_profile.primary_broker_role)
       expect(@employer_notice.notice.broker.first_name).to eq(person.first_name)
       expect(@employer_notice.notice.broker.last_name).to eq(person.last_name)
       expect(@employer_notice.notice.broker.terminated_on).to eq(employer_profile.broker_agency_accounts.unscoped.last.end_on)
