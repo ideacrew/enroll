@@ -17,11 +17,16 @@ module Config::AcaModelConcern
     delegate :enforce_employer_attestation?, to: :class
     delegate :employee_participation_ratio_minimum, to: :class
     delegate :non_owner_participation_count_minimum, to: :class
+    delegate :aca_shop_market_small_market_employee_count_maximum, to: :class
   end
 
   class_methods do
     def aca_shop_market_cobra_enrollment_period_in_months
       @@aca_shop_market_cobra_enrollment_period_in_months ||= Settings.aca.shop_market.cobra_enrollment_period.months
+    end
+
+    def aca_shop_market_small_market_employee_count_maximum
+      @@aca_shop_market_small_market_employee_count_maximum ||= Settings.aca.shop_market.small_market_employee_count_maximum
     end
 
     def aca_state_abbreviation
