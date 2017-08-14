@@ -10,7 +10,7 @@ module Subscribers
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
 
-      application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
+      application = FinancialAssistance::Application.find(stringed_key_payload["application_id"]) if stringed_key_payload["application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
         unless application.success_status_codes?(payload_http_status_code.to_i)
