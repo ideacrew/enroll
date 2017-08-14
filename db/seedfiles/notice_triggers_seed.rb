@@ -315,6 +315,51 @@ shop_notice_triggers = [
             }
         ]
     },
+
+    {
+    hbx_id: 'SHOP_M008',
+    title: 'Action Needed – Add all Eligible Employees to your Roster',
+    description: 'This notice goes to all the employers with zero employees on roster when published',
+    resource_name: 'employer',
+    event_name: 'zero_employees_on_roster',
+    notice_triggers: [
+      {
+        name: 'Zero Employees on Rotser',
+        notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
+        notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
+        mpi_indicator: 'SHOP_M008',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+    # {
+    #   hbx_id: 'SHOP3A',
+    #   title: 'Plan Offerings Finalized',
+    #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer publishes PlanYear',
+    #   resource_name: 'employer',
+    #   event_name: 'planyear_renewal_3a',
+    #   notice_triggers: [
+    #     {
+    #       name: 'PlanYear Renewal',
+    #       notice_template: 'notices/shop_employer_notices/3a_employer_plan_year_renewal',
+    #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
+    #       mpi_indicator: 'MPI_SHOPRA',
+    #       notice_trigger_element_group: {
+    #         market_places: ['shop'],
+    #         primary_recipients: ["employer"],
+    #         primary_recipient_delivery_method: ["secure_message"],
+    #         secondary_recipients: []
+    #       }
+    #     }
+    #   ]
+    # },
+
     # {
     #   hbx_id: 'SHOP3B',
     #   title: 'Plan Offerings Finalized',

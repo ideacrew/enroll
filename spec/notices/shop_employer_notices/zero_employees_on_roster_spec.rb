@@ -10,8 +10,8 @@ RSpec.describe ShopEmployerNotices::ZeroEmployeesOnRoster do
                             :name =>'Zero Employees on Roster',
                             :notice_template => 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
                             :notice_builder => 'ShopEmployerNotices::ZeroEmployeesOnRoster',
+                            :mpi_indicator => 'SHOP_M008',
                             :event_name => 'zero_employees_on_roster',
-                            :mpi_indicator => 'MPI_SHOP6',
                             :title => "Action Needed – Add all Eligible Employees to your Roster"})
                           }
     let(:valid_parmas) {{
@@ -67,5 +67,21 @@ RSpec.describe ShopEmployerNotices::ZeroEmployeesOnRoster do
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
     end
   end
+
+  describe "Rendering notice for employers with zero employees on roaster template and generate pdf" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::ZeroEmployeesOnRoster.new(employer_profile, valid_parmas)
+    end
+    it "should render zero employees on roaster" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster"
+    end
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end 
 
 end

@@ -96,6 +96,10 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
+  def site_main_web_address_url
+    Settings.site.main_web_address_url
+  end
+
   def site_main_web_link
     link_to site_website_name, site_main_web_address_url
   end
@@ -118,6 +122,10 @@ module Config::SiteHelper
 
   def site_main_web_address_url
      Settings.site.main_web_address_url
+  end
+
+  def site_make_their_premium_payments_online
+    Settings.site.make_their_premium_payments_online
   end
 
   def site_uses_default_devise_path?
