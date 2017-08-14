@@ -12,7 +12,7 @@ module Effective
 
         table_column :employee_name, :width => '50px', :proc => Proc.new { |row|
           @employer_profile = row.employer_profile
-          (link_to row.full_name, employers_employer_profile_census_employee_path(@employer_profile.id, row.id)) + raw("<br>")
+          (link_to row.full_name, employers_employer_profile_census_employee_path(@employer_profile.id, row.id, tab: 'employees')) + raw("<br>")
         }, :sortable => false, :filter => false
 
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row|
@@ -60,9 +60,9 @@ module Effective
           # Has to specify the valid route path for rehire and initiate cobra
           dropdown = [
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-              ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id), 'static'],
-              ['Terminate', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'terminate'), terminate_possible?(row)],
-              ['Rehire', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'rehire'), rehire_possible?(row)],
+              ['Edit', edit_employers_employer_profile_census_employee_path(@employer_profile, row.id, tab: 'employees'), 'static'],
+              ['Terminate', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'terminate', tab: 'employees'), terminate_possible?(row)],
+              ['Rehire', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, census_employee: row.id, type: 'rehire', tab: 'employees'), rehire_possible?(row)],
               ['Initiate Cobra', confirm_effective_date_employers_employer_profile_census_employees_path(@employer_profile, census_employee_id: row.id, type: 'cobra'), cobra_possible?(row)]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "census_employeeid_#{row.id.to_s}"}, formats: :html

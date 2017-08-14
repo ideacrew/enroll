@@ -5,9 +5,10 @@
   <p class="twenty"> Please review our list of <%= link_to "documents that can be used as proof", aca_shop_market_valid_employer_attestation_documents_url %> and ensure that you have the right documentation available.
   </p>
 </div>
-
-<div class="upload-document upload-document-location">
+<div class="col-xs-12">
+<div class="pull-right upload-document-location">
   <%= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
+</div>
 </div>
 
 <div class= "effectivedatatable">
