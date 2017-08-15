@@ -311,6 +311,7 @@ end
 
 Then(/^.+ should see cobra successful msg/) do
   expect(page).to have_content('Successfully update Census Employee.')
+  wait_for_ajax(3,2)
 end
 
 And(/^.+ should only see the status of Cobra Linked$/) do
