@@ -13,7 +13,7 @@ namespace :report do
                                                 not_lawfully_present_in_us 
                                                 non_native_not_lawfully_present_in_us)+[nil]})
     puts lawful_aliens.size
-    field_names = ["Person HBX ID", "First Name", "Last Name", "DOB", "SSN", "Citizen Status", "Document(s)"]
+    field_names = ["Person HBX ID", "First Name", "Last Name", "DOB", "SSN", "Citizen Status", "Document(s)","Last Updated Date"]
     Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
     file_name = "#{Rails.root}/hbx_report/lawful_alien_documents_#{Time.now.strftime('%Y%m%d%H%M')}.csv"
     count = 0 
@@ -35,11 +35,17 @@ namespace :report do
         ssn = la.ssn
         citizen_status = la.consumer_role.lawful_presence_determination.citizen_status
         if la.consumer_role.vlp_documents.size > 0
-          documents = la.consumer_role.vlp_documents.map(&:subject).join(", ")
+          la.consumer_role.vlp_documents.each do |i|
+            if VlpDocument::VLP_DOCUMENT_KINDS.include? i.subject
+              csv << [hbx_id, first_name, last_name, dob, ssn, citizen_status, i.subject, i.updated_at]
+            end
+          end
         elsif la.consumer_role.vlp_documents.size == 0
           documents = "No VLP Documents Found"
+          update_date= ""
+          csv << [hbx_id, first_name, last_name, dob, ssn, citizen_status, documents, update_date]
         end
-        csv << [hbx_id, first_name, last_name, dob, ssn, citizen_status, documents]
+
       end
     end
   end
