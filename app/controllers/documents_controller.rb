@@ -81,14 +81,6 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def enrollment_docs_state
-    @person.primary_family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-      enrollment.update_attributes(:review_status => "ready")
-    end
-    flash[:success] = "Your documents were sent for verification."
-    redirect_to :back
-  end
-
   def show_docs
     if current_user.has_hbx_staff_role?
       session[:person_id] = params[:person_id]
