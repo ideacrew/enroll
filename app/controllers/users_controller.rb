@@ -39,7 +39,7 @@ class UsersController < ApplicationController
 
   def login_history
     @user = User.find(params[:id])
-    @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC')
+    @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
   end
 
   private
