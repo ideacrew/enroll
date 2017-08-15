@@ -72,8 +72,6 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.open_enrollment_start_on).to eq plan_year.open_enrollment_start_on
-      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
     end
