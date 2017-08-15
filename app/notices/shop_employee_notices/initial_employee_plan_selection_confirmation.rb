@@ -11,15 +11,13 @@ class ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation < ShopEmploy
   end
 
   def append_data
-    binding.pry
-    plan_year = census_employee.employer_profile.plan_years.where(aasm_state: 'enrolled').first
+    plan_year = census_employee.employer_profile.plan_years.where(aasm_state: 'enrolled' || "renewing_enrolled").first
     notice.plan_year = PdfTemplates::PlanYear.new({
       :start_on => plan_year.start_on
       })
 
     enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
     notice.enrollment = PdfTemplates::Enrollment.new({ 
-      effective_on: enrollment.effective_on,
       responsible_amount: enrollment.total_employer_contribution,
       employee_cost: enrollment.total_employee_cost,
       })
