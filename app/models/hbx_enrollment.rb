@@ -40,14 +40,14 @@ class HbxEnrollment
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   WAIVER_REASONS = [
-      "I have coverage through spouse’s employer health plan",
-      "I have coverage through parent’s employer health plan",
-      "I have coverage through any other employer health plan",
-      "I have coverage through an individual market health plan",
-      "I have coverage through Medicare",
-      "I have coverage through Tricare",
-      "I have coverage through Medicaid",
-      "I do not have other coverage"
+    "I have coverage through spouse’s employer health plan",
+    "I have coverage through parent’s employer health plan",
+    "I have coverage through any other employer health plan",
+    "I have coverage through an individual market health plan",
+    "I have coverage through Medicare",
+    "I have coverage through Tricare",
+    "I have coverage through Medicaid",
+    "I do not have other coverage"
   ]
 
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
@@ -230,7 +230,7 @@ class HbxEnrollment
     # terminate all Enrollments scheduled for termination
     def terminate_scheduled_enrollments(as_of_date = TimeKeeper.date_of_record)
       families = Family.where("households.hbx_enrollments" => {
-          :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
+        :$elemMatch => { :aasm_state => "coverage_termination_pending", :terminated_on.lt => as_of_date }
       })
 
       enrollments_for_termination = families.inject([]) do |enrollments, family|
@@ -241,18 +241,17 @@ class HbxEnrollment
       enrollments_for_termination.each do |hbx_enrollment|
         hbx_enrollment.terminate_coverage!(hbx_enrollment.terminated_on)
       end
-
     end
 
     def families_with_contingent_enrollments
       Family.by_enrollment_individual_market.where(:'households.hbx_enrollments' => {
-          :$elemMatch => {
-              :aasm_state => "enrolled_contingent",
-              :$or => [
-                  {:"terminated_on" => nil},
-                  {:"terminated_on".gt => TimeKeeper.date_of_record}
-              ]
-          }
+        :$elemMatch => {
+            :aasm_state => "enrolled_contingent",
+            :$or => [
+                {:"terminated_on" => nil},
+                {:"terminated_on".gt => TimeKeeper.date_of_record}
+            ]
+        }
       })
     end
 
@@ -1042,12 +1041,12 @@ class HbxEnrollment
 
   def self.create_from(employee_role: nil, coverage_household:, benefit_group: nil, benefit_group_assignment: nil, consumer_role: nil, benefit_package: nil)
     enrollment = self.new_from(
-        employee_role: employee_role,
-        coverage_household: coverage_household,
-        benefit_group: benefit_group,
-        benefit_group_assignment: benefit_group_assignment,
-        consumer_role: consumer_role,
-        benefit_package: benefit_package
+      employee_role: employee_role,
+      coverage_household: coverage_household,
+      benefit_group: benefit_group,
+      benefit_group_assignment: benefit_group_assignment,
+      consumer_role: consumer_role,
+      benefit_package: benefit_package
     )
     enrollment.save
     enrollment
@@ -1107,7 +1106,7 @@ class HbxEnrollment
   def self.find(id)
     id = BSON::ObjectId.from_string(id) if id.is_a? String
     families = Family.where({
-                                "households.hbx_enrollments._id" => id
+                              "households.hbx_enrollments._id" => id
                             })
     found_value = catch(:found) do
       families.each do |family|
