@@ -58,7 +58,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
 
-    send_enrollment_notice unless @enrollment.is_shop?
+    IvlNoticesNotifierJob.perform_later(@person.consumer_role ,"enrollment_notice") unless @enrollment.is_shop?
     send_receipt_emails if @person.emails.first
   end
 
@@ -223,18 +223,6 @@ class Insured::PlanShoppingsController < ApplicationController
       subject: 'Your Secure Enrollment Confirmation'
     }
     create_secure_message(message_params, @person, :inbox)
-  end
-
-  def send_enrollment_notice
-    event = "enrollment_notice"
-    event_kind = ApplicationEventKind.where(:event_name => event).first
-    notice_trigger = event_kind.notice_triggers.first
-    builder = notice_trigger.notice_builder.camelize.constantize.new(@person.consumer_role, {
-              template: notice_trigger.notice_template,
-              subject: event_kind.title,
-              event_name: event,
-              mpi_indicator: notice_trigger.mpi_indicator,
-              }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
   end
 
   def set_plans_by(hbx_enrollment_id:)
