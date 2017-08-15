@@ -102,6 +102,9 @@ class ShopEmployerNotice < Notice
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      assignment_date: employer_profile.active_broker_agency_account.present? ? employer_profile.active_broker_agency_account.start_on : "",
       address: PdfTemplates::NoticeAddress.new({
         street_1: location.address.address_1,
         street_2: location.address.address_2,

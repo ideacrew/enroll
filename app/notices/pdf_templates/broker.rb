@@ -8,5 +8,8 @@ module PdfTemplates
     attribute :phone, String
     attribute :email, String
     attribute :web_address, String
+    attribute :first_name, String
+    attribute :last_name, String
+    attribute :assignment_date, Date
   end
 end
