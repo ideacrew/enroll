@@ -17,7 +17,8 @@ RSpec.describe CarrierProfile, :type => :model do
     let(:valid_params) do
       {
         organization: organization,
-        abbrev: abbrev
+        abbrev: abbrev,
+        issuer_hios_ids: ['11111', '22222']
       }
     end
 
@@ -36,6 +37,11 @@ RSpec.describe CarrierProfile, :type => :model do
       it "should save" do
         expect(carrier_profile.save).to be_truthy
       end
+
+      it "should not offer sole source" do
+        expect(carrier_profile.offers_sole_source?).to be_falsey
+      end
+
       context "and it is saved" do
         before do
           carrier_profile.save

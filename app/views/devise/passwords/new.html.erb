@@ -1,4 +1,4 @@
-<div class="container top-pd">
+<div class="container top-pd forgot-password">
 	<div class="col-md-6 col-md-offset-3 col-sm-8 col-xs-12">
 		<h1>Forgot your password?</h1>
 
@@ -8,6 +8,7 @@
 		  <div class="form-group">
 		    <%= f.label :email %><br />
 		    <%= f.email_field :email, autofocus: true, class: "form-control" %>
+				<%= f.hidden_field :identity_confirmed_token %>
 		  </div>
 
 		  <div class="form-group">
@@ -16,5 +17,17 @@
 		<% end %>
 
 		<%= render "devise/shared/links" %>
+		<div class="modal fade" id="securityChallengeModal" tabindex="-1" role="dialog" aria-labelledby="securityChallengeModal">
+		</div>
 	</div>
 </div>
+
+<script>
+	$('.forgot-password form .btn-primary').click(function(event){
+		event.preventDefault();
+		$.post(
+			"<%= users_challenge_path %>.js",
+			{ user: { email: $('#user_email').val() } }
+		);
+	});
+</script>

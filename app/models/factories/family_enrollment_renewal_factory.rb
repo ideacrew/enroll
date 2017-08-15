@@ -18,14 +18,9 @@ module Factories
 
       raise ArgumentError unless defined?(family)
 
-      # excluded_states = %w(coverage_canceled, coverage_terminated unverified renewing_passive
-      #                       renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-      #                     )
-      # shop_enrollments = family.enrollments.shop_market.reduce([]) { |list, e| excluded_states.include?(e.aasm_state) ? list : list << e }
       ## Works only for data migrated into Enroll
       ## FIXME add logic to support Enroll native renewals
 
-      # return true if family.active_household.hbx_enrollments.any?{|enrollment| (HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) || enrollment.renewing_waived?)}
 
       shop_enrollments  = family.active_household.hbx_enrollments.enrolled.shop_market.by_coverage_kind('health').to_a
       shop_enrollments += family.active_household.hbx_enrollments.waived.to_a
@@ -139,16 +134,6 @@ module Factories
       renewal_enrollment
     end
 
-
-    # def display_premiums(enrollment)
-    #   puts "#{enrollment.aasm_state.humanize} enrollment amounts-------"
-    #   puts enrollment.total_premium
-    #   puts enrollment.total_employer_contribution
-    #   puts enrollment.total_employee_cost
-    #   puts "member premiums #{enrollment.hbx_enrollment_members.map(&:premium_amount)}"
-    #   puts "---------------------------------"
-    # end
-
     def save_renewal_enrollment(renewal_enrollment, active_enrollment)
       if renewal_enrollment.save
         renewal_enrollment
@@ -248,6 +233,7 @@ module Factories
 
     # relationship offered in renewal plan year and member active in enrollment.
     def is_relationship_offered_and_member_covered?(member,renewal_enrollment)
+      return true if renewal_enrollment.composite_rated?
       relationship = PlanCostDecorator.benefit_relationship(member.primary_relationship)
       relationship = "child_over_26" if relationship == "child_under_26" && member.person.age_on(@plan_year_start_on) >= 26
       (renewal_relationship_benefits(renewal_enrollment).include?(relationship) && member.is_covered_on?(@plan_year_start_on - 1.day))

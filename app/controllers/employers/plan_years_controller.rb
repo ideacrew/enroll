@@ -6,11 +6,14 @@ class Employers::PlanYearsController < ApplicationController
 
   def new
     @plan_year = build_plan_year
-    @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    if @employer_profile.service_areas.any?
+      @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
+    else
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(@plan_year) }
+    end
   end
 
   def dental_reference_plans
-
     @location_id = params[:location_id]
     @carrier_profile = params[:carrier_id]
     @benefit_group = params[:benefit_group]
@@ -32,18 +35,20 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = PlanYear.find(params[:plan_year_id])
     @location_id = params[:location_id]
     @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
+
+    offering_query = Queries::EmployerPlanOfferings.new(@employer_profile)
     @plans = if params[:plan_option_kind] == "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      offering_query.single_carrier_offered_health_plans(params[:carrier_id], params[:start_on])
     elsif params[:plan_option_kind] == "metal_level"
       @metal_level = params[:metal_level]
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_metal_level(@metal_level).and(hios_id: /-01/)
-    elsif params[:plan_option_kind] == "single_plan"
+      offering_query.metal_level_offered_health_plans(params[:metal_level], params[:start_on])
+    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
-      Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+      offering_query.single_option_offered_health_plans(params[:carrier_id], params[:start_on])
     end
 
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
@@ -119,7 +124,6 @@ class Employers::PlanYearsController < ApplicationController
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @plan_year.benefit_groups.each_with_index do |benefit_group, i|
-
       benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
       benefit_group.elected_dental_plans = if benefit_group.dental_plan_option_kind == "single_plan"
         if i == 0
@@ -131,6 +135,21 @@ class Employers::PlanYearsController < ApplicationController
         Plan.where(:id.in=> ids)
       else
         benefit_group.elected_dental_plans_by_option_kind
+      end
+      if benefit_group.sole_source?
+        if benefit_group.composite_tier_contributions.empty?
+          benefit_group.build_composite_tier_contributions
+        end
+        begin
+          benefit_group.estimate_composite_rates
+        rescue => e
+          flash[:error] = ""
+          benefit_group.errors[:composite_tier_contributions].each do |err|
+            flash[:error] << err
+          end
+          render action: 'new'
+          return
+        end
       end
     end
 
@@ -170,9 +189,10 @@ class Employers::PlanYearsController < ApplicationController
   def calc_employer_contributions
     @benefit_group_index = params[:benefit_group_index].to_i
     @location_id = params[:location_id]
+    @plan = Plan.find(params[:reference_plan_id])
+    @plan_option_kind = params[:plan_option_kind]
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
-    @plan = Plan.find(params[:reference_plan_id])
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     coverage_type = 'health'
@@ -182,6 +202,7 @@ class Employers::PlanYearsController < ApplicationController
     else
       @plan_year.benefit_groups[0].reference_plan = @plan
     end
+    @plan_year.benefit_groups[0].build_estimated_composite_rates if @plan_option_kind == 'sole_source'
 
     @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount(@plan)
     @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost(coverage_type)
@@ -194,9 +215,10 @@ class Employers::PlanYearsController < ApplicationController
     @location_id = params[:location_id]
     @coverage_type = params[:coverage_type]
     @plan_option_kind = params[:plan_option_kind]
+    @plan = Plan.find(params[:reference_plan_id])
+
     params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
 
-    @plan = Plan.find(params[:reference_plan_id])
     @hios_id = @plan.hios_id
 
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
@@ -210,22 +232,29 @@ class Employers::PlanYearsController < ApplicationController
       @plan_year.benefit_groups[0].reference_plan = @plan
     end
 
+    @plan_year.benefit_groups[0].build_estimated_composite_rates
+
     @employer_contribution_amount = @plan_year.benefit_groups[0].monthly_employer_contribution_amount(@plan)
+
     @min_employee_cost = @plan_year.benefit_groups[0].monthly_min_employee_cost(coverage_type)
     @max_employee_cost = @plan_year.benefit_groups[0].monthly_max_employee_cost(coverage_type)
   end
 
   def edit
     plan_year = @employer_profile.find_plan_year(params[:id])
+    unless plan_year.products_offered_in_service_area
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits"), :flash => { :error => no_products_message(plan_year) }
+      return
+    end
     if params[:publish]
       @just_a_warning = !plan_year.is_application_eligible? ? true : false
       plan_year.application_warnings
     end
     @plan_year = ::Forms::PlanYearForm.new(plan_year)
     @plan_year.benefit_groups.each do |benefit_group|
+      benefit_group.build_composite_tier_contributions if benefit_group.composite_tier_contributions.empty?
       benefit_group.build_relationship_benefits if benefit_group.relationship_benefits.empty?
       benefit_group.build_dental_relationship_benefits if benefit_group.dental_relationship_benefits.empty?
-
       case benefit_group.plan_option_kind
       when "metal_level"
         benefit_group.metal_level_for_elected_plan = benefit_group.elected_plans.try(:last).try(:metal_level)
@@ -258,8 +287,8 @@ class Employers::PlanYearsController < ApplicationController
         benefit_group.elected_dental_plans_by_option_kind
       end
       benefit_group.elected_dental_plans = ax if ax
+      benefit_group.build_estimated_composite_rates
     end
-
     if @plan_year.save
       flash[:notice] = "Plan Year successfully saved."
       redirect_to employers_employer_profile_path(@employer_profile, :tab => "benefits")
@@ -337,20 +366,22 @@ class Employers::PlanYearsController < ApplicationController
   def force_publish
     plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
     plan_year.force_publish!
-    flash[:error] = "As submitted, this application is ineligible for coverage under the #{Settings.site.short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by DCHL officials."
+    flash[:error] = "As submitted, this application is ineligible for coverage under the #{site_short_name} exchange. If information that you provided leading to this determination is inaccurate, you have 30 days from this notice to request a review by #{site_short_name} officials."
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
   end
 
   def employee_costs
     @benefit_group_index = params[:benefit_group_index].to_i
-    params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
     @coverage_type = params[:coverage_type]
     @location_id = params[:location_id]
     @plan_option_kind = params[:plan_option_kind]
     @plan = Plan.find(params[:reference_plan_id])
+    params.merge!({ plan_year: { start_on: params[:start_on] }.merge(relationship_benefits) })
+
     @plan_year = ::Forms::PlanYearForm.build(@employer_profile, plan_year_params)
 
     @benefit_group = @plan_year.benefit_groups[0]
+    @benefit_group.build_estimated_composite_rates if @plan_option_kind == 'sole_source'
 
     if @coverage_type == '.dental'
       @plan_year.benefit_groups[0].dental_reference_plan = @plan
@@ -425,18 +456,19 @@ class Employers::PlanYearsController < ApplicationController
     id_params = params.permit(:id, :employer_profile_id, :active_year, :plan_year_id)
     id = id_params[:employer_profile_id] || id_params[:id]
     @employer_profile = EmployerProfile.find(id)
-
   end
 
   def generate_carriers_and_plans
-    @carrier_names = Organization.valid_carrier_names
-    @carriers_array = Organization.valid_carrier_names_for_options
+    @carrier_names = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location)
+    @carrier_names_with_sole_source = Organization.valid_carrier_names(primary_office_location: @employer_profile.organization.primary_office_location, sole_source_only: true)
+    @carriers_array = Organization.valid_carrier_names_for_options(primary_office_location: @employer_profile.organization.primary_office_location)
   end
 
   def build_plan_year
     plan_year = PlanYear.new
     plan_year.benefit_groups.build
     plan_year.benefit_groups.first.build_relationship_benefits
+    plan_year.benefit_groups.first.build_composite_tier_contributions
     plan_year.benefit_groups.first.build_dental_relationship_benefits
     ::Forms::PlanYearForm.new(plan_year)
   end
@@ -453,6 +485,9 @@ class Employers::PlanYearsController < ApplicationController
                                       ],
                                       :dental_relationship_benefits_attributes => [
                                         :id, :relationship, :premium_pct, :employer_max_amt, :offered, :_destroy
+                                      ],
+                                      :composite_tier_contributions_attributes => [
+                                        :id, :composite_rating_tier, :employer_contribution_percent, :offered
                                       ]
     ]
     )
@@ -466,14 +501,28 @@ class Employers::PlanYearsController < ApplicationController
       "benefit_groups_attributes" =>
       {
         "0" => {
-           "title"=>"2015 Employer Benefits",
-           # "carrier_for_elected_plan"=>"53e67210eb899a4603000004",
+           "title"=>"#{TimeKeeper.date_of_record} Employer Benefits",
+           "carrier_for_elected_plan"=> @plan.carrier_profile_id,
+           "plan_option_kind" => @plan_option_kind,
            "reference_plan_id" => params[:reference_plan_id],
-           "relationship_benefits_attributes" => params[:relation_benefits],
            "dental_relationship_benefits_attributes" => params[:dental_relation_benefits]
-        }
+        }.merge(composite_or_relation_benefits)
       }
     }
+  end
+
+  def composite_or_relation_benefits
+    if @plan_option_kind.nil?
+      return { "relationship_benefits_attributes" => params[:relation_benefits] }
+    elsif @plan_option_kind == 'sole_source'
+      return { "composite_tier_contributions_attributes" => params[:relation_benefits] }
+    else
+      return { "relationship_benefits_attributes" => params[:relation_benefits] }
+    end
+  end
+
+  def no_products_message(plan_year)
+    "Unable to continue application, as this employer is either ineligible to enroll on the #{Settings.site.long_name}, or no products are available for a benefit plan year starting #{plan_year.start_on}"
   end
 
 end

@@ -10,7 +10,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">
-          <%= image_tag 'logo.png' %>
+          <%= image_tag Settings.site.logo_file_name %>
         </a>
       </div>
 
@@ -21,7 +21,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
-          <li><a class="call-customer-service" href="tel:<%= Settings.contact_center.phone_number %>">
+          <li><a class="call-customer-service" href="tel:<%= contact_center_phone_number %>">
             <span class="header-text">
               Call Customer Service
             </span>
@@ -29,7 +29,7 @@
             <span>
               <i class="fa fa-phone fa-lg"></i>
               <strong>
-                <%= Settings.contact_center.phone_number %>
+                <%= contact_center_phone_number %>
               </strong>
             </span>
           </a>
@@ -39,7 +39,7 @@
               <span class="my-portal-links">
                 <%= render partial: "shared/my_portal_links"%>
                 <span>
-                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text">Help</a>
+                  <%= link_to 'Help', site_help_url, target: '_blank', class: 'header-text' %>
                 </span>
                 <span> | </span>
                 <span>

@@ -10,6 +10,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       metal_level: "bronze",
       is_standard_plan: true,
       nationwide: "true",
+      network_information: "This is a plan",
       total_employee_cost: 100,
       deductible: 500,
       family_deductible: "500 per person | $1000 per group",

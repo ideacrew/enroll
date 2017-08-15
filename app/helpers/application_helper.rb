@@ -23,7 +23,12 @@ module ApplicationHelper
   end
 
   def copyright_notice
-    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.short_name}. All Rights Reserved.</span>")
+    if TimeKeeper.date_of_record.year.to_s == Settings.site.copyright_period_start.to_s
+      copyright_attribution = "#{Settings.site.copyright_period_start} #{Settings.site.long_name}"
+    else
+      copyright_attribution = "#{Settings.site.copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+    end
+    raw("<span class='copyright'><i class='fa fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end
 
   def menu_tab_class(a_tab, current_tab)
@@ -381,18 +386,8 @@ module ApplicationHelper
   end
 
   def display_carrier_logo(plan, options = {:width => 50})
-    return "" if !plan.carrier_profile.extract_value.present?
-    hios_id = plan.hios_id[0..6].extract_value
-    carrier_name = case hios_id
-    when "75753DC"
-      "oci"
-    when "21066DC"
-      "uhcma"
-    when "41842DC"
-      "uhic"
-    else
-      plan.carrier_profile.legal_name.extract_value
-    end
+    return "" if !plan.carrier_profile.legal_name.extract_value.present?
+    carrier_name = plan.carrier_profile.legal_name.extract_value
     image_tag("logo/carrier/#{carrier_name.parameterize.underscore}.jpg", width: options[:width]) # Displays carrier logo (Delta Dental => delta_dental.jpg)
   end
 
@@ -555,7 +550,7 @@ module ApplicationHelper
 
   def env_bucket_name(bucket_name)
     aws_env = ENV['AWS_ENV'] || "local"
-    "dchbx-enroll-#{bucket_name}-#{aws_env}"
+    "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 
   def display_dental_metal_level(plan)
@@ -642,5 +637,10 @@ module ApplicationHelper
 
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def load_captcha_widget?
+    return false if Rails.env.test?
+    true
   end
 end

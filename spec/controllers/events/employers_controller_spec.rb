@@ -17,7 +17,8 @@ describe Events::EmployersController do
       allow(Organization).to receive(:employer_by_hbx_id).with(employer_hbx_id).and_return(found_orgs)
       allow(controller).to receive(:render_to_string).with(
         "events/v2/employers/updated", {:formats => ["xml"], :locals => {
-         :employer => employer_profile
+         :employer => employer_profile,
+         :manual_gen => false
         }}).and_return(rendered_template)
     end
 
@@ -30,7 +31,7 @@ describe Events::EmployersController do
           :headers => {
             :employer_id => employer_hbx_id,
             :return_status => "200"
-          }       
+          }
         })
         controller.resource(connection, di, props, "")
       end
@@ -45,7 +46,7 @@ describe Events::EmployersController do
           :headers => {
             :employer_id => employer_hbx_id,
             :return_status => "404"
-          }       
+          }
         })
         controller.resource(connection, di, props, "")
       end

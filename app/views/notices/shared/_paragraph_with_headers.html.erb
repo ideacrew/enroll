@@ -1,24 +1,25 @@
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
-      <tr>
-        <td></br></td>
-      </tr>
-      <% if heading.present? %>
-      <tr>
-        <td><h2 style="color:rgb(54,95,145);"><%= heading.html_safe %></h2></td>
-      </tr>
+    <% if defined? heading %>
+        <tr>
+          <td>
+            <h2 style="color:rgb(54,95,145); font-size: 14px; font-weight: bold; <%= col_styles[0] if defined? col_styles %>"><%= heading.html_safe %></h2>
+          </td>
+        </tr>
     <% end %>
-      <% if sub_heading.present? %>
-      <tr>
-        <td><h3 style="color:black;"><%= sub_heading.html_safe %></h3></td>
-      </tr>
-      <% end %>
-      <% contents.each do |para| %>
-      <tr>
-        <td><%= para.html_safe %></td>
-      </tr>
-      <% end %>
+    <% if defined? sub_heading %>
+        <tr>
+          <td><h3 style="color:black;"><%= sub_heading.html_safe %></h3></td>
+        </tr>
+    <% end %>
+    <% if defined? contents %>
+        <% contents.each do |para| %>
+            <tr>
+              <td class="notice-font"><%= para.html_safe %></td>
+            </tr>
+        <% end %>
+    <% end %>
     </tbody>
   </table>
 </div>

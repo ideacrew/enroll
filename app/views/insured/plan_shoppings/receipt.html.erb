@@ -7,7 +7,7 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12">
 
-          <h1 class="darkblue">Enrollment Submitted</h1>
+          <h1>Enrollment Submitted</h1>
           <p>Your enrollment has been submitted as of <%= format_datetime(@enrollment.updated_at) %>.</p>
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
           <% if @enrollment.employee_role.present? %>
@@ -59,7 +59,7 @@
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= Settings.site.short_name %> doesn’t collect your premium payments.
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %>.</strong>  Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>, and they will send you an invoice. If you don’t receive an invoice from <%= @plan.carrier_profile.legal_name %> within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your coverage will be active as of the effective date once you have paid the first month’s premium for coverage. You must make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= site_short_name %> doesn’t collect your premium payments.
                   <br/>
                 </li>
                 <br>
@@ -128,7 +128,7 @@
               <br/>
               <ol>
                 <li>
-                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   <%= Settings.site.short_name %> does not collect premiums.
+                  <strong>Make your first premium payment directly to <%= @plan.carrier_profile.legal_name %></strong>. Your enrollment information was electronically submitted to <%= @plan.carrier_profile.legal_name %>. <%= @plan.carrier_profile.legal_name %> will bill you directly.  If you do not receive a bill within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your dental coverage will be active once you have paid the premium for your first month of coverage.  You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.   <%= site_short_name %> does not collect premiums.
                   <br/>
                 </li>
                 <div class="carrier-numbers">

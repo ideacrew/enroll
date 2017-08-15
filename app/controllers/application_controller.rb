@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   include Pundit
+  include Config::SiteConcern
+  include Config::AcaConcern
+  include Config::ContactCenterConcern
   include Acapi::Notifiers
 
   after_action :update_url, :unless => :format_js?
@@ -15,6 +18,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   ## Devise filters
+  ##before_filter :require_login, unless: :authentication_not_required?
+  ##before_filter :authenticate_user_from_token!
+  ##before_filter :authenticate_me!
   before_filter :require_login, unless: :authentication_not_required?
   before_filter :authenticate_user_from_token!
   before_filter :authenticate_me!
@@ -60,7 +66,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
+    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
     authenticate_user!
   end
 
@@ -116,7 +122,9 @@ class ApplicationController < ActionController::Base
     def update_url
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
-          (controller_name == "profiles" && action_name == "new")
+          (controller_name == "profiles" && action_name == "new") ||
+          (controller_name == 'profiles' && action_name == 'show') ||
+          (controller_name == 'hbx_profiles' && action_name == 'show')
           if current_user.last_portal_visited != request.original_url
             current_user.last_portal_visited = request.original_url
             current_user.save
@@ -135,7 +143,20 @@ class ApplicationController < ActionController::Base
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
       (controller_name == "invitations") ||
-      (controller_name == "saml")
+      (controller_name == "saml") ||
+      (controller_name == 'security_question_responses')
+    end
+
+    def check_for_special_path
+      if site_sign_in_routes.include? request.path
+        redirect_to new_user_session_path
+        return
+      elsif site_create_routes.include? request.path
+        redirect_to new_user_registration_path
+        return
+      else
+        return
+      end
     end
 
     def require_login
@@ -143,7 +164,12 @@ class ApplicationController < ActionController::Base
         unless request.format.js?
           session[:portal] = url_for(params)
         end
-        redirect_to new_user_registration_path
+        if site_uses_default_devise_path?
+          check_for_special_path
+          redirect_to new_user_session_path
+        else
+          redirect_to new_user_registration_path
+        end
       end
     rescue Exception => e
       message = {}
@@ -157,7 +183,11 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
-      session[:portal] || request.referer || root_path
+      if request.referrer =~ /sign_in/
+        session[:portal] || resource.try(:last_portal_visited) || root_path
+      else
+        session[:portal] || request.referer || root_path
+      end
     end
 
     def after_sign_out_path_for(resource_or_scope)

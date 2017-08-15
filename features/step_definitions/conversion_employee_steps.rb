@@ -45,6 +45,21 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
   secondary_employee.add_renew_benefit_group_assignment benefit_group
 
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
+
+  benefit_group_carrier = benefit_group.reference_plan.carrier_profile
+  renewing_carrier = benefit_group.reference_plan.carrier_profile
+  [benefit_group_carrier, renewing_carrier].each do |carrier_profile|
+    sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+      factor_set.rating_factor_entries.new(factor_key: secondary_employer_profile.sic_code, factor_value: 1.0)
+    end
+    sic_factors.save!
+    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+      [0..5].each do |size|
+        factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
+      end
+    end
+    group_size_factors.save!
+  end
 end
 
 Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
@@ -146,13 +161,7 @@ And(/Employer for (.*) is under open enrollment/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
 
-  open_enrollment_start_on = TimeKeeper.date_of_record.beginning_of_month
-  open_enrollment_end_on = open_enrollment_start_on.end_of_month + 12.days
-  start_on = open_enrollment_start_on.end_of_month + 1.day + 1.month
-  end_on = start_on + 1.year - 1.day
-
-  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', :open_enrollment_start_on => open_enrollment_start_on,
-    :open_enrollment_end_on => open_enrollment_end_on, :start_on => start_on, :end_on => end_on)
+  employer_profile.renewing_plan_year.update_attributes(:aasm_state => 'renewing_enrolling', open_enrollment_start_on: TimeKeeper.date_of_record.beginning_of_month)
 end
 
 And(/Other Employer for (.*) is also under open enrollment/) do |named_person|

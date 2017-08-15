@@ -35,5 +35,6 @@ $('#stay-logged-in').on('click', function() {
 
 });
 <% else %>
+<% @time_left = 10000 if Rails.env.development? %>
 setTimeout(check_time_until_logout, <%= (@time_left - 30) * 1000 %>);
 <% end %>

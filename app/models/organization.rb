@@ -44,14 +44,12 @@ class Organization
   field :updated_by, type: BSON::ObjectId
 
   embeds_many :office_locations, cascade_callbacks: true, validate: true
-
+  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :employer_profile, cascade_callbacks: true, validate: true
   embeds_one :broker_agency_profile, cascade_callbacks: true, validate: true
-  embeds_one :general_agency_profile, cascade_callbacks: true, validate: true
   embeds_one :carrier_profile, cascade_callbacks: true, validate: true
   embeds_one :hbx_profile, cascade_callbacks: true, validate: true
   embeds_many :documents, as: :documentable
-
   accepts_nested_attributes_for :office_locations, :employer_profile, :broker_agency_profile, :carrier_profile, :hbx_profile, :general_agency_profile
 
   validates_presence_of :legal_name, :fein, :office_locations #, :updated_by
@@ -112,6 +110,7 @@ class Organization
 
   before_save :generate_hbx_id
   after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
+  after_save :validate_and_send_denial_notice
 
   default_scope                               ->{ order("legal_name ASC") }
   scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
@@ -170,12 +169,27 @@ class Organization
         }
       })
   }
+
+  scope :employer_attestations, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending', 'approved', 'denied']) }
+  scope :employer_attestations_submitted, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'submitted') }
+  scope :employer_attestations_pending, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'pending') }
+  scope :employer_attestations_approved, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'approved') }
+  scope :employer_attestations_denied, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'denied') }
+
+  scope :employer_profiles_with_attestation_document, -> { exists(:"employer_profile.employer_attestation.employer_attestation_documents" => true) }
+
   scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => Regexp.compile(Regexp.escape(query), true)}, {"fein" => Regexp.compile(Regexp.escape(query), true)}, {"hbx_id" => Regexp.compile(Regexp.escape(query), true)}])}) }
-  
+
   def self.generate_fein
     loop do
       random_fein = (["00"] + 7.times.map{rand(10)} ).join
       break random_fein unless Organization.where(:fein => random_fein).count > 0
+    end
+  end
+
+  def validate_and_send_denial_notice
+    if employer_profile.present? && primary_office_location.present? && primary_office_location.address.present?
+      employer_profile.validate_and_send_denial_notice
     end
   end
 
@@ -223,9 +237,21 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
-  def self.valid_carrier_names
-    Rails.cache.fetch("carrier-names-at-#{TimeKeeper.date_of_record.year}", expires_in: 2.hour) do
+  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
+    cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    if (filters[:primary_office_location].present?)
+      office_location = filters[:primary_office_location]
+      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    end
+
+    Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        unless (filters[:primary_office_location].nil?)
+          next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+        end
+        if (filters[:sole_source_only]) ## Only sole source carriers requested
+          next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
+        end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
         carrier_names
       end
@@ -255,8 +281,8 @@ class Organization
     Organization.valid_dental_carrier_names.invert.to_a
   end
 
-  def self.valid_carrier_names_for_options
-    Organization.valid_carrier_names.invert.to_a
+  def self.valid_carrier_names_for_options(**args)
+    Organization.valid_carrier_names(args).invert.to_a
   end
 
   def self.upload_invoice(file_path,file_name)
@@ -430,6 +456,6 @@ class Organization
       agency_ids = agencies.map{|org| org.broker_agency_profile.id}
       brokers.select{ |broker| agency_ids.include?(broker.broker_role.broker_agency_profile_id) }
     end
-    
+
   end
 end

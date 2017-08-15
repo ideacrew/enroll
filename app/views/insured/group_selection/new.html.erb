@@ -5,8 +5,8 @@
   <div class="row">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
-        <h1 class="darkblue">Choose Coverage for your Household</h1>
-        <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
+        <h1>Choose Coverage for your Household</h1>
+        <p class="twenty">Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</p>
         <div style="font-size :24px">
         <%if @effective_on_date.present? %>
           EFFECTIVE DATE: <span style="color: red;"><%= @effective_on_date %></span>
@@ -84,7 +84,8 @@
           <% end %>
 
           <% if @employee_role.present? %>
-            <h3>Employer: <%= @employee_role.employer_profile.legal_name %></h3>
+            <br>
+            <p class="twenty">Employer: <%= @employee_role.employer_profile.legal_name %></p>
           <% end %>
 
           <% if can_shop_resident?(@person) %>
@@ -135,7 +136,7 @@
           <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
+              <p>Since <%= @person.full_name %> is not a resident of the <%= aca_state_name %> she/he is not eligible to purchase a plan through <%= site_short_name %>. Other members may still be eligible to enroll. Please call us at <%= contact_center_phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
             </div>
           </div>
           <% end %>

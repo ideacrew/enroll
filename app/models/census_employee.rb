@@ -5,18 +5,21 @@ class CensusEmployee < CensusMember
   # include Validations::EmployeeInfo
   include Autocomplete
   include Acapi::Notifiers
+  include Config::AcaModelConcern
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
 
   require 'roo'
 
   EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
-  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
+  EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
+  EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
   ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
+  ENROLL_STATUS_STATES = %w(enroll waive will_not_participate)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
@@ -26,6 +29,7 @@ class CensusEmployee < CensusMember
   field :employment_terminated_on, type: Date
   field :coverage_terminated_on, type: Date
   field :aasm_state, type: String
+  field :expected_selection, type: String, default: "enroll"
 
   # Employer for this employee
   field :employer_profile_id, type: BSON::ObjectId
@@ -55,6 +59,8 @@ class CensusEmployee < CensusMember
   validate :no_duplicate_census_dependent_ssns
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
+  validates :expected_selection,
+    inclusion: {in: ENROLL_STATUS_STATES, message: "%{value} is not a valid  expected selection" }
   after_update :update_hbx_enrollment_effective_on_by_hired_on
 
   before_save :assign_default_benefit_package
@@ -84,6 +90,10 @@ class CensusEmployee < CensusMember
   scope :without_cobra,     ->{ not_in(aasm_state: COBRA_STATES) }
   scope :by_cobra,          ->{ any_in(aasm_state: COBRA_STATES) }
   scope :pending,           ->{ any_in(aasm_state: PENDING_STATES) }
+  scope :active_alone,      ->{ any_in(aasm_state: EMPLOYMENT_ACTIVE_ONLY) }
+
+  # scope :emplyee_profiles_active_cobra,        ->{ where(aasm_state: "eligible") }
+  scope :employee_profiles_terminated,         ->{ where(aasm_state: "employment_terminated")}
 
   #TODO - need to add fix for multiple plan years
   # scope :enrolled,    ->{ where("benefit_group_assignments.aasm_state" => ["coverage_selected", "coverage_waived"]) }
@@ -316,6 +326,13 @@ class CensusEmployee < CensusMember
 
   def is_inactive?
     EMPLOYMENT_TERMINATED_STATES.include?(aasm_state)
+  end
+
+  def active_or_pending_termination?
+    return true if self.employment_terminated_on.present?
+    return true if PENDING_STATES.include?(self.aasm_state)
+    return false if self.rehired?
+    !(self.is_eligible? || self.employee_role_linked?)
   end
 
   def employee_relationship
@@ -694,10 +711,13 @@ class CensusEmployee < CensusMember
 
   def have_valid_date_for_cobra?(current_user = nil)
     return true if current_user.try(:has_hbx_staff_role?)
-    cobra_begin_date.present? && hired_on <= cobra_begin_date &&
-      coverage_terminated_on && TimeKeeper.date_of_record <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months) &&
-      coverage_terminated_on <= cobra_begin_date &&
-      cobra_begin_date <= (coverage_terminated_on + Settings.aca.shop_market.cobra_enrollment_period.months.months)
+    return false unless cobra_begin_date.present?
+    return false unless coverage_terminated_on
+    return false unless coverage_terminated_on <= cobra_begin_date
+
+    (hired_on <= cobra_begin_date) &&
+      (TimeKeeper.date_of_record <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)) &&
+      cobra_begin_date <= (coverage_terminated_on + aca_shop_market_cobra_enrollment_period_in_months.months)
   end
 
   def has_employee_role_linked?
@@ -739,6 +759,26 @@ class CensusEmployee < CensusMember
     enrollments += coverages_selected.call(active_benefit_group_assignment)
     enrollments += coverages_selected.call(renewal_benefit_group_assignment)
     enrollments.compact.uniq
+  end
+
+
+  def expected_to_enroll?
+    expected_selection == 'enroll'
+  end
+
+  def expected_to_enroll_or_valid_waive?
+    %w(enroll waive).include?  expected_selection
+  end
+
+  # TODO: Implement for 16219
+  def composite_rating_tier
+    return CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?
+    relationships = self.census_dependents.map(&:employee_relationship)
+    if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+      relationships.many? ? CompositeRatingTier::FAMILY : CompositeRatingTier::EMPLOYEE_AND_SPOUSE
+    else
+      CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
+    end
   end
 
   private

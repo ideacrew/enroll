@@ -11,8 +11,10 @@ class User
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
+  devise :database_authenticatable, :registerable, :lockable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
+
+  embeds_many :security_question_responses
 
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
@@ -23,6 +25,10 @@ class User
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :password, within: Devise.password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
+
+  scope :locked, ->{ where(:locked_at.ne => nil) }
+  scope :unlocked, ->{ where(locked_at: nil) }
+  scope :datatable_search, ->(query) { self.where({"$or" => ([{"name" => Regexp.compile(Regexp.escape(query), true)}, {"email" => Regexp.compile(Regexp.escape(query), true)}])}) }
 
   def oim_id_rules
     if oim_id.present? && oim_id.match(/[;#%=|+,">< \\\/]/)
@@ -119,6 +125,7 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+  field :identity_confirmed_token, type: String
 
   ##RIDP
   field :identity_verified_date, type: Date
@@ -146,6 +153,11 @@ class User
 
   field :last_portal_visited, type: String
   field :idp_verified, type: Boolean, default: false
+
+  ## Lockable
+  field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
+  field :unlock_token,    type: String # Only if unlock strategy is :email or :both
+  field :locked_at,       type: Time
 
   index({preferred_language: 1})
   index({approved: 1})
@@ -187,9 +199,9 @@ class User
   # field :unconfirmed_email,    type: String # Only if using reconfirmable
 
   ## Lockable
-  # field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
-  # field :unlock_token,    type: String # Only if unlock strategy is :email or :both
-  # field :locked_at,       type: Time
+  field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
+  field :unlock_token,    type: String # Only if unlock strategy is :email or :both
+  field :locked_at,       type: Time
 
   before_save :ensure_authentication_token
 
@@ -234,6 +246,18 @@ class User
     self.password = passwd
     self.password_confirmation = passwd
     self.save
+  end
+
+  def update_lockable
+    if locked_at.nil?
+      self.lock_access!
+    else
+      self.unlock_access!
+    end
+  end
+
+  def lockable_notice
+    self.locked_at.nil? ? 'unlocked' : 'locked'
   end
 
   def has_role?(role_sym)
@@ -363,6 +387,10 @@ class User
     end
   end
 
+  def needs_to_provide_security_questions?
+    security_question_responses.length < 3
+  end
+
   class << self
 
     def by_email(email)
@@ -373,10 +401,25 @@ class User
       Thread.current[:current_user] = user
     end
 
+    def logins_before_captcha
+      4
+    end
+
+    def login_captcha_required?(login)
+      begin
+        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+      rescue => e
+        true
+      end
+    end
+
     def current_user
       Thread.current[:current_user]
     end
 
+    def logins_before_captcha
+      4
+    end
   end
 
   # def password_digest(plaintext_password)

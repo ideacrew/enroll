@@ -13,13 +13,15 @@ describe Forms::FamilyMember do
     expect(subject).to have_errors_on(:relationship)
   end
 
+
   it "should require tribal_id when citizen_status=indian_tribe_member" do
-    subject.is_consumer_role = true
-    subject.is_applying_coverage = true
-    subject.citizen_status = "indian_tribe_member"
-    subject.valid?
-    expect(subject).to have_errors_on(:tribal_id)
-    expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
+    if individual_market_is_enabled?
+      subject.is_consumer_role = "true"
+      subject.citizen_status = "indian_tribe_member"
+      subject.valid?
+      expect(subject).to have_errors_on(:tribal_id)
+      expect(subject.errors[:tribal_id]).not_to eq ["is required when native american / alaskan native is selected"]
+    end
   end
 
   it "should not require validations on indian_tribe_member" do
@@ -330,6 +332,7 @@ describe "checking validations on family member object" do
   subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
 
   before do
+    allow(subject.class).to receive(:individual_market_is_enabled?).and_return(true)
     allow(subject).to receive(:family).and_return family
   end
 

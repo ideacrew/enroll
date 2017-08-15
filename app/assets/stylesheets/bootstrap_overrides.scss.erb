@@ -1,14 +1,24 @@
 @import "variables";
 
-body {
-  opacity: 0;
-  display: none;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  color: $primary-orange;
 }
 
 .navbar {
   margin-bottom: 0;
   background-color: $primary-button-text;
-  border-bottom: solid 3px $primary-blue;
+  border-bottom: solid 3px $brand-primary;
   .navbar-header {
     .navbar-brand {
       border-right: solid 1px #d7d7d7;
@@ -47,7 +57,7 @@ body {
         span:first-of-type {}
         span:last-of-type {
           .fa {
-            color: $primary-blue;
+            color: $brand-primary;
           }
           strong {
             line-height: 0;
@@ -67,64 +77,6 @@ body {
       }
     }
   }
-}
-
-.btn-primary {
-  color: $primary-white;
-  background-color: $primary-red;
-  border-color: $primary-button-border;
-  text-transform: $primary-button-text-casing;
-  font-weight: $primary-bold;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  text-shadow: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  border-bottom-width: medium;
-}
-.btn-primary:hover,
-.btn-primary:focus,
-.btn-primary.focus,
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
-  color: $primary-white;
-  background-color: $primary-button-border;
-  border-color: $primary-button-border;
-}
-.btn-primary:active,
-.btn-primary.active,
-.open > .dropdown-toggle.btn-primary {
-  background-image: none;
-}
-.btn-primary.disabled,
-.btn-primary[disabled],
-fieldset[disabled] .btn-primary,
-.btn-primary.disabled:hover,
-.btn-primary[disabled]:hover,
-fieldset[disabled] .btn-primary:hover,
-.btn-primary.disabled:focus,
-.btn-primary[disabled]:focus,
-fieldset[disabled] .btn-primary:focus,
-.btn-primary.disabled.focus,
-.btn-primary[disabled].focus,
-fieldset[disabled] .btn-primary.focus,
-.btn-primary.disabled:active,
-.btn-primary[disabled]:active,
-fieldset[disabled] .btn-primary:active,
-.btn-primary.disabled.active,
-.btn-primary[disabled].active,
-fieldset[disabled] .btn-primary.active {
-  background-color: $primary-button-disabled;
-  border-color: $primary-button-borer-disabled;
-}
-.btn-primary .badge {
-  color: #337ab7;
-  background-color: #fff;
 }
 
 .btn {

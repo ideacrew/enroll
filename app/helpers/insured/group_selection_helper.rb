@@ -23,6 +23,14 @@ module Insured
       end
     end
 
+    def health_relationship_benefits_for_composite(employee_role)
+      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+
+      if benefit_group.present?
+        benefit_group.composite_tier_contributions.select(&:offered).map(&:composite_rating_tier)
+      end
+    end
+
     def dental_relationship_benefits(employee_role)
       benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
       if benefit_group.present?

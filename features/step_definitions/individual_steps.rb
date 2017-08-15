@@ -94,7 +94,7 @@ Then (/Individual resumes enrollment/) do
 end
 
 Then (/Individual sees previously saved address/) do
-  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD')
+  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -198,7 +198,7 @@ And(/I click on back to my account button$/) do
 end
 
 Then(/I should land on home page$/) do
-  expect(page).to have_content 'My DC Health Link'
+  expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
 And(/I click on log out link$/) do

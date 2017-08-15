@@ -68,7 +68,7 @@ Then(/^the broker enters the quote effective date$/) do
 end
 
 When(/^the broker selects employer type$/) do
- find('.interaction-choice-control-quote-employer-type').click()
+ #find('.interaction-choice-control-quote-employer-type').click()
  select "Prospect", :from => "quote_employer_type"
  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
@@ -95,7 +95,7 @@ Then(/^the broker clicks on Home button$/) do
 end
 
 Then(/^the broker clicks Actions dropdown$/) do
-  find('#dropdownMenu1').trigger 'click'
+  find('.dropdown-toggle', :text => "Actions").trigger 'click'
 end
 
 When(/^the broker clicks delete$/) do

@@ -45,8 +45,8 @@ class Insured::GroupSelectionController < ApplicationController
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
     qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    benefit_group = (@employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil)
-    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: benefit_group)
+    @benefit_group = (@employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil)
+    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
 
     generate_coverage_family_members_for_cobra
     # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
@@ -86,6 +86,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment.broker_agency_profile_id = broker_role.broker_agency_profile_id if broker_role
 
     hbx_enrollment.coverage_kind = @coverage_kind
+
     hbx_enrollment.validate_for_cobra_eligiblity(@employee_role)
 
     # Set effective_on if this is a case of QLE with date options available.

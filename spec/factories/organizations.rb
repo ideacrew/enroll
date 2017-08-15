@@ -61,6 +61,24 @@ FactoryGirl.define do
     after(:create) do |organization|
       FactoryGirl.create(:broker_agency_profile, organization: organization)
     end
+
+    trait :shop_only do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "shop", organization: organization)
+      end
+    end
+
+    trait :ivl_only do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "individual", organization: organization)
+      end
+    end
+
+    trait :both_ivl_and_shop do
+      after(:create) do |organization|
+        FactoryGirl.create(:broker_agency_profile, market_kind: "both", organization: organization)
+      end
+    end
   end
 
   factory :employer, class: Organization do

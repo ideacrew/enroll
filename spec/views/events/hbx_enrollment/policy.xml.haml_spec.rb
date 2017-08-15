@@ -23,4 +23,13 @@ RSpec.describe "events/hbx_enrollment/policy.haml.erb" do
     expect(rendered).to include("<premium_total_amount>")
     expect(rendered).to include("<total_responsible_amount>")
   end
+
+  it "includes the special carrier id" do
+    special_plan_id_prefix = Settings.aca.carrier_special_plan_identifier_namespace
+    special_plan_id = "abcdefg"
+    expected_special_plan_id = special_plan_id_prefix + special_plan_id
+    allow(plan).to receive(:carrier_special_plan_identifier).and_return(special_plan_id)
+    render :template=>"events/hbx_enrollment/policy", :locals=>{hbx_enrollment: hbx_enrollment}
+    expect(rendered).to have_selector("plan id alias_ids alias_id id", :text => expected_special_plan_id)
+  end
 end

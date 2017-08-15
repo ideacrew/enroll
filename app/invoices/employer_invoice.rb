@@ -21,10 +21,18 @@ class EmployerInvoice
         FileUtils.mkdir_p(invoice_folder_path)
       end
       pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
+      join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', 'ma_non_discrimination_and_language_tags.pdf')]
     rescue Exception => e
       @errors << "Unable to create PDF for #{@organization.hbx_id}."
       @errors << e.inspect
     end
+  end
+
+
+  def join_pdfs(pdfs)
+    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf << CombinePDF.load(pdfs[1])
+    pdf.save invoice_absolute_file_path
   end
 
   def save_to_cloud
@@ -51,7 +59,7 @@ class EmployerInvoice
     message_params = {
       sender_id: "admins",
       parent_message_id: @organization.employer_profile.id,
-      from: "DC Health Link",
+      from: Settings.site.short_name,
       to: "Employer Mailbox",
       subject: subject,
       body: body
@@ -107,7 +115,7 @@ class EmployerInvoice
       Rails.root.join('tmp',current_month)
     end
   end
-
+ 
   def invoice_absolute_file_path
     "#{invoice_folder_path}/#{invoice_file_name}"
   end

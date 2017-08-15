@@ -2,8 +2,12 @@ module PdfTemplates
   class EmployeeNotice
     include Virtus.model
 
+    attribute :notification_type, String
+    attribute :subject, String
+    attribute :mpi_indicator, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
+    attribute :mpi_indicator, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :employer_name, String
     attribute :broker, PdfTemplates::Broker

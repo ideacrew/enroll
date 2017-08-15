@@ -4,8 +4,10 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
   let(:person) { FactoryGirl.build(:person) }
   let(:person1) { FactoryGirl.build(:invalid_person) }
   let(:consumer_role) { FactoryGirl.build(:consumer_role) }
+  let(:individual_market_is_enabled) { true }
   context 'family is updateable' do
     before(:each) do
+      allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       assign(:person, person)
       person.addresses.build(kind: 'home')
@@ -26,8 +28,20 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
         render :template => "people/landing_pages/_personal.html.erb"
       end
 
-      it "should have consumer_fields area" do
-        expect(rendered).to have_selector('div#consumer_fields')
+      context "with individual market enabled in settings" do
+        let(:individual_market_is_enabled) { true }
+
+        it "should have consumer_fields area" do
+          expect(rendered).to have_selector('div#consumer_fields')
+        end
+      end
+
+      context "with individual market disabled in settings" do
+        let(:individual_market_is_enabled) { false }
+
+        it "should not have consumer_fields area" do
+          expect(rendered).to_not have_selector('div#consumer_fields')
+        end
       end
 
       it "should display the is_applying_coverage field option" do
@@ -141,7 +155,3 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     end
   end
 end
-
-
-
-

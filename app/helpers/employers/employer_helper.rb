@@ -112,6 +112,7 @@ module Employers::EmployerHelper
       "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
     else
       return "1 Plan Only" if benefit_group.single_plan_type?
+      return "Sole Source Plan" if benefit_group.plan_option_kind == 'sole_source'
       if benefit_group.plan_option_kind == "single_carrier"
         plan_count = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile).count
         "All #{reference_plan.carrier_profile.legal_name} Plans (#{plan_count})"
@@ -162,7 +163,7 @@ module Employers::EmployerHelper
     return false if employer_profile.blank?
 
     plan_year = employer_profile.renewing_plan_year || employer_profile.active_plan_year || employer_profile.published_plan_year
-    
+
     return false if plan_year.blank?
     return false if plan_year.is_renewing? && !employer_profile.is_converting?
 
@@ -205,4 +206,12 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def selected_benefit_plan(plan)
+    case plan 
+      when 'single_carrier' then 'All Plans From A Single Carrier'
+      when 'metal_level' then 'All Plans From A Given Metal Level'
+      when 'single_plan' then 'A Single Plan'
+      when 'sole_source' then 'A Sole Source Plan'
+    end
+  end
 end

@@ -18,7 +18,9 @@
           <th>HBX ID</th>
           <th>Family</th>
           <th>Registered?</th>
+          <% if individual_market_is_enabled? %>
           <th>Consumer?</th>
+          <%end%>
           <th>Employee?</th>
         </tr>
         </thead>
@@ -54,7 +56,9 @@
             { data: 'hbx_id'},
             { data: 'family_count'},
             { data: 'registered'},
+            <% if individual_market_is_enabled? %>
             { data: 'consumer'},
+            <%end%>
             { data: 'employee'}
       ],
 'dom': "<'row'" +

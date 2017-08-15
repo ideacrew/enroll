@@ -1,15 +1,24 @@
 <table class="table table-wrapper table-condensed group-selection-tbl">
   <tbody>
 
-    <% offered_relationship_benefits = (coverage_kind == 'health') ? health_relationship_benefits(@employee_role) : dental_relationship_benefits(@employee_role) %>
-
+    <% if @benefit_group.sole_source? %>
+      <% offered_relationship_benefits = (coverage_kind == 'health') ? health_relationship_benefits_for_composite(@employee_role) : dental_relationship_benefits(@employee_role) %>
+    <% else %>
+      <% offered_relationship_benefits = (coverage_kind == 'health') ? health_relationship_benefits(@employee_role) : dental_relationship_benefits(@employee_role) %>
+    <% end %>
     <%# show_residency_alert = false %>
     <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
-
-        <% is_coverage = offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
-        is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
-        is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
+        <% if @benefit_group.sole_source? %>
+        <% is_coverage = offered_relationship_benefits.present? ? composite_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
+           is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
+           is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
         %>
+        <% else %>
+          <% is_coverage = offered_relationship_benefits.present? ? coverage_relationship_check(offered_relationship_benefits, family_member, @new_effective_on) : true
+             is_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_coverage && @coverage_family_members_for_cobra.present?
+             is_primary = @employee_role.present? ? family_member.is_primary_applicant? : false
+          %>
+        <% end %>
         <tr class="<%='ineligible_row' unless is_coverage%>">
           <td width="20">
             <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_coverage, disabled: !is_coverage, readonly: is_primary, onclick: "return #{!is_primary};") %>

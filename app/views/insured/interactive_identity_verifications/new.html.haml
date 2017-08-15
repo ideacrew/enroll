@@ -3,7 +3,7 @@
 .container
   .row
     .col-lg-7.col-md-7.col-sm-8.col-xs-12
-      %h1.darkblue Verify Identity
+      %h1 Verify Identity
       %h4 Please answer the following security questions. When you're finished click SUBMIT.
       = form_for(@interactive_verification, :as => :interactive_verification, :url => insured_interactive_identity_verifications_path, :method => :post) do |f|
         = f.hidden_field :session_id

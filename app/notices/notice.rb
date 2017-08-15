@@ -1,8 +1,12 @@
 class Notice
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+  include Config::AcaHelper
+  include Config::SiteHelper
+  include Config::ContactCenterHelper
 
-  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:recipient_document_store]
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+
+  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 
   def initialize(params = {})
     validate_params(params)
@@ -11,6 +15,7 @@ class Notice
     self.template = params[:template]
     self.notice= params[:notice]
     self.market_kind= params[:market_kind]
+    self.event_name = params[:event_name]
     self.recipient= params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
@@ -66,6 +71,7 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
+          locals: {notice: notice}
           }),
         }
     }
@@ -157,7 +163,7 @@ class Notice
     body = "<br>You can download the notice by clicking this link " +
             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = recipient.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
+    message = recipient.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
     message.save!
   end
 

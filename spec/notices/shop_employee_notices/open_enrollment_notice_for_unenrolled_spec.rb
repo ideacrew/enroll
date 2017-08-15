@@ -15,12 +15,14 @@ RSpec.describe ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled, :dbclean 
                             :notice_template => 'notices/shop_employee_notices/8c_renewal_open_enrollment_notice_for_unenrolled_employee',
                             :notice_builder => 'ShopEmployeeNotices::OpenEnrollmentNoticeForUnenrolled',
                             :mpi_indicator => 'MPI_SHOP8c',
+                            :event_name => 'employee_open_enrollment_unenrolled',
                             :title => "Your Health Plan Open Enrollment Period has Begun"})
                           }
 
     let(:valid_parmas) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
+        :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
 

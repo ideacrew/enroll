@@ -4,17 +4,18 @@
   .n-radio-group.select-employer
     - @employment_relationships.each_with_index do |er, index|
       = render partial: "insured/employee_roles/employment_relationships", locals: {er: er, index: index}
-
-    .n-radio-row
-      %label.n-radio{ :for=>"individual-benefits" }
-        %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
-        %span.n-radio
-        Enroll in Individual Benefits
+ 
+    - if individual_market_is_enabled?
+      .n-radio-row
+        %label.n-radio{ :for=>"individual-benefits" }
+          %input.n-radio{ :type=>"radio", :id=>"individual-benefits", :name=>"healthcare-marketplace" }
+          %span.n-radio
+          Enroll in Individual Benefits
     %br
   .row
     .col-md-12.col-sm-12.col-xs-12
       %p
         %br
         If you don't see your employer listed above, click
-        = link_to 'here', 'https://dchealthlink.com/help', class: '', target: '_blank'
+        = link_to 'here', site_help_url, class: '', target: '_blank'
         for help.

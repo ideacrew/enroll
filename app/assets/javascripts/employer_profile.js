@@ -3,7 +3,7 @@ var EmployerProfile = ( function( window, undefined ) {
   function changeCensusEmployeeStatus($thisObj) {
     $('.injected-edit-status').html('<br/><h3 class="no-buffer">'+$thisObj.text()+'</h3><div class="module change-employee-status hbx-panel panel panel-default"><div class="panel-body"><div class="vertically-aligned-row"><div><label class="enroll-label">Enter Date of '+$thisObj.text()+':</label><input title="&#xf073; &nbsp;" placeholder="&#xf073; &nbsp;'+$thisObj.text()+' Date" type="text" class="date-picker date-field form-control"/></div><div class="text-center"><span class="btn btn-primary btn-sm disabled">'+$thisObj.text()+'</span></div></div></div></div>');
     if ( $thisObj.text() == 'Terminate' ) {
-      $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
+        $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
       $('.injected-edit-status .change-employee-status .date-picker').attr('placeholder', $('.injected-edit-status .change-employee-status .date-picker').attr('title')+'Termination Date (must be within the past 60 days)');
       $('.injected-edit-status .change-employee-status label').text('Enter Date of Termination:')
     }
@@ -49,12 +49,21 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
+  function showActionNeeded(){
+    $('.interaction-click-control-documents').html('Documents <span class="label label-danger">Action Needed</span>')
+  }
+
   function validateEditPlanYear() {
+    var minimumEmployerEmployeeContributionPct = $("input#employerMinEmployeeContribution").data('value');
+    var minimumEmployerFamilyContributionPct = $("input#employerMinFamilyContribution").data('value');
     editbgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     editbgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     edit_all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     editreferenceplanselections = $('.reference-plan input[type=radio]:checked');
     editselectedplan = $('input.ref-plan');
+    editbgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    editbgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    var validatedbgfamilypremiums = false;
 
     editbgtitles.each(function() {
         editplantitle = $(this).val();
@@ -87,38 +96,95 @@ var EmployerProfile = ( function( window, undefined ) {
       editvalidated = true;
     } else {
       editbgemployeepremiums.each(function() {
-        if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
-        } else {
-          if ( parseInt($(this).val() ) >= parseInt(50) ) {
-            editvalidatedbgemployeepremiums = true
-            editvalidated = true;
+        if ($('.composite-offerings').is(':visible')) {
+          if ($('.family').is(':checked')) {
+            editbgfamilypremiums.each(function() {
+              if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                editvalidatedbgfamilypremiums = true;
+                editvalidated = true;
+              } else {
+                $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                editvalidatedbgfamilypremiums = false;
+                editvalidated = false;
+                return false;
+              }
+            });
           } else {
-            $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be atleast 50%');
-            editvalidatedbgemployeepremiums = false;
-            editvalidated = false;
-            return false;
+            editvalidatedbgfamilypremiums = true;
+          }
+          editbgemployeeonlypremiums.each(function() {
+            if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+              editvalidatedbgemployeepremiums = true;
+              editvalidated = true;
+            } else {
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              editvalidatedbgemployeepremiums = false;
+              editvalidated = false;
+              return false;
+            }
+          });
+        } else {
+          if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-fs-plan').length ) {
+          } else {
+            if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+              editvalidatedbgemployeepremiums = true
+              editvalidated = true;
+            } else {
+
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              editvalidatedbgemployeepremiums = false;
+              editvalidated = false;
+              return false;
+            }
           }
         }
       });
     }
-
     if ( editreferenceplanselections.length != $('.benefit-group-fields').length ) {
       editvalidatedreferenceplanselections = true
       editvalidated = true;
     } else {
       editbgemployeepremiums.each(function() {
-        if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
+        if ($('.composite-offerings').is(':visible')) {
+          editbgfamilypremiums.each(function() {
+            if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+              editvalidatedbgfamilypremiums = true;
+              editvalidated = true;
+            } else {
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+              editvalidatedbgfamilypremiums = false;
+              editvalidated = false;
+              return false;
+            }
+          });
+          editbgemployeeonlypremiums.each(function() {
+            if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+              editvalidatedbgemployeepremiums = true;
+              editvalidated = true;
+            } else {
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              editvalidatedbgemployeepremiums = false;
+              editvalidated = false;
+              return false;
+            }
+          });
         } else {
-        if ( parseInt($(this).val() ) >= parseInt(50) ) {
-          editvalidatedbgemployeepremiums = true
-          editvalidated = true;
-        } else {
-          $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
-          editvalidatedbgemployeepremiums = false;
-          editvalidated = false;
-          return false;
+          if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
+          } else {
+            if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+              editvalidatedbgemployeepremiums = true
+              validatedbgfamilypremiums = true
+
+              editvalidated = true;
+            } else {
+
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              editvalidatedbgemployeepremiums = false;
+              editvalidated = false;
+              return false;
+            }
+          }
         }
-      }
       });
     }
 
@@ -197,22 +263,32 @@ var EmployerProfile = ( function( window, undefined ) {
     }
     });
 
-    if ( editvalidatedbgtitles == true && editvalidatedbgemployeepremiums == true && editvalidatedreferenceplanselections == true && edit_validated_all_premiums == true ) {
+    if ( editvalidatedbgtitles && editvalidatedbgemployeepremiums && editvalidatedreferenceplanselections && edit_validated_all_premiums && editvalidatedbgfamilypremiums) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        $('.interaction-click-control-save-plan-year').removeAttr('disabled');
+
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
       } else {
         $('.interaction-click-control-save-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').attr('disabled', true);
       }
       Freebies.tooltip();
   }
 
   function validatePlanYear() {
+    var minimumEmployerEmployeeContributionPct = $("input#employerMinEmployeeContribution").data('value');
+    var minimumEmployerFamilyContributionPct = $("input#employerMinFamilyContribution").data('value');
+    var validatedbgfamilypremiums = false;
+
     bgtitles = $('.plan-title').find('label.title').parents('.form-group').find('input');
     bgemployeepremiums = $('.benefits-fields').find('input[value=employee]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+
+    bgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+    bgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
+
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
-
     bgtitles.each(function() {
       plantitle = $(this).val();
       if ( $(this).val().length > 0 && $('.plan-title input[value=' + "\"plantitle\"" + ']').size() < 2 ) {
@@ -244,14 +320,45 @@ var EmployerProfile = ( function( window, undefined ) {
       validated = true;
     } else {
       bgemployeepremiums.each(function() {
-        if ( parseInt($(this).val()) >= parseInt(50) ) {
-          validatedbgemployeepremiums = true;
-          validated = true;
+        if ($('.composite-offerings').is(":visible")) {
+          if ($('.family').is(':checked')) {
+            bgfamilypremiums.each(function() {
+              if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                validatedbgfamilypremiums = true;
+                validated = true;
+              } else {
+                $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                validatedbgfamilypremiums = false;
+                validated = false;
+                return false;
+              }
+            });
+          } else {
+            validatedbgfamilypremiums = true;
+          }
+
+          bgemployeeonlypremiums.each(function() {
+            if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+              validatedbgemployeepremiums = true;
+              validated = true;
+            } else {
+              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              validatedbgemployeepremiums = false;
+              validated = false;
+              return false;
+            }
+          });
         } else {
-          $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium for Health must be atleast 50%');
-          validatedbgemployeepremiums = false;
-          validated = false;
-          return false;
+          if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
+            validatedbgemployeepremiums = true;
+            validatedbgfamilypremiums = true
+            validated = true;
+          } else {
+            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+            validatedbgemployeepremiums = false;
+            validated = false;
+            return false;
+          }
         }
       });
     }
@@ -269,9 +376,9 @@ var EmployerProfile = ( function( window, undefined ) {
     });
 
     dental_bgs = $('.select-dental-plan:visible').length
-    health_bgs = $('.benefit-group-fields > .health:visible').length
+    health_bgs = $('.benefit-group-fields > .health.offerings-slider:visible').length
     selected_reference_plans = dental_bgs + health_bgs;
-
+    validatedreferenceplanselections = false;
     if ( referenceplanselections.length != selected_reference_plans ) {
       validatedreferenceplanselections = false;
       validated = false;
@@ -289,13 +396,17 @@ var EmployerProfile = ( function( window, undefined ) {
       });
     }
 
-    if ( validatedbgtitles == true && validatedbgemployeepremiums == true && validatedreferenceplanselections == true && validated_all_premiums == true ) {
+    if (validatedbgtitles && validatedbgemployeepremiums && validatedbgfamilypremiums && validatedreferenceplanselections && validated_all_premiums) {
         $('.interaction-click-control-create-plan-year').removeClass('disabled');
+        $('.interaction-click-control-save-plan-year').removeAttr('disabled');
+
         $('.interaction-click-control-create-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Click here to create your plan year');
         $('.interaction-click-control-create-plan-year').unbind('click');
       } else {
         $('.interaction-click-control-create-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').attr('disabled', true);
+
         $('.interaction-click-control-create-plan-year').click(function(event){
           event.preventDefault();
         });
@@ -317,10 +428,7 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
-  function submitCobraDate(type, ce_id) {
-    var target = $("tr."+type+'_'+ce_id);
-    var cobra_date = target.find('input.date-picker').val();
-    var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  function submitCobraDate(cobra_date, cobra_link) {
     $.ajax({
       type: 'get',
       datatype : 'js',
@@ -344,7 +452,8 @@ var EmployerProfile = ( function( window, undefined ) {
       validatePlanYear : validatePlanYear,
       validateCobraBeginDate : validateCobraBeginDate,
       viewDetails : viewDetails,
-      viewCobraDateField : viewCobraDateField,
+      viewCobraDateField: viewCobraDateField,
+      showActionNeeded : showActionNeeded,
       submitCobraDate : submitCobraDate,
     };
 
@@ -445,6 +554,38 @@ $(function() {
   })
 })
 
+$(document).on('click', "a.terminate.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', "a.cobra.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', "a.rehire.cancel", function(){
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', "a.interaction-click-control-terminate", function(){
+  event.preventDefault();
+    $('tr.child-row:visible').remove();
+    $("li>a:contains('Collapse Form')").addClass('disabled');
+});
+
+$(document).on('click', '.cobra_confirm', function(){
+  event.preventDefault();
+  var datepicker = $(this).prev();
+  var cobra_date = datepicker.val();
+  var cobra_link = $(this).data('link');
+  // var target = $("tr."+type+'_'+ce_id);
+  // var cobra_date = target.find('input.date-picker').val();
+  // var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+  EmployerProfile.submitCobraDate(cobra_date, cobra_link);
+})
+
 $(document).on('click', ".delete_confirm", function(){
   var termination_date = $(this).closest('div').find('input').val();
   var link_to_delete = $(this).data('link');
@@ -465,7 +606,7 @@ $(document).on('click', ".delete_confirm", function(){
   });
 });
 
-$(document).on('click', ".rehire_confirm", function(){
+$(document).on('click', ".rehire-confirm", function(){
   var element_id = $(this).attr('id');
   var rehiring_date = $(this).siblings().val();
   var rehire_link = $(this).data('link');
@@ -558,6 +699,12 @@ $(document).on('change', '#address_info .office_kind_select select', function() 
     $(this).parents('fieldset').find('#phone_info input.area_code').attr('required', true);
     $(this).parents('fieldset').find('#phone_info input.phone_number7').attr('required', true);
   };
+  if ($(this).val() == 'primary') {
+    $(this).parents('fieldset').find(".county-select").addClass('primary-office-location');
+  }
+  else {
+    $(this).parents('fieldset').find(".county-select").removeClass('primary-office-location');
+  }
 })
 
 function checkPhone(textbox) {
@@ -573,16 +720,53 @@ function checkPhone(textbox) {
 }
 
 function checkZip(textbox) {
-  var phoneRegex = /^\d{5}$/;
+  var zipRegex = /^\d{5}$/;
   if (textbox.value == '') {
     textbox.setCustomValidity('Please fill out this zipcode field.');
-  } else if(!phoneRegex.test(textbox.value)){
+  } else if(!zipRegex.test(textbox.value)){
     textbox.setCustomValidity('please enter a valid zipcode.');
   } else {
     textbox.setCustomValidity('');
+    if ($('.county-select').length > 0) {
+      var child_index = $(textbox).data('child-index');
+      $.ajax({
+        type: 'get',
+        datatype: 'js',
+        url: '/employers/employer_profiles/counties_for_zip_code',
+        data: { zip_code: textbox.value },
+        success: function (response) {
+          $('#county-select-' + child_index + " select").html(response);
+          $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+          if (!$('#organization_office_locations_attributes_0_address_attributes_county').val() &&
+                  $("#organization_office_locations_attributes_0_address_attributes_county option[value='Zip code outside MA']").length === 0)
+          {
+              $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+          }
+        }
+      });
+    }
   }
   return true;
 }
+
+function validateCounty(selectField) {
+    if (!$('#organization_office_locations_attributes_0_address_attributes_county').val())
+    {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('Please select county.');
+    } else {
+        $('#organization_office_locations_attributes_0_address_attributes_county').get(0).setCustomValidity('');
+    }
+}
+
+$(document).on('submit', '#new_organization', function() {
+  var retVal = true;
+  if ($("#organization_sic_code").length && !$("#organization_sic_code option:selected").val())
+  {
+    $("#sic_warning").html('Please fill Standard Indusry Code');
+    retVal = false;
+  }
+  return retVal;
+});
 
 function checkAreaCode(textbox) {
   var phoneRegex = /^\d{3}$/;

@@ -5,7 +5,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information
-    And Primary Broker enters broker agency information
+    And Primary Broker enters broker agency information for SHOP markets
     And Primary Broker enters office location for default_office_location
     And Primary Broker clicks on Create Broker Agency
     Then Primary Broker should see broker registration successful message
@@ -15,7 +15,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Then Hbx Admin should see the list of broker applicants
     When Hbx Admin clicks on the current broker applicant show button
     Then Hbx Admin should see the broker application
-    And Hbx Admin checks Kaiser Foundation
-    And Hbx Admin checks Optimum Choice
+    And Hbx Admin checks FCHP
+    And Hbx Admin checks Guardian
     When Hbx Admin clicks pending button
     Then Hbx Admin sees a successful message

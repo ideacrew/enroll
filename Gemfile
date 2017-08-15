@@ -1,8 +1,11 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.3'
+
+# Mount Enroll App component engines
+gem "transport_gateway",  path: "components/transport_gateway"
+
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -53,7 +56,7 @@ gem 'mongo_session_store-rails4', '~> 6.0.0'
 gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
@@ -72,7 +75,7 @@ gem 'roo', '~> 2.1.0'
 # configuration support
 gem "config", '~> 1.0.0'
 
-gem 'devise', '~> 3.4.1'
+gem 'devise', '>= 3.5.4'
 # gem 'devise_ldap_authenticatable', '~> 0.8.1'
 gem "pundit", '~> 1.0.1'
 
@@ -99,18 +102,19 @@ gem 'wkhtmltopdf-binary-edge', '~> 0.12.3.0'
 gem 'wicked_pdf', '1.0.6'
 
 # provide recaptcha services
-gem "recaptcha", '1.1.0'
+gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
 
 gem 'jquery-datatables-rails', '3.4.0'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+gem 'chosen-rails'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '2.3.0'
-  gem "parallel_tests"
+  gem "certified"
 end
 
 group :development, :test do
@@ -142,11 +146,14 @@ group :development, :test do
   gem 'email_spec', '2.0.0'
   gem 'byebug', '8.2.2'
   gem 'rspec_junit_formatter', '0.2.3'
+  gem "parallel_tests"
 end
 
 group :test do
+  gem 'simplecov', '0.14.1', :require => false
   gem 'mongoid-rspec', '3.0.0'
   gem 'watir'
+  gem 'webmock'
   gem 'cucumber-rails', '~> 1.4.2', :require => false
   gem 'poltergeist'
   gem 'capybara-screenshot'
@@ -156,6 +163,7 @@ group :test do
   gem 'capybara', '2.6.2'
   gem 'warden'
   gem 'fakeredis', :require => 'fakeredis/rspec'
+  gem 'rspec-instafail'
 end
 
 group :production do
@@ -171,3 +179,5 @@ end
 gem 'aws-sdk', '2.2.4'
 gem 'ruby-saml', '~> 1.3.0'
 gem 'combine_pdf'
+gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
+gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar'

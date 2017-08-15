@@ -362,12 +362,14 @@ RSpec.describe Plan, dbclean: :after_each do
       1;
     end
 
+    let(:in_service_area_count) { platinum_count + individual_silver_count }
+
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
     let(:organization) { FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
-    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization) }
+    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
     let(:carrier_profile_1) { FactoryGirl.create(:carrier_profile) }
-
+    let(:carrier_service_area) { create(:carrier_service_area, issuer_hios_id: '11111', serves_entire_state: true, service_area_id: 'EX123') }
     let(:shop_count) { platinum_count + gold_count + shop_silver_count }
     let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
     let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
@@ -377,12 +379,12 @@ RSpec.describe Plan, dbclean: :after_each do
 
     context "with plans loaded" do
       before do
-        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1)
-        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year)
-        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year)
-        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
-        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year)
-        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year)
+        FactoryGirl.create_list(:plan, platinum_count, metal_level: "platinum", market: "shop", plan_type: "ppo", carrier_profile: carrier_profile_0, active_year: current_year-1, service_area_id: 'EX123')
+        FactoryGirl.create_list(:plan, gold_count, metal_level: "gold", market: "shop", plan_type: "pos", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX111')
+        FactoryGirl.create_list(:plan, shop_silver_count, metal_level: "silver", plan_type: "ppo", market: "shop", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX222')
+        FactoryGirl.create_list(:plan, individual_silver_count, metal_level: "silver", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX123')
+        FactoryGirl.create_list(:plan, bronze_count, metal_level: "bronze", market: "individual", plan_type: "epo", carrier_profile: carrier_profile_0, active_year: current_year, service_area_id: 'EX321')
+        FactoryGirl.create_list(:plan, catastrophic_count, metal_level: "catastrophic", market: "individual", plan_type: "hmo", carrier_profile: carrier_profile_1, active_year: current_year, service_area_id: 'EX321')
       end
 
       context "with no referenced scope" do
@@ -394,6 +396,12 @@ RSpec.describe Plan, dbclean: :after_each do
       context "by_active_year" do
         it "should return all plans of this year" do
           expect(Plan.by_active_year.count).to eq (total_plan_count - platinum_count)
+        end
+      end
+
+      context "for_service_areas" do
+        it 'should return all plans assigned the given service area ids' do
+          expect(Plan.for_service_areas(['EX123']).count).to eq(in_service_area_count)
         end
       end
 

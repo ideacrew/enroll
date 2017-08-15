@@ -29,17 +29,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:plan){ Maybe.new(FactoryGirl.build(:plan)) }
     let(:carrier_profile){ FactoryGirl.build(:carrier_profile, legal_name: "Kaiser")}
-    let(:plan_1){ Maybe.new(FactoryGirl.build(:plan, hios_id: "89789DC0010006-01", carrier_profile: carrier_profile)) }
+    let(:plan){ FactoryGirl.build(:plan, carrier_profile: carrier_profile) }
 
-    it "should return uhic logo" do
-      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/uhic.jpg\" alt=\"Uhic\" />"
+    before do
+      allow(plan).to receive(:carrier_profile).and_return(carrier_profile)
+      allow(carrier_profile).to receive_message_chain(:legal_name, :extract_value).and_return('kaiser')
+    end
+    it "should return the named logo" do
+      expect(helper.display_carrier_logo(plan)).to eq "<img width=\"50\" src=\"/images/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
     end
 
-    it "should return non united logo" do
-      expect(helper.display_carrier_logo(plan_1)).to eq "<img width=\"50\" src=\"/assets/logo/carrier/kaiser.jpg\" alt=\"Kaiser\" />"
-    end
   end
 
   describe "#format_time_display" do
@@ -265,7 +265,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   describe "env_bucket_name" do
     it "should return bucket name with system name prepended and environment name appended" do
       bucket_name = "sample-bucket"
-      expect(env_bucket_name(bucket_name)).to eq("dchbx-enroll-" + bucket_name + "-local")
+      expect(env_bucket_name(bucket_name)).to eq("mhc-enroll-" + bucket_name + "-local")
     end
   end
 
@@ -296,8 +296,8 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "show_default_ga?", dbclean: :after_each do
-    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
-    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
+    let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile, :shop_agency) }
+    let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile, :shop_agency) }
 
     it "should return false without broker_agency_profile" do
       expect(helper.show_default_ga?(general_agency_profile, nil)).to eq false
@@ -350,6 +350,21 @@ RSpec.describe ApplicationHelper, :type => :helper do
     it "should return nil given an invalid enrollment ID" do
       expect(helper.find_plan_name(invalid_enrollment_id)).to eq  nil
     end
+  end
+end
+
+  describe "Enabled/Disabled IVL market" do
+    shared_examples_for "IVL market status" do |value|
+       if value == true
+        it "should return true if IVL market is enabled" do
+          expect(helper.individual_market_is_enabled?).to eq  true
+        end
+       else
+        it "should return false if IVL market is disabled" do
+          expect(helper.individual_market_is_enabled?).to eq  false
+        end
+       end
+    it_behaves_like "IVL market status", Settings.aca.market_kinds.include?("individual")
   end
 
   describe "#is_new_paper_application?" do
