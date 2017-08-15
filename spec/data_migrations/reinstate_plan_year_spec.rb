@@ -28,13 +28,16 @@ describe ReinstatePlanYear, dbclean: :after_each do
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq 'active'
+      expect(plan_year.end_on).to eq plan_year.start_on + 364.days
     end
 
     it "should not reinstate plan year" do
+      end_on = plan_year.end_on
       plan_year.update_attributes!(aasm_state:'canceled')
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq 'canceled'
+      expect(plan_year.end_on).to eq end_on
     end
   end
 end
