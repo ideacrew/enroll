@@ -13,8 +13,9 @@ module VerificationHelper
     end
   end
 
-  def verification_type_status(type, member)
+  def verification_type_status(type, member, admin=false)
     consumer = member.consumer_role
+    return "curam" if (consumer.vlp_authority == "curam" && consumer.fully_verified? && admin)
     case type
       when 'Social Security Number'
         if consumer.ssn_verified?
@@ -43,14 +44,16 @@ module VerificationHelper
     end
   end
 
-  def verification_type_class(type, member)
-    case verification_type_status(type, member)
+  def verification_type_class(type, member, admin=false)
+    case verification_type_status(type, member, admin)
       when "verified"
         "success"
       when "in review"
         "warning"
       when "outstanding"
         member.consumer_role.processing_hub_24h? ? "info" : "danger"
+      when "curam"
+        "default"
     end
   end
 
@@ -160,12 +163,14 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-  def show_v_type(v_type, person)
-    case verification_type_status(v_type, person)
+  def show_v_type(v_type, person, admin = false)
+    case verification_type_status(v_type, person, admin)
       when "in review"
         "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "curam"
+        admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end

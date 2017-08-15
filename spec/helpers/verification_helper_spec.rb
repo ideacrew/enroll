@@ -20,37 +20,53 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification_type_status" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status|
+    let(:types) { ["Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
+    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin|
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
-        if current_state == "valid"
-          person.consumer_role.ssn_validation = "valid"
-          person.consumer_role.native_validation = "valid"
-          person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
+        if curam
+          person.consumer_role.import!(verification_attr) if current_state == "valid"
+          person.consumer_role.vlp_authority = "curam"
         else
-          person.consumer_role.ssn_validation = "outstanding"
-          person.consumer_role.native_validation = "outstanding"
-          person.consumer_role.lawful_presence_determination.deny!(verification_attr)
+          if current_state == "valid"
+            person.consumer_role.ssn_validation = "valid"
+            person.consumer_role.native_validation = "valid"
+            person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
+          else
+            person.consumer_role.ssn_validation = "outstanding"
+            person.consumer_role.native_validation = "outstanding"
+            person.consumer_role.lawful_presence_determination.deny!(verification_attr)
+          end
         end
       end
       it "returns #{status} status for #{verification_type} #{uploaded_doc ? 'with uploaded doc' : 'without uploaded docs'}" do
-        expect(helper.verification_type_status(verification_type, person)).to eq status
+        expect(helper.verification_type_status(verification_type, person, admin)).to eq status
       end
     end
 
-    it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding"
-    it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified"
-    it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review"
-    it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding"
-    it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified"
-    it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review"
-    it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding"
-    it_behaves_like "verification type status", "valid", "Citizenship", false, "verified"
-    it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review"
-    it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding"
-    it_behaves_like "verification type status", "valid", "Immigration status", false, "verified"
-    it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review"
+    context "consumer role" do
+      it_behaves_like "verification type status", "outstanding", "Social Security Number", false, "outstanding", false, false
+      it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, false
+      it_behaves_like "verification type status", "outstanding", "Social Security Number", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", false, false
+      it_behaves_like "verification type status", "valid", "American Indian Status", false, "verified", false, false
+      it_behaves_like "verification type status", "outstanding", "American Indian Status", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "Citizenship", false, "outstanding", false, false
+      it_behaves_like "verification type status", "valid", "Citizenship", false, "verified", false, false
+      it_behaves_like "verification type status", "outstanding", "Citizenship", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "Immigration status", false, "outstanding", false, false
+      it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
+      it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
+      it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", "curam", false
+    end
+
+    context "admin role" do
+      it_behaves_like "verification type status", "valid", "Immigration status", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
+      it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
+      it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
+    end
   end
 
   describe "#verification_type_class" do
