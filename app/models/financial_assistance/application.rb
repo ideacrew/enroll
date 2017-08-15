@@ -310,11 +310,8 @@ class FinancialAssistance::Application
   end
 
   def tax_households
-    tax_households = []
-    family.active_household.tax_households.each do |tax_household|
-      tax_households << tax_household unless tax_household.application_id.nil?
-    end
-    tax_households
+    return nil unless family.active_household.tax_households.present?
+    family.active_household.tax_households.where(application_id: id.to_s)
   end
 
   def eligibility_determinations
@@ -692,7 +689,7 @@ private
 
   def create_tax_households
     ## Remove  when copy method is fixed to exclude copying Tax Household
-    tax_households.destroy_all
+    # tax_households.destroy_all #We don't need to do it anymore as TaxHouseholds are embeded in Household
     applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
     ##
     applicants.each do |applicant|
@@ -708,7 +705,7 @@ private
       else
         # Create a new THH and assign it to the applicant
         # Need THH for Medicaid cases too
-        applicant.tax_household = tax_households.create!
+        applicant.tax_household = family.active_household.tax_households.create!(application_id: id)
         applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
       end
     end

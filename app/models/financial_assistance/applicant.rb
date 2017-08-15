@@ -291,7 +291,7 @@ class FinancialAssistance::Applicant
 
   def tax_household
     return nil unless tax_household_id
-    self.application.tax_households.find(tax_household_id)
+    self.application.tax_households.find(tax_household_id) if application.tax_households.present?
   end
 
   def age_on_effective_date
