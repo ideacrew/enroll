@@ -95,7 +95,7 @@ class ShopEmployerNotice < Notice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
-    
+
     notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,
