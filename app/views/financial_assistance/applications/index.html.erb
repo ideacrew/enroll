@@ -1,7 +1,5 @@
 <div class="container bottom-pd">
-	<div class="row">
-		<h3 class="title-inline"><b>Your Financial Asistance Applications</b></h3>
-	</div>
+	<h1 class="darkblue">Your Financial Asistance Applications</h1>
 	<div class="form-group">
 		<div class="">
 			<%= form_tag({:action => 'create'}, {:method => 'post'}) do %>
@@ -23,14 +21,14 @@
 	</div>
 	<%if @applications.present?%>
 		<table class="table table-striped">
-			<thead>
+			<thead class ="form-heading">
 				<tr>
-				  <th>ID</th>
-				  <th>Status</th>
-				  <th>Started On</th>
-				  <th>Submitted On</th>
-				  <th>Determination</th>
-				  <th>Actions</th>
+				  <th class ="form-heading">ID</th>
+				  <th class ="form-heading">STATUS</th>
+				  <th class ="form-heading">STARTED ON</th>
+				  <th class ="form-heading">SUBMITTED ON</th>
+				  <th class ="form-heading">DETERMINATION</th>
+				  <th class ="form-heading">ACTIONS</th>
 				</tr>
 			</thead>
 			<tbody>
