@@ -4,7 +4,6 @@ class ShopEmployerNotices::ZeroEmployeesOnRoster < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
-    employer_appeal_rights_attachment
     attach_envelope
     non_discrimination_attachment
     upload_and_send_secure_message
