@@ -500,9 +500,7 @@ private
   end
 
   def age_of_applicant
-    now = Time.now.utc.to_date
-    dob = self.family_member.person.dob
-    age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+    person.age_on(TimeKeeper.date_of_record)
   end
 
   def clean_params(model_params)

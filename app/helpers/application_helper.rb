@@ -651,7 +651,7 @@ module ApplicationHelper
   end
 
   def current_year
-    Time.now.utc.year
+    TimeKeeper.date_of_record.year
   end
 
   def is_new_paper_application?(current_user, app_type)
