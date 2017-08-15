@@ -283,6 +283,23 @@ class PlanYear
     benefit_groups.detect(&:default)
   end
 
+  def is_offering_dental?
+    benefit_groups.any?{|bg| bg.is_offering_dental?}
+  end
+
+  def carriers_offered
+    benefit_groups.inject([]) do |carriers, bg| 
+      carriers += bg.carriers_offered
+    end.uniq
+  end
+
+  def dental_carriers_offered
+    return [] unless is_offering_dental?
+    benefit_groups.inject([]) do |carriers, bg| 
+      carriers += bg.dental_carriers_offered
+    end.uniq
+  end
+
   def default_renewal_benefit_group
     # benefit_groups.detect { |bg| bg.is_default? && is_coverage_renewing? }
   end

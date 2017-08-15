@@ -116,6 +116,10 @@ aca:
     employer_profiles:
       minimum_invoice_display_year: 2015
 
+    transmit_employers_immediately: false
+    transmit_scheduled_employers: false
+    employer_transmission_day_of_month: 16
+
 paper_notice: 'paper-notices'
 checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
