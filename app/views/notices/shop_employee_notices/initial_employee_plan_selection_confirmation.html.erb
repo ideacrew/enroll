@@ -1,7 +1,6 @@
 <%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
 <%= render partial: 'notices/shared/logo_and_address_shop' %>
 <%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
-<br><br><br>
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
@@ -20,8 +19,6 @@
   </tbody>
 </table>
 
-<%binding.pry%>
-
 <%= render partial: 'notices/shared/paragraph', :locals => { 
   content: "Congratulations! Your employer, #{notice.employer_name}, has completed its open enrollment period and has successfully met all eligibility requirements." }%>
 
@@ -29,7 +26,7 @@
   content: "Your plan selection #{notice.plan.plan_name} will go into effect on #{notice.plan_year.start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { 
-  content: "Please note that your monthly premium contribution will be #{notice.enrollment.employee_cost}.  Your employer, #{notice.employer_name}, will contribute #{notice.enrollment.responsible_amount} towards your monthly premium."} %>
+  content: "Please note that your monthly premium contribution will be #{notice.enrollment.employee_cost}. Your employer, #{notice.employer_name}, will contribute #{notice.enrollment.responsible_amount} towards your monthly premium."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { 
   content: "Thank you for enrolling into employer-sponsored coverage through the #{Settings.site.short_name}"} %>
