@@ -63,6 +63,10 @@ class Insured::PlanShoppingsController < ApplicationController
     if (@change_plan.present? || @enrollment_kind.present?) && @census_employee.present?
       employee_mid_year_plan_change_non_congressional(@census_employee)
     end
+
+    unless @enrollment.is_shop?
+      IvlNoticesNotifierJob.perform_later(@person.consumer_role ,"enrollment_notice") unless Rails.env.test?
+    end
     send_receipt_emails if @person.emails.first
   end
 
@@ -82,7 +86,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
-    
+
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -141,7 +145,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-      
+
       redirect_to family_account_path
     else
       redirect_to :back
@@ -286,7 +290,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
-    
+
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan
