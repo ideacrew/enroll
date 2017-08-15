@@ -9,15 +9,14 @@
                                                       { content: "Congratulations on completing your application for employer-sponsored coverage through the #{site_short_name}!"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-                                                      { content: "Your employee open enrollment period will close on #{notice.plan_year.open_enrollment_end_on}. We notice no employees are listed on your roster at this time. You have until #{notice.plan_year.open_enrollment_end_on} to correct this issue by adding all eligible employees to your roster. A failure to correct this will result in your group being ineligible for employer-sponsored health insurance through #{site_short_name}."} %>
+                                                      { content: "Your employee open enrollment period will close on #{notice.plan_year.open_enrollment_end_on}. We notice no employees are listed on your roster at this time. You have until #{notice.plan_year.open_enrollment_end_on} to correct this issue by adding all eligible employees to your roster. A failure to correct this will result in your group being ineligible for employer-sponsored health insurance through the #{site_short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-                                                      { content: "All eligible employees must create an employee account on MAhealthconnector.org and enroll in or waive coverage by 8pm Eastern on #{notice.plan_year.open_enrollment_end_on}. Please share our <strong>Employee guide to enrolling</strong> with your employees to help them with the steps needed to enroll. You can Download this guide from our online Bussiness Resource Center. If you wish to cancel your #{site_short_name} account, please contact #{site_short_name} at #{contact_center_phone_number}."} %>
+                                                      { content: "All eligible employees must create an employee account on <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> and enroll in or waive coverage by 8pm Eastern on #{notice.plan_year.open_enrollment_end_on}. Please share our <strong>Employee guide to enrolling</strong> with your employees to help them with the steps needed to enroll. You can Download this guide from our online Bussiness Resource Center. If you wish to cancel your #{site_short_name} account, please contact #{site_short_name} at #{contact_center_phone_number}."} %>
 <br>
-<%= render partial: 'notices/shared/unordered_list', locals: {
-                                                           previous: "Please note that your group will only obtain coverage if:",
-                                                           listings: [""] } %>
-
+<%= render partial: 'notices/shared/paragraph', locals: {
+                                                           content: "Please note that your group will only obtain coverage if:" } %>
+<br>
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -58,13 +57,13 @@
       <td>
         <ul style="list-style: circle solid;">
           <li>
-            <strong>Log in to your <a href="MAhealthconnector.org">MAhealthconnector.org</a> Account</strong>
+            <strong>Log in to your <%= link_to "#{site_website_name}", "#{site_main_web_address_url}" %> Account</strong>
           </li>
            <li>
-            <strong>Employee Enrollments</strong><br/>
+            <strong>Employee Enrollments</strong><br><br>
             Share the <strong>Employee guide to enrolling</strong> with your eligible employees to help them with the steps needed to enroll. You can download this guide from our online Business Resource Center. If you are the point of contact for the group, you may also want to follow the steps in our <strong>Employer guide to enrolling as an employee</strong>, also available in the Business Resource center.
-            <br/>
-            <strong style="font-style: italic">Employers should review their roster to ensure that any employees who are also owners (or spouses of owners) are identified as owners on their roster</strong>. For your group to receive coverage through the Small Group Marketplace, you must have at least one non-owner enrolled in a health plan at the end of each annual employee open enrollment period.
+            <br><br>
+            <strong><i>Employers should review their roster to ensure that any employees who are also owners (or spouses of owners) are identified as owners on their roster</i></strong>. For your group to receive coverage through the Small Group Marketplace, you must have at least one non-owner enrolled in a health plan at the end of each annual employee open enrollment period.
           </li>
         </ul>
       </td>
@@ -80,16 +79,16 @@
         <ul style="list-style: circle solid;">
           <li>
             <strong>First Month’s Premium Payment</strong><br>
-            Once your open enrollment period ends, you will receive an email from the Health Connector listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. Eastern on <%= notice.plan_year.binder_payment_due_date %>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong>required</strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.
-            <br/>  <br/>
+            Once your open enrollment period ends, you will receive an email from the Health Connector listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. Eastern on <%= notice.plan_year.binder_payment_due_date %>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong><i>required</i></strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.
+            <br><br>
             Once this first premium payment is received, your enrollments will be transmitted to the insurance companies to complete processing and setup of your group and each employee’s enrollments. The insurance companies mail member ID cards to each enrolled employee’s home address on or around the coverage effective date, this usually takes two weeks.
-             <br/><br/>Once your coverage takes effect, you will receive regular monthly invoices from the Health Connector through the mail that include each employee’s enrollment, their premium, and the employer/employee cost breakdown. All premium payments will be made directly to the Health Connector either online, by phone or by mail.
-            <br/><br/>
-            <strong>Make a Secure Online Payment</strong><br/>
+             <br><br>Once your coverage takes effect, you will receive regular monthly invoices from the Health Connector through the mail that include each employee’s enrollment, their premium, and the employer/employee cost breakdown. All premium payments will be made directly to the Health Connector either online, by phone or by mail.
+            <br><br>
+            <strong>Make a Secure Online Payment</strong><br>
             The Health Connector offers small businesses the option to make their premium payments online through secure electronic check payment. Follow the instructions in our <strong>Employer guide to paying premiums</strong>, which can be found in our online Business Resource Center.
-            <br/><br/>
+            <br><br>
             <strong>To make a secure electronic check payment by phone</strong>
-            <br/>Call 1-888-813-9220
+            <br/>Call <%= contact_center_phone_number %>
             <br/>Select your language (1 for English, 2 for Spanish, additional language options available)
           </li>
         </ul>
@@ -100,7 +99,7 @@
 </div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-  { contents: ["Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
+  { contents: ["Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -108,19 +107,19 @@
       <td>
         <ul style="list-style: circle solid;">
         <li class="notice-font">
-            By calling <%=contact_center_phone_number%><br>
+            By calling <%=contact_center_phone_number%>.  TTY: <%=contact_center_tty_number%><br>
         </li>
         <li class="notice-font">
-             TTY: <%=contact_center_tty_number%>
-        </li>
-        <li class="notice-font">
-            Online at  <a href= "#{site_main_web_address}"><%= site_main_web_address %></a>
+            By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%>
         </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
+
+<%= render partial: 'notices/shared/paragraph', locals: {
+                                                           content: "You can also find more information on our website at <a href= '#{site_main_web_address_url}'>#{site_website_name}</a>" } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
@@ -129,4 +128,4 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-                                                      content: "This notice is being provided in accordance with 45 C.F.R. 155.715(e)"} %>
+                                                      content: "This notice is being provided in accordance with 45 C.F.R. 155.715(e)."} %>

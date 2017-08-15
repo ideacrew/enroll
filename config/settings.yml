@@ -5,6 +5,8 @@ site:
   help_url: "https://mhc.hbxshop.org/help"
   faqs_url: "https://mhc.hbxshop.org/faqs"
   main_web_address: "www.MAhealthconnector.org"
+  main_web_address_url: "https://www.MAhealthconnector.org"
+  website_name: "MAhealthconnector.org"
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
