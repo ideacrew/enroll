@@ -136,7 +136,11 @@ module Insured
       active_bg = employee_role.census_employee.active_benefit_group
 
       if change_plan != "change_by_qle"
-        ( renewing_bg || active_bg ).present? && (renewing_bg || active_bg ).is_offering_dental?
+        if employee_role.can_enroll_as_new_hire?
+          active_bg.present? && active_bg.is_offering_dental?
+        else
+          ( renewing_bg || active_bg ).present? && (renewing_bg || active_bg ).is_offering_dental?
+        end
       else
         effective_on = employee_role.person.primary_family.current_sep.effective_on
 
