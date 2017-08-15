@@ -13,7 +13,7 @@ namespace :migrations do
       else  
         if row["Term_or_Cancel?"].downcase == "cancelled"
           plan_year=EmployerProfile.find_by_fein(row['FEIN']).plan_years.where(start_on: date).first
-            if plan_year.present? && plan_year.published?
+            if plan_year.present? && plan_year.is_published?
               Rake::Task["migrations:cancel_employer_incorrect_renewal"].invoke(row['FEIN']) unless Rails.env.test?
               puts "Plan Year Cancelled for #{row['ERLegalName']}" unless Rails.env.test?
             else
