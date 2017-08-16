@@ -12,6 +12,7 @@ module PdfTemplates
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
     attribute :coverage_kind, String
+    attribute :kind, String
     attribute :is_receiving_assistance, Boolean
   end
 end

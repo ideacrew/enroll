@@ -184,7 +184,7 @@ content: "If you end your plan, you also won’t be able to sign up again until 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
 
-<% if notice.documents_needed == true %>
+<% if (notice.documents_needed == true && !notice.cover_all?) %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
   listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>

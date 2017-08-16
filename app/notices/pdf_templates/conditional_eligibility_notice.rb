@@ -67,6 +67,10 @@ module PdfTemplates
       individuals.select{|individual| individual.incarcerated}
     end
 
+    def cover_all?
+      enrollments.select{|enrollment| enrollment.kind == "coverall"}.present?
+    end
+
     def current_health_enrollments
       enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end
