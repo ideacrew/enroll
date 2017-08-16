@@ -25,7 +25,7 @@
                   <%= render 'coverage_household', :coverage_kind => 'health' %>
                 </div>
               </div>
-              <% if is_eligible_for_dental?(@employee_role, @change_plan) %>
+              <% if is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment) %>
                 <div class="module group-selection-table dn dental">
                   <div class="table-responsive table-border">
                     <%= render 'coverage_household', :coverage_kind => 'dental' %>
