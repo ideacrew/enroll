@@ -120,12 +120,12 @@ $(document).ready(function() {
   $('#employer_phone_full_phone_number').on('keyup keydown keypress', function (e) {
     var key = e.which || e.keyCode || e.charCode;
     $(this).attr('maxlength', '10');
-    return (key == 8 || 
-            key == 9 || 
-            key == 46 || 
-            (key >= 37 && key <= 40) || 
-            (key >= 48 && key <= 57) || 
-            (key >= 96 && key <= 105) );
+    return (key == 8 ||
+      key == 9 ||
+      key == 46 ||
+      (key >= 37 && key <= 40) ||
+      (key >= 48 && key <= 57) ||
+      (key >= 96 && key <= 105) );
   })
 
   .on('focus', function () {
