@@ -14,5 +14,8 @@ module PdfTemplates
     attribute :coverage_kind, String
     attribute :kind, String
     attribute :is_receiving_assistance, Boolean
+    attribute :plan_year, Date
+    attribute :ivl_open_enrollment_start_on, Date
+    attribute :ivl_open_enrollment_end_on, Date
   end
 end
