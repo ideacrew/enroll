@@ -64,9 +64,6 @@ class Insured::PlanShoppingsController < ApplicationController
       employee_mid_year_plan_change_non_congressional(@census_employee)
     end
 
-    unless @enrollment.is_shop?
-      IvlNoticesNotifierJob.perform_later(@person.consumer_role ,"enrollment_notice") unless Rails.env.test?
-    end
     send_receipt_emails if @person.emails.first
   end
 
