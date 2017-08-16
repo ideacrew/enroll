@@ -1,5 +1,5 @@
 module TransportProfiles
-  class Processes::PushEdiEnrollmentTerminationReport < Processes::Process
+  class Processes::Legacy::PushEdiEnrollmentTerminationReport < Processes::Process
     def initialize(report_file_name, gateway)
       super("Distribute system generated legacy employee terminations report", gateway)
       @report_file_name = report_file_name
