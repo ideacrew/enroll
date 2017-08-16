@@ -30,7 +30,7 @@
   content: "For detailed information on how to complete your application for employer-sponsored coverage, please review our <strong>Employer guide to applying for coverage</strong> in our Business Resource Center."} %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note in order to participate in #{site_short_name}, your group must meet the following eligibility requirements:",
-  listings: [["You have submitted documents to show that your group meets residency requirements:", ["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR", "You offer coverage through #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the small group exchange serving their primary worksite(s);"]],
+  listings: [["You have submitted documents to show that your group meets residency requirements:", ["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR", "You offer coverage through #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the small group exchange serving their primary worksite(s)."]],
     "At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage.",
     "At least one non-owner employee enrolls in health coverage."]} %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -66,7 +66,7 @@
           <li class="notice-font">
             <strong>Finalize List of Eligible Employees</strong><br>
             At a minimum, you must offer coverage to all employees working 30 hours or more per week.<br></br>
-            At the beginning of Open Enrollment, the Health Connector will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period. This notice will provide them with instructions on how to create a the Health Connector account and log in, review their plan options, and enroll into coverage.  You will also receive a copy of this open enrollment notice.<br></br>
+            At the beginning of Open Enrollment, the <%= site_short_name %> will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period. This notice will provide them with instructions on how to create a the <%= site_short_name %> account and log in, review their plan options, and enroll into coverage.  You will also receive a copy of this open enrollment notice.<br></br>
             During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan or waived coverage.
           </li>
           </ul>
@@ -122,7 +122,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "You can also find more information on our website at <a href = '#{site_main_web_address_url}'>#{site_website_name}</a>"}%> 
-
+<br>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
