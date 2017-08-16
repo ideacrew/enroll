@@ -71,7 +71,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents if notice.documents_needed
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
@@ -174,6 +174,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       phone: enrollment.phone_number,
       is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
       coverage_kind: enrollment.coverage_kind,
+      kind: enrollment.kind,
       effective_on: enrollment.effective_on,
       plan: plan,
       enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|

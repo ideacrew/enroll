@@ -59,10 +59,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @census_employee = @enrollment.census_employee
     ee_mid_year_plan_change_notice_congressional(@census_employee) if @census_employee.present?
 
-    @census_employee = @enrollment.census_employee
-    if (@change_plan.present? || @enrollment_kind.present?) && @census_employee.present?
-      employee_mid_year_plan_change_non_congressional(@census_employee)
-    end
+    IvlNoticesNotifierJob.perform_later(@person.id.to_s ,"enrollment_notice") unless @enrollment.is_shop?
 
     send_receipt_emails if @person.emails.first
   end
