@@ -545,7 +545,7 @@ module ApplicationHelper
     employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
     begin
       employee_roles = employer_ids.include?(census_employee.employee_role.employer_profile_id)
-      if employee_roles.present? && census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.enrollment_kind != "open_enrollment"
+      if employee_roles.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.enrollment_kind != "open_enrollment" || has_new_hire_enrollment_period?(census_employee)) 
         ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_mid_year_plan_change_notice_congressional")
       end
     rescue Exception => e
