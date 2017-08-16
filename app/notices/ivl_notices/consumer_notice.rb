@@ -18,9 +18,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
       append_address(recipient.mailing_address)
     else  
       # @notice.primary_address = nil
-      raise 'mailing address not present' 
+      raise 'mailing address not present'
     end
-
     append_unverified_family_members
   end
 
