@@ -594,13 +594,12 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         end
       end
 
-      context "when EE selects SEP & effective_on covers under active plan year period", db_clean: :after_each do
+      context "when EE selects SEP & effective_on does not covers under renewal plan year period", db_clean: :after_each do
 
         before do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
-          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return true
         end
 
         it "should return true if active benefit group offers dental" do
@@ -620,7 +619,6 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           allow(active_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
-          allow(helper).to receive(:is_covered_plan_year?).with(active_bg.plan_year, sep.effective_on).and_return false
         end
 
         it "should return true if renewal benefit group offers dental" do
