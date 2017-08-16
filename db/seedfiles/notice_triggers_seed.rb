@@ -528,7 +528,7 @@ shop_notice_triggers = [
         event_name: 'broker_agency_hired_confirmation',
         notice_triggers: [
            {
-              name: 'Broker Hired',
+              name: 'Broker Agency Hired',
               notice_template: 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
               notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
               mpi_indicator: 'SHOP_M044',
