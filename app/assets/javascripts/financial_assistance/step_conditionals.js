@@ -116,6 +116,30 @@ $(document).ready(function() {
 
   /* Benefit Form Related */
 
+  /* employer phone & zip validations */
+  $('#employer_phone_full_phone_number').on('keyup keydown keypress', function (e) {
+    var key = e.which || e.keyCode || e.charCode;
+    $(this).attr('maxlength', '10');
+    return (key == 8 ||
+      key == 9 ||
+      key == 46 ||
+      (key >= 37 && key <= 40) ||
+      (key >= 48 && key <= 57) ||
+      (key >= 96 && key <= 105) );
+  })
+
+  .on('focus', function () {
+    $(this).val($(this).val().replace(/\W+/g, ''));
+  })
+
+  .on('blur', function () {
+    $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1) $2-$3"));
+  });
+
+  $("#employer_address_zip").mask("99999");
+  /* employer phone & zip validations */
+
+
   /* Toggle Show/Hide of  dates row when eligible/ enrolled types are selected */
   $("#is_eligible, #is_enrolled").on('change', function() {
     if ($('#is_eligible').is(':checked')) {
@@ -135,7 +159,6 @@ $(document).ready(function() {
       toggle_employer_contact_divs_benefit('hide');
     }
   });
-
   /* This is to show/hide ESI fields on Page Load. Will show ESI related
    * fields if InsuranceKind is selected as 'employer_sponsored_insurance'
    * when page loads (possible on a page reload due to validation error) */

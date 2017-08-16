@@ -65,7 +65,7 @@
   end
 
   def build_error_messages(model)
-    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.messages.first[1][0].titleize
+    model.valid?("step_#{@current_step.to_i}".to_sym) ? nil : model.errors.full_messages.join("<br />")
   end
 
   def update_employer_contact model, params
