@@ -221,11 +221,54 @@ class CensusEmployee < CensusMember
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
 
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+  end
+
+  def inactive_benefit_group_assignments
+    benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def published_benefit_group_assignment
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+    end
+  end
+
   def active_and_renewing_benefit_group_assignments
     result = []
     result << active_benefit_group_assignment if !active_benefit_group_assignment.nil?
     result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
     result
+  end
+
+  def add_default_benefit_group_assignment
+    if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
+      add_benefit_group_assignment(plan_year.benefit_groups.first)
+      if self.employer_profile.renewing_plan_year.present?
+        add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
+      end
+    end
+  end
+
+  def active_benefit_group
+    if active_benefit_group_assignment.present?
+      active_benefit_group_assignment.benefit_group
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def renewal_published_benefit_group
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      renewal_benefit_group_assignment.benefit_group
+    end
   end
 
   # Initialize a new, refreshed instance for rehires via deep copy
@@ -286,6 +329,7 @@ class CensusEmployee < CensusMember
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
         template: notice_trigger.notice_template,
         subject: event_kind.title,
+        event_name: event_kind.event_name,
         mpi_indicator: notice_trigger.mpi_indicator,
         data: url
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
@@ -303,6 +347,7 @@ class CensusEmployee < CensusMember
       builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
         template: notice_trigger.notice_template,
         subject: event_kind.title,
+        event_name: event_kind.event_name,
         mpi_indicator: notice_trigger.mpi_indicator,
         data: url
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
@@ -539,7 +584,7 @@ class CensusEmployee < CensusMember
         employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
         Person.all_employee_roles.each do |person|
           begin
-          employee_roles = person.active_employee_roles.select{|role| employer_ids.include?(role.employer_profile_id) } 
+          employee_roles = person.active_employee_roles.select{|role| employer_ids.include?(role.employer_profile_id) }
           next if employee_roles.empty?
           if person.person_relationships.present?
             relations = person.person_relationships.select{|relation| relation.kind == 'child'}
@@ -547,7 +592,7 @@ class CensusEmployee < CensusMember
             relations.select do |relation|
               id = relation.relative_id.to_s
               dep =  Person.where(_id: id).first
-              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && dep.age_on(TimeKeeper.date_of_record.end_of_month) < 27 
+              if dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && dep.age_on(TimeKeeper.date_of_record.end_of_month) < 27
                 aged_off_dependents << dep
                 next if aged_off_dependents.empty?
                 employee_roles.each do |employee_role|

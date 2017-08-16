@@ -21,7 +21,7 @@ gem 'animate-rails', '~> 1.0.7'
 gem 'maskedinput-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'jquery-turbolinks'
-gem 'turbolinks'
+gem 'turbolinks','2.5.3'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
@@ -79,7 +79,7 @@ gem "pundit", '~> 1.0.1'
 # will provide fast group premium plan fetch
 gem 'redis-rails'
 
-gem 'kaminari'
+gem 'kaminari', '0.17.0'
 
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
