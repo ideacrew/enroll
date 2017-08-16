@@ -54,6 +54,7 @@ class Insured::FamiliesController < FamiliesController
   def family_relationships_matrix
     set_bookmark_url
     @family_members = @family.active_family_members
+    @people = @family.family_members.where(is_active: true).map(&:person)
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships
