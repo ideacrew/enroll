@@ -137,6 +137,9 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
+
+      @census_employee = hbx_enrollment.census_employee
+      ee_mid_year_plan_change_notice_congressional(@census_employee) if @census_employee.present?
       
       redirect_to family_account_path
     else
