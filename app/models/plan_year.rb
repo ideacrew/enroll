@@ -883,7 +883,7 @@ class PlanYear
 
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
-      transitions from: :terminated, to: :active
+      transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1188,5 +1188,9 @@ class PlanYear
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
     end
+  end
+
+  def reset_termination_and_end_date
+    update_attributes!({terminated_on: nil, end_on: start_on.next_year.prev_day})
   end
 end
