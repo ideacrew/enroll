@@ -17,6 +17,7 @@ site:
   use_default_devise_path: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
+  main_web_address_text: "MAhealthconnector.org"
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
