@@ -18,32 +18,75 @@ namespace :reports do
       processed_count = 0
       Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
       file_path = "#{Rails.root}/hbx_report/ee_with_waiver_enrollment.csv"
-      
+
+      def enrollment_transition_date(enrollment, aasm_state)
+        enrollment.workflow_state_transitions.select{|state| state.to_state == aasm_state }.first.transition_at
+      end
+
+      def plan_year_matched?(cancelled_enr, waived_enr)
+        cancelled_enr.benefit_group.plan_year.id.to_s == waived_enr.benefit_group.plan_year.id.to_s
+      end
+
+      def transition_matched?(cancelled_enr, waived_enr)
+        enrollment_transition_date(cancelled_enr, "coverage_canceled") == enrollment_transition_date(waived_enr, "inactive")
+      end
+
+      def waived_enrollments(hbx_enrollments)
+        hbx_enrollments.where(aasm_state: "inactive")
+      end
+
+      def canceled_enrollments(hbx_enrollments)
+        cancelled_enrs = []
+        hbx_enrollments.where(aasm_state: "coverage_canceled").each do |enrollment|
+          transition_date = enrollment_transition_date(enrollment, "coverage_canceled")
+          if enrollment.effective_on < transition_date
+            cancelled_enrs << enrollment
+          end
+        end
+
+        cancelled_enrs
+      end
+
+      def canceled_waived_enrollments(hbx_enrollments)
+        enrollment_pairs = []
+
+        canceled_enrs = canceled_enrollments(hbx_enrollments)
+        waived_enrs = waived_enrollments(hbx_enrollments)
+
+        if canceled_enrs.present? && waived_enrs.present?
+          canceled_enrs.each do |cancelled_enr|
+            waived_enrs.each do |waived_enr|
+              if plan_year_matched?(cancelled_enr, waived_enr) && transition_matched?(cancelled_enr, waived_enr)
+                enrollment_pairs << [waived_enr, cancelled_enr]
+              end
+            end
+          end
+        end
+
+        enrollment_pairs
+      end
+
       CSV.open(file_path, "w", force_quotes: true) do |csv|
         csv << field_names
 
   			Person.all_employee_roles.each do |person|
           begin
             if person.primary_family.present? && person.primary_family.households.first.hbx_enrollments.count > 1
-              hbx_enrollments = person.primary_family.households.first.hbx_enrollments
-              aasm_states = hbx_enrollments.map(&:aasm_state)
-              if (aasm_states.include? "coverage_canceled") && ((aasm_states.include? "inactive") || (aasm_states.include? "renewing_waived"))
-                waived_enrollment = hbx_enrollments.where(:aasm_state.in => ["inactive", "renewing_waived").first
-                waived_plan_year = waived_enrollment.benefit_group.plan_year.id.to_s
-                hbx_enrollments.where(aasm_state: "coverage_canceled").each do |canceled_enrollment|
-                  if waived_plan_year == canceled_enrollment.benefit_group.plan_year.id.to_s
-                    if canceled_enrollment.workflow_state_transitions.where(to_state: 'coverage_canceled').first.transition_at.to_date == waived_enrollment.workflow_state_transitions.where(to_state: 'inactive').first.transition_at.to_date
-                      csv << [
-                        person.hbx_id,
-                        person.full_name,
-                        waived_enrollment.id,
-                        canceled_enrollment.id,
-                      ]
-                    end
-                  end
+              hbx_enrollments = person.primary_family.active_household.hbx_enrollments
+              next if !hbx_enrollments.present?
+              canceled_waived_pairs = canceled_waived_enrollments(hbx_enrollments)
+
+              if canceled_waived_pairs.present?
+                canceled_waived_pairs.each do |cancelled_waived_pair|
+                  csv << [
+                    person.hbx_id,
+                    person.full_name,
+                    cancelled_waived_pair.first.id,
+                    cancelled_waived_pair.second.id,
+                  ]
                 end
+                processed_count = processed_count + 1
               end
-            processed_count +=1
             end
           rescue
             puts "Bad Person record #{person.hbx_id}"
