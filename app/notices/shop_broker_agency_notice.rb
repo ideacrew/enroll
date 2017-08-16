@@ -20,11 +20,6 @@ class ShopBrokerAgencyNotice < Notice
   def build
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = broker_agency_profile.primary_broker_role.person.full_name.titleize
-    # notice.broker = PdfTemplates::Broker.new({
-    #   full_name: broker_agency_profile.primary_broker_role.person.full_name.titleize,
-    #   hbx_id: broker_agency_profile.primary_broker_role.person.hbx_id,
-    #   assignment_date: employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
-    # })
     notice.employer_name = employer_profile.legal_name.titleize
     notice.employer_first_name = employer_profile.staff_roles.first.first_name.titleize
     notice.employer_last_name = employer_profile.staff_roles.first.last_name.titleize
