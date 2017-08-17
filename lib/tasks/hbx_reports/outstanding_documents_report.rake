@@ -2,7 +2,7 @@ require 'rake'
 require "#{Rails.root}/app/helpers/verification_helper"
 include VerificationHelper
 # This is a report that is generated for audit purpose, for all families with outstanding documents
-# The task to run is RAILS_ENV=production bundle exec rake reports:audit_requested_list
+# The task to run is RAILS_ENV=production bundle exec rake reports:outstanding_documents_list
 
 namespace :reports do
 
@@ -31,7 +31,7 @@ namespace :reports do
         puts "File path: %s. Total count of families with outstanding documents: #{count}"
       end
     else
-      puts 'Families with outstanding documents are not present on the documents screen'
+      puts 'Families with outstanding documents does not exist.. Quitting Rake Task!!'
     end
   end
 
