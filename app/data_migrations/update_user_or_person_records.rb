@@ -8,6 +8,7 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
       user_name = ENV['user_name'].to_s
       headless_user = ENV['headless_user'].to_s
       find_user_by = ENV['find_user_by'] || ENV['hbx_id'].to_s
+      dob = Date.strptime(ENV['dob'].to_s, "%d/%m/%Y") if ENV['dob'].present?
 
       record = case find_user_by
       when "email"
@@ -43,6 +44,10 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
 
       if action.casecmp("update_person_work_email") == 0
         update_person_work_email(record.first, email)
+      end
+
+      if action.casecmp("person_dob") == 0
+        update_person_dob(record.first, dob)
       end
 
       if headless_user.casecmp("yes") == 0
@@ -97,6 +102,29 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
     else
       email.update_attributes!(address: address)
       puts "Updated Work E-mail address on person record" unless Rails.env.test?
+    end
+  end
+
+  def update_person_dob(person, dob)
+    person = person.person if person.class == User
+    if TimeKeeper.date_of_record - 110.years > dob
+      puts "No kidding!! seriously more than 110 years old!!" unless Rails.env.test?
+      return
+    end
+
+    if person.employee_roles.present?
+      puts "This person was already linked on roster. Check the Census Record. Attempt Failed!!" unless Rails.env.test?
+      return
+    end
+
+    attrs = {:ssn => person.ssn, dob: dob, last_name: person.last_name, first_name: person.first_name }
+
+    if Person.match_by_id_info(attrs).size > 0
+      puts "This may effect the person match!! Assign this ticket to Dev" unless Rails.env.test?
+      return
+    else
+      person.update_attributes!(dob: dob)
+      puts "Succesfully updated dob on person record" unless Rails.env.test?
     end
   end
 
