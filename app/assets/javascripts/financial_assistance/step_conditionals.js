@@ -493,8 +493,8 @@ $(document).ready(function() {
   /* enable or disable submit application button by electronic siganture (first/last name match)*/
 
   function enable_submit_button_by_electronic_signature() {
-    first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
-    last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
+    first_name_thank_you = $("#first_name_thank_you").val();
+    last_name_thank_you = $("#last_name_thank_you").val();
     subscriber_first_name = $("#subscriber_first_name").val();
     subscriber_last_name = $("#subscriber_last_name").val();
 
