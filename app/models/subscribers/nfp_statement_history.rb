@@ -22,15 +22,16 @@ module Subscribers
         Rails.logger.info "Enroll received nfp_statement_summary_success"
         Rails.logger.info xml
         Rails.logger.info stringed_key_payload
-        Rails.logger.info eid
+        Rails.logger.info "Employer id: " eid
         Rails.logger.info "END **********===================**********"
 
         response = eval(xml)
 
         ep = Organization.where("hbx_id" => eid).first
 
-        if ep.employer_profile && ep.employer_profile.employer_profile_account
-          ep.employer_profile.employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
+        if ep.employer_profile
+          employer_profile_account = ep.employer_profile.employer_profile_account || ep.employer_profile.build_employer_profile_account
+          employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
            :next_premium_amount => response[:new_charges].to_f,
            :message => response[:message],
            :past_due => response[:past_due],
@@ -41,7 +42,7 @@ module Subscribers
         end
 
       rescue => e
-        Rails.logger.error e
+        Rails.logger.error e.message
         notify("acapi.error.application.enroll.remote_listener.nfp_statement_history_responses", {
           :body => JSON.dump({
              :error => e.inspect,
