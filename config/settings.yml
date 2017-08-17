@@ -12,6 +12,7 @@ site:
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
+  make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   logo_file_name: "logo.png"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
