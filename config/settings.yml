@@ -6,6 +6,8 @@ site:
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   main_web_address: "www.MAhealthconnector.org"
+  main_web_address_url: "https://www.MAhealthconnector.org"
+  website_name: "MAhealthconnector.org"
   short_name: "Health Connector"
   main_web_address_url: "https://www.MAhealthconnector.org"
   website_name: "MAhealthconnector.org"
@@ -14,6 +16,7 @@ site:
   copyright_period_start: "2017"
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "mhc_logo.svg"
+  make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   use_default_devise_path: true
