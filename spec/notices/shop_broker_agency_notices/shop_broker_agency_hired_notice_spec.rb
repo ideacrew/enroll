@@ -54,11 +54,12 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
 
     end
     it "should build notice with all necessory info" do
+      binding.pry
       @broker_agency_profile_notice.build
       expect(@broker_agency_profile_notice.notice.employer_name).to eq employer_profile.legal_name.titleize
       expect(@broker_agency_profile_notice.notice.employer_first_name).to eq employer_profile.staff_roles.first.first_name
       expect(@broker_agency_profile_notice.notice.employer_last_name).to eq employer_profile.staff_roles.first.last_name
-      expect(@broker_agency_profile_notice.notice.primary_address).to eq broker_agency_profile.organization.primary_office_location.address
+      expect(@broker_agency_profile_notice.notice.email).to eq employer_profile.staff_roles.first.work_email_or_best
       expect(@broker_agency_profile_notice.notice.phone).to eq broker_agency_profile.phone
     end
   end
