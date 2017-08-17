@@ -143,6 +143,10 @@ class EmployerProfile
     send_broker_notice
     notify_broker_terminated
   end
+  
+  def send_broker_notice
+    trigger_notices('broker_termination_notice')
+  end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
 
@@ -1032,9 +1036,5 @@ class EmployerProfile
 
   def plan_year_publishable?
     !published_plan_year.is_application_unpublishable?
-  end
-
-  def send_broker_notice
-    ShopNoticesNotifierJob.perform_later(self.id.to_s, "broker_termination_notice")
   end
 end

@@ -282,7 +282,6 @@ Rails.application.routes.draw do
           get :active_broker
         end
         get :terminate
-        get :generate_termination_pdf
       end
 
       resources :census_employees, only: [:new, :create, :edit, :update, :show] do

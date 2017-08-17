@@ -91,13 +91,7 @@ class Employers::BrokerAgencyController < ApplicationController
       }
     end
   end
-
-  def generate_termination_pdf
-        @terminated_broker_acocunt = @employer_profile.broker_agency_accounts.unscoped.where(:id => params[:terminated_broker_agency_account]).first
-        @broker = Person.where(:'broker_role._id' => @broker_agency_profile.primary_broker_role_id).first
-        render :pdf => "terminated_status"
-     end
-
+  
   private
 
   def updateable?
