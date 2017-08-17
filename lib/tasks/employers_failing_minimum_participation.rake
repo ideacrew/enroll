@@ -45,7 +45,7 @@ namespace :reports do
 
       end
 
-      pubber = Publishers::EmployersFailingPaticipationReportPublisher.new
+      pubber = Publishers::Legacy::EmployersFailingPaticipationReportPublisher.new
       pubber.publish URI.join("file://", file_name)
     end
 
