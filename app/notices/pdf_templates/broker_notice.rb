@@ -8,8 +8,16 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
-    attribute :first_name,String
-    attribute :last_name, String
+    attribute :er_first_name, String
+    attribute :er_last_name, String
+    attribute :er_fullname, String
+    attribute :er_address, String
+    attribute :er_email, String
+    attribute :er_phone, String
+    attribute :er_legal_name, String
+    attribute :employer_name, String
+    attribute :broker_agency, String
+    attribute :mpi_indicator, String
 
     def shop?
       return true

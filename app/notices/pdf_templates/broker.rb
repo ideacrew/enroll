@@ -17,10 +17,14 @@ module PdfTemplates
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :mpi_indicator, String
     attribute :employer_name
+    attribute :first_name, String
+    attribute :last_name, String
+    attribute :assignment_date, Date
+    attribute :full_name, String
+    attribute :hbx_id, String
 
     def shop?
       false
     end
-
   end
 end
