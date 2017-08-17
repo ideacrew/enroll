@@ -31,6 +31,14 @@ module Config::SiteHelper
     Settings.site.help_url
   end
 
+  def site_business_resource_center_url
+    Settings.site.business_resource_center_url
+  end
+
+  def site_nondiscrimination_notice_url
+    Settings.site.nondiscrimination_notice_url
+  end
+
   def site_faqs_url
     Settings.site.faqs_url
   end
@@ -41,6 +49,10 @@ module Config::SiteHelper
 
   def site_registration_path(resource_name, params)
     Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+  end
+
+  def site_long_name
+    Settings.site.long_name
   end
 
   def site_broker_quoting_enabled?
