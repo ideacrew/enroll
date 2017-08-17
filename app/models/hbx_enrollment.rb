@@ -160,6 +160,7 @@ class HbxEnrollment
   scope :enrolled_and_waived, -> { any_of([enrolled.selector, waived.selector]) }
   scope :show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, canceled.selector, waived.selector]) }
   scope :show_enrollments_sans_canceled, -> { any_of([enrolled.selector, renewing.selector, terminated.selector, waived.selector]).order(created_at: :desc) }
+  scope :non_waived_show_enrollments, -> { any_of([enrolled.selector, renewing.selector, terminated.selector]).order(created_at: :desc) }
   scope :enrollments_for_cobra, -> { where(:aasm_state.in => ['coverage_terminated', 'coverage_termination_pending', 'auto_renewing']).order(created_at: :desc) }
   scope :with_plan, -> { where(:plan_id.ne => nil) }
   scope :coverage_selected_and_waived, -> {where(:aasm_state.in => SELECTED_AND_WAIVED).order(created_at: :desc)}
@@ -1406,7 +1407,7 @@ class HbxEnrollment
 
     benefit_groups = renewing_plan_year.benefit_groups
     bg_list = benefit_groups.map(&:id)
-    enrollments = family.active_household.hbx_enrollments.show_enrollments_sans_canceled
+    enrollments = family.active_household.hbx_enrollments.non_waived_show_enrollments
     return false if enrollments.where(:"benefit_group_id".in => bg_list).present?
 
     bga_list = benefit_groups.flat_map(&:benefit_group_assignments).map(&:id)
@@ -1418,7 +1419,6 @@ class HbxEnrollment
   def end_date_for_non_renewed_enrollment
     return nil unless is_non_renewed_enrollment?
     return terminated_on if terminated_on.present?
-    return benefit_group.plan_year.end_on if benefit_group.present?
     return employer_profile.active_plan_year.end_on
   end
 
