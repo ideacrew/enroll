@@ -138,4 +138,9 @@ module Config::SiteHelper
   def site_document_verification_checklist_url
     Settings.site.document_verification_checklist_url
   end
+
+  def site_main_web_address_text
+   Settings.site.main_web_address_text
+  end
+
 end
