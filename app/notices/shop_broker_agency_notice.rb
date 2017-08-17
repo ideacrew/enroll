@@ -6,13 +6,13 @@ class ShopBrokerAgencyNotice < Notice
 
   def initialize(employer_profile, args = {})
     self.employer_profile = employer_profile
-    self.broker_agency_profile = employer_profile.broker_agency_profile
+    self.broker_agency_profile = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
-    args[:to] = employer_profile.broker_agency_profile.primary_broker_role.email_address
-    args[:name] = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
-    args[:recipient_document_store] = employer_profile.broker_agency_profile.primary_broker_role.person
+    args[:to] = broker_agency_profile.primary_broker_role.email_address
+    args[:name] = broker_agency_profile.primary_broker_role.person.full_name
+    args[:recipient_document_store] = broker_agency_profile
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
@@ -23,11 +23,10 @@ class ShopBrokerAgencyNotice < Notice
     notice.employer_name = employer_profile.legal_name.titleize
     notice.employer_first_name = employer_profile.staff_roles.first.first_name.titleize
     notice.employer_last_name = employer_profile.staff_roles.first.last_name.titleize
-    notice.assignment_date = employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
-    notice.broker_agency = employer_profile.broker_agency_profile.legal_name.titleize
+    notice.broker_agency = broker_agency_profile.legal_name.titleize
     notice.email = employer_profile.staff_roles.first.work_email_or_best
     notice.phone = broker_agency_profile.phone
-    append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
+    append_address(broker_agency_profile.organization.primary_office_location.address)
   end
 
 

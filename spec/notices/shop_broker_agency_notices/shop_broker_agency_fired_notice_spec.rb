@@ -16,7 +16,7 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
                             :notice_builder => 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
                             :event_name => 'broker_agency_hired_confirmation',
                             :mpi_indicator => 'SHOP_M044',
-                            :title => "You have been Hired as a Broker"})
+                            :title => "You have been removed as a Broker"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
@@ -32,7 +32,7 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopBrokerAgencyNotices::BrokerAgencyHiredNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopBrokerAgencyNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -40,7 +40,7 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopBrokerAgencyNotices::BrokerAgencyHiredNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopBrokerAgencyNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -52,7 +52,7 @@ RSpec.describe ShopBrokerAgencyNotices::BrokerAgencyHiredNotice do
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
       allow(employer_profile).to receive_message_chain("broker_agency_accounts.detect").and_return(broker_agency_account)
       allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last.broker_agency_profile").and_return(broker_agency_profile)
-      @broker_agency_profile_notice = ShopBrokerAgencyNotices::BrokerAgencyHiredNotice.new(employer_profile, valid_parmas)
+      @broker_agency_profile_notice = ShopBrokerAgencyNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_parmas)
 
     end
     it "should build notice with all necessory info" do

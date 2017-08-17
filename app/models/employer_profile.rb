@@ -152,6 +152,16 @@ class EmployerProfile
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
     notify_broker_terminated
+    broker_agency_fired_confirmation
+
+  end
+
+  def broker_agency_fired_confirmation
+    begin
+      trigger_notices("broker_agency_fired_confirmation")
+    rescue Exception => e
+      puts "Unable to deliver broker agency fired confirmation notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
+    end
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency

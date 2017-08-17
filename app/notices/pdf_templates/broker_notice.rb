@@ -14,6 +14,7 @@ module PdfTemplates
     attribute :broker_agency, String
     attribute :mpi_indicator, String
     attribute :assignment_date, Date
+    attribute :assignment_end_date, Date
     attribute :hbx_id, String
     attribute :phone, String
     attribute :email, String
