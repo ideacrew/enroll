@@ -541,6 +541,28 @@ shop_notice_triggers = [
             }
         ]
     },
+
+    {
+        hbx_id: 'SHOP_M050',
+        title: 'Eligible to Apply for Employer-sponsored Health Insurance',
+        description: 'Employee completes initial application and matches the employee to a SHOP Employer (checks SSN and DOB against roster)',
+        resource_name: 'employee_role',
+        event_name: 'employee_matches_employer_rooster',
+        notice_triggers: [
+            {
+                name: 'Employee must be notified when they successfully match to their employer',
+                notice_template: 'notices/shop_employee_notices/employee_matches_employer_rooster_notification',
+                notice_builder: 'ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice',
+                mpi_indicator: 'SHOP_M050',
+                notice_trigger_element_group: {
+                    market_places: ['shop'],
+                    primary_recipients: ["employee"],
+                    primary_recipient_delivery_method: ["secure_message"],
+                    secondary_recipients: []
+                }
+            }
+        ]
+    },
 ]
 
 ivl_notice_triggers = [

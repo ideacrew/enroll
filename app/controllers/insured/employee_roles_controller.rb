@@ -34,6 +34,7 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
+        employee_eligible_notice
         respond_to do |format|
           format.html { render 'match' }
         end
@@ -202,4 +203,15 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
+
+  def employee_eligible_notice
+     if @found_census_employees.present
+      begin
+        ShopNoticesNotifierJob.perform_later(@found_census_employees.first.id.to_s, "employee_matches_employer_rooster")
+      rescue Exception => e
+        puts "Unable to send Employee Open Enrollment begin notice to #{@found_census_employees.first.full_name}" unless Rails.env.test?
+      end
+    end
+  end
+
 end
