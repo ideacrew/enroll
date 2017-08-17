@@ -14,6 +14,7 @@ class ShopEmployerNotices::OutOfPocketNotice < ShopEmployerNotice
   end
 
   def build
+      append_hbe
       published_plan_years = @recipient.plan_years.published_or_renewing_published      
       @notice.benefit_group_assignments = published_plan_years.collect{|py| py.benefit_groups}.flatten.group_by(&:id)
       @notice.legal_name= @recipient.organization.legal_name

@@ -50,6 +50,9 @@ gem 'mongo_session_store-rails4', '~> 6.0.0'
 
 ## Add field-level encryption
 # gem 'mongoid-encrypted-fields', '~> 1.3.3'
+
+#DEPRECATION WARNING: Kaminari Mongoid support has been extracted to a separate gem, and will be removed in the next 1.0 release.
+#gem 'kaminari-mongoid'
 gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
