@@ -840,7 +840,6 @@ shop_notice_triggers = [
   #       }
   #     }
   #   ]
-  # },
 ]
 
 ivl_notice_triggers = [

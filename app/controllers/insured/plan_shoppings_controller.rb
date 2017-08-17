@@ -112,6 +112,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
+      employee_waiver_notice(person)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
@@ -146,6 +147,15 @@ class Insured::PlanShoppingsController < ApplicationController
      rescue Exception => e
        log("#{e.message}; person_id: #{person.id}")
      end
+  end
+
+  def employee_waiver_notice(person)
+    begin
+      census_employee = person.employee_roles.first.census_employee
+      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_waiver_notice")
+    rescue Exception => e
+      puts "Unable to send Employee Waiver notice to #{personfirst.full_name}" unless Rails.env.test?
+    end
   end
 
   def terminate
