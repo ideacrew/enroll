@@ -5,6 +5,8 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
+  business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
+  nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
   main_web_address: "www.MAhealthconnector.org"
   main_web_address_url: "https://www.MAhealthconnector.org"
   website_name: "MAhealthconnector.org"
@@ -23,6 +25,7 @@ site:
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
+  main_web_address_text: "MAhealthconnector.org"
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
   registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
@@ -39,7 +42,8 @@ contact_center:
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
   email_address: "smallbusiness@mahealthconnector.org"
-  small_business_email: "smallbusiness@MAhealthconnector.org"
+  small_business_email: "smallbusiness@mahealthconnector.org"
+  non_discrimination_email: "Nondiscrimination@state.ma.us"
 
   appeals: "connector-appeals@state.ma.us"
 
@@ -50,6 +54,21 @@ contact_center:
     city: "Philadelphia"
     state: "PA"
     zip_code: "19178-0833"
+
+  appeal_center:
+    name: "Appeals Unit"
+    address_1: "PO Box 960189"
+    address_2:
+    city: "Boston"
+    state: "MA"
+    zip_code: "02196"
+
+  non_discrimination:
+    email: "Nondiscrimination@state.ma.us"
+    phone_1: "617-936-1037"
+    phone_2: "1-800-368-1019"
+    phone_3: "800-537-7697"
+    complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
 notices:
   mailing_address:
