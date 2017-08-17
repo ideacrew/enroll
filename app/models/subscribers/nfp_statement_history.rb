@@ -22,7 +22,7 @@ module Subscribers
         Rails.logger.info "Enroll received nfp_statement_summary_success"
         Rails.logger.info xml
         Rails.logger.info stringed_key_payload
-        Rails.logger.info "Employer id: " eid
+        Rails.logger.info "Employer id: #{eid}"
         Rails.logger.info "END **********===================**********"
 
         response = eval(xml)
