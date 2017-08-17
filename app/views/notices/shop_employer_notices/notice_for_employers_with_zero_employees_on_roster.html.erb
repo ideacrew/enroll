@@ -12,7 +12,7 @@
                                                       { content: "Your employee open enrollment period will close on #{notice.plan_year.open_enrollment_end_on}. We notice no employees are listed on your roster at this time. You have until #{notice.plan_year.open_enrollment_end_on} to correct this issue by adding all eligible employees to your roster. A failure to correct this will result in your group being ineligible for employer-sponsored health insurance through the #{site_short_name}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-                                                      { content: "All eligible employees must create an employee account on <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> and enroll in or waive coverage by 8pm Eastern on #{notice.plan_year.open_enrollment_end_on}. Please share our <strong>Employee guide to enrolling</strong> with your employees to help them with the steps needed to enroll. You can Download this guide from our online Bussiness Resource Center. If you wish to cancel your #{site_short_name} account, please contact #{site_short_name} at #{contact_center_phone_number}."} %>
+                                                      { content: "All eligible employees must create an employee account on <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> and enroll in or waive coverage by 8pm Eastern on #{notice.plan_year.open_enrollment_end_on}. Please share our <strong>Employee guide to enrolling</strong> with your employees to help them with the steps needed to enroll. You can Download this guide from our online Business Resource Center. If you wish to cancel your #{site_short_name} account, please contact #{site_short_name} at #{contact_center_phone_number}."} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
@@ -29,7 +29,7 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
   listings: ["<strong>Log in to your <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> Account</strong>","<strong>Employee Enrollments</strong><br><br>
-            Share the <strong>Employee guide to enrolling</strong> with your eligible employees to help them with the steps needed to enroll. You can download this guide from our online Business Resource Center. If you are the point of contact for the group, you may also want to follow the steps in our <strong>Employer guide to enrolling as an employee</strong>, also available in the Business Resource center.
+            Share the <strong>Employee guide to enrolling</strong> with your eligible employees to help them with the steps needed to enroll. You can download this guide from our online Business Resource Center. If you are the point of contact for the group, you may also want to follow the steps in our <strong>Employer guide to enrolling as an employee</strong>, also available in the Business Resource Center.
             <br><br>
             <strong><i>Employers should review their roster to ensure that any employees who are also owners (or spouses of owners) are identified as owners on their roster</i></strong>. For your group to receive coverage through the Small Group Marketplace, you must have at least one non-owner enrolled in a health plan at the end of each annual employee open enrollment period.", "<strong>First Month’s Premium Payment</strong><br>
             Once your open enrollment period ends, you will receive an email from the Health Connector listing each of your enrolled employees, their premiums, and the employer/employee cost breakdown. If your first month’s premium is not received and cleared by 5:00 p.m. Eastern on #{notice.plan_year.binder_payment_due_date}, your group’s coverage will be delayed and your employees may experience a gap in coverage. Payments over the phone or online are <strong><i>required</i></strong> for your first payment, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.
@@ -48,7 +48,7 @@
   { contents: ["Please contact your broker for further assistance. You can also contact the #{site_short_name} with any questions:"], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-    previous: "Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:",
+    previous: "",
     listings: ["By calling #{contact_center_phone_number}.  TTY: #{contact_center_tty_number}",
                "By email: <a href='mailto:#{small_businesss_email}'>#{small_businesss_email}</a>"],
     col_styles: ['0px']}%>
