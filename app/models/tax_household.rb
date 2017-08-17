@@ -75,7 +75,6 @@ class TaxHousehold
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
     benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
     aptc_members.select { |thm| thm.is_medicaid_chip_eligible == false && thm.is_without_assistance == false && thm.is_totally_ineligible == false}.each do |member|
@@ -83,16 +82,13 @@ class TaxHousehold
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.family_member.id.to_s] = premium
     end
-
     # Sum premium total for aptc_members
     sum_premium_total = benchmark_member_cost_hash.values.sum.to_f
-
     # Compute the ratio
     ratio_hash = {}
     benchmark_member_cost_hash.each do |member_id, cost|
       ratio_hash[member_id] = cost/sum_premium_total
     end
-
     ratio_hash
   rescue => e
     log(e.message, {:severity => 'critical'})
@@ -103,7 +99,8 @@ class TaxHousehold
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
     hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
+      sum = 0 if sum.nil?
+      sum + ( aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
     end
   end
 
@@ -179,20 +176,19 @@ class TaxHousehold
 
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    #Review split brain
-    if application_id.present?
-      applicants.each do |applicant|
-        return applicant if applicant.family_member.is_primary_applicant?
-      end
-    else
-      tax_household_members.detect do |tax_household_member|
-        tax_household_member.is_subscriber == true
-      end
-    end
+    application_id.present? ? application.applicants.detect{ |applicant| applicant.family_member.is_primary_applicant?} : tax_household_members.detect { |tax_household_member| tax_household_member.is_subscriber }
+  end
+
+  def application
+    FinancialAssistance::Application.find(application_id)
+  end
+
+  def applicants
+    return nil unless application
+    application.applicants.where(tax_household_id: self.id) if application.applicants.present?
   end
 
   def preferred_eligibility_determination
-    #Review split brain
     return nil unless eligibility_determinations.present?
     if application_id.present?
       admin_ed = eligibility_determinations.where(source: "Admin").first

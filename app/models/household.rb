@@ -187,17 +187,12 @@ class Household
     tax_households.where(effective_ending_on: nil)
   end
 
-  def latest_active_tax_household_with_year(year)
+  def latest_active_tax_households_with_year(year)
     tax_households = self.tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year
       tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
     end
-
-    if tax_households.empty?
-      nil
-    else
-      tax_households.entries.last
-    end
+    tax_households unless tax_households.empty?
   end
 
   def latest_tax_household_with_year(year)

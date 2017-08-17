@@ -47,7 +47,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
-            # dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           else
             @application.unsubmit!
@@ -161,21 +161,20 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def dummy_data_for_demo(params)
     #Dummy_ED
-    @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year)
+    @model.update_attributes!(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year, determination_http_status_code: 200)
     @model.applicants.each do |applicant|
       applicant.update_attributes!(is_ia_eligible: true)
     end
     @model.tax_households.each do |txh|
       txh.update_attributes!(allocated_aptc: 200.00)
-      @model.eligibility_determinations.build(max_aptc: 200.00,
+      txh.eligibility_determinations.build(max_aptc: 200.00,
                                               csr_percent_as_integer: 73,
                                               csr_eligibility_kind: "csr_73",
                                               determined_on: TimeKeeper.datetime_of_record - 30.days,
                                               determined_at: TimeKeeper.datetime_of_record - 30.days,
                                               premium_credit_strategy_kind: "allocated_lump_sum_credit",
                                               e_pdc_id: "3110344",
-                                              source: "Haven",
-                                              tax_household_id: txh.id).save!
+                                              source: "Haven").save!
       @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.applicants.count > 1
     end
   end

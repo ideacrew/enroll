@@ -689,7 +689,6 @@ private
 
   def create_tax_households
     ## Remove  when copy method is fixed to exclude copying Tax Household
-    # tax_households.destroy_all #We don't need to do it anymore as TaxHouseholds are embeded in Household
     applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
     ##
     applicants.each do |applicant|

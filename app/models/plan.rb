@@ -468,15 +468,27 @@ class Plan
 
         if tax_households.present?
           if family_member_ids.present?
-            tax_households.first.family.active_approved_application.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
-              if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
-                csr_kinds << "csr_100"
+            app_ids = tax_households.map(&:application_id)
+            if !app_ids.include?(nil)
+              tax_households.each do |tax_household|
+                tax_household.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+                  if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
+                    csr_kinds << "csr_100"
+                  else
+                    csr_kinds << tax_household.current_csr_eligibility_kind
+                  end
+                end
               end
-            end
-          end
-          tax_households.each do |tax_household|
-            if tax_household.preferred_eligibility_determination.present?
-              csr_kinds << tax_household.preferred_eligibility_determination.csr_eligibility_kind
+            else
+              tax_households.each do |tax_household|
+                tax_household.tax_household_members.where(:applicant_id.in => family_member_ids).each do |tax_household_member|
+                  if tax_household_member.is_medicaid_chip_eligible == true || tax_household_member.is_without_assistance == true || tax_household_member.is_totally_ineligible == true
+                    csr_kinds << "csr_100"
+                  else
+                    csr_kinds << tax_household.current_csr_eligibility_kind
+                  end
+                end
+              end
             end
           end
         end
