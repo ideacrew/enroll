@@ -24,6 +24,5 @@ module FinancialAssistanceWorld
   def create_plan
     FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01")
   end
-
 end
 World(FinancialAssistanceWorld)

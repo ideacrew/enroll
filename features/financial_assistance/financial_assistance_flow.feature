@@ -1,6 +1,6 @@
-Feature:	A dedicated page that improves visibility & ensures that the user is making an educated election. 
+Feature:	A dedicated page that improves visibility & ensures that the user is making an educated election.
 	Background:
-		Given that the user is applying for a CONSUMER role 
+		Given that the user is applying for a CONSUMER role
 		And the primary member has supplied mandatory information required
 		And the primary member authorizes the system to call EXPERIAN
 		And system receives a positive response from EXPERIAN
@@ -15,7 +15,7 @@ Feature:	A dedicated page that improves visibility & ensures that the user is ma
     Given the user is on the Help Paying For Coverage page
     When the user clicks CONTINUE
     And the answer to Do you want to apply for Medicaid… is NIL
-    Then the user will remain on the page 
+    Then the user will remain on the page
     And an error message will display stating the requirement to populate an answer
 
   Scenario:	User does NOT want to apply for financial assistance
@@ -40,3 +40,4 @@ Feature:	A dedicated page that improves visibility & ensures that the user is ma
 		When the user clicks the SAVE & EXIT link
 		And successfully logs out
 		Then next time the user logs in the user will Help Paying For Coverage page
+    And an error message will display stating the requirement to populate an answer
