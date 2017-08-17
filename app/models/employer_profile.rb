@@ -651,7 +651,7 @@ class EmployerProfile
           if (new_date + 2.days == plan_year_due_date)
             initial_employers_reminder_to_publish(start_on_1).each do |organization|
               begin
-                organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
               rescue Exception => e
                 puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
               end
