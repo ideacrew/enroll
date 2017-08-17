@@ -28,7 +28,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
 
         processed_count = 0
 
-        time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+        time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
         file_name = File.expand_path("#{Rails.root}/public/edi_enrollment_termination_report_#{time_stamp}.csv")
 
         CSV.open(file_name, "w", force_quotes: true) do |csv|
