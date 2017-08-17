@@ -33,6 +33,7 @@ class ShopEmployeeNotice < Notice
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = census_employee.employee_role.person.hbx_id
     notice.employer_name = census_employee.employer_profile.legal_name
+    notice.employer_full_name = census_employee.employer_profile.staff_roles.first.full_name.titleize
     append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)
     append_address(census_employee.employee_role.person.mailing_address)
@@ -44,6 +45,10 @@ class ShopEmployeeNotice < Notice
 
   def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
+  end
+
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_employee_appeal_rights.pdf')]
   end
 
   def append_hbe
