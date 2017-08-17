@@ -7,6 +7,10 @@ module Config::SiteHelper
     Settings.site.domain_name
   end
 
+  def site_website_name
+    Settings.site.website_name
+  end
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
@@ -43,12 +47,24 @@ module Config::SiteHelper
     Settings.site.broker_quoting_enabled
   end
 
+  def site_main_web_address_url
+    Settings.site.main_web_address_url
+  end
+
   def site_main_web_address
     Settings.site.main_web_address
   end
 
   def site_main_web_link
     link_to site_main_web_address, site_main_web_address
+  end
+
+  def health_care_website
+      Settings.site.health_care_website
+  end
+
+  def health_care_website_url
+      Settings.site.health_care_website_url
   end
 
   def site_uses_default_devise_path?
