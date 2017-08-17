@@ -3,7 +3,6 @@ class TaxHouseholdMember
   include Mongoid::Timestamps
 
   embedded_in :tax_household
-  # embeds_many :financial_statements
 
   field :applicant_id, type: BSON::ObjectId
 
