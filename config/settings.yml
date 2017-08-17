@@ -5,6 +5,8 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
+  main_web_address_url: "https://www.MAhealthconnector.org"
+  website_name: "MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
@@ -17,7 +19,6 @@ site:
   use_default_devise_path: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
-  main_web_address_text: "MAhealthconnector.org"
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
