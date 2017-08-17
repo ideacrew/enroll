@@ -13,10 +13,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! #{notice.primary_fullname} has been selected as the broker for #{notice.employer_name} as of #{notice.assignment_date}. The primary contact for #{notice.employer_name} is #{notice.employer_first_name} #{notice.employer_last_name} #{notice.phone} #{notice.email}."} %>
+  { content: "Congratulations! #{notice.primary_fullname} has been selected as the broker for #{notice.employer_name} as of #{notice.assignment_date}. The primary contact for #{notice.employer_name} is #{notice.employer_first_name} #{notice.employer_last_name}, #{notice.phone} #{notice.email}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Please remember that as a registered broker with the #{aca_state_name} #{site_short_name}, you are agreeing to the  Commonwealth Health Insurance Connector Authority Brokerage Terms and Conditions when logging into #{site_website_name}."} %>
+  content: "Please remember that as a registered broker with the #{aca_state_name} #{site_short_name}, you are agreeing to the  Commonwealth Health Insurance Connector Authority Brokerage Terms and Conditions when logging into <a href = '#{site_main_web_address_url}'> #{site_website_name}</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "If you need resources in assisting your new client, please look to <a href = '#{site_main_web_address_url}'> #{site_website_name}</a>. "} %>
