@@ -43,12 +43,14 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  config.action_mailer.default_url_options = { 
+  config.action_mailer.default_url_options = {
     :host => "127.0.0.1",
     :port => 3000
   }
 
   HbxIdGenerator.slug!
+  config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR

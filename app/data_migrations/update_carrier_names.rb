@@ -4,9 +4,10 @@ class UpdateCarrierNames < MongoidMigrationTask
   def migrate
 
     org_hash = {
-      "237442369" => "Fallon Community Health Plan",
+      "237442369" => "Fallon Health",
       "042864973" => "Health New England",
-      "453596033" => "Minuteman Health"
+      "453596033" => "Minuteman Health",
+      "043373331" => "BMC HealthNet Plan"
     }
 
     org_hash.each do |fein, legal_name|

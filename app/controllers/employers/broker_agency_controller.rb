@@ -6,7 +6,6 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def index
     @filter_criteria = params.permit(:q, :working_hours, :languages => [])
-
     if @filter_criteria.empty?
       @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
       @page_alphabets = page_alphabets(@orgs, "legal_name")
@@ -50,6 +49,7 @@ class Employers::BrokerAgencyController < ApplicationController
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
+      broker_hired
     end
 
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
@@ -89,6 +89,14 @@ class Employers::BrokerAgencyController < ApplicationController
           redirect_to employers_employer_profile_path(@employer_profile)
         end
       }
+    end
+  end
+
+  def broker_hired
+    begin
+         ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
+    rescue Exception => e
+       puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 

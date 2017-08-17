@@ -56,7 +56,7 @@ gem 'mongo_session_store-rails4', '~> 6.0.0'
 gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1'
 
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"

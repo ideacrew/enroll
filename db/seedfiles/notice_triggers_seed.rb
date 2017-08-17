@@ -130,6 +130,28 @@ shop_notice_triggers = [
         ]
     },
 
+    {
+    hbx_id: 'SHOP_M008',
+    title: 'Action Needed – Add all Eligible Employees to your Roster',
+    description: 'This notice goes to all the employers with zero employees on roster when published',
+    resource_name: 'employer',
+    event_name: 'zero_employees_on_roster',
+    notice_triggers: [
+      {
+        name: 'Zero Employees on Rotser',
+        notice_template: 'notices/shop_employer_notices/notice_for_employers_with_zero_employees_on_roster',
+        notice_builder: 'ShopEmployerNotices::ZeroEmployeesOnRoster',
+        mpi_indicator: 'SHOP_M008',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
     # {
     #   hbx_id: 'SHOP3A',
     #   title: 'Plan Offerings Finalized',
@@ -431,7 +453,6 @@ shop_notice_triggers = [
             }
         ]
     },
-
     # {
     #   hbx_id: 'SHOP27',
     #   title: 'Final Reminder to publish Application',
@@ -454,6 +475,28 @@ shop_notice_triggers = [
     #   ]
     # },
 
+  {
+    hbx_id: 'SHOP_M015',
+    title: 'Notice of Low Enrollment - Action Needed',
+    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
+    resource_name: 'employer',
+    event_name: 'low_enrollment_notice_for_employer',
+    notice_triggers: [
+      {
+        name: 'Low Enrollment Notice',
+        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
+        mpi_indicator: 'SHOP_M015',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+    
     # {
     #   hbx_id: 'SHOP28',
     #   title: 'Final Reminder to publish Application',
@@ -499,6 +542,28 @@ shop_notice_triggers = [
     },
 
     {
+        hbx_id: 'SHOP45',
+        title: 'You have been Hired as a Broker',
+        description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+        resource_name: 'broker_role',
+        event_name: 'broker_hired',
+        notice_triggers: [
+           {
+              name: 'Broker Hired',
+              notice_template: 'notices/shop_broker_notices/broker_hired_notice.html.erb',
+              notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
+              mpi_indicator: 'SHOP_M045',
+              notice_trigger_element_group: {
+                market_places: ['shop'],
+                primary_recipients: ["broker"],
+                primary_recipient_delivery_method: ["secure_message"],
+                secondary_recipients: []
+              }
+            }
+        ]
+    },
+
+    {
         hbx_id: 'SHOP_M068',
         title: 'Employee Plan Selection Confirmation',
         description: 'Employee selects a plan during annual open enrollement OE is still open and not final confirmation',
@@ -518,6 +583,27 @@ shop_notice_triggers = [
                 }
             }
         ]
+    },
+    {
+      hbx_id: 'SHOP_M070',
+      title: 'Employee Enrollment Confirmation',
+      description: 'Employee selects a plan during annual open enrollment OE is still close and final confirmation',
+      resource_name: 'employee_role',
+      event_name: 'initial_employee_plan_selection_confirmation',
+      notice_triggers: [
+        {
+            name: 'Notice to employee after they select a plan Annual Open Enrollment',
+            notice_template: 'notices/shop_employee_notices/initial_employee_plan_selection_confirmation',
+            notice_builder: 'ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation',
+            mpi_indicator: 'SHOP_M070',
+            notice_trigger_element_group: {
+                market_places: ['shop'],
+                primary_recipients: ["employee"],
+                primary_recipient_delivery_method: ["secure_message"],
+                secondary_recipients: []
+            }
+        }
+      ]
     },
 ]
 

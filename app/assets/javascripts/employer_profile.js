@@ -97,37 +97,41 @@ var EmployerProfile = ( function( window, undefined ) {
     } else {
       editbgemployeepremiums.each(function() {
         if ($('.composite-offerings').is(':visible')) {
-          editbgfamilypremiums.each(function() {
-            if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
-              editvalidatedbgfamilypremiums = true;
-              editvalidated = true;
-            } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
-              editvalidatedbgfamilypremiums = false;
-              editvalidated = false;
-              return false;
-            }
-          });
+          if ($('.family').is(':checked')) {
+            editbgfamilypremiums.each(function() {
+              if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                editvalidatedbgfamilypremiums = true;
+                editvalidated = true;
+              } else {
+                $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                editvalidatedbgfamilypremiums = false;
+                editvalidated = false;
+                return false;
+              }
+            });
+          } else {
+            editvalidatedbgfamilypremiums = true;
+          }
           editbgemployeeonlypremiums.each(function() {
             if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
             }
           });
         } else {
-          if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-dental-plan').length ) {
+          if ( $(this).closest('.benefit-group-fields').hasClass('edit-additional') && $(this).closest('.select-fs-plan').length ) {
           } else {
             if ( parseInt($(this).val() ) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               editvalidatedbgemployeepremiums = true
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -147,7 +151,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgfamilypremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
               editvalidatedbgfamilypremiums = false;
               editvalidated = false;
               return false;
@@ -158,7 +162,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidatedbgemployeepremiums = true;
               editvalidated = true;
             } else {
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -174,7 +178,7 @@ var EmployerProfile = ( function( window, undefined ) {
               editvalidated = true;
             } else {
 
-              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employee premium must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Employer premium contribution for Dental Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               editvalidatedbgemployeepremiums = false;
               editvalidated = false;
               return false;
@@ -262,9 +266,12 @@ var EmployerProfile = ( function( window, undefined ) {
     if ( editvalidatedbgtitles && editvalidatedbgemployeepremiums && editvalidatedreferenceplanselections && edit_validated_all_premiums && editvalidatedbgfamilypremiums) {
         $('.interaction-click-control-save-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-save-plan-year').removeClass('disabled');
+        $('.interaction-click-control-save-plan-year').removeAttr('disabled');
+
         $('.interaction-click-control-save-plan-year').attr('data-original-title', 'Click here to save your plan year');
       } else {
         $('.interaction-click-control-save-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').attr('disabled', true);
       }
       Freebies.tooltip();
   }
@@ -279,8 +286,7 @@ var EmployerProfile = ( function( window, undefined ) {
 
     bgemployeeonlypremiums = $('.benefits-fields').find('input[value=employee_only]').closest('fieldset').find('input.hidden-param.premium-storage-input');
     bgfamilypremiums = $('.benefits-fields').find('input[value=family]').closest('fieldset').find('input.hidden-param.premium-storage-input');
-    //TODO: brianweiner
-    //dont check if family premium contribution isnt offered
+
     all_premiums = $('.benefits-fields').find('input').closest('fieldset').find('input.hidden-param.premium-storage-input');
     referenceplanselections = $('.reference-plan input[type=radio]:checked');
     bgtitles.each(function() {
@@ -315,24 +321,28 @@ var EmployerProfile = ( function( window, undefined ) {
     } else {
       bgemployeepremiums.each(function() {
         if ($('.composite-offerings').is(":visible")) {
-          bgfamilypremiums.each(function() {
-            if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
-              validatedbgfamilypremiums = true;
-              validated = true;
-            } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Family premium contributions for Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
-              validatedbgfamilypremiums = false;
-              validated = false;
-              return false;
-            }
-          });
+          if ($('.family').is(':checked')) {
+            bgfamilypremiums.each(function() {
+              if ( parseInt($(this).val()) >= parseInt(minimumEmployerFamilyContributionPct) ) {
+                validatedbgfamilypremiums = true;
+                validated = true;
+              } else {
+                $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Family Health Plans must be at least ' + minimumEmployerFamilyContributionPct + '%');
+                validatedbgfamilypremiums = false;
+                validated = false;
+                return false;
+              }
+            });
+          } else {
+            validatedbgfamilypremiums = true;
+          }
 
           bgemployeeonlypremiums.each(function() {
             if ( parseInt($(this).val()) >= parseInt(minimumEmployerEmployeeContributionPct) ) {
               validatedbgemployeepremiums = true;
               validated = true;
             } else {
-              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+              $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
               validatedbgemployeepremiums = false;
               validated = false;
               return false;
@@ -344,7 +354,7 @@ var EmployerProfile = ( function( window, undefined ) {
             validatedbgfamilypremiums = true
             validated = true;
           } else {
-            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employee premium contribution for Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
+            $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Employer premium contribution for Employee Only Health Plans must be at least ' + minimumEmployerEmployeeContributionPct + '%');
             validatedbgemployeepremiums = false;
             validated = false;
             return false;
@@ -388,11 +398,15 @@ var EmployerProfile = ( function( window, undefined ) {
 
     if (validatedbgtitles && validatedbgemployeepremiums && validatedbgfamilypremiums && validatedreferenceplanselections && validated_all_premiums) {
         $('.interaction-click-control-create-plan-year').removeClass('disabled');
+        $('.interaction-click-control-save-plan-year').removeAttr('disabled');
+
         $('.interaction-click-control-create-plan-year').removeAttr('data-original-title');
         $('.interaction-click-control-create-plan-year').attr('data-original-title', 'Click here to create your plan year');
         $('.interaction-click-control-create-plan-year').unbind('click');
       } else {
         $('.interaction-click-control-create-plan-year').addClass('disabled');
+        $('.interaction-click-control-save-plan-year').attr('disabled', true);
+
         $('.interaction-click-control-create-plan-year').click(function(event){
           event.preventDefault();
         });

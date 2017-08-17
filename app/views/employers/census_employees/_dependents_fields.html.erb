@@ -1,18 +1,16 @@
-<div class="row">
-  <div class="col-xs-12">
-    <h3>
-      <%= pluralize(@census_employee.census_dependents.count, 'Dependent') %>
-    </h3>
-    <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
-        <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
-            <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
-            <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>
-        <% end %>
-    <% else %>
-        <div class="vertically-aligned-row">
-          <h4 class="add-dependent-text">Click "Add Dependent" to add a dependent</h4>
-          <%= render 'shared/add_dependents', { f: f } %>
-        </div>
+<div class="col-xs-12">
+  <% if @census_employee.census_dependents.size == 0 %>
+    <h3>Dependents</h3>
+  <% else %>
+    <h3>Dependents (<%= @census_employee.census_dependents.size %>)</h3>
+  <% end %> 
+
+  <% if @census_employee.census_dependents.present? #&& @census_employee.census_dependents.all?(&:valid?) %>
+    <%= f.fields_for :census_dependents, errors: {}, fieldset: false do |census_dependent| %>
+      <%= render partial: 'shared/census_dependent_fields', locals: { f: census_dependent } %>
+      <%= render 'shared/add_dependents', { f: f } if census_dependent.index + 1 == @census_employee.census_dependents.size %>
     <% end %>
-  </div>
+  <% else %>
+    <%= render 'shared/add_dependents', { f: f } %>
+  <% end %>
 </div>

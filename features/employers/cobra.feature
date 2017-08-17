@@ -1,25 +1,26 @@
 Feature: COBRA basic
-
-  @more_than_sole_source
   Scenario: An Employer is new to the Exchange and needs to enter COBRA enrollees
     Given shop health plans exist for both last and this year
     Given Employer has not signed up as an HBX user
+    Given vertical and horizontal plan choices are offered
     When I visit the Employer portal
     Then Jack Doe create a new account for employer
     Then I should see a successful sign up message
+    And I select the all security question and give the answer
+    When I have submit the security questions
     Then I should click on employer portal
     Then Jack Doe creates a new employer profile with default_office_location
     When I go to the Profile tab
     When Employer goes to the benefits tab I should see plan year information
     And Employer should see a button to create new plan year
-    And Employer should be able to enter plan year, benefits, relationship benefits for cobra
+    And Employer should be able to enter single carrier plan year, benefits, relationship benefits for cobra
     And Employer should see a success message after clicking on create plan year button
     Then Employer uploads an attestation document
     When Employer goes to the benefits tab I should see plan year information
     Then Employer can see the plan information
     Then Employer clicks on publish plan year
     Then Employer should see a published success message without employee
-    
+
     When I go to MY Health Connector tab
     Then Employer can see the plan information on home tab
 
@@ -39,6 +40,8 @@ Feature: COBRA basic
 
     When Jack Cobra visits the employee portal
     When Jack Cobra creates an HBX account
+    And I select the all security question and give the answer
+    When I have submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Jack Cobra
@@ -56,6 +59,8 @@ Feature: COBRA basic
 
     When Jack Employee visits the employee portal
     When Jack Employee creates an HBX account
+    And I select the all security question and give the answer
+    When I have submit the security questions
     When Employee goes to register as an employee
     Then Employee should see the employee search page
     When Employee enters the identifying info of Jack Employee
@@ -96,3 +101,14 @@ Feature: COBRA basic
     Then Jack Employee should not see individual on enrollment title
     Then Set Date back to two months ago
     Then Employee logs out
+
+  Scenario: An Employer Representative has not signed up on the HBX
+    Given Employer has not signed up as an HBX user
+    When I visit the Employer portal
+    Then John Doe creates an HBX account
+    Then I should see a successful sign up message
+    And I select the all security question and give the answer
+    When I have submit the security questions
+    Then I should click on employer portal
+    Then John Doe creates a new employer profile with default_office_location
+    Then Employer can see the important documents needed

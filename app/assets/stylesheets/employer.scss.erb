@@ -42,6 +42,47 @@
       .health {
         padding-top: 3.75%;
       }
+      table.benefit-group-contribution-table {
+        padding: 0 2%;
+        margin: auto;
+        table-layout: fixed;
+
+        tr.not-offered {
+          opacity: 0.35;
+        }
+
+        tr:first-of-type {
+          border-top: none;
+          th:first-of-type {
+            width: 28%;
+          }
+          th {
+            font-weight: normal;
+            text-transform: uppercase;
+            padding: 10px 0;
+            color: #9b9b9b;
+          }
+
+        }
+        tr {
+          border-bottom: solid 1px #d5d5d5;
+
+          td {
+            padding: 15px 0;
+            font-size: 16px;
+            i {
+              margin-left: -17%;
+              color: #69A30D;
+              margin-right: 10px;
+              cursor: default;
+            }
+          }
+          &:last-of-type {
+            border-bottom: none;
+            display: none;
+          }
+        }
+      }
       table {
         width: 100%;
         margin-top: 10px;
@@ -152,7 +193,7 @@
         background-image: none;
         background-color: transparent;
         .panel-title {
-          color: $primary-blue;
+          color: $brand-primary;
         }
       }
     }
@@ -227,14 +268,11 @@
       width: 50%;
       margin-left: 2.5%;
     }
-    .btn-primary {
-      width: 100%;
-    }
   }
   &.broker {
     .panel-body, .panel-footer {
       .fa {
-        color: $primary-blue;
+        color: $brand-primary;
       }
       .vertically-aligned-row {
         table-layout: fixed;
@@ -263,11 +301,10 @@
     .fa {
       margin: 0;
     }
-    .referenceplan {
-    }
+
     .title {
       text-transform: uppercase;
-      color: $primary-green;
+      color: $primary-orange;
       font-weight: bold;
       span {
         color: #333;
@@ -291,7 +328,7 @@
   }
   &#plan_year {
     .fa {
-      color: $primary-blue;
+      color: $brand-primary;
     }
   }
   &.plan-year {
@@ -339,7 +376,7 @@
       }
       .title {
         text-transform: uppercase;
-        color: $primary-green;
+        color: $primary-orange;
         font-weight: bold;
         span {
           color: #333;
@@ -387,7 +424,7 @@
   &.employer-broker-widget {
     .panel-heading {
       .panel-title {
-        color: $primary-blue;
+        color: $brand-primary;
       }
     }
     .panel-body {
@@ -421,7 +458,7 @@
             display: inline-block;
           }
           h2, span {
-            color: $primary-green;
+            color: $primary-orange;
             line-height: 1.1;
           }
           h2 {
@@ -436,7 +473,7 @@
           h3 {
             line-height: 1.1;
             margin-bottom: 2.5%;
-            color: $primary-green;
+            color: $primary-orange;
           }
         }
       }

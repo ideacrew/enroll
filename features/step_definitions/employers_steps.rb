@@ -289,6 +289,15 @@ And(/^.+ should see the census family is successfully rehired message$/) do
   Watir::Wait.until(30) {  @browser.text.include?("Successfully rehired family.") }
 end
 
+And(/^Employer can( not)? see the important documents needed$/) do |negate|
+  if negate
+    expect(page).not_to have_content('Important Documents Needed')
+    # page.should_not have_content('Important Documents Needed')
+  else
+    expect(page).to have_content('Important Documents Needed')
+  end
+end
+
 When(/^I go to the Profile tab$/) do
   find('.interaction-click-control-update-business-info').click
   find('.interaction-click-control-cancel').click
@@ -314,10 +323,24 @@ And(/^Employer can see the plan information on home tab$/) do
   end
 end
 
+And(/^Employer can see the sole source plan information on home tab$/) do
+  sleep 1
+  within('.benefit-group') do
+    expect(page).to have_content('A Sole Source Plan')
+  end
+end
+
 And(/^Employer can see the plan information$/) do
   sleep 1
   within('.benefit-package') do
     expect(page).to have_content('All Plans From A Single Carrier')
+  end
+end
+
+And(/^Employer can see the sole source plan information$/) do
+  sleep 1
+  within('.benefit-package') do
+    expect(page).to have_content('A Sole Source Plan')
   end
 end
 

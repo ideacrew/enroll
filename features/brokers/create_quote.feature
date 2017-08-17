@@ -1,3 +1,4 @@
+@quoting_enabled
 Feature: Create Employee Roster
   In order for Brokers to give a quote to employers
   The Broker should be able to add emloyees

@@ -105,8 +105,12 @@
             <% end %>
           </div>
           <div class="col-xs-4">
-            <% if @plan.nationwide %>
-            <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+            <% if offers_nationwide_plans? %>
+              <% if @plan.nationwide %>
+              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
+              <% end %>
+            <% else %>
+              <%= link_to "PROVIDER DIRECTORY", @plan.provider_directory_url, target: "_blank" %>
             <% end %>
           </div>
         </div>

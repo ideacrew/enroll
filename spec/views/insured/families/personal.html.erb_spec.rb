@@ -10,14 +10,13 @@ RSpec.describe "insured/families/personal.html.erb" do
   end
 
   shared_examples_for "display_heading" do
-      it "should display the title" do
-    expect(rendered).to have_selector('h1', text: "Manage Family")
-   end
+    it "should display the title" do
+      expect(rendered).to have_selector('h1', text: "Manage Family")
+    end
 
-      it "should display notice of action title " do
-    expect(rendered).to have_selector('h5', text: "Please indicate preferred method to receive notices (OPTIONAL)")
-   end
-
+    it "should display notice of action title " do
+      expect(rendered).to have_selector('p', text: "Please indicate preferred method to receive notices (OPTIONAL)")
+    end
   end
 
   context "for employee role" do

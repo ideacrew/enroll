@@ -7,6 +7,10 @@ module Config::SiteHelper
     Settings.site.domain_name
   end
 
+  def site_website_name
+    Settings.site.website_name
+  end
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
@@ -35,6 +39,10 @@ module Config::SiteHelper
     Settings.site.short_name
   end
 
+  def site_registration_path(resource_name, params)
+    Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+  end
+
   def site_broker_quoting_enabled?
     Settings.site.broker_quoting_enabled
   end
@@ -43,8 +51,16 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
+  def site_main_web_address_url
+    Settings.site.main_web_address_url
+  end
+
   def site_main_web_link
     link_to site_main_web_address, site_main_web_address
+  end
+
+  def site_make_their_premium_payments_online
+    Settings.site.make_their_premium_payments_online
   end
 
   def site_uses_default_devise_path?
@@ -57,5 +73,9 @@ module Config::SiteHelper
 
   def site_main_web_address_text
     Settings.site.main_web_address_text
+  end
+
+  def site_document_verification_checklist_url
+    Settings.site.document_verification_checklist_url
   end
 end

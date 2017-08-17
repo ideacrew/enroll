@@ -66,7 +66,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations"].include?(controller_name.downcase)
+    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
     authenticate_user!
   end
 
@@ -122,7 +122,9 @@ class ApplicationController < ActionController::Base
     def update_url
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
-          (controller_name == "profiles" && action_name == "new")
+          (controller_name == "profiles" && action_name == "new") ||
+          (controller_name == 'profiles' && action_name == 'show') ||
+          (controller_name == 'hbx_profiles' && action_name == 'show')
           if current_user.last_portal_visited != request.original_url
             current_user.last_portal_visited = request.original_url
             current_user.save
@@ -141,7 +143,8 @@ class ApplicationController < ActionController::Base
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
       (controller_name == "invitations") ||
-      (controller_name == "saml")
+      (controller_name == "saml") ||
+      (controller_name == 'security_question_responses')
     end
 
     def check_for_special_path
@@ -180,7 +183,11 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
-      session[:portal] || request.referer || root_path
+      if request.referrer =~ /sign_in/
+        session[:portal] || resource.try(:last_portal_visited) || root_path
+      else
+        session[:portal] || request.referer || root_path
+      end
     end
 
     def after_sign_out_path_for(resource_or_scope)

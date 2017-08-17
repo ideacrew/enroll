@@ -11,6 +11,7 @@ require 'rspec/expectations'
 require 'capybara/cucumber'
 require 'capybara/poltergeist'
 require 'capybara-screenshot/cucumber'
+require 'cucumber/rspec/doubles'
 
 Dir[File.expand_path(Rails.root.to_s + "/lib/test/**/*.rb")].each { |f| load f }
 

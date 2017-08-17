@@ -14,6 +14,8 @@ class User
   devise :database_authenticatable, :registerable, :lockable,
          :recoverable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true}
 
+  embeds_many :security_question_responses
+
   validates_presence_of :oim_id
   validates_uniqueness_of :oim_id, :case_sensitive => false
   validate :password_complexity
@@ -123,6 +125,7 @@ class User
   ## Recoverable
   field :reset_password_token,   type: String
   field :reset_password_sent_at, type: Time
+  field :identity_confirmed_token, type: String
 
   ##RIDP
   field :identity_verified_date, type: Date
@@ -384,6 +387,10 @@ class User
     end
   end
 
+  def needs_to_provide_security_questions?
+    security_question_responses.length < 3
+  end
+
   class << self
 
     def by_email(email)
@@ -412,6 +419,10 @@ class User
 
     def logins_before_captcha
       4
+    end
+
+    def has_answered_question? security_question_id
+      where(:'security_question_responses.security_question_id' => security_question_id).any?
     end
   end
 

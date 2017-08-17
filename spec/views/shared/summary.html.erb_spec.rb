@@ -106,11 +106,18 @@ describe "shared/_summary.html.erb" do
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
-    it "should not have provider directory url if nationwide = false" do
+    it "should not have provider directory url if nationwide = false(for dc)" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
       allow(mock_plan).to receive(:nationwide).and_return(false)
-      allow(mock_plan).to receive(:service_area_id).and_return('XX-111')
       render "shared/summary", :qhp => mock_qhp_cost_share_variance
       expect(rendered).to_not match(/#{mock_plan.provider_directory_url}/)
+    end
+
+    it "should not have provider directory url if nationwide = false(for ma)" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(false)
+      allow(mock_plan).to receive(:nationwide).and_return(false)
+      render "shared/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to match(/#{mock_plan.provider_directory_url}/)
     end
   end
 end

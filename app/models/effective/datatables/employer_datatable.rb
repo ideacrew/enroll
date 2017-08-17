@@ -10,7 +10,7 @@ module Effective
 
         table_column :legal_name, :proc => Proc.new { |row|
           @employer_profile = row.employer_profile
-          (link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
+          (link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home'))
 
           }, :sortable => false, :filter => false
         #table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| truncate(row.id.to_s, length: 8, omission: '' ) }, :sortable => false, :filter => false

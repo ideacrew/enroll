@@ -24,6 +24,7 @@ describe CreateNewInitialPlanYearUsingAnother, dbclean: :after_each do
     context "plan_year.application_errors absent" do
       before do
         plan_year = benefit_group.plan_year
+        plan_year.fte_count = 3
         allow(plan_year).to receive(:application_errors).and_return({})
       end
       it "sets the plan year in enrolling state" do

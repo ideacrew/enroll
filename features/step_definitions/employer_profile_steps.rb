@@ -6,6 +6,21 @@ Given /(\w+) is a person$/ do |name|
   email = Forgery('email').address
   user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
+
+Given /(\w+) has already provided security question responses/ do |name|
+  security_questions = []
+  3.times do
+    security_questions << FactoryGirl.create(:security_question)
+  end
+  User.all.each do |u|
+    next if u.security_question_responses.count == 3
+    security_questions.each do |q|
+      u.security_question_responses << FactoryGirl.build(:security_question_response, security_question_id: q.id, question_answer: 'answer')
+    end
+    u.save!
+  end
+end
+
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
   FactoryGirl.create(:person, first_name: person.first_name,
@@ -87,12 +102,19 @@ Then(/(\w+) is the staff person for an employer$/) do |name|
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
 end
 
-Given(/^Sarh is the staff person for an organization with employer profile and broker agency profile$/) do
-  person = Person.where(first_name: "Sarh").first
+Given(/^Sarah is the staff person for an organization with employer profile and broker agency profile$/) do
+  person = Person.where(first_name: "Sarah").first
   organization = FactoryGirl.create(:organization)
   employer_profile = FactoryGirl.create(:employer_profile, organization: organization)
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
   broker_agency_profile = FactoryGirl.create(:broker_agency_profile, organization: organization)
+end
+
+Then(/he should have an option to select paper or electronic notice option/) do
+  expect(page).to have_content("Please indicate preferred method to receive notices (optional)")
+  find('.selectric-interaction-choice-control-organization-contact-method').click
+  expect(page).to have_content(/Only Electronic communications/i)
+  expect(page).to have_content(/Paper and Electronic communications/i)
 end
 
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
@@ -124,7 +146,8 @@ end
 
 Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
   person = Person.where(first_name: new_staff).first
-  click_link 'Add Employer Staff Role'
+
+  click_link 'Add Employer Contact'
   fill_in 'first_name', with: person.first_name
   fill_in 'last_name', with: person.last_name
   fill_in  'dob', with: person.dob
