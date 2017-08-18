@@ -2627,6 +2627,7 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
 
   context "#end_date_for_non_renewed_enrollment" do
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:benefit_group_assignment) { double("BenefitGroupAssignment", :benefit_group => benefit_group)}
 
     it "should return nil if the enrollment is not a non_renewed enrollment" do
       allow(enrollment).to receive(:is_non_renewed_enrollment?).and_return false
@@ -2639,10 +2640,10 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
       expect(enrollment.end_date_for_non_renewed_enrollment).to eq TimeKeeper.date_of_record + 8.days
     end
 
-    it "should return the plan year end on date if it is a non_renewed enrollment" do
+    it "should return the benfit group end on date if it is a non_renewed enrollment" do
       allow(enrollment).to receive(:is_non_renewed_enrollment?).and_return true
-      allow(enrollment).to receive(:employer_profile).and_return employer_profile
-      expect(enrollment.end_date_for_non_renewed_enrollment).to eq employer_profile.active_plan_year.end_on
+      allow(enrollment).to receive(:benefit_group_assignment).and_return benefit_group_assignment
+      expect(enrollment.end_date_for_non_renewed_enrollment).to eq benefit_group.end_on
     end
   end
 end

@@ -1419,7 +1419,7 @@ class HbxEnrollment
   def end_date_for_non_renewed_enrollment
     return nil unless is_non_renewed_enrollment?
     return terminated_on if terminated_on.present?
-    return employer_profile.active_plan_year.end_on
+    return benefit_group_assignment.benefit_group.end_on
   end
 
   private
