@@ -33,7 +33,6 @@ class ShopEmployeeNotice < Notice
     notice.mpi_indicator = self.mpi_indicator
     notice.primary_identifier = census_employee.employee_role.person.hbx_id
     notice.employer_name = census_employee.employer_profile.legal_name
-    notice.employer_full_name = census_employee.employer_profile.staff_roles.first.full_name.titleize
     append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)
     append_address(census_employee.employee_role.person.mailing_address)

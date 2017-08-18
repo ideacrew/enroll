@@ -27,6 +27,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice, :dbcle
   describe "New" do
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice.new(census_employee, valid_parmas)
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
       it "should initialze" do
@@ -47,11 +48,23 @@ RSpec.describe ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice, :dbcle
   describe "Build" do
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice.new(census_employee, valid_parmas)
+      allow(census_employee).to receive("employer_profile").and_return(employer_profile)
     end
-    it "should build notice with all necessory information" do
+    it "should build notice with all necessary information" do
       @employee_notice.build
-      expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+    end
+  end
+
+  describe "append_data" do
+    before do
+      @employee_notice = ShopEmployeeNotices::EmployeeMatchesEmployerRoosterNotice.new(census_employee, valid_parmas)
+      allow(census_employee).to receive("employer_profile").and_return(employer_profile)
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+    end
+    it "should append necessary information" do
+      @employee_notice.append_data
+      expect(@employee_notice.notice.employer_full_name).to eq person.full_name.titleize
     end
   end
 
