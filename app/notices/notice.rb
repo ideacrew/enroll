@@ -71,9 +71,10 @@ class Notice
           }),
         }
     }
+    footer = (market_kind == "individual") ? "notices/shared/footer.html.erb" : "notices/shared/shop_footer.html.erb"
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
-        template: "notices/shared/footer.html.erb",
+        template: footer,
         layout: false,
         locals: {notice: notice}
       })
