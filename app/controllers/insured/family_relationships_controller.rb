@@ -23,7 +23,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @people = @family.family_members.where(is_active: true).map(&:person)
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships
+    @relationship_kinds = PersonRelationship::Relationships_UI
 
     render layout: 'financial_assistance'
 	end
@@ -36,7 +36,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @family.reload
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships
+    @relationship_kinds = PersonRelationship::Relationships_UI
 
     respond_to do |format|
       format.html {
