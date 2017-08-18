@@ -29,6 +29,7 @@ class ShopBrokerNotices::BrokerFiredNotice < Notice
   end
 
    def build
+    notice.primary_fullname = broker.primary_fullname.titleize
     notice.first_name = broker.first_name.titleize
     notice.last_name = broker.last_name.titleize
     notice.hbx_id = broker.hbx_id
