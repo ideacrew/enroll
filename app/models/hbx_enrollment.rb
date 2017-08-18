@@ -1407,7 +1407,7 @@ class HbxEnrollment
 
     benefit_groups = renewing_plan_year.benefit_groups
     bg_list = benefit_groups.map(&:id)
-    enrollments = family.active_household.hbx_enrollments.non_waived_show_enrollments
+    enrollments = family.active_household.hbx_enrollments.non_waived_show_enrollments.by_coverage_kind(self.coverage_kind)
     return false if enrollments.where(:"benefit_group_id".in => bg_list).present?
 
     bga_list = benefit_groups.flat_map(&:benefit_group_assignments).map(&:id)

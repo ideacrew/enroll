@@ -2613,13 +2613,13 @@ describe HbxEnrollment, '.build_plan_premium', type: :model, dbclean: :after_all
       expect(enrollment3.is_non_renewed_enrollment?).to eq false
     end
 
-    it "should return true if user enrolled/waived through renewing_plan_year" do
+    it "should return true if user waived through renewing_plan_year" do
       allow(employer_profile).to receive(:renewing_plan_year).and_return employer_profile.plan_years.first
       enrollment5.update_attributes(aasm_state: "renewing_waived", benefit_group_id: employer_profile.plan_years.first.benefit_groups[0].id)
       expect(enrollment4.is_non_renewed_enrollment?).to eq true
     end
 
-    it "should return true if user not enrolled/waived through renewing_plan_year" do
+    it "should return true if user not enrolled/ not waived through renewing_plan_year" do
       allow(employer_profile).to receive(:renewing_plan_year).and_return employer_profile.plan_years.first
       expect(enrollment4.is_non_renewed_enrollment?).to eq true
     end
