@@ -19,14 +19,14 @@ class IvlEnrollmentDataUpdate < MongoidMigrationTask
         families.each do |family|
           enrollments=family.active_household.hbx_enrollments
           if enrollments.size >= 2
-            canceled_enrollments=enrollments.where(aasm_state:"coverage_canceled").where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"])
+            canceled_enrollments=enrollments.where(aasm_state:"coverage_canceled").where(kind:"individual")
             if canceled_enrollments.size > 0
               other_enrollments = enrollments - canceled_enrollments
               other_enrollments = other_enrollments.select{|a| a.subscriber  && a.effective_on  && a.submitted_at  }
 
               if other_enrollments.size>0
                 canceled_enrollments.each do |canceled_enrollment|
-                  if canceled_enrollment.kind  && canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
+                  if canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
                     kind = canceled_enrollment.kind
                     person= canceled_enrollment.subscriber.person
                     effective = canceled_enrollment.effective_on

@@ -27,13 +27,13 @@ class ShopEnrollmentDataUpdate < MongoidMigrationTask
 
               if other_enrollments.size>0
                 canceled_enrollments.each do |canceled_enrollment|
-                  if canceled_enrollment.kind &&  canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
+                  if canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
                     kind = canceled_enrollment.kind
                     person= canceled_enrollment.subscriber.person
                     effective = canceled_enrollment.effective_on
                     other_enrollments = other_enrollments.select{|a| a.kind == kind && a.subscriber.person == person && effective > a.submitted_at && effective < a.effective_on }
                     if other_enrollments.size > 0
-                      if canceled_enrollment.terminated_on.present? && canceled_enrollment.terminated_on > Timekeeper.datetime_of_record
+                      if canceled_enrollment.terminated_on.present? && canceled_enrollment.terminated_on > TimeKeeper.datetime_of_record
                         canceled_enrollment.update_attributes(aasm_state:"coverage_termination_pending")
                       else
                         canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")

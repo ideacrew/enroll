@@ -14,10 +14,10 @@ describe ShopEnrollmentDataUpdate do
   describe "shop enrollment case " do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let(:benefit_group) { FactoryGirl.create(:benefit_group) }
-    let!(:hbx_enrollment1) { FactoryGirl.create(:hbx_enrollment, :shop, benefit_group: benefit_group , household: family.active_household,effective_on: TimeKeeper.datetime_of_record-30.days, terminated_on: TimeKeeper.datetime_of_record-1.days, aasm_state: "coverage_canceled") }
-    let!(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, :shop, benefit_group: benefit_group, household: family.active_household,effective_on: TimeKeeper.datetime_of_record-29.dayss,submitted_at:TimeKeeper.datetime_of_record-29.days) }
-    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment1,applicant_id: family.primary_family_member.id,eligibility_date: TimeKeeper.datetime_of_record-5.days) }
-    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment2,applicant_id: family.primary_family_member.id,eligibility_date: TimeKeeper.datetime_of_record-5.days) }
+    let!(:hbx_enrollment1) { FactoryGirl.create(:hbx_enrollment, :shop, benefit_group: benefit_group , household: family.active_household,effective_on: 1.month.ago.to_date, terminated_on: TimeKeeper.datetime_of_record-1, aasm_state: "coverage_canceled") }
+    let!(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, :shop, benefit_group: benefit_group, household: family.active_household,effective_on: 1.month.ago.to_date+1.days,submitted_at:1.month.ago.to_date-1.days) }
+    let!(:hbx_enrollment_member1) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment1,applicant_id: family.primary_family_member.id,eligibility_date: Date.new(2016,1,1)) }
+    let!(:hbx_enrollment_member2) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment2,applicant_id: family.primary_family_member.id,eligibility_date: Date.new(2016,1,1)) }
 
     it "should change enrollment 1's state to coverage terminataed" do
       expect(hbx_enrollment1.aasm_state).to eq "coverage_canceled"
