@@ -16,8 +16,10 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
   def append_data
     hbx = HbxProfile.current_hbx
     enrollments = []
-    health_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == 'health' && h.aasm_state == 'coverage_selected'}
-    dental_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.coverage_kind == 'dental' && h.aasm_state == 'coverage_selected'}
+    en = census_employee.published_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
+    health_enrollment = en.select{ |h| h.coverage_kind == 'health'}.sort_by(&:effective_on).last
+    dental_enrollment = en.select{ |h| h.coverage_kind == 'dental'}.sort_by(&:effective_on).last
+
     enrollments << health_enrollment
     enrollments << dental_enrollment
     notice.census_employee = PdfTemplates::CensusEmployee.new({

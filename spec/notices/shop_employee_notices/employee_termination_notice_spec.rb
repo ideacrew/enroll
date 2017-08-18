@@ -43,7 +43,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
     }
 
   let(:enrollment) do
-    hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health', aasm_state:'coverage_selected',benefit_group_assignment_id: benefit_group_assignment.id)
+    hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health', aasm_state:'coverage_termination_pending',benefit_group_assignment_id: benefit_group_assignment.id)
     hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true)
     hbx.save
     hbx
