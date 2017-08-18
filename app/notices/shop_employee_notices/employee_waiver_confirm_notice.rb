@@ -5,7 +5,6 @@ class ShopEmployeeNotices::EmployeeWaiverConfirmNotice < ShopEmployeeNotice
     build
     append_data
     generate_pdf_notice
-    employee_appeal_rights_attachment
     attach_envelope
     non_discrimination_attachment
     upload_and_send_secure_message
