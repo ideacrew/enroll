@@ -1,5 +1,5 @@
 module Publishers
-  class Legacy::EmployersFailingPaticipationReportPublisher
+  class Legacy::EmployersFailingParticipationReportPublisher
     attr_reader :gateway
     def initialize
       @gateway = TransportGateway::Gateway.new(nil, Rails.logger)
