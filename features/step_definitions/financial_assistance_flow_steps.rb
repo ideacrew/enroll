@@ -77,8 +77,8 @@ When(/^the user clicks CONTINUE$/) do
 end
 
 When(/^the answer to Do you want to apply for Medicaid… is NIL$/) do
-  # expect(find_field('radio1')).to be_checked
-  # expect(find_field('radio2')).to be_checked
+  expect(find('#radio1', visible: false)).not_to be_checked
+  expect(find('#radio2', visible: false)).not_to be_checked
 end
 
 Then(/^the user will remain on the page$/) do
@@ -87,4 +87,54 @@ end
 
 Then(/^an error message will display stating the requirement to populate an answer$/) do
   expect(page).to have_content('Please choose an option before you proceed.')
+end
+
+When(/^the answer to Do you want to apply for Medicaid… is NO$/) do
+  find(:xpath, '//label[@for="radio2"]').click
+end
+
+When(/^clicks CONTINUE$/) do
+  find('.btn', text: 'CONTINUE').click
+end
+
+Then(/^the user will navigate to the UQHP Household Info: Family Members page$/) do
+  consumer.person.families.last.family_members.each do |family_member|
+    expect(page).to have_content(family_member.first_name)
+  end
+end
+
+When(/^the answer to Do you want to apply for Medicaid… is YES$/) do
+  expect(page).to have_content('Verify Identity')
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]').click
+  find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]').click
+  click_button "Submit"
+  click_link "Please click here once you have contacted the exchange and have been told to proceed."
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.btn', text: 'CONTINUE').click
+end
+
+Then(/^the user will navigate to the FAA Household Info: Family Members page$/) do
+  consumer.person.families.last.family_members.each do |family_member|
+    expect(page).to have_content(family_member.first_name)
+  end
+  expect(page).to have_content('Household Info: Family Members')
+end
+
+When(/^the user clicks the PREVIOUS  link$/) do
+  find('.interaction-click-control-previous').trigger 'click'
+end
+
+When(/^navigates to the Verify Identity page$/) do
+  expect(page).to have_content('Verify Identity')
+end
+
+When(/^the user clicks the SAVE & EXIT link$/) do
+  find('.interaction-click-control-save---exit').trigger 'click'
+end
+
+Then(/^next time the user logs in the user will Help Paying For Coverage page$/) do
+  visit "/users/sign_in"
+  fill_in "user_login", with: user_sign_up[:oim_id]
+  fill_in "user_password", with: user_sign_up[:password]
+  click_button "Sign in"
 end

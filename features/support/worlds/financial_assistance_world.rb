@@ -1,7 +1,7 @@
 module FinancialAssistanceWorld
   def consumer(*traits)
     attributes = traits.extract_options!
-    @consumer ||= FactoryGirl.create :user, :consumer, *traits, attributes
+    @consumer ||= FactoryGirl.create :user, :consumer, :with_family, *traits, attributes
   end
 
   def application(*traits)
