@@ -620,8 +620,8 @@ shop_notice_triggers = [
       notice_triggers: [
           {
               name: 'Employee termination notice by employer',
-              notice_template: 'notices/shop_employer_notices/broker_termination_notice.html.erb',
-              notice_builder: 'TerminatedBrokerNotice',
+              notice_template: 'notices/shop_broker_notices/broker_agency_fired_notice.html.erb',
+              notice_builder: 'ShopBrokerNotices::BrokerAgencyFiredNotice',
               mpi_indicator: 'MPI_SHOP_D050',
               notice_trigger_element_group: {
                   market_places: ['shop'],

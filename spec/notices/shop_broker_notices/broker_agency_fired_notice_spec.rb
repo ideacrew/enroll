@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TerminatedBrokerNotice do
+RSpec.describe ShopBrokerNotices::BrokerAgencyFiredNotice do
   before(:all) do
     @employer_profile = FactoryGirl.create(:employer_profile)
     @broker_role =  FactoryGirl.create(:broker_role, aasm_state: 'active')
@@ -23,12 +23,13 @@ RSpec.describe TerminatedBrokerNotice do
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'draft', :fte_count => 55) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:end_on) {TimeKeeper.date_of_record}
+  let!(:broker_agency_profile) { create :broker_agency_profile }
 
   #add broker to broker agency profile
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Employee termination notice by employer',
-      :notice_template => 'notices/shop_employer_notices/broker_termination_notice.html.erb',
-      :notice_builder => 'TerminatedBrokerNotice',
+      :notice_template => 'notices/shop_employer_notices/broker_agency_fired_notice.html.erb',
+      :notice_builder => 'BrokerAgencyFiredNotice',
       :mpi_indicator => 'MPI_SHOP_D050',
       :event_name => 'broker_termination_notice',
       :title => "Broker Terminated by Employer"})
@@ -43,7 +44,7 @@ RSpec.describe TerminatedBrokerNotice do
   describe "Construct Terminated Notice" do
     context "valid params" do
       it "should initialze" do
-        expect{TerminatedBrokerNotice.new(employer_profile, valid_params)}.not_to raise_error
+        expect{ShopBrokerNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_params)}.not_to raise_error
       end
     end
 
@@ -51,7 +52,7 @@ RSpec.describe TerminatedBrokerNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{TerminatedBrokerNotice.new(employer_profile, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopBrokerNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_params)}.to raise_error(RuntimeError, "Required params #{key} not present")
         end
       end
     end
@@ -59,7 +60,7 @@ RSpec.describe TerminatedBrokerNotice do
 
   describe "build notice data" do
     before do
-      @broker_agency_notice = TerminatedBrokerNotice.new(employer_profile, valid_params)
+      @broker_agency_notice = ShopBrokerNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_params)
     end
     it "should build notice with all necessary info" do
       @broker_agency_notice.build
@@ -69,4 +70,17 @@ RSpec.describe TerminatedBrokerNotice do
     end
   end
 
+  describe "Build" do
+    before do
+      @broker_notice = ShopBrokerNotices::BrokerAgencyFiredNotice.new(employer_profile, valid_params)
+    end
+    it "should build notice with all necessory info" do
+      @broker_notice.build
+      expect(@broker_notice.notice.broker_first_name).to eq person.first_name
+      expect(@broker_notice.notice.broker_last_name).to eq person.last_name
+      expect(@broker_notice.notice.primary_fullname).to eq organization.broker_agency_profile.try(:legal_name)
+      expect(@broker_notice.notice.organization).to eq organization.legal_name
+      expect(@broker_notice.notice.employer_name).to eq employer_profile.try(:legal_name)
+    end
+  end
 end
