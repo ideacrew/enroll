@@ -19,7 +19,7 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
                             :notice_builder => 'ShopBrokerNotices::BrokerFiredNotice',
                             :event_name => 'broker_fired_confirmation_to_broker',
                             :mpi_indicator => 'SHOP_M048',
-                            :title => "has removed you as their broker"})
+                            :title => "You have been removed as a Broker"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,

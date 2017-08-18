@@ -544,7 +544,7 @@ shop_notice_triggers = [
 
     {
         hbx_id: 'SHOP48',
-        title: 'has removed you as their broker',
+        title: 'You have been removed as a Broker',
         description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
         resource_name: 'broker_role',
         event_name: 'broker_fired_confirmation_to_broker',
