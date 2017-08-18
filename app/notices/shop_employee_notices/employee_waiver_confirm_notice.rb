@@ -3,6 +3,7 @@ class ShopEmployeeNotices::EmployeeWaiverConfirmNotice < ShopEmployeeNotice
 
   def deliver
     build
+    append_data
     generate_pdf_notice
     employee_appeal_rights_attachment
     attach_envelope
@@ -12,7 +13,7 @@ class ShopEmployeeNotices::EmployeeWaiverConfirmNotice < ShopEmployeeNotice
   end
 
   def append_data
-    notice = PdfTemplates::PlanYear.new({
+    notice.enrollment = PdfTemplates::Enrollment.new({
                       :waived_on => census_employee.active_benefit_group_assignment.hbx_enrollments.first.updated_at
       })
   end

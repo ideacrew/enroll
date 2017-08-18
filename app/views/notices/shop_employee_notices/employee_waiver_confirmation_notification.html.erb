@@ -11,12 +11,11 @@
   </tr>
   </tbody>
 </table>
+<%= render partial: 'notices/shared/paragraph', :locals =>
+                                                  { content: "This notice confirms your election to waive your right to enroll in employer-sponsored insurance with #{notice.employer_name}. Beginning on #{notice.enrollment.waived_on.to_date}, you will not have insurance with #{notice.employer_name}." }%>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-                                                  { content: "This notice confirms your election to waive your right to enroll in employer-sponsored insurance with #{notice.employer_name}. hBeginning on #{notice.waived_on}, you will not have insurance with #{notice.employer_name}." }%>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you experience a qualifying event at a later date, you may be eligible to apply for a special enrollment period (SEP) and enroll in employer-sponsored health insurance outside of open enrollment. Please visit theBusiness Resource Center for additional resources and assistance on reporting qualifying events."} %>
+  { content: "If you experience a qualifying event at a later date, you may be eligible to apply for a special enrollment period (SEP) and enroll in employer-sponsored health insurance outside of open enrollment. Please visit the Business Resource Center for additional resources and assistance on reporting qualifying events."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
     { heading: 'For Questions or Assistance:',
@@ -25,8 +24,10 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "Please contact your broker for further assistance. You can also contact #{site_short_name} with any questions:",
     listings: ["By calling #{contact_center_phone_number}. TTY: #{contact_center_tty_number}",
-               "By email: <a mail_to = '#{small_businesss_email}'>#{small_businesss_email}</a>"],
-    after:"You can also find more information on our website at <a href= '#{site_main_web_address}''> #{site_main_web_address}</a> "}%>
+               "By email: <a mail_to = '#{small_businesss_email}'>#{small_businesss_email}</a>"]}%>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "You can also find more information on our website at <a href= '#{site_main_web_address}'> #{site_main_web_address}</a>"} %>
+<br><br>
 <% if notice.broker.present? %>
     <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
 <% else %>
