@@ -39,6 +39,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
 
       it "should migrate the 2015 plan year" do
         expired_plan_year = organization.employer_profile.plan_years.where(:aasm_state => "expired").first
+        expired_plan_year.update(is_conversion: true)
         subject.migrate
         expired_plan_year.reload
         expect(expired_plan_year.aasm_state).to eq "conversion_expired"

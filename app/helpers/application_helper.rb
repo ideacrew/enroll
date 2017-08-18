@@ -1,5 +1,13 @@
 module ApplicationHelper
 
+  def deductible_display(hbx_enrollment, plan)
+    if hbx_enrollment.hbx_enrollment_members.size > 1
+      plan.family_deductible.split("|").last.squish
+    else
+      plan.deductible
+    end
+  end
+
   def get_portals_text(insured, employer, broker)
     my_portals = []
     if insured == true
@@ -421,8 +429,8 @@ module ApplicationHelper
 
   def relationship_options(dependent, referer)
     relationships = referer.include?("consumer_role_id") || @person.try(:has_active_consumer_role?) ?
-      BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS - ["self"] :
-      PersonRelationship::Relationships
+      BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
+      PersonRelationship::Relationships_UI
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
   end
 
@@ -521,22 +529,6 @@ module ApplicationHelper
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
   end
 
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
-
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
-      when 'fixed_first_of_next_month'
-        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
-      end
-    end
-
-    options
-  end
-
   def purchase_or_confirm
     'Confirm'
   end
@@ -615,7 +607,8 @@ module ApplicationHelper
       if text == "Yes"
         "Eligible"
       else
-        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+        "Ineligible"
+        #{}"<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='tooltip' title='#{eligibility_text}'></i>".html_safe
       end
     else
       "Ineligible"
@@ -648,5 +641,7 @@ module ApplicationHelper
     end
   end
 
-
+  def is_new_paper_application?(current_user, app_type)
+    current_user.has_hbx_staff_role? && app_type == "paper"
+  end
 end

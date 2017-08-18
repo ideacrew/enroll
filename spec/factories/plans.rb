@@ -13,6 +13,8 @@ FactoryGirl.define do
     carrier_profile     { FactoryGirl.create(:carrier_profile)  } #{ BSON::ObjectId.from_time(DateTime.now) }
     minimum_age         19
     maximum_age         66
+    deductible          "$500"
+    family_deductible   "$500 per person | $1000 per group"
 
     # association :premium_tables, strategy: :build
 

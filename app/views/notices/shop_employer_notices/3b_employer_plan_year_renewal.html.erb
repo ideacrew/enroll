@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "DC Health Link finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
+    content: "#{Settings.site.short_name} finalized your plan offerings based on your prior year plan offerings due to the passing of the deadlines to do so, found <a href='https://dchealthlink.com/smallbusiness/employer-coverage-deadlines'>here</a>."} %>
     
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Based upon the information you have provided, you are eligible to offer group health coverage to your employees through #{Settings.site.short_name}."} %>
@@ -43,7 +43,7 @@
       <td>
         <ul style="list-style: circle solid;">
         <li style="margin-top: 0px;">
-          <strong>Employee Open Enrollment Period</strong><br>We sent an email to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%= Settings.site.short_name %> account and log in, review their plan options, and enroll into coverage.<br>During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan.
+          <strong>Employee Open Enrollment Period</strong><br>When your employee open enrollment period begins, we will send an email to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%= Settings.site.short_name %> account and log in, review their plan options, and enroll into coverage.<br>During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan.
         </li>
         <li style="margin-top: 5px;">
           <strong>Review Employee Enrollments</strong><br>As your employees enroll, you are able to track their enrollment actions in your <%= Settings.site.short_name %> Employer account by clicking on “View Enrollment Reports”, including a breakdown of employer and employee premium contributions.

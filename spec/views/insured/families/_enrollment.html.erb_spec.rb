@@ -107,8 +107,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{plan.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{plan.hios_id}']", text: "View Details")
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the plan start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
@@ -130,10 +130,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     context "when outside Employers open enrollment period and not a new hire" do
+      let(:employer_profile) { FactoryGirl.create(:employer_profile) }
       before :each do
         allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(false)
         allow(census_employee).to receive(:new_hire_enrollment_period).and_return(TimeKeeper.datetime_of_record - 20.days .. TimeKeeper.datetime_of_record - 10.days)
-
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment).to receive(:employer_profile).and_return(employer_profile)
+        allow(hbx_enrollment).to receive(:total_employee_cost).and_return(111)
+        allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
       end
 
@@ -153,14 +157,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       end
     end
 
-    it "should display the effective date" do
-      expect(rendered).to have_selector('strong', text: 'Effective Date:')
+    it "should display the Plan Start" do
+      expect(rendered).to have_selector('strong', text: 'Plan Start:')
       expect(rendered).to match /#{Date.new(2015,8,10)}/
     end
 
     it "should display effective date when terminated enrollment" do
       allow(hbx_enrollment).to receive(:coverage_terminated?).and_return(true)
-      expect(rendered).to match /effective date/i
+      expect(rendered).to match /plan start/i
     end
 
     it "should display market" do
@@ -169,6 +173,11 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display future_enrollment_termination_date when coverage_termination_pending" do
       expect(rendered).to match /Future enrollment termination date:/
+    end
+    
+    it "should not show a Plan End if cobra" do
+      allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
+      expect(rendered).not_to match /plan ending/i 
     end
   end
 
@@ -323,6 +332,42 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to have_text(/Coverage End/)
       expect(rendered).to have_text(/#{end_on.strftime("%m/%d/%Y")}/)
     end
+  end
 
+  context "when the enrollment is_coverage_waived" do
+    let(:employer_profile) { FactoryGirl.build_stubbed(:employer_profile) }
+    let(:enrollment) { double("enrollment", aasm_state: "inactive", coverage_kind: "health", is_shop?: true,
+                        employer_profile: employer_profile, effective_on: TimeKeeper.date_of_record - 1.month,
+                        submitted_at: TimeKeeper.date_of_record - 1.month, waiver_reason: nil, id: nil) }
+
+    context "it should render waived_coverage_widget " do
+
+      before :each do
+        allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return true
+        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should render waiver template with read_only param as true" do
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: true, hbx_enrollment: enrollment})
+      end
+
+      it "should display waiver text" do
+        expect(rendered).to have_text(/You have selected to waive your employer health coverage/)
+      end
+    end
+
+    context "it should render waived_coverage_widget with read_only param value as helper method result" do
+
+      before :each do
+        allow(enrollment).to receive(:is_coverage_waived?).and_return true
+        allow(view).to receive(:disable_make_changes_button?).with(enrollment).and_return false
+        render partial: "insured/families/enrollment", collection: [enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      end
+
+      it "should render waiver template with read_only param" do
+        expect(response).to render_template(partial: "insured/families/waived_coverage_widget", locals: {read_only: view.disable_make_changes_button?(enrollment), hbx_enrollment: enrollment})
+      end
+    end
   end
 end
