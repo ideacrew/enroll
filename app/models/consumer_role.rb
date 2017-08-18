@@ -450,19 +450,19 @@ class ConsumerRole
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :first_verifications_reminder, :after => [:record_transition] do
+    event :first_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :second_verifications_reminder, :after => [:record_transition] do
+    event :second_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :third_verifications_reminder, :after => [:record_transition] do
+    event :third_verifications_reminder, :after => [:record_transition,:send_consumer_notifications] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :fourth_verifications_reminder, :after => [:record_transition] do
+    event :fourth_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
   end
@@ -800,6 +800,20 @@ class ConsumerRole
       to_state: aasm.to_state,
       event: aasm.current_event
     )
+  end
+
+  #check if consumer notification job exists
+  def send_consumer_notification(*args)
+    event_name=aasm.current_event
+    event_kind = ApplicationEventKind.where(:event_name => event_name).first
+    notice_trigger = event_kind.notice_triggers.first
+    builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+              template: notice_trigger.notice_template,
+              subject: event_kind.title,
+              event_name: event_name,
+              mpi_indicator: notice_trigger.mpi_indicator,
+              }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+    builder.deliver
   end
 
   def verification_attr(*authority)

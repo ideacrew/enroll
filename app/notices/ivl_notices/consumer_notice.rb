@@ -20,6 +20,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
       # @notice.primary_address = nil
       raise 'mailing address not present'
     end
+    notice.due_date = consumer_role.hc.d 
     append_unverified_family_members
   end
 

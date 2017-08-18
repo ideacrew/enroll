@@ -13,6 +13,12 @@ module PdfTemplates
     attribute :first_name, String
     attribute :last_name, String
     attribute :due_date, String
+    attribute :due_date, String
+    attribute :due_date, String
+
+    attribute :due_date, String
+    attribute :due_date, String
+    
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
