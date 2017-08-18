@@ -60,7 +60,7 @@
   You can also find more information on our website at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>.
   <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
-  <% location = broker.organization.primary_office_location %>
+  <% location = broker.organization.primary_office_location if broker.present? %>
   <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
     <table style="width: 100%">
       <tr>
