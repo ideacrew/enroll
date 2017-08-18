@@ -6,12 +6,13 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
     self.employer_profile = employer_profile
     self.broker_agency_profile = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile
     self.terminated_broker_account = employer_profile.broker_agency_accounts.unscoped.last
-    args[:recipient] = broker_agency_profile
+    broker_person = broker_agency_profile.try(:primary_broker_role).try(:person)
+    args[:recipient] = broker_person
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::Broker.new
     args[:to] = broker_agency_profile.try(:legal_name)
     args[:name] = broker_agency_profile.try(:legal_name)
-    args[:recipient_document_store]= broker_agency_profile.try(:primary_broker_role).try(:person)
+    args[:recipient_document_store]= broker_person
     self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
@@ -22,6 +23,14 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
     non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
+  end
+
+  def create_secure_inbox_message(notice)
+    body = "<br>You can download the notice by clicking this link " +
+        "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
+                                                                                               recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+    message = broker_agency_profile.inbox.messages.build({ subject: subject, body: body, from: 'DC Health Link' })
+    message.save!
   end
 
   def build
@@ -36,8 +45,8 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
-    notice.broker_first_name = person.first_name
-    notice.broker_last_name = person.last_name
+    notice.first_name = person.first_name
+    notice.last_name = person.last_name
     notice.primary_fullname = self.broker_agency_profile.try(:legal_name)
     notice.organization = broker.legal_name
     notice.phone = location.phone.try(:to_s)

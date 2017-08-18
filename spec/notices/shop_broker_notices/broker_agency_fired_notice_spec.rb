@@ -76,8 +76,8 @@ RSpec.describe ShopBrokerNotices::BrokerAgencyFiredNotice do
     end
     it "should build notice with all necessory info" do
       @broker_notice.build
-      expect(@broker_notice.notice.broker_first_name).to eq person.first_name
-      expect(@broker_notice.notice.broker_last_name).to eq person.last_name
+      expect(@broker_notice.notice.first_name).to eq person.first_name
+      expect(@broker_notice.notice.last_name).to eq person.last_name
       expect(@broker_notice.notice.primary_fullname).to eq organization.broker_agency_profile.try(:legal_name)
       expect(@broker_notice.notice.organization).to eq organization.legal_name
       expect(@broker_notice.notice.employer_name).to eq employer_profile.try(:legal_name)
