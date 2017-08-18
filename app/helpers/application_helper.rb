@@ -661,4 +661,14 @@ module ApplicationHelper
     return false if Rails.env.test?
     true
   end
+
+  def exchange_icon_path(icon)
+    site_key = Settings.site.key
+    
+    if site_key.blank? || site_key.to_sym == :dchbx
+      "icons/#{icon}"
+    else
+      "icons/#{site_key}-#{icon}"
+    end     
+  end
 end
