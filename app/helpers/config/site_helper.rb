@@ -59,10 +59,6 @@ module Config::SiteHelper
     Settings.site.long_name
   end
 
-  def site_main_web_address_url
-    Settings.site.main_web_address_url
-  end
-
   def site_registration_path(resource_name, params)
     Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
   end
