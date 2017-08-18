@@ -3,11 +3,11 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   attr_reader :elected_aptc
   attr_reader :tax_household
 
-  def initialize(plan, hbx_enrollment, elected_aptc=0, tax_household=nil)
+  def initialize(plan, hbx_enrollment, elected_aptc=0, tax_households=nil)
     super(plan)
     @member_provider = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
-    @tax_household = tax_household
+    @tax_households = tax_households
   end
 
   def members
@@ -48,7 +48,12 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def aptc_amount(member)
-    if @tax_household.present?
+    if @tax_households.present?
+      if !@tax_households.map(&:application_id).include?(nil)
+        @tax_household = @tax_households.select{|thh|  thh if thh.applicants.map(&:applicant_id).include?(member.applicant_id)}.first
+      else
+        @tax_household = @tax_households.select{|thh|  thh if thh.tax_household_members.map(&:applicant_id).include?(member.applicant_id)}.first
+      end
       aptc_available_hash = @tax_household.aptc_available_amount_for_enrollment(@member_provider, __getobj__, @elected_aptc)
       ((aptc_available_hash[member.applicant_id.to_s].try(:to_f) || 0) * large_family_factor(member)).round(2)
     else
