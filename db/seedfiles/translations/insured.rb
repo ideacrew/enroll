@@ -168,7 +168,7 @@ INSURED_TRANSLATIONS = {
   "en.broker" => "Broker",
   "en.benefit_type" => "Benefit Type",
   "en.member_ct" => "Member Ct",
-  "en.start_date" => "Start Date", 
+  "en.start_date" => "Start Date",
   "en.yes" => "Yes",
   "en.no" => "No",
   "en.none_given" => "None given",
@@ -211,20 +211,21 @@ INSURED_TRANSLATIONS = {
   "en.insured.change_tax_credits_or_cost_sharing_reductions" => "Change in income that may impact my tax credits/cost-sharing reductions",
   "en.insured.qle_detail.eligible_to_enroll_limited_time" => "Based on the information you entered, you may be eligible to enroll now but there is limited time.",
   "en.insured.qle_detail.error_text" => "Based on the information you entered, you may be eligible for a special enrollment period. Please call us at %{contact_center_phone_number} to give us more information so we can see if you qualify.",
-  
+  "en.insured.families.qles_panel.life_event" => "Life event",
+
   "en.insured.eligible_to_enroll" => "Eligible TO Enroll",
   "en.insured.choose_the_date_you_want_your_plan_start" => "Choose the date you want your plan to start.",
   "en.insured.families.indicate_following_circumstances_to_you" => "Please indicate which of the following circumstances apply to you",
   "en.insured.families.was_living_outside_US_or_in_US_territory" => "I was living outside the US or in a US territory",
   "en.insured.families.had_income_below_the_federal_poverty_level" => "I had income below 100% of the Federal Poverty Level and was living in a state that had not expanded Medicaid (tool-tip below)",
   "en.insured.families.tooltip_use_this_calculator_html" => "Tool-tip: Use this calculator ( %{link} to find out if you meet the qualifications. ",
-  
+
   "en.insured.top_life_changes" => "Top Life Changes",
   "en.insured.have_life_changes" => "Have life changes",
   "en.insured.how_may_effect_your_health_insurance" => "See how it may affect your health insurance.",
   "en.insured.employer_assigned_broker" => "Employer Assigned Broker",
   "en.insured.shop_for_health_and_dental_plans" => "Shop for health and dental plans",
-  "en.insured.shop_for_plans" => "Shop for Plans",  
+  "en.insured.shop_for_plans" => "Shop for Plans",
   "en.insured.you_are_not_under_open_enrollment_period" => "You are not under open enrollment period.",
   "en.insured.do_you_need_coverage_earlier_msg" => "Do you need coverage earlier? See if you qualify for a %{link}",
   "en.insured.enroll_in_the_individual_market_msg" => "If you wish to purchase insurance, please enroll in the Individual Market.",
@@ -389,7 +390,7 @@ INSURED_TRANSLATIONS = {
   "en.plan_compare_alert" => "Plan Compare Alert",
   "en.insured.plan_shoppings.show.can_not_select_more_than_n_plans_to_compare" => "Can not select more than %{number} plans to compare.",
   "en.insured.plan_shoppings.thankyou.review_your_current_plan_selection" => "Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.",
- "en.important" => "Important", 
+ "en.important" => "Important",
  "en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll" => "You must complete these steps to enroll.",
  "en.insured.plan_shoppings.thankyou.additional_administration_msg" => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
 }
