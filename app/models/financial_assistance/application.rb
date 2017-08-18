@@ -599,7 +599,7 @@ private
   end
 
   def set_submission_date
-    update_attribute(:submitted_at, TimeKeeper.datetime_of_record)
+    update_attribute(:submitted_at, Time.current)
   end
 
   def set_assistance_year

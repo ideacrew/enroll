@@ -43,7 +43,6 @@ class FinancialAssistance::ApplicationsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params[:commit] == "Submit Application"
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
@@ -74,16 +73,25 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def copy
-    @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
     if @person.primary_family.application_in_progress.blank?
       old_application = @person.primary_family.applications.find params[:id]
-      application = old_application.dup
-      application.aasm_state = "draft"
-      application.submitted_at = nil
-      application.created_at = TimeKeeper.datetime_of_record
-      application.save!
+      old_application.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      @application = old_application.dup
+      @application.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      @application.aasm_state = "draft"
+      @application.submitted_at = nil
+      @application.created_at = nil
+      @application.save!
     end
-    redirect_to edit_financial_assistance_application_path(application)
+    redirect_to edit_financial_assistance_application_path(@application)
   end
 
   def help_paying_coverage
