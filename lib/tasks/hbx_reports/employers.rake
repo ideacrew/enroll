@@ -13,17 +13,17 @@ namespace :reports do
       orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
 
       field_names  = %w(
-          fein       
-          legal_name        
-          dba       
+          fein
+          legal_name
+          dba
           employer_aasm_state
 
-          plan_year_start_on        
+          plan_year_start_on
           plan_year_aasm_state
 
           benefit_package_title
           plan_option_kind
-          ref_plan_name 
+          ref_plan_name
           ref_plan_year
           ref_plan_hios_id
           employee_contribution_pct
@@ -31,23 +31,19 @@ namespace :reports do
           domestic_partner_contribution_pct
           child_under_26_contribution_pct
 
-          staff_name        
-          staff_phone       
+          staff_name
+          staff_phone
           staff_email
 
-          broker_name     
-          broker_phone   
+          broker_name
+          broker_phone
           broker_email
         )
 
       processed_count = 0
-<<<<<<< HEAD
-      file_name = "#{Rails.root}/public/employers.csv"
-=======
 
       time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
       file_name = File.expand_path("#{Rails.root}/public/employers_#{time_stamp}.csv")
->>>>>>> 80ea5babc... Refs #17777.  Replace reports.
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -80,7 +76,7 @@ namespace :reports do
 
           plan_year_start_on    = plan_year.start_on
           plan_year_aasm_state  = plan_year.aasm_state
-          
+
           plan_year.benefit_groups.each do |bg|
             benefit_package_title = bg.title
             plan_option_kind      = bg.plan_option_kind
