@@ -1,4 +1,5 @@
-class ShopBrokerNotices::BrokerFiredNotice < Notice
+class ShopBrokerNotice < Notice
+
   Required= Notice::Required + []
 
   attr_accessor :broker
@@ -6,9 +7,7 @@ class ShopBrokerNotices::BrokerFiredNotice < Notice
 
   def initialize(employer_profile, args = {})
     self.employer_profile = employer_profile
-    broker_agency_account = employer_profile.broker_agency_accounts.unscoped.select{ |b| b.is_active == false}.sort_by(&:created_at).last
-    broker_role = broker_agency_account.broker_agency_profile.primary_broker_role.person
-    self.broker = broker_role
+    self.broker = employer_profile.broker_agency_profile.primary_broker_role.person
     args[:recipient] = broker
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
@@ -19,29 +18,19 @@ class ShopBrokerNotices::BrokerFiredNotice < Notice
     super(args)
   end
 
-
-  def deliver
-    build
-    generate_pdf_notice
-    attach_envelope
-    non_discrimination_attachment
-    upload_and_send_secure_message
-    send_generic_notice_alert
-  end
-
    def build
-    broker_agency_account = employer_profile.broker_agency_accounts.unscoped.select{ |b| b.is_active == false}.sort_by(&:created_at).last
     notice.primary_fullname = broker.full_name.titleize
     notice.first_name = broker.first_name.titleize
     notice.last_name = broker.last_name.titleize
     notice.hbx_id = broker.hbx_id
+    notice.assignment_date = employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
     notice.mpi_indicator = self.mpi_indicator
     notice.employer_name = employer_profile.legal_name.titleize
     notice.employer_first_name = employer_profile.staff_roles.first.first_name.titleize
     notice.employer_last_name = employer_profile.staff_roles.first.last_name.titleize
-    notice.termination_date = broker_agency_account.end_on
-    notice.broker_agency = broker_agency_account.broker_agency_profile.legal_name.titleize
-    append_address(broker_agency_account.broker_agency_profile.organization.primary_office_location.address)
+    notice.broker_agency = employer_profile.broker_agency_profile.legal_name.titleize
+    append_address(employer_profile.broker_agency_profile.organization.primary_office_location.address)
+    append_hbe
   end
 
   def attach_envelope
@@ -66,4 +55,12 @@ class ShopBrokerNotices::BrokerFiredNotice < Notice
                              })
   end
 
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+                   url: "www.dhs.dc.gov",
+                   phone: "(855) 532-5465",
+                   fax: "(855) 532-5465",
+                   email: "#{Settings.contact_center.email_address}"
+               })
+  end
 end

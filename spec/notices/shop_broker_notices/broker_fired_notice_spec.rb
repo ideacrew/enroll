@@ -6,7 +6,7 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
   let!(:broker_agency_profile) { create :broker_agency_profile }
   let(:broker_agency_staff_role) {FactoryGirl.create(:broker_agency_staff_role, broker_agency_profile: broker_agency_profile)}
   let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
-  let!(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile,employer_profile: employer_profile, end_on: TimeKeeper.date_of_record)}
+  let!(:broker_agency_account) {FactoryGirl.create(:broker_agency_account, broker_agency_profile: broker_agency_profile,employer_profile: employer_profile, end_on: TimeKeeper.date_of_record, is_active: false)}
   let!(:person){ create :person }
   let!(:broker_person) { broker_agency_staff_role.person }
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
@@ -30,7 +30,6 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
 
   describe "New" do
     before do
-      allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last").and_return(broker_agency_account)
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
     end
     context "valid params" do
@@ -52,7 +51,6 @@ RSpec.describe ShopBrokerNotices::BrokerFiredNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      allow(employer_profile).to receive_message_chain("broker_agency_accounts.unscoped.last").and_return(broker_agency_account)
       @broker_notice = ShopBrokerNotices::BrokerFiredNotice.new(employer_profile, valid_parmas)
       @broker_notice.build
     end
