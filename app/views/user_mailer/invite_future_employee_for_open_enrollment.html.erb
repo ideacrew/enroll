@@ -60,27 +60,29 @@
   You can also find more information on our website at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>.
   <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
-  <% location = broker.organization.primary_office_location %>
-  <% if broker.present? && broker.primary_broker_role.person.present? && location.present? %>
-    <table style="width: 100%">
-      <tr>
-        <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
-        <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:phone) %></td>
-      </tr>
-      <tr>
-        <td style="width: 15%"></td>
-        <td style="width: 85%"><%= location.try(:email) %></td>
-      </tr>
-    </table>
+  <% if broker.present? %>
+    <% location = broker.organization.primary_office_location %>
+    <% if broker.primary_broker_role.person.present? && location.present? %>
+      <table style="width: 100%">
+        <tr>
+          <td style="width: 15%"><strong>Broker:&nbsp;&nbsp;</strong></td>
+          <td style="width: 85%"><%= broker.primary_broker_role.person.full_name.titleize if broker.primary_broker_role.present?%></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= broker.organization.legal_name.titleize %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:phone) %></td>
+        </tr>
+        <tr>
+          <td style="width: 15%"></td>
+          <td style="width: 85%"><%= location.try(:email) %></td>
+        </tr>
+      </table>
 
+    <% end %>
   <% end %>
   This notice is being provided in accordance with 45 CFR 155.725.
 </div>
