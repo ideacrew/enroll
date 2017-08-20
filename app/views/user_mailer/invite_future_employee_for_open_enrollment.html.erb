@@ -26,7 +26,7 @@
         <td>
           <ul>
           <li style="margin-top: 0px;">
-            Go to <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %> 
+            Go to <%= site_website_address %>
           </li>
           <li style="margin-top: 5px;">
             Log-in or create an account as an employee
@@ -57,7 +57,7 @@
     <li>By calling <%= contact_center_phone_number %>. TTY: <%= contact_center_tty_number %></li>
     <li> By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%> </li>
   </ul>
-  You can also find more information on our website at <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>.
+  You can also find more information on our website at <%= site_website_address %>.
   <br/>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
   <% if broker.present? %>
