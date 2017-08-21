@@ -35,13 +35,6 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
-        if @found_census_employees.size == 1
-          begin
-            ShopNoticesNotifierJob.perform_later(@found_census_employees.first.id.to_s, "employee_eligibility_notice")
-          rescue Exception => e
-            puts "Unable to deliver Employee Eligibility Notice to #{@found_census_employees.first.full_name} due to #{e}" unless Rails.env.test?
-          end
-        end
         respond_to do |format|
           format.html { render 'match' }
         end
@@ -67,6 +60,7 @@ class Insured::EmployeeRolesController < ApplicationController
           format.html { redirect_to :action => "edit", :id => @employee_role.id }
         end
       end
+      trigger_employee_eligibility_notice(@employee_role.census_employee)
     else
       respond_to do |format|
         format.html { redirect_to :back, alert: "You can not enroll as another employee"}
@@ -191,6 +185,14 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   private
+
+  def trigger_employee_eligibility_notice(census_employee)
+    begin
+      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_eligibility_notice")
+    rescue Exception => e
+      puts "Unable to deliver Employee Eligibility Notice to #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+    end
+  end
 
   def check_employee_role_permissions_edit
     @employee_role = EmployeeRole.find(params.require(:id))

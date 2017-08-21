@@ -48,10 +48,25 @@ RSpec.describe ShopEmployeeNotices::EmployeeEligibilityNotice, :dbclean => :afte
     before do
       @employee_notice = ShopEmployeeNotices::EmployeeEligibilityNotice.new(census_employee, valid_parmas)
     end
-    it "should build notice with all necessory information" do
+    it "should build notice with all necessary information" do
       @employee_notice.build
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
+    end
+    it "should render notice template" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_eligibility_notice"
+    end
+  end
+
+  describe "#generate_pdf_notice" do
+    before do
+      @employee_notice = ShopEmployeeNotices::EmployeeEligibilityNotice.new(census_employee, valid_parmas)
+    end
+
+    it "should create a pdf" do
+      @employee_notice.build
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 
