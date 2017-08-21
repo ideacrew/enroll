@@ -26,6 +26,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     family = recipient.primary_family    
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.first_name = recipient.first_name
+    append_hbe
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
@@ -113,6 +114,15 @@ class IvlNotices::ConsumerNotice < IvlNotice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+      url: Settings.site.home_url,
+      phone: phone_number_format(Settings.contact_center.phone_number),
+      email: Settings.contact_center.email_address,
+      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
+    })
   end
 
   def capitalize_quadrant(address_line)
