@@ -1073,6 +1073,10 @@ class Family
     return matrix
   end
 
+  def relationships_complete?
+    find_missing_relationships(build_relationship_matrix).present? ? false : true
+  end
+
   def create_dep_consumer_role
     if dependents.any?
       dependents.each do |member|

@@ -384,7 +384,7 @@ class FinancialAssistance::Application
     self.applicants.each do |applicant|
       return false unless applicant.applicant_validation_complete?
     end
-    application_valid
+    application_valid && family.relationships_complete?
   end
 
   def is_draft?
@@ -642,8 +642,16 @@ private
   end
 
   def is_application_valid?
-    #self.save!(context: :submission)
-    self.valid?(:submission) ? true : false
+    application_attributes_validity = self.valid?(:submission) ? true : false
+
+    if family.relationships_complete?
+      relationships_validity = true
+    else
+      self.errors[:base] << "You must have a complete set of relationships defined among every member."
+      relationships_validity = false
+    end
+
+    application_attributes_validity && relationships_validity
   end
 
   def is_application_ready_for_attestation?

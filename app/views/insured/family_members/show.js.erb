@@ -5,6 +5,14 @@
     </div>
   <% end %>
 <% end %>
+
+<% if !@family.relationships_complete? %>
+  <% puts 'family_reslationships_complete is not true' %>
+  <%= content_for :submit_button do %>
+    <%= link_to 'Continue', insured_family_relationships_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue' %>
+  <% end %>
+<% end %>
+
 if ($("#add_member_list_<%= @dependent.id %>").length) {
   $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent', dependent: @dependent.family_member,person: @person) %>");
 
@@ -20,6 +28,6 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 $("#dependent_buttons").removeClass('hidden');
 
 <% if @family.application_in_progress.present? %>
-	$(".container > .col-md-2").replaceWith("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: financial_assistance_applications_path, 
+	$(".container > .row > .col-md-2").html("<%= escape_javascript(render partial: 'financial_assistance/shared/right_nav', locals: { previous_url: financial_assistance_applications_path,
 		next_url:  go_to_step_financial_assistance_application_applicant_path(@family.application_in_progress, @family.application_in_progress.applicants.first, 1)}) %>");
 <% end %>
