@@ -335,7 +335,8 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     first_name: person[:first_name],
     last_name: person[:last_name],
     ssn: person[:ssn],
-    dob: person[:dob_date]
+    dob: person[:dob_date],
+    email: FactoryGirl.build(:email, address: person[:email])
 
   open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month.next_day
   open_enrollment_end_on = open_enrollment_start_on + 12.days

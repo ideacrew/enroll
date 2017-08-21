@@ -23,12 +23,12 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :security_question_responses, controller: "users/security_question_responses"
+    post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
+
     member do
-      get :reset_password, :lockable, :confirm_lock
-      put :confirm_reset_password
-      post :unlock
-      get :lockable, :confirm_lock, :login_history, :edit
-      put :update
+      get :reset_password, :lockable, :confirm_lock, :login_history, :edit
+      put :confirm_reset_password, :update
+      post :unlock, :change_password
     end
   end
 
