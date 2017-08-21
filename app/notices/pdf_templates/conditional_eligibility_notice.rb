@@ -22,6 +22,10 @@ module PdfTemplates
       false
     end
 
+    def broker?
+      return false
+    end
+
     def verified_individuals
       individuals.select{|individual| individual.verified }
     end

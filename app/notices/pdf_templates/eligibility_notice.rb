@@ -18,5 +18,9 @@ module PdfTemplates
     def shop?
       false
     end
+
+    def broker?
+      return false
+    end
   end
 end

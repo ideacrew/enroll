@@ -52,13 +52,19 @@ RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
       allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
       allow(employer_profile).to receive_message_chain("broker_agency_accounts.detect").and_return(broker_agency_account)
       @broker_notice = ShopBrokerNotices::BrokerHiredNotice.new(employer_profile, valid_parmas)
-    end
-    it "should build notice with all necessory info" do
       @broker_notice.build
+    end
+    it "returns broker full name" do
       expect(@broker_notice.notice.primary_fullname).to eq broker_agency_profile.primary_broker_role.person.full_name
-      expect(@broker_notice.notice.er_legal_name).to eq employer_profile.legal_name.titleize
-      expect(@broker_notice.notice.er_first_name).to eq employer_profile.staff_roles.first.first_name
-      expect(@broker_notice.notice.er_last_name).to eq employer_profile.staff_roles.first.last_name
+    end
+    it "returns employer name" do
+      expect(@broker_notice.notice.employer_name).to eq employer_profile.legal_name.titleize
+    end
+    it "returns employer first name" do
+      expect(@broker_notice.notice.employer.employer_first_name).to eq employer_profile.staff_roles.first.first_name
+    end
+    it "returns employer last name" do
+      expect(@broker_notice.notice.employer.employer_last_name).to eq employer_profile.staff_roles.first.last_name
     end
   end
   
