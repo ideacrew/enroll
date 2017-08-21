@@ -2,6 +2,10 @@ require 'rails_helper'
 
 describe UsersController do
 
+  let(:admin) { FactoryGirl.create(:user, :with_family, :hbx_staff) }
+  let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: admin.person) }
+  let(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+
   after :all do
     DatabaseCleaner.clean
   end
@@ -25,6 +29,8 @@ describe UsersController do
   end
 
   describe ".lockable" do
+    let(:permission_yes) { FactoryGirl.create(:permission, can_lock_unlock: true) }
+    let(:permission_no) { FactoryGirl.create(:permission, can_lock_unlock: false) }
 
     context 'When admin is not authorized for lockable then User status can not be changed' do
       let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
@@ -68,111 +74,39 @@ describe UsersController do
     end
   end
 
-  describe '.reset_password' do
+  describe '.edit' do
     let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
-    context 'When admin is not authorized for reset password then' do
-      before do
-        hbx_staff_role.permission_id = permission_no.id
-        hbx_staff_role.save
-        sign_in(admin)
-        get :reset_password, id: user.id, format: :js
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url) }
+    before do
+      sign_in(admin)
+      get :edit, id: user.id, format: 'js'
+    end
+    it { expect(assigns(:user)).to eq(user) }
+    it { expect(response).to render_template('edit') }
+  end
+
+  describe '.update' do
+    let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
+    let(:new_user) { FactoryGirl.create(:user, :without_email) }
+    before do
+      sign_in(admin)
+      put :update, id: new_user.id, user: user_params, format: 'js'
     end
 
-    context 'When admin is authorized for reset password then' do
-      before do
-        hbx_staff_role.permission_id = permission_yes.id
-        hbx_staff_role.save
-        sign_in(admin)
-        get :reset_password, id: user.id, format: :js
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(response).to render_template('reset_password') }
+    context 'When email is not uniq then' do
+      let(:user_params) { {email: user.email} }
+      it { expect(assigns(:user)).to eq(new_user) }
+      it { expect(assigns(:user).errors.full_messages).to eq(['Email is already taken']) }
+      it { expect(response).to render_template('update') }
+    end
+
+    context 'When email is uniq then' do
+      let(:user_params) { {email: 'hello@employee.com'} }
+      subject(:result) { User.find(new_user.id) }
+      it { expect(assigns(:user)).to eq(new_user) }
+      it { expect(assigns(:user).email).to eq('hello@employee.com') }
+      it { expect(result.errors.full_messages).to eq([]) }
+      it { expect(response).to render_template('update') }
     end
   end
 
-  describe '.confirm_reset_password' do
-
-    context 'When admin is not authorized for reset password then' do
-      let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
-      before do
-        hbx_staff_role.permission_id = permission_no.id
-        hbx_staff_role.save
-        sign_in(admin)
-        put :confirm_reset_password, id: user.id, format: :js
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(user.reset_password_token).to be_nil }
-      it { expect(user.reset_password_sent_at).to be_nil }
-      it { expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url) }
-    end
-
-    context 'When user email not present then' do
-      let!(:user) { FactoryGirl.create(:user, :without_email, :with_family) }
-      before do
-        hbx_staff_role.permission_id = permission_yes.id
-        hbx_staff_role.save
-        sign_in(admin)
-        put :confirm_reset_password, id: user.id, user: { email: '' }, format: :js
-        user.reload
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:error)).to eq('Please enter a valid email') }
-      it { expect(user.reset_password_token).to be_nil }
-      it { expect(user.reset_password_sent_at).to be_nil }
-      it { expect(response).to render_template('users/reset_password.js.erb') }
-    end
-
-    context 'When user email is not valid then' do
-      let!(:user) { FactoryGirl.create(:user, :without_email, :with_family) }
-      before do
-        hbx_staff_role.permission_id = permission_yes.id
-        hbx_staff_role.save
-        sign_in(admin)
-        put :confirm_reset_password, id: user.id, user: { email: 'hello' }, format: :js
-        user.reload
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:error)).to eq('Email is invalid') }
-      it { expect(user.reset_password_token).to be_nil }
-      it { expect(user.reset_password_sent_at).to be_nil }
-      it { expect(response).to render_template('users/reset_password.js.erb') }
-    end
-
-    context 'When user email is not unique then' do
-      let(:user1) { FactoryGirl.create(:user, :with_consumer_role) }
-      let!(:user) { FactoryGirl.create(:user, :without_email, :with_family) }
-      before do
-        hbx_staff_role.permission_id = permission_yes.id
-        hbx_staff_role.save
-        sign_in(admin)
-        put :confirm_reset_password, id: user.id, user: { email: user1.email }, format: :js
-        user.reload
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:error)).to eq('Email is already taken') }
-      it { expect(user.reset_password_token).to be_nil }
-      it { expect(user.reset_password_sent_at).to be_nil }
-      it { expect(response).to render_template('users/reset_password.js.erb') }
-    end
-
-    context 'When admin is authorized for reset password then' do
-      let!(:user) { FactoryGirl.create(:user, :with_consumer_role) }
-      before do
-        hbx_staff_role.permission_id = permission_yes.id
-        hbx_staff_role.save
-        sign_in(admin)
-        put :confirm_reset_password, id: user.id, format: :js
-        user.reload
-      end
-      it { expect(assigns(:user)).to eq(user) }
-      it { expect(assigns(:error)).to be_nil }
-      it { expect(user.reset_password_token).not_to be_nil }
-      it { expect(user.reset_password_sent_at).not_to be_nil }
-      it { expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url) }
-    end
-
-  end
 end

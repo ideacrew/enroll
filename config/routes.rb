@@ -27,7 +27,8 @@ Rails.application.routes.draw do
       get :reset_password, :lockable, :confirm_lock
       put :confirm_reset_password
       post :unlock
-      get :login_history
+      get :lockable, :confirm_lock, :login_history, :edit
+      put :update
     end
   end
 
@@ -265,10 +266,10 @@ Rails.application.routes.draw do
     end
 
     resources :employer_attestations do
-       get 'authorized_download'
-       get 'verify_attestation'
-       delete 'delete_attestation_documents'
-       #get 'revert_attestation'
+      get 'authorized_download'
+      get 'verify_attestation'
+      delete 'delete_attestation_documents'
+      #get 'revert_attestation'
     end
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
@@ -536,8 +537,8 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
   resources :documents, only: [ :new, :create, :destroy, :update] do
-      get :document_reader,on: :member
-      get :autocomplete_organization_legal_name, :on => :collection
+    get :document_reader,on: :member
+    get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
       get :show_docs

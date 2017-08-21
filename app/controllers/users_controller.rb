@@ -42,17 +42,19 @@ class UsersController < ApplicationController
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
   end
 
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    @user.update_attributes(email_update_params)
+  end
+
   private
 
-  def reset_password_params
+  def email_update_params
     params.require(:user).permit(:email)
   end
 
-  def validate_email
-     @error = if params[:user][:email].blank?
-               'Please enter a valid email'
-              elsif params[:user].present? && !@user.update_attributes(reset_password_params)
-                @user.errors.full_messages.join.gsub('(optional) ', '')
-              end
-  end
 end
