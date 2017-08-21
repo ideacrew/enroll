@@ -11,20 +11,20 @@ namespace :reports do
     count = 0
     families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => 'enrolled_contingent')
     if families.present?
-      file_name = "#{Rails.root}/public/outstanding_documents_report_#{Time.now.utc.strftime('%Y%m%dT%H%M%S')}.csv"
+      file_name = "#{Rails.root}/public/outstanding_documents_report_#{TimeKeeper.date_of_record.strftime('%Y-%m-%d')}.csv"
       CSV.open(file_name, 'w', force_quotes: true) do |csv|
         csv << %w[HBX_ID First_Name Last_Name Number_of_Documents Due_Date Review_Color]
         families.each do |family|
           person = family.primary_applicant.person
           document_count = documents_count(person)
-          due_date = family.min_verification_due_date_on_family
+          min_verification_due_date = family.min_verification_due_date || TimeKeeper.date_of_record + 95.days
           status = review_button_class(family)
           color = color_scheme(status)
           csv << [person.hbx_id,
                   person.first_name,
                   person.last_name,
                   document_count,
-                  due_date,
+                  min_verification_due_date,
                   color]
           count += 1
         end
