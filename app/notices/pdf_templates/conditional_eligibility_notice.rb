@@ -11,13 +11,13 @@ module PdfTemplates
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :first_name, String
-    attribute :last_name, String
+    # attribute :last_name, String
     attribute :due_date, String
-    attribute :due_date, String
-    attribute :due_date, String
+    # attribute :first_name, String
 
-    attribute :due_date, String
-    attribute :due_date, String
+
+    # attribute :application_date, String
+    # attribute :due_date, String
     
 
     def other_enrollments

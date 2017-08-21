@@ -11,9 +11,21 @@ class IvlNotices::ConsumerNotice < IvlNotice
     super(args)
   end
 
+  def deliver
+    build
+    generate_pdf_notice
+    attach_envelope
+    upload_and_send_secure_message
+    send_generic_notice_alert
+  end
+
+  def attach_envelope
+  end
+
   def build
     family = recipient.primary_family    
     notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.first_name = recipient.first_name
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
@@ -26,7 +38,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+    enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments)
+    enrollments.select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -67,8 +80,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # enrollments.each {|e| e.update_attributes(special_verification_period: Date.today + 95.days)}
 
     append_unverified_individuals(outstanding_people)
+    # binding.pry
     notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
-    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
+    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y") rescue ""
   end
 
   def ssn_outstanding?(person)
