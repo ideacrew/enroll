@@ -310,7 +310,6 @@ class FinancialAssistance::Application
   end
 
   def tax_households
-    return nil unless family.active_household.tax_households.present?
     family.active_household.tax_households.where(application_id: id.to_s)
   end
 

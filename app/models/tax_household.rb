@@ -99,7 +99,6 @@ class TaxHousehold
   def total_aptc_available_amount_for_enrollment(hbx_enrollment)
     return 0 if hbx_enrollment.blank?
     hbx_enrollment.hbx_enrollment_members.reduce(0) do |sum, member|
-      sum = 0 if sum.nil?
       sum + ( aptc_available_amount_by_member[member.applicant_id.to_s] || 0)
     end
   end
