@@ -120,7 +120,7 @@ Then(/^the user will navigate to the FAA Household Info: Family Members page$/) 
   expect(page).to have_content('Household Info: Family Members')
 end
 
-When(/^the user clicks the PREVIOUS  link$/) do
+When(/^the user clicks the PREVIOUS link$/) do
   find('.interaction-click-control-previous').trigger 'click'
 end
 

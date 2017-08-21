@@ -32,7 +32,7 @@ Feature:	A dedicated page that improves visibility & ensures that the user is ma
 
 	Scenario: User clicks PREVIOUS or the BACK browser button
 		Given	the user is on the Help Paying For Coverage page
-		When the user clicks the PREVIOUS  link
+		When the user clicks the PREVIOUS link
 		And navigates to the Verify Identity page
 
 	Scenario: User clicks Save & Exit
