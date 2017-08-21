@@ -65,7 +65,7 @@
     // check time until logout
     function check_time_until_logout(){
       $.ajax({
-        url: '/check_time_until_logout',
+	url: '<%= check_time_until_logout_path %>',
         type: 'GET',
         success: function(response){
         },
@@ -73,7 +73,7 @@
         }
       });
     }
-    setTimeout(check_time_until_logout, 87000);
+    var logout_check_timer = setTimeout(check_time_until_logout, 87000);
   </script>
 <% end %>
 <script>
