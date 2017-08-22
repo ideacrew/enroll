@@ -105,7 +105,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
-    notice.coverage_year = bc_period.start_on.year
   end
 
   def check_for_unverified_individuals
@@ -133,10 +132,18 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
     # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
 
-    enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}.each do |enrollment|
+    hbx_enrollments = []
+    en = enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}
+    health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:effective_on).last
+    dental_enrollment = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:effective_on).last
+    hbx_enrollments << health_enrollment
+    hbx_enrollments << dental_enrollment
+
+    hbx_enrollments.compact.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
     end
-    notice.due_date = enrollments.first.special_verification_period.strftime("%B %d, %Y")
+    notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
+    notice.due_date = hbx_enrollments.compact.first.special_verification_period.strftime("%B %d, %Y")
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
