@@ -211,7 +211,7 @@ class Insured::PlanShoppingsController < ApplicationController
     if primary_family.active_approved_application.present?
       family_member_ids.each do |key, member_id|
         applicant = primary_family.active_approved_application.applicants.where(family_member_id: member_id).first
-        if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
+        if applicant.non_ia_eligible?
           return false
         end
         tax_household = primary_family.active_approved_application.tax_household_for_family_member(member_id)
@@ -223,7 +223,7 @@ class Insured::PlanShoppingsController < ApplicationController
         primary_family.active_household.tax_households.each do |thh|
           tax_household_member = thh.tax_household_members.where(applicant_id: member_id).first
           if tax_household_member.present?
-            if tax_household_member.is_medicaid_chip_eligible == true || tax_household_member.is_without_assistance == true || tax_household_member.is_totally_ineligible == true
+            if tax_household_member.non_ia_eligible?
               return false
             end
             csr_kind = thh.current_csr_eligibility_kind

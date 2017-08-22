@@ -472,7 +472,7 @@ class Plan
             if !app_ids.include?(nil)
               tax_households.each do |tax_household|
                 tax_household.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
-                  if applicant.is_medicaid_chip_eligible == true || applicant.is_without_assistance == true || applicant.is_totally_ineligible == true
+                  if applicant.non_ia_eligible?
                     csr_kinds << "csr_100"
                   else
                     csr_kinds << tax_household.current_csr_eligibility_kind
@@ -482,7 +482,7 @@ class Plan
             else
               tax_households.each do |tax_household|
                 tax_household.tax_household_members.where(:applicant_id.in => family_member_ids).each do |tax_household_member|
-                  if tax_household_member.is_medicaid_chip_eligible == true || tax_household_member.is_without_assistance == true || tax_household_member.is_totally_ineligible == true
+                  if tax_household_member.non_ia_eligible?
                     csr_kinds << "csr_100"
                   else
                     csr_kinds << tax_household.current_csr_eligibility_kind

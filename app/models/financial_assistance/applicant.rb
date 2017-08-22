@@ -159,8 +159,12 @@ class FinancialAssistance::Applicant
     is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
   end
 
+  def non_ia_eligible?
+    (is_medicaid_chip_eligible || is_without_assistance || is_totally_ineligible) && !is_ia_eligible
+  end
+
   def is_medicaid_chip_eligible?
-    is_medicaid_chip_eligible
+    is_medicaid_chip_eligible && !is_ia_eligible && !is_without_assistance && !is_totally_ineligible
   end
 
   def is_tax_dependent?

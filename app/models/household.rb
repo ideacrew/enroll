@@ -402,12 +402,9 @@ class Household
   end
 
   def eligibility_determinations_for_year(year)
-    eds = []
-    tax_households.tax_household_with_year(year).each do |th|
-      th.eligibility_determinations.each do |ed|
-        eds << ed
-      end
+    tax_households.tax_household_with_year(year).inject([]) do |ed, th|
+      ed << th.eligibility_determinations
+      ed.flatten
     end
-    eds
   end
 end
