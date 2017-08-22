@@ -8,13 +8,6 @@ module PdfTemplates
     attribute :phone, String
     attribute :email, String
     attribute :web_address, String
-    attribute :employer_profile, EmployerProfile
-    attribute :broker_agency_profile, BrokerAgencyProfile
-    attribute :terminated_broker_account, BrokerAgencyAccount
-    attribute :hbe, PdfTemplates::Hbe
-    attribute :primary_address, PdfTemplates::NoticeAddress
-    attribute :mpi_indicator, String
-    attribute :employer_name
     attribute :first_name, String
     attribute :last_name, String
     attribute :assignment_date, Date

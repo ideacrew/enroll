@@ -79,8 +79,8 @@ RSpec.describe ShopBrokerNotices::BrokerAgencyFiredNotice do
       expect(@broker_notice.notice.first_name).to eq person.first_name
       expect(@broker_notice.notice.last_name).to eq person.last_name
       expect(@broker_notice.notice.primary_fullname).to eq organization.broker_agency_profile.try(:legal_name)
-      expect(@broker_notice.notice.organization).to eq organization.legal_name
       expect(@broker_notice.notice.employer_name).to eq employer_profile.try(:legal_name)
+      expect(@broker_notice.notice.broker).to be_an_instance_of(PdfTemplates::Broker)
     end
   end
 end

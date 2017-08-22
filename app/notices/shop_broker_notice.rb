@@ -6,6 +6,9 @@ class ShopBrokerNotice < Notice
   attr_accessor :employer_profile
 
   def initialize(args = {})
+    args[:market_kind]= 'shop'
+    args[:notice] = PdfTemplates::BrokerNotice.new
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 

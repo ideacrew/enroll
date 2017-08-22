@@ -4,16 +4,13 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
 
   def initialize(employer_profile, args = {})
     self.employer_profile = employer_profile
-    self.broker_agency_profile = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile
-    self.terminated_broker_account = employer_profile.broker_agency_accounts.unscoped.last
-    broker_person = broker_agency_profile.try(:primary_broker_role).try(:person)
+    self.broker_agency_profile = employer_profile.broker_agency_accounts.unscoped.select{ |b| b.is_active == false}.sort_by(&:created_at).last.broker_agency_profile
+    self.terminated_broker_account = employer_profile.broker_agency_accounts.unscoped.select{ |b| b.is_active == false}.sort_by(&:created_at).last
+    broker_person = broker_agency_profile.primary_broker_role.person
     args[:recipient] = broker_person
-    args[:market_kind]= 'shop'
-    args[:notice] = PdfTemplates::Broker.new
-    args[:to] = broker_agency_profile.try(:legal_name)
-    args[:name] = broker_agency_profile.try(:legal_name)
+    args[:to] = broker_agency_profile.legal_name
+    args[:name] = broker_agency_profile.legal_name
     args[:recipient_document_store]= broker_person
-    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
@@ -47,16 +44,22 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
     return if person.blank? || location.blank?
     notice.first_name = person.first_name
     notice.last_name = person.last_name
-    notice.primary_fullname = self.broker_agency_profile.try(:legal_name)
-    notice.organization = broker.legal_name
-    notice.phone = location.phone.try(:to_s)
-    notice.email = (person.home_email || person.work_email).try(:address)
-    notice.web_address = broker.home_page
+    notice.primary_fullname = self.broker_agency_profile.legal_name
+    # notice.organization = broker.legal_name
+    notice.broker = PdfTemplates::Broker.new({
+      organization: broker.legal_name,
+      phone: location.phone,
+      email: (person.home_email || person.work_email).address,
+      web_address: broker.home_page
+    })
+    # notice.phone = location.phone.try(:to_s)
+    # notice.email = (person.home_email || person.work_email).try(:address)
+    # notice.web_address = broker.home_page
     notice.mpi_indicator = self.mpi_indicator
     notice.employer_profile = self.employer_profile
     notice.broker_agency_profile = self.broker_agency_profile
     notice.terminated_broker_account = self.terminated_broker_account
-    notice.employer_name = self.employer_profile.try(:legal_name)
+    notice.employer_name = self.employer_profile.legal_name
   end
 
 end

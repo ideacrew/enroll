@@ -613,7 +613,7 @@ shop_notice_triggers = [
   },
   {
       hbx_id: 'SHOP_D050',
-      title: 'Broker Terminated by Employer',
+      title: 'Broker Agency Fired',
       description: 'PDF Generation for Broker after Termination',
       resource_name: 'employer',
       event_name: 'broker_termination_notice',
