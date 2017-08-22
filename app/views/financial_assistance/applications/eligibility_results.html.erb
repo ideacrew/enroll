@@ -38,7 +38,7 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <p>These people are <span>eligible for savings of $137 per month</span> called an <a class="glossary_lookup">advance premium tax credit</a>. This means they won't have to pay full price for health insurance.</p>
+              <p>These people are <span>eligible for savings of <%= total_aptc_across_tax_households(params[:id])%> per month</span> called an <a class="glossary_lookup">advance premium tax credit</a>. This means they won't have to pay full price for health insurance.</p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
                 <div class="er-prsn mt-15">
@@ -111,7 +111,7 @@
             </div>
           </div>
           <p class="mt-10">If you do not agree with this determination, you have the right to appeal. <a href="">Find out more about the appeal process</a> or <a href="">get assistance</a> by contacting us directly.</p>
-          <p class="mb-0">Your application reference number is <b>190009446</b>.</p>
+          <p class="mb-0">Your application reference number is <b><%= params[:id]%></b>.</p>
         </div>
       </div>
     </div>

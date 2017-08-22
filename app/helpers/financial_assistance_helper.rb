@@ -12,6 +12,15 @@ module FinancialAssistanceHelper
     return sum
   end
 
+  def total_aptc_across_tax_households(application_id)
+    application = FinancialAssistance::Application.find(application_id)
+    total_aptc = 0.0
+    application.tax_households.each do |thh|
+      total_aptc += thh.preferred_eligibility_determination.max_aptc
+    end
+    total_aptc
+  end
+
   def eligible_applicants application_id, eligibility_flag
     application = FinancialAssistance::Application.find(application_id)
     application.applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
