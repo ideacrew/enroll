@@ -126,4 +126,12 @@ module FinancialAssistanceHelper
   def left_nav_css(conditional)
     'cna disabled' unless conditional
   end
+
+  def claim_eligible_tax_dependents
+    @application.applicants.inject({}) do |memo, applicant|
+      memo.merge! applicant.person.full_name => applicant.id.to_s if (applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id)
+      memo
+    end
+  end
+
 end
