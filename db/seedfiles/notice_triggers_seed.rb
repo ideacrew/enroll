@@ -402,6 +402,27 @@ shop_notice_triggers = [
     ]
   },
   {
+      hbx_id: 'SHOP21',
+      title: 'Your Renewal Invoice for Employer Sponsored Coverage is Now Available',
+      description: 'When groups renewal invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment. This notice is not sent when initial invoice is not generated.',
+      resource_name: 'employer',
+      event_name: 'renewal_employer_invoice_available',
+      notice_triggers: [
+          {
+              name: 'Employer monthly invoice available in the account',
+              notice_template: 'notices/shop_employer_notices/renewal_employer_invoice_available_notice',
+              notice_builder: 'ShopEmployerNotices::RenewalEmployerInvoiceAvailable',
+              mpi_indicator: 'SHOP_D021',
+              notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["employer"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+  },
+  {
     hbx_id: 'SHOP26',
     title: 'First Reminder to publish Application',
     description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
