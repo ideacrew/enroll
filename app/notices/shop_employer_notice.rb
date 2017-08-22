@@ -13,13 +13,14 @@ class ShopEmployerNotice < Notice
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
     self.key = args[:key]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
   def deliver
     build
     generate_pdf_notice
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -27,6 +28,7 @@ class ShopEmployerNotice < Notice
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
