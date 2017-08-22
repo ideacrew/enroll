@@ -1,4 +1,9 @@
 module Config::SiteHelper
+
+  def site_redirect_on_timeout_route
+    Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
+  end
+  
   def site_byline
     Settings.site.byline
   end
