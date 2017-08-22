@@ -13,9 +13,5 @@ module PdfTemplates
     attribute :assignment_date, Date
     attribute :full_name, String
     attribute :hbx_id, String
-
-    def shop?
-      false
-    end
   end
 end
