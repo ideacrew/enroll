@@ -18,13 +18,13 @@ class ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment < ShopEmployee
 
     enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :responsible_amount => enrollment.total_employer_contribution,
-      :employee_cost => enrollment.total_employee_cost,
+      :employer_contribution => enrollment.total_employer_contribution,
+      :employee_cost => enrollment.total_employee_cost
       })
 
     plan = enrollment.plan
     notice.plan = PdfTemplates::Plan.new({
-      :plan_name => plan.try(:name)
+      :plan_name => plan.name
       })
   end
 end
