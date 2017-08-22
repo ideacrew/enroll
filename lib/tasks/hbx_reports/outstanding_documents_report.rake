@@ -16,7 +16,7 @@ namespace :reports do
         csv << %w[HBX_ID First_Name Last_Name Number_of_Documents Due_Date Review_Color]
         families.each do |family|
           person = family.primary_applicant.person
-          document_count = documents_count(person)
+          document_count = documents_count(family)
           min_verification_due_date = family.min_verification_due_date || TimeKeeper.date_of_record + 95.days
           status = review_button_class(family)
           color = color_scheme(status)
