@@ -801,7 +801,7 @@ class PlanYear
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
       transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
-      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => :initial_employer_ineligibility_notice
+      transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
       transitions from: :active, to: :terminated, :guard => :is_event_date_valid?
@@ -879,6 +879,11 @@ class PlanYear
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
       transitions from: [:active, :suspended], to: :terminated
+    end
+
+    # Coverage reinstated
+    event :reinstate_plan_year, :after => :record_transition do
+      transitions from: :terminated, to: :active
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1040,6 +1045,13 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
       self.employer_profile.trigger_notices("zero_employees_on_roster")
+    end
+  end
+
+  def notify_employee_of_initial_employer_ineligibility
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.census_employees.non_terminated.each do |ce|
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_initial_employer_ineligibility")
     end
   end
 

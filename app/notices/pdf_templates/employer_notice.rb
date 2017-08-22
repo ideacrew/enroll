@@ -26,5 +26,11 @@ module PdfTemplates
     def broker?
       return false
     end
+
+    def employee_notice?
+      false
+    end
+
+
   end
 end
