@@ -23,7 +23,7 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
     writing_agent= BrokerRole.by_npn(ENV['npn']).first
 
     if org.blank? && writing_agent.present?
-      broker_agency_profile = BrokerAgencyProfile.create!(market_kind: ENV['market_kind'],
+      broker_agency_profile = BrokerAgencyProfile.new(market_kind: ENV['market_kind'],
                                                           entity_kind: "s_corporation",
                                                           primary_broker_role_id: writing_agent.id,
                                                           default_general_agency_profile_id: ENV['defualt_general_agency_id'])
@@ -78,7 +78,7 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
 
     feins = ENV['org_fein'].split(' ').uniq
     writing_agent= BrokerRole.by_npn(ENV['npn']).first
-    broker_agency_profile= broker_role.broker_agency_profile
+    broker_agency_profile= writing_agent.broker_agency_profile
 
     if feins.present? && writing_agent.present? && broker_agency_profile.present?
       feins.each do |fein|
@@ -100,10 +100,10 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
   def update_family_broker_agency_accounts
     return "NPN not found" if ENV['npn'].blank? && !Rails.env.test?
 
-    writing_agent= BrokerRole.by_npn(ENV['npn'])
-    broker_agency_profile= broker_role.broker_agency_profile
+    writing_agent= BrokerRole.by_npn(ENV['npn']).first
+    broker_agency_profile= writing_agent.broker_agency_profile
 
-    if broker_role.present? && broker_agency_profile.present?
+    if writing_agent.present? && broker_agency_profile.present?
     Family.where(:broker_agency_accounts.exists=>true,:'broker_agency_accounts'=> {:$elemMatch => {:writing_agent_id=>BSON::ObjectId(writing_agent.id)}}).each do |fam|
       fam.broker_agency_accounts.unscoped.each do |agency_account|
         if agency_account.writing_agent_id == BSON::ObjectId(writing_agent.id)
