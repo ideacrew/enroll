@@ -15,7 +15,7 @@
             <%= member.full_name%> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= member.age %>
           </td>
           <td class="small">
-            <%= member.documents_due_date.strftime("%B %d, %Y") %>
+            <%= member.documents_due_date.strftime("%B %d, %Y") rescue "" %>
           </td>
         </tr>
       <%end%>

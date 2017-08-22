@@ -16,7 +16,7 @@ module PdfTemplates
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
-    attribute :individuals, Array[PdfTemplates::Individual]
+    attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
@@ -123,6 +123,7 @@ module PdfTemplates
     end
 
     def aqhp_enrollments
+      puts enrollments.inspect
       enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
     end
 

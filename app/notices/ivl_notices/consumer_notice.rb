@@ -15,11 +15,27 @@ class IvlNotices::ConsumerNotice < IvlNotice
     build
     generate_pdf_notice
     attach_envelope
+    # attach_blank_page(notice_path)
+    # attach_required_documents
+    # join_pdfs [notice_path, custom_notice_path]
+    # clear_tmp
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def attach_envelope
+  end
+
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+  end
+
+  def clear_tmp
+    File.delete(custom_notice_path)
+  end
+
+  def custom_notice_path
+    Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
   end
 
   def build
@@ -81,9 +97,22 @@ class IvlNotices::ConsumerNotice < IvlNotice
     # enrollments.each {|e| e.update_attributes(special_verification_period: Date.today + 95.days)}
 
     append_unverified_individuals(outstanding_people)
-    # binding.pry
-    notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
-    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y") rescue ""
+
+    # notice.enrollments << enrollments.each{|e| return build_enrollment(e) if e.enrolled_contingent?}
+    notice.due_date = TimeKeeper.date_of_record #enrollments.first.special_verification_period.strftime("%m/%d/%Y")  rescue ""
+  end
+
+   def build_enrollment(hbx_enrollment)
+    PdfTemplates::Enrollment.new({
+      plan_name: hbx_enrollment.plan.name,
+      premium: hbx_enrollment.total_premium,
+      phone: hbx_enrollment.phone_number,
+      effective_on: hbx_enrollment.effective_on,
+      selected_on: hbx_enrollment.created_at,
+      enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
+        names << member.person.full_name.titleize
+      end
+    })
   end
 
   def ssn_outstanding?(person)
