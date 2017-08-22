@@ -59,4 +59,24 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder do
     end
   end
 
+  describe "Rendering environment_notice template and genearte pdf" do
+    before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
+      @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_parmas)
+    end
+
+    it "should render environment_notice" do
+      expect(@eligibility_notice.template).to eq "notices/ivl/enrollment_notice"
+    end
+
+    it "should generate pdf" do
+      @eligibility_notice.append_hbe
+      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
+      @eligibility_notice.build
+      file = @eligibility_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
+
 end
