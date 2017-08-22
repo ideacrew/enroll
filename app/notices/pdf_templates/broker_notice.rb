@@ -27,5 +27,13 @@ module PdfTemplates
     def shop?
       return true
     end
+
+    def employee_notice?
+      return true
+    end
+
+    def broker?
+      return true
+    end
   end
 end

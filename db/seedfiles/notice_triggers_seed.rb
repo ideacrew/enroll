@@ -616,7 +616,7 @@ shop_notice_triggers = [
       title: 'Broker Agency Fired',
       description: 'PDF Generation for Broker after Termination',
       resource_name: 'employer',
-      event_name: 'broker_termination_notice',
+      event_name: 'broker_agency_termination_notice',
       notice_triggers: [
           {
               name: 'Employee termination notice by employer',
