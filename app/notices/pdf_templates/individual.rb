@@ -4,6 +4,7 @@ module PdfTemplates
 
     attribute :first_name, String
     attribute :full_name, String
+    attribute :last_name, String
     attribute :age, String
     attribute :ssn_verified, Boolean, :default => false
     attribute :citizenship_verified, Boolean, :default => false

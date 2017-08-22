@@ -17,7 +17,6 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     generate_pdf_notice
     attach_blank_page
     attach_voter_application
-    # prepend_envelope
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -36,6 +35,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   def build
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
+    notice.coverage_year = TimeKeeper.date_of_record.next_year.year
     family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
@@ -48,9 +48,13 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def append_data
+    notice.has_applied_for_assistance
+    notice.irs_consent_needed
+
     notice.individuals=data.collect do |datum|
         person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
         PdfTemplates::Individual.new({
+          :first_name => person.first_name,
           :full_name => person.full_name,
           :incarcerated=> datum["ea_incarcerated"].try(:upcase) == "FALSE" ? "No" : "Yes",
           :citizen_status=> citizen_status(datum["ea_citizenship"]),
@@ -78,15 +82,15 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   def citizen_status(status)
     case status
     when "us_citizen"
-      "U.S. Citizen"
+      "US Citizen"
     when "alien_lawfully_present"
       "Lawfully Present"
     when "indian_tribe_member"
-      "U.S. Citizen"
+      "US Citizen"
     when "naturalized_citizen"
-      "U.S. Citizen"
+      "US Citizen"
     else
-      "Not Lawfully Present"
+      "Ineligible Immigration Status"
     end
   end
 

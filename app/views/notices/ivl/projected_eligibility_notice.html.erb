@@ -6,10 +6,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>UPDATE YOUR INFORMATION BY <%= (TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y") %></td>
-      <td>UPDATE YOUR INFORMATION BY <%= (TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y") %>
-      IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <coverage year>
-      </td>
+      <% if notice.has_applied_for_assistance && !notice.irs_consent_needed %>
+        <td>UPDATE YOUR INFORMATION BY <%= (TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y") %>
+        IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <coverage year>
+        </td>
+      <% else %>
+        <td>UPDATE YOUR INFORMATION BY <%= (TimeKeeper.date_of_record + 35.days).strftime("%B %d, %Y") %></td>
+      <% end %>
     </tr>
   </tbody>
 </table>
@@ -30,37 +33,36 @@
    heading: 'Here’s What You Need to Do Now', sub_heading: ''} %>
 
 <!-- [IF AQHP=YES AND IRS CONSENT FOR UPCOMING COVERAGE YEAR = NO] -->
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "<strong>Types of cost-sharing include:</strong>",
-  listings: ["Call us as soon as possible if you still need help paying for coverage in <coverage year>",
-             "Review your household information, and make sure it’s correct",
-             "Let us know by <Date of letter + 35 days> if you need to update your household information for <coverage year>",
-             "Review your projected eligibility results for <coverage year>"]} %>
+<% if notice.has_applied_for_assistance && !notice.irs_consent_needed %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    listings: ["Call us as soon as possible if you still need help paying for coverage in #{notice.coverage_year}",
+               "Review your household information, and make sure it’s correct",
+               "Let us know by <Date of letter + 35 days> if you need to update your household information for #{notice.coverage_year}",
+               "Review your projected eligibility results for #{notice.coverage_year}"]} %>
 <!-- [IF AQHP=YES AND IRS CONSENT FOR UPCOMING COVERAGE YEAR = NO] -->
-
+<% else %>
 <!-- IRS CONSENT FOR UPCOMING COVERAGE YEAR = NO] -->
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "<strong>Types of cost-sharing include:</strong>",
-  listings: ["Call us as soon as possible if you still need help paying for coverage in <coverage year>",
-             "Review your household information, and make sure it’s correct",
-             "Let us know by <Date of letter + 35 days> if you need to update your household information for <coverage year>",
-             "Review your projected eligibility results for <coverage year>"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    listings: ["Review your household information, and make sure it’s correct",
+               "Let us know by <Date of letter + 35 days> if you need to update your household information for #{notice.coverage_year}",
+               "Review your projected eligibility results for #{notice.coverage_year}"]} %>
+<% end %>
 <!-- IRS CONSENT FOR UPCOMING COVERAGE YEAR = NO] -->
 
 <!-- All -->
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "<strong>Types of cost-sharing include:</strong>",
-  listings: ["Call us as soon as possible if you still need help paying for coverage in <coverage year>",
+  listings: ["Call us as soon as possible if you still need help paying for coverage in #{notice.coverage_year}",
              "Review your household information, and make sure it’s correct",
-             "Let us know by <Date of letter + 35 days> if you need to update your household information for <coverage year>",
-             "Review your projected eligibility results for <coverage year>"]} %>
+             "Let us know by <Date of letter + 35 days> if you need to update your household information for #{notice.coverage_year}",
+             "Review your projected eligibility results for #{notice.coverage_year}"]} %>
  <!-- All -->
 
-
+<% unless notice.irs_consent_needed %>
 <!-- if irs consent = NO -->
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in <coverage year>, call DC Health Link as soon as possible at (855) 532-5465. Tell customer service that you want to update your IRS consent."],
-   heading: 'It’s Urgent that You Call Us if You Still Need Help Paying for Coverage', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: ["The federal government requires us to verify your household income every year to see if you’re still eligible for help paying for coverage. We do this by checking tax data from the Internal Revenue Service (IRS), but need your consent. If you do not give us permission to check IRS data, you can’t get help paying for coverage.", "If you want to continue to receive a tax credit to help pay your monthly premiums, or cost-sharing reductions that lower other health care costs in #{notice.coverage_year}, call DC Health Link as soon as possible at (855) 532-5465. Tell customer service that you want to update your IRS consent."],
+     heading: 'It’s Urgent that You Call Us if You Still Need Help Paying for Coverage', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+<% end %>
 <!-- if irs consent = NO -->
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -68,73 +70,74 @@
    heading: 'Review Your Household Information', sub_heading: ''} %>
 
 <!-- [If UQHP=YES] -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for <coverage year>, or if you need to add or remove someone, please let us know by <Date of Letter + 35 Days>. To make updates, login to your account at dchealthlink.com or call us at (855) 532-5465."} %>
+<% if notice.uqhp_individuals.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by <Date of Letter + 35 Days>. To make updates, login to your account at dchealthlink.com or call us at (855) 532-5465."} %>
 
-<!-- uqhp individuals -->
-<% notice.individuals.each do |member| %>
-  <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name],
-                             rows: [['DC Resident', "#{member.residency_verified}"],
-                                ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
-                                ['Incarcerated',"#{member.incarcerated}"]],
-    col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
-<%end%>
+  <!-- uqhp individuals -->
+  <% notice.uqhp_individuals.each do |member| %>
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: ["#{member.first_name} #{member.last_name}"],
+                               rows: [['DC Resident', "#{member.residency_verified}"],
+                                  ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
+                                  ['Incarcerated',"#{member.incarcerated}"]],
+      col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
+  <%end%>
 
-<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If your household meets certain income and other requirements, you may be able to get help paying for your health coverage in <coverage year>. There are several types of help that may be available to you:"],
-   heading: 'Need Help Paying for Your Health Plan?', sub_heading: '', top_margin: '8px'} %>
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+   contents: ["If your household meets certain income and other requirements, you may be able to get help paying for your health coverage in #{notice.coverage_year}. There are several types of help that may be available to you:"],
+     heading: 'Need Help Paying for Your Health Plan?', sub_heading: '', top_margin: '8px'} %>
 
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "",
-  listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage",
-            "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
-            "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
+  <%= render partial: 'notices/shared/unordered_list', locals: {
+    previous: "",
+    listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage",
+              "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance",
+              "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services"]} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "To see if you can get help, login to your account at dchealthlink.com, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at (855) 532-5465."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "To see if you can get help, login to your account at dchealthlink.com, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at (855) 532-5465."} %>
+<% end %>
  <!-- uqhp = YES -->
 
 <!-- [If AQHP=YES] -->
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in <coverage year>."} %>
+<% if notice.aqhp_individuals.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}."} %>
 
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
- content: "Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for <coverage year>, or if you need to add or remove someone, please let us know by <Date of Letter + 35 Days>. To make updates, login to your account at dchealthlink.com or call us at (855) 532-5465."} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by <Date of Letter + 35 Days>. To make updates, login to your account at dchealthlink.com or call us at (855) 532-5465."} %>
 
-<!-- aqhp individuals -->
-<% notice.individuals.each do |member| %>
-  <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name],
-                             rows: [['DC Resident', "#{member.residency_verified}"],
-                                ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
-                                ['Incarcerated',"#{member.incarcerated}"],
-                                ['Other Coverage', ""],
-                                ['Federal Tax Filing Status:', ""],
-                                ['Tax Household Size:', ""],
-                                ['Expected Income for <coverage year>',""]],
-    col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
-<%end%>
+  <!-- aqhp individuals -->
+  <% notice.aqhp_individuals.each do |member| %>
+    <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {headers: [member.full_name],
+                               rows: [['DC Resident', "#{member.residency_verified}"],
+                                  ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
+                                  ['Incarcerated',"#{member.incarcerated}"],
+                                  ['Other Coverage', "#{member.mec}"],
+                                  ['Federal Tax Filing Status:', "#{member.tax_status}"],
+                                  ['Tax Household Size:', "#{member.taxhh_count}"],
+                                  ['Expected Income for #{notice.coverage_year}',""]],
+      col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
+  <%end%>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Based on the information we have in our records about your household, your projected results are listed below. This is not a final eligibility decision. Your eligibility may change once we get more information from you, or from our electronic data sources. You will get another notice with your final eligibility determination for <Coverage Year> in about a month."],
-   heading: 'Your Projected Eligibility Results for <Coverage Year>', sub_heading: '', top_margin: '8px'} %>
+ contents: ["Based on the information we have in our records about your household, your projected results are listed below. This is not a final eligibility decision. Your eligibility may change once we get more information from you, or from our electronic data sources. You will get another notice with your final eligibility determination for #{notice.coverage_year} in about a month."],
+   heading: 'Your Projected Eligibility Results for #{notice.coverage_year}', sub_heading: '', top_margin: '8px'} %>
 
 <!-- [If likely MAGI Medicaid=YES] -->
-<%= render partial: 'notices/shared/unordered_family_listing', locals: {
-  previous: "<strong>Likely Qualify for Medicaid:</strong>",
-  listings: notice.magi_medicaid_eligible} %>
+<% if notice.magi_medicaid_eligible.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Likely Qualify for Medicaid:</strong>",
+    listings: notice.magi_medicaid_eligible} %>
+<% end %>
 
-
+<% if notice.aqhp_or_non_magi_medicaid_eligible.present? %>
 <!-- [If AQHP=YES for AQHP OR for NON MAGI MEDICAID ONLY] -->
-<%= render partial: 'notices/shared/unordered_family_listing', locals: {
-  previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
-  listings: notice.aqhp_individuals} %>
-
-
-<% if notice.aqhp_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
-    listings: notice.aqhp_individuals} %>
+    listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
+
   <% notice.tax_households.each do |thh|%>
     <% if thh.max_aptc > 0 %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
@@ -153,27 +156,27 @@
     <% case hh_csr.csr_percent_as_integer %>
     <% when 73 %>
       <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $1,300. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 87 %>
       <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 94 %>
       <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $2,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $0 instead of $25. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs. <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 100 %>
       <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% else %>
       <%= render partial: 'notices/shared/paragraph', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong> Those listed are also eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% end %>
   <% end %>
 <% end %>
 
-<% if notice.uqhp_individuals.present? %>
+<% if notice.uqhp_or_non_magi_medicaid_individuals.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
-    listings: notice.uqhp_individuals} %>
+    listings: notice.uqhp_or_non_magi_medicaid_individuals} %>
 <% end %>
 
 <% if notice.ineligible_applicants.present? %>
@@ -183,7 +186,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, it will not be automatically renewed. You must go to dchealthlink.com during open enrollment to enroll for <coverage year>.","Open enrollment for <coverage year> begins on <OE Start Date>, and ends on <OE End Date>."],
+ contents: ["If your plan is terminated, or cancelled for any reason before the end of the year, it will not be automatically renewed. You must go to dchealthlink.com during open enrollment to enroll for #{notice.coverage_year}.","Open enrollment for #{notice.coverage_year} begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")}, and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}."],
    heading: 'What if I Don’t Have a Plan Anymore?', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

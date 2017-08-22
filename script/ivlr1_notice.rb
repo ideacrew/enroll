@@ -18,12 +18,12 @@
           family_id
           hbx_id
         )
-  file_name = "#{Rails.root}/public/ivl_renewal_notice_1_report.csv"
+  file_name = "#{Rails.root}/public/projected_eligibility_notice_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
   CSV.open(file_name, "w", force_quotes: true) do |csv|
     csv << field_names
 
-    event_kind = ApplicationEventKind.where(:event_name => 'ivl_renewal_notice_1').first
+    event_kind = ApplicationEventKind.where(:event_name => 'projected_eligibility_notice').first
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |family_id , members|
       primary_member = members[0]
