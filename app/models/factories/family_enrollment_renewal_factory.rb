@@ -63,7 +63,7 @@ module Factories
           ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_unenrolled") unless disable_notifications
         end
       rescue Exception => e
-        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+        "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
 
       return family
@@ -260,7 +260,7 @@ module Factories
     end
   end
 
-  class FamilyEnrollmentRenewalFactoryError < StandardError; end
+class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
 
 

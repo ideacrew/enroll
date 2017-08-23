@@ -650,13 +650,25 @@ class EmployerProfile
         employer_enroll_factory.date = new_date
 
         organizations_for_plan_year_begin(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.begin
+          begin
+            puts "START START FOR #{organization.legal_name} - #{Time.now}"
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.begin
+            puts "PROCESSED START FOR #{organization.legal_name} - #{Time.now}"
+          rescue Exception => e
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year begin" }
+          end
         end
 
         organizations_for_plan_year_end(new_date).each do |organization|
-          employer_enroll_factory.employer_profile = organization.employer_profile
-          employer_enroll_factory.end
+          begin
+            puts "START END FOR #{organization.legal_name} - #{Time.now}"
+            employer_enroll_factory.employer_profile = organization.employer_profile
+            employer_enroll_factory.end
+            puts "PROCESSED END FOR #{organization.legal_name} - #{Time.now}"
+          rescue Exception => e
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year end" }
+          end
         end
 
         if new_date.day == Settings.aca.shop_market.renewal_application.force_publish_day_of_month
@@ -679,7 +691,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error {e}"
+              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
@@ -687,7 +699,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
+              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         else
@@ -697,7 +709,7 @@ class EmployerProfile
               begin
                 organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
               rescue Exception => e
-                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
+                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
               end
             end
           end
