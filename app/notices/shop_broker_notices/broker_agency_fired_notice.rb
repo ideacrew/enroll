@@ -45,16 +45,12 @@ class ShopBrokerNotices::BrokerAgencyFiredNotice < ShopBrokerNotice
     notice.first_name = person.first_name
     notice.last_name = person.last_name
     notice.primary_fullname = self.broker_agency_profile.legal_name
-    # notice.organization = broker.legal_name
     notice.broker = PdfTemplates::Broker.new({
       organization: broker.legal_name,
       phone: location.phone,
       email: (person.home_email || person.work_email).address,
       web_address: broker.home_page
     })
-    # notice.phone = location.phone.try(:to_s)
-    # notice.email = (person.home_email || person.work_email).try(:address)
-    # notice.web_address = broker.home_page
     notice.mpi_indicator = self.mpi_indicator
     notice.employer_profile = self.employer_profile
     notice.broker_agency_profile = self.broker_agency_profile
