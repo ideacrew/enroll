@@ -48,15 +48,16 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def append_data
-    notice.has_applied_for_assistance
-    notice.irs_consent_needed
+    primary_member = data.detect{|m| m["subscriber"] == "Yes"}
+    notice.has_applied_for_assistance = check(primary_member["aqhp_elig"])
+    notice.irs_consent_needed = check(primary_member["irs_consent"])
 
-    notice.individuals=data.collect do |datum|
+    notice.individuals = data.collect do |datum|
         person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
         PdfTemplates::Individual.new({
           :first_name => person.first_name,
           :full_name => person.full_name,
-          :incarcerated=> datum["ea_incarcerated"].try(:upcase) == "FALSE" ? "No" : "Yes",
+          :incarcerated=> check(datum["ea_incarcerated"])
           :citizen_status=> citizen_status(datum["ea_citizenship"]),
           :residency_verified => datum["ea_dc_resident"].try(:upcase) == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
         })

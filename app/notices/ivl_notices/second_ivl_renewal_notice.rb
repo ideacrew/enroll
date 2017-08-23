@@ -1,4 +1,5 @@
 class IvlNotices::SecondIvlRenewalNotice < IvlNotice
+  include ApplicationHelper
   attr_accessor :family, :data,:identifier, :person
 
   def initialize(consumer_role, args = {})
@@ -10,7 +11,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     self.person = args[:person]
     self.data = args[:data]
     self.identifier = args[:primary_identifier]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end
 
@@ -30,10 +31,6 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     end
   end
 
-  def attach_voter_application
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
-  end
-
   def build
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
@@ -51,13 +48,15 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
   end
 
   def append_data
+    append_open_enrollment_data
     append_member_information
-    primary_member = members.detect{|m| m["subscriber"] == "Y"}
+    primary_member = data.detect{|m| m["subscriber"] == "Yes"}
     if primary_member["aqhp_elig"].upcase == "YES"
       append_tax_household_information(primary_member)
     end
-    notice.has_applied_for_assistance = (primary_member["aqhp_elig"].upcase == "YES") ? true : false
-    notice.irs_consent_needed = (primary_member["irs_consent"].upcase == "YES") ? true : false
+    notice.has_applied_for_assistance = check(primary_member["aqhp_elig"])
+    notice.irs_consent_needed = check(primary_member["irs_consent"])
+    notice.primary_firstname = primary_member["first_name"]
   end
 
   def append_member_information
@@ -66,20 +65,20 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
         PdfTemplates::Individual.new({
           :first_name => datum["first_name"],
           :last_name => datum["last_name"],
-          :age => calculate_age_by_dob(datum["dob"]),
-          :incarcerated => datum["incarcerated"].try(:upcase) == "NO" ? "No" : "Yes",
+          :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
+          :incarcerated => datum["incarcerated"].upcase == "NO" ? "No" : "Yes",
           :citizen_status => citizen_status(datum["citizen_status"]),
-          :residency_verified => datum["resident"].try(:upcase) == "Y"  ? "Yes" : "No",
+          :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
           :projected_amount => datum["actual_income"],
           :taxhh_count => datum["tax_hh_count"],
           :uqhp_reason => datum["uqhp_reason"],
           :tax_status => filer_type(datum["filer_type"]),
-          :mec => datum["mec"].upcase == "N" ? "No" : "Yes",
-          :is_ia_eligible => datum["aqhp_elig"],
-          :is_medicaid_chip_eligible => datum["magi_medicaid"],
-          :is_non_magi_medicaid_eligible => datum["non_magi_medicaid"],
-          :is_without_assistance => datum["uqhp_elig"],
-          :is_totally_ineligible => datum["totally_ineligible"]
+          :mec => datum["mec"].try(:upcase) == "N" ? "No" : "Yes",
+          :is_ia_eligible => check(datum["aqhp_elig"]),
+          :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
+          :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
+          :is_without_assistance => check(datum["uqhp_elig"]),
+          :is_totally_ineligible => check(datum["totally_ineligible"])
         })
     end
   end
@@ -91,27 +90,11 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
         })
   end
 
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
-  end
-
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
-    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == notice.coverage_year }
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == notice.coverage_year }
     notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
   end
 
   def filer_type(type)

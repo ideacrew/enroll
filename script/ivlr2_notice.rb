@@ -44,8 +44,8 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |ic_ref, members|
       begin
-        primary_member = members.detect{|m| m["subscriber"] == "Y"}
-        person = Person.where(:hbx_id => primary_member["hbxid"]).first
+        primary_member = members.detect{|m| m["subscriber"] == "Yes"}
+        person = Person.where(:hbx_id => primary_member["hbx_id"]).first
         consumer_role =person.consumer_role
         if consumer_role.present?
             builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -67,7 +67,7 @@
           puts "Unable to send notice to family_id : #{ic_ref}"
         end
       rescue Exception => e
-        puts "Unable to deliver to #{ic_ref} for the following error #{e.backtrace} ----- #{e.inspect}"
+        puts "Unable to deliver to #{ic_ref} for the following error ----- #{e.backtrace}"
         next
       end
     end
