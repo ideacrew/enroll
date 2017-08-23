@@ -15,6 +15,8 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
         update_family_broker_agency_accounts
       when "update_employer_broker_agency_accounts"
         update_employer_broker_agency_account
+      else
+        exit
     end
   end
 
@@ -27,11 +29,13 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
                                                           entity_kind: "s_corporation",
                                                           primary_broker_role_id: writing_agent.id,
                                                           default_general_agency_profile_id: ENV['defualt_general_agency_id'])
-      org = Organization.create!(office_locations: [create_new_primary_office_location], fein: ENV['fein'], legal_name: ENV['legal_name'], is_fake_fein: true, broker_agency_profile: broker_agency_profile)
+      org = Organization.create(office_locations: [create_new_primary_office_location], fein: ENV['fein'], legal_name: ENV['legal_name'], 
+                                is_fake_fein: true, broker_agency_profile: broker_agency_profile)
       org.broker_agency_profile.approve!
       org.save!
+      writing_agent.broker_agency_profile_id = broker_agency_profile.id
+      writing_agent.save
       puts "Organization and BrokerAgencyProfile created" unless Rails.env.test?
-      update_broker_role(broker_agency_profile)
     else
       puts "writing_agent not found" if !Rails.env.test?  && writing_agent.blank?
       puts "Organization exists with given fein" if !Rails.env.test? && org.present?
@@ -55,12 +59,14 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
     puts "Office locations created for broker agency profile organization." unless Rails.env.test?
     else
       puts "Organization not found for #{ ENV['fein']}" unless Rails.env.test?
+      # update_broker_role
     end
   end
 
-  def update_broker_role(broker_agency_profile = nil)
+  def update_broker_role
     writing_agent= BrokerRole.by_npn(ENV['npn']).first
-
+    broker_agency_profile = BrokerAgencyProfile.find(ENV['broker_agency_profile_id'])
+  
     if broker_agency_profile.present? && writing_agent.present?
       writing_agent.update_attributes!(:market_kind => ENV['market_kind'],broker_agency_profile_id: broker_agency_profile.id)
       puts "Updated broker's broker agency profile and market kind" unless Rails.env.test?
