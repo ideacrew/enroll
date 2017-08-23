@@ -45,8 +45,6 @@ module Factories
       elsif @employer_profile.may_force_enroll?
         @employer_profile.force_enroll!
       end
-
-      create_active_benefit_group_assignments(current_plan_year.benefit_groups)
     end
 
     def end
@@ -66,16 +64,5 @@ module Factories
         expiring_plan_year.expire! if expiring_plan_year.may_expire?
       end
     end
-
-    def create_active_benefit_group_assignments(benefit_groups)
-      benefit_group_ids = benefit_groups.map(&:id)
-
-      @employer_profile.census_employees.non_terminated.each do |census_employee|
-        next if census_employee.active_benefit_group_assignment.present? && benefit_group_ids.include?(census_employee.active_benefit_group_assignment.benefit_group_id)
-        if valid_bg_assignment = census_employee.benefit_group_assignments.renewing.detect{|bg_assignment| benefit_group_ids.include?(bg_assignment.benefit_group_id)}
-          valid_bg_assignment.make_active
-        end
-      end
-    end
-  end   
+  end 
 end
