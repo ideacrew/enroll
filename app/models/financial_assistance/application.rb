@@ -193,7 +193,7 @@ class FinancialAssistance::Application
     end
 
     event :determine, :after => :record_transition do
-      transitions from: :submitted, to: :determined
+      transitions from: :submitted, to: :determined, :after => :trigger_eligibilility_notice
     end
 
   end
@@ -308,6 +308,11 @@ class FinancialAssistance::Application
       total_incomes[y] = (income_this_year - deductions_this_year) * 0.01
     end
     total_incomes
+  end
+
+  def is_family_totally_ineligibile
+    applicants.each { |applicant| return false unless applicant.is_totally_ineligible }
+    return true
   end
 
   def all_tax_households
@@ -566,6 +571,14 @@ private
     ).save!
     else
       throw(:processing_issue, "Failed to create Eligibility Determinations")
+    end
+  end
+
+  def trigger_eligibilility_notice
+    if is_family_totally_ineligibile
+      IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "ineligibility_notice")
+    else
+      IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "eligibility_notice")
     end
   end
 

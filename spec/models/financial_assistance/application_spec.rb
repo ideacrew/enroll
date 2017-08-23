@@ -2,7 +2,9 @@ require 'rails_helper'
 require 'aasm/rspec'
 
 RSpec.describe FinancialAssistance::Application, type: :model do
-
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
   let(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:family_member1) { FactoryGirl.create(:family_member, family: family) }
   let(:family_member2) { FactoryGirl.create(:family_member, family: family) }
@@ -133,13 +135,13 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       end
 
       it "should invoke submit_application on a sucessful state transition on submit" do
-        expect(valid_application).to receive(:submit_application)
+        expect(valid_application).to receive(:set_submit)
         valid_application.submit!
       end
 
       it "should not invoke submit_application on a submit of an invalid application" do
-        expect(invalid_application).to_not receive(:submit_application)
-        valid_application.submit!
+        expect(invalid_application).to_not receive(:set_submit)
+        invalid_application.submit!
       end
 
       it "should prevent the state transition to happen and report invalid if the application is invalid" do
@@ -158,6 +160,38 @@ RSpec.describe FinancialAssistance::Application, type: :model do
         expect(invalid_application).to receive(:record_transition)
         invalid_application.submit!
       end
+    end
+  end
+
+  describe "trigger eligibility notice" do
+    let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
+    let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    before do
+      application.update_attributes(:aasm_state => "submitted")
+    end
+
+    it "on event determine and family totally eligibile" do
+      expect(application.is_family_totally_ineligibile).to eq false
+      expect(application).to receive(:trigger_eligibilility_notice)
+      application.determine!
+    end
+  end
+
+  describe "trigger ineligibilility notice" do
+    let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
+    let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    before do
+      application.applicants.each do |applicant|
+        applicant.is_totally_ineligible = true
+        applicant.save!
+      end
+      application.update_attributes(:aasm_state => "submitted")
+    end
+
+    it "event determine and family totally ineligibile" do
+      expect(application.is_family_totally_ineligibile).to eq true
+      expect(application).to receive(:trigger_eligibilility_notice)
+      application.determine!
     end
   end
 end

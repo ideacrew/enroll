@@ -851,6 +851,69 @@ ivl_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'IVL_ELA',
+    title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
+    description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+    resource_name: 'consumer_role',
+    event_name: 'eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Eligibilty Notice',
+        notice_template: 'notices/ivl/eligibility_notice',
+        notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_ELA',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_NEL',
+    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
+    description: 'Notice will be sent to the household if everyone in the household is ineligible',
+    resource_name: 'consumer_role',
+    event_name: 'ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Ineligibilty Notice',
+        notice_template: 'notices/ivl/ineligibility_notice',
+        notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_NEL',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Enrollment notice',
+    description: 'Notice will be sent to families after their enrollment is done.',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+        mpi_indicator: 'IVL_ENR',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
