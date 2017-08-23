@@ -63,11 +63,12 @@ class EmployerInvoice
     File.delete(file)
   end
 
-  def send_first_invoice_available_notice
+  def send_invoice_available_notice
+     #   Triggers this Notice if it is an initial invoice
     if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
       @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
     else
-    #   Trigger Notice if it is not a initial and invoice size count is greater than 1
+    #   Triggers this Notice if it is not an initial invoice or it is a renewal invoice
       @organization.employer_profile.trigger_notices("renewal_employer_invoice_available")
     end
   end
@@ -77,7 +78,7 @@ class EmployerInvoice
     save_to_cloud
     send_to_print_vendor
     send_email_notice
-    send_first_invoice_available_notice
+    send_invoice_available_notice
     clear_tmp(invoice_absolute_file_path)
   end
 
@@ -86,7 +87,7 @@ class EmployerInvoice
     save_to_cloud
     send_to_print_vendor
     send_email_notice
-    send_first_invoice_available_notice
+    send_invoice_available_notice
   end
 
   private
