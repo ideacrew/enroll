@@ -48,15 +48,7 @@ module Factories
     def valid_enrollment?(hbx_enrollment, renewal_enrollment)
       hbx_enrollment.effective_on == renewal_enrollment.effective_on && hbx_enrollment.effective_on <= TimeKeeper.date_of_record
     end
-    def end_coverage
-      prev_year_enrollments = employee_enrollments.select{|enrollment| enrollment.benefit_group == @plan_year.benefit_groups.first}.select{|e| HbxEnrollment::ENROLLED_STATUSES.include?(e.aasm_state)}
-      prev_year_enrollments.each do |hbx_enrollment|
-        hbx_enrollment.expire_coverage! if hbx_enrollment.may_expire_coverage?
-        benefit_group_assignment = hbx_enrollment.benefit_group_assignment
-        benefit_group_assignment.expire_coverage! if benefit_group_assignment.may_expire_coverage?
-        benefit_group_assignment.update_attributes(is_active: false) if benefit_group_assignment.is_active?
-      end
-    end
+  
     private
     def employee_enrollments
       family_record.active_household.hbx_enrollments

@@ -52,19 +52,17 @@ module Factories
     def end
       expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.each do |expiring_plan_year|
-        census_employee_factory = Factories::CensusEmployeeFactory.new
-        census_employee_factory.plan_year = expiring_plan_year
-
-        @employer_profile.census_employees.non_terminated.each do |census_employee|
+        expiring_plan_year.hbx_enrollments.each do |enrollment|
           begin
-            census_employee_factory.census_employee = census_employee
-            census_employee_factory.end_coverage
-
+            enrollment.expire_coverage! if enrollment.may_expire_coverage?
+            if assignment = enrollment.benefit_group_assignment
+              assignment.expire_coverage! if assignment.may_expire_coverage?
+              assignment.update_attributes(is_active: false) if assignment.is_active?
+            end
           rescue Exception => e
             @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
           end
         end
-
         expiring_plan_year.expire! if expiring_plan_year.may_expire?
       end
     end
