@@ -163,31 +163,35 @@ RSpec.describe FinancialAssistance::Application, type: :model do
     end
   end
 
-  describe "state machine" do
-    data = []
-
-    it "should trigger trigger_eligibilility_notice on event determine and family totally eligibile" do
-      application.class.send(:define_method, 'trigger_eligibilility_notice') do
-        data = [1]
-      end
-      expect(application).to transition_from(:submitted).to(:determined).on_event(:determine)
-      expect(application.aasm_state).to eq 'determined'
-      expect(application.is_family_totally_ineligibile).to eq false
-      expect(data).to eq [1]
+  describe "trigger eligibility notice" do
+    let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
+    let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    before do
+      application.update_attributes(:aasm_state => "submitted")
     end
 
-    it "should trigger trigger_eligibilility_notice on event determine and family totally ineligibile" do
-      application.class.send(:define_method, 'trigger_eligibilility_notice') do
-        data = [2]
-      end
+    it "on event determine and family totally eligibile" do
+      expect(application.is_family_totally_ineligibile).to eq false
+      expect(application).to receive(:trigger_eligibilility_notice)
+      application.determine!
+    end
+  end
+
+  describe "trigger ineligibilility notice" do
+    let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
+    let!(:applicant) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member.id) }
+    before do
       application.applicants.each do |applicant|
-          applicant.is_totally_ineligible = true
-          applicant.save!
+        applicant.is_totally_ineligible = true
+        applicant.save!
       end
-      expect(application).to transition_from(:submitted).to(:determined).on_event(:determine)
-      expect(application.aasm_state).to eq 'determined'
+      application.update_attributes(:aasm_state => "submitted")
+    end
+
+    it "event determine and family totally ineligibile" do
       expect(application.is_family_totally_ineligibile).to eq true
-      expect(data).to eq [2]
+      expect(application).to receive(:trigger_eligibilility_notice)
+      application.determine!
     end
   end
 end
