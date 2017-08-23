@@ -615,7 +615,7 @@ class EmployerProfile
               organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
             end
           rescue Exception => e
-            puts "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}"
+            Rails.logger.error { "Unable to deliver Low Enrollment Notice to #{organization.legal_name} due to #{e}" }
           end
         end
 
@@ -626,7 +626,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver first reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-6
@@ -634,7 +634,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_second_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver second reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         elsif new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month-2
@@ -642,7 +642,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("renewal_employer_final_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}"
+              Rails.logger.error { "Unable to deliver final reminder notice to publish plan year to renewing employer #{organization.legal_name} due to #{e}" }
             end
           end
         end
@@ -652,19 +652,23 @@ class EmployerProfile
 
         organizations_for_plan_year_begin(new_date).each do |organization|
           begin
+            puts "START START FOR #{organization.legal_name} - #{Time.now}"
             employer_enroll_factory.employer_profile = organization.employer_profile
             employer_enroll_factory.begin
+            puts "PROCESSED START FOR #{organization.legal_name} - #{Time.now}"
           rescue Exception => e
-            puts "Error found for employer - #{organization.legal_name} during plan year begin"
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year begin" }
           end
         end
 
         organizations_for_plan_year_end(new_date).each do |organization|
           begin
+            puts "START END FOR #{organization.legal_name} - #{Time.now}"
             employer_enroll_factory.employer_profile = organization.employer_profile
             employer_enroll_factory.end
+            puts "PROCESSED END FOR #{organization.legal_name} - #{Time.now}"
           rescue Exception => e
-            puts "Error found for employer - #{organization.legal_name} during plan year end"
+            Rails.logger.error { "Error found for employer - #{organization.legal_name} during plan year end" }
           end
         end
 
@@ -683,7 +687,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              Rails.logger.error { "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         elsif new_date+1.day == start_on.last_month
@@ -691,7 +695,7 @@ class EmployerProfile
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
             rescue Exception => e
-              puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+              Rails.logger.error { "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
             end
           end
         else
@@ -701,7 +705,7 @@ class EmployerProfile
               begin
                 organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
               rescue Exception => e
-                puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}"
+                Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
               end
             end
           end
