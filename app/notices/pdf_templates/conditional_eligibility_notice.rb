@@ -76,7 +76,7 @@ module PdfTemplates
     end
 
     def current_health_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == coverage_year}
     end
 
     def assisted_enrollments
@@ -88,15 +88,15 @@ module PdfTemplates
     end
 
     def current_dental_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == coverage_year}
     end
 
     def renewal_health_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def renewal_dental_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def magi_medicaid_eligible
