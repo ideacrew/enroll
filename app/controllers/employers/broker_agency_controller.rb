@@ -40,7 +40,6 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
@@ -50,8 +49,6 @@ class Employers::BrokerAgencyController < ApplicationController
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
-      broker_hired
-      
     end
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
@@ -90,10 +87,6 @@ class Employers::BrokerAgencyController < ApplicationController
         end
       }
     end
-  end
-
-  def broker_hired
-    ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
   end
 
   private
