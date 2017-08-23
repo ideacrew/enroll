@@ -82,11 +82,19 @@ module Factories
             end
           end
 
-          enrollment.begin_coverage! if enrollment.may_begin_coverage?
-          if enrollment.is_coverage_waived?
-            enrollment.benefit_group_assignment.waive_benefit
-          else
-            enrollment.benefit_group_assignment.begin_benefit
+          if enrollment.benefit_group_assignment.blank?
+            @logger.debug "Benefit group assignment missing for Enrollment: #{enrollment.hbx_id}."
+            next
+          end
+
+          if enrollment.may_begin_coverage?
+            enrollment.begin_coverage! 
+
+            if enrollment.is_coverage_waived?
+              enrollment.benefit_group_assignment.waive_benefit
+            else
+              enrollment.benefit_group_assignment.begin_benefit
+            end
           end
         end
       end
