@@ -792,26 +792,7 @@ class HbxEnrollment
     end
   end
 
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
-    qhp_plan ||= self.plan
-
-    if self.is_shop?
-      if benefit_group.is_congress
-        PlanCostDecoratorCongress.new(qhp_plan, self, benefit_group)
-      else
-        reference_plan = (coverage_kind == "health") ? benefit_group.reference_plan : benefit_group.dental_reference_plan
-        PlanCostDecorator.new(qhp_plan, self, benefit_group, reference_plan)
-      end
-    else
-      if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
-      else
-        UnassistedPlanCostDecorator.new(qhp_plan, self)
-      end
-    end
-  end
-
-  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_household: nil, apply_aptc: nil)
+  def build_plan_premium(qhp_plan: nil, elected_aptc: false, tax_households: nil, apply_aptc: nil)
     qhp_plan ||= self.plan
 
     if self.is_shop?

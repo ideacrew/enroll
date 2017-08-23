@@ -494,6 +494,7 @@ class Plan
         end
 
         #Selects the right csr_kind from the array of csr_kinds.
+        csr_kind = "csr_0" if csr_kinds.include? "csr_0"
         csr_kind = "csr_73" if csr_kinds.include? "csr_73"
         csr_kind = "csr_87" if csr_kinds.include? "csr_87"
         csr_kind = "csr_94" if csr_kinds.include? "csr_94"

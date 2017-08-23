@@ -67,8 +67,7 @@ class EligibilityDetermination
       message: "%{value} is not a valid cost sharing eligibility kind"
     }
 
-  validates :source,
-    inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" }
+  validate :source_kind
 
   def csr_percent_as_integer=(new_csr_percent)
     super
@@ -128,6 +127,13 @@ class EligibilityDetermination
   end
 
 private
+
+  def source_kind
+    unless source.nil?
+      errors.add(:source, " Can't be other than Curam Haven Admin ") unless SOURCE_KINDS.include?source
+    end
+  end
+
   def set_premium_credit_strategy
     self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
   end

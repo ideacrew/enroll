@@ -31,7 +31,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
-    plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
+    plan_selection.apply_aptc_if_needed(@shopping_tax_households, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
@@ -47,12 +47,12 @@ class Insured::PlanShoppingsController < ApplicationController
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
     else
-      @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
+      @shopping_tax_households = get_shopping_tax_households_from_person(@person, @enrollment.effective_on.year)
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
 
-    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_households: @shopping_tax_households)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -74,7 +74,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     @enrollment.reset_dates_on_previously_covered_members(@plan)
-    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_households: @shopping_tax_households)
     @family = @person.primary_family
     
     #FIXME need to implement can_complete_shopping? for individual
@@ -147,7 +147,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     @family_member_ids = params[:family_member_ids]
-    shopping_tax_households = get_tax_household_from_family_members(@person, @family_member_ids)
+    shopping_tax_households = get_tax_households_from_family_members(@person, @family_member_ids)
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
       @tax_households = shopping_tax_households
@@ -324,8 +324,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def get_aptc_info_from_session(hbx_enrollment)
-    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
-    if @shopping_tax_household.present?
+    @shopping_tax_households = get_shopping_tax_households_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
+    if @shopping_tax_households.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
     else
@@ -335,7 +335,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def can_apply_aptc?(plan)
-    @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    @shopping_tax_households.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
   end
 
   def set_elected_aptc_by_params(elected_aptc)
