@@ -11,9 +11,9 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
-    args[:to] = employer_profile.broker_agency_profile.primary_broker_role.email_address
-    args[:name] = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
-    args[:recipient_document_store] = employer_profile.broker_agency_profile.primary_broker_role.person
+    args[:to] = broker_agency_profile.primary_broker_role.email_address
+    args[:name] = broker_agency_profile.primary_broker_role.person.full_name
+    args[:recipient_document_store] = broker_agency_profile
     self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end

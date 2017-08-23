@@ -133,8 +133,6 @@ class EmployerProfile
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
-    broker_hired
-    broker_agency_hired
   end
 
   def fire_broker_agency(terminate_on = today)
@@ -143,14 +141,6 @@ class EmployerProfile
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
     notify_broker_terminated
-  end
-
-  def broker_hired
-    trigger_notices("broker_hired")
-  end
-  
-  def broker_agency_hired
-    trigger_notices("broker_agency_hired")
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency

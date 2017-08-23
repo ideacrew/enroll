@@ -147,7 +147,6 @@ class Notice
       identifier: doc_uri,
       format: "application/pdf"
     })
-
     if notice.save
       notice
     else
