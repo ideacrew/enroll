@@ -2,7 +2,9 @@ require 'rails_helper'
 require 'aasm/rspec'
 
 RSpec.describe FinancialAssistance::Application, type: :model do
-
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
   let(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:family_member1) { FactoryGirl.create(:family_member, family: family) }
   let(:family_member2) { FactoryGirl.create(:family_member, family: family) }
@@ -133,13 +135,13 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       end
 
       it "should invoke submit_application on a sucessful state transition on submit" do
-        expect(valid_application).to receive(:submit_application)
+        expect(valid_application).to receive(:set_submit)
         valid_application.submit!
       end
 
       it "should not invoke submit_application on a submit of an invalid application" do
-        expect(invalid_application).to_not receive(:submit_application)
-        valid_application.submit!
+        expect(invalid_application).to_not receive(:set_submit)
+        invalid_application.submit!
       end
 
       it "should prevent the state transition to happen and report invalid if the application is invalid" do
@@ -158,6 +160,34 @@ RSpec.describe FinancialAssistance::Application, type: :model do
         expect(invalid_application).to receive(:record_transition)
         invalid_application.submit!
       end
+    end
+  end
+
+  describe "state machine" do
+    data = []
+
+    it "should trigger trigger_eligibilility_notice on event determine and family totally eligibile" do
+      application.class.send(:define_method, 'trigger_eligibilility_notice') do
+        data = [1]
+      end
+      expect(application).to transition_from(:submitted).to(:determined).on_event(:determine)
+      expect(application.aasm_state).to eq 'determined'
+      expect(application.is_family_totally_ineligibile).to eq false
+      expect(data).to eq [1]
+    end
+
+    it "should trigger trigger_eligibilility_notice on event determine and family totally ineligibile" do
+      application.class.send(:define_method, 'trigger_eligibilility_notice') do
+        data = [2]
+      end
+      application.applicants.each do |applicant|
+          applicant.is_totally_ineligible = true
+          applicant.save!
+      end
+      expect(application).to transition_from(:submitted).to(:determined).on_event(:determine)
+      expect(application.aasm_state).to eq 'determined'
+      expect(application.is_family_totally_ineligibile).to eq true
+      expect(data).to eq [2]
     end
   end
 end
