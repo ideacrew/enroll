@@ -5,21 +5,19 @@ module PdfTemplates
     attribute :primary_fullname, String
     attribute :primary_identifier, String
     attribute :primary_address, PdfTemplates::NoticeAddress
+    attribute :employer, PdfTemplates::EmployerStaff
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
-    attribute :er_first_name, String
-    attribute :er_last_name, String
-    attribute :er_fullname, String
-    attribute :er_address, String
-    attribute :er_email, String
-    attribute :er_phone, String
-    attribute :er_legal_name, String
     attribute :employer_name, String
     attribute :broker_agency, String
     attribute :mpi_indicator, String
 
     def shop?
+      return true
+    end
+
+    def broker?
       return true
     end
   end

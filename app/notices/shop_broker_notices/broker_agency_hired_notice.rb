@@ -11,9 +11,9 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
     args[:recipient] = broker_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::BrokerNotice.new
-    args[:to] = employer_profile.broker_agency_profile.primary_broker_role.email_address
-    args[:name] = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
-    args[:recipient_document_store] = employer_profile.broker_agency_profile.primary_broker_role.person
+    args[:to] = broker_agency_profile.primary_broker_role.email_address
+    args[:name] = broker_agency_profile.primary_broker_role.person.full_name
+    args[:recipient_document_store] = broker_agency_profile
     self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
@@ -28,18 +28,20 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
   end
 
   def build
+    notice.primary_fullname = broker_agency_profile.legal_name
     notice.mpi_indicator = self.mpi_indicator
     notice.broker = PdfTemplates::Broker.new({
       full_name: broker_agency_profile.primary_broker_role.person.full_name.titleize,
-      hbx_id: broker_agency_profile.primary_broker_role.person.hbx_id,
       assignment_date: employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on
     })
-    notice.er_legal_name = employer_profile.legal_name.titleize
-    notice.er_first_name = employer_profile.staff_roles.first.first_name
-    notice.er_last_name = employer_profile.staff_roles.first.last_name
-    notice.er_email = employer_profile.staff_roles.first.work_email_or_best
-    notice.er_address = broker_agency_profile.organization.primary_office_location.address
-    notice.er_phone = broker_agency_profile.phone
+    notice.employer_name = employer_profile.legal_name.titleize
+      notice.employer = PdfTemplates::EmployerStaff.new({
+            employer_first_name: employer_profile.staff_roles.first.first_name,
+            employer_phone: broker_agency_profile.phone,
+            employer_last_name: employer_profile.staff_roles.first.last_name,
+            employer_email: employer_profile.staff_roles.first.work_email_or_best,
+
+    })
     notice.broker_agency = broker_agency_profile.legal_name.titleize
     append_address(broker_agency_profile.organization.primary_office_location.address)
     append_hbe
