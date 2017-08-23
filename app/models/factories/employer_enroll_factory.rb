@@ -69,7 +69,7 @@ module Factories
       families.each do |family|
         enrollments = family.active_household.hbx_enrollments.where(enrollment_expr)
 
-        %w(health dental).each do |coverage_kind|
+        HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
           enrollments_by_kind = enrollments.by_coverage_kind(coverage_kind)
           enrollment = enrollments_by_kind.first
           next if enrollment.blank?
@@ -88,7 +88,7 @@ module Factories
           end
 
           if enrollment.may_begin_coverage?
-            enrollment.begin_coverage! 
+            enrollment.begin_coverage!
 
             if enrollment.is_coverage_waived?
               enrollment.benefit_group_assignment.waive_benefit
