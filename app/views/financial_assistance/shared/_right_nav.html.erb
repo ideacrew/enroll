@@ -1,4 +1,4 @@
-<% if (controller_name == 'application' and action_name == 'edit') or controller_name == 'family_relationships' %>
+<% if (controller_name == 'applications' and action_name == 'edit') or controller_name == 'family_relationships' %>
   <%= render partial: 'financial_assistance/shared/status', locals: { application: @application || @family.application_in_progress } %>
 <% end %>
 
