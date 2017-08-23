@@ -23,11 +23,19 @@ module Aptc
         if family.active_household.latest_active_tax_households.present?
           family.active_household.latest_active_tax_households.each do |th|
             tax_households << th if th.tax_household_members.where(:applicant_id.in => family_member_ids).present?
+            # thh_family_member_ids = th.tax_household_members.map(&:family_member).map(&:id).inject([]) do |fm_ids, id|
+            #                           fm_ids << id.to_s
+            #                           fm_ids.flatten
+            #                         end
+
+            # thh_family_member_ids.each do |tfm_id|
+            #   tax_households << th if thh_family_member_ids.include?(tfm_id)
+            # end
           end
         end
       end
     end
-    tax_households
+    tax_households.uniq
   end
 
   def total_aptc_on_tax_households(tax_households, hbx_enrollment)

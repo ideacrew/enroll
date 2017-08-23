@@ -80,71 +80,60 @@ class Household
   #   hh
   # end
 
-  def build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-    verified_tax_household = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
-    if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
-      verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
-      primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
+  def build_or_update_tax_households_and_eligibility_determinations(verified_family, primary_person, active_verified_household, new_dependents)
+    verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
+    verified_tax_households = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }
 
-      if tax_households.present?
-        latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
+    if tax_households.present?
+      latest_tax_households = tax_households.where(effective_ending_on: nil)
+      latest_tax_households.each do |thh|
+        thh.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
       end
-
-      th = tax_households.build(
-        allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
-        effective_starting_on: verified_tax_household.start_date,
-        is_eligibility_determined: true,
-        submitted_at: verified_tax_household.submitted_at
-      )
-
-      th.tax_household_members.build(
-        family_member: primary_family_member,
-        is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
-      )
-
-      # verified_primary_family_member.financial_statements.each do |fs|
-      #   th.tax_household_members.first.financial_statements.build(
-      #     tax_filing_status: fs.tax_filing_status.split('#').last,
-      #     is_tax_filing_together: fs.is_tax_filing_together
-      #   )
-
-      #   th.tax_household_members.first.financial_statements.last.incomes.each do |i|
-      #     th.tax_household_members.first.financial_statements.last.incomes.build(
-      #       amount:
-      #       end_date:
-      #       frequency:
-      #       start_date:
-      #       submitted_date:
-      #       type:
-      #     )
-      #   end
-      # end
-
-      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
-
-      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
-      th.eligibility_determinations.build(
-        e_pdc_id: latest_eligibility_determination.id,
-        benchmark_plan_id: benchmark_plan_id,
-        max_aptc: latest_eligibility_determination.maximum_aptc,
-        csr_percent_as_integer: latest_eligibility_determination.csr_percent,
-        determined_on: latest_eligibility_determination.determination_date
-      )
-
-      th.save!
     end
-  end
 
-  def add_tax_household_family_member(family_member, verified_tax_household_member)
-    th = latest_active_tax_household
-    th.tax_household_members.build(
-      family_member: family_member,
-      is_subscriber: false,
-      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
-    )
-    th.save!
+    verified_tax_households.each do |verified_tax_household|
+      if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
+
+        th = tax_households.build(
+          allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
+          effective_starting_on: verified_tax_household.start_date,
+          is_eligibility_determined: true,
+          submitted_at: verified_tax_household.submitted_at
+        )
+
+        new_dependents << [primary_person, "self", [verified_primary_family_member.id]]
+
+        verified_tax_household.tax_household_members.each do |tax_household_member|
+          family_member = nil
+          new_dependents.each do |dependent|
+            if dependent[2][0] == tax_household_member.id
+              family_member = family.family_members.select{|fm| fm if fm.person.id.to_s == dependent[0].id.to_s}.first
+            end
+          end
+
+          th.tax_household_members.build(
+            family_member: family_member,
+            applicant_id: family_member.id,
+            is_subscriber: true,
+            is_ia_eligible: tax_household_member.is_insurance_assistance_eligible ? tax_household_member.is_insurance_assistance_eligible : false,
+            is_medicaid_chip_eligible: tax_household_member.is_medicaid_chip_eligible,
+            is_without_assistance: tax_household_member.is_without_assistance
+          )
+        end
+
+        benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+        latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+        th.eligibility_determinations.build(
+          e_pdc_id: latest_eligibility_determination.id,
+          benchmark_plan_id: benchmark_plan_id,
+          max_aptc: latest_eligibility_determination.maximum_aptc,
+          csr_percent_as_integer: latest_eligibility_determination.csr_percent,
+          determined_on: latest_eligibility_determination.determination_date,
+          source: "Curam"
+        )
+        th.save!
+      end
+    end
   end
 
   def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household, application_in_context)
