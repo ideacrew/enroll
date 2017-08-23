@@ -24,26 +24,15 @@ module Factories
       end
 
       current_plan_year = published_plan_years.first
+      if current_plan_year.may_activate?
+        begin_coverage_for_employees(current_plan_year)
+        current_plan_year.activate!
 
-      census_employee_factory = Factories::CensusEmployeeFactory.new
-      census_employee_factory.plan_year = current_plan_year
-
-      @employer_profile.census_employees.non_terminated.each do |census_employee|
-        begin
-          census_employee_factory.census_employee = census_employee
-          census_employee_factory.begin_coverage
-
-        rescue Exception => e
-          @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
+        if @employer_profile.may_enroll_employer?
+          @employer_profile.enroll_employer!
+        elsif @employer_profile.may_force_enroll?
+          @employer_profile.force_enroll!
         end
-      end
-
-      current_plan_year.activate! if current_plan_year.may_activate?
-
-      if @employer_profile.may_enroll_employer?
-        @employer_profile.enroll_employer!
-      elsif @employer_profile.may_force_enroll?
-        @employer_profile.force_enroll!
       end
     end
 
@@ -62,6 +51,44 @@ module Factories
           end
         end
         expiring_plan_year.expire! if expiring_plan_year.may_expire?
+      end
+    end
+
+    private
+
+    def begin_coverage_for_employees(current_plan_year)
+      id_list = current_plan_year.benefit_groups.collect(&:_id).uniq
+
+      enrollment_expr = {
+        :benefit_group_id.in => id_list,
+        :effective_on => current_plan_year.start_on,
+        :aasm_state.in => (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES)
+      }
+
+      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => enrollment_expr})
+      families.each do |family|
+        enrollments = family.active_household.hbx_enrollments.where(enrollment_expr)
+
+        %w(health dental).each do |coverage_kind|
+          enrollments_by_kind = enrollments.by_coverage_kind(coverage_kind)
+          enrollment = enrollments_by_kind.first
+          next if enrollment.blank?
+
+          if enrollments_by_kind.size > 1
+            enrollment = enrollments_by_kind.order(:"created_at".desc).first
+            enrollments_by_kind.each do |e|
+              next if e.hbx_id == enrollment.hbx_id
+              e.cancel_coverage! if e.may_cancel_coverage?
+            end
+          end
+
+          enrollment.begin_coverage! if enrollment.may_begin_coverage?
+          if enrollment.is_coverage_waived?
+            enrollment.benefit_group_assignment.waive_benefit
+          else
+            enrollment.benefit_group_assignment.begin_benefit
+          end
+        end
       end
     end
   end 
