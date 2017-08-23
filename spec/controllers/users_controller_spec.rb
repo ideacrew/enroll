@@ -75,9 +75,10 @@ describe UsersController do
   end
 
   describe '.edit' do
-    let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
+    let(:user) { FactoryGirl.build(:user, :with_consumer_role) }
     before do
       sign_in(admin)
+      allow(User).to receive(:find).with(user.id).and_return(user)
       get :edit, id: user.id, format: 'js'
     end
     it { expect(assigns(:user)).to eq(user) }
@@ -85,26 +86,36 @@ describe UsersController do
   end
 
   describe '.update' do
-    let(:user) { FactoryGirl.create(:user, :with_consumer_role) }
-    let(:new_user) { FactoryGirl.create(:user, :without_email) }
+    let(:user) { FactoryGirl.build(:user, :with_consumer_role) }
     before do
       sign_in(admin)
-      put :update, id: new_user.id, user: user_params, format: 'js'
     end
 
     context 'When email is not uniq then' do
-      let(:user_params) { {email: user.email} }
-      it { expect(assigns(:user)).to eq(new_user) }
-      it { expect(assigns(:user).errors.full_messages).to eq(['Email is already taken']) }
+      let(:user_params) { { email: '' } }
+      before do
+        sign_in(admin)
+        allow(User).to receive(:find).with(user.id).and_return(user)
+        allow(user).to receive(:update_attributes).with(user_params).and_return(false)
+        allow(user).to receive(:errors).and_return({email: 'Email is already taken'})
+        put :update, id: user.id, user: user_params, format: 'js'
+      end
+      it { expect(assigns(:user)).to eq(user) }
+      it { expect(user.errors[:email]).to eq('Email is already taken') }
       it { expect(response).to render_template('update') }
     end
 
     context 'When email is uniq then' do
-      let(:user_params) { {email: 'hello@employee.com'} }
-      subject(:result) { User.find(new_user.id) }
-      it { expect(assigns(:user)).to eq(new_user) }
-      it { expect(assigns(:user).email).to eq('hello@employee.com') }
-      it { expect(result.errors.full_messages).to eq([]) }
+      let(:user_params) { { email: 'test@user.com' } }
+      before do
+        sign_in(admin)
+        allow(User).to receive(:find).with(user.id).and_return(user)
+        allow(user).to receive(:update_attributes).with(user_params).and_return(true)
+        allow(user).to receive(:errors).and_return({email: ''})
+        put :update, id: user.id, user: user_params, format: 'js'
+      end
+      it { expect(assigns(:user)).to eq(user) }
+      it { expect(user.errors[:email]).to eq('') }
       it { expect(response).to render_template('update') }
     end
   end

@@ -58,10 +58,6 @@ Then(/^an error (.*?) should be raised$/) do |error|
   end
 end
 
-Then(/^the reset password email should be sent to the user$/) do
-  expect(User.all.to_a.last.reset_password_token).to be_a String
-end
-
 Then(/^the user email should be (.*?)$/) do |email|
   expect(User.all.to_a.last.email).to eq email
 end
