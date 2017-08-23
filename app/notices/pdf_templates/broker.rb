@@ -21,8 +21,8 @@ module PdfTemplates
     attribute :full_name, String
     attribute :hbx_id, String
 
-     def shop?
+    def shop?
       false
-   end
+    end
   end
 end
