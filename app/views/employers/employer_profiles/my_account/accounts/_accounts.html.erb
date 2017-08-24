@@ -7,16 +7,12 @@
     <tr>
       <th>Account Balance</th>
       <th>Past Due Balance</th>
-      <th></th>
-      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><%= number_to_currency(@total_due) %></td>
-      <td><%= number_to_currency(@past_due) %></td>
-      <td></td>
-      <td><%= number_to_currency(@previous_balance) %></td>
+      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:total_due)) || "Data not available" %></td>
+      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due)) || "Data not available" %></td>
     </tr>
   </tbody>
 </table>
