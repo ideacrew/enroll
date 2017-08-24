@@ -188,7 +188,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(enrollment).to receive(:build_plan_premium).and_return(true)
       allow(enrollment).to receive(:census_employee).and_return(double)
       allow(subject).to receive(:ee_mid_year_plan_change_notice_congressional).and_return(true)
-      allow(subject).to receive(:employee_mid_year_plan_change_non_congressional).and_return(true)
+      # allow(subject).to receive(:employee_mid_year_plan_change_non_congressional).and_return(true)
     end
 
     it "returns http success" do
@@ -368,7 +368,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:census_employee).and_return(double)
       allow(subject).to receive(:ee_mid_year_plan_change_notice_congressional).and_return(true)
-      allow(subject).to receive(:employee_mid_year_plan_change_non_congressional).and_return(true)
+      # allow(subject).to receive(:employee_mid_year_plan_change_non_congressional).and_return(true)
       sign_in user
 
     end
