@@ -567,7 +567,7 @@ module ApplicationHelper
   end
 
   def env_bucket_name(bucket_name)
-    aws_env = ENV['AWS_ENV'] || "local"
+    aws_env = ENV['AWS_ENV'] || "qa"
     "#{Settings.site.s3_prefix}-enroll-#{bucket_name}-#{aws_env}"
   end
 

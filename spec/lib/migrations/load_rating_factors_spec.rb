@@ -11,9 +11,9 @@ end
 
 RSpec.describe 'Load Rate Factors Task', :type => :task do
 
-  context "rate_reference:load_rating_factors", :dbclean => :after_each do
-    before :each do
-      ['82569','88806','34484','73331'].each do |hios_id|
+  context "rate_reference:load_rating_factors" do
+    before :all do
+      ['82569','88806','34484'].each do |hios_id|
         carrier_profile = FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
       end
 
@@ -27,7 +27,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
                                               }
 
       it 'creates sic code factor sets' do
-        expect(SicCodeRatingFactorSet.count).to be(4)
+        expect(SicCodeRatingFactorSet.count).to be(3)
       end
 
       it "creates sic factor entries" do
@@ -52,7 +52,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
                                                   default_factor_value: 1.0
                                               }
       it 'creates employer group size codes' do
-        expect(EmployerGroupSizeRatingFactorSet.count).to be(4)
+        expect(EmployerGroupSizeRatingFactorSet.count).to be(3)
       end
 
       it 'creates employer group size factor entries' do
@@ -73,7 +73,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
                                                   default_factor_value: 1.0
                                               }
       it 'creates employer participation rate codes' do
-        expect(EmployerParticipationRateRatingFactorSet.count).to be(4)
+        expect(EmployerParticipationRateRatingFactorSet.count).to be(3)
       end
 
       it 'creates employer participation rate factor entries' do
@@ -94,7 +94,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
                                                   default_factor_value: 1.0
                                               }
       it 'creates composite rating codes' do
-        expect(CompositeRatingTierFactorSet.count).to be(4)
+        expect(CompositeRatingTierFactorSet.count).to be(3)
       end
 
       it 'creates composite tier factor entries' do
@@ -111,7 +111,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     private
 
     def invoke_task
-      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
+      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "#{Rails.root}/lib/xls_templates/rating_factors/2017/SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
     end
   end
 end

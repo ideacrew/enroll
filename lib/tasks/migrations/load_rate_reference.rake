@@ -3,6 +3,7 @@ namespace :load_rate_reference do
   task :update_rating_areas => :environment do
     begin
       file_path = File.join(Rails.root, 'lib', 'xls_templates', "SHOP_ZipCode_CY2017_FINAL.xlsx")
+      puts "processing file : #{file_path}"
       xlsx = Roo::Spreadsheet.open(file_path)
       sheet = xlsx.sheet(0)
       (2..sheet.last_row).each do |i|
