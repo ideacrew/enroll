@@ -59,21 +59,23 @@ module Factories
     def begin_coverage_for_employees(current_plan_year)
       id_list = current_plan_year.benefit_groups.collect(&:_id).uniq
 
-      enrollment_expr = {
+
+      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => {
         :benefit_group_id.in => id_list,
         :effective_on => current_plan_year.start_on,
-        :aasm_state.in => (HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES)
-      }
+        :aasm_state.in => enrollment_statuses
+      }})
 
-      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => enrollment_expr})
       families.each do |family|
-        enrollments = family.active_household.hbx_enrollments.where(enrollment_expr)
+        enrollments = family.active_household.hbx_enrollments.select do |e| 
+          enrollment_statuses.include?(e.aasm_state) && e.effective_on == current_plan_year.start_on && id_list.include?(e.benefit_group_id)
+        end
 
         HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
-          enrollments_by_kind = enrollments.by_coverage_kind(coverage_kind)
-          enrollment = enrollments_by_kind.first
-          next if enrollment.blank?
+          enrollments_by_kind = enrollments.select{|e| e.coverage_kind == coverage_kind }
+          next if enrollments_by_kind.blank?
 
+          enrollment = enrollments_by_kind.first
           if enrollments_by_kind.size > 1
             enrollment = enrollments_by_kind.order(:"created_at".desc).first
             enrollments_by_kind.each do |e|
@@ -98,6 +100,10 @@ module Factories
           end
         end
       end
+    end
+    
+    def enrollment_statuses
+      HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES
     end
   end 
 end
