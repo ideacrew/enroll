@@ -14,6 +14,7 @@ module PdfTemplates
     attribute :documents_due_date, Date
     # attribute :household_size, String
     attribute :projected_amount, String
+    attribute :actual_income, String
     attribute :taxhh_count, String
     attribute :tax_status, String
     attribute :filer_type, String

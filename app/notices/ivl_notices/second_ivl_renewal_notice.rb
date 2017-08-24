@@ -61,7 +61,6 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
 
   def append_member_information
     notice.individuals = data.collect do |datum|
-        # person = Person.where(:hbx_id => datum["hbx_id"]).first
         PdfTemplates::Individual.new({
           :first_name => datum["first_name"],
           :last_name => datum["last_name"],
@@ -69,7 +68,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
           :incarcerated => datum["incarcerated"].upcase == "NO" ? "No" : "Yes",
           :citizen_status => citizen_status(datum["citizen_status"]),
           :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
-          :projected_amount => datum["actual_income"],
+          :actual_income => datum["actual_income"],
           :taxhh_count => datum["tax_hh_count"],
           :uqhp_reason => datum["uqhp_reason"],
           :tax_status => filer_type(datum["filer_type"]),

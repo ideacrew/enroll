@@ -115,7 +115,7 @@
                                   ['Other Coverage', "#{member.mec}"],
                                   ['Federal Tax Filing Status:', "#{member.tax_status}"],
                                   ['Tax Household Size:', "#{member.taxhh_count}"],
-                                  ["Expected Income for #{notice.coverage_year}",""]],
+                                  ["Expected Income for #{notice.coverage_year}","$#{member.actual_income}"]],
       col_styles: ['width: 35%;', 'width: 65%; text-align: left;'], table_width: '100%'} %>
   <%end%>
 <% end %>
