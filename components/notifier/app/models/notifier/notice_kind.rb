@@ -37,7 +37,7 @@ module Notifier
 
     def to_html(options = {})
       Notifier::NoticeKindsController.new.render_to_string({ 
-        :inline => template.raw_body.gsub('#{-', '<%').gsub('#{', '<%=').gsub('}','%>'),
+        :inline => template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
         :layout => 'notifier/pdf_layout',
         :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object }
         })
