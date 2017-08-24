@@ -456,8 +456,8 @@ class CensusEmployee < CensusMember
       employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
       CensusEmployee.all.non_terminated.each do |census_employee|
         begin 
-          census_employees = employer_ids.include?(census_employee.employer_profile_id)
-          if census_employees.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
+          census_employee = employee if employer_ids.include?(employee.employer_profile_id)
+          if census_employee.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
             if census_employee.new_hire_enrollment_period.last == new_date || census_employee.active_benefit_group_assignment.hbx_enrollment.try(:special_enrollment_period).try(:end_on) == new_date
               ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "ee_mid_year_plan_change_notice_congressional")
             end
