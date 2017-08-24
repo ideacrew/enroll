@@ -57,7 +57,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
         PdfTemplates::Individual.new({
           :first_name => person.first_name,
           :full_name => person.full_name,
-          :incarcerated=> check(datum["ea_incarcerated"])
+          :incarcerated=> check(datum["ea_incarcerated"]),
           :citizen_status=> citizen_status(datum["ea_citizenship"]),
           :residency_verified => datum["ea_dc_resident"].try(:upcase) == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
         })
