@@ -55,7 +55,7 @@ module Factories
           trigger_notice { "employee_open_enrollment_unenrolled" } if coverage_kind == 'health'
         end
       rescue Exception => e
-        puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
+        "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
       end
     end
 
@@ -104,7 +104,12 @@ module Factories
 
     def trigger_notice
       if !disable_notifications
-        ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        notice_name = yield
+        begin
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
+        end
       end
     end
 
@@ -119,5 +124,5 @@ module Factories
     end
   end
 
-  class FamilyEnrollmentRenewalFactoryError < StandardError; end
+class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
