@@ -114,8 +114,6 @@ class Insured::PlanShoppingsController < ApplicationController
     if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
       redirect_to print_waiver_insured_plan_shopping_path(hbx_enrollment), notice: "Waive Coverage Successful"
-      @census_employee = hbx_enrollment.census_employee
-      ee_mid_year_plan_change_notice_congressional(@census_employee) if @census_employee.present?
 
     else
       redirect_to new_insured_group_selection_path(person_id: @person.id, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id), alert: "Waive Coverage Failed"
@@ -137,9 +135,6 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.terminate_reason = params[:terminate_reason] if params[:terminate_reason].present?
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
-
-      @census_employee = hbx_enrollment.census_employee
-      ee_mid_year_plan_change_notice_congressional(@census_employee) if @census_employee.present?
       
       redirect_to family_account_path
     else

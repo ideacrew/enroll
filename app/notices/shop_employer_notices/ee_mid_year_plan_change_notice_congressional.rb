@@ -37,7 +37,7 @@ class ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional < Notice
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employer_profile.staff_roles.first.full_name.titleize
     notice.employee_fullname = census_employee.full_name.titleize
-    notice.employer_name = recipient.organization.legal_name.titleize
+    notice.employer_name = recipient.organization.legal_name.titleize.split(" ").map!{|w| (["us","usa"].include? w.downcase.strip) ? w.upcase : w}.join(' ')
     notice.primary_identifier = census_employee.employer_profile.hbx_id
     append_address(census_employee.employer_profile.organization.primary_office_location.address)
     append_hbe
