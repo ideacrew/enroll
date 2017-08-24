@@ -77,31 +77,31 @@ module Factories
 
           enrollment = enrollments_by_kind.first
           if enrollments_by_kind.size > 1
-            enrollment = enrollments_by_kind.order(:"created_at".desc).first
+            enrollment = enrollments_by_kind.sort_by(&:created_at).last
             enrollments_by_kind.each do |e|
               next if e.hbx_id == enrollment.hbx_id
               e.cancel_coverage! if e.may_cancel_coverage?
             end
           end
 
-          if enrollment.benefit_group_assignment.blank?
+          benefit_group_assignment = enrollment.benefit_group_assignment
+          if benefit_group_assignment.blank?
             @logger.debug "Benefit group assignment missing for Enrollment: #{enrollment.hbx_id}."
             next
           end
 
           if enrollment.may_begin_coverage?
             enrollment.begin_coverage!
-
             if enrollment.is_coverage_waived?
-              enrollment.benefit_group_assignment.waive_benefit
+              benefit_group_assignment.waive_benefit
             else
-              enrollment.benefit_group_assignment.begin_benefit
+              benefit_group_assignment.begin_benefit
             end
           end
         end
       end
     end
-    
+
     def enrollment_statuses
       HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES
     end
