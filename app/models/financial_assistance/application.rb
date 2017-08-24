@@ -376,7 +376,7 @@ class FinancialAssistance::Application
                 {:correlation_id => SecureRandom.uuid.gsub("-",""),
                   :body => payload,
                   :family_id => self.family_id.to_s,
-                  :application_id => self._id.to_s})
+                  :assistance_application_id => self._id.to_s})
     else
       false
     end
