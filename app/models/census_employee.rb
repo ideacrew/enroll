@@ -454,7 +454,7 @@ class CensusEmployee < CensusMember
 
     def ee_mid_year_plan_change_notice_congressional(new_date)
       employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
-      CensusEmployee.all.non_terminated.each do |census_employee|
+      CensusEmployee.all.non_terminated.each do |employee|
         begin 
           census_employee = employee if employer_ids.include?(employee.employer_profile_id)
           if census_employee.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
