@@ -8,7 +8,7 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     {content: "Dear #{notice.employer_name},"} %>
-<% binding.pry %>
+    
 <%= render partial: 'notices/shared/paragraph', :locals =>
     {content: "Your #{TimeKeeper.date_of_record.next_month.strftime('%B')}  invoice is now available in the billing tab of your DC Health Link account. Please follow the steps listed below for assistance making your premium payment."} %>
 
