@@ -1152,7 +1152,7 @@ class HbxEnrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
 
-    after_all_transitions :perform_employer_plan_year_count
+    # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing

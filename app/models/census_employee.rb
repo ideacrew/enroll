@@ -279,7 +279,7 @@ class CensusEmployee < CensusMember
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
         terminate_employee_role!
-        perform_employer_plan_year_count
+        # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }

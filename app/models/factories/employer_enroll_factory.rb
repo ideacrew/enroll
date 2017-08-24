@@ -42,7 +42,8 @@ module Factories
         expiring_plan_year.hbx_enrollments.each do |enrollment|
           begin
             enrollment.expire_coverage! if enrollment.may_expire_coverage?
-            if assignment = enrollment.benefit_group_assignment
+            if !enrollment.benefit_group_assignment_id.blank?
+              assignment = enrollment.benefit_group_assignment
               assignment.expire_coverage! if assignment.may_expire_coverage?
               assignment.update_attributes(is_active: false) if assignment.is_active?
             end
@@ -82,7 +83,7 @@ module Factories
             end
           end
 
-          if enrollment.benefit_group_assignment.blank?
+          if enrollment.benefit_group_assignment_id.blank?
             @logger.debug "Benefit group assignment missing for Enrollment: #{enrollment.hbx_id}."
             next
           end
