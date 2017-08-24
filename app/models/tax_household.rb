@@ -186,6 +186,11 @@ class TaxHousehold
     application.applicants.where(tax_household_id: self.id)
   end
 
+  def any_applicant_ia_eligible?
+    return nil unless applicants.present?
+    applicants.map(&:is_ia_eligible).include?(true)
+  end
+
   def preferred_eligibility_determination
     return nil unless family.active_approved_application
     eds = application.eligibility_determinations.where(tax_household_id: self.id)
