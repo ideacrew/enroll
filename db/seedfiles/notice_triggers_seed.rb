@@ -631,7 +631,7 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
   {
     hbx_id: 'SHOP10066',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
