@@ -114,10 +114,11 @@ module Factories
     end
 
     def renewal_plan_offered_by_er?(enrollment)
-      if enrollment.plan.present? || enrollment.plan.renewal_plan.present?
+      plan = enrollment.plan
+      if plan.present? || plan.renewal_plan_id.present?
         benefit_group = renewal_assignment.try(:benefit_group) || renewing_plan_year.default_benefit_group || renewing_plan_year.benefit_groups.first
         elected_plan_ids = (enrollment.coverage_kind == 'health' ? benefit_group.elected_plan_ids : benefit_group.elected_dental_plan_ids)
-        elected_plan_ids.include?(enrollment.plan.renewal_plan_id)
+        elected_plan_ids.include?(plan.renewal_plan_id)
       else
         false
       end
