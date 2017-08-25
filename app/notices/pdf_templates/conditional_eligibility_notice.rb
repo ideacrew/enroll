@@ -76,7 +76,7 @@ module PdfTemplates
     end
 
     def current_health_enrollments
-      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == coverage_year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def assisted_enrollments
@@ -88,7 +88,7 @@ module PdfTemplates
     end
 
     def current_dental_enrollments
-      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == coverage_year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def renewal_health_enrollment
