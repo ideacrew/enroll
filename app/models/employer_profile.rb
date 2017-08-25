@@ -145,11 +145,11 @@ class EmployerProfile
   end
 
   def broker_fired_confirmation_to_broker
-    # begin
+     # begin
       trigger_notices('broker_fired_confirmation_to_broker')
-    # rescue Exception => e
-    #   puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
-    # end
+     # rescue Exception => e
+     #   puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
+     # end
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -978,7 +978,7 @@ class EmployerProfile
   end
 
   def trigger_notices(event)
-    ShopNoticesNotifierJob.perform(self.id.to_s, event)
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
 private

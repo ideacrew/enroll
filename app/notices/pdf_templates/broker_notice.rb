@@ -12,6 +12,12 @@ module PdfTemplates
     attribute :employer_name, String
     attribute :broker_agency, String
     attribute :mpi_indicator, String
+    attribute :termination_date, Date
+    attribute :first_name, String
+    attribute :last_name, String
+    attribute :hbx_id, String
+    attribute :employer_first_name, String
+    attribute :employer_last_name, String
 
     def shop?
       return true
