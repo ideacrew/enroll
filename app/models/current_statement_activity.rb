@@ -4,8 +4,10 @@ class CurrentStatementActivity
 
   embedded_in :employer_profile_account
 
-  MethodKinds = %w(ach credit_card check)
-
-  field :desc, type: String
+  field :description, type: String
+  field :amount, type: Money
+  field :name, type: String
+  field :posting_date, type: Date
+  field :type, type: String
 
 end
