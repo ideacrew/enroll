@@ -22,11 +22,11 @@ cp = org.create_carrier_profile(id: "53e67210eb899a4603000057", abbrev: "ALT", h
 org = Organization.new(fein: "041045815", legal_name: "Blue Cross Blue Shield MA", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000061", abbrev: "BCBS", hbx_carrier_id: 20002, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['42690'])
 
-org = Organization.new(fein: "046143185", legal_name: "Delta Dental", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000065", abbrev: "DDA", hbx_carrier_id: 20004, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['11821'])
+# org = Organization.new(fein: "046143185", legal_name: "Delta Dental", office_locations: [hbx_office])
+# cp = org.create_carrier_profile(id: "53e67210eb899a4603000065", abbrev: "DDA", hbx_carrier_id: 20004, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['11821'])
 
 org = Organization.new(fein: "465661073", legal_name: "Delta Dental", office_locations: [hbx_office])
-cp = org.create_carrier_profile(id: "53e67210eb899a4603000081", abbrev: "DDA", hbx_carrier_id: 20004, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['80538'])
+cp = org.create_carrier_profile(id: "53e67210eb899a4603000081", abbrev: "DDA", hbx_carrier_id: 20004, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['80538', '11821'])
 
 org = Organization.new(fein: "042452600", legal_name: "Harvard Pilgrim Health Care", office_locations: [hbx_office])
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000073", abbrev: "HPHC", hbx_carrier_id: 20008, ivl_health: false, ivl_dental: false, shop_health: true, shop_dental: true, issuer_hios_ids: ['36046'])
