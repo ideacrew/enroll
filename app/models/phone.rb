@@ -41,6 +41,10 @@ class Phone
     end
   end
 
+  def load_full_phone_number
+    [:country_code, :area_code, :number, :extension].map { |i| self.send(i) || '' }.join('')
+  end
+
   def save_phone_components
     phone_number = filter_non_numeric(self.full_phone_number).to_s
     if !phone_number.blank?
@@ -88,6 +92,6 @@ class Phone
 
 private
   def filter_non_numeric(str)
-    str.to_s.gsub(/\D/,'') if str.present? 
+    str.to_s.gsub(/\D/,'') if str.present?
   end
 end
