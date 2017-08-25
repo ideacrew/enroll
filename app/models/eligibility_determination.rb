@@ -125,7 +125,7 @@ class EligibilityDetermination
 
   def tax_household
     return nil unless tax_household_id
-    tax_households.where(id: tax_household_id).first
+    application.tax_households.where(id: tax_household_id).first
   end
 
 private
