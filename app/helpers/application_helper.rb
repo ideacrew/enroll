@@ -666,4 +666,8 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
+  def humanize_relationships
+    PersonRelationship::Relationships_UI.map{|r| [r.to_s.humanize, r.to_s] }
+  end
+
 end
