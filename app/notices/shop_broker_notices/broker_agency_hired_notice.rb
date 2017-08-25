@@ -37,7 +37,7 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
     notice.employer_name = employer_profile.legal_name.titleize
       notice.employer = PdfTemplates::EmployerStaff.new({
             employer_first_name: employer_profile.staff_roles.first.first_name,
-            employer_phone: broker_agency_profile.phone,
+            employer_phone: employer_profile.staff_roles.first.work_phone_or_best,
             employer_last_name: employer_profile.staff_roles.first.last_name,
             employer_email: employer_profile.staff_roles.first.work_email_or_best,
 
