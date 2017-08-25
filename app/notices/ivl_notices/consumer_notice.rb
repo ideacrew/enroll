@@ -15,6 +15,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     build
     generate_pdf_notice
     attach_envelope
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
     # attach_blank_page(notice_path)
     # attach_required_documents
     # join_pdfs [notice_path, custom_notice_path]
