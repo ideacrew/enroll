@@ -135,7 +135,7 @@ module PdfTemplates
         else
           subject = "Your Health Plan and Cost Savings"
         end
-      elsif current_health_enrollments.present? && assisted_enrollments.nil?
+      elsif current_health_enrollments.present? && assisted_enrollments.empty?
         if current_dental_enrollments.present?
           subject = "Your Health and Dental Plan"
         else
