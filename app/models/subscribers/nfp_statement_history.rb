@@ -32,7 +32,6 @@ module Subscribers
         if ep.employer_profile
           employer_profile_account = ep.employer_profile.employer_profile_account || ep.employer_profile.build_employer_profile_account
           employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
-           :next_premium_amount => response[:new_charges].to_f,
            :message => response[:message],
            :past_due => response[:past_due],
            :adjustments => response[:adjustments],
