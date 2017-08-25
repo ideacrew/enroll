@@ -178,7 +178,8 @@ class Insured::GroupSelectionController < ApplicationController
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @coverage_household,
-        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'))
+        qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+        opt_effective_on: @optional_effective_on)
     end
   end
 
