@@ -494,7 +494,7 @@ class PlanYear
   end
 
   def calc_active_health_assignments_for(employee_pool)
-    benefit_group_ids = self.benefit_groups.map(&:id)
+    benefit_group_ids = self.benefit_groups.pluck(:_id)
     candidate_benefit_group_assignments = employee_pool.map do |ce|
         bg_assignment = nil
         bg_assignment = ce.active_benefit_group_assignment if benefit_group_ids.include?(ce.active_benefit_group_assignment.try(:benefit_group_id))
