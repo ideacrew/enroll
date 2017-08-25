@@ -33,9 +33,9 @@
                 <tbody>
                 <tr class="noBorder">
                   <td><%= applicant.age_of_the_applicant %></td>
-                  <td><%= applicant.person.gender %></td>
-                  <td><%= applicant.family_member.relationship %></td>
-                  <td><%= applicant.person.citizen_status %></td>
+                  <td><%= applicant.person.gender.try(:humanize) %></td>
+                  <td><%= applicant.family_member.relationship.try(:humanize) %></td>
+                  <td><%= applicant.person.citizen_status.try(:humanize) %></td>
                   <td><%= human_boolean applicant.person.is_incarcerated %></td>
                   <td>Yes</td>
                 </tr>
@@ -103,7 +103,7 @@
 
             <div class="form-bottom-border">
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-                <div class="col-md-11">Deductions</div>
+                <div class="col-md-11">Income Adjustments</div>
                 <div class="col-md-1">
                   <% if applicant.deductions.present? %>
                       <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
