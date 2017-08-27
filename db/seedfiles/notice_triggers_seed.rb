@@ -610,7 +610,28 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
+    hbx_id: 'SHOPDAE074',
+    title: 'Employee Plan Selection Confirmation',
+    description: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
+    resource_name: 'employee_role',
+    event_name: 'ee_plan_selection_confirmation_sep_new_hire',
+    notice_triggers: [
+      {
+        name: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
+        notice_template: 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
+        notice_builder: 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
+        mpi_indicator: 'MPI_SHOPDAE074',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
