@@ -57,6 +57,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    ee_plan_selection_confirmation_sep_new_hire(@enrollment)
 
     send_receipt_emails if @person.emails.first
   end

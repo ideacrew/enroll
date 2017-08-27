@@ -546,6 +546,10 @@ module ApplicationHelper
     end
   end
 
+  def ee_plan_selection_confirmation_sep_new_hire(enrollment)
+    ShopNoticesNotifierJob.perform_later(enrollment.census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire")
+  end
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
