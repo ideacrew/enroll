@@ -1,6 +1,6 @@
 namespace :shop do
   desc "Print out employer pending POCs"
-  task :employer_poc_pending_report do
+  task :employer_poc_pending_report => :environment do
     roles = Person.where(:employer_staff_roles.exists => true).map(&:employer_staff_roles).flatten
     pending = roles.select{|role| role.aasm_state == 'is_applicant'}
     time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
