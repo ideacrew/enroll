@@ -1,5 +1,4 @@
 # Report: Rake task to find users account which has email address and no oim_id
-# RAILS_ENV=production bundle exec rake migrations:terminate_enr_with_date
 require 'csv'
 
 namespace :report do
