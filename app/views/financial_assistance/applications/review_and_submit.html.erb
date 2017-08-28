@@ -33,9 +33,9 @@
                 <tbody>
                 <tr class="noBorder">
                   <td><%= applicant.age_of_the_applicant %></td>
-                  <td><%= applicant.person.gender.try(:humanize) %></td>
-                  <td><%= applicant.family_member.relationship.try(:humanize) %></td>
-                  <td><%= applicant.person.citizen_status.try(:humanize) %></td>
+                  <td><%= applicant.person.gender.humanize %></td>
+                  <td><%= applicant.family_member.relationship.humanize %></td>
+                  <td><%= applicant.person.citizen_status.humanize if applicant.person.citizen_status.present? %></td>
                   <td><%= human_boolean applicant.person.is_incarcerated %></td>
                   <td>Yes</td>
                 </tr>
