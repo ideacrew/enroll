@@ -4,9 +4,8 @@ require 'csv'
 
 namespace :report do
   namespace :user_account do
-
     desc "List of users with no oim_id"
-    task :with_no_oim_id  do |task, args|
+    task :with_no_oim_id => :environment do
       users = User.where(:"oim_id".exists=>false, :"email".exists=>true)
       field_names  = %w(
                user_id
