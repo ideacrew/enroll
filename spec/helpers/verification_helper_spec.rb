@@ -185,13 +185,15 @@ RSpec.describe VerificationHelper, :type => :helper do
   end
 
   describe "#documents count" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person) }
+
     it "returns the number of uploaded documents" do
-      person.consumer_role.vlp_documents<<FactoryGirl.build(:vlp_document)
-      expect(helper.documents_count(person)).to eq 2
+      family.family_members.first.person.consumer_role.vlp_documents<<FactoryGirl.build(:vlp_document)
+      expect(helper.documents_count(family)).to eq 2
     end
     it "returns 0 for consumer without vlp" do
-      person.consumer_role.vlp_documents = []
-      expect(helper.documents_count(person)).to eq 0
+      family.family_members.first.person.consumer_role.vlp_documents = []
+      expect(helper.documents_count(family)).to eq 0
     end
   end
 

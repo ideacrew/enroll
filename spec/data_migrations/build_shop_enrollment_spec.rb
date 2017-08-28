@@ -26,6 +26,9 @@ describe BuildShopEnrollment do
       allow(ENV).to receive(:[]).with("fein").and_return plan_year.employer_profile.parent.fein
       allow(ENV).to receive(:[]).with("hios_id").and_return nil
       allow(ENV).to receive(:[]).with("active_year").and_return nil
+      allow(ENV).to receive(:[]).with("enr_aasm_state").and_return nil
+      allow(ENV).to receive(:[]).with("coverage_kind").and_return nil
+      allow(ENV).to receive(:[]).with("waiver_reason").and_return nil
       person.employee_roles[0].update_attributes(census_employee_id: census_employee.id)
       census_employee.update_attributes(employee_role_id: person.employee_roles[0].id)
     end
@@ -75,6 +78,23 @@ describe BuildShopEnrollment do
         subject.migrate
         person.reload
         expect(person.primary_family.active_household.hbx_enrollments.first.plan_id).to eq plan.id
+      end
+    end
+
+    context "creating dental waiver enrollment" do
+      before do
+        allow(ENV).to receive(:[]).with("enr_aasm_state").and_return "inactive"
+        allow(ENV).to receive(:[]).with("coverage_kind").and_return "dental"
+        subject.migrate
+        person.reload
+      end
+
+      it "should generate a dental enrollment" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.coverage_kind).to eq "dental"
+      end
+
+      it "should generate a waiver" do
+        expect(person.primary_family.active_household.hbx_enrollments.first.aasm_state).to eq "inactive"
       end
     end
   end
