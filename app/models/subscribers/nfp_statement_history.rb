@@ -38,6 +38,19 @@ module Subscribers
            :payments => response[:payments],
            :total_due => response[:total_due]
            )
+
+           employer_profile_account.current_statement_activity.destroy_all
+           response[:adjustment_items].each do |line|
+             csa = CurrentStatementActivity.new
+             csa.description = line[:description]
+             csa.name = line[:name]
+             csa.amount = line[:amount]
+             csa.posting_date = line[:posting_date]
+             csa.type = line[:type]
+             employer_profile_account.current_statement_activity << csa
+             csa.save
+           end
+
         end
 
       rescue => e
