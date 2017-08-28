@@ -50,7 +50,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def aptc_amount(member)
     if @tax_households.present?
       if !@tax_households.map(&:application_id).include?(nil)
-        @tax_household = @tax_households.select{|thh|  thh if thh.applicants.map(&:applicant_id).include?(member.applicant_id)}.first
+        @tax_household = @tax_households.select{|thh|  thh if thh.applicants.map(&:family_member_id).include?(member.applicant_id)}.first
       else
         @tax_household = @tax_households.select{|thh|  thh if thh.tax_household_members.map(&:applicant_id).include?(member.applicant_id)}.first
       end

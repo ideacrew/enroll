@@ -3,7 +3,7 @@ module Aptc
     if person.present? && person.has_active_consumer_role?
       family = person.primary_family
       if family.active_approved_application.present?
-        person.primary_family.active_approved_application.latest_active_tax_households_with_year(year).first rescue nil
+        person.primary_family.active_approved_application.latest_active_tax_households_with_year(year) rescue nil
       else
         person.primary_family.latest_household.latest_active_tax_households_with_year(year) rescue nil
       end

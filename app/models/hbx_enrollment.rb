@@ -804,7 +804,7 @@ class HbxEnrollment
       end
     else
       if apply_aptc
-        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_household)
+        UnassistedPlanCostDecorator.new(qhp_plan, self, elected_aptc, tax_households)
       else
         UnassistedPlanCostDecorator.new(qhp_plan, self)
       end
