@@ -669,6 +669,27 @@ shop_notice_triggers = [
             }
         ]
     },
+    {
+        hbx_id: 'SHOP40',
+        title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
+        description: 'Employee mid year plan change when an eligiblity determination is reached',
+        resource_name: 'employer',
+        event_name: 'employee_mid_year_plan_change',
+        notice_triggers: [
+          {
+                name: 'Employee Mid-Year Plan change',
+                notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
+                notice_builder: 'ShopEmployeeNotices::EmployeeMidYearPlanChange',
+                mpi_indicator: 'MPI_SHOP40',
+                notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["employer"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+                }
+            }
+        ]
+    }
 ]
 
 ivl_notice_triggers = [
