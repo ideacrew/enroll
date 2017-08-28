@@ -17,7 +17,7 @@
       </tr>
       <tr>
         <td><%= member_name_by_id(missing_relationships.first.flatten.first) %></td>
-        <td><%= select_tag "kind", options_for_select(relationship_kinds), include_blank: true, required: true%></td>
+        <td><%= select_tag "kind", options_for_select(humanize_relationships), include_blank: true, required: true%></td>
         <td><%= member_name_by_id(missing_relationships.first.flatten.second) %></td>
       </tr>
     </table>
