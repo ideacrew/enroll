@@ -21,13 +21,15 @@ class ShopEmployerNotices::InitialEmployerDenialNotice < ShopEmployerNotice
         when "primary_office_location"
           plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
         end
-      end      
+      end
+        unless employer_profile.is_zip_outside?
+         plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
+        end
     else
       plan_year_warnings << "primary business address not located in #{Settings.aca.state_name}"
     end
-    
     notice.plan_year = PdfTemplates::PlanYear.new({
-          :warnings => plan_year_warnings,
+          :warnings => plan_year_warnings.uniq,
         })
   end
 
