@@ -151,9 +151,18 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
     broker_fired_confirmation_to_broker
     broker_agency_fired_confirmation
+  end
+
+  def employer_broker_fired
+    begin
+      trigger_notices('employer_broker_fired')
+    rescue Exception => e
+      puts "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" unless Rails.env.test?
+    end
   end
 
   def broker_agency_fired_confirmation
