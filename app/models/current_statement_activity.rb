@@ -6,6 +6,11 @@ class CurrentStatementActivity
 
   MethodKinds = %w(ach credit_card check)
 
-  field :desc, type: String
+  field :description, type: String
+  field :name, type: String
+  field :type, type: String
+  field :posting_date, type: Date
+  field :amount, type: Money
+
 
 end
