@@ -24,6 +24,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def edit
+    save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find params[:id]
     matrix = @family.build_relationship_matrix
@@ -32,6 +33,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def step
+    save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]
@@ -95,6 +97,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def help_paying_coverage
+    save_faa_bookmark(@person, request.original_url)
     @transaction_id = params[:id]
   end
 
@@ -123,10 +126,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def application_checklist
+    save_faa_bookmark(@person, request.original_url)
     @application = @person.primary_family.application_in_progress
   end
 
   def review_and_submit
+    save_faa_bookmark(@person, request.original_url)
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
     @applicants = @application.applicants
@@ -135,11 +140,13 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def wait_for_eligibility_response
+    save_faa_bookmark(@person, financial_assistance_applications_path)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
   end
 
   def eligibility_results
+    save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -147,6 +154,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def application_publish_error
+    save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
@@ -154,6 +162,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   end
 
   def eligibility_response_error
+    save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
