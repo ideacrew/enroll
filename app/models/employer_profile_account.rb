@@ -8,23 +8,24 @@ class EmployerProfileAccount
 
   field :next_premium_due_on, type: Date
   field :next_premium_amount, type: Money
-  # temp fields
+
   field :message, type: String
-  field :past_due, type: String
-  field :previous_balance, type: String
-  field :new_charges, type: String
-  field :adjustments, type: String
-  field :payments, type: String
-  field :total_due, type: String
+  field :past_due, type: Money
+  field :previous_balance, type: Money
+  field :new_charges, type: Money
+  field :adjustments, type: Money
+  field :payments, type: Money
+  field :total_due, type: Money
 
   field :aasm_state, type: String, default: "binder_pending"
 
   embeds_many :premium_payments
+  embeds_many :current_statement_activity
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :premium_payments
 
-  validates_presence_of :next_premium_due_on, :next_premium_amount
+  #validates_presence_of :next_premium_due_on, :next_premium_amount
 
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 

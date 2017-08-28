@@ -32,13 +32,25 @@ module Subscribers
         if ep.employer_profile
           employer_profile_account = ep.employer_profile.employer_profile_account || ep.employer_profile.build_employer_profile_account
           employer_profile_account.update_attributes!(:next_premium_due_on => Date.today,
-           :next_premium_amount => response[:new_charges].to_f,
            :message => response[:message],
            :past_due => response[:past_due],
            :adjustments => response[:adjustments],
            :payments => response[:payments],
            :total_due => response[:total_due]
            )
+
+           employer_profile_account.current_statement_activity.destroy_all
+           response[:adjustment_items].each do |line|
+             csa = CurrentStatementActivity.new
+             csa.description = line[:description]
+             csa.name = line[:name]
+             csa.amount = line[:amount]
+             csa.posting_date = line[:posting_date]
+             csa.type = line[:type]
+             employer_profile_account.current_statement_activity << csa
+             csa.save
+           end
+
         end
 
       rescue => e
