@@ -16,12 +16,12 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
   let(:renewal_plan) { FactoryGirl.create(:plan)}
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
-      :name =>'Ee Mid Year Plan Change Notice',
+      :name =>'Notification to employees regarding plan purchase during Open Enrollment or an SEP',
       :notice_template => 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
       :notice_builder => 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
       :event_name => 'ee_plan_selection_confirmation_sep_new_hire',
-      :mpi_indicator => 'MPI_SHOP37',
-      :title => "MidYearPlanChangeNotice"})
+      :mpi_indicator => 'MPI_SHOPDAE074',
+      :title => "Employee Plan Selection Confirmation"})
   }
 
   let(:valid_params) {{
@@ -79,10 +79,5 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
 
-    it "should append data" do
-      sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-      @employer_notice.append_data
-      expect(@employer_notice.notice.sep.effective_on).to eq effective_on
-    end
   end
 end

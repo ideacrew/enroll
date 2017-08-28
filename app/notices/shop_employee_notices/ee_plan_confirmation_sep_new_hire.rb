@@ -1,4 +1,5 @@
-class ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
+class
+ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
 
   attr_accessor :census_employee
 
