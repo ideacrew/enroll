@@ -1,14 +1,14 @@
 require "rails_helper"
 
-require File.join(Rails.root, "components/transport_gateway/spec/lint/credentials/sftp_credentials")
+require File.join(File.dirname(__FILE__), "../../../../../transport_gateway/spec/lint/credentials/sftp_credentials")
 
-describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" do
+describe TransportProfiles::TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" do
 
   describe "given a uri which has no userinfo" do
     let(:no_credential_uri) { URI.parse("ftp:///alksjdfkljef") }
 
     it "finds nothing" do
-      expect(TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
+      expect(TransportProfiles::TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
     end
   end
 
@@ -16,7 +16,7 @@ describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" 
     let(:no_credential_uri) { URI.parse("ftp:///:kkjljsf@something.com/") }
 
     it "finds nothing" do
-      expect(TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
+      expect(TransportProfiles::TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
     end
   end
 
@@ -24,7 +24,7 @@ describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" 
     let(:username) { "user#($&#$&:;\"{)_#@^" }
     let(:credential_uri) { URI.parse("sftp://#{ERB::Util.url_encode(username)}@host1.com") }
     let!(:credential) do
-      TransportCredentials::SftpTransportCredential.create!({
+      TransportProfiles::TransportCredentials::SftpTransportCredential.create!({
         :user => username,
         :host => "host1.com",
         :password => "NOTHING"
@@ -36,7 +36,7 @@ describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" 
     end
 
     it "finds the matching credentials" do
-      expect(TransportCredentials::SftpTransportCredential.credentials_for_sftp(credential_uri)).to eq credential
+      expect(TransportProfiles::TransportCredentials::SftpTransportCredential.credentials_for_sftp(credential_uri)).to eq credential
     end
   end
 
@@ -44,7 +44,7 @@ describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" 
     let(:username) { "user#($&#$&:;\"{)_#@^" }
     let(:no_credential_uri) { URI.parse("sftp://#{ERB::Util.url_encode(username)}@host2.com") }
     let!(:credential) do
-      TransportCredentials::SftpTransportCredential.create!({
+      TransportProfiles::TransportCredentials::SftpTransportCredential.create!({
         :user => username,
         :host => "host1.com",
         :password => "NOTHING"
@@ -56,13 +56,13 @@ describe TransportCredentials::SftpTransportCredential, ".credentials_for_sftp" 
     end
 
     it "finds nothing" do
-      expect(TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
+      expect(TransportProfiles::TransportCredentials::SftpTransportCredential.credentials_for_sftp(no_credential_uri)).to eq nil
     end
   end
 
 end
 
-describe TransportCredentials::SftpTransportCredential, "given:
+describe TransportProfiles::TransportCredentials::SftpTransportCredential, "given:
 - a user
 - a password
 " do
@@ -70,7 +70,7 @@ describe TransportCredentials::SftpTransportCredential, "given:
   let(:expected_password) { "password1" }
   let(:host) { "host1" }
   let(:sftp_credentials) do
-    TransportCredentials::SftpTransportCredential.new({
+    TransportProfiles::TransportCredentials::SftpTransportCredential.new({
       :user => expected_user,
       :password => expected_password,
       :host => host
@@ -79,7 +79,7 @@ describe TransportCredentials::SftpTransportCredential, "given:
   it_behaves_like "sftp credentials, using a password"
 end
 
-describe TransportCredentials::SftpTransportCredential, "given:
+describe TransportProfiles::TransportCredentials::SftpTransportCredential, "given:
 - a user
 - a key pem 
 " do
@@ -87,7 +87,7 @@ describe TransportCredentials::SftpTransportCredential, "given:
   let(:expected_key_pem) { "98273498712983740983742(*&34043" }
   let(:host) { "host1" }
   let(:sftp_credentials) do
-    TransportCredentials::SftpTransportCredential.new({
+    TransportProfiles::TransportCredentials::SftpTransportCredential.new({
       :user => expected_user,
       :key_pem => expected_key_pem,
       :host => host
@@ -96,7 +96,7 @@ describe TransportCredentials::SftpTransportCredential, "given:
   it_behaves_like "sftp credentials, using a key pem"
 end
 
-describe TransportCredentials::SftpTransportCredential do
+describe TransportProfiles::TransportCredentials::SftpTransportCredential do
   it "is invalid without a user" do
     subject.valid?
     expect(subject.errors.keys).to include(:user)

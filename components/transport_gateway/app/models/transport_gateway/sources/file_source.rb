@@ -9,7 +9,9 @@ module TransportGateway
       end
 
       def cleanup
-        @stream.close
+        if !@stream.closed?
+          @stream.close
+        end
       end
     end
   end

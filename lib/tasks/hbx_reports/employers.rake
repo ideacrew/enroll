@@ -133,6 +133,8 @@ namespace :reports do
       pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_range.first} - #{date_range.last}, #{processed_count} employers output to file: #{file_name}"
+      pubber = Publishers::LegacyShopReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
     end
   end
 end
