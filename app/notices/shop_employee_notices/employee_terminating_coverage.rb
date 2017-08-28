@@ -11,12 +11,12 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverage < ShopEmployeeNotice
     
  end
  	def append_data
- 		enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
-    plan = enrollment.plan
+    terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
+    plan = terminated_enrollment.plan
     notice.plan = PdfTemplates::Plan.new({
-                                             :plan_name => plan.try(:name)
+                                             :plan_name => plan.name
                                          })
- 		terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
+ 		
     notice.enrollment = PdfTemplates::Enrollment.new({
       :terminated_on => terminated_enrollment.set_coverage_termination_date,
       :enrolled_count => terminated_enrollment.humanized_dependent_summary

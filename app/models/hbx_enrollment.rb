@@ -1455,7 +1455,7 @@ class HbxEnrollment
 
   def notify_employee_confirming_coverage_termination
     if is_shop? && self.census_employee.present?
-      ShopNoticesNotifierJob.perform(self.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
+      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
     end
   end
   

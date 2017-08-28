@@ -77,4 +77,21 @@ describe "append data" do
       expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
     end
   end
+describe "Rendering terminating_coverage_notice template and generate pdf" do
+    before do
+      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+    it "should render terminating_coverage_notice" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_coverage"
+    end
+    it "should generate pdf" do
+      @employee_notice.build
+      @employee_notice.append_data
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end 
+
 end
