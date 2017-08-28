@@ -699,6 +699,8 @@ private
   def create_tax_households
     ## Remove  when copy method is fixed to exclude copying Tax Household
     tax_households.destroy_all
+    eligibility_determinations.destroy_all
+
     applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
     ##
     applicants.each do |applicant|
