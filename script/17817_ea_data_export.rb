@@ -32,12 +32,12 @@ while offset < family_count
              person.is_incarcerated, person.citizen_status,
              person.is_dc_resident?]
 
-      policy.hbx_enrollment_members.each do |hbx_enrollment_member|
-        next if hbx_enrollment_member.person == person
-        row = row + [hbx_enrollment_member.person.hbx_id,
-                     hbx_enrollment_member.person.is_incarcerated, hbx_enrollment_member.person.citizen_status,
-                     hbx_enrollment_member.person.is_dc_resident?]
-      end
+      # policy.hbx_enrollment_members.each do |hbx_enrollment_member|
+      #   next if hbx_enrollment_member.person == person
+      #   row = row + [hbx_enrollment_member.person.hbx_id,
+      #                hbx_enrollment_member.person.is_incarcerated, hbx_enrollment_member.person.citizen_status,
+      #                hbx_enrollment_member.person.is_dc_resident?]
+      # end
       csv << row
     rescue => e
       puts "Error policy id #{policy.id} family id #{policy.family.id}" + e.message + "   " + e.backtrace.first
