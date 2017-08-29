@@ -666,7 +666,7 @@ class EmployerProfile
               puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error {e}"
             end
           end
-        elsif (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
+        elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month 
           initial_employers_reminder_to_publish(start_on_1).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")

@@ -17,7 +17,7 @@
 <% case notice.notification_type %>
 <% when "initial_employer_first_reminder_to_publish_plan_year" %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Action is needed to complete your application for employer-sponsored health coverage with the #{site_short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/%d/%Y")}. Please complete your application by this date or you may have to reapply for coverage starting at a later date."} %>
+  content: "Action is needed to complete your application for employer-sponsored health coverage with the #{site_short_name}. The deadline to complete your application has been extended to #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}. Please complete your application by this date or you may have to reapply for coverage starting at a later date."} %>
 <% when "initial_employer_second_reminder_to_publish_plan_year"%>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Action is needed to complete your application for employer-sponsored health coverage with the #{aca_state_name} #{site_short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}/%Y")}."} %>
@@ -27,10 +27,10 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "For detailed information on how to complete your application for employer-sponsored coverage, please review our <strong>Employer guide to applying for coverage</strong> in our Business Resource Center."} %>
+  content: "For detailed information on how to complete your application for employer-sponsored coverage, please review our <strong>Employer guide to applying for coverage</strong> in our <a href= '#{site_business_resource_center_url}'>Business Resource Center.</a>"} %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  previous: "Please note in order to participate in #{site_short_name}, your group must meet the following eligibility requirements:",
-  listings: [["You have submitted documents to show that your group meets residency requirements:", ["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR", "You offer coverage through #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the small group exchange serving their primary worksite(s)."]],
+  previous: "Please note in order to participate in the #{site_short_name}, your group must meet the following eligibility requirements:",
+  listings: [["You have submitted documents to show that your group meets residency requirements:", ["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR", "You offer coverage through the #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the small group exchange serving their primary worksite(s)."]],
     "At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage.",
     "At least one non-owner employee enrolls in health coverage."]} %>
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -48,7 +48,7 @@
           <ul style="list-style: circle solid;">
           <li class="notice-font-padding">
             <strong>Log in to your <%= site_website_name%> Account</strong><br><br>
-            You will need to submit proof of your eligibility as a <%= aca_state_name %> small business to the <%= site_short_name %> before you or your employees can shop for coverage. You can find a list of documents that can be submitted as proof on our website. You can submit your documents by uploading to our website or faxing to <%= contact_center_alt_fax_number%>.
+            You will need to submit proof of your eligibility as a <%= aca_state_name %> small business to the <%= site_short_name %> before you or your employees can shop for coverage. You can find a list of documents that can be submitted as proof <a href= <%=site_document_verification_checklist_url%>>on our website.</a>. You can submit your documents by uploading to our website or faxing to <%= contact_center_alt_fax_number%>.
           </li>
           </ul>
         </td>
