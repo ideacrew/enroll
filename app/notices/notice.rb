@@ -4,7 +4,7 @@ class Notice
   include Config::SiteHelper
   include Config::ContactCenterHelper
 
-  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header
+  attr_accessor :from, :to, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep
 
   Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
 
@@ -20,6 +20,7 @@ class Notice
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
     self.name = params[:name] || recipient.first_name
+    self.sep = params[:sep]
   end
 
   def html(options = {})
