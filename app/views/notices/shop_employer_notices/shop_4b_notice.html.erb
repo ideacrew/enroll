@@ -54,7 +54,7 @@ content: "<span #{@style_color_text}>[SHOP4B]</span><br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
  previous: "You can also contact #{Settings.site.short_name} with any questions:",
  listings: ["Online at #{notice.hbe.url};",
-            "By email at #{notice.hbe.email}; or",
+            "By email at <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>; or",
             "By calling #{notice.hbe.phone}."] }%>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<p style='display:flex'>
