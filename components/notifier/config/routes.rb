@@ -5,5 +5,9 @@ Notifier::Engine.routes.draw do
     member do
       get :preview
     end
+
+    collection do
+      post :delete_notices
+    end
   end
 end

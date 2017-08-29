@@ -1,8 +1,20 @@
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
 
+    def index
+      @notice_kinds = Notifier::NoticeKind.all
+      @datatable = Effective::Datatables::NoticesDatatable.new
+    end
+
     def new
-      @notice_kind = Notifier::NoticeKind.find('5987104cfb9cddd6a0000005')
+      @notice_kind = Notifier::NoticeKind.new
+      @notice_kind.template = Notifier::Template.new
+      # @notice_kind = #find('5987104cfb9cddd6a0000005')
+    end
+
+    def edit
+      @notice_kind = Notifier::NoticeKind.find(params[:id])
+      render :layout => 'notifier/application'
     end
 
     def create
@@ -27,10 +39,10 @@ module Notifier
       # template = Template.new(raw_body: params['template'])
       # notice_kind = NoticeKind.new(title: 'Sample')
       # notice_kind.template = template
-      notice_kind = Notifier::NoticeKind.find('5987104cfb9cddd6a0000005')
+      notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
 
-      render :json => { :message => "notice generated successuflly." }
+      send_file "#{Rails.root}/public/Sample.pdf", :type => 'application/pdf', :disposition => 'inline'
     end
 
     def show
@@ -39,6 +51,12 @@ module Notifier
 
       render :inline => notice_kind.template.raw_body.gsub('#{-', '<%').gsub('#{', '<%=').gsub('}','%>'), :layout => 'notifier/pdf_layout', :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object }
 
+    end
+
+    def delete_notices
+      Notifier::NoticeKind.where(:id.in => params['ids']).each do |notice|
+        notice.delete
+      end
     end
 
     private
