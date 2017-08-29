@@ -11,49 +11,53 @@
     </tr>
   </thead>
   <tbody>
-    <!-- Starting Balancce -->
+    <!-- Starting Balance -->
     <tr>
       <td></td>
       <td><strong>Previous Balance</strong></td>
       <td></td>
-      <td><%= number_to_currency(@previous_balance) %></td>
+      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:previous_balance)) || "Data not available" %></td>
     </tr>
     <!-- Payment -->
     <tr>
       <td><%= @most_recent_payment_date %></td>
       <td>Payment</td>
-      <td><%= number_to_currency(@payments) %></td>
+      <td><%= (@employer_profile.try(:employer_profile_account).try(:payments)) || "Data not available" %></td>
       <td></td>
     </tr>
     <!-- New Charges -->
     <tr>
       <td></td>
       <td>New Charges</td>
-      <td><%= number_to_currency(@new_charges) %></td>
+      <td><%= (@employer_profile.try(:employer_profile_account).try(:new_charges)) || "Data not available" %></td>
       <td></td>
     </tr>
     <!-- Adjustments -->
     <tr>
       <td class="icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
       <td>Adjustments since last invoice</td>
-      <td><%= number_to_currency(@adjustments) %></td>
+      <td></td>
       <td></td>
     </tr>
 
     <!-- Payments -->
+    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity).size == 0 %>
     <tr class="payments">
       <td></td>
-      <td>Nikola</td>
-      <td>Aleksandra</td>
-      <td>Andreja</td>
-    </tr>
-
-    <tr class="payments">
+      <td>There have been no adjustments since the last invoice.</td>
       <td></td>
-      <td>Nikola</td>
-      <td>Aleksandra</td>
-      <td>Andreja</td>
+      <td></td>
     </tr>
+    <% else %>
+      <% @employer_profile.try(:employer_profile_account).try(:current_statement_activity).each do |activity| %>
+        <tr class="payments">
+          <td><%= activity.coverage_month %></td>
+          <td><%= activity.description %></td>
+          <td><%= number_to_currency(activity.amount) %></td>
+          <td></td>
+        </tr>
+      <% end %>
+    <% end %>
 
   </tbody>
 
