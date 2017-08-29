@@ -161,7 +161,7 @@ class EmployerProfile
     begin
       trigger_notices('employer_broker_fired')
     rescue Exception => e
-      puts "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" unless Rails.env.test?
+      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
     end
   end
 

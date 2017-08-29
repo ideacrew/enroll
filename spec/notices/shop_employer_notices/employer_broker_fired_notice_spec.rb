@@ -95,17 +95,16 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
     end
   end
 
-  describe "Rendering environment_notice template and genearte pdf" do
+  describe "Rendering notice template and genearte pdf" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @eligibility_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)
     end
-    it "should render environment_notice" do
+    it "should render notice" do
       expect(@eligibility_notice.template).to eq "notices/shop_employer_notices/employer_broker_fired_notice"
     end
     it "should generate pdf" do
       @eligibility_notice.append_hbe
-      #bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
       @eligibility_notice.build
       file = @eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
