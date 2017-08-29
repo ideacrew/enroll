@@ -650,14 +650,6 @@ module ApplicationHelper
     end
   end
 
-  # Returns URL to the Edit page of FinancialAssistance::Application if there exists an Application in progress
-  # If there is no application in progress, returns nil.
-  def faa_edit_page
-    application_in_progress = @person.primary_family.application_in_progress
-    return nil if application_in_progress.blank?
-    edit_financial_assistance_application_path(application_in_progress)
-  end
-
   def current_year
     TimeKeeper.date_of_record.year
   end
