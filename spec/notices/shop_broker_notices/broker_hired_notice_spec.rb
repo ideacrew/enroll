@@ -12,7 +12,7 @@ RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Broker Hired',
-                            :notice_template => 'notices/shop_broker_notices/broker_hired',
+                            :notice_template => 'notices/shop_broker_notices/broker_hired_notice',
                             :notice_builder => 'ShopBrokerNotices::BrokerHiredNotice',
                             :event_name => 'broker_hired',
                             :mpi_indicator => 'SHOP_D048',
@@ -77,7 +77,13 @@ RSpec.describe ShopBrokerNotices::BrokerHiredNotice do
     end
 
     it "should render broker_agency_hired" do
-      expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_hired"
+      expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_hired_notice"
+    end
+
+    it "should generate pdf" do
+      @broker_notice.build
+      file = @broker_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
   
