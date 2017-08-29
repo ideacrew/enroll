@@ -10,6 +10,6 @@ class CurrentStatementActivity
   field :posting_date, type: Date
   field :amount, type: Money
   field :coverage_month, type: Date
-
+  field :payment_method, type: String
 
 end
