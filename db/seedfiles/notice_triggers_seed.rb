@@ -615,7 +615,7 @@ shop_notice_triggers = [
       hbx_id: 'SHOP_D050',
       title: 'Broker Agency Fired',
       description: 'PDF Generation for Broker after Termination',
-      resource_name: 'employer',
+      resource_name: 'broker_role',
       event_name: 'broker_agency_termination_notice',
       notice_triggers: [
           {
