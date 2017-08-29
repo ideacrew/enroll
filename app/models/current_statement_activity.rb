@@ -11,6 +11,6 @@ class CurrentStatementActivity
   field :type, type: String
   field :posting_date, type: Date
   field :amount, type: Money
-  field :coverage_month, type: Date, default: TimeKeeper.date_of_record
+  field :coverage_month, type: Date
 
 end
