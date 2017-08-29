@@ -18,7 +18,9 @@
 //= require bootstrap-multiselect
 //= require jquery.selectric.min
 //= require turbolinks
+//= require notifier/ckeditor/basepath.js.erb
 //= require ckeditor/init
+//= require_tree ./ckeditor/plugins
 //= require_tree .
 
 
@@ -37,4 +39,7 @@ $(document).ready(function () {
            }
          });
   });
+
+
+
 })
