@@ -47,6 +47,7 @@ module Subscribers
              csa.amount = line[:amount]
              csa.posting_date = line[:posting_date]
              csa.type = line[:type]
+             csa.coverage_month = line[:coverage_month]
              employer_profile_account.current_statement_activity << csa
              csa.save
            end
