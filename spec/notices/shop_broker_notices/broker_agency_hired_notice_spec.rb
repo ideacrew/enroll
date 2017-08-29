@@ -79,6 +79,12 @@ RSpec.describe ShopBrokerNotices::BrokerAgencyHiredNotice do
     it "should render broker_agency_hired" do
       expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_agency_hired_notice"
     end
+
+    it "should generate pdf" do
+      @broker_notice.build
+      file = @broker_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
   end
   
 end
