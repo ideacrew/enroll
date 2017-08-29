@@ -357,7 +357,7 @@ class BrokerRole
     if has_broker_agency_profile?
       families = self.broker_agency_profile.family_clients
       families.each do |f|
-        f.terminate_broker_agency
+        f.current_broker_agency.destroy
       end
     end
     
