@@ -1,58 +1,74 @@
 <%if missing_relationships.present?%>
-  <h1 class="darkblue">Household Relationships</h1>
-  <p>Enter this household member's relationship to other members of your household. Click Add Relationship to proceed.</p>
-  <%= form_tag "/insured/family_relationships", remote: form_remote do %>
-    <%= hidden_field_tag :family_id, family.id%>
-    <%= hidden_field_tag :predecessor_id, missing_relationships.first.flatten.first%>
-    <%= hidden_field_tag :successor_id, missing_relationships.first.flatten.second%>
-    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id]%>
-    <%= hidden_field_tag :resident_role_id, params[:resident_role_id]%>
-    <%= hidden_field_tag :employee_role_id, params[:employee_role_id]%>
-    <%= hidden_field_tag :redirect_url, redirect_url%>
-    <table class="table">
-      <tr>
-        <th> Member A </th>
-        <th> Relationship to </th>
-        <th> Member B </th>
-      </tr>
-      <tr>
-        <td><%= member_name_by_id(missing_relationships.first.flatten.first) %></td>
-        <td><%= select_tag "kind", options_for_select(humanize_relationships), include_blank: true, required: true%></td>
-        <td><%= member_name_by_id(missing_relationships.first.flatten.second) %></td>
-      </tr>
-    </table>
-    <br />
-    <%= submit_tag "Add Relationship", class: "btn btn-primary" %>
-  <% end %>
+	<h1 class="darkblue">Family Relationships</h1>
+	<p>We need to understand which members of your household are related. Select the relationship for each person listed below. Then select CONTINUE..</p>
+	<%= form_tag "/insured/family_relationships", remote: form_remote do %>
+		<%= hidden_field_tag :family_id, family.id%>
+		<%= hidden_field_tag :predecessor_id, missing_relationships.first.flatten.first%>
+		<%= hidden_field_tag :successor_id, missing_relationships.first.flatten.second%>
+		<%= hidden_field_tag :consumer_role_id, params[:consumer_role_id]%>
+		<%= hidden_field_tag :resident_role_id, params[:resident_role_id]%>
+		<%= hidden_field_tag :employee_role_id, params[:employee_role_id]%>
+		<%= hidden_field_tag :redirect_url, redirect_url%>
+
+		<div class="household">
+			<div class="usercard">
+				<div class="row card-detail-titles">
+					<div class="col-lg-3">Name</div>
+					<div class="col-lg-5">Relationship *</div>
+					<div class="col-lg-4">Household Member</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-3"><%= member_name_by_id(missing_relationships.first.flatten.first) %></div>
+					<div class="col-lg-5">
+						<div class="dd-rel">is
+							<select class="relation">
+								<option value="mother" selected="selected">Mother of</option>
+								<option value="father">Father of</option>
+								<option value="child">Child of</option>
+							</select>
+						</div>
+						<div class="icon-rel">
+							<i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+							<i class="fa fa-link" aria-hidden="true"></i>
+							<i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+						</div>
+					</div>
+					<div class= "col-lg-4">
+						<%= member_name_by_id(missing_relationships.first.flatten.second) %>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<%= submit_tag "Add Relationship", class: "btn btn-primary" %>
+	<% end %>
 <%else%>
-  <h1 class="darkblue">Household Relationships</h1>
-  <div>
-    <h4>All the relationships are added. Please continue.</h4>
-    <% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present?%>
-      <h4> Please click continue to proceed.</h4>
-    <% end %>
-  </div>
-
-  <br />
-  <div>
-    <table id="relationship-matrix">
-      <thead>
-        <th></th> 
-        <%@people.each do |person|%>
-          <th><%=person.full_name%></th>
-        <%end%>
-      </thead>
-      <tbody>
-        <%@matrix.each_with_index do |relationships_row, index_x|%>
-          <tr>
-            <td><b><%=@people[index_x].full_name%></b></td>
-            <%relationships_row.each_with_index do |rel, index_y|%>
-              <td><small><%= rel.titleize if rel.present?%></small></td>
-            <%end%>
-          </tr>
-        <%end%>
-      </tbody>
-    </table>
-  </div>
+	<h1 class="darkblue">Household Relationships</h1>
+	<div>
+		<h4>All the relationships are added. Please continue.</h4>
+		<% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present?%>
+			<h4> Please click continue to proceed.</h4>
+		<% end %>
+	</div>
+	<br />
+	<div>
+		<table id="relationship-matrix">
+			<thead>
+				<th></th>
+				<%@people.each do |person|%>
+					<th><%=person.full_name%></th>
+				<%end%>
+			</thead>
+			<tbody>
+				<%@matrix.each_with_index do |relationships_row, index_x|%>
+					<tr>
+						<td><b><%=@people[index_x].full_name%></b></td>
+						<%relationships_row.each_with_index do |rel, index_y|%>
+							<td><small><%= rel.titleize if rel.present?%></small></td>
+						<%end%>
+					</tr>
+				<%end%>
+			</tbody>
+		</table>
+	</div>
 <%end%>
-
