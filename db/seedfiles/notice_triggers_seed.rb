@@ -679,7 +679,7 @@ shop_notice_triggers = [
           {
                 name: 'Employee Mid-Year Plan change',
                 notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                notice_builder: 'ShopEmployeeNotices::EmployeeMidYearPlanChange',
+                notice_builder: 'EmployeeMidYearPlanChange',
                 mpi_indicator: 'MPI_SHOP40',
                 notice_trigger_element_group: {
                   market_places: ['shop'],

@@ -18,6 +18,7 @@ module PdfTemplates
     attribute :to, String
     attribute :plan, PdfTemplates::Plan
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
 
     def shop?
       return true

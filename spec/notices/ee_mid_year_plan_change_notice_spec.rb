@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
+RSpec.describe EmployeeMidYearPlanChange do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -18,7 +18,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employee Mid-Year Plan change',
                             :notice_template => 'notices/shop_employer_notices/employee_mid_year_plan_change',
-                            :notice_builder => 'ShopEmployeeNotices::EmployeeMidYearPlanChange',
+                            :notice_builder => 'EmployeeMidYearPlanChange',
                             :event_name => 'eemployee_mid_year_plan_change',
                             :mpi_indicator => 'MPI_SHOP40',
                             :title => "EMPLOYEE has made a change to their employer-sponsored coverage selection"})
@@ -34,11 +34,11 @@ RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
   describe "New" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployeeNotices::EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::EmployeeMidYearPlanChange.new(census_employee, valid_params)}.not_to raise_error
+        expect{EmployeeMidYearPlanChange.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{ShopEmployeeNotices::EmployeeMidYearPlanChange.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{EmployeeMidYearPlanChange.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -55,7 +55,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
   describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployeeNotices::EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
     end
 
     it "should build notice with all necessory info" do
@@ -74,7 +74,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeMidYearPlanChange do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
-      @employer_notice = ShopEmployeeNotices::EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
       sep.effective_on = effective_on
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end

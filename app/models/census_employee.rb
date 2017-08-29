@@ -466,14 +466,12 @@ class CensusEmployee < CensusMember
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
-      CensusEmployee.mid_year_plan_change(new_date)
+      CensusEmployee.employee_mid_year_plan_change(new_date)
     end
 
-    def mid_year_plan_change(new_date)
-      employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups" => true).map{|org| org.employer_profile.id}
-      CensusEmployee.all.non_terminated.each do |employee|
+    def employee_mid_year_plan_change(new_date)
+      CensusEmployee.all.non_terminated.each do |census_employee|
         begin
-          census_employee = employee if employer_ids.include?(employee.employer_profile_id)
           if census_employee.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
             if census_employee.new_hire_enrollment_period.last == new_date || census_employee.active_benefit_group_assignment.hbx_enrollment.try(:special_enrollment_period).try(:end_on) == new_date
               ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change")
