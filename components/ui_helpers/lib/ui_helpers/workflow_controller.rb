@@ -10,6 +10,7 @@ module UIHelpers
 
       before_filter :find_or_create, only: :step
       before_filter :load_steps, only: :step
+      before_filter :load_support_texts, only: :step
       before_filter :current_step, only: :step
     end
 
@@ -29,6 +30,10 @@ module UIHelpers
 
     def load_steps
       @steps = Workflow::Steps.new YAML.load_file(Rails.root + "app/views/#{controller_path}/steps.yml")
+    end
+
+    def load_support_texts
+      @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
     end
 
     def current_step
