@@ -52,7 +52,7 @@
       <% @employer_profile.try(:employer_profile_account).try(:current_statement_activity).each do |activity| %>
         <tr class="payments">
           <td><%= activity.coverage_month %></td>
-          <td><%= activity.description %></td>
+          <td><%= activity.name %></td>
           <td><%= number_to_currency(activity.amount) %></td>
           <td></td>
         </tr>
