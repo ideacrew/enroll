@@ -14,7 +14,7 @@
 
   <div class="form-group col-xs-8">
     <label for="noticeDescription">Receipient</label>
-    <%= f.select(:receipient, options_for_select(Notifier::NoticeKind::RECEIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}), { :class => 'form-control'} ) %>
+    <%= f.select(:receipient, options_for_select(Notifier::NoticeKind::RECEIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.receipient), { :class => 'form-control'} ) %>
   </div>
  
   <div class="form-group col-xs-12">
