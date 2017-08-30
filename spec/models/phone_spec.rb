@@ -44,19 +44,6 @@ describe Phone, type: :model do
     end
   end
 
-  context "load_full_phone_number" do
-    let!(:phone) { build(:phone, country_code: "1", area_code: "222", number: "3334444", extension: "555") }
-
-    it "returns a combined number" do
-      expect(phone.load_full_phone_number).to eq('12223334444555')
-    end
-
-    it "can handle a nil extension" do
-      phone.extension = nil
-      expect(phone.load_full_phone_number).to eq('12223334444')
-    end
-  end
-
   context "set_full_phone_number" do
     let(:params) {{kind: "home", number: "111-3333", area_code: "123", person: person}}
     let(:phone) {Phone.create(**params)}
