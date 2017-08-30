@@ -17,10 +17,10 @@
   { content: "Congratulations! You successfully linked your Massachusetts #{site_short_name} account to your employer, #{notice.employer_name}. You may be eligible to enroll in employer-sponsored health insurance at this time." }%>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you have not already done so, you can complete the application process through your <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> employee account.  You can find step-by-step instructions for applying to enroll in the health plan(s) offered to you by your employer in our <strong>Employee guide to enrolling</strong>, which you can find in our online <a href='#{site_business_resource_center_url}'>Business Resource Center</a>."} %>
+  { content: "If you have not already done so, you can complete the application process through your <a href= '#{site_main_web_address_url}'>#{site_website_name}</a> employee account.  You can find step-by-step instructions for applying to enroll in the health plan(s) offered to you by your employer in our <strong>Employee guide to enrolling</strong>, which you can find in our online #{link_to_site_business_resource_center}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "<i>Note:</i> If you have other insurance coverage and do not wish to apply to enroll into the plan(s) offered to you by #{notice.employer_full_name} during your enrollment period, you must still apply to “waive” coverage during your enrollment period. You can find instructions for how to waive coverage in our <strong>Employee guide to waiving coverage</strong>, also available in the <a href='#{site_business_resource_center_url}'>Business Resource Center</a>."} %>
+  { content: "<i>Note:</i> If you have other insurance coverage and do not wish to apply to enroll into the plan(s) offered to you by #{notice.employer_full_name} during your enrollment period, you must still apply to “waive” coverage during your enrollment period. You can find instructions for how to waive coverage in our <strong>Employee guide to waiving coverage</strong>, also available in the #{link_to_site_business_resource_center}."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: '', col_styles: ['margin-bottom: 0px']} %>
