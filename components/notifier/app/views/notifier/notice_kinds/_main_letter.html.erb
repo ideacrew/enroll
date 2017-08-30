@@ -1,0 +1,20 @@
+<table class="total_table address custom-address" border="0">
+  <tbody>
+    <tr><td colspan="2"><br><br></td></tr>
+    <tr>
+      <td colspan="2" class="fssize health-connector-address "><%= receipient.primary_fullname %></td>
+    </tr>
+    <tr>
+       <td colspan="2" class="fssize1 health-connector-address"><%= receipient.primary_address.street_1 %></td>
+    </tr>
+    <% if receipient.primary_address.street_2.present? %>
+    <tr>
+      <td colspan="2" class="fssize1 health-connector-address"><%= receipient.primary_address.street_2 %></td>
+    </tr>
+    <% end %>
+    <tr>
+      <td class="fssize1 health-connector-address"><%= receipient.primary_address.city %> <%= receipient.primary_address.state %> <%= receipient.primary_address.zip %></td>
+       <td align="right" style="padding-right: 15px">Notice No. <%= receipient.try(:mpi_indicator) || "SHOP_M001" %></td>
+    </tr>
+  </tbody>
+</table>

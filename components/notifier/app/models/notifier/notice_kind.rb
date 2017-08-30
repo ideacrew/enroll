@@ -20,48 +20,31 @@ module Notifier
     embeds_one :template, class_name: "Notifier::Template"
     embeds_one :merge_data_model
 
-    # def self.markdown
-    #   Redcarpet::Markdown.new(ReplaceTokenRenderer,
-    #       no_links: true,
-    #       hard_wrap: true,
-    #       disable_indented_code_blocks: true,
-    #       fenced_code_blocks: false,        
-    #     )
-    # end
-
-    # # Markdown API: http://www.rubydoc.info/gems/redcarpet/3.3.4
-    # def to_html
-    #   self.markdown.render(template.body)
-    # end
-
-    def view_template
-      'notifier/notice_kinds/template.html.erb'
-    end
-
-    def notice_filename
-      "#{title.titleize.gsub(/\s*/, '')}"
+    def receipient_class_name
+      receipient.constantize.class_name.underscore
     end
 
     def to_html(options = {})
-      Notifier::NoticeKindsController.new.render_to_string({ 
+      Notifier::NoticeKindsController.new.render_to_string({
+        :template => 'notifier/notice_kinds/template.html.erb', 
+        :layout => false,
+        :locals => { receipient: receipient.constantize.stubbed_object}
+      }) + Notifier::NoticeKindsController.new.render_to_string({ 
         :inline => template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        #:template => 'notifier/notice_kinds/template.html.erb',
         :layout => 'notifier/pdf_layout',
-        :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object, notice_kind: self }
-        })
-    end
-  
-    def notice_path
-      Rails.root.join("public", "Sample.pdf")
+        :locals => { receipient_class_name => receipient.constantize.stubbed_object }
+      })
     end
 
+    def save_html
+      File.open(Rails.root.join("tmp", "notice.html"), 'wb') do |file|
+        file << self.to_html({kind: 'pdf'})
+      end
+    end 
+  
     def to_pdf
       WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options)
     end
-
-    # def to_pdf
-    #   WickedPdf.new.pdf_from_string(to_html, pdf_options)
-    # end
 
     def generate_pdf_notice
       File.open(notice_path, 'wb') do |file|
@@ -92,5 +75,23 @@ module Notifier
           }
       }
     end
+
+    def notice_path
+      Rails.root.join("public", "NoticeTemplate.pdf")
+    end
+
+    # def self.markdown
+    #   Redcarpet::Markdown.new(ReplaceTokenRenderer,
+    #       no_links: true,
+    #       hard_wrap: true,
+    #       disable_indented_code_blocks: true,
+    #       fenced_code_blocks: false,        
+    #     )
+    # end
+
+    # # Markdown API: http://www.rubydoc.info/gems/redcarpet/3.3.4
+    # def to_html
+    #   self.markdown.render(template.body)
+    # end
   end
 end

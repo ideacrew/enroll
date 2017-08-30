@@ -30,10 +30,10 @@ module Notifier
     end
 
     def update
-      template = Notifier::NoticeKind.find(params['id']).template
-      template.update_attributes!(raw_body: params['notice_kind']['template']['raw_body'].html_safe)
-      flash[:notice] = 'Notice content updated successfully'
+      notice_kind = Notifier::NoticeKind.find(params['id'])
+      notice_kind.update_attributes(notice_params)
 
+      flash[:notice] = 'Notice content updated successfully'
       redirect_to notice_kinds_path
     end
 
@@ -77,7 +77,7 @@ module Notifier
     private
 
     def notice_params
-      params.require(:notice_kind).permit(:title, :description, {:template => [:raw_body]})
+      params.require(:notice_kind).permit(:title, :description, :receipient, {:template => [:raw_body]})
     end
   end
 end
