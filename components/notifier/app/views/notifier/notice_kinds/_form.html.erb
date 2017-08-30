@@ -1,20 +1,24 @@
-<h2>Create Notice Template</h2>
+<h2><%= notice_kind.persisted? ? 'Edit' : 'Create' %> Notice Template</h2>
 
-<%= stylesheet_link_tag    "notifier/application", media: "all" %>
-<%= javascript_include_tag "notifier/application" %>
+<span class="pull-right">
+<%= link_to preview_notice_kind_path(id: notice_kind.id), class: "btn btn-primary notice-preview", target: '_blank' do %>
+    <span class="glyphicon glyphicon-eye-open"></span> Preview
+<% end %>
+</span>
 
+<div class="row">
 <%= form_for notice_kind do |f| %>
-  <div class="form-group">
+  <div class="form-group col-xs-8">
     <label for="noticeTitle">Title</label>
     <%= f.text_field :title, class: 'form-control' %>
   </div>
 
-  <div class="form-group">
+  <div class="form-group col-xs-8">
     <label for="noticeDescription">Description</label>
     <%= f.text_field :description, class: 'form-control' %>
   </div>
  
-  <div class="form-group">
+  <div class="form-group col-xs-12">
     <%= f.fields_for :template do |template_form| %>
     <label for="noticeBody">NoticeBody</label>
       <%= template_form.cktext_area :raw_body, value: notice_kind.template.raw_body, class: 'notice_template' %>
@@ -22,16 +26,15 @@
   </div>
 
   <%= hidden_field_tag 'notice_preview_url', preview_notice_kind_path(id: notice_kind.id) %>
-
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <div class="col-xs-12">
+    <button type="submit" class="btn btn-primary">Submit</button>
+   </div>
 <% end %>
-
+</div>
 
 <!-- <a href="#" class="btn btn-primary notice-preview"><span class="glyphicon glyphicon-eye-open"></span> Preview</a>
  -->
-<%= link_to preview_notice_kind_path(id: notice_kind.id), class: "btn btn-primary notice-preview", target: '_blank' do %>
-    <span class="glyphicon glyphicon-eye-open"></span> Preview
-<% end %>
+
 
 <!-- <div class='pdf_preview_container'>
 </div> -->

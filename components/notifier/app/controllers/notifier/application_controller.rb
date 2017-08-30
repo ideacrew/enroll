@@ -1,5 +1,6 @@
 module Notifier
   class ApplicationController < ActionController::Base
-    layout "notifier/application"
+    include Pundit
+    layout "notifier/single_column"
   end
 end

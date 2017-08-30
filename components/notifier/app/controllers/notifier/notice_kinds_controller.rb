@@ -1,6 +1,8 @@
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
 
+    layout 'notifier/single_column'
+
     def index
       @notice_kinds = Notifier::NoticeKind.all
       @datatable = Effective::Datatables::NoticesDatatable.new
@@ -25,38 +27,33 @@ module Notifier
       if notice_kind.save
         flash[:notice] = 'Notice created successfully'
       end
-      redirect_to new_notice_kind_path
+      redirect_to notice_kinds_path
     end
 
     def update
       template = Notifier::NoticeKind.find(params['id']).template
       template.update_attributes!(raw_body: params['notice_kind']['template']['raw_body'].html_safe)
       flash[:notice] = 'Notice content updated successfully'
-      redirect_to new_notice_kind_path
+
+      redirect_to notice_kinds_path
     end
 
     def preview
-      # template = Template.new(raw_body: params['template'])
-      # notice_kind = NoticeKind.new(title: 'Sample')
-      # notice_kind.template = template
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
 
-      send_file "#{Rails.root}/public/Sample.pdf", :type => 'application/pdf', :disposition => 'inline'
-    end
-
-    def show
-      notice_kind = Notifier::NoticeKind.find('5987104cfb9cddd6a0000005')
-            # render :inline => notice_kind.template.raw_body.gsub('#{', '<%=').gsub('}','%>'), :layout => 'notifier/pdf_layout'
-
-      render :inline => notice_kind.template.raw_body.gsub('#{-', '<%').gsub('#{', '<%=').gsub('}','%>'), :layout => 'notifier/pdf_layout', :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object }
-
+      send_file "#{Rails.root}/public/Sample.pdf", 
+        :type => 'application/pdf', 
+        :disposition => 'inline'
     end
 
     def delete_notices
       Notifier::NoticeKind.where(:id.in => params['ids']).each do |notice|
         notice.delete
       end
+
+      flash[:notice] = 'Notices deleted successfully'
+      redirect_to notice_kinds_path
     end
 
     private
