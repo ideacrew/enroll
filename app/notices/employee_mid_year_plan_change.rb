@@ -5,12 +5,12 @@ class EmployeeMidYearPlanChange < Notice
 
   def initialize(census_employee, args = {})
     self.census_employee = census_employee
-    args[:recipient] = census_employee.employee_role.person
+    args[:recipient] = census_employee.employer_profile
     args[:market_kind]= 'shop'
-    args[:notice] = PdfTemplates::EmployeeNotice.new
-    args[:to] = census_employee.employee_role.person.work_email_or_best
-    args[:name] = census_employee.employee_role.person.full_name
-    args[:recipient_document_store]= census_employee.employee_role.person
+    args[:notice] = PdfTemplates::EmployerNotice.new
+    args[:to] = census_employee.employer_profile.staff_roles.first.work_email_or_best
+    args[:name] = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    args[:recipient_document_store]= census_employee.employer_profile
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
@@ -37,15 +37,13 @@ class EmployeeMidYearPlanChange < Notice
 
   def build
     notice.notification_type = self.event_name
-    notice.subject = self.subject
     notice.mpi_indicator = self.mpi_indicator
-    notice.primary_fullname = census_employee.employee_role.person.full_name
-    notice.mpi_indicator = self.mpi_indicator
-    notice.primary_identifier = census_employee.employee_role.person.hbx_id
-    notice.employer_name = census_employee.employer_profile.legal_name
-    append_hbe
+    notice.primary_fullname = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    notice.employer_name = recipient.organization.legal_name.titleize
+    notice.primary_identifier = census_employee.employer_profile.hbx_id
+    notice.employee_fullname = census_employee.full_name.titleize
+    append_address(census_employee.employer_profile.organization.primary_office_location.address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
-    append_address(census_employee.employee_role.person.mailing_address)
   end
 
   def non_discrimination_attachment
