@@ -860,7 +860,7 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => [:renewal_employer_ineligibility_notice, :zero_employees_on_roster]
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
@@ -1209,6 +1209,14 @@ class PlanYear
   def renewal_employer_open_enrollment_completed
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
+  end
+
+  def renewal_employee_enrollment_confirmation
+    if is_renewing?
+      self.employer_profile.census_employees.enrolled.each do |ce|
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+      end
+    end
   end
 
   def renewal_employer_ineligibility_notice
