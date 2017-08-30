@@ -118,5 +118,10 @@ describe Phone, type: :model do
     it "when extension doesn't present" do
       expect(phone.to_s).to eq "(222) 111-3333"
     end
+
+    it "when extesnion is default" do
+      phone.extension = ""
+      expect(phone.to_s).to eq "(222) 111-3333"
+    end
   end
 end
