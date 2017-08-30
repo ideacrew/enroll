@@ -145,8 +145,8 @@ class Insured::FamiliesController < FamiliesController
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
-
-    if (@future_qualified_date || !@qualified_date) == true
+    
+    if (@future_qualified_date || !@qualified_date) == true && params[:qle_id].present?
       sep_request_denial_notice
     end
   end
@@ -235,6 +235,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def sep_request_denial_notice
+    # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
     begin
       ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee, "sep_request_denial_notice", options = {qle_reported_date: @qle_date, qle_id: @qle.id})
     rescue Exception => e
