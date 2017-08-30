@@ -14,7 +14,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
                             :mpi_indicator => 'SHOP_M027',
                             :title => "Reminder to publish Application"})
                           }
-    let(:valid_parmas) {{
+    let(:valid_params) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
         :event_name => application_event.event_name,
@@ -27,15 +27,15 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_params)}.not_to raise_error
       end
     end
 
     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
-          valid_parmas.delete(key)
-          expect{ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          valid_params.delete(key)
+          expect{ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
         end
     end
@@ -44,7 +44,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_params)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,7 +57,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_params)
       @employer_notice.append_data
     end
     it "should append necessary" do
@@ -67,4 +67,19 @@ RSpec.describe ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear do
     end
   end
 
+describe "Rendering terminating_coverage_notice template and generate pdf" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::InitialEmployerReminderToPublishPlanYear.new(employer_profile, valid_params)
+    end
+    it "should render employer reminder notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_reminder_to_publish_plan_year"
+    end
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end
