@@ -28,7 +28,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active employee role" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
 
       it "should have active employee role but no benefit group" do
@@ -36,11 +36,11 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
 
     end
-    
+
     context "with active employee role and benefit group" do
       let(:person) { FactoryGirl.create(:person, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
       end
 
@@ -56,17 +56,17 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
       end
       it "should have both active consumer and employee role" do
         expect(subject.can_shop_both_markets?(person)).not_to be_truthy
       end
     end
-    
+
     context "with active consumer role" do
       let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_employee_role) }
       before do
-        allow(person).to receive(:has_active_employee_role?).and_return(true) 
+        allow(person).to receive(:has_active_employee_role?).and_return(true)
         allow(person).to receive(:has_employer_benefits?).and_return(true)
       end
       it "should have both active consumer and employee role" do
@@ -594,7 +594,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         end
       end
 
-      context "when EE selects SEP & effective_on does not covers under renewal plan year period", db_clean: :after_each do
+      context "when EE selects SEP & effective_on does not covers under renewal plan year period", dbclean: :after_each do
 
         before do
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
@@ -613,7 +613,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         end
       end
 
-      context "when EE selects SEP & effective_on covers under renewal plan year period", db_clean: :after_each do
+      context "when EE selects SEP & effective_on covers under renewal plan year period", dbclean: :after_each do
 
         before do
           allow(active_bg).to receive(:is_offering_dental?).and_return true
