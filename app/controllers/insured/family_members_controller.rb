@@ -2,6 +2,7 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
 
   before_action :set_current_person, :set_family
+  before_filter :load_support_texts, only: [:new, :edit, :create]
 
   def index
     set_bookmark_url
@@ -222,6 +223,10 @@ private
 
   def set_family
     @family = @person.try(:primary_family)
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def init_address_for_dependent
