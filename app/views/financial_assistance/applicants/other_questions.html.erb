@@ -42,6 +42,10 @@
           <%= f.radio_button("is_pregnant", false, class: "radio-yml", id: "is_pregnant_no", required: true) %>
           <label class="radio-yml" for="is_pregnant_no">No</label>
         </div>
+        <div class='col-md-2'>
+          <a href="#is_pregnant" data-toggle="modal" data-target="#is_pregnant">Not Sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %>
+        </div>
       </div>
 
     <div class="row row-form-wrapper no-buffer row-height">
@@ -205,6 +209,10 @@
           <%= f.radio_button("is_self_attested_blind", false, class: "radio-yml", id: "is_self_attested_blind_no", required: true )%>
           <label class="radio-yml" for="is_self_attested_blind_no">No</label>
         </div>
+        <div class='col-md-2'>
+          <a href="#is_self_assisted_blind" data-toggle="modal" data-target="#is_self_assisted_blind">Not Sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_self_assisted_blind"} %>
+        </div>
       </div>
 
       <div class="row row-form-wrapper no-buffer row-height">
@@ -219,6 +227,10 @@
           <%= f.radio_button("has_daily_living_help", false, class: "radio-yml", id: "has_daily_living_no", required: true) %>
           <label class="radio-yml" for="has_daily_living_help_no">No</label>
         </div>
+        <div class='col-md-2'>
+          <a href="#has_daily_living_help" data-toggle="modal" data-target="#has_daily_living_help">Not Sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_daily_living_help"} %>
+        </div>
       </div>
 
       <div class="row row-form-wrapper no-buffer row-height">
@@ -232,6 +244,10 @@
         <div class='col-md-2'>
           <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "has_daily_living_help_no", required: true )%>
           <label class="radio-yml" for="need_help_paying_bills_no">No</label>
+        </div>
+        <div class='col-md-2'>
+          <a href="#need_help_paying_bills" data-toggle="modal" data-target="#need_help_paying_bills">Not Sure?</a>
+          <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "need_help_paying_bills"} %>
         </div>
       </div>
       <% if @person.eligible_immigration_status.present? %>
