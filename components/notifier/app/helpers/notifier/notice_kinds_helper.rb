@@ -60,14 +60,8 @@ module Notifier
       false
     end
 
-    # def notice_template(notice_kind)
-    #   notice_kind.template.raw_body.gsub(/\#\{(\w+)\}/) do |match| 
-    #     if respond_to?(match[2..-2].to_sym)
-    #       send(match[2..-2].to_sym) 
-    #     else
-    #       match
-    #     end
-    #   end.html_safe
-    # end
+    def notice_template(notice_kind)
+      notice_kind.template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>').html_safe
+    end
   end
 end

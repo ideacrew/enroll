@@ -1,9 +1,24 @@
 module Notifier
-  class MergeDataModels::EmployerProfile
+  class MergeDataModels::EmployeeProfile
     include Virtus.model
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
-    
+
+    # attribute :notification_type, String
+    # attribute :subject, String
+    # attribute :mpi_indicator, String
+    # attribute :primary_fullname, String
+    # attribute :primary_identifier, String
+    # attribute :mpi_indicator, String
+    # attribute :primary_address, PdfTemplates::NoticeAddress
+    # attribute :employer_name, String
+    # attribute :broker, PdfTemplates::Broker
+    # attribute :hbe, PdfTemplates::Hbe
+    # attribute :plan, PdfTemplates::Plan
+    # attribute :enrollment, PdfTemplates::Enrollment
+    # attribute :email, String
+    # attribute :plan_year, PdfTemplates::PlanYear
+
     attribute :primary_fullname, String, default: 'John Whitmore'
     attribute :primary_identifier, String
     attribute :mpi_indicator, String
@@ -11,21 +26,7 @@ module Notifier
     attribute :application_date, Date
     attribute :employer_name, String, default: 'MA Health Connector'
     attribute :primary_address, MergeDataModels::Address
-    attribute :broker, MergeDataModels::Broker
-    attribute :to, String
-    attribute :plan, MergeDataModels::Plan
-    attribute :plan_year, MergeDataModels::PlanYear
     attribute :addresses, Array[MergeDataModels::Address]
-
-    def self.stubbed_object
-      notice = Notifier::MergeDataModels::EmployerProfile.new
-      notice.primary_address = Notifier::MergeDataModels::Address.new
-      notice.plan_year = Notifier::MergeDataModels::PlanYear.new
-      notice.plan = Notifier::MergeDataModels::Plan.new
-      notice.broker = Notifier::MergeDataModels::Broker.new
-      notice.addresses = [ notice.primary_address ]
-      notice
-    end
 
     def collections
       %w{addresses}

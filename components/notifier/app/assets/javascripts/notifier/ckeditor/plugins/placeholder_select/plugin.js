@@ -41,7 +41,7 @@ CKEDITOR.plugins.add('placeholder_select',
 			}
 
 			if (config.placeholders[i].type == 'condition'){
-				format = '[[ if %placeholder% ]] <br /> [[ end ]]';
+				format = '[[ if %placeholder% ]] <br /> [[ else ]] <br /> [[ end ]]';
 			}
 
 

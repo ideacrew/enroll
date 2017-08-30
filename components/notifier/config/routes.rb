@@ -8,6 +8,8 @@ Notifier::Engine.routes.draw do
 
     collection do
       post :delete_notices
+      get :get_tokens
+      get :get_placeholders
     end
   end
 end
