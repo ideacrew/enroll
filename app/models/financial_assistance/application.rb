@@ -27,8 +27,16 @@ class FinancialAssistance::Application
 
   # TODO: Need enterprise ID assignment call for Assisted Application
   field :hbx_id, type: String
+
+  ## Remove after data Cleanup ##
   field :external_id, type: String
   field :integrated_case_id, type: String
+  ##
+
+  field :haven_app_id, type: String
+  field :haven_ic_id, type: String
+  field :e_case_id, type: String
+
   field :applicant_kind, type: String
 
   field :request_kind, type: String
