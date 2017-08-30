@@ -6,6 +6,8 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include Acapi::Notifiers
   require 'securerandom'
 
+  before_filter :load_support_texts, only: [:help_paying_coverage]
+
   def index
     @family = @person.primary_family
     @applications = @family.applications
@@ -194,6 +196,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def hash_to_param param_hash
     ActionController::Parameters.new(param_hash)
+  end
+
+  def load_support_texts
+   @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
   end
 
   def permit_params(attributes)

@@ -6,7 +6,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   include FinancialAssistanceHelper
 
   before_filter :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
-
+  before_filter :load_support_texts, only: [:other_questions, :step]
 
   def edit
     @applicant = @application.applicants.find(params[:id])
@@ -73,6 +73,10 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   end
 
   private
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+  end
 
   def format_date_params model_params
     model_params["pregnancy_due_on"]=Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
