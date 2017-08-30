@@ -40,6 +40,8 @@ module Subscribers
            )
 
            employer_profile_account.current_statement_activity.destroy_all
+           employer_profile_account.premium_payments.destroy_all
+
            response[:adjustment_items].each do |line|
              csa = CurrentStatementActivity.new
              csa.description = line[:description]
@@ -50,6 +52,16 @@ module Subscribers
              csa.coverage_month = line[:coverage_month]
              employer_profile_account.current_statement_activity << csa
              csa.save
+           end
+
+           response[:payment_history].each do |payment|
+             payment = PremiumPayment.new
+             payment.paid_on = payment[:paid_on]
+             payment.reference_id = payment[:reference_id]
+             payment.method_kind = payment[:method_kind]
+             payment.amount = payment[:amount]
+             employer_profile_account.premium_payments << payment
+             payment.save
            end
 
         end
