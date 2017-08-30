@@ -252,6 +252,12 @@ class ApplicationController < ActionController::Base
         @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
+
+    def save_faa_bookmark person, url
+      return if person.consumer_role.blank?
+      person.consumer_role.update_attribute(:bookmark_url, url)
+    end
+
     def set_bookmark_url(url=nil)
       set_current_person
       bookmark_url = url || request.original_url

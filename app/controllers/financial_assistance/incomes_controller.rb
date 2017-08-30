@@ -1,11 +1,14 @@
  class FinancialAssistance::IncomesController < ApplicationController
 
+  before_action :set_current_person
+
   include UIHelpers::WorkflowController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
 
   def index
+    save_faa_bookmark(@person, request.original_url)
     render layout: 'financial_assistance'
   end
 
@@ -17,6 +20,7 @@
   end
 
   def step
+    save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
     flash[:error] = nil
     model_name = @model.class.to_s.split('::').last.downcase
     model_params = params[model_name]

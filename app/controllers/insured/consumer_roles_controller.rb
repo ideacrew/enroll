@@ -20,7 +20,7 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to bookmark_url || family_account_path
     elsif @person.try(:consumer_role?)
       bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s + "?#{@key.to_s}=#{@val.to_s}" : nil
-      redirect_to faa_edit_page || bookmark_url || family_account_path
+      redirect_to bookmark_url || family_account_path
     end
   end
 
