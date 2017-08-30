@@ -41,7 +41,7 @@ module Notifier
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
 
-      send_file "#{Rails.root}/public/Sample.pdf", 
+      send_file "#{Rails.root}/public/NoticeTemplate.pdf", 
         :type => 'application/pdf', 
         :disposition => 'inline'
     end

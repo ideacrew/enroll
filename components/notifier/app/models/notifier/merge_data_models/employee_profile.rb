@@ -20,16 +20,26 @@ module Notifier
     # attribute :plan_year, PdfTemplates::PlanYear
 
     attribute :primary_fullname, String, default: 'John Whitmore'
+    attribute :notice_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :primary_address, MergeDataModels::Address
+    attribute :employer_name, String, default: 'MA Health Connector'
+    attribute :date_of_hire, String, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :new_hire_coverage_begin_date, String, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :new_hire_oe_end_date, String, default: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y')
+
     attribute :primary_identifier, String
     attribute :mpi_indicator, String
-    attribute :notice_date, Date, default: '08/07/2017'
     attribute :application_date, Date
-    attribute :employer_name, String, default: 'MA Health Connector'
-    attribute :primary_address, MergeDataModels::Address
-    attribute :addresses, Array[MergeDataModels::Address]
+
+  
+    def self.stubbed_object
+      notice = Notifier::MergeDataModels::EmployeeProfile.new
+      notice.primary_address = Notifier::MergeDataModels::Address.new
+      notice
+    end
 
     def collections
-      %w{addresses}
+      []
     end
 
     def conditions

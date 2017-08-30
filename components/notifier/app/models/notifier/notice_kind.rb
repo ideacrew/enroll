@@ -32,7 +32,7 @@ module Notifier
       }) + Notifier::NoticeKindsController.new.render_to_string({ 
         :inline => template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
         :layout => 'notifier/pdf_layout',
-        :locals => { receipient_class_name => receipient.constantize.stubbed_object }
+        :locals => { receipient_class_name.to_sym => receipient.constantize.stubbed_object }
       })
     end
 
