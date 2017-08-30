@@ -39,7 +39,7 @@
                 <td class="mpi_indicator">
                   <ul style="list-style: circle;">
                   <li class="notice_spacing">
-                     Email: <%=small_business_email_link%>
+                     Email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}", target: "_blank"%>
                   </li>
                   </ul>
                 </td>

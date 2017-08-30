@@ -420,6 +420,10 @@ class User
     def logins_before_captcha
       4
     end
+
+    def has_answered_question? security_question_id
+      where(:'security_question_responses.security_question_id' => security_question_id).any?
+    end
   end
 
   # def password_digest(plaintext_password)

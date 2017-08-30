@@ -25,7 +25,7 @@ class Exchanges::SecurityQuestionsController < ApplicationController
 
   def update
     @question = SecurityQuestion.find(params[:id])
-    if @question.update_attributes(security_question_params)
+    if @question.safe_to_edit_or_delete? && @question.update_attributes(security_question_params)
       redirect_to exchanges_security_questions_path, notice: 'Question was updated successfully'
     else
       render :edit
@@ -34,8 +34,13 @@ class Exchanges::SecurityQuestionsController < ApplicationController
 
   def destroy
     @question = SecurityQuestion.find(params[:id])
-    @question.destroy
-    redirect_to exchanges_security_questions_path, notice: 'Question was deleted successfully.'
+    if @question.safe_to_edit_or_delete?
+      @question.destroy
+      notice = 'Question was deleted successfully.'
+    else
+      notice = 'That Question is already in use'
+    end
+    redirect_to exchanges_security_questions_path, notice: notice
   end
 
   private

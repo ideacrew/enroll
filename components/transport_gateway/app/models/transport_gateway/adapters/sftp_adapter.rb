@@ -17,8 +17,7 @@ module TransportGateway
 
       target_uri = message.from
 
-      parse_credentials(target_uri)
-      check_credential_provider(target_uri)
+      resolve_from_credentials(message)
       if @user.blank? || @credential_options.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source server credentials not found" }
         raise ArgumentError.new("source server username:password not provided")
@@ -42,17 +41,16 @@ module TransportGateway
     def send_message(message)
       if (message.from.blank? && message.body.blank?)
         log(:error, "transport_gateway.sftp_adapter") { "source data not provided" }
-        raise ArgumentError.new "source data not provided" if (message.from.blank? && message.body.blank?)
+        raise ArgumentError.new "source data not provided"
       end
       unless message.to.present?
         log(:error, "transport_gateway.sftp_adapter") { "destination not provided" }
-        raise ArgumentError.new "destination not provided" unless message.to.present?
+        raise ArgumentError.new "destination not provided"
       end
 
       target_uri = message.to
 
-      parse_credentials(target_uri)
-      check_credential_provider(target_uri)
+      resolve_to_credentials(message)
       if @user.blank? || @credential_options.blank?
         log(:error, "transport_gateway.sftp_adapter") { "target server credentials not found" }
         raise ArgumentError.new("target server username:password not provided")
@@ -71,6 +69,24 @@ module TransportGateway
         raise e
       ensure
         source.cleanup
+      end
+    end
+
+    def resolve_from_credentials(message)
+      cr = CredentialResolvers::SftpCredentialResolver.new(message, credential_provider)
+      creds = cr.source_credentials
+      unless creds.blank?
+        @user = creds.user
+        @credential_options = creds.sftp_options
+      end
+    end
+
+    def resolve_to_credentials(message)
+      cr = CredentialResolvers::SftpCredentialResolver.new(message, credential_provider)
+      creds = cr.destination_credentials
+      unless creds.blank?
+        @user = creds.user
+        @credential_options = creds.sftp_options
       end
     end
 
@@ -95,20 +111,6 @@ module TransportGateway
     end
 
     private
-    def check_credential_provider(target_uri)
-      return nil if credential_provider.blank?
-      found_credentials = credential_provider.credentials_for(target_uri)
-      return nil if found_credentials.blank?
-      @user = found_credentials.user
-      @credential_options = found_credentials.sftp_options
-    end
-
-    def parse_credentials(uri)
-      return nil if uri.user.blank? || uri.password.blank?
-      @user     ||= URI.decode(uri.user)
-      @credential_options ||= {:password => URI.decode(uri.password)}
-    end
-
     def find_or_create_target_folder_for(sftp, path)
       folder = File.dirname(path)
       begin

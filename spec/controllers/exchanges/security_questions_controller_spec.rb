@@ -1,17 +1,19 @@
 require 'rails_helper'
 
-RSpec.describe Exchanges::SecurityQuestionsController do
+RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
 
   let(:user) { FactoryGirl.create(:user, with_security_questions: false) }
   let(:person) { FactoryGirl.create(:person, user: user) }
   let(:hbx_staff_role) { FactoryGirl.create(:hbx_staff_role, person: person) }
-  let(:question) { FactoryGirl.create(:security_question) }
+  let(:question) { instance_double("SecurityQuestion", title: 'Your Question', id: '1') }
 
   before :each do
     allow(user).to receive(:has_hbx_staff_role?).and_return true
+
+    allow(SecurityQuestion).to receive(:all).and_return([question])
+    allow(SecurityQuestion).to receive(:find).with(question.id).and_return(question)
     sign_in user
   end
-  after { SecurityQuestion.destroy_all }
 
   describe 'GET index' do
     before { get :index }
@@ -53,26 +55,60 @@ RSpec.describe Exchanges::SecurityQuestionsController do
   end
 
   describe 'PUT update' do
+    let(:true_if_allowed) { true }
+    let(:title) { 'Updated title' }
+    before do
+      allow(question).to receive(:safe_to_edit_or_delete?).and_return(true_if_allowed)
+      allow(question).to receive(:update_attributes).with({ title: nil }).and_return(false)
+      allow(question).to receive(:update_attributes).with({ title: 'Updated title' }).and_return(true)
+      allow(question).to receive(:title).and_return(title)
+      put :update, id: question.id, security_question: { title: title }
+    end
+
+    context 'When update question with valid title' do
+      it { expect(assigns(:question)).to eq(question) }
+      it { expect(assigns(:question).title).to eq(title) }
+      it { expect(response).to redirect_to('/exchanges/security_questions') }
+    end
+
+    context "when updating a question that has been answered already" do
+      let!(:true_if_allowed) { false }
+
+      it { expect(assigns(:question)).to eq(question) }
+      it { expect(response).to have_http_status(:success) }
+      it { expect(response).to render_template('exchanges/security_questions/edit') }
+    end
+
     context 'When update question with blank title' do
-      before { put :update, id: question.id, security_question: { title: nil } }
+      let(:title) { nil }
+      let(:errors) { double(:errors, full_messages: ["Title can't be blank"]) }
+      before do
+        allow(question).to receive(:errors).and_return(errors)
+      end
       it { expect(assigns(:question)).to eq(question) }
       it { expect(assigns(:question).errors.full_messages).to eq(['Title can\'t be blank']) }
       it { expect(response).to have_http_status(:success) }
       it { expect(response).to render_template('exchanges/security_questions/edit') }
     end
-
-    context 'When update question with valid title' do
-      before { put :update, id: question.id, security_question: { title: 'Updated title' } }
-      it { expect(assigns(:question)).to eq(question) }
-      it { expect(assigns(:question).title).to eq('Updated title') }
-      it { expect(response).to redirect_to('/exchanges/security_questions') }
-    end
   end
 
   describe 'DELETE destroy' do
-    before { delete :destroy, id: question.id }
-    it { expect(SecurityQuestion.all.to_a).to eq([]) }
+    let(:true_if_allowed) { true }
+    let(:this_many) { 1 }
+    before do
+      allow(question).to receive(:safe_to_edit_or_delete?).and_return(true_if_allowed)
+      expect(question).to receive(:destroy).exactly(this_many).times
+
+      delete :destroy, id: question.id
+    end
+
     it { expect(response).to redirect_to('/exchanges/security_questions') }
+
+    context "when attempting to delete a question that has been answered already" do
+      let!(:true_if_allowed) { false }
+      let(:this_many) { 0 }
+      it { expect(response).to redirect_to('/exchanges/security_questions') }
+    end
   end
 
 end
