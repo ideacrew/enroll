@@ -8,6 +8,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
+  before_filter :load_support_texts, only: [:personal]
 
   def home
     authorize @family, :show?
@@ -252,6 +253,10 @@ class Insured::FamiliesController < FamiliesController
 
   def updateable?
     authorize Family, :updateable?
+  end
+  
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def check_employee_role
