@@ -37,14 +37,12 @@ class Exchanges::HbxProfilesController < ApplicationController
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
     @employer_profile = EmployerProfile.find(params[:id])
-    @fein=@employer_profile.fein
-    start_on = @employer_profile.active_plan_year.start_on.strftime("%Y%m%d")
-    end_on = @employer_profile.active_plan_year.end_on.strftime("%Y%m%d")
+    @fein = @employer_profile.fein
+    start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
+    end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
     @xml_submit_time = @employer_profile.xml_transmitted_timestamp
     v2_xml_generator =  V2GroupXmlGenerator.new([@fein], start_on, end_on)
     send_data v2_xml_generator.generate_xmls
-    #flash["notice"] = "Successfully transmitted the employer group xml."
-    #redirect_to exchanges_hbx_profiles_root_path
   end
 
   def employer_index
@@ -373,18 +371,16 @@ def employer_poc
 
   def verifications_index_datatable
     dt_query = extract_datatable_parameters
-    all_families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
+    query = ::Queries::VerificationsDatatableQuery.new(dt_query, params["filter"])
 
-    families = search_families(dt_query.search_string, all_families)
+    order = params[:order]["0"][:dir] if params[:order].present?
 
-    sorted_by, order = input_sort_request
-
-    families = sorted_families(sorted_by, order, families)
+    sorted_results = sorted_families(order, dt_query, query)
 
     @draw = dt_query.draw
-    @total_records = all_families.count
-    @records_filtered = families.count
-    @families = families[dt_query.skip, dt_query.take]
+    @total_records = query.all_families.count
+    @records_filtered = query.search_and_filter.count
+    @families = sorted_results
     render
   end
 
