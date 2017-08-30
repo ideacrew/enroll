@@ -11,7 +11,6 @@ module Notifier
     def new
       @notice_kind = Notifier::NoticeKind.new
       @notice_kind.template = Notifier::Template.new
-      # @notice_kind = #find('5987104cfb9cddd6a0000005')
     end
 
     def edit
@@ -54,6 +53,25 @@ module Notifier
 
       flash[:notice] = 'Notices deleted successfully'
       redirect_to notice_kinds_path
+    end
+
+    def get_tokens
+      builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
+      tokens = builder.constantize.new.editor_tokens
+
+      respond_to do |format|
+        format.html
+        format.json {render json: tokens}
+      end
+    end
+
+    def get_placeholders
+      placeholders = Notifier::MergeDataModels::EmployerProfile.new.place_holders
+
+      respond_to do |format|
+        format.html
+        format.json {render json: placeholders}
+      end
     end
 
     private

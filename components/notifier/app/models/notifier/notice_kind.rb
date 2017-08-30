@@ -5,9 +5,16 @@ module Notifier
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    RECEIPIENTS = {
+      "Employer" => "Notifier::MergeDataModels::EmployerProfile",
+      "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
+      "Broker" => "Notifier::MergeDataModels::BrokerProfile"
+    }
+
     field :title, type: String
     field :description, type: String
     field :identifier, type: String
+    field :receipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
@@ -38,8 +45,9 @@ module Notifier
     def to_html(options = {})
       Notifier::NoticeKindsController.new.render_to_string({ 
         :inline => template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
+        #:template => 'notifier/notice_kinds/template.html.erb',
         :layout => 'notifier/pdf_layout',
-        :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object }
+        :locals => { employer: Notifier::MergeDataModels::EmployerProfile.stubbed_object, notice_kind: self }
         })
     end
   

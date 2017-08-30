@@ -1,20 +1,38 @@
 CKEDITOR.editorConfig = function( config )
 {
-  // Configure available tokens
-  config.availableTokens = <%= [["Choose your token", ""]] + Notifier::MergeDataModels::EmployerProfile.new.editor_tokens %>;
+  $.ajax({
+    type:"GET",
+    url:"notice_kinds/get_tokens",
+    dataType:"json",
+    data: {builder: $('#notice_kind_receipient').val()},
+    success:function(result){
+       config.availableTokens = result;
+         // Configure token string
+        config.tokenStart = '#{';
+         config.tokenEnd = '}';
+    }
+  });
 
-  // Configure token string
-  config.tokenStart = '#{';
-  config.tokenEnd = '}';
+  // var placeholders = [];
+  // $.ajax({
+  //   type:"GET",
+  //   url:"notice_kinds/get_placeholders",
+  //   dataType:"json",
+  //   data: {builder: $('#notice_kind_receipient').val()},
+  //   success:function(result){
+  //      placeholders = result;
+
+  //      alert('hell3');
+  //   }
+  // })
 
   config.placeholder_selects = [
-    config.placeholder_select = {
-      key: 'placeholder_select',
-      title: 'Place Holder Select',
-      placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
-    }
-  ];
-
+      config.placeholder_select = {
+        key: 'placeholder_select',
+        title: 'Place Holder Select',
+        placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+      }
+      ];
 
   config.extraPlugins = 'button,lineutils,widgetselection,notification,toolbar,widget,dialogui,dialog,clipboard,token,placeholder,placeholder_select';
   config.language = 'en';
