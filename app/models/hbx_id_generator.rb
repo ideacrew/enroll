@@ -20,6 +20,10 @@ class HbxIdGenerator
     provider.generate_organization_id
   end
 
+  def generate_application_id
+    provider.generate_application_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
