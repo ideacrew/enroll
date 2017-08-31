@@ -575,6 +575,14 @@ class EmployerProfile
     })
     end
 
+    def initial_employers_enrolled_plan_year_state
+      Organization.where(:"employer_profile.plan_years" => 
+        { :$elemMatch => { 
+          :aasm_state => "enrolled"
+          }
+        })
+    end
+
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
@@ -684,8 +692,23 @@ class EmployerProfile
               end
             end
           end
-        end     
+        end    
 
+        #initial employers missing binder payment notices to active employees.
+        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        if new_date == binder_next_day
+          initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+              org.employer_profile.census_employees.active.each do |ce|
+                begin
+                  ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
+                rescue Exception => e
+                  (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
+                end
+              end
+            end
+          end
+        end
       end
 
       # Employer activities that take place monthly - on first of month
