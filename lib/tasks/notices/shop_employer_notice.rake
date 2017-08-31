@@ -7,7 +7,7 @@ namespace :notice do
    @event_name = args[:event_name].to_s
    if @employer_id.present? && @event_name.present?
      employer = EmployerProfile.find @employer_id
-     ShopNoticesNotifierJob.perform_now(@employer_id, @event_name) if employer
+     ShopNoticesNotifierJob.perform_later(@employer_id, @event_name) if employer
    else
      Rails.logger.error "shop_employer_notice: invalid arguments."
    end
