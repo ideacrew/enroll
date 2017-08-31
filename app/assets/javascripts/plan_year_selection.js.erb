@@ -703,7 +703,20 @@ function attachEmployerHealthContributionShowHide() {
 	});
 }
 
+function confirmActivePlanYear() {
+  var planYear = $('#plan_year_start_on').val() || "0000"
+  planYear = planYear.substr(0,4);
+
+
+
+  if($.inArray(planYear, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+    $(".show-dental-plans").show();
+  }else{
+    $(".show-dental-plans").hide();
+  }
+}
 
 $(document).ready(ready);
 $(document).on('page:load', plan_year_selection_loader);
 $(document).on('ready', attachEmployerHealthContributionShowHide);
+$(document).on('ready', confirmActivePlanYear);
