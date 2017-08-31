@@ -1,12 +1,13 @@
 # This rake task used to terminate employer active plan year && active enrollments.
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date', 'generate_termination_notice']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017',true/false]
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
-  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
+  task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
 
     fein = args[:fein]
+    generate_termination_notice = args[:generate_termination_notice]
     organizations = Organization.where(fein: fein)
 
     if organizations.size > 1
@@ -33,7 +34,6 @@ namespace :migrations do
 
         plan_year.expire! if plan_year.may_expire?
       end
-
       # Terminate current active plan years
       organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
 
@@ -53,6 +53,7 @@ namespace :migrations do
         if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+          ShopNoticesNotifierJob.perform_later(organization.employer_profile.id.to_s, "group_advance_termination_confirmation") if generate_termination_notice
         end
       end
 
