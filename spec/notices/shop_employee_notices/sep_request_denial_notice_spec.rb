@@ -23,7 +23,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
                             :name =>'Denial of SEP Requested by EE outside of allowable time frame',
                             :notice_template => 'notices/shop_employee_notices/sep_request_denial_notice',
                             :notice_builder => 'ShopEmployeeNotices::SepRequestDenialNotice',
-                            :mpi_indicator => 'MPI_SHOP35',
+                            :mpi_indicator => 'SHOP_M033',
                             :event_name => 'sep_request_denial_notice',
                             :title => "Special Enrollment Period Denial"})
                           }
@@ -35,7 +35,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
         :template => application_event.notice_template,
         :options => {
           :qle_id => qle.id,
-          :qle_reported_date => TimeKeeper.date_of_record
+          :qle_reported_date => Date.new(TimeKeeper.date_of_record.year, 04, 14)
         }
     }}
 
@@ -71,7 +71,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
     end
   end
 
-  describe "append data" do
+  describe "append data notice template and genearte pdf" do
     let(:qle_on) {Date.new(TimeKeeper.date_of_record.year, 04, 14)}
     let(:end_on) {Date.new(TimeKeeper.date_of_record.year, 04, 18)}
     let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
@@ -83,13 +83,34 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
       @employee_notice = ShopEmployeeNotices::SepRequestDenialNotice.new(census_employee, valid_params)
-      sep1.qle_on = qle_on
-      sep1.end_on = end_on
-      sep1.title = "had a baby"
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
-  end
 
+    it "should append data" do
+      sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
+      
+      @employee_notice.append_data
+      expect(@employee_notice.notice.qle.qle_on).to eq qle_on
+      expect(@employee_notice.notice.qle.title).to eq "Married"
+      
+      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
+      expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
+    end
+
+    it "should render notice" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/sep_request_denial_notice"
+    end
+    it "should generate pdf" do
+
+
+
+      @employee_notice.build
+      @employee_notice.append_data
+      file = @employee_notice.generate_pdf_notice
+      
+      expect(File.exist?(file.path)).to be true
+    end    
+  end  
 end

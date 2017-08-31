@@ -499,7 +499,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'MAE033',
+    hbx_id: 'SHOP33',
     title: 'Special Enrollment Period Denial',
     description: 'EE SEP Requested by Employee outside of allowable time frame',
     resource_name: 'employee_role',
@@ -509,7 +509,7 @@ shop_notice_triggers = [
         name: 'Denial of SEP Requested by EE outside of allowable time frame',
         notice_template: 'notices/shop_employee_notices/sep_request_denial_notice',
         notice_builder: 'ShopEmployeeNotices::SepRequestDenialNotice',
-        mpi_indicator: 'MAE033',
+        mpi_indicator: 'SHOP_M033',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
