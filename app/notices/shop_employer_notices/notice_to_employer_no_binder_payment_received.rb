@@ -11,7 +11,7 @@ class ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived < ShopEmploye
   end
 
   def append_data
-    plan_year = employer_profile.active_plan_year
+    plan_year = employer_profile.plan_years.where(:aasm_state.in => PlanYear::INITIAL_ENROLLING_STATE).first
 
     #plan = plan_year.reference_plan
     notice.plan_year = PdfTemplates::PlanYear.new({

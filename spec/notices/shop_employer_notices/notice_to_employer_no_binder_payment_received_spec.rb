@@ -4,7 +4,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'enrolled' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Initial Employer SHOP Approval Notice',
@@ -60,7 +60,6 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
       @employer_notice = ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived.new(employer_profile, valid_parmas)
     end
     it "should append necessary" do
-      plan_year = employer_profile.plan_years.first
       due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
       @employer_notice.append_data
       due_total = employer_profile.show_plan_year.benefit_groups.last.monthly_employer_contribution_amount
