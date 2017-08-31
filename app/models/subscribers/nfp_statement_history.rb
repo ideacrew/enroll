@@ -50,18 +50,19 @@ module Subscribers
              csa.posting_date = line[:posting_date]
              csa.type = line[:type]
              csa.coverage_month = line[:coverage_month]
+             csa.payment_method = line[:payment_method]
              employer_profile_account.current_statement_activity << csa
              csa.save
            end
 
            response[:payment_history].each do |payment|
-             payment = PremiumPayment.new
-             payment.paid_on = payment[:paid_on]
-             payment.reference_id = payment[:reference_id]
-             payment.method_kind = payment[:method_kind]
-             payment.amount = payment[:amount]
-             employer_profile_account.premium_payments << payment
-             payment.save
+             p = PremiumPayment.new
+             p.paid_on = payment[:paid_on]
+             p.reference_id = payment[:reference_id]
+             p.method_kind = payment[:method_kind]
+             p.amount = payment[:amount]
+             employer_profile_account.premium_payments << p
+             p.save
            end
 
         end
