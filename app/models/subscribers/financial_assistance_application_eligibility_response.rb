@@ -54,6 +54,7 @@ module Subscribers
 
       application_in_context = family.applications.find(verified_family.fin_app_id)
       throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless application_in_context.present?
+      application_in_context.update_attributes(haven_app_id: verified_family.haven_app_id, haven_ic_id: verified_family.haven_ic_id, e_case_id: verified_family.e_case_id)
 
       active_verified_household = verified_family.households.max_by(&:start_date)
 

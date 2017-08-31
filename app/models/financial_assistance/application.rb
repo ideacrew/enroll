@@ -8,7 +8,7 @@ class FinancialAssistance::Application
 
   belongs_to :family, class_name: "::Family"
 
-  before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id
+  before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id, :set_external_identifiers
   validates :application_submission_validity, presence: true, on: :submission
   validates :before_attestation_validity, presence: true, on: :before_attestation
   validate :attestation_terms_on_parent_living_out_of_home
@@ -636,6 +636,15 @@ private
   def set_benchmark_plan_id
     benchmark_plan_id = Plan.where(active_year: 2017, hios_id: "86052DC0400001-01").first.id
     write_attribute(:benchmark_plan_id, benchmark_plan_id)
+  end
+
+  def set_external_identifiers
+    app  = family.active_approved_application
+    if app.present?
+      write_attribute(:haven_app_id, app.haven_app_id)
+      write_attribute(:haven_ic_id, app.haven_ic_id)
+      write_attribute(:e_case_id, app.e_case_id)
+    end
   end
 
   def unset_submission_date
