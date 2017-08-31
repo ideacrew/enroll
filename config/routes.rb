@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   mount TransportProfiles::Engine, at: "/transport_profiles"
 
   require 'resque/server'
-  mount Resque::Server, at: '/jobs'
+  # mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
