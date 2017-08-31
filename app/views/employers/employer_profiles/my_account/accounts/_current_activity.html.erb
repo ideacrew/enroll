@@ -26,7 +26,7 @@
       <td></td>
       <td></td>
     </tr>
-    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity).size == 0 %>
+    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity) == nil %>
     <tr class="payments">
       <td></td>
       <td>There have been no payments since the last invoice.</td>
@@ -61,7 +61,7 @@
       <td></td>
     </tr>
 
-    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity).size == 0 %>
+    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity) == nil %>
     <tr class="adjustments">
       <td></td>
       <td>There have been no adjustments since the last invoice.</td>
