@@ -6,6 +6,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
+  before_filter :load_support_texts, only: [:edit, :search]
 
   def ssn_taken
   end
@@ -321,6 +322,10 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       return message
     end
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def build_person_params
