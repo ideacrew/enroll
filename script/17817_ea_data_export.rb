@@ -21,8 +21,15 @@ def is_dc_resident(person)
   return true if person.no_dc_address == true && person.no_dc_address_reason.present?
 
   address_to_use = person.addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
-  person.addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
-  return ""
+  if person.addresses.present?
+    if person.addresses.select{|address| address.kind == address_to_use && address.state == 'DC'}.present?
+      return true
+    else
+      return false
+    end
+  else
+    return ""
+  end
 end
 
 while offset < family_count
