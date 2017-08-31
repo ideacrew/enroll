@@ -72,6 +72,7 @@ RSpec.describe EmployeeMidYearPlanChange do
     let(:order) {[sep]}
 
     before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
       @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
@@ -83,6 +84,22 @@ RSpec.describe EmployeeMidYearPlanChange do
       sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
       @employer_notice.append_data
       expect(@employer_notice.notice.sep.effective_on).to eq effective_on
+    end
+  end
+  describe "Rendering employee mid year plan change template and generate pdf" do
+    before do
+      census_employee.stub(employer_profile: employer_profile)
+      employer_profile.stub_chain(:staff_roles, :first).and_return(person)
+      @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
+    end
+    it "should render employer reminder notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/employee_mid_year_plan_change"
+    end
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 end
