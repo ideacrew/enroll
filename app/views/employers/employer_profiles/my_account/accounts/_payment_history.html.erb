@@ -10,6 +10,22 @@
     </tr>
   </thead>
   <tbody>
-
+    <% if @employer_profile.try(:employer_profile_account).try(:premium_payments).size == 0 %>
+    <tr class="payments">
+      <td></td>
+      <td>There are no payments in your history.</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <% else %>
+      <% @employer_profile.try(:employer_profile_account).try(:premium_payments).each do |payment| %>
+        <tr>
+          <td><%= payment.paid_on %></td>
+          <td><%= number_to_currency(payment.amount) %></td>
+          <td><%= payment.method_kind %></td>
+          <td></td>
+        </tr>
+      <% end %>
+    <% end %>
   </tbody>
 </table>
