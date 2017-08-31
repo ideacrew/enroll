@@ -453,10 +453,13 @@
 
   <xs:simpleType name="IncomeVerificationCodeType">
 			<xs:restriction base="xs:anyURI">
-				<xs:enumeration value="urn:openhbx:terms:v1:income_verification#pending"/>
-				<xs:enumeration value="urn:openhbx:terms:v1:income_verification#outstanding"/>
-				<xs:enumeration value="urn:openhbx:terms:v1:income_verification#verified"/>
-				<xs:enumeration value="urn:openhbx:terms:v1:income_verification#cleared"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#submitted"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#external_source"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#not_required"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#pending"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#unverified"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#outstanding"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:income_verification#verified"/>
 			</xs:restriction>
 	</xs:simpleType>
 
@@ -465,6 +468,7 @@
 			<xs:documentation>Root element for Eligibility Determination Income Verification response.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/> 
 			<xs:element name="individual" type="verificationIndividualType"/>
 			<xs:element name="response_code" type="IncomeVerificationCodeType"/>
 			<xs:element name="response_text" type="xs:string" minOccurs="0"/>
@@ -481,10 +485,13 @@
 
 	<xs:simpleType name="MECVerificationCodeType">
 		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#submitted"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#external_source"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#not_required"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#pending"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#unverified"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#outstanding"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#verified"/>
-			<xs:enumeration value="urn:openhbx:terms:v1:mec_verification#cleared"/>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -493,6 +500,7 @@
 			<xs:documentation>Root element for Eligibility Determination MEC Verification response.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
 			<xs:element name="individual" type="verificationIndividualType"/>
 			<xs:element name="response_code" type="MECVerificationCodeType"/>
 			<xs:element name="response_text" type="xs:string" minOccurs="0"/>
