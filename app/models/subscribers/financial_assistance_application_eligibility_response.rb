@@ -2,6 +2,8 @@ module Subscribers
   class FinancialAssistanceApplicationEligibilityResponse < ::Acapi::Subscription
     include Acapi::Notifiers
 
+    ELIGIBILITY_SCHEMA_FILE_PATH = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
+
     def self.subscription_details
       ["acapi.info.events.assistance_application.application_processed"]
     end
@@ -13,24 +15,26 @@ module Subscribers
       application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
-        unless application.success_status_codes?(payload_http_status_code.to_i)
+        if application.success_status_codes?(payload_http_status_code.to_i)
+          if eligibility_payload_schema_valid?(xml)
+            sc = ShortCircuit.on(:processing_issue) do |err|
+              log(xml, {:severity => "critical", :error_message => err})
+            end
+            sc.and_then do |payload|
+              haven_import_from_xml(payload)
+            end
+            sc.call(xml)
+          else
+            log(xml, {:severity => "critical", :error_message => "ERROR: Failed to validate the XML against FAA XSD"})
+          end
+        else
           error_message = stringed_key_payload["body"]
           application.set_determination_response_error!
+          application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
         end
-        application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
       else
-        log(stringed_key_payload, {:severity => "critical", :error_message => "Failed to find the Application in XML"})
+        log(xml, {:severity => "critical", :error_message => "ERROR: Failed to find the Application in XML"})
       end
-
-      log(stringed_key_payload, {:severity => "critical", :error_message => "Testing Purpose"})
-
-      sc = ShortCircuit.on(:processing_issue) do |err|
-        log(xml, {:severity => "critical", :error_message => err})
-      end
-      sc.and_then do |payload|
-        haven_import_from_xml(payload)
-      end
-      sc.call(xml)
     end
 
     def ecase_id_valid?(family, verified_family)
@@ -211,6 +215,13 @@ module Subscribers
           :first_name => first_name_regex
         }).first
       end
+    end
+
+    def eligibility_payload_schema_valid?(xml)
+      return false if xml.blank?
+      xml = Nokogiri::XML.parse(xml)
+      xsd = Nokogiri::XML::Schema(File.open ELIGIBILITY_SCHEMA_FILE_PATH)
+      xsd.valid?(xml)
     end
   end
 end
