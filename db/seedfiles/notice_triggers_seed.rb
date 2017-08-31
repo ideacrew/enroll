@@ -601,7 +601,7 @@ shop_notice_triggers = [
               name: 'YOU REMOVED YOUR BROKER ON DC HEALTH LINK',
               notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
               notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
-              mpi_indicator: 'MPI_SHOP52',
+              mpi_indicator: 'SHOP_D052',
               notice_trigger_element_group: {
                   market_places: ['shop'],
                   primary_recipients: ["employer"],

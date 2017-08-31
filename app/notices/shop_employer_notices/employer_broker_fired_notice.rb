@@ -13,7 +13,7 @@ class ShopEmployerNotices::EmployerBrokerFiredNotice < ShopEmployerNotice
   end
 
   def append_data
-    last_broker_agency_account = employer_profile.broker_agency_accounts.unscoped.last
+    last_broker_agency_account = employer_profile.broker_agency_accounts.unscoped.select{|br| br.is_active ==  false}.sort_by(&:created_at).last
     broker_profile = last_broker_agency_account.broker_agency_profile
     broker_role = broker_profile.primary_broker_role
     person = broker_role.person
