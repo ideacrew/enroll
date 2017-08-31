@@ -4,14 +4,14 @@ RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
-  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'draft', :fte_count => 55) }
+  let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active', :fte_count => 55) }
   let(:application_event) do
     double("ApplicationEventKind",
       {
         name: 'Notice to employee after they select a plan Annual Open Enrollment',
         notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
         notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
-        mpi_indicator: 'MPI_SHOP2B',
+        mpi_indicator: 'SHOP_M041',
         event_name: 'group_advance_termination_confirmation',
         title: 'Notice Confirmation for Group termination due to ER advance request'
       }
@@ -64,7 +64,7 @@ RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
       @employer_notice = ShopEmployerNotices::GroupAdvanceTerminationConfirmation.new(employer_profile, valid_parmas)
     end
 
-    it "should render intitial shop application approval notice" do
+    it "should render group termination due to ER advance request" do
       expect(@employer_notice.template).to eq "notices/shop_employer_notices/group_advance_termination_confirmation"
     end
 
