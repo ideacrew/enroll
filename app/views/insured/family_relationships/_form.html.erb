@@ -1,6 +1,6 @@
 <%if missing_relationships.present?%>
   <h1 class="darkblue">Family Relationships</h1>
-  <p>We need to understand which members of your household are related. Select the relationship for each person listed below. Then select CONTINUE..</p>
+  <p>We need to understand how members of your household are related. Select the relationship for each person listed below. Then select CONTINUE.</p>
   <%= form_tag "/insured/family_relationships", remote: form_remote do %>
     <%= hidden_field_tag :family_id, family.id%>
     <%= hidden_field_tag :predecessor_id, missing_relationships.first.flatten.first%>
