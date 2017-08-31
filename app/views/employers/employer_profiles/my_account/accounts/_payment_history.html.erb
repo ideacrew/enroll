@@ -10,8 +10,8 @@
     </tr>
   </thead>
   <tbody>
-    <% if @employer_profile.try(:employer_profile_account).try(:premium_payments).size == 0 %>
-    <tr class="payments">
+    <% if @employer_profile.try(:employer_profile_account).try(:premium_payments) == nil %>
+    <tr>
       <td></td>
       <td>There are no payments in your history.</td>
       <td></td>
