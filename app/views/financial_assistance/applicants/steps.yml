@@ -27,8 +27,7 @@
                   model: applicant
                   attribute: has_job_income
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_job_income
             - cells:
                 - gutter: 5
@@ -53,8 +52,7 @@
                   model: applicant
                   attribute: has_self_employment_income
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_self_employment_income
             - cells:
                 - gutter: 5
@@ -79,8 +77,7 @@
                   model: applicant
                   attribute: has_other_income
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_other_income
             - cells:
                 - gutter: 5
@@ -105,8 +102,7 @@
                   model: applicant
                   attribute: has_deductions
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_deductions
             - cells:
                 - gutter: 5
@@ -131,8 +127,7 @@
                   model: applicant
                   attribute: has_enrolled_health_coverage
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_enrolled_health_coverage
             - cells:
                 - gutter: 5
@@ -157,8 +152,7 @@
                   model: applicant
                   attribute: has_eligible_health_coverage
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: has_eligible_health_coverage
 - step:
     heading: Tax Info for <family-member-name-placeholder>
@@ -189,8 +183,7 @@
                   model: applicant
                   attribute: is_required_to_file_taxes
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: is_required_to_file_taxes
             - cells:
                 - gutter: 5
@@ -213,8 +206,7 @@
                   model: applicant
                   attribute: is_joint_tax_filing
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: is_joint_tax_filing
             - cells:
                 - gutter: 5
@@ -239,8 +231,7 @@
                   model: applicant
                   attribute: is_claimed_as_tax_dependent
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: is_claimed_as_tax_dependent
             - cells:
                 - gutter: 6
@@ -255,8 +246,7 @@
                   model: applicant
                   attribute: claimed_as_tax_dependent_by
                 - gutter: 3
-                  type: raw_html
-                  text: '| &nbsp Not Sure?'
+                  type: support_text_raw_html
                   support_text_key: claimed_as_tax_dependent_by
 # - step:
 #     heading: Other Questions for <family-member-name-placeholder>

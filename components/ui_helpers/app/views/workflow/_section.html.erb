@@ -28,6 +28,8 @@
       <%= render 'workflow/label', cell: cell %>
     <% when 'raw_html' %>
       <%= render 'workflow/raw_html', cell: cell %>
+        <% when 'support_text_raw_html' %>
+    <%= render 'workflow/support_text_raw_html', cell: cell %>
     <% when 'anchor' %>
       <%= render 'workflow/anchor', cell: cell %>
     <% when 'label_radio' %>
