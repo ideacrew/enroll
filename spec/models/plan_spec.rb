@@ -53,10 +53,10 @@ RSpec.describe Plan, dbclean: :after_each do
     "#{bad_metal_level} is not a valid metal level kind";
   end
 
-  it { should validate_presence_of :name }
-  it { should validate_presence_of :carrier_profile_id }
-  it { should validate_presence_of :hios_id }
-  it { should validate_presence_of :active_year }
+  it {should validate_presence_of :name}
+  it {should validate_presence_of :carrier_profile_id}
+  it {should validate_presence_of :hios_id}
+  it {should validate_presence_of :active_year}
 
   describe ".new" do
     let(:valid_params) do
@@ -211,40 +211,40 @@ RSpec.describe Plan, dbclean: :after_each do
           metal_level: metal_level,
           coverage_kind: coverage_kind,
           market: market,
-          premium_tables: [ premium_table_entry1,
-                            premium_table_entry2,
-                            premium_table_entry3,
-                            premium_table_entry4 ]
+          premium_tables: [premium_table_entry1,
+                           premium_table_entry2,
+                           premium_table_entry3,
+                           premium_table_entry4]
       }
     end
 
-    let(:premium_table_entry1) { {
-      start_on: "2015-01-01",
-      end_on: "2015-05-31",
-      cost: 500,
-      age: 32
-      } }
+    let(:premium_table_entry1) {{
+        start_on: "2015-01-01",
+        end_on: "2015-05-31",
+        cost: 500,
+        age: 32
+    }}
 
-    let(:premium_table_entry2) { {
-      start_on: "2015-06-01",
-      end_on: "2015-08-31",
-      cost: 502,
-      age: 32
-      } }
+    let(:premium_table_entry2) {{
+        start_on: "2015-06-01",
+        end_on: "2015-08-31",
+        cost: 502,
+        age: 32
+    }}
 
-    let(:premium_table_entry3) { {
-      start_on: "2015-09-01",
-      end_on: "2015-12-31",
-      cost: 504,
-      age: 32
-      } }
+    let(:premium_table_entry3) {{
+        start_on: "2015-09-01",
+        end_on: "2015-12-31",
+        cost: 504,
+        age: 32
+    }}
 
-    let(:premium_table_entry4) { {
-      start_on: "2015-09-01",
-      end_on: "2015-12-31",
-      cost: 574,
-      age: 34
-      } }
+    let(:premium_table_entry4) {{
+        start_on: "2015-09-01",
+        end_on: "2015-12-31",
+        cost: 574,
+        age: 34
+    }}
 
 
     context "valid arguments" do
@@ -255,10 +255,10 @@ RSpec.describe Plan, dbclean: :after_each do
 
       def premium_table_hash(premium_table)
         {
-          start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
-          end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
-          cost: premium_table.cost,
-          age: premium_table.age
+            start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
+            end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
+            cost: premium_table.cost,
+            age: premium_table.age
         }
       end
 
@@ -297,7 +297,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should raise exception" do
-        expect { plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1) }.to raise_error(NameError)
+        expect {plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1)}.to raise_error(NameError)
       end
     end
 
@@ -337,6 +337,11 @@ RSpec.describe Plan, dbclean: :after_each do
 end
 
 RSpec.describe Plan, dbclean: :after_each do
+
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+
   describe "scopes" do
     def platinum_count;
       11;
@@ -362,16 +367,16 @@ RSpec.describe Plan, dbclean: :after_each do
       1;
     end
 
-    let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
+    let(:total_plan_count) {platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count}
 
-    let(:organization) { FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
-    let(:carrier_profile_0) { FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization) }
-    let(:carrier_profile_1) { FactoryGirl.create(:carrier_profile) }
+    let(:organization) {FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser")}
+    let(:carrier_profile_0) {FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization)}
+    let(:carrier_profile_1) {FactoryGirl.create(:carrier_profile)}
 
-    let(:shop_count) { platinum_count + gold_count + shop_silver_count }
-    let(:individual_count) { individual_silver_count + bronze_count + catastrophic_count }
-    let(:carrier_profile_0_count) { platinum_count + gold_count + bronze_count }
-    let(:carrier_profile_1_count) { shop_silver_count + individual_silver_count + catastrophic_count }
+    let(:shop_count) {platinum_count + gold_count + shop_silver_count}
+    let(:individual_count) {individual_silver_count + bronze_count + catastrophic_count}
+    let(:carrier_profile_0_count) {platinum_count + gold_count + bronze_count}
+    let(:carrier_profile_1_count) {shop_silver_count + individual_silver_count + catastrophic_count}
     let(:current_year) {TimeKeeper.date_of_record.year}
     let(:next_year) {current_year + 1}
 
@@ -484,7 +489,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
   describe "class method" do
     it "reference_plan_metal_level_for_options" do
-      expect(Plan.reference_plan_metal_level_for_options).to eq Plan::REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
+      expect(Plan.reference_plan_metal_level_for_options).to eq Plan::REFERENCE_PLAN_METAL_LEVELS.map {|k| [k.humanize, k]}
     end
 
     context "valid_shop_health_plans" do
@@ -503,14 +508,14 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "individual_plans" do
-      let(:plan1) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
-      let(:plan2) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06") }
-      let(:plan3) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01") }
-      let(:plan4) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02") }
-      let(:tax_household) { double(preferred_eligibility_determination: double(csr_eligibility_kind: "csr_94")) }
-      let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-      let(:primary_family_member) { family.primary_applicant }
-      let(:application) { FactoryGirl.create(:application, family: family) }
+      let(:plan1) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01")}
+      let(:plan2) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06")}
+      let(:plan3) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01")}
+      let(:plan4) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02")}
+      let(:tax_household) {double(preferred_eligibility_determination: double(csr_eligibility_kind: "csr_94"))}
+      let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+      let(:primary_family_member) {family.primary_applicant}
+      let(:application) {FactoryGirl.create(:application, family: family)}
 
       before :each do
         Plan.delete_all
@@ -518,38 +523,40 @@ RSpec.describe Plan, dbclean: :after_each do
 
       it "should return dental plans" do
         plans = [plan4]
-        expect(Plan.individual_plans(coverage_kind:'dental', active_year:TimeKeeper.date_of_record.year, tax_households:nil, family_member_ids:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind: 'dental', active_year: TimeKeeper.date_of_record.year, tax_households: nil, family_member_ids: nil).to_a).to eq plans
       end
 
       it "should return health plans without silver" do
         plans = [plan1, plan3]
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households:nil, family_member_ids:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind: 'health', active_year: TimeKeeper.date_of_record.year, tax_households: nil, family_member_ids: nil).to_a).to eq plans
       end
 
       it "should return health plans" do
         plans = [plan2]
         allow(tax_household).to receive(:family).and_return family
         allow(application).to receive(:applicants).and_return nil
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids:nil).to_a).to eq plans
+        expect(Plan.individual_plans(coverage_kind: 'health', active_year: TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids: nil).to_a).to eq []
       end
 
       context "individual_plans" do
-        let(:family_member2) { FactoryGirl.create(:family_member, family: family) }
-        let(:family_member3) { FactoryGirl.create(:family_member, family: family) }
-        let(:family_member4) { FactoryGirl.create(:family_member, family: family) }
-        let(:tax_household1) { FactoryGirl.create(:tax_household, application: application) }
-        let(:eligibility_determination1) { FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_87", tax_household_id: tax_household2.id) }
-        let(:tax_household2) { FactoryGirl.create(:tax_household, application: application) }
-        let(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_94", tax_household_id: tax_household2.id) }
-        let(:applicant1) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: primary_family_member.id) }
-        let(:applicant2) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_totally_ineligible: true) }
-        let(:applicant3) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member3.id) }
-        let(:applicant4) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member4.id, is_medicaid_chip_eligible: true) }
-        let(:family_member_ids) { [primary_family_member.id.to_s, family_member4.id.to_s] }
+        let(:family_member2) {FactoryGirl.create(:family_member, family: family)}
+        let(:family_member3) {FactoryGirl.create(:family_member, family: family)}
+        let(:family_member4) {FactoryGirl.create(:family_member, family: family)}
+        let(:household) {FactoryGirl.create(:household, family: family)}
+        let(:tax_household1) {FactoryGirl.create(:tax_household, application_id: application.id, household: household)}
+        let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, application_id: application.id, csr_eligibility_kind: "csr_87", tax_household_id: tax_household2.id)}
+        let(:tax_household2) {FactoryGirl.create(:tax_household, application_id: application.id, household: household)}
+        let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_94", tax_household_id: tax_household2.id)}
+        let(:applicant1) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: primary_family_member.id)}
+        let(:applicant2) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_totally_ineligible: true)}
+        let(:applicant3) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member3.id)}
+        let(:applicant4) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member4.id, is_medicaid_chip_eligible: true)}
+        let(:family_member_ids) {[primary_family_member.id.to_s, family_member4.id.to_s]}
 
         it "should return health plans without silver" do
+          application.applicants << [applicant1, applicant2, applicant3, applicant4]
           plans = [plan1, plan3]
-          expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household1, tax_household2], family_member_ids: family_member_ids).to_a).to eq plans
+          expect(Plan.individual_plans(coverage_kind: 'health', active_year: TimeKeeper.date_of_record.year, tax_households: [tax_household1, tax_household2], family_member_ids: family_member_ids).to_a).to eq plans
         end
       end
     end
