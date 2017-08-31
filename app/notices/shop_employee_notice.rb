@@ -107,12 +107,14 @@ class ShopEmployeeNotice < Notice
   end
 
   def append_sep_qle(sep)
-    notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new(
-        title: sep.title,
-        qle_on: sep.qle_on,
-        start_on: sep.start_on,
-        end_on: sep.end_on
-    )
+    if sep.present?
+      notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new(
+          title: sep.title,
+          qle_on: sep.qle_on,
+          start_on: sep.start_on,
+          end_on: sep.end_on
+      )
+    end
   end
 
 end

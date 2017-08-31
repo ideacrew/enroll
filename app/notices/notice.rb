@@ -20,7 +20,7 @@ class Notice
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
     self.name = params[:name] || recipient.first_name
-    self.sep = params[:sep]
+    self.sep = params[:sep] if params[:sep]
   end
 
   def html(options = {})

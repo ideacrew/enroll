@@ -172,6 +172,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     it "should get employer_profile" do
+      allow(enrollment).to receive(:employee_role_id).and_return(nil)
       allow(enrollment).to receive(:is_shop?).and_return(true)
       allow(enrollment).to receive(:coverage_kind).and_return('health')
       allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
