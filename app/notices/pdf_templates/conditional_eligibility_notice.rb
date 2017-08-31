@@ -25,10 +25,9 @@ module PdfTemplates
     attribute :mec_conflict, Array[PdfTemplates::Individual]
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
-    attribute :due_date, String
-    # attribute :application_date, String
-    attribute :last_name, String
     attribute :due_date, Date
+    attribute :application_date, Date
+    attribute :last_name, String
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String

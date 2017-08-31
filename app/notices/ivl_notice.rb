@@ -27,7 +27,6 @@ class IvlNotice < Notice
     end
   end
 
-
   def pdf_custom(custom_template)
     WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options_custom)
   end
@@ -64,7 +63,13 @@ class IvlNotice < Notice
     options
   end
 
+  def clear_tmp
+    File.delete(custom_notice_path)
+  end
 
+  def custom_notice_path
+    Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
+  end
 
   def generate_custom_notice(custom_template)
     File.open(custom_notice_path, 'wb') do |file|

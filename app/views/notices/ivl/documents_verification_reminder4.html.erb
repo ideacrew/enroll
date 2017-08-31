@@ -7,62 +7,48 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3><b>IMPORTANT NOTICE - KEEPING YOUR HEALTH INSURANCE</b></h3></td>
-    </tr>
-    <tr>
-      <td><h3>FOURTH REMINDER - SUBMIT DOCUMENTS NEEDED BY </h3></td>
+      <td>
+          <div class='mar10'><b>IMPORTANT NOTICE - KEEPING YOUR HEALTH INSURANCE</b></div><br/>
+          <div><b>FOURTH REMINDER - SUBMIT DOCUMENTS NEEDED BY <%= notice.due_date %></b></div>
+      </td>
     </tr>
   </tbody>
 </table>
-
+<br>
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Dear <%= notice.first_name %>:  </td>
+    <td><div> Dear <%= notice.first_name %>  :</div></td>
     </tr>
   </tbody>
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You submitted an application for health insurance through DC Health Link on <application date>, and recently enrolled in a plan. We're writing again to remind you that you must submit documents if you want to keep your health insurance."} %>
+  content: "You submitted an application for health insurance through DC Health Link on #{notice.application_date.strftime("%m/%d/%Y")}, and recently enrolled in a plan. We're writing again to remind you that you must submit documents if you want to keep your health insurance.", top_margin: '10px'} %>
 
-<h3>Send Us Documents</h3>
+<h3><div class='mar10'>Send Us Documents</div></h3>
 
-<h4>[IF APTC and/or CSR Enrolled with or without dental AND Documents Needed = YES]</h4>
+<% if notice.aqhp_enrollments.present? %>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date.strftime("%m/%d/%Y")}. You could lose your insurance or cost savings if you don't submit them by this deadline."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. <b>The deadline to return them is <notice.due_date>. You could lose your insurance or cost savings if you don't submit them by this deadline.</b> "} %>
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["The list of documents we need from you is at the end of this letter}.",
-    "We also tell you how to send them to us.",
-    "We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings"]} %>
-  
-<h4>[IF UQHP Enrolled with or without Dental OR Dental ONLY AND Documents Needed = YES]</h4>
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["The list of documents we need from you is at the end of this letter.",
+      "We also tell you how to send them to us.",
+      "We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings"]} %>
+<%else%>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. The deadline to return them is #{notice.due_date}. You could lose your insurance or cost savings if you don't submit them by this deadline."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You need to send documents to DC Health Link. We need them to verify what you told us on your application. <b>The deadline to return them is <notice.due_date>. You could lose your insurance or cost savings if you don't submit them by this deadline.</b> "} %>
-
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["The list of documents we need from you is at the end of this letter}.",
-    "We also tell you how to send them to us.",
-    "We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["The list of documents we need from you is at the end of this letter.",
+      "We also tell you how to send them to us.",
+      "We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+<%end%>
 
 <%= render partial: 'notices/shared/paragraph', locals:
   { content: "If you have questions or concerns, we're here to help."} %>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
- content: "The #{Settings.site.short_name} Team"} %> <br><br><br>
-
-<%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
-"Eligibility standards:  45 CFR §155.305",
-"Social security number requests/use:  45 CFR §155.305(f)(6)",
-"Eligibility process:  45 CFR §155.310",
-"Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
-"Document requests:  45 CFR §155.315(f)(2)(ii)",
-"Eligibility verification process for insurance affordability programs:  45 CFR §155.320",
-"Annual open enrollment period:  45 CFR §155.410(e)",
-"Special enrollment periods: 45 CFR §155.420",
-"Voluntary termination of health plan: 45 CFR §155.430(b)(1)",
-"Non-voluntary termination of health plan: 45 CFR §155.430(b)(2)"]} %>
+ content: "The #{Settings.site.short_name} Team"} %>
  
