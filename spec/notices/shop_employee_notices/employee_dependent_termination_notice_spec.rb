@@ -94,4 +94,23 @@ RSpec.describe ShopEmployeeNotices::EmployeeDependentTerminationNotice, :dbclean
     end
 
   end
+
+  describe "Rendering employee dependent termination template and generate pdf" do
+    before do
+      allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return enrollment
+      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employee_notice = ShopEmployeeNotices::EmployeeDependentTerminationNotice.new(census_employee, valid_parmas)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+    it "should render termination_of_employers_health_coverage" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_dependent_termination_notice"
+    end
+    it "should generate pdf" do
+      @employee_notice.build
+      @employee_notice.append_data
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
+
 end

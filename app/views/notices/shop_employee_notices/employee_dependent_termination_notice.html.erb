@@ -12,10 +12,10 @@
 	</tbody>
 </table>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-																									content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance with #{notice.employer_name} will terminate automatically on #{notice.enrollment.dependent_dob}. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."} %>
+																									content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turned 26 and their coverage as a dependent on your employer-sponsored insurance through #{notice.employer_name} will terminate automatically on #{notice.enrollment.dependent_dob}. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the month in which they turn 26 and automatically terminates on the last day of that month."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-																									content: "This means that, although your dependent child may be eligible to participate in #{site_short_name},they are not eligible to remain active on your policy as a dependent. This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
+																									content: "This means that, although your dependent child may be eligible to participate in the #{site_short_name}, they are not eligible to remain active on your policy as a dependent. This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 																									content: "Dependent children with disabilities may be eligible to remain covered by their parents’ policy regardless of their age. Please contact the #{site_short_name} at #{contact_center_phone_number} regarding adult children with disabilities that need to remain enrolled on an employee’s plan beyond age 26 or if you believe this decision is the result of an error."} %>
@@ -24,7 +24,7 @@
 																									content: "<strong>Individual Market Enrollment</strong><br>", col_styles: ['margin-bottom: 0px']} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-																																		 content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, they can enroll during annual individual market open enrollment period. During this period your dependent can enroll in individual market coverage through the #{site_short_name} if they live in Massachusetts.  Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance.  Your dependent child can create a #{site_short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside of Massachusetts, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href= '#{health_care_website_url}'> #{health_care_website} </a> "} %>
+																																		 content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, they can enroll during annual individual market open enrollment period. During this period your dependent can enroll in individual market coverage through the #{site_short_name} if they live in Massachusetts.  Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance.  Your dependent child can create a #{site_short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside of Massachusetts, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href= '#{health_care_website_url}'> #{health_care_website}. </a> "} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 																									content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage.  If your dependent is a Massachusetts resident and thinks they might be eligible for an individual market Special Enrollment Period, they can contact the #{site_short_name} at #{contact_center_ivl_phone_number} to see if they are eligible to enroll through a Special Enrollment Period."} %>
@@ -33,26 +33,10 @@
 																															 { heading: 'For Questions or Assistance:',
 																																 col_styles: ['margin-bottom: 0px']} %>
 <%= render partial: 'notices/shared/paragraph', :locals =>
-																									{ content: "Please contact your benefits office for further assistance. You can also contact the Health Connector with any questions:"} %>
-<table class="total_table" border="0">
-	<tbody>
-	<tr>
-		<td>
-			<ul style="list-style: circle solid;">
-				<li class="notice-font">
-					By calling <%=contact_center_phone_number%> <br>
-				</li>
-				<li class="notice-font" > 
-					TTY: <%=contact_center_tty_number%> <br> 
-				</li>
-				<li class="notice-font">
-					Online at <a href= "#{site_main_web_address}"> <%= site_main_web_address %></a>
-				</li>
-			</ul>
-		</td>
-	</tr>
-	</tbody>
-</table>
+																									{ content: "Please contact your benefits office for further assistance. You can also contact the #{site_short_name} with any questions:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+                                                                      ["By calling #{contact_center_phone_number}.","TTY: #{contact_center_tty_number}", "Online at: #{site_website_address}" ] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 																									content: "This notice is being provided in accordance with 45 C.F.R. §155.735(d)."} %>
