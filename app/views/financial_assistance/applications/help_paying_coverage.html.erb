@@ -32,7 +32,7 @@
                   <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person.primary_family.is_applying_for_assistance == false%>>
                   <label class="radio-label" for="radio2"><span>No</span></label>
                 </div>
-                <div class="col-md-2" style="margin-top: 10px">
+                <div class="col-md-2 not-sure-margin">
                   <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not Sure?</a>
                   <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_applying_for_assistance"} %>
                 </div>
