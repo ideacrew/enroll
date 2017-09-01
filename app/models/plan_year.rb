@@ -1143,7 +1143,11 @@ class PlanYear
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if application_eligibility_warnings.include?(:primary_office_location)
       self.employer_profile.census_employees.non_terminated.each do |ce|
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+        begin
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver employee employer renewal denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+        end
       end
     end
   end
