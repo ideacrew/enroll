@@ -1,8 +1,5 @@
 require 'rails_helper'
 RSpec.describe Household, :type => :model do
-  before :each do
-    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-  end
 
   describe Household, "given a coverage household with a dependent", :dbclean => :after_each do
     let(:family_member) {FamilyMember.new}
@@ -54,9 +51,8 @@ RSpec.describe Household, :type => :model do
   context "latest_active_tax_household_with_year" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:household) {FactoryGirl.create(:household, family: family)}
-    let(:application) { FactoryGirl.create(:application, family: family) }
-    let(:tax_household) {FactoryGirl.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil)}
-    let(:tax_household2) {FactoryGirl.create(:tax_household, application_id: application.id, household: household)}
+    let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+    let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
     let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
 
       it "return correct tax_household" do
@@ -137,54 +133,51 @@ RSpec.describe Household, :type => :model do
       expect(Family::IMMEDIATE_FAMILY.include?('stepchild')).to eq true
     end
 
-    # context "eligibility determinations for a household" do
-    #   #let!(:tax_household1) {FactoryGirl.create(:tax_household }
-    #   let(:year) { TimeKeeper.date_of_record.year }
-    #   let!(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
-    #   let!(:household) {FactoryGirl.create(:household, family: family)}
-    #   let!(:application) { FactoryGirl.create(:application, family: family) }
-    #   let!(:tax_household1) {FactoryGirl.create(:tax_household, application: application)}
-    #   let!(:tax_household2) {FactoryGirl.create(:tax_household, application: application)}
-    #   let!(:tax_household3) {FactoryGirl.create(:tax_household, application: application)}
-    #   let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, application: application, tax_household_id: tax_household1.id)}
-    #   let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, application: application, tax_household_id: tax_household2.id)}
-    #   let!(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, application: application, tax_household_id: tax_household3.id)}
+    context "eligibility determinations for a household" do
+      let(:year) { TimeKeeper.date_of_record.year }
+      let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+      let!(:household) {FactoryGirl.create(:household, family: family)}
+      let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
+      let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
+      let(:tax_household3) {FactoryGirl.create(:tax_household, household: household)}
+      let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
+      let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2)}
+      let(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3)}
 
-    #   it "should return all the eligibility determinations across all tax households when there is one eligibility determination per tax household" do
-    #
-    #     # tax_household1.eligibility_determinations.first = eligibility_determination1
-    #     # tax_household2.eligibility_determinations = [eligibility_determination2]
-    #     # application.tax_households = [tax_household1, tax_household2]
-    #     expect(application.eligibility_determinations_for_year(year).size).to eq 3
-    #     application.eligibility_determinations_for_year(year).each do |ed|
-    #       expect(application.eligibility_determinations_for_year(year)).to include(ed)
-    #     end
-    #   end
+      it "should return all the eligibility determinations across all tax households when there is one eligibility determination per tax household" do
+        tax_household1.eligibility_determinations = [eligibility_determination1]
+        tax_household2.eligibility_determinations = [eligibility_determination2]
+        household.tax_households = [tax_household1, tax_household2]
+        expect(household.eligibility_determinations_for_year(year).size).to eq 2
+        household.eligibility_determinations_for_year(year).each do |ed|
+          expect(household.eligibility_determinations_for_year(year)).to include(ed)
+        end
+      end
 
-    #   it "should return all the eligibility determinations across all tax households when there is more than one eligibility determination in some tax household" do
-    #     tax_household1.eligibility_determinations = [eligibility_determination1, eligibility_determination3]
-    #     tax_household2.eligibility_determinations = [eligibility_determination2]
-    #     household.tax_households = [tax_household1, tax_household2]
-    #     expect(household.eligibility_determinations_for_year(year).size).to eq 3
-    #     household.eligibility_determinations_for_year(year).each do |ed|
-    #       expect(household.eligibility_determinations_for_year(year)).to include(ed)
-    #     end
-    #   end
-    # end
+      it "should return all the eligibility determinations across all tax households when there is more than one eligibility determination in some tax household" do
+        tax_household1.eligibility_determinations = [eligibility_determination1, eligibility_determination3]
+        tax_household2.eligibility_determinations = [eligibility_determination2]
+        household.tax_households = [tax_household1, tax_household2]
+        expect(household.eligibility_determinations_for_year(year).size).to eq 3
+        household.eligibility_determinations_for_year(year).each do |ed|
+          expect(household.eligibility_determinations_for_year(year)).to include(ed)
+        end
+      end
+    end
 
 
-    # context "with an enrolled hbx enrollment" do
-    #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
-    #   let(:hbx_enrollments) { [mock_hbx_enrollment] }
-    #   before do
-    #     allow(HbxEnrollment).to receive(:covered).with(hbx_enrollments).and_return(hbx_enrollments)
-    #     allow(subject).to receive(:hbx_enrollments).and_return(hbx_enrollments)
-    #   end
+  # context "with an enrolled hbx enrollment" do
+  #   let(:mock_hbx_enrollment) { instance_double(HbxEnrollment) }
+  #   let(:hbx_enrollments) { [mock_hbx_enrollment] }
+  #   before do
+  #     allow(HbxEnrollment).to receive(:covered).with(hbx_enrollments).and_return(hbx_enrollments)
+  #     allow(subject).to receive(:hbx_enrollments).and_return(hbx_enrollments)
+  #   end
 
-    #   it "should return the enrolled hbx enrollment in an array" do
-    #     expect(subject.enrolled_hbx_enrollments).to eq hbx_enrollments
-    #   end
-    # end
+  #   it "should return the enrolled hbx enrollment in an array" do
+  #     expect(subject.enrolled_hbx_enrollments).to eq hbx_enrollments
+  #   end
+  # end
   end
 
 
