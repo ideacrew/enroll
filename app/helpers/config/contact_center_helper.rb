@@ -60,7 +60,7 @@ module Config::ContactCenterHelper
   end
 
   def small_business_email_link
-    link_to small_businesss_email,small_businesss_email
+    mail_to small_businesss_email,small_businesss_email
   end
 
   def contact_center_appeals
