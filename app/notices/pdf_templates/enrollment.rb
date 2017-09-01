@@ -13,13 +13,10 @@ module PdfTemplates
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
     attribute :enrolled_count, String
-    attribute :dependents, Array[String]
     attribute :dependent_dob, Date
     attribute :coverage_kind, String
     attribute :kind, String
     attribute :is_receiving_assistance, Boolean
-    attribute :plan_year, Date
-    attribute :ivl_open_enrollment_start_on, Date
-    attribute :ivl_open_enrollment_end_on, Date
+    attribute :dependents_count, String
   end
 end

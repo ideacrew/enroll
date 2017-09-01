@@ -554,31 +554,7 @@ class CensusEmployee < CensusMember
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
       CensusEmployee.ee_mid_year_plan_change_notice_congressional(new_date)
-      CensusEmployee.employee_dependent_age_off_termination
       CensusEmployee.mid_year_plan_change(new_date)
-    end
-
-
-    def employee_dependent_age_off_termination
-      return unless TimeKeeper.date_of_record.mday == 1
-      CensusEmployee.all.each do |census_employee|
-        if census_employee.employee_role.present?
-          plan_year = census_employee.employee_role.employer_profile.plan_years.where(:aasm_state.nin => PlanYear::INELIGIBLE_FOR_EXPORT_STATES).first
-          next if plan_year.benefit_groups.any?{|bg| bg.is_congress?}
-          census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
-            if PlanCostDecorator.benefit_relationship(dependent.primary_relationship).include? "child_under_26"
-              dep = dependent.person
-              now = TimeKeeper.date_of_record
-              age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
-              if age >= 25
-                if (now.month == 12 && now.day == 1) || (now.month == dep.dob.month && now.day == 1)
-                  ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "employee_dependent_age_off_termination")
-                end
-              end
-            end
-          end
-        end
-      end
     end
 
     def congress_employee_dependent_age_off_termination_notice(new_date)
@@ -655,7 +631,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test?
         end
       end
     end
