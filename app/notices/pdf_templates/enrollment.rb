@@ -13,7 +13,6 @@ module PdfTemplates
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
     attribute :enrolled_count, String
-    attribute :dependent_dob, Date
     attribute :coverage_kind, String
     attribute :kind, String
     attribute :is_receiving_assistance, Boolean
