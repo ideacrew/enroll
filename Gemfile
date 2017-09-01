@@ -115,8 +115,8 @@ end
 
 group :development, :test do
   # YARD documentation generation tool: http://yardoc.org/
-  gem 'yard', '~> 0.9.5'
-  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'yard', '~> 0.9.5', require: false
+  gem 'yard-mongoid', '~> 0.1.0', require: false
   gem 'railroady', '~> 1.5.2'
 
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
