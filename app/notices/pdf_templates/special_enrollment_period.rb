@@ -7,6 +7,5 @@ module PdfTemplates
     attribute :qle_on, Date
     attribute :start_on, Date
     attribute :end_on, Date
-    attribute :effective_on, Date
   end
 end

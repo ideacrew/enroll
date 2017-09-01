@@ -1,13 +1,12 @@
 module PdfTemplates
   class EmployerNotice
-   include Virtus.model
+    include Virtus.model
 
     attribute :notification_type, String
     attribute :mpi_indicator, String
     attribute :primary_fullname, String
     attribute :employee_fullname, String
     attribute :primary_identifier, String
-    attribute :employee_fullname, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
@@ -32,8 +31,6 @@ module PdfTemplates
     attribute :plan, PdfTemplates::Plan
     attribute :benefit_group_assignments, Hash
     attribute :plan_year, PdfTemplates::PlanYear
-    attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
-    attribute :mpi_indicator, String
 
     def shop?
       return true
