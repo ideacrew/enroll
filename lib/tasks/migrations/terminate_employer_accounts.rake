@@ -50,13 +50,15 @@ namespace :migrations do
         if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
-          organization.employer_profile.census_employees.active.each do |ce|
-               begin
-                 ShopNoticesNotifierJob.perform(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination") if generate_termination_notice
-               rescue Exception => e
-                 (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
-               end
-          end 
+          if generate_termination_notice == true
+            organization.employer_profile.census_employees.active.each do |ce|
+                 begin
+                   ShopNoticesNotifierJob.perform(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+                 rescue Exception => e
+                   (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
+                 end
+            end 
+          end
         end
       end
 
