@@ -28,6 +28,7 @@ class ShopEmployeeNotice < Notice
     notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
+    append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
@@ -57,6 +58,16 @@ class ShopEmployeeNotice < Notice
         zip: "20005"
       })
     })
+  end
+
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: primary_address.address_1.titleize,
+      street_2: primary_address.address_2.titleize,
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
   end
 
   def append_broker(broker)
