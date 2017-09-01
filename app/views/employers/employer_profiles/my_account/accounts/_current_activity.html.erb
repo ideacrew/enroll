@@ -16,7 +16,7 @@
       <td></td>
       <td><strong>Previous Balance</strong></td>
       <td></td>
-      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:previous_balance)) || "Data not available" %></td>
+      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:previous_balance)) || "-" %></td>
     </tr>
     <!-- Payments -->
     <tr>
@@ -50,7 +50,7 @@
     <tr>
       <td></td>
       <td>New Charges</td>
-      <td><%= (@employer_profile.try(:employer_profile_account).try(:new_charges)) || "Data not available" %></td>
+      <td><%= (@employer_profile.try(:employer_profile_account).try(:new_charges)) || "-" %></td>
       <td></td>
     </tr>
     <!-- Adjustments -->
