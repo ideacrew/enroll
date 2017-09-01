@@ -554,7 +554,7 @@ class CensusEmployee < CensusMember
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
       CensusEmployee.ee_mid_year_plan_change_notice_congressional(new_date)
-      CensusEmployee.mid_year_plan_change(new_date)
+      CensusEmployee.employee_dependent_age_off_termination
     end
 
     def congress_employee_dependent_age_off_termination_notice(new_date)
@@ -589,22 +589,6 @@ class CensusEmployee < CensusMember
           rescue Exception => e
             puts "#{person.full_name}, #{person.hbx_id} #{e.message}"
           end
-        end
-      end
-    end
-
-    def mid_year_plan_change(new_date)
-      employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
-      CensusEmployee.all.non_terminated.each do |employee|
-        begin
-          census_employee = employee if employer_ids.exclude?(employee.employer_profile_id)
-          if census_employee.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
-            if census_employee.new_hire_enrollment_period.last == new_date || census_employee.active_benefit_group_assignment.hbx_enrollment.try(:special_enrollment_period).try(:end_on) == new_date
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change_non_congressional")
-            end
-          end
-        rescue Exception => e
-          log("#{e.message}; person_id: #{census_employee.employee_role.person.hbx_id}")
         end
       end
     end

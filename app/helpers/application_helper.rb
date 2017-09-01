@@ -547,8 +547,9 @@ module ApplicationHelper
   end
 
   def employee_mid_year_plan_change_non_congressional(census_employee)
+  
     employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
-     begin
+     begin 
        employee_roles = employer_ids.exclude?(census_employee.employee_role.employer_profile_id)
        if employee_roles.present? && census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.enrollment_kind != "open_enrollment"
          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change_non_congressional")
