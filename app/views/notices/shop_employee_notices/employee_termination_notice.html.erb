@@ -9,27 +9,30 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "This letter is notification that your employer, #{notice.employer_name}, has removed you from their list of employees eligible for employer-sponsored health insurance. Effective #{notice.census_employee.employment_terminated_on}, you are no longer eligible to apply for or make changes to your health insurance with #{notice.employer_name}."} %>
-
-<% if notice.census_employee.health_enrollment.present? %>
+<% if !notice.census_employee.health_enrollment.present? && !notice.census_employee.dental_enrollment.present? %>
   <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "Your coverage into #{notice.census_employee.health_enrollment.plan.plan_name} for you and any covered dependents will end on #{notice.census_employee.coverage_terminated_on}."} %>
+    { content: "This letter is notification that your employer, #{notice.employer_name}, has removed you from their list of employees eligible for employer-sponsored insurance. Your employer has indicated that, effective #{notice.census_employee.employment_terminated_on}, you are no longer eligible for employer-sponsored insurance."} %>
 <% end %>
 
-<% if notice.census_employee.dental_enrollment.present? %>
+<% if notice.census_employee.health_enrollment.present? && !notice.census_employee.dental_enrollment.present?%>
   <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "Your coverage into #{notice.census_employee.dental_enrollment.plan.plan_name} for you and #{notice.census_employee.dental_enrollment.enrolled_count} dependents will end on #{notice.census_employee.coverage_terminated_on}."} %>
+    { content: "This letter is notification that your employer, #{notice.employer_name}, has removed you from their list of employees eligible for employer-sponsored insurance. Your coverage into #{notice.census_employee.health_enrollment.plan.plan_name} for you and any covered dependents will end on #{notice.census_employee.coverage_terminated_on}, due to your loss of eligibility on #{notice.census_employee.employment_terminated_on}. 
+"} %>
+<% end %>
+
+<% if notice.census_employee.dental_enrollment.present? && notice.census_employee.health_enrollment.present?%>
+  <%= render partial: 'notices/shared/paragraph', :locals =>
+    { content: "This letter is notification that your employer, #{notice.employer_name}, has removed you from their list of employees eligible for employer-sponsored health insurance. Your coverage into #{notice.census_employee.health_enrollment.plan.plan_name} and #{notice.census_employee.dental_enrollment.plan.plan_name} for you and any covered dependents will end on #{notice.census_employee.coverage_terminated_on}, due to your loss of eligibility on #{notice.census_employee.employment_terminated_on}."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
-  { contents: ["If you are enrolled in #{notice.employer_name}’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members  through DC Health Link’s individual marketplace.  You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance."], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
+  { contents: ["If you are enrolled in #{notice.employer_name}’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members through #{Settings.site.short_name}’s individual marketplace. You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance."], heading: 'You May be Eligible for Other Coverage', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the date of the loss of coverage, beginning #{TimeKeeper.date_of_record} until #{notice.census_employee.coverage_terminated_on}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period from #{notice.enrollment.ivl_open_enrollment_start_on} through #{notice.enrollment.ivl_open_enrollment_end_on}. Please log into your DC Health Link account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the date of the loss of coverage, beginning #{TimeKeeper.date_of_record} until #{notice.census_employee.coverage_terminated_on}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment period from #{notice.enrollment.ivl_open_enrollment_start_on} through #{notice.enrollment.ivl_open_enrollment_end_on}. Please log into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs.  To find the Health Insurance Marketplace in your state, go to <a href='www.healthcare.gov'>www.healthcare.gov</a>."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs. To find the Health Insurance Marketplace in your state, go to <a href='www.healthcare.gov'>www.healthcare.gov</a>."} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll.  While you may generally have a 60-day Special Enrollment Period to enroll in individual market DC Health Link coverage, you typically only have a 30-day Special Enrollment Period to enroll in another employer’s group health plan."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "If you are eligible to participate in another employer's plan, contact that employer promptly to enroll. While you may generally have a 60-day Special Enrollment Period to enroll in individual market #{Settings.site.short_name} coverage, you typically only have a 30-day Special Enrollment Period to enroll in another employer’s group health plan."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>

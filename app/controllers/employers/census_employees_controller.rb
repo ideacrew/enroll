@@ -121,11 +121,7 @@ class Employers::CensusEmployeesController < ApplicationController
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
       if termination_date >= (TimeKeeper.date_of_record - 60.days)
         @fa = @census_employee.terminate_employment(termination_date) && @census_employee.save
-        begin
-          ShopNoticesNotifierJob.perfrom_later(@census_employee.id.to_s, "employee_termination_notice") if @census_employee.published_benefit_group_assignment.hbx_enrollments.present?
-        rescue Exception => e
-          puts "Unable to deliver Termination notice to #{@census_employee.full_name}" unless Rails.env.test?
-        end
+        notify_employee_of_termination
       end
     end
 
@@ -254,6 +250,14 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def benefit_group
     @census_employee.benefit_group_assignments.build unless @census_employee.benefit_group_assignments.present?
+  end
+
+  def notify_employee_of_termination
+    begin
+      ShopNoticesNotifierJob.perfrom_later(@census_employee.id.to_s, "employee_termination_notice")
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
+    end
   end
 
   private

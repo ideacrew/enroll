@@ -9,13 +9,12 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
                             :event_name => 'employee_termination_notice',
                             :title => "EE Ineligibility Notice – Terminated from Roster"})
                           }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
-
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
   let(:hbx_profile) {double}
   let(:benefit_sponsorship) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, renewal_benefit_coverage_period: renewal_bcp, current_benefit_coverage_period: bcp) }
   let(:bcp) { double(earliest_effective_date: TimeKeeper.date_of_record - 2.months, start_on: TimeKeeper.date_of_record.beginning_of_year, end_on: TimeKeeper.date_of_record.end_of_year, open_enrollment_start_on: Date.new(TimeKeeper.date_of_record.next_year.year,11,1), open_enrollment_end_on: Date.new((TimeKeeper.date_of_record+2.years).year,1,31)) }
@@ -43,7 +42,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
     }
 
   let(:enrollment) do
-    hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health', aasm_state:'coverage_selected',benefit_group_assignment_id: benefit_group_assignment.id)
+    hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health', aasm_state:'coverage_termination_pending',benefit_group_assignment_id: benefit_group_assignment.id)
     hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true)
     hbx.save
     hbx
@@ -87,16 +86,49 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
       @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)
-
-    end
-    it "should append data" do
       @employee_notice.append_data
+    end
+
+    it "should return employment terminated date" do
       expect(@employee_notice.census_employee.employment_terminated_on).to eq census_employee.employment_terminated_on
+    end
+
+    it "should return coverage terminated date" do
       expect(@employee_notice.census_employee.coverage_terminated_on).to eq census_employee.coverage_terminated_on
-      expect(@employee_notice.notice.census_employee.enrollments.count).to eq 1
+    end
+
+    it "should return plan name" do
       expect(@employee_notice.notice.census_employee.enrollments.first.plan.plan_name).to eq enrollment.plan.name
+    end
+
+    it "should return coverage kind" do
       expect(@employee_notice.notice.census_employee.enrollments.first.plan.coverage_kind).to eq enrollment.coverage_kind
+    end
+
+    it "should return enrolled count" do
       expect(@employee_notice.notice.census_employee.enrollments.first.enrolled_count).to eq enrollment.humanized_dependent_summary.to_s
+    end
+
+  end
+
+  describe "render template and generate pdf" do
+    before do
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)
+      @employee_notice.build
+      @employee_notice.append_data
+    end
+
+    it "should render employee termination notice" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_termination_notice"
+    end
+
+    it "should generate pdf" do
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 
