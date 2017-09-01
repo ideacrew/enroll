@@ -1,11 +1,13 @@
+listener_class = Acapi::Publishers::UpstreamEventPublisher 
+
 if defined?(NewRelic)
-  require 'new_relic/agent/method_tracer'
+  require 'new_relic_rpm'
   Acapi::Publishers::UpstreamEventPublisher.class_eval do
-    include ::NewRelic::Agent::MethodTracer
-    add_method_tracer :handle_message
+    include NewRelic::Agent::Instrumentation::ControllerInstrumentation
+    add_transaction_tracer :handle_message, :category => :task
   end
 end
 
-listener = Acapi::Publishers::UpstreamEventPublisher.new
+listener = listener_class.new
 listener.register_subscribers!
 listener.run
