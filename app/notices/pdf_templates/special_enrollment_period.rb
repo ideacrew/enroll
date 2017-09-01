@@ -10,4 +10,3 @@ module PdfTemplates
     attribute :effective_on, Date
   end
 end
-

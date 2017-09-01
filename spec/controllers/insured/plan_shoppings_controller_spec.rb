@@ -366,7 +366,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:shopping?).and_return(true)
       allow(hbx_enrollment).to receive(:census_employee).and_return(double)
       sign_in user
-
     end
 
     it "should get success flash message" do
