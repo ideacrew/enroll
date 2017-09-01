@@ -462,7 +462,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryGirl.create(:person)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:sep){
+    let!(:sep){
       sep = family.special_enrollment_periods.new
       sep.effective_on_kind = 'date_of_event'
       sep.qualifying_life_event_kind= qle_effective_date
