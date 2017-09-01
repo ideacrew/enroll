@@ -51,6 +51,9 @@ class Employers::CensusEmployeesController < ApplicationController
     #end
   end
 
+  def create_cobra_dependent
+  end
+
   def edit
     @census_employee.build_address unless @census_employee.address.present?
     @census_employee.build_email unless @census_employee.email.present?

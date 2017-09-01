@@ -581,6 +581,8 @@ class CensusEmployee < CensusMember
     state :newly_designated_eligible    # congressional employee state with certain new hire rules
     state :employee_role_linked
     state :cobra_linked
+    state :cobra_dependent
+    state :employment_terminated_with_cobra_dependent
     state :newly_designated_linked
     state :cobra_termination_pending
     state :employee_termination_pending
@@ -603,8 +605,8 @@ class CensusEmployee < CensusMember
     end
 
     event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
-      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
-      transitions from: :employment_terminated, to: :cobra_eligible
+      transitions from: [:employment_terminated, :employment_terminated_with_cobra_dependent], to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
+      transitions from: [:employment_terminated, :employment_terminated_with_cobra_dependent], to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
@@ -629,9 +631,13 @@ class CensusEmployee < CensusMember
       transitions from: [:cobra_eligible, :cobra_linked, :cobra_termination_pending],  to: :cobra_terminated
     end
 
+    event :promote_cobra_dependent, :after => :record_transition do
+      transitions from: :employment_terminated, to: :employment_terminated_with_cobra_dependent 
+    end
+
     event :reinstate_eligibility, :after => [:record_transition] do
-      transitions from: :employment_terminated, to: :employee_role_linked, :guard => :has_employee_role_linked?
-      transitions from: :employment_terminated,  to: :eligible
+      transitions from: :employment_terminated, to: :employment_terminated_with_cobra_dependent, to: :employee_role_linked, :guard => :has_employee_role_linked?
+      transitions from: :employment_terminated, to: :employment_terminated_with_cobra_dependent, to: :eligible
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated, to: :cobra_eligible
     end
