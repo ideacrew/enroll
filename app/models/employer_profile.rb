@@ -786,7 +786,7 @@ class EmployerProfile
     end
   end
 
-  def transmit_scheduled_employers(new_date, feins=[])
+  def self.transmit_scheduled_employers(new_date, feins=[])
     start_on = new_date.next_month.beginning_of_month
     employer_collection = Organization
     employer_collection = Organization.where(:fein.in => feins) if feins.any?
