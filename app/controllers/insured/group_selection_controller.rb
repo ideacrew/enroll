@@ -209,12 +209,6 @@ class Insured::GroupSelectionController < ApplicationController
     @optional_effective_on = params[:effective_on_option_selected].present? ? Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') : nil
   end
 
-  def insure_hbx_enrollment_for_shop_qle_flow
-    if @market_kind == 'shop' && (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @hbx_enrollment.blank?
-      @hbx_enrollment = selected_enrollment(@family, @employee_role)
-    end
-  end
-
   def generate_coverage_family_members_for_cobra
     if @market_kind == 'shop' && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && @employee_role.present? && @employee_role.is_cobra_status?
       hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
