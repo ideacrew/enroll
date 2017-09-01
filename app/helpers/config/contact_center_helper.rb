@@ -11,10 +11,6 @@ module Config::ContactCenterHelper
     Settings.contact_center.alt_phone_number
   end
 
-  def contact_center_sep_phone_number
-    Settings.contact_center.sep_phone_number
-  end  
-
   def contact_center_alt_fax_number
     Settings.contact_center.alt_fax
   end
