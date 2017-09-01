@@ -672,7 +672,7 @@ shop_notice_triggers = [
     {
         hbx_id: 'SHOP40',
         title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
-        description: 'Employee mid year plan change when an eligiblity determination is reached',
+        description: 'EE Made Mid-Year Plan Change (Reason: New Hire, SEP, OR DPT Age-Off)',
         resource_name: 'employer',
         event_name: 'employee_mid_year_plan_change',
         notice_triggers: [
