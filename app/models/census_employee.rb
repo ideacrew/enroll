@@ -547,15 +547,15 @@ class CensusEmployee < CensusMember
     end
 
     def advance_day(new_date)
-      CensusEmployee.congress_employee_dependent_age_off_termination_notice(new_date)
+#      CensusEmployee.congress_employee_dependent_age_off_termination_notice(new_date)
       CensusEmployee.terminate_scheduled_census_employees
       CensusEmployee.rebase_newly_designated_employees
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
-      CensusEmployee.ee_mid_year_plan_change_notice_congressional(new_date)
-      CensusEmployee.employee_dependent_age_off_termination
-      CensusEmployee.mid_year_plan_change(new_date)
+#      CensusEmployee.ee_mid_year_plan_change_notice_congressional(new_date)
+#      CensusEmployee.employee_dependent_age_off_termination
+#      CensusEmployee.mid_year_plan_change(new_date)
     end
 
 
