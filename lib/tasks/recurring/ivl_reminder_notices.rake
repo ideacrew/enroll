@@ -13,7 +13,7 @@ namespace :recurring do
 								      "aasm_state" => { "$in" => ["enrolled_contingent"] },
 								      "special_verification_period" => { "$lt"  => TimeKeeper.date_of_record + previous_days, "$gte" => TimeKeeper.date_of_record + reminder_days }
 								  } }
-								}).to_a
+								})
       puts "families #{families.count}"
 			families.each do |family|
         puts "family.primary_applicant.person.consumer_role.present? #{family.primary_applicant.person.consumer_role.present?}"
@@ -33,7 +33,7 @@ namespace :recurring do
                     consumer_role.second_verifications_reminder unless is_notice_sent?(person,SECOND_REMINDER_TITLE)
                   when 45
                     puts "sending third_verifications_reminder to #{consumer_role.id}" unless is_notice_sent?(person,THIRD_REMINDER_TITLE)
-                    consumer_role.third_verifications_reminder unless is_notice_sent?(person,THIRD_REMINDER_TITLE)
+                    consumer_role.third_verifications_reminder unless is_notice_sent?(person,THIRD_REMINDER_TITLE) 
                   when 30
                     puts "sending fourth_verifications_reminder to #{consumer_role.id}" unless is_notice_sent?(person,FOURTH_REMINDER_TITLE)
                     consumer_role.fourth_verifications_reminder unless is_notice_sent?(person,FOURTH_REMINDER_TITLE)

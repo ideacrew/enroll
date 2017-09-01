@@ -45,10 +45,9 @@ RSpec.describe IvlNotices::ConsumerNotice, :dbclean => :after_each do
   describe "Build" do
     before do
       @consumer_notice = IvlNotices::ConsumerNotice.new(consumer_role, valid_parmas)
-      allow(@consumer_notice).to receive("append_unverified_family_members").and_return(true)
     end
     it "should build notice with all necessory info" do
-
+      expect(@consumer_notice).to receive("append_unverified_family_members").and_return(true)
       @consumer_notice.build
       expect(@consumer_notice.notice.primary_fullname).to eq person.full_name.titleize
     end
