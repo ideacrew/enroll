@@ -26,10 +26,8 @@ class ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional < Notice
 
   def append_data
   	sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-    new_hire = census_employee.employee_role.person.primary_family.households.first.hbx_enrollments.order_by(:"created_at".desc)[0]
-    effective_on = sep.present? ? sep.effective_on : new_hire.effective_on
   	notice.sep = PdfTemplates::SpecialEnrollmentPeriod.new({
-      :effective_on => effective_on
+      :effective_on => sep.effective_on,
       })
   end
 
@@ -37,7 +35,7 @@ class ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional < Notice
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employer_profile.staff_roles.first.full_name.titleize
     notice.employee_fullname = census_employee.full_name.titleize
-    notice.employer_name = recipient.organization.legal_name.titleize.split(" ").map!{|w| (["us","usa"].include? w.downcase.strip) ? w.upcase : w}.join(' ')
+    notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = census_employee.employer_profile.hbx_id
     append_address(census_employee.employer_profile.organization.primary_office_location.address)
     append_hbe
