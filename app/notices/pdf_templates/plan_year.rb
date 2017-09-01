@@ -10,6 +10,7 @@ module PdfTemplates
     attribute :warnings, Array[String]
     attribute :binder_payment_due_date, Date
     attribute :renewing_start_on, Date
+    attribute :terminated_on, Date
     
   end
 end

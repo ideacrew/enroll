@@ -8,7 +8,7 @@ namespace :migrations do
 
     fein = args[:fein]
     generate_termination_notice = args[:generate_termination_notice]
-    organizations = Organization.where(fein: fein).all.to_a
+    organizations = Organization.where(fein: fein)
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
       raise 'more than 1 employer found with given fein'
@@ -33,7 +33,7 @@ namespace :migrations do
         plan_year.expire! if plan_year.may_expire?
       end
       # Terminate current active plan years
-      organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record + 3.month).each do |plan_year|
+      organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
           puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
