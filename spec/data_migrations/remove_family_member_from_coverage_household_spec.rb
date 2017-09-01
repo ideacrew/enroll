@@ -13,17 +13,19 @@ describe RemoveFamilyMemberFromCoverageHousehold, dbclean: :after_each do
   describe "remove family member from coverage household", dbclean: :after_each do
 
     let(:person) { FactoryGirl.create(:person) }
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member_and_dependent, person: person)}
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member){ FactoryGirl.create(:family_member,family: family)}
 
     before do
       allow(ENV).to receive(:[]).with('person_hbx_id').and_return person.hbx_id
-      allow(ENV).to receive(:[]).with('family_member_hbx_id').and_return family.family_members.last.hbx_id
+      allow(ENV).to receive(:[]).with('family_member_hbx_id').and_return family_member.hbx_id
     end
 
     it "should remove a family member to household" do
       size = family.family_members.size
       subject.migrate
       person.reload
+      family.reload
       expect(family.family_members.size).to eq size-1
     end
   end
