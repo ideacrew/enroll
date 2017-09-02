@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
-  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year }
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year }
   let!(:employer_profile) { create :employer_profile, aasm_state: "active" }
   let!(:person) { create :person }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
@@ -9,14 +9,14 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft') }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
-  let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
-  let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
+  let!(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: employer_profile) }
+  let!(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id) }
   let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
-  let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
-  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, benefit_group: benefit_group, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: renewal_plan, aasm_state: 'coverage_termination_pending') }
-  let(:renewal_plan) { FactoryGirl.create(:plan) }
-  let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id) }
-  let(:application_event) { double("ApplicationEventKind", {
+  let!(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: active_benefit_group, census_employee: census_employee) }
+  let!(:renewal_plan) { FactoryGirl.create(:plan) }
+  let!(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id) }
+  let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, benefit_group_assignment: benefit_group_assignment, benefit_group: benefit_group, household: family.active_household, effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, plan: plan, aasm_state: 'coverage_termination_pending') }
+  let!(:application_event) { double("ApplicationEventKind", {
     :name => 'Notification to employees regarding plan purchase during Open Enrollment or an SEP',
     :notice_template => 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
     :notice_builder => 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
@@ -25,7 +25,7 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
     :title => "Employee Plan Selection Confirmation"})
   }
 
-  let(:valid_params) { {
+  let!(:valid_params) { {
     :subject => application_event.title,
     :mpi_indicator => application_event.mpi_indicator,
     :event_name => application_event.event_name,
@@ -85,7 +85,7 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
 
     it "should append data" do
       expect(@employer_notice.notice.enrollment.effective_on.to_s).to eq("07/14/2017")
-      expect(@employer_notice.notice.enrollment.plan.plan_name).to eq("BlueChoice Silver24 2,000")
+      expect(@employer_notice.notice.enrollment.plan.plan_name).to eq(plan.name)
       expect(@employer_notice.notice.enrollment.employee_cost).to eq("0.0")
     end
 
