@@ -1,7 +1,7 @@
 class Insured::FamilyRelationshipsController < ApplicationController
-	before_action :set_current_person, :set_family
+  before_action :set_current_person, :set_family
 
-	def index
+  def index
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = @person.resident_role
@@ -23,10 +23,10 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @people = @family.family_members.where(is_active: true).map(&:person)
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships_UI
+    @relationship_kinds = PersonRelationship::Relationships
 
     render layout: 'financial_assistance'
-	end
+  end
 
   def create
     predecessor = Person.where(id: params[:predecessor_id]).first
@@ -36,8 +36,15 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @family.reload
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships_UI
-
+    @relationship_kinds = PersonRelationship::Relationships
+    @next_url = if @family.application_in_progress.present?
+                  go_to_step_financial_assistance_application_applicant_path(@family.application_in_progress, @family.application_in_progress.applicants.first, 1)
+                else
+                  find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)
+                end
+    if @missing_relationships.blank?
+      redirect_to @next_url and return
+    end
     respond_to do |format|
       format.html {
         redirect_to insured_family_relationships_path(employee_role_id: params[:employee_role_id], consumer_role_id: params[:consumer_role_id], resident_role_id: params[:resident_role_id]), notice: 'Relationship was successfully updated.'
@@ -46,8 +53,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     end
   end
 
-	private
-	def set_family
-		@family = @person.try(:primary_family)
-	end
+  private
+  def set_family
+    @family = @person.try(:primary_family)
+  end
 end
