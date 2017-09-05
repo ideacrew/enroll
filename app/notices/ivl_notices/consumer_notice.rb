@@ -49,7 +49,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def append_unverified_family_members
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments)
-    enrollments.select do |hbx_en|
+    #enrollments.select do |hbx_en|
+    family = recipient.primary_family
+    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
         (
           hbx_en.terminated_on.blank? ||
@@ -88,6 +90,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     notice.documents_needed = outstanding_people.present? ? true : false
     notice.due_date = contingent_enrollment.special_verification_period  rescue ""
     notice.application_date = contingent_enrollment.created_at  rescue ""
+    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
     append_unverified_individuals(outstanding_people)
     notice.primary_identifier = contingent_enrollment.id
   end
