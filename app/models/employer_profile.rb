@@ -694,18 +694,13 @@ class EmployerProfile
           end
         end    
 
-        #initial employers missing binder payment notices to active employees.
+        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
         binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state.each do |org|
             if !org.employer_profile.binder_paid?
-              org.employer_profile.census_employees.active.each do |ce|
-                begin
-                  ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
-                rescue Exception => e
-                  (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
-                end
-              end
+              notice_to_employer_for_missing_binder_payment(org)
+              notice_to_employee_for_missing_binder_payment(org)
             end
           end
         end
@@ -1111,6 +1106,24 @@ class EmployerProfile
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def self.notice_to_employer_for_missing_binder_payment(org)
+    begin
+      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver Notice on next day to #{org.legal_name} when employer misses binder payment due date deadline due to #{e}"}) unless Rails.env.test?
+    end
+  end
+
+  def self.notice_to_employee_for_missing_binder_payment(org)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
+      end
+    end
   end
 
   # TODO - fix premium amount
