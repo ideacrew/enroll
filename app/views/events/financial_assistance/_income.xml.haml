@@ -7,7 +7,7 @@
     %has_property_usage_rights= income.has_property_usage_rights
   - if income.wage_type.present?
     %wage_type= "urn:openhbx:terms:v1:financial_assistance_income_wage_type##{income.wage_type}"
-  - if income.hours_per_week > 0
+  - if income.hours_per_week.present? && income.hours_per_week > 0
     %hours_per_week= income.hours_per_week
   %amount= '%.2f' % (income.amount.to_f.round(2))
   %frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{income.frequency_kind}"
