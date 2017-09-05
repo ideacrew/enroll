@@ -680,11 +680,11 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
+    hbx_id: 'IVL_PRE_1',
     title: 'Projected Eligibility Notice',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'projected_eligibility_notice',
+    event_name: 'projected_eligibility_notice_1',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
@@ -702,11 +702,11 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
+    hbx_id: 'IVL_PRE_2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'ivl_renewal_notice_1_second_batch',
+    event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
