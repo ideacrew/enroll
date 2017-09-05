@@ -1404,12 +1404,6 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
-  def notify_employer_when_employee_terminate_coverage
-    if is_shop? && self.census_employee.present?
-      ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "notify_employer_when_employee_terminate_coverage")
-    end
-  end
-
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
