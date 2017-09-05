@@ -1,11 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :after_each do
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    sign_in(user)
+    allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
+    assign(:person, person)
+    assign(:plan_hsa_status, plan_hsa_status)
+    assign(:hbx_enrollment, hbx_enrollment)
+    assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
+  end
+
   let(:carrier_profile) { instance_double("CarrierProfile", id: "carrier profile id", legal_name: "legal_name") }
   let(:user) { FactoryGirl.create(:user, person: person) }
   let(:person) { FactoryGirl.create(:person, :with_family ) }
-  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let(:application) { FactoryGirl.create(:application, family: family1) }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:application) { FactoryGirl.create(:application, family: family) }
 
   let(:plan) do
     double(plan_type: "ppo",
@@ -41,22 +51,17 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       plan: plan
     )
   end
+  let(:household) { family.households.first }
 
   before :each do
-    sign_in(user)
-    allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-    assign(:person, person)
-    assign(:plan_hsa_status, plan_hsa_status)
-    assign(:hbx_enrollment, hbx_enrollment)
-    assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
     assign(:carrier_names_map, {})
     allow(plan).to receive(:total_employee_cost).and_return 100
     allow(plan).to receive(:is_csr?).and_return false
     family = person.primary_family
     active_household = family.households.first
     application.update_attributes!(family: family)
-    tax_household = FactoryGirl.create(:tax_household, application: application )
-    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
+    tax_household = FactoryGirl.create(:tax_household, household: household )
+    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
   end
 
   context "deductible" do
@@ -75,11 +80,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
   context "without aptc" do
     before :each do
-      sign_in(user)
-      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-      assign(:plan_hsa_status, plan_hsa_status)
-      assign(:hbx_enrollment, hbx_enrollment)
-      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       assign(:person, person)
       allow(plan).to receive(:total_employee_cost).and_return 100
@@ -87,8 +87,8 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       family = person.primary_family
       active_household = family.households.first
       application.update_attributes!(family: family)
-      tax_household = FactoryGirl.create(:tax_household, application: application )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
+      tax_household = FactoryGirl.create(:tax_household, household: household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -139,11 +139,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     before :each do
       allow(plan).to receive(:is_csr?).and_return true
       allow(view).to receive(:current_cost).and_return(52)
-      family = person.primary_family
-      active_household = family.households.first
-      application.update_attributes!(family: family)
-      tax_household = FactoryGirl.create(:tax_household, application: application )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -182,7 +177,7 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       allow(plan).to receive(:metal_level).and_return('dental')
       family = person.primary_family
       application.update_attributes!(family: family)
-      tax_household = FactoryGirl.create(:tax_household, application: application )
+      tax_household = FactoryGirl.create(:tax_household, household: household )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -195,22 +190,16 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
 
 context "with tax household and eligibility determination of csr_94" do
   before :each do
-    sign_in(user)
-    allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-    assign(:person, person)
-    assign(:plan_hsa_status, plan_hsa_status)
-    assign(:hbx_enrollment, hbx_enrollment)
-    assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
-    assign(:carrier_names_map, {})
-    assign(:eligibility_kind, "csr_94")
-    allow(plan).to receive(:total_employee_cost).and_return 100
-    allow(plan).to receive(:is_csr?).and_return false
-    allow(view).to receive(:params).and_return({:market_kind => 'individual'})
-    family = person.primary_family
-    application.update_attributes!(family: family)
-    tax_household = FactoryGirl.create(:tax_household, application: application )
-    eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
-    render "insured/plan_shoppings/plan_details", plan: plan
+      allow(view).to receive(:params).and_return :market_kind => 'individual'
+      view.instance_variable_set(:@eligibility_kind, "csr_94")
+      assign(:carrier_names_map, {})
+      allow(plan).to receive(:total_employee_cost).and_return 100
+      allow(plan).to receive(:is_csr?).and_return false
+      family = person.primary_family
+      application.update_attributes!(family: family)
+      tax_household = FactoryGirl.create(:tax_household, household: family.households.first , application_id: application.id)
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household, source: "Curam" )
+      render "insured/plan_shoppings/plan_details", plan: plan
     end
 
     it "should have hidden modal for csr elibility reminder" do
@@ -224,8 +213,8 @@ context "with tax household and eligibility determination of csr_94" do
       family = person.primary_family
       active_household = family.households.first
       application.update_attributes!(family: family)
-      tax_household = FactoryGirl.create(:tax_household, application: application )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application )
+      tax_household = FactoryGirl.create(:tax_household, household: household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
@@ -237,20 +226,14 @@ context "with tax household and eligibility determination of csr_94" do
   context "with tax household and eligibility determination of csr_100" do
 
     before :each do
-      sign_in(user)
-      allow(Caches::MongoidCache).to receive(:lookup).with(CarrierProfile, anything).and_return(carrier_profile)
-      assign(:person, person)
-      assign(:plan_hsa_status, plan_hsa_status)
-      assign(:hbx_enrollment, hbx_enrollment)
-      assign(:enrolled_hbx_enrollment_plan_ids, [plan.id])
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
       allow(plan).to receive(:is_csr?).and_return false
       family = person.primary_family
       active_household = family.households.first
       application.update_attributes!(family: family)
-      tax_household = FactoryGirl.create(:tax_household, application: application )
-      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, application: application, csr_eligibility_kind: "csr_100", source: "Curam" )
+      tax_household = FactoryGirl.create(:tax_household, household: household )
+      eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_eligibility_kind: "csr_100", source: "Curam" )
       render "insured/plan_shoppings/plan_details", plan: plan
     end
 
