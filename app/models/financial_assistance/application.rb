@@ -172,7 +172,6 @@ class FinancialAssistance::Application
     state :submitted
     state :determination_response_error
     state :determined
-    state :denied
 
     event :submit, :after => :record_transition do
       transitions from: :draft, to: :submitted, :after => :set_submit do
@@ -482,7 +481,9 @@ class FinancialAssistance::Application
 
         #When taxhousehold does not exist in your DB
         else
-          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
+          self.set_determination_response_error!
+          self.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find Tax Households for the IDs in the XML")
+          throw(:processing_issue, "ERROR: Failed to find Tax Households for the IDs in the XML")
         end
       end
 
