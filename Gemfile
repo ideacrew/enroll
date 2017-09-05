@@ -66,7 +66,7 @@ gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'mas
 #For Background jobs
 gem 'resque'
 
-gem 'aasm', '~> 4.12.0'
+gem 'aasm', '~> 4.8.0'
 gem 'haml'
 # gem 'bh'
 
@@ -113,9 +113,9 @@ gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 gem 'chosen-rails'
 
-gem 'rocketjob_mission_control', '~> 3.0'
-gem 'rails_semantic_logger'
-gem 'rocketjob', '~> 3.0'
+# gem 'rocketjob_mission_control', '~> 3.0'
+# gem 'rails_semantic_logger'
+# gem 'rocketjob', '~> 3.0'
 
 gem 'ckeditor'
 
