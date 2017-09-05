@@ -83,6 +83,8 @@ gem "pundit", '~> 1.0.1'
 gem 'redis-rails'
 
 gem 'kaminari', '0.17.0'
+gem 'kaminari-mongoid'
+
 
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
