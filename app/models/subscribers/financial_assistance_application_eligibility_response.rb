@@ -64,15 +64,8 @@ module Subscribers
       end
       stupid_family_id = family.id
       active_household = family.active_household
-      family.save! # In case the tax household does not exist
-      #        family = Family.find(stupid_family_id) # wow
-      #        active_household = family.active_household
+      family.save!
 
-      if application_in_context.blank?
-        application_in_context.set_determination_response_error!
-        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find application for person in xml")
-        throw(:processing_issue, "ERROR: Failed to find application for person in xml")
-      end
       application_in_context.update_attributes(haven_app_id: verified_family.haven_app_id, haven_ic_id: verified_family.haven_ic_id, e_case_id: verified_family.e_case_id)
 
       active_verified_household = verified_family.households.max_by(&:start_date)
