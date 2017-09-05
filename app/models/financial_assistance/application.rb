@@ -591,8 +591,8 @@ private
   end
 
   def set_hbx_id
-    # write_attribute(:hbx_id, HbxIdGenerator.generate_application_id) if hbx_id.blank?
-    write_attribute(:hbx_id, self.id) if hbx_id.blank?
+    #TODO: Use hbx_id generator for Application
+    write_attribute(:hbx_id, self.id)
   end
 
   def set_applicant_kind
