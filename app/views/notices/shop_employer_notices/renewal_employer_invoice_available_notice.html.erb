@@ -4,16 +4,16 @@
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    {content: "SUBJECT: DC Health Link Invoice Available"} %>
+    {content: "SUBJECT: #{Settings.site.short_name} Invoice Available"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     {content: "Dear #{notice.employer_name},"} %>
     
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    {content: "Your #{TimeKeeper.date_of_record.next_month.strftime('%B')}  invoice is now available in the billing tab of your DC Health Link account. Please follow the steps listed below for assistance making your premium payment."} %>
+    {content: "Your #{TimeKeeper.date_of_record.next_month.strftime('%B')}  invoice is now available in the billing tab of your #{Settings.site.short_name} account. Please follow the steps listed below for assistance making your premium payment."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<b>Make a Secure Online Payment</b> </br>DC Health Link offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online.</br><a href=#{"https://www.e-BillExpress.com/ebpp/DCHealthPay"}>https://www.e-BillExpress.com/ebpp/DCHealthPay</a>"} %>
+    content: "<b>Make a Secure Online Payment</b> </br>#{Settings.site.short_name} offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in Employers Paying Your Premiums Online to make your premium payment online.</br><a href=#{"https://www.e-BillExpress.com/ebpp/DCHealthPay"}>https://www.e-BillExpress.com/ebpp/DCHealthPay</a>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     {content: "<b>To make a secure electronic check payment by phone<b> </br>Call 855-532-5465 (LINK)</br>
@@ -24,7 +24,7 @@ Select option for Need to Make a Payment"} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => {listings:
                                                                      ["Log in to your <a href= #{Settings.site.home_url} >DCHealthLink.com</a> Account",
                                                                       "Select “Employee” from the menu on the left of your account page",
-                                                                      ["You will see a list of all eligible employees showing each action they have taken on DC Health Link. Each entry will have one of the following statuses:",
+                                                                      ["You will see a list of all eligible employees showing each action they have taken on #{Settings.site.short_name}. Each entry will have one of the following statuses:",
                                                                         ["Blank - No Coverage Selected",
                                                                           "Coverage Selected ",
                                                                           "Coverage Waived ",
@@ -35,7 +35,7 @@ Select option for Need to Make a Payment"} %>
                                                                      ["By calling 855-532-5465",
                                                                       "TTY: 711",
                                                                       "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"],
-                                                                      previous:"Contact your broker for further assistance.  You can also contact DC Health Link with any questions:" } }"], 
+                                                                      previous:"Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:" } }"],
                                                                       heading: 'For Questions or Assistance:', 
                                                                       sub_heading: ''} %>
 
