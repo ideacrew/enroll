@@ -5,7 +5,7 @@
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
       <label>Are you a US Citizen or US National? *</label>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
         <%= f.label :us_citizen, :value => true do %>
@@ -13,7 +13,7 @@
         <% end %>
       </div>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :us_citizen, :value => false do %>
@@ -43,7 +43,7 @@
         <% end %>
       </div>
     </div>
-    <div class="col-md-2" style="margin-top: 10px">
+    <div class="col-md-2 not-sure-margin">
       <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not Sure?</a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
     </div>
@@ -69,7 +69,7 @@
         <% end %>
       </div>
     </div>
-    <div class="col-md-2" style="margin-top: 10px">
+    <div class="col-md-2 not-sure-margin" >
       <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not Sure?</a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
     </div>
@@ -83,13 +83,13 @@
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
         <div class="radio">
           <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
           <label for="indian_tribe_member_yes"><span>Yes</span></label>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio">
           <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
           <label for="indian_tribe_member_no"><span>No</span></label>
@@ -125,7 +125,7 @@
         <label for="radio_incarcerated_no"><span>No</span></label>
       </div>
     </div>
-    <div class="col-md-2" style="margin-top: 10px">
+    <div class="col-md-2 not-sure-margin">
       <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not Sure?</a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
     </div>
@@ -146,7 +146,7 @@
         <label for="radio_physically_disabled_no"><span>No</span></label>
       </div>
     </div>
-    <div class="col-md-2" style="margin-top: 10px">
+    <div class="col-md-2 not-sure-margin">
       <a href="#is_physically_disabled" data-toggle="modal" data-target="#is_physically_disabled">Not Sure?</a>
       <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_physically_disabled"} %>
     </div>
