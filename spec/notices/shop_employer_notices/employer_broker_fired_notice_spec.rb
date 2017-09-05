@@ -32,7 +32,7 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
       :event_name => 'employer_broker_fired',
       :title => "Confirmation of Broker Fired to Employer"})
   }
-  let(:valid_parmas) {{
+  let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
@@ -45,15 +45,15 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)}.not_to raise_error
       end
     end
 
     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
-          valid_parmas.delete(key)
-          expect{ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          valid_params.delete(key)
+          expect{ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -62,7 +62,7 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
   describe "Build" do
       before do
         allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-        @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)
+        @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)
       end
       it "should build notice with all necessary info" do
         @employer_notice.build
@@ -77,7 +77,7 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
     let(:broker_agency_profile) { FactoryGirl.build(:broker_agency_profile) }
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)
     end
 
     it "should append necessary" do
@@ -95,4 +95,19 @@ RSpec.describe ShopEmployerNotices::EmployerBrokerFiredNotice do
     end
   end
 
+  describe "Rendering notice template and genearte pdf" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @eligibility_notice = ShopEmployerNotices::EmployerBrokerFiredNotice.new(employer_profile, valid_params)
+    end
+    it "should render notice" do
+      expect(@eligibility_notice.template).to eq "notices/shop_employer_notices/employer_broker_fired_notice"
+    end
+    it "should generate pdf" do
+      @eligibility_notice.append_hbe
+      @eligibility_notice.build
+      file = @eligibility_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end
