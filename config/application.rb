@@ -62,6 +62,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
       config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
       config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
+      config.acapi.add_async_subscription("TransportProfiles::Subscribers::TransportArtifactSubscriber")
     end
   end
 end
