@@ -2,6 +2,8 @@ module Subscribers
   class FinancialAssistanceApplicationEligibilityResponse < ::Acapi::Subscription
     include Acapi::Notifiers
 
+    ELIGIBILITY_SCHEMA_FILE_PATH = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
+
     def self.subscription_details
       ["acapi.info.events.assistance_application.application_processed"]
     end
@@ -13,24 +15,29 @@ module Subscribers
       application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
-        unless application.success_status_codes?(payload_http_status_code.to_i)
+        application.update_attributes(determination_http_status_code: payload_http_status_code)
+        if application.success_status_codes?(payload_http_status_code.to_i)
+          if eligibility_payload_schema_valid?(xml)
+            sc = ShortCircuit.on(:processing_issue) do |err|
+              log(xml, {:severity => "critical", :error_message => err})
+            end
+            sc.and_then do |payload|
+              haven_import_from_xml(payload)
+            end
+            sc.call(xml)
+          else
+            application.set_determination_response_error!
+            application.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to validate Eligibility Determination response XML")
+            log(xml, {:severity => "critical", :error_message => "ERROR: Failed to validate Eligibility Determination response XML"})
+          end
+        else
           error_message = stringed_key_payload["body"]
           application.set_determination_response_error!
+          application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
         end
-        application.update_attributes(determination_http_status_code: payload_http_status_code, determination_error_message: error_message)
       else
-        log(stringed_key_payload, {:severity => "critical", :error_message => "Failed to find the Application in XML"})
+        log(xml, {:severity => "critical", :error_message => "ERROR: Failed to find the Application in XML"})
       end
-
-      log(stringed_key_payload, {:severity => "critical", :error_message => "Testing Purpose"})
-
-      sc = ShortCircuit.on(:processing_issue) do |err|
-        log(xml, {:severity => "critical", :error_message => err})
-      end
-      sc.and_then do |payload|
-        haven_import_from_xml(payload)
-      end
-      sc.call(xml)
     end
 
     def ecase_id_valid?(family, verified_family)
@@ -42,24 +49,40 @@ module Subscribers
       verified_family.parse(xml)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+      application_in_context = family.applications.find(verified_family.fin_app_id)
       primary_person = search_person(verified_primary_family_member)
-      throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless primary_person.present?
+      if primary_person.blank?
+        application_in_context.set_determination_response_error!
+        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find primary person in xml")
+        throw(:processing_issue, "ERROR: Failed to find primary person in xml")
+      end
       family = primary_person.primary_family
-      throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
+      if family.blank?
+        application_in_context.set_determination_response_error!
+        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find primary family for users person in xml")
+        throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml")
+      end
       stupid_family_id = family.id
       active_household = family.active_household
       family.save! # In case the tax household does not exist
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
 
-      application_in_context = family.applications.find(verified_family.fin_app_id)
-      throw(:processing_issue, "ERROR: Failed to find application for person in xml") unless application_in_context.present?
+      if application_in_context.blank?
+        application_in_context.set_determination_response_error!
+        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find application for person in xml")
+        throw(:processing_issue, "ERROR: Failed to find application for person in xml")
+      end
       application_in_context.update_attributes(haven_app_id: verified_family.haven_app_id, haven_ic_id: verified_family.haven_ic_id, e_case_id: verified_family.e_case_id)
 
       active_verified_household = verified_family.households.max_by(&:start_date)
 
       verified_dependents.each do |verified_family_member|
-        throw(:processing_issue, "Failed to find dependent from xml") unless search_person(verified_family_member).present?
+        if search_person(verified_family_member).blank?
+          application_in_context.set_determination_response_error!
+          application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failed to find dependent from xml")
+          throw(:processing_issue, "ERROR: Failed to find dependent from xml")
+        end
       end
 
       if verified_family.broker_accounts.present?
@@ -77,17 +100,9 @@ module Subscribers
       begin
         application_in_context.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
       rescue
-        throw(:processing_issue, "Failure to update tax household")
-      end
-
-      begin
-        if application_in_context.tax_households.present?
-          unless application_in_context.eligibility_determinations.present?
-            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-          end
-        end
-      rescue
-        log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
+        application_in_context.set_determination_response_error!
+        application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: "Failure to update tax household")
+        throw(:processing_issue, "ERROR: Failure to update tax household")
       end
       family.save!
       application_in_context.determine!
@@ -211,6 +226,13 @@ module Subscribers
           :first_name => first_name_regex
         }).first
       end
+    end
+
+    def eligibility_payload_schema_valid?(xml)
+      return false if xml.blank?
+      xml = Nokogiri::XML.parse(xml)
+      xsd = Nokogiri::XML::Schema(File.open ELIGIBILITY_SCHEMA_FILE_PATH)
+      xsd.valid?(xml)
     end
   end
 end
