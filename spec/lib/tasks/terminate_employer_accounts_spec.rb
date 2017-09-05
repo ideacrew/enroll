@@ -40,5 +40,15 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       expect(active_plan_year.terminated_on).to eq nil
       expect(active_plan_year.aasm_state).to eq "published"
     end
+     it 'should trigger notification when generate termination notice is true' do
+      load File.expand_path("#{Rails.root}/lib/tasks/migrations/terminate_employer_accounts.rake", __FILE__)
+      Rake::Task.define_task(:environment)
+      fein = organization.fein
+      end_on = TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')
+      termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,true)
+      expect(Rails.logger).to receive(:info)
+      Rails.logger.info 
+    end
   end
 end

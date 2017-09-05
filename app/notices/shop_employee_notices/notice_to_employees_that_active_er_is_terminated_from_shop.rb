@@ -12,6 +12,6 @@ class ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop < S
 
   def append_data
     plan_year = census_employee.employer_profile.plan_years.first
-    notice.plan_year = PdfTemplates::PlanYear.new({ terminated_on: plan_year.terminated_on })
+    notice.plan_year = PdfTemplates::PlanYear.new({:end_on => plan_year.end_on})
   end
 end
