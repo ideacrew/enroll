@@ -7,7 +7,7 @@ namespace :migrations do
   task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
 
     fein = args[:fein]
-    generate_termination_notice = args[:generate_termination_notice]
+    generate_termination_notice = args[:generate_termination_notice] == "true"
     organizations = Organization.where(fein: fein)
 
     if organizations.size > 1
