@@ -33,7 +33,6 @@ class ConsumerRole
       naturalized_citizen
       alien_lawfully_present
       lawful_permanent_resident
-      indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
       non_native_not_lawfully_present_in_us
@@ -762,10 +761,10 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
-      self.native_validation = "outstanding" if native_validation == "na"
-    else
+    if (tribal_id.nil? || tribal_id.empty?)
       self.native_validation = "na"
+    else
+      self.native_validation = "outstanding" if native_validation == "na"
     end
   end
 
