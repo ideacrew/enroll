@@ -10,10 +10,10 @@ RSpec.describe FinancialAssistance::Income, type: :model do
 
   let(:valid_params){
     {
-        applicant: applicant,
-        amount: 1000,
-        frequency_kind: 'monthly',
-        start_on: Date.today
+      applicant: applicant,
+      amount: 1000,
+      frequency_kind: 'monthly',
+      start_on: Date.today
     }
   }
 
@@ -83,10 +83,7 @@ RSpec.describe FinancialAssistance::Income, type: :model do
       end
     end
 
-
-
     context "on step_1 and submission amount validations" do
-
       it "with a missing amount on step_1" do
         income.amount = nil
         income.valid?(:step_1)
@@ -125,7 +122,6 @@ RSpec.describe FinancialAssistance::Income, type: :model do
     end
 
     context "if step_1 and submission kind validations" do
-
       it "with a missing kind on step_1" do
         income.kind = nil
         income.valid?(:step_1)
@@ -161,11 +157,9 @@ RSpec.describe FinancialAssistance::Income, type: :model do
         income.valid?(:submission)
         expect(income.errors["kind"]).to be_empty
       end
-
     end
 
     context "if step_1 and submission frequency_kind validations" do
-
       it "with a missing frequency_kind on step_1" do
         income.frequency_kind = nil
         income.valid?(:step_1)
@@ -201,11 +195,9 @@ RSpec.describe FinancialAssistance::Income, type: :model do
         income.valid?(:submission)
         expect(income.errors["frequency_kind"]).to be_empty
       end
-
     end
 
     context "if step_1 and submission start_on validations" do
-
       it "with a missing start_on step_1" do
         income.start_on = nil
         income.valid?(:step_1)
@@ -229,7 +221,6 @@ RSpec.describe FinancialAssistance::Income, type: :model do
         income.valid?(:submission)
         expect(income.errors["start_on"]).to be_empty
       end
-
     end
 
     context "if end on date occur before start on date" do
@@ -241,7 +232,6 @@ RSpec.describe FinancialAssistance::Income, type: :model do
       end
     end
   end
-
 
   context "Hours worked per week" do
     let(:income) {

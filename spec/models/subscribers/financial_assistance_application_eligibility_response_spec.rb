@@ -3,19 +3,13 @@ require "rails_helper"
 describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-    # allow_any_instance_of(Subscribers::FinancialAssistanceApplicationEligibilityResponse).to receive(:eligibility_payload_schema_valid?).and_return(true)
   end
 
   let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
-  let(:max_aptc) { parser.households.select do |h|
-    h.integrated_case_id == parser.integrated_case_id
-  end.first.tax_households.select do |th|
-    th.primary_applicant_id == parser.family_members.detect do |fm|
-      fm.id == parser.primary_family_member_id
-    end.id.split('#').last
-  end.select do |th|
-    th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
-  end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc }
+  let(:max_aptc){parser.households.select do |h| h.integrated_case_id == parser.integrated_case_id
+                                          end.first.tax_households.select do |th| th.primary_applicant_id == parser.family_members.detect do |fm| fm.id == parser.primary_family_member_id
+                                          end.id.split('#').last end.select do |th| th.id == th.primary_applicant_id && th.primary_applicant_id == parser.primary_family_member_id.split('#').last
+                                          end.first.eligibility_determinations.max_by(&:determination_date).maximum_aptc }
 
   it "should subscribe to the correct event" do
     expect(Subscribers::FinancialAssistanceApplicationEligibilityResponse.subscription_details).to eq ["acapi.info.events.assistance_application.application_processed"]
