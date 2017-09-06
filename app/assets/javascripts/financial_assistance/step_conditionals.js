@@ -509,7 +509,7 @@ $(document).ready(function() {
   }
 
   $(window).load(function() {
-    enable_submit_button_by_electronic_signature();
+    if ($("#first_name_thank_you").length) enable_submit_button_by_electronic_signature();
   });
 
   $(document).on('blur keyup', 'input.thank_you_field', function() {
