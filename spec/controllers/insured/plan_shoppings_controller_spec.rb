@@ -7,35 +7,34 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   describe ".sort_by_standard_plans" do
-      context "width standard plan present" do
-        let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
-        let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
-        let(:application) { FactoryGirl.create(:application, family: family) }
-        let(:person) { FactoryGirl.build_stubbed(:person) }
-        let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
-        let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
-        let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group) }
+    context "width standard plan present" do
+      let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
+      let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+      let(:application) { FactoryGirl.create(:application, family: family) }
+      let(:person) { FactoryGirl.build_stubbed(:person) }
+      let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
+      let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
+      let(:benefit_group) { FactoryGirl.build_stubbed(:benefit_group) }
 
-        before :each do
-          sign_in user
-          allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
-          allow(person.primary_family).to receive(:active_approved_application).and_return(application)
-        end
-
-        @controller = Insured::PlanShoppingsController.new
-
-        let(:plan1) { FactoryGirl.build(:plan) }
-        let(:plan2) { FactoryGirl.build(:plan, is_standard_plan: true ) }
-        let(:plans) {[PlanCostDecorator.new(plan1, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id), PlanCostDecorator.new(plan2, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id)]}
-
-        it "should display the standard plan first" do
-          expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
-        end
+      before :each do
+        sign_in user
+        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_approved_application).and_return(application)
       end
+
+      @controller = Insured::PlanShoppingsController.new
+
+      let(:plan1) { FactoryGirl.build(:plan) }
+      let(:plan2) { FactoryGirl.build(:plan, is_standard_plan: true ) }
+      let(:plans) {[PlanCostDecorator.new(plan1, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id), PlanCostDecorator.new(plan2, hbx_enrollment_one, benefit_group, benefit_group.reference_plan_id)]}
+
+      it "should display the standard plan first" do
+        expect(@controller.send(:sort_by_standard_plans,plans) ).to eq [plan2, plan1]
+      end
+    end
   end
 
   describe "not eligible for cost sharing or aptc / normal user" do
-
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
     let(:application) { FactoryGirl.create(:application, family: family) }
@@ -61,7 +60,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         expect(response).to have_http_status(:success)
       end
     end
-
   end
 
   let(:plan) { double("Plan", id: "plan_id", coverage_kind: 'health', carrier_profile_id: 'carrier_profile_id') }
@@ -150,7 +148,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET receipt" do
-
     let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
     let(:plan) { double("Plan") }
@@ -188,7 +185,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   context "GET thankyou" do
-
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double)) }
     let(:plan) { double("Plan") }
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
@@ -367,12 +363,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     context "waived_enrollment coverage kind" do
-        let(:person) { FactoryGirl.create(:person) }
-        let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
-        let(:coverage_household) {double}
-        let(:family) {Family.new}
-        let(:hbx_enrollment) {HbxEnrollment.create}
-        let(:wavied_enrollment) {HbxEnrollment.create}
+      let(:person) { FactoryGirl.create(:person) }
+      let(:household) {double(:immediate_family_coverage_household=> coverage_household)}
+      let(:coverage_household) {double}
+      let(:family) {Family.new}
+      let(:hbx_enrollment) {HbxEnrollment.create}
+      let(:wavied_enrollment) {HbxEnrollment.create}
+
       before :each do
         allow(HbxEnrollment).to receive(:find).with(hbx_enrollment.id).and_return(hbx_enrollment)
         allow(person).to receive(:primary_family).and_return(family)
@@ -598,11 +595,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let!(:previous_hbx_enrollment) { 
       FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
     }
-
     let!(:new_hbx_enrollment) { 
       FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual', aasm_state: 'shopping') 
     }
-
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
 
     before do 
@@ -615,7 +610,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     end
 
     context "when plan is same as existing coverage plan" do
-
       let(:previous_age) {
         person.age_on(previous_hbx_enrollment.effective_on)
       }
