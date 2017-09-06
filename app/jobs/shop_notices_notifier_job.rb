@@ -3,7 +3,6 @@ class ShopNoticesNotifierJob < ActiveJob::Base
 
   def perform(id, event, options = {})
     Resque.logger.level = Logger::DEBUG
-    event = "notify_employee_of_special_enrollment_period"
     profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
     if event_kind.present?

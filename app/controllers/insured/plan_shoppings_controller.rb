@@ -60,8 +60,7 @@ class Insured::PlanShoppingsController < ApplicationController
     employee_mid_year_plan_change(@person, @change_plan)
 
     # send accepted SEP QLE event notice to enrolled employee
-    binding.pry
-    if @market_kind == "shop" && @enrollment.employee_role_id.present?
+    if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
        emp_role_id = @enrollment.employee_role_id.to_s
        @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
        sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
@@ -158,7 +157,7 @@ class Insured::PlanShoppingsController < ApplicationController
      
   def sep_qle_request_accept_notice_ee(employee_id, enrollment)
     sep = enrollment.special_enrollment_period
-    options = { :sep_qle_end_on => sep.end_on, :sep_qle_title => sep.title, :sep_qle_on => sep.qle_on }
+    options = { :sep_qle_end_on => sep.end_on.to_s, :sep_qle_title => sep.title, :sep_qle_on => sep.qle_on.to_s }
     begin
       ShopNoticesNotifierJob.perform_later(employee_id, "notify_employee_of_special_enrollment_period", :sep => options)
     rescue Exception => e
