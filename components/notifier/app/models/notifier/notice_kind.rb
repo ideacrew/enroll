@@ -14,6 +14,7 @@ module Notifier
     field :title, type: String
     field :description, type: String
     field :identifier, type: String
+    field :notice_number, type: String
     field :receipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
 
     embeds_one :cover_page
@@ -28,7 +29,7 @@ module Notifier
       Notifier::NoticeKindsController.new.render_to_string({
         :template => 'notifier/notice_kinds/template.html.erb', 
         :layout => false,
-        :locals => { receipient: receipient.constantize.stubbed_object}
+        :locals => { receipient: receipient.constantize.stubbed_object, notice_number: self.notice_number}
       }) + Notifier::NoticeKindsController.new.render_to_string({ 
         :inline => template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
         :layout => 'notifier/pdf_layout',

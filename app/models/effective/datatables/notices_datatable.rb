@@ -7,12 +7,15 @@ module Effective
           bulk_action 'Delete', notifier.delete_notices_notice_kinds_path, data: { confirm: 'Are you sure?', no_turbolink: true }
         end
 
+        table_column :notice_number, :proc => Proc.new { |row|
+          link_to row.notice_number, preview_notice_kind_path(row), target: '_blank'
+        }, :filter => false, :sortable => false
         table_column :title, :proc => Proc.new { |row|
           link_to row.title, preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
         table_column :description, :proc => Proc.new { |row|
           row.description
-         }, :sortable => false, :filter => false
+        }, :filter => false, :sortable => false
         table_column :receipient, :proc => Proc.new { |row|
          row.receipient_class_name.titleize
         }, :filter => false, :sortable => false

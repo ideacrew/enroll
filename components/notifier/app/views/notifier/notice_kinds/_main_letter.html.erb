@@ -14,7 +14,7 @@
     <% end %>
     <tr>
       <td class="fssize1 health-connector-address"><%= receipient.primary_address.city %> <%= receipient.primary_address.state %> <%= receipient.primary_address.zip %></td>
-       <td align="right" style="padding-right: 15px">Notice No. <%= receipient.try(:mpi_indicator) || "SHOP_M001" %></td>
+       <td align="right" style="padding-right: 15px">Notice No. <%= notice_number || "SHOP_M001" %></td>
     </tr>
   </tbody>
 </table>

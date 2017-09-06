@@ -77,7 +77,7 @@ module Notifier
     private
 
     def notice_params
-      params.require(:notice_kind).permit(:title, :description, :receipient, {:template => [:raw_body]})
+      params.require(:notice_kind).permit(:title, :description, :notice_number, :receipient, {:template => [:raw_body]})
     end
   end
 end
