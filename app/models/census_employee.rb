@@ -466,22 +466,8 @@ class CensusEmployee < CensusMember
       CensusEmployee.terminate_future_scheduled_census_employees(new_date)
       CensusEmployee.initial_employee_open_enrollment_notice(new_date)
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
-      CensusEmployee.employee_mid_year_plan_change(new_date)
     end
 
-    def employee_mid_year_plan_change(new_date)
-      CensusEmployee.all.non_terminated.each do |census_employee|
-        begin
-          if census_employee.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.try(:enrollment_kind) != "open_enrollment" || census_employee.new_hire_enrollment_period.present?)
-            if census_employee.new_hire_enrollment_period.last == new_date || census_employee.active_benefit_group_assignment.hbx_enrollment.try(:special_enrollment_period).try(:end_on) == new_date
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change")
-            end
-          end
-          rescue Exception => e
-          log("#{e.message}; person_id: #{census_employee.employee_role.person.hbx_id}")
-          end
-      end
-    end
 
     def initial_employee_open_enrollment_notice(date)
       census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated

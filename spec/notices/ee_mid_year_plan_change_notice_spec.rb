@@ -88,9 +88,9 @@ RSpec.describe EmployeeMidYearPlanChange do
   end
   describe "Rendering employee mid year plan change template and generate pdf" do
     before do
-      census_employee.stub(employer_profile: employer_profile)
-      employer_profile.stub_chain(:staff_roles, :first).and_return(person)
+      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employer_notice = EmployeeMidYearPlanChange.new(census_employee, valid_params)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should render employer reminder notice" do
       expect(@employer_notice.template).to eq "notices/shop_employer_notices/employee_mid_year_plan_change"
