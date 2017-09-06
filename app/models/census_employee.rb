@@ -468,7 +468,6 @@ class CensusEmployee < CensusMember
       CensusEmployee.census_employee_open_enrollment_reminder_notice(new_date)
     end
 
-
     def initial_employee_open_enrollment_notice(date)
       census_employees = CensusEmployee.where(:"hired_on" => date).non_terminated
       census_employees.each do |ce|
