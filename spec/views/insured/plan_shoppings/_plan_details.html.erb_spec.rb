@@ -132,7 +132,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     it "should have title text for standard plan " do
       expect(rendered).to match /Each health insurance company offers a standard plan at each metal level. Benefits and cost-sharing are the same among standard plans of the same metal level, but monthly premiums and provider network options may be different. This makes it easier for consumers to compare plans at the same metal level and choose what's best for them./i
     end
-
   end
 
   context "with aptc" do
@@ -168,7 +167,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
     it "should match fa-check-square for csr" do
       expect(rendered).to have_css("i.fa-check-square-o")
     end
-
   end
 
   context "with dental coverage_kind" do
@@ -185,7 +183,6 @@ RSpec.describe "insured/plan_shoppings/_plan_details.html.erb", :dbclean => :aft
       expect(rendered).to have_selector('a', text:'Plan Summary')
       expect(rendered).to match "High"
     end
-
   end
 
 context "with tax household and eligibility determination of csr_94" do
@@ -224,7 +221,6 @@ context "with tax household and eligibility determination of csr_94" do
   end
 
   context "with tax household and eligibility determination of csr_100" do
-
     before :each do
       assign(:carrier_names_map, {})
       allow(plan).to receive(:total_employee_cost).and_return 100
@@ -241,5 +237,4 @@ context "with tax household and eligibility determination of csr_94" do
       expect(rendered).to_not have_css("#csrEligibleReminder-#{plan.id}")
     end
   end
-
 end

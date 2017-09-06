@@ -61,13 +61,13 @@ RSpec.describe Plan, dbclean: :after_each do
   describe ".new" do
     let(:valid_params) do
       {
-          name: name,
-          active_year: active_year,
-          hios_id: hios_id,
-          carrier_profile_id: carrier_profile_id,
-          metal_level: metal_level,
-          coverage_kind: coverage_kind,
-          market: market
+        name: name,
+        active_year: active_year,
+        hios_id: hios_id,
+        carrier_profile_id: carrier_profile_id,
+        metal_level: metal_level,
+        coverage_kind: coverage_kind,
+        market: market
       }
     end
 
@@ -204,17 +204,17 @@ RSpec.describe Plan, dbclean: :after_each do
   describe ".premium_table_for" do
     let(:valid_plan_params) do
       {
-          name: name,
-          active_year: active_year,
-          hios_id: hios_id,
-          carrier_profile_id: carrier_profile_id,
-          metal_level: metal_level,
-          coverage_kind: coverage_kind,
-          market: market,
-          premium_tables: [premium_table_entry1,
-                           premium_table_entry2,
-                           premium_table_entry3,
-                           premium_table_entry4]
+        name: name,
+        active_year: active_year,
+        hios_id: hios_id,
+        carrier_profile_id: carrier_profile_id,
+        metal_level: metal_level,
+        coverage_kind: coverage_kind,
+        market: market,
+        premium_tables: [premium_table_entry1,
+                         premium_table_entry2,
+                         premium_table_entry3,
+                         premium_table_entry4]
       }
     end
 
@@ -255,10 +255,10 @@ RSpec.describe Plan, dbclean: :after_each do
 
       def premium_table_hash(premium_table)
         {
-            start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
-            end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
-            cost: premium_table.cost,
-            age: premium_table.age
+          start_on: premium_table.start_on.try(:strftime, "%Y-%m-%d"),
+          end_on: premium_table.end_on.try(:strftime, "%Y-%m-%d"),
+          cost: premium_table.cost,
+          age: premium_table.age
         }
       end
 
@@ -273,17 +273,17 @@ RSpec.describe Plan, dbclean: :after_each do
   describe ".premium_for" do
     let(:valid_plan_params) do
       {
-          name: name,
-          active_year: active_year,
-          hios_id: hios_id,
-          carrier_profile_id: carrier_profile_id,
-          metal_level: metal_level,
-          coverage_kind: coverage_kind,
-          market: market,
-          premium_tables: [{start_on: "2015-01-01",
-                            end_on: "2015-12-31",
-                            cost: 500,
-                            age: 32}]
+        name: name,
+        active_year: active_year,
+        hios_id: hios_id,
+        carrier_profile_id: carrier_profile_id,
+        metal_level: metal_level,
+        coverage_kind: coverage_kind,
+        market: market,
+        premium_tables: [{start_on: "2015-01-01",
+                          end_on: "2015-12-31",
+                          cost: 500,
+                          age: 32}]
       }
     end
 
@@ -368,11 +368,9 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     let(:total_plan_count) {platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count}
-
     let(:organization) {FactoryGirl.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser")}
     let(:carrier_profile_0) {FactoryGirl.create(:carrier_profile, abbrev: "KP", organization: organization)}
     let(:carrier_profile_1) {FactoryGirl.create(:carrier_profile)}
-
     let(:shop_count) {platinum_count + gold_count + shop_silver_count}
     let(:individual_count) {individual_silver_count + bronze_count + catastrophic_count}
     let(:carrier_profile_0_count) {platinum_count + gold_count + bronze_count}
