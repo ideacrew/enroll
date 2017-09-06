@@ -95,4 +95,12 @@ module EventsHelper
   def is_renewal_or_conversion_employer?(employer)
     is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
   end
+
+  def plan_years_for_manual_export(employer)
+    plan_years = employer.plan_years.select(&:eligible_for_export?)
+    plan_years << employer.plan_years.detect do |py|
+      py.terminated? && py.terminated_on >= TimeKeeper.date_of_record
+    end
+    plan_years.compact
+  end
 end
