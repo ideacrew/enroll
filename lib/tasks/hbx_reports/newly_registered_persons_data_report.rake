@@ -40,7 +40,8 @@ require 'csv'
            Ethnicity
          )
        count = 0
-       file_name = "#{Rails.root}/public/new_registered_persons_data_report.csv"
+       time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+       file_name = "#{Rails.root}/public/new_registered_persons_data_report_#{time_stamp}.csv"
  
       CSV.open(file_name, "w", force_quotes: true) do |csv|
          csv << field_names
@@ -110,6 +111,10 @@ require 'csv'
           end
         end
       end
+
+      pubber = Publishers::Legacy::NewPeopleApplicationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
+
       puts "Total person's that are created in a time frame of #{start_date}-#{end_date - 1.day} count is #{count}"
      end
    end
