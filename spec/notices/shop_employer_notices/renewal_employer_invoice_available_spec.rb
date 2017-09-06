@@ -67,4 +67,19 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
     end
   end
+
+  describe "Render template & Generate PDF" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+    end
+    it "should render renewal_employer_available_notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/renewal_employer_invoice_available_notice"
+    end
+    it "should generate pdf" do
+      @employer_notice.deliver
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end
