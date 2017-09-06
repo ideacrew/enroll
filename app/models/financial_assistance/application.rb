@@ -403,6 +403,10 @@ class FinancialAssistance::Application
     self.aasm_state == "draft" ? true : false
   end
 
+  def is_determined?
+    self.aasm_state == "determined" ? true : false
+  end
+
   def incomplete_applicants?
     applicants.each do |applicant|
       return true if applicant.applicant_validation_complete? == false

@@ -152,7 +152,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
 
-    render layout: 'financial_assistance'
+    render layout: 'financial_assistance' unless request.referrer.present? && request.referrer.include?('financial_assistance/applications')
   end
 
   def application_publish_error

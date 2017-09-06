@@ -39,12 +39,13 @@
 				  <td><%=to_est application.created_at%></td>
 				  <td><%=to_est application.submitted_at%></td>
 				  <td></td>
-				  <%
+            <%
             dropdown = [
               ['Update Application', edit_financial_assistance_application_path(application), application.is_draft? ? 'static' : 'disabled'],
-              ['Copy to new application', copy_financial_assistance_application_path(application), application.is_draft? || @family.application_in_progress.present? ? 'disabled' : 'static']
+              ['Copy to new application', copy_financial_assistance_application_path(application), application.is_draft? || @family.application_in_progress.present? ? 'disabled' : 'static'],
+              ['View Eligibility Determination', eligibility_results_financial_assistance_application_path(application), application.is_determined? ? 'static' : 'disabled']
             ]
-				  %>
+            %>
 				  <td>
 					<%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: ""}, formats: :html%>
 
