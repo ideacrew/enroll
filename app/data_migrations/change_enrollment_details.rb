@@ -18,8 +18,9 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
       revert_cancel(enrollment)
     when "cancel", "cancel_enrollment"
       cancel_enr(enrollment)
+    when "generate_hbx_signature"
+      generate_hbx_signature(enrollment)
     end
-
   end
 
   def get_enrollment
@@ -40,7 +41,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   end
 
   def revert_termination(enrollment)
-    enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_selected")
+    enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
     enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
     puts "Reverted Enrollment termination" unless Rails.env.test?
   end
@@ -59,5 +60,11 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
   def cancel_enr(enrollment)
     enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     puts "canceled enrollment with hbx_id: #{enrollment.hbx_id}" unless Rails.env.test?
+  end
+
+  def generate_hbx_signature(enrollment)
+    enrollment.generate_hbx_signature
+    enrollment.save!
+    puts "enrollment_signature generated #{enrollment.enrollment_signature}" unless Rails.env.test?
   end
 end

@@ -18,6 +18,7 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
@@ -105,6 +106,10 @@ aca:
 
 
 paper_notice: 'paper-notices'
+checkbook_services: 
+    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
+    base_url:  "https://dc.checkbookhealth.org"
+    url: "https://dc.checkbookhealth.org/shop/dc/"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."

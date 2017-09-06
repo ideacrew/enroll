@@ -9,7 +9,7 @@
     <tr>
       <td><%= notice.primary_fullname %></td>
     </tr>
-    <% if notice.shop? %>
+    <% if (notice.shop? && !notice.employee_notice?) %>
     <tr class="fssize1">
       <td><%= notice.employer_name %></td>
     </tr>

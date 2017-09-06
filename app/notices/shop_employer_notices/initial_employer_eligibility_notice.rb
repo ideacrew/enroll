@@ -4,6 +4,8 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
+    shop_dchl_rights_attachment
+    non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
@@ -14,6 +16,8 @@ class ShopEmployerNotices::InitialEmployerEligibilityNotice < ShopEmployerNotice
     plan_year = employer_profile.plan_years.first
     notice.plan_year = PdfTemplates::PlanYear.new({
           :start_on => plan_year.start_on,
+          :open_enrollment_start_on => plan_year.open_enrollment_start_on,
+          :open_enrollment_end_on => plan_year.open_enrollment_end_on
         })
     #binder payment deadline
     notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
