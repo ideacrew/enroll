@@ -393,4 +393,24 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
+
+  describe "#trigger eeplan_selection_confirmation_notice" do
+    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
+    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:enrollment_kind).and_return('health')
+      # allow(enrollment).to receive(:employer_profile).and_return(employer_profile)
+      allow(enrollment).to receive_message_chain("enrollment.census_employee.new_hire_enrollment_period.present?").and_return(true)
+      allow(enrollment).to receive_message_chain("special_enrollment_period.present?").and_return(true)
+      allow(enrollment).to receive_message_chain("census_employee.new_hire_enrollment_period.last").and_return(TimeKeeper.date_of_record)
+      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("2")
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      helper.ee_plan_selection_confirmation_sep_new_hire(enrollment)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq ["2", 'ee_plan_selection_confirmation_sep_new_hire']
+    end
+  end
 end
