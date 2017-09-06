@@ -56,7 +56,7 @@
   <ul style="list-style-type:circle">
     <li>By calling <%= Settings.contact_center.phone_number %></li>
     <li>TTY: 711</li>
-    <li>Online at <a href="<%= Settings.site.home_url %>">www.DCHealthLink.com</a>.</li>
+    <li>Online at <a href=<%="#{Settings.site.home_url}"%>><%="#{Settings.site.website_name}"%></a>.</li>
   </ul>
   <% broker = census_employee.employer_profile.broker_agency_profile%>
   <% location = broker.organization.primary_office_location %>
