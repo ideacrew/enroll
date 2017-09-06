@@ -350,6 +350,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(hbx_enrollment).to receive(:save).and_return(true)
       allow(hbx_enrollment).to receive(:waive_coverage).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("waiver").and_return(true)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
+      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
       post :waive, id: "hbx_id", waiver_reason: "waiver"
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
