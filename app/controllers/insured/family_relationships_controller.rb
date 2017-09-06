@@ -1,7 +1,7 @@
 class Insured::FamilyRelationshipsController < ApplicationController
-    before_action :set_current_person, :set_family
+  before_action :set_current_person, :set_family
 
-    def index
+  def index
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = @person.resident_role
@@ -26,7 +26,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @relationship_kinds = PersonRelationship::Relationships
 
     render layout: 'financial_assistance'
-    end
+  end
 
   def create
     predecessor = Person.where(id: params[:predecessor_id]).first
@@ -46,8 +46,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     end
   end
 
-    private
-    def set_family
-        @family = @person.try(:primary_family)
-    end
+  private
+  def set_family
+    @family = @person.try(:primary_family)
+  end
 end
