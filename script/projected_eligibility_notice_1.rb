@@ -38,6 +38,7 @@
           builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
+              :event_name => event_kind.event_name,
               mpi_indicator: notice_trigger.mpi_indicator,
               data: members
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)

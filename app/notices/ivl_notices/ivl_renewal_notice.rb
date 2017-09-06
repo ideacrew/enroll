@@ -2,11 +2,11 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   attr_accessor :family, :data
 
   def initialize(consumer_role, args = {})
-    args[:recipient] = consumer_role.person
+    args[:recipient] = consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
-    args[:to] = consumer_role.person.work_email_or_best
+    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
+    args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -46,7 +46,15 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     end
   end
 
+  def append_open_enrollment_data
+    hbx = HbxProfile.current_hbx
+    bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == notice.coverage_year }
+    notice.ivl_open_enrollment_start_on = bc_period.open_enrollment_start_on
+    notice.ivl_open_enrollment_end_on = bc_period.open_enrollment_end_on
+  end
+
   def append_data
+    append_open_enrollment_data
     notice.individuals = data.collect do |datum|
       person = Person.where(:hbx_id => datum["policy.subscriber.person.hbx_id"]).first
       PdfTemplates::Individual.new({
