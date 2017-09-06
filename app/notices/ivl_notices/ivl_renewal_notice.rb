@@ -16,6 +16,8 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page
+    attach_non_discrimination
+    attach_taglines
     attach_voter_application
     upload_and_send_secure_message
 
@@ -28,11 +30,8 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     end
   end
 
-  def attach_voter_application
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
-  end
-
   def build
+    append_hbe
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.coverage_year = TimeKeeper.date_of_record.next_year.year
@@ -48,36 +47,16 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
   end
 
   def append_data
-    primary_member = data.detect{|m| m["subscriber"] == "Yes"}
-    notice.has_applied_for_assistance = check(primary_member["aqhp_elig"])
-    notice.irs_consent_needed = check(primary_member["irs_consent"])
-
     notice.individuals = data.collect do |datum|
-        person = Person.where(:hbx_id => datum["glue_hbx_id"]).first
-        PdfTemplates::Individual.new({
-          :first_name => person.first_name,
-          :full_name => person.full_name,
-          :incarcerated=> check(datum["ea_incarcerated"]),
-          :citizen_status=> citizen_status(datum["ea_citizenship"]),
-          :residency_verified => datum["ea_dc_resident"].try(:upcase) == "TRUE"  ? "District of Columbia Resident" : "Not a District of Columbia Resident"
-        })
-    end
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
+      person = Person.where(:hbx_id => datum["policy.subscriber.person.hbx_id"]).first
+      PdfTemplates::Individual.new({
+        :first_name => person.first_name,
+        :full_name => person.full_name,
+        :incarcerated=> datum["policy.subscriber.person.is_incarcerated"] == "TRUE" ? "Yes" : "No",#Per Sarah, for blank incarceration, fill in FALSE
+        :citizen_status=> citizen_status(datum["policy.subscriber.person.citizen_status"]),
+        :residency_verified => datum["policy.subscriber.person.is_dc_resident?"].try(:upcase) == "TRUE"  ? "Yes" : "No"
       })
-  end
-
-  def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
-      x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
-    end.join(' ')
+    end
   end
 
   def citizen_status(status)
@@ -88,6 +67,8 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
       "Lawfully Present"
     when "indian_tribe_member"
       "US Citizen"
+    when "lawful_permanent_resident"
+      "Lawfully Present"
     when "naturalized_citizen"
       "US Citizen"
     else
