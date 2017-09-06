@@ -28,7 +28,7 @@ class EmployeeTerminatingCoverage < Notice
   def append_data
     terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :terminated_on => terminated_enrollment.set_coverage_termination_date,
+      :terminated_on => terminated_enrollment.terminated_on,
       :enrolled_count => terminated_enrollment.humanized_dependent_summary
       })
   end
@@ -39,6 +39,7 @@ class EmployeeTerminatingCoverage < Notice
     notice.employee_fullname = census_employee.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = census_employee.employer_profile.hbx_id
+    notice.employee_email = census_employee.employee_role.person.work_email_or_best
     append_address(census_employee.employer_profile.organization.primary_office_location.address)
     append_hbe
     append_broker(census_employee.employer_profile.broker_agency_profile)

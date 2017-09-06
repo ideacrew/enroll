@@ -74,8 +74,25 @@ RSpec.describe EmployeeTerminatingCoverage do
 
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.set_coverage_termination_date
+      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
+    end
+  end
+
+  describe "Rendering employee_terminating_coverage notice template and generate pdf" do
+    before do
+      allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employee_notice = EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+    it "should render employee_terminating_coverage notice" do
+      expect(@employee_notice.template).to eq "notices/employee_terminating_coverage"
+    end
+    it "should generate pdf" do
+      @employee_notice.build
+      @employee_notice.append_data
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 end
