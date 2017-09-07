@@ -1,5 +1,5 @@
   begin
-    csv = CSV.open('final_report_sep_20.csv',"r",:headers =>true)
+    csv = CSV.open('uqhp_projected_eligibility_notice_report.csv',"r",:headers =>true)
     @data= csv.to_a
     @data_hash = {}
     @data.each do |d|
@@ -40,6 +40,7 @@
               subject: event_kind.title,
               :event_name => event_kind.event_name,
               mpi_indicator: notice_trigger.mpi_indicator,
+              person: person,
               data: members
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
               )

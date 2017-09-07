@@ -21,6 +21,7 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
+      :person => person,
       :data => data
   }}
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
@@ -51,6 +52,10 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
       @proj_eligibility_notice = IvlNotices::IvlRenewalNotice.new(person.consumer_role, valid_parmas)
       @proj_eligibility_notice.build
+    end
+
+    it "returns person's first_name" do
+      expect(@proj_eligibility_notice.notice.primary_firstname).to eq person.first_name
     end
 
     it "returns coverage_year" do

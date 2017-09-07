@@ -1,5 +1,5 @@
 class IvlNotices::IvlRenewalNotice < IvlNotice
-  attr_accessor :family, :data
+  attr_accessor :family, :data, :person
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -7,6 +7,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
+    self.person = args[:person]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -35,6 +36,7 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
     notice.coverage_year = TimeKeeper.date_of_record.next_year.year
+    notice.primary_firstname = person.first_name
     family = recipient.primary_family
     append_data
     notice.primary_fullname = recipient.full_name.titleize || ""
@@ -60,6 +62,9 @@ class IvlNotices::IvlRenewalNotice < IvlNotice
       PdfTemplates::Individual.new({
         :first_name => person.first_name,
         :full_name => person.full_name,
+        :last_name => person.last_name,
+        :age => person.age_on(TimeKeeper.date_of_record),
+        :is_without_assistance => true,
         :incarcerated=> datum["policy.subscriber.person.is_incarcerated"] == "TRUE" ? "Yes" : "No",#Per Sarah, for blank incarceration, fill in FALSE
         :citizen_status=> citizen_status(datum["policy.subscriber.person.citizen_status"]),
         :residency_verified => datum["policy.subscriber.person.is_dc_resident?"].try(:upcase) == "TRUE"  ? "Yes" : "No"
