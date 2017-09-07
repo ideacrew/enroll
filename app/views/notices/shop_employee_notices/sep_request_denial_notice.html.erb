@@ -205,7 +205,7 @@ content: "There are separate eligibility rules for Special Enrollment Periods in
   previous: "Please contact your broker for further assistance. You can also contact #{Settings.site.short_name} with any questions:",
   listings: ["By calling #{notice.hbe.phone}.",
             "TTY: 711",
-            "Online at <a href='www.DCHealthLink.com'>www.DCHealthLink.com</a>"]} %>
+            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

@@ -121,7 +121,7 @@
  previous: "Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
  listings: ["By calling #{notice.hbe.phone}.",
             "TTY: 711",
-            "Online at www.DCHealthLink.com"] } %>
+            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
