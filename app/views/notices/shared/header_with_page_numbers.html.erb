@@ -28,11 +28,11 @@
         var y = document.getElementsByClassName(x[i]);
         for(var j=0; j<y.length; ++j){
           if(j == 0 ){
-            if(x[i] == 'page' && vars[x[i]] <= 2){
+            if(x[i] == 'page' && vars[x[i]] <= 3){
               continue;
             }
           }
-        y[j].textContent = "Your Health Connector ID is: <%= notice.primary_identifier %>" + "| Page "+(vars[x[i]]-1)+ " of " + (vars[x[1]]-1);
+        y[j].textContent = "Your Health Connector ID is: <%= notice.primary_identifier %>" + "| Page "+(vars[x[i]]-2)+ " of " + (vars[x[1]]-2);
         }
       }
     }
