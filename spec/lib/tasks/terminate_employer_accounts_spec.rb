@@ -52,7 +52,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       end_on = TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       Rake::Task["migrations:terminate_employer_account"].reenable
-      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,true)
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
       expect($stdout.string).to match("Notification generated\n")
     end
 
@@ -61,7 +61,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       end_on = TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       Rake::Task["migrations:terminate_employer_account"].reenable
-      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,false)
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
       expect($stdout.string).not_to match("Notification generated\n")
     end
 
