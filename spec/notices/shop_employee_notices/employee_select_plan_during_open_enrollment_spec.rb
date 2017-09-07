@@ -68,13 +68,36 @@ RSpec.describe ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment, :dbc
       @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
+
     it "should append data" do
       hbx_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id)
       enrollment = census_employee.active_benefit_group_assignment.hbx_enrollments.first
       @employee_notice.append_data
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
+      expect(@employee_notice.notice.enrollment.employee_cost).to eq("0.0")
+      expect(@employee_notice.notice.enrollment.employer_contribution).to eq("0.0")
     end
   end
 
+  describe "Rendering Employee Plan Selection Confirmation template and generate pdf" do
+    before do
+      allow(census_employee).to receive_message_chain("employee_role.person").and_return(person)
+      allow(census_employee).to receive(:employer_profile).and_return(employer_profile)
+      @employee_notice = ShopEmployeeNotices::EmployeeSelectPlanDuringOpenEnrollment.new(census_employee, valid_params)
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return hbx_enrollment
+    end
+
+    it "should render employee_select_plan_during_open_enrollment" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_select_plan_during_open_enrollment"
+    end
+
+    it "should generate pdf" do
+      @employee_notice.append_data
+      @employee_notice.build
+      @employee_notice.generate_pdf_notice
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end

@@ -2640,4 +2640,26 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+
+  describe "#trigger ee_select_plan_during_oe" do
+    let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: @household, applied_aptc_amount: 0, kind: "employer_sponsored") }
+    let(:census_employee) { FactoryGirl.create(:census_employee)  }
+
+    before :each do
+      @household = mikes_family.households.first
+    end
+
+    it "should trigger ee_select_plan_during_oe job in queue" do
+      allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+
+      hbx_enrollment.ee_select_plan_during_oe
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_select_plan_during_oe']
+    end
+  end
 end
