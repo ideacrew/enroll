@@ -47,20 +47,14 @@ namespace :migrations do
           end
         end
 
-      if plan_year.may_terminate?
-        plan_year.terminate!
+        if plan_year.may_terminate?
+          plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
-        if generate_termination_notice
-          puts "Notification generated"
-          organization.employer_profile.census_employees.active.each do |ce|
-            begin
-               ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
-            rescue Exception => e
-               (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
-            end
-          end 
+          if generate_termination_notice
+            send_notice_to_employer(organization)
+            send_notice_to_employees(organization)
+          end
         end
-      end
     end
 
       # organization.employer_profile.census_employees.non_terminated.each do |census_employee|
@@ -126,5 +120,25 @@ def enrollments_for_plan_year(plan_year)
   families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
   enrollments = families.inject([]) do |enrollments, family|
     enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+  end
+end
+
+def send_notice_to_employer(org)
+  puts "Notification generated for employer"
+  begin
+    ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
+  rescue Exception => e
+    (Rails.logger.error { "Unable to deliver Notices to #{org.employer_profile.legal_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+  end
+end
+
+def send_notice_to_employees(org)
+  puts "Notification generated for employee"
+  org.employer_profile.census_employees.active.each do |ce|
+    begin
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+    end
   end
 end

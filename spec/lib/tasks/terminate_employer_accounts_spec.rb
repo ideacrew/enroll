@@ -53,7 +53,8 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       Rake::Task["migrations:terminate_employer_account"].reenable
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
-      expect($stdout.string).to match("Notification generated\n")
+      expect($stdout.string).to match("Notification generated for employer\n")
+      expect($stdout.string).to match("Notification generated for employee\n")
     end
 
     it 'should not send notification when we pass false in generate_termination_notice attribute' do
@@ -62,7 +63,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       Rake::Task["migrations:terminate_employer_account"].reenable
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
-      expect($stdout.string).not_to match("Notification generated\n")
+      expect($stdout.string).not_to match("Notification generated for\n")
     end
 
   end
