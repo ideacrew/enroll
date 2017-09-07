@@ -1,11 +1,21 @@
-<div class="col-md-10 col-sm-10 no-pd form-group-lg no-pd app-status white-background">
+<div class="col-md-4 col-sm-10 no-pd form-group-lg app-status white-background">
   <% if applicant.applicant_validation_complete? %>
-    <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+    <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Info Complete</span>
   <% else %>
-    <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+    <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">Info Needed</span>
   <% end %>
 </div>
 
-<div class="col-md-2 col-sm-2 no-pd form-group-lg no-pd white-background">
-  <%= link_to applicant.workflow.present? ? "Edit Info" : "Add Info", go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-info" %>
+<div class="col-md-8 col-sm-2 form-group-lg white-background right">
+ <% if applicant.workflow.present? %>
+		<%= link_to go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default" do %>
+			<i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
+			EDIT INCOME & COVERAGE INFO
+		<% end %>
+	<% else %>
+		<%= link_to go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default add" do %>
+			<i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
+			ADD INCOME & COVERAGE INFO
+		<% end %>
+	<% end %>
 </div>
