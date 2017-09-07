@@ -1060,7 +1060,7 @@ describe Person do
       before do
         allow(person).to receive(:ssn).and_return(ssn) if ssn
         allow(person).to receive(:us_citizen).and_return(citizen)
-        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
+        allow(person).to receive(:tribal_id).and_return("444444444") if native
       end
       it "returns array of verification types" do
         expect(person.verification_types).to be_a Array
