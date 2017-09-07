@@ -104,7 +104,11 @@ FactoryGirl.define do
 
   trait :with_consumer_role do
     after :create do |user|
-      FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+      if user.person.blank?
+        FactoryGirl.create :person, :with_consumer_role, :with_family, :user => user
+      else
+        create :consumer_role, person: user.person, dob: user.person.dob
+      end
     end
   end
 
@@ -122,7 +126,7 @@ FactoryGirl.define do
 
   trait :with_nuclear_family do
     after :create do |user|
-      FactoryGirl.create :person, :with_family, :user => user
+      FactoryGirl.create :person, :with_nuclear_family, :user => user
     end
   end
 
