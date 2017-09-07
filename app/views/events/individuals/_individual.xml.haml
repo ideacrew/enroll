@@ -4,7 +4,7 @@
 = render :partial => "events/individuals/person", :object => individual
 - if individual.person_relationships.any?
   %person_relationships
-    - individual.person_relationships.each do |rel|
+    - individual.person_relationships.where(family_id: family_id).each do |rel|
       %person_relationship
         %subject_individual
           %id= individual.hbx_id

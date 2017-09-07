@@ -1,7 +1,7 @@
 - if assistance_tax_household_member.tax_household_id == assistance_tax_household._id
   %assistance_tax_household_member
     %individual
-      = render :partial => "events/individuals/individual", :object => assistance_tax_household_member.person, as: :individual
+      = render :partial => "events/individuals/individual", :object => assistance_tax_household_member.person, as: :individual, :locals=> {family_id: financial_assistance_application.family.id}
       %is_primary_applicant= assistance_tax_household_member.family_member.is_primary_applicant
       %is_consent_applicant= assistance_tax_household_member.family_member.is_consent_applicant
       %is_coverage_applicant= assistance_tax_household_member.family_member.is_coverage_applicant
