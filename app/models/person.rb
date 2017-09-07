@@ -805,6 +805,7 @@ class Person
 
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
+    return nil if citizen_status.blank?
     @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
   end
 
