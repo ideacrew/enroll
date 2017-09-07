@@ -6,42 +6,44 @@
   <div class="container">
     <div id="new_person_wrapper">
       <div class="row">
-        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
           <%= render :partial => 'shared/left_nav.html.erb' %>
         </div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
 
-        <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
-        <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
-          <h1 class="darkblue">Application Checklist</h1>
-          <p>To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.</p>
-          <p class="memo">* = required field</p>
-          <div class="knowmore rounded-top">
-            <div class="row">
-              <div class="col-lg-3 stacked-icons text-center">
-                <i class="fa fa-arrow-down fa-3x adjustments" aria-hidden="true"></i>
-                <br>
-                <span class="fa-stack fa-4x">
-                  <i class="fa fa-folder-o fa-stack-2x" aria-hidden="true"></i>
-                  <i class="fa fa-info-circle fa-stack-1x adjustments" aria-hidden="true"></i>
-                </span>
-              </div>
-              <div class="col-lg-9">
-                <div>
-                  <h4>Gather Income and Coverage Info</h4>
-                  <div>You will need detailed information about everyone's income and any other health coverage that anyone in your household may have access to. <br> <br>
-                  Depending on how much info you have to enter, it may take you between 10 - 20 minutes to fill in this information. You can always save your work for later. Simply select SAVE & EXIT.
+          <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+          <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-pd">
+            <h1 class="darkblue">Application Checklist</h1>
+            <p>To see if you qualified for Medicaid, tax credits, or cost-sharing reductions, you must select 'Yes'<br/>When you've finished,select CONTINUE.</p>
+            <p class="memo">* = required field</p>
+            <div class="knowmore rounded-top">
+              <div class="row">
+                <div class="col-lg-3 stacked-icons text-center">
+                  <i class="fa fa-arrow-down fa-3x adjustments" aria-hidden="true"></i>
+                  <br>
+                  <span class="fa-stack fa-4x">
+                    <i class="fa fa-folder-o fa-stack-2x" aria-hidden="true"></i>
+                    <i class="fa fa-info-circle fa-stack-1x adjustments" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <div class="col-lg-9">
+                  <div>
+                    <h4>Gather Income and Coverage Info</h4>
+                    <div>You will need detailed information about everyone's income and any other health coverage that anyone in your household may have access to. <br> <br>
+                    Depending on how much info you have to enter, it may take you between 10 - 20 minutes to fill in this information. You can always save your work for later. Simply select SAVE & EXIT.
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-            previous_url: help_paying_coverage_financial_assistance_applications_path,
-            next_url: edit_financial_assistance_application_path(@application)
-          } %>
+          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+            <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+              previous_url: help_paying_coverage_financial_assistance_applications_path,
+              next_url: edit_financial_assistance_application_path(@application)
+            } %>
+          </div>
         </div>
       </div>
     </div>
