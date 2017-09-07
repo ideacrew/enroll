@@ -1338,7 +1338,7 @@ context "Benefits are terminated" do
                                                  submitted_at: effective_on_date - 10.days
                                                  )
                               }
-    let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
+    let(:ivl_termination_date)  { TimeKeeper.date_of_record}
 
     it "should be open enrollment" do
       expect(ivl_enrollment.is_open_enrollment?).to be_truthy
