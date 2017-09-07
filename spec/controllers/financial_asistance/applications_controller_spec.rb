@@ -11,6 +11,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   let!(:application2) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
   let!(:applicant2) { FactoryGirl.create(:applicant, application: application2, family_member_id: family.primary_applicant.id) }
   let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+  let(:application_valid_params) { {"medicaid_terms"=>"yes", "report_change_terms"=>"yes", "medicaid_insurance_collection_terms"=>"yes", "parent_living_out_of_home_terms"=>"true", "attestation_terms"=>"yes", "submission_terms"=>"yes"} }
 
   before do
     sign_in(user)
@@ -34,7 +35,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   context "POST create" do
     it "should redirect" do
       post :create
-      expect(response).to be_redirect
+      family.reload
+      existing_app_ids = [application.id, application2.id]
+      new_app = application.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
+      expect(response).to redirect_to(edit_financial_assistance_application_path(new_app.id))
     end
   end
 
@@ -60,20 +64,21 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
 
     context "when params has application key" do
       it "When model is saved" do
-        post :step, id: application.id, application: {"medicaid_terms"=>"yes", "report_change_terms"=>"yes", "medicaid_insurance_collection_terms"=>"yes", "parent_living_out_of_home_terms"=>"true", "attestation_terms"=>"yes", "submission_terms"=>"yes"}
+        post :step, id: application.id, application: application_valid_params
         expect(application.save).to eq true
       end
 
       it "should fail during publish application and redirects to error_page" do
-        post :step, id: application2.id, commit: "Submit Application", application: {"medicaid_terms"=>"yes", "report_change_terms"=>"yes", "medicaid_insurance_collection_terms"=>"yes", "parent_living_out_of_home_terms"=>"true", "attestation_terms"=>"yes", "submission_terms"=>"yes"}
+        post :step, id: application2.id, commit: "Submit Application", application: application_valid_params
         expect(response).to redirect_to(application_publish_error_financial_assistance_application_path(application2))
       end
 
       it "should successfully publish application and redirects to wait_for_eligibility" do
-        post :step, id: application.id, commit: "Submit Application", application: {"medicaid_terms"=>"yes", "report_change_terms"=>"yes", "medicaid_insurance_collection_terms"=>"yes", "parent_living_out_of_home_terms"=>"true", "attestation_terms"=>"yes", "submission_terms"=>"yes"}
+        post :step, id: application.id, commit: "Submit Application", application: application_valid_params
         expect(response).to redirect_to(wait_for_eligibility_response_financial_assistance_application_path(application))
       end
     end
+
     it "should render step if model is not saved" do
       post :step, id: application.id
       expect(response).to render_template 'workflow/step'
@@ -91,22 +96,61 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     before do
       family.applications.each { |app| app.update_attributes(aasm_state: "determined")}
     end
-    it 'should redirect' do
+
+    it 'should copy applicant and redirect to financial assistance application edit path' do
       get :copy, id: application.id
-      expect(response).to be_redirect
+      family.reload
+      existing_app_ids = [application.id, application2.id]
+      copy_app = application.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
+      expect(response).to redirect_to(edit_financial_assistance_application_path(copy_app.id))
     end
   end
 
   context "GET help_paying_coverage" do
-    let(:id) { "_id" }
     it 'should assign application id to transaction id' do
-      get :help_paying_coverage, id: id
-      expect(assigns(:transaction_id)).to eq id
+      get :help_paying_coverage, id: application.id
+      expect(assigns(:transaction_id)).to eq application.id.to_s
+    end
+  end
+
+  context "GET help_paying_coverage" do
+
+    context "'Yes' to is_applying_for_assistance" do
+      it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
+        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: true
+        expect(response).to redirect_to(application_checklist_financial_assistance_applications_path)
+        expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
+      end
+
+      let(:person1) { FactoryGirl.create(:person)}
+      let(:family_member){FactoryGirl.build(:family_member, family: family, person: person1)}
+
+      it "should redirect to app checklist by creating applicants to all family members of the family if answered 'yes'" do
+        family.applications.each { |app| app.update_attributes(aasm_state: "determined") }
+        person.person_relationships.create(predecessor_id: person.id, :successor_id => person1.id, :kind => "spouse", family_id: family.id)
+        family_member.save
+        family.save
+        get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: true
+        family.reload
+        expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 2
+        expect(response).to redirect_to(application_checklist_financial_assistance_applications_path)
+      end
+    end
+
+    it "should redirect to insured family memebers if 'no' is answered to is_applying_for_assistance" do
+      get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: false
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: person.consumer_role.id))
+    end
+
+    it "should remain on the same page and flash an error message if nothing is answered to is_applying_for_assistance" do
+      get :get_help_paying_coverage_response, exit_after_method: false, is_applying_for_assistance: nil
+      expect(response).to redirect_to(help_paying_coverage_financial_assistance_applications_path)
+      expect(flash[:error]).to match(/Please choose an option before you proceed./)
     end
   end
 
   context "GET review_and_submit" do
-    it 'should render review and submit page' do
+    it 'should  review and submit page' do
       application.update_attributes(:aasm_state => "draft")
       get :review_and_submit, id: application.id
       expect(assigns(:consumer_role)).to eq person.consumer_role
@@ -116,7 +160,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
   end
 
   context "GET wait_for_eligibility_response" do
-    it 'should wait for eligibility response' do
+    it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, id: application.id
       expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
@@ -141,4 +185,16 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
     end
   end
 
+  context "check eligibility results received" do
+    it "should return true if the Header of the response doesn't has the success status code" do
+      get :check_eligibility_results_received, id: application.id
+      expect(response.body).to eq "false"
+    end
+
+    it 'should return true if the Header of the response has the success status code' do
+    application.update_attributes(determination_http_status_code: 200)
+      get :check_eligibility_results_received, id: application.id
+      expect(response.body).to eq "true"
+    end
+  end
 end
