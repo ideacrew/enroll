@@ -986,7 +986,6 @@ class PlanYear
 
   def renewal_employee_enrollment_confirmation
     if is_renewing?
-      binding.pry
       self.employer_profile.census_employees.enrolled.each do |ce|
         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
       end
