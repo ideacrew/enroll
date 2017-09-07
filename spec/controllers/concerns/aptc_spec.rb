@@ -1,6 +1,5 @@
 require 'rails_helper'
 
-
 class FakesController < ApplicationController
   include Aptc
 end
@@ -35,7 +34,7 @@ RSpec.describe FakesController, :type => :controller do
       end
 
       it "should get taxhousehold with person" do
-        expect(subject.get_shopping_tax_households_from_person(person, 2017)).to eq tax_household1
+        expect(subject.get_shopping_tax_households_from_person(person, 2017).to_a).to eq [tax_household1, tax_household2, tax_household3]
       end
 
       it "should get nil when person without consumer_role" do
