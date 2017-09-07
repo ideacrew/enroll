@@ -787,7 +787,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_1',
-    title: 'Projected Eligibility Notice',
+    title: 'Update your information at DC Health Link by October 15',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_1',

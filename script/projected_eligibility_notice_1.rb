@@ -28,6 +28,7 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |family_id , members|
       primary_member = members.detect{ |m| m["is_dependent"] == "FALSE"}
+      next if primary_member.nil?
       next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] == "FALSE")
       next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
       next if (members.any?{ |m| m["policy.subscriber.person.citizen_status"].blank? || (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
