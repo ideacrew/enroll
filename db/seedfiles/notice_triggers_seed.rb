@@ -670,7 +670,7 @@ shop_notice_triggers = [
         ]
     },
     {
-        hbx_id: 'SHOP40',
+        hbx_id: 'SHOP43',
         title: 'EMPLOYEE has made a change to their employer-sponsored coverage selection',
         description: 'EE Made Mid-Year Plan Change (Reason: New Hire, SEP, OR DPT Age-Off)',
         resource_name: 'employer',
@@ -680,7 +680,7 @@ shop_notice_triggers = [
                 name: 'Employee Mid-Year Plan change',
                 notice_template: 'notices/shop_employer_notices/employee_mid_year_plan_change',
                 notice_builder: 'EmployeeMidYearPlanChange',
-                mpi_indicator: 'MPI_SHOP40',
+                mpi_indicator: 'MPI_SHOP43',
                 notice_trigger_element_group: {
                   market_places: ['shop'],
                   primary_recipients: ["employer"],
