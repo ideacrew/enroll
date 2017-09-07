@@ -18,7 +18,7 @@ namespace :reports do
           family.family_members.each do |family_member|
             if family.enrolled_policy(family_member).present? # checking whether the family_member is present on enrollment or not
               person = family_member.person
-              document_count = family_member.person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
+              document_count = person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
               min_verification_due_date = family.min_verification_due_date || TimeKeeper.date_of_record + 95.days
               status = review_button_class(family)
               color = color_scheme(status)
@@ -47,7 +47,8 @@ namespace :reports do
   def calculate_due_date(family, family_member)
     @citizenship_due_date = @ssn_due_date = @ami_due_date = @immigration_due_date = nil
     family_member.person.verification_types.each do |v_type|
-      due_date = family.document_due_date(family_member, v_type).present? ? family.document_due_date(family_member, v_type).to_date :  nil
+      doc_due_date = family.document_due_date(family_member, v_type)
+      due_date = doc_due_date.present? ? doc_due_date.to_date : nil
       if v_type == 'Citizenship'
         @citizenship_due_date = due_date
       elsif v_type == 'Social Security Number'
