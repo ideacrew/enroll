@@ -177,6 +177,32 @@
               </div>
             </td>
           </tr>
+
+         <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+            <td class="col-md-6">
+             COBRA/Continuation Effective Date:
+            </td>
+            <td class="col-md-6">
+            <input name='name' value="" type="text" class="form-control date-picker col-md-2"
+               data-date-format="yyyy-mm-dd"/>
+            </td>
+          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+            <td class="confirm-terminate-wrapper" colspan="4">
+              <span>Please enter the maximum number of months the enrollee is eligible for cobra</span>
+            </td>
+          </tr>
+           </tr>
+
+           <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+            <td class="confirm-terminate-wrapper col-md-6">
+              <span>Maximum COBRA months:</span>
+            </td>
+            <td class="confirm-terminate-wrapper col-md-4">
+              <span>Maximum COBRA/contination end date: 11/30/2018</span>
+            </td>
+          </tr>
+
+
            <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td colspan="12">
               <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
