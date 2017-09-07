@@ -237,7 +237,7 @@ class Insured::FamiliesController < FamiliesController
   def sep_request_denial_notice
     # options will be {qle_reported_date: "%m/%d/%Y", qle_id: "59a068feb49a96cb6500000e"}
     begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee, "sep_request_denial_notice", options = {qle_reported_date: @qle_date, qle_id: @qle.id})
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice", qle_reported_date: @qle_date.to_s, qle_id: @qle.id.to_s)
     rescue Exception => e
       log("#{e.message}; person_id: #{@person.hbx_id}")
     end
