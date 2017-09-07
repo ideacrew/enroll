@@ -3,21 +3,22 @@ class UsersController < ApplicationController
 
   def confirm_lock
     params.permit!
+    authorize User, :lockable?
     @user_id  = params[:user_action_id]
   end
 
   def lockable
     authorize User, :lockable?
     user.lock!
-    redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User #{user.person.full_name} is successfully #{user.lockable_notice}."
-  rescue Exception => e
+    redirect_to user_account_index_exchanges_hbx_profiles_url, notice: "User #{user.email} is successfully #{user.lockable_notice}."
+  rescue Pundit::NotAuthorizedError
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
   def reset_password
     @user = User.find(params[:id])
     authorize User, :reset_password?
-  rescue Exception => e
+  rescue Pundit::NotAuthorizedError
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
@@ -32,7 +33,7 @@ class UsersController < ApplicationController
     else
       render file: 'users/reset_password.js.erb'
     end
-  rescue Exception => e
+  rescue Pundit::NotAuthorizedError
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
