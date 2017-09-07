@@ -14,17 +14,5 @@ module Parsers::Xml::Cv
     element :created_at, DateTime
     # element :household_state, String
     # element :modified_at, DateTime
-
-    # def to_hash
-    #   {
-    #     id: id,
-    #     household_state: household_state.split('#').last,
-    #     maximum_aptc: maximum_aptc,
-    #     csr_percent: csr_percent,
-    #     determination_date: determination_date,
-    #     created_at: created_at,
-    #     modified_at: modified_at
-    #   }
-    # end
   end
 end

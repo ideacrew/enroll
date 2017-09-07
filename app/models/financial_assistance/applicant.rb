@@ -158,11 +158,15 @@ class FinancialAssistance::Applicant
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
 
   def is_ia_eligible?
-    is_ia_eligible
+    is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
+  end
+
+  def non_ia_eligible?
+    (is_medicaid_chip_eligible || is_without_assistance || is_totally_ineligible) && !is_ia_eligible
   end
 
   def is_medicaid_chip_eligible?
-    is_medicaid_chip_eligible
+    is_medicaid_chip_eligible && !is_ia_eligible && !is_without_assistance && !is_totally_ineligible
   end
 
   def is_tax_dependent?
@@ -293,7 +297,7 @@ class FinancialAssistance::Applicant
 
   def tax_household
     return nil unless tax_household_id
-    self.application.tax_households.find(tax_household_id)
+    self.application.tax_households.find(tax_household_id) if application.tax_households.present?
   end
 
   def age_on_effective_date

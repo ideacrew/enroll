@@ -20,9 +20,9 @@ class HbxIdGenerator
     provider.generate_organization_id
   end
 
-  # def generate_application_id
-  #   provider.generate_application_id
-  # end
+  def generate_application_id
+    provider.generate_application_id
+  end
 
   def self.slug!
     self.instance.provider = SlugSource
@@ -40,9 +40,9 @@ class HbxIdGenerator
     self.instance.generate_organization_id
   end
 
-  # def self.generate_application_id
-  #   self.instance.generate_application_id
-  # end
+  def self.generate_application_id
+    self.instance.generate_application_id
+  end
 
   class AmqpSource
     def self.generate_id_from_sequence(sequence_name)
@@ -67,9 +67,9 @@ class HbxIdGenerator
       generate_id_from_sequence("organization_id")
     end
 
-    # def self.generate_application_id
-    #   generate_id_from_sequence("faa_application_id")
-    # end
+    def self.generate_application_id
+      generate_id_from_sequence("faa_application_id")
+    end
   end
 
   class SlugSource
@@ -89,9 +89,9 @@ class HbxIdGenerator
       SecureRandom.uuid.gsub("-","")
     end
 
-    # def self.generate_application_id
-    #   random_uuid
-    # end
+    def self.generate_application_id
+      random_uuid
+    end
   end
 end
 
