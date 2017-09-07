@@ -110,8 +110,8 @@ FactoryGirl.define do
     end
 
     trait :with_nuclear_family do
-      after :create do |person|
-        family = FactoryGirl.create :family, :with_primary_family_member_and_dependent, person: person
+      before :create do |person|
+        family = FactoryGirl.create :family, :with_nuclear_family, person: person
       end
     end
 

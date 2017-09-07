@@ -37,13 +37,13 @@ Scenario: CONTINUE button navigation
   Given that the user is on the FAA Household Info: Family Members page
   When the user completes application and clicks CONTINUE
   And all applicants are in a COMPLETED state
-  And now add two more members to the family with atleast one relationship as Unrelated 
+  And now add two more members to the family with at least one relationship as Unrelated
   And at least one member to member relationships is NIL
   Then the user will navigate to Household Relationships page
 
 Scenario: CONTINUE button navigation
   Given that the user is on the FAA Household Info: Family Members page
   And at least one applicant is in the In Progress state
-  And now add two more members to the family with atleast one relationship as Unrelated 
+  And now add two more members to the family with at least one relationship as Unrelated
   And at least one member to member relationships is NIL
   Then the user will navigate to Household Relationships page

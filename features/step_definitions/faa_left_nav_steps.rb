@@ -62,8 +62,8 @@ When(/^all member to member relationships are NOT nil$/) do
 end
 
 Then(/^the user will navigate into the first incomplete applicant's Income & Coverage page$/) do
-find('.btn', text: 'CONTINUE').click
-expect(page).to have_content('Income and Coverage')
+  click_button 'CONTINUE'
+  expect(page).to have_content('Income and Coverage')
 end
 
 When(/^all applicants are in a COMPLETED state$/) do
@@ -88,12 +88,10 @@ When(/^the user completes application and clicks CONTINUE$/) do
   find("#is_self_attested_blind_no").trigger('click')
   choose('has_daily_living_no')
   choose('has_daily_living_help_no')
-  choose('is_resident_post_092296_no')
-  choose('is_veteran_or_active_military_yes')
   find('.interaction-click-control-continue').click
 end
 
-When(/^now add two more members to the family with atleast one relationship as Unrelated$/) do
+When(/^now add two more members to the family with at least one relationship as Unrelated$/) do
   find('.interaction-click-control-add-member').click
   fill_in "dependent_first_name", with: 'johnson'
   fill_in "dependent_last_name", with: 'smith'
@@ -106,18 +104,23 @@ When(/^now add two more members to the family with atleast one relationship as U
   find('#add_info_buttons_ > span').click
 
   find('.interaction-click-control-add-member').click
+
   fill_in "dependent_first_name", with: 'Jackson'
-  fill_in "dependent_last_name", with: 'lee'
+  fill_in "dependent_last_name", with: 'Lee'
   fill_in "family_member_dob_", with: '10/10/1990'
   fill_in "dependent_ssn", with: '123456333'
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div/div[2]/p').click
   find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div/div[3]/div/ul/li[5]').click
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  puts '1'
   find('#add_info_buttons_ > span').click
+
+  puts '2'
 
   find('.btn', text: 'CONTINUE').click
   find('.interaction-click-control-continue').click
+  puts '3'
   find('.interaction-click-control-continue').click
   find('.interaction-click-control-continue').click
   find('.interaction-click-control-continue').click
