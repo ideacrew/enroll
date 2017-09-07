@@ -12,8 +12,13 @@ module PdfTemplates
     attribute :enrollment, PdfTemplates::Enrollment
     attribute :email, String
     attribute :plan_year, PdfTemplates::PlanYear
+    attribute :sep, PdfTemplates::SpecialEnrollmentPeriod
 
     def shop?
+      return true
+    end
+
+    def employee_notice?
       return true
     end
   end

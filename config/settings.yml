@@ -6,6 +6,7 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  website_name: "www.DCHealthLink.com"
 
   social_media:
     facebook_url: ""
@@ -17,6 +18,7 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 

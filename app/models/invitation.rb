@@ -190,7 +190,7 @@ class Invitation
   end
 
   def send_future_employee_invitation_for_open_enrollment!(census_employee)
-    UserMailer.send_future_employee_open_enrollment_invitation(invitation_email,census_employee. self).deliver_now
+    UserMailer.send_future_employee_open_enrollment_invitation(invitation_email, census_employee, self).deliver_now
   end
 
   def send_renewal_invitation!(census_employee)
