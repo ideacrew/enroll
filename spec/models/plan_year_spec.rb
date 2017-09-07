@@ -2473,4 +2473,24 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
   end
+
+  describe "#trigger renewal_employee_enrollment_confirmation" do
+    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:plan_year) { FactoryGirl.create(:plan_year, benefit_groups: [benefit_group], employer_profile: employer_profile, aasm_state: "renewing_enrolled")}
+    let(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let(:employer_profile) { FactoryGirl.build(:employer_profile) }
+    it "should trigger renewal_employee_enrollment_confirmation job in queue" do
+      allow(plan_year).to receive(:is_renewing?).and_return(true)
+      allow(plan_year).to receive_message_chain("employer_profile.census_employees.enrolled").and_return([census_employee])
+      allow(plan_year).to receive_message_chain("employer_profile.census_employees.first.id.to_s").and_return(census_employee.id)
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      plan_year.renewal_employee_enrollment_confirmation
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'renewal_employee_enrollment_confirmation']
+    end
+  end
+
 end
