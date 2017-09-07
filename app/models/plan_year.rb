@@ -984,6 +984,15 @@ class PlanYear
     self.employer_profile.is_conversion? && self.is_conversion
   end
 
+  def renewal_employee_enrollment_confirmation
+    if is_renewing?
+      binding.pry
+      self.employer_profile.census_employees.enrolled.each do |ce|
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+      end
+    end
+  end
+
   alias_method :external_plan_year?, :can_be_migrated?
 
   private
@@ -1106,14 +1115,6 @@ class PlanYear
   def renewal_employer_open_enrollment_completed
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
-  end
-
-  def renewal_employee_enrollment_confirmation
-    if is_renewing?
-      self.employer_profile.census_employees.enrolled.each do |ce|
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
-      end
-    end
   end
 
   def renewal_employer_ineligibility_notice
