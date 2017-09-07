@@ -149,6 +149,28 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  }, 
+
+  {
     hbx_id: 'SHOP5',
     title: 'Group Renewal Available',
     description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
