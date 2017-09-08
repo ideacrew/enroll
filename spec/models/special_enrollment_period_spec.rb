@@ -1,3 +1,4 @@
+
 require 'rails_helper'
 
 RSpec.describe SpecialEnrollmentPeriod, :type => :model do
@@ -473,6 +474,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     before do
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
       census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
+    end
+
+    it "should return a sep with an effective date that equals to sep date" do
+       sep.update_attributes(:qle_on => organization.employer_profile.plan_years[0].end_on - 14.days )
+       expect(sep.effective_on).to eq sep.qle_on
     end
 
     it "should return a sep with an effective date that equals to first of month" do
