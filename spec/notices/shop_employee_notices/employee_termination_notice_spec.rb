@@ -28,7 +28,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
   let(:census_employee) { FactoryGirl.create(:census_employee, employee_role_id: employee_role.id, employer_profile_id: employer_profile.id,
     employment_terminated_on:TimeKeeper.date_of_record.end_of_month,
     coverage_terminated_on:TimeKeeper.date_of_record.end_of_month) }
-  let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: active_benefit_group.id, census_employee: census_employee, start_on: start_on) }
+  let!(:benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group_id: active_benefit_group.id, census_employee: census_employee, start_on: start_on, is_active: true) }
   let(:family) {
       family = FactoryGirl.build(:family, :with_primary_family_member_and_dependent)
       primary_person = family.family_members.where(is_primary_applicant: true).first.person
@@ -41,7 +41,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
       family
     }
 
-  let(:enrollment) do
+  let!(:enrollment) do
     hbx = FactoryGirl.create(:hbx_enrollment, household: family.active_household, coverage_kind: 'health', aasm_state:'coverage_termination_pending',benefit_group_assignment_id: benefit_group_assignment.id)
     hbx.hbx_enrollment_members << FactoryGirl.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true)
     hbx.save
@@ -83,7 +83,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
     before do
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
-      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
       @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)
       @employee_notice.append_data
@@ -115,7 +115,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminationNotice, :dbclean => :afte
     before do
       allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
       allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
-      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
       @employee_notice = ShopEmployeeNotices::EmployeeTerminationNotice.new(census_employee, valid_parmas)
       @employee_notice.build

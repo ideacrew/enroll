@@ -21,7 +21,7 @@ class ShopEmployeeNotices::EmployeeTerminationNotice < ShopEmployeeNotice
                       :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
       })
     enrollments = []
-    en = census_employee.published_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
+    en = census_employee.active_benefit_group_assignment.hbx_enrollments.select{ |h| ['coverage_terminated', 'coverage_termination_pending'].include?(h.aasm_state)}
     health_enrollment = en.select{ |h| h.coverage_kind == 'health'}.sort_by(&:effective_on).last
     dental_enrollment = en.select{ |h| h.coverage_kind == 'dental'}.sort_by(&:effective_on).last
     enrollments << health_enrollment
