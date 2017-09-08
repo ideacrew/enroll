@@ -35,6 +35,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :min_verification_due_date, type: Date, default: nil
 
   belongs_to  :person
 
@@ -187,6 +188,11 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
+  scope :having_unverified_enrollment,          ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :with_all_verifications,                ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "ready"}})}
+  scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
+  scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
+  scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -949,7 +955,7 @@ class Family
     return nil if family_member.person.consumer_role.is_type_verified?(v_type)
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
     enrollment = enrolled_policy(family_member)
-    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : TimeKeeper.date_of_record + 95.days)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : nil )
   end
 
   def enrolled_policy(family_member)
@@ -960,13 +966,13 @@ class Family
     if enrollment.special_verification_period
       enrollment.special_verification_period.to_date
     else
-      TimeKeeper.date_of_record + 95.days
+      nil
     end
   end
 
   def review_status
     if active_household.hbx_enrollments.verification_needed.any?
-      active_household.hbx_enrollments.verification_needed.first.review_status.gsub(/\s+/, '')
+      active_household.hbx_enrollments.verification_needed.first.review_status
     else
       "no enrollment"
     end

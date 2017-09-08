@@ -149,6 +149,28 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_Out_of_pocket_notice',
+    title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
+    description: 'Out of pocket calculator notifier',
+    resource_name: 'employer',
+    event_name: 'out_of_pocker_url_notifier',
+    notice_triggers: [
+      {
+        name: 'Out of pocket Notice',
+        notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+        notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
+        mpi_indicator: 'MPI',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: [""],
+          primary_recipient_delivery_method: ["email"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  }, 
+
+  {
     hbx_id: 'SHOP5',
     title: 'Group Renewal Available',
     description: 'Notice will be sent to the Renewal Groups three months prior to their plan year renewing',
@@ -353,6 +375,27 @@ shop_notice_triggers = [
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'SHOP18',
+    title: 'Group Open Enrollment Successfully Completed',
+    description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
+    resource_name: 'employer',
+    event_name: 'renewal_employer_open_enrollment_completed',
+    notice_triggers: [
+      {
+        name: 'Renewal Employee Open Employee Completed',
+        notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
+        notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
+        mpi_indicator: 'MPI_SHOP18',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["secure_message"],
           secondary_recipients: []
         }
@@ -610,7 +653,28 @@ shop_notice_triggers = [
         }
       }
     ]
-  }
+  },
+  {
+    hbx_id: 'SHOP10066',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
+    resource_name: 'employee_role',
+    event_name: 'notify_employee_of_renewing_employer_ineligibility',
+    notice_triggers: [
+      {
+        name: 'Notify Employees of their employer termination due to ineligibility',
+        notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
+        notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
+        mpi_indicator: 'MPI_SHOP10066',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

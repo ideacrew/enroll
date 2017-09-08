@@ -75,15 +75,14 @@ class Notice
           }),
         }
     }
-    if market_kind == 'individual'
-      options.merge!({footer: { 
-        content: ApplicationController.new.render_to_string({ 
-          template: "notices/shared/footer_ivl.html.erb",
-          layout: false,
-          locals: {notice: notice}
-        })
-      }})
-    end
+    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
+    options.merge!({footer: {
+      content: ApplicationController.new.render_to_string({
+        template: footer,
+        layout: false,
+        locals: {notice: notice}
+      })
+    }})
     
     options
   end
@@ -99,9 +98,14 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
+    begin
+      File.open(notice_path, 'wb') do |file|
+        file << self.pdf
+      end      
+    rescue Exception => e
+      puts "#{e} #{e.backtrace}"
     end
+
     # clear_tmp
   end
 
