@@ -71,10 +71,11 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-          locals: {notice: notice, recipient: recipient}
+          locals: { recipient: recipient, notice: notice}
           }),
         }
     }
+
     footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
