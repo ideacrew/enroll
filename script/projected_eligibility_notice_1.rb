@@ -21,7 +21,7 @@ file_name = "#{Rails.root}/projected_eligibility_notice_1_report_#{TimeKeeper.da
 
 #open enrollment information
 hbx = HbxProfile.current_hbx
-bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == notice.coverage_year }
+bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == TimeKeeper.date_of_record.next_year.year.to_s }
 
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
