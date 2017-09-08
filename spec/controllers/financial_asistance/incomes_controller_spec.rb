@@ -17,7 +17,6 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
   let(:income_employer_address_params){ {"address_1"=>"23 main st", "address_2"=>"", "city"=>"washington", "state"=>"dc", "zip"=>"12343"}}
   let(:income_employer_phone_params) {{"full_phone_number"=>""}}
 
-
   before do
     sign_in(user)
   end
@@ -56,6 +55,7 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
         post :step, application_id: application.id , applicant_id: applicant.id, id: income.id, income: valid_income_params, employer_phone: income_employer_phone_params
         expect(applicant.save).to eq true
       end
+
       it "should redirect to find_applicant_path when passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE", last_step: true
         expect(response.headers['Location']).to have_content 'incomes'
@@ -63,11 +63,13 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
         expect(flash[:notice]).to match('Income Added')
         expect(response).to redirect_to(financial_assistance_application_applicant_incomes_path(application, applicant))
       end
+
       it "should not redirect to find_applicant_path when not passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE"
         expect(response.status).to eq 200
         expect(response).to render_template 'workflow/step'
       end
+
       it "should render workflow/step when we are not params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: income.id,income: valid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params, commit: "CONTINUE"
         expect(response).to render_template 'workflow/step'

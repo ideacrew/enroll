@@ -75,6 +75,7 @@ RSpec.describe FinancialAssistance::BenefitsController, type: :controller do
         post :step, application_id: application.id , applicant_id: applicant.id, id: benefit.id, employer_address: employer_address, employer_phone: employer_phone
         expect(applicant.save).to eq true
       end
+
       it "should redirect to find_applicant_path when passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: "CONTINUE", last_step: true
         expect(response.headers['Location']).to have_content 'benefits'
@@ -82,11 +83,13 @@ RSpec.describe FinancialAssistance::BenefitsController, type: :controller do
         expect(flash[:notice]).to match('Benefit Info Added.')
         expect(response).to redirect_to(financial_assistance_application_applicant_benefits_path(application, applicant))
       end
+
       it "should not redirect to find_applicant_path when not passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: "CONTINUE"
         expect(response.status).to eq 200
         expect(response).to render_template 'workflow/step'
       end
+
       it "should render workflow/step when we are not params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: "CONTINUE"
         expect(response).to render_template 'workflow/step'
