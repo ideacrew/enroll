@@ -118,6 +118,20 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'accounts'
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+
+        #grab url for WellsFargoSSO and store in insance variable
+        email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.person.emails.first &&
+          @employer_profile.staff_roles.first.person.emails.first.address) || nil
+
+        if email.present?
+          wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
+        end
+
+        if wells_fargo_sso.present?
+          if wells_fargo_sso.token.present?
+            @wf_url = w.url
+          end
+        end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
