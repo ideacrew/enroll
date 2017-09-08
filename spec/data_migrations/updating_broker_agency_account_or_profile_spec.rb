@@ -1,7 +1,7 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "updating_broker_agency_account_or_profile")
 
-describe UpdatingBrokerAgencyAccountOrProfile do
+describe UpdatingBrokerAgencyAccountOrProfile, dbclean: :after_each do 
   
   let!(:given_task_name) { "delinking_broker" }
   let!(:person) { FactoryGirl.create(:person,:with_broker_role)}
@@ -68,31 +68,5 @@ describe UpdatingBrokerAgencyAccountOrProfile do
       expect(person.broker_role.market_kind).to eq 'both'
     end
   end
-
-  context "update_employer_broker_agency_account" do 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("person_hbx_id").and_return(person.hbx_id)
-      allow(ENV).to receive(:[]).with("legal_name").and_return(organization.legal_name)
-      allow(ENV).to receive(:[]).with("fein").and_return(fein)
-      allow(ENV).to receive(:[]).with("defualt_general_agency_id").and_return(broker_agency_profile.default_general_agency_profile_id)
-      allow(ENV).to receive(:[]).with("npn").and_return(person.broker_role.npn)
-      allow(ENV).to receive(:[]).with("address_1").and_return(office_locations.address_1)
-      allow(ENV).to receive(:[]).with("address_2").and_return(office_locations.address_2)
-      allow(ENV).to receive(:[]).with("city").and_return(office_locations.city)
-      allow(ENV).to receive(:[]).with("state").and_return(office_locations.state)
-      allow(ENV).to receive(:[]).with("zip").and_return(office_locations.zip)
-      allow(ENV).to receive(:[]).with("area_code").and_return(office_locations_contact.area_code)
-      allow(ENV).to receive(:[]).with("number").and_return(office_locations_contact.number)
-      allow(ENV).to receive(:[]).with("market_kind").and_return('both')
-      allow(ENV).to receive(:[]).with("broker_agency_profile_id").and_return(broker_agency_profile.id.to_s)
-      allow(ENV).to receive(:[]).with("action").and_return("update_employer_broker_agency_account")
-      employer_profile.broker_agency_accounts << broker_agency_account
-    end
-
-    it "Should update the person broker_role id with with new broker_agency" do
-      subject.migrate
-      person.reload
-      expect(person.broker_role.npn).to eq '4738984343'
-    end
-  end
+  
 end
