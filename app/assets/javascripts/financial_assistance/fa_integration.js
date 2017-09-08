@@ -22,7 +22,7 @@ $(document).ready(function() {
           success: function (response_received_flag) {
             if (response_received_flag == "true"){
               // redirect to the existing eligibility_results page
-              window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_results")
+              window.location = window.location.href.replace(/wait_for_eligibility_response/, "eligibility_results?cur=1")
             }
           }
         });

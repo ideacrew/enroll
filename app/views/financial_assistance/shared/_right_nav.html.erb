@@ -5,9 +5,7 @@
 <% if content_for? :submit_button %>
   <%= yield :submit_button %>
 <% else %>
-  <% unless request.referrer.present? && request.referrer.include?('financial_assistance/applications') and action_name == 'eligibility_results' %>
-    <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue' %>
-  <% end %>
+    <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue' unless (action_name == "eligibility_results") && (params.keys.exclude?"cur") %>
 <% end %>
 
 <ul class='list-unstyled list-right-section'>
