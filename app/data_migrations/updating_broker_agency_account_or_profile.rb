@@ -83,23 +83,18 @@ class UpdatingBrokerAgencyAccountOrProfile < MongoidMigrationTask
     return "org fein not found" if ENV['org_fein'].blank? && !Rails.env.test?
 
     feins = ENV['org_fein'].split(' ').uniq
-    puts "statement 1"
     writing_agent= BrokerRole.by_npn(ENV['npn']).first
-    puts "statement 2"
     broker_agency_profile= writing_agent.broker_agency_profile
-    puts "statement 3"
 
     if feins.present? && writing_agent.present? && broker_agency_profile.present?
       feins.each do |fein|
         org = Organization.where(:fein => fein).first
-        puts "statement 4"
         broker_agency_account = org.employer_profile.broker_agency_accounts.where(:is_active => true).first
         if broker_agency_account.present?
           broker_agency_account.update_attributes!(broker_agency_profile_id:broker_agency_profile.id, writing_agent_id:writing_agent.id)
           puts "broker_agency_profile and writing_agent updated for broker_agency_account" unless Rails.env.test?
         else
           puts "No broker_agency_account found for organization fein:#{fein}" if !Rails.env.test?  && broker_agency_account.blank?
-          puts "statement 5"
         end
       end
     else
