@@ -16,15 +16,20 @@ RSpec.describe IvlNotices::IvlRenewalNotice, :dbclean => :after_each do
                             :mpi_indicator => 'IVL_PRE_1',
                             :title => "Projected Eligibility Notice"})
                           }
+  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+  let!(:open_enrollment_start_on)    { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_start_on}
+  let!(:open_enrollment_end_on)      { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_end_on }
   let(:valid_parmas) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :person => person,
+      :open_enrollment_start_on => open_enrollment_start_on,
+      :open_enrollment_end_on => open_enrollment_end_on,
       :data => data
   }}
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
+
 
   describe "New" do
     before do
