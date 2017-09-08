@@ -321,11 +321,17 @@ var EmployerProfile = ( function( window, undefined ) {
     var target = $("tr."+type+'_'+ce_id);
     var cobra_date = target.find('input.date-picker').val();
     var cobra_link = target.find('a.cobra_confirm_submit').data('link');
+    var cobra_options = {};
+    $('input[name="cobra_options_is_cobra"]:checked').map(function(){
+       cobra_type = $(this).parent().parent().find("select[name='cobra_options_type']").val();
+       cobra_options[$(this).parent().find("[name='cobra_options_id']").val()] = cobra_type;
+    })
+    
     $.ajax({
       type: 'get',
       datatype : 'js',
       url: cobra_link,
-      data: {cobra_date: cobra_date},
+      data: {cobra_date: cobra_date, cobra_options: cobra_options},
     });
   }
 

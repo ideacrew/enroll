@@ -119,65 +119,46 @@
           </tr>
           <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td>
-               Bertrand baudelair 
+               <%= census_employee.full_name %>
             </td>
             <td>
-              <input type="checkbox">
+              <input name="cobra_options_is_cobra" type="checkbox">
+              <input type="hidden" name="cobra_options_id" data-dependent="false" value="<%= census_employee.id %>">
             </td>
             <td>
               <div class="container">
                 <div class="dropdown">
-                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Please Select
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                    <li><a href="#">Primary</a></li>
-                    <li><a href="#">Dependent</a></li>
-                    </ul>
+                  <select name="cobra_options_type" >
+                    <option value="primary">Primary</option>
+                    <option value="Dependent">Dependent</option>
+                  </select>
                 </div>
               </div>
             </td>
           </tr>
+          <%census_employee.census_dependents.each do |dependent| %>
           <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td>
-              Beatrice baudelaire 
+               <%= dependent.full_name %>
             </td>
             <td>
-              <input type="checkbox">
-            </td>
-            <td>
-              <div class="container">
-                <div class="dropdown">
-                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Please Select
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                    <li><a href="#">Primary</a></li>
-                    <li><a href="#">Dependent</a></li>
-                    </ul>
-                </div>
-              </div>
-            </td>
-          </tr>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td>
-              violet baudelaire
-            </td>
-            <td>
-              <input type="checkbox">
+              <input name="cobra_options_is_cobra" type="checkbox">
+              <input type="hidden" name="cobra_options_id" data-dependent="true" value="<%= dependent.id %>">
             </td>
             <td>
               <div class="container">
                 <div class="dropdown">
-                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Please Select
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu">
-                    <li><a href="#">Primary</a></li>
-                    <li><a href="#">Dependent</a></li>
-                    </ul>
+                  <select name="cobra_options_type">
+                    <% if ['spouse'].include?(dependent.employee_relationship.downcase) %>
+                      <option value="primary">Primary</option>
+                    <%end%>
+                    <option value="Dependent">Dependent</option>
+                  </select>
                 </div>
               </div>
             </td>
           </tr>
-
+          <%end%>
          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td class="col-md-6">
              COBRA/Continuation Effective Date:
@@ -201,10 +182,10 @@
               <span>Maximum COBRA/contination end date: 11/30/2018</span>
             </td>
           </tr>
-
-
            <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
             <td colspan="12">
+             <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
+                <strong>&nbsp;Cancel</strong>
               <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
                 <strong>&nbsp;Submit</strong>
               </a>
