@@ -129,7 +129,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
         if wells_fargo_sso.present?
           if wells_fargo_sso.token.present?
-            @wf_url = w.url
+            @wf_url = wells_fargo_sso.url
           end
         end
       when 'employees'
