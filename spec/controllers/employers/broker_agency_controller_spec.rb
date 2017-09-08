@@ -72,6 +72,8 @@ RSpec.describe Employers::BrokerAgencyController do
       it "should be a success" do
         expect(flash[:notice]).to eq("Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'.")
         expect(response).to redirect_to(employers_employer_profile_path(@employer_profile, tab:'brokers'))
+        expect(controller).to receive(:broker_hired_confirmation_notice)
+        controller.broker_hired_confirmation_notice
       end
     end
 

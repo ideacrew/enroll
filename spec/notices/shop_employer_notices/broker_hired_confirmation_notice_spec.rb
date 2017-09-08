@@ -78,4 +78,20 @@ RSpec.describe ShopEmployerNotices::BrokerHiredConfirmationNotice do
       expect(@employer_notice.notice.broker.organization).to eq organization.legal_name
     end
   end
+
+  describe "Rendering notice template and generate pdf" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::BrokerHiredConfirmationNotice.new(employer_profile, valid_params)
+    end
+    it "should render notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/broker_hired_confirmation_notice"
+    end
+    it "should generate pdf" do
+      @employer_notice.append_hbe
+      @employer_notice.build
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end
