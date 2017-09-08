@@ -52,10 +52,10 @@ $(function () {
     $("#qle-details .error-text").html(errorNotice);
   }
 
-  function get_qle_date() {
+  function get_qle_date(notice_gen = nil) {
     $.ajax({
       type: "GET",
-      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val()},
+      data:{date_val: $("#qle_date").val(), qle_id: $("#qle_id").val(), qle_reason_val: $("input:radio[name=reason]:checked").val(), notice_gen: notice_gen},
       url: "/insured/families/check_qle_date.js"
     });
   }
@@ -162,7 +162,7 @@ $(function () {
       $('#qle_date').removeClass('input-error');
 
       if(QLE.check_qle_reason()){
-        get_qle_date();
+        get_qle_date(true);
       }
     } else {
       $('#qle_date').addClass('input-error');
