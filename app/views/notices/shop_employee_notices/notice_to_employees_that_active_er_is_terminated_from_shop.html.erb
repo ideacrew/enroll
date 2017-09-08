@@ -47,9 +47,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                     ["By calling #{contact_center_phone_number}.","TTY: #{contact_center_tty_number}","Online at <a href = '#{site_main_web_address_url}'> #{site_website_name}</a>"] } %>
-
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You can also find more information on our website at <a href = '#{site_main_web_address_url}'> #{site_website_name}</a>"} %>   
+  
 <br>                                                                 
 
 <% if notice.broker.present? %>                                                                     
