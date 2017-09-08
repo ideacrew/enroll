@@ -15,7 +15,6 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
     {"kind"=>"pppppp", "amount"=>"23.5", "frequency_kind"=>"biweekly", "start_on"=>"09/09/2017", "end_on"=>"09/29/2017"}
   }
 
-
   before do
     sign_in(user)
   end
@@ -53,6 +52,7 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
         post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_valid_params
         expect(applicant.save).to eq true
       end
+
       it "should redirect to find_applicant_path when passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_valid_params, commit: "CONTINUE", last_step: true
         expect(response.headers['Location']).to have_content 'deductions'
@@ -60,15 +60,18 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
         expect(flash[:notice]).to match('Deduction Added')
         expect(response).to redirect_to(financial_assistance_application_applicant_deductions_path(application, applicant))
       end
+
       it "should not redirect to find_applicant_path when not passing params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_valid_params, commit: "CONTINUE"
         expect(response.status).to eq 200
       end
+
       it "should render workflow/step when we are not params last step" do
         post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_valid_params, commit: "CONTINUE"
         expect(response).to render_template 'workflow/step'
       end
     end
+
     it "should render step if model is not saved" do
       post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_invalid_params
       expect(flash[:error]).to match("Pppppp Is Not A Valid Deduction Type")
