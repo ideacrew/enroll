@@ -15,7 +15,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals =>
                                                   { content: "You recently applied to offer employer-sponsored health insurance through the #{site_short_name}.  Based on your failure to submit documentation sufficient to establish your eligibility and the information in the #{site_short_name} system, your application has been denied." }%>
 <%= render partial: 'notices/shared/paragraph', :locals =>
-                                                  { content: "This means that you are not eligible to offer employer-sponsored #{site_short_name} to your employees through the #{site_short_name} at this time." }%>
+                                                  { content: "This means that you are not eligible to offer employer-sponsored health insurance to your employees through the #{site_short_name} at this time." }%>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
     { sub_heading: 'In order to participate in the Heath Connector, regulations require:',
@@ -38,6 +38,13 @@
     </tr>
   </tbody>
 </table>
+
+<br>
+<br>
+
+<%= render partial: 'notices/shared/paragraph', :locals =>
+                                                  { content: "See 45 C.F.R 155.710(b) and 155.715(d) for more information." }%>
+
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
     { heading: 'For Questions or Assistance:',
