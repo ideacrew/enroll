@@ -805,16 +805,8 @@ class ConsumerRole
 
   #check if consumer notification job exists
   def send_consumer_notification(*args)
-    event_name=aasm.current_event
-    event_kind = ApplicationEventKind.where(:event_name => event_name).first
-    notice_trigger = event_kind.notice_triggers.first
-    builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
-              template: notice_trigger.notice_template,
-              subject: event_kind.title,
-              event_name: event_name,
-              mpi_indicator: notice_trigger.mpi_indicator,
-              }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
-    builder.deliver
+    event_name = aasm.current_event
+    IvlNoticesNotifierJob.perform_later(self.person.id.to_s , event_name)
   end
 
   def verification_attr(*authority)

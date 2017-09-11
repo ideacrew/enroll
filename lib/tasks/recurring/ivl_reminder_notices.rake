@@ -8,12 +8,12 @@ namespace :recurring do
      { 90 =>85, 85 => 70, 70 => 45 , 45 => 30}.each do |previous_days, reminder_days|
       puts "reminder_days #{reminder_days}" unless Rails.env.test?
   		families = Family.where({
-								  "households.hbx_enrollments" => {
-								    "$elemMatch" => {
-								      "aasm_state" => { "$in" => ["enrolled_contingent"] },
-								      "special_verification_period" => { "$lt"  => TimeKeeper.date_of_record + previous_days, "$gte" => TimeKeeper.date_of_record + reminder_days }
-								  } }
-								})
+			  "households.hbx_enrollments" => {
+				"$elemMatch" => {
+				"aasm_state" => { "$in" => ["enrolled_contingent"] },
+				"special_verification_period" => { "$lt"  => TimeKeeper.date_of_record + previous_days, "$gte" => TimeKeeper.date_of_record + reminder_days }
+				} }
+			})
       puts "families #{families.count}" unless Rails.env.test?
 			families.each do |family|
         puts "family.primary_applicant.person.consumer_role.present? #{family.primary_applicant.person.consumer_role.present?}" unless Rails.env.test?

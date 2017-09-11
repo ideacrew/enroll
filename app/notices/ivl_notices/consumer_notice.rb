@@ -39,17 +39,13 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
-      # @notice.primary_address = nil
       raise 'mailing address not present'
     end
-    # notice.due_date = consumer_role.hc.d
-    #notice.due_date = family.document_due_date(family_member, v_type)
     append_unverified_family_members
   end
 
   def append_unverified_family_members
     enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments)
-    #enrollments.select do |hbx_en|
     family = recipient.primary_family
     enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
@@ -59,7 +55,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
         )
     end
     enrollments.reject!{|e| e.coverage_terminated? }
-    # enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
     if enrollments.empty?
       raise 'enrollments not found!'
     end

@@ -7,7 +7,7 @@ describe 'recurring:ivl_reminder_notices', :dbclean => :around_each do
 	let(:person) {family.primary_applicant.person}
 	let(:consumer_role) {person.consumer_role}
 	before do 
-		allow(Family).to receive(:where).and_return([family])
+	allow(Family).to receive(:where).and_return([family])
     allow(family).to receive_message_chain(:enrollments,:order,:select,:first).and_return(hbx_enrollment)
     allow(hbx_enrollment).to receive(:special_verification_period).and_return(DateTime.now + 84.days)
     load File.expand_path("#{Rails.root}/lib/tasks/recurring/ivl_reminder_notices.rake", __FILE__)

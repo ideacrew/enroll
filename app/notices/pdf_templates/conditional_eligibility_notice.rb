@@ -131,7 +131,6 @@ module PdfTemplates
     end
 
     def aqhp_enrollments
-      puts enrollments.inspect
       enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
     end
 
