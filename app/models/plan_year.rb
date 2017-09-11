@@ -1049,10 +1049,12 @@ class PlanYear
   end
 
   def renewal_employee_enrollment_confirmation
-    if is_renewing?
+    begin
       self.employer_profile.census_employees.enrolled.each do |ce|
         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
       end
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver notice to census_employee #{ce.id} due to #{e}" }
     end
   end
 
