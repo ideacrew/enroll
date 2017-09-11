@@ -21,10 +21,13 @@ gem 'animate-rails', '~> 1.0.7'
 gem 'maskedinput-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'jquery-turbolinks'
-gem 'turbolinks'
+gem 'turbolinks','2.5.3'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
+
+# Background Jobs with Resque
+gem 'resque'
 
 # JS graph API
 # gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
@@ -50,6 +53,9 @@ gem 'mongo_session_store-rails4', '~> 6.0.0'
 
 ## Add field-level encryption
 # gem 'mongoid-encrypted-fields', '~> 1.3.3'
+
+#DEPRECATION WARNING: Kaminari Mongoid support has been extracted to a separate gem, and will be removed in the next 1.0 release.
+#gem 'kaminari-mongoid'
 gem 'symmetric-encryption', '~> 3.6.0'
 
 # Use ActiveModel has_secure_password
@@ -58,9 +64,6 @@ gem 'symmetric-encryption', '~> 3.6.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
-
-#For Background jobs
-gem 'resque'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
@@ -79,7 +82,7 @@ gem "pundit", '~> 1.0.1'
 # will provide fast group premium plan fetch
 gem 'redis-rails'
 
-gem 'kaminari'
+gem 'kaminari', '0.17.0'
 
 gem 'sprockets' , "~> 2.12.3"
 # for I18n
@@ -106,6 +109,9 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
+
+# Httparty
+gem 'httparty'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

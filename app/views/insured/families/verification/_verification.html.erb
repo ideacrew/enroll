@@ -3,10 +3,10 @@
     <h4>
       <% if can_show_due_date?(@person) %>
           Document Due Date:&nbsp;&nbsp;
-          <% if @person.primary_family.min_verification_due_date_on_family <= TimeKeeper.date_of_record %>
+          <% if (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) <= TimeKeeper.date_of_record %>
               <span class="label label-danger"><%= @person.primary_family.min_verification_due_date_on_family %> (Past Due)</span>
           <% else %>
-              <span class="label label-warning"><%= @person.primary_family.min_verification_due_date_on_family %></span>
+              <span class="label label-warning"><%= (@person.primary_family.min_verification_due_date || TimeKeeper.date_of_record + 95.days) %></span>
           <% end %>
       <% end %>
     </h4>
@@ -30,21 +30,23 @@
                     <%= v_type %>
                   </div>
                   <div class="v-type-status col-md-2">
-                    <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
-                      <%= show_v_type(v_type, person) %>
-                    </span>&nbsp;
-                    <%= pundit_span Family, :updateable? %>
+                    <% if f_member.is_applying_coverage %>
+                      <span class="label lb-md label-<%=verification_type_class(v_type, person, current_user.has_hbx_staff_role?)%>">
+                        <%= show_v_type(v_type, person, current_user.has_hbx_staff_role?) %>
+                      </span>&nbsp;
+                        <%= pundit_span Family, :updateable? %>
+                    <% end %>
                   </div>
 
                   <div class="v-type-due-date col-md-3">
                     <% if can_show_due_date?(@person, f_member: f_member, v_type: v_type) %>
                       <span class="text-danger">Due Date:</span>
-                      <%= f_member.family.document_due_date(f_member, v_type).to_date %>
+                      <%= f_member.family.document_due_date(f_member, v_type).present? ? f_member.family.document_due_date(f_member, v_type).to_date : TimeKeeper.date_of_record + 95.days %>
                     <% end %>
                   </div>
 
                   <div class="v-type-upload col-md-3">
-                    <% if type_unverified?(v_type, person) %>
+                    <% if type_unverified?(v_type, person) && f_member.is_applying_coverage %>
                       <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                         <span class="btn btn-default btn-file">
                           <i class="fa fa-upload" aria-hidden="true"></i>
@@ -104,8 +106,6 @@
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) %>
       <%= link_to "Complete Verification for Enrollment", enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: 'Click OK if you would like confirm verification for this family.' } %>
-    <% elsif show_send_button_for_consumer? %>
-      <%= link_to "Send documents for review", enrollment_docs_state_documents_path(:person_id => @person.id), class: "btn btn-success btn-sm", method: :put, data: { confirm: 'Click OK if you would like to send all your documents for review.' } %>
     <% end %>
   </div>
   <div class="col-xs-6">
