@@ -13,10 +13,9 @@ class ShopEnrollmentDataUpdate < MongoidMigrationTask
     # SHOP Enrollments should be transitioned from the Canceled state to the Termination_Pending if coverage end date is in the future, otherwise they should be transitioned to Terminated state.
 
     require 'csv'
-    families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
+    families=Family.by_enrollment_shop_market.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
     families.each do |family|
       begin
-        families=Family.by_enrollment_shop_market.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
         families.each do |family|
           enrollments=family.active_household.hbx_enrollments
           if enrollments.size >= 2
@@ -27,7 +26,7 @@ class ShopEnrollmentDataUpdate < MongoidMigrationTask
 
               if other_enrollments.size>0
                 canceled_enrollments.each do |canceled_enrollment|
-                  if canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
+                  if canceled_enrollment.kind  && canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
                     kind = canceled_enrollment.kind
                     person= canceled_enrollment.subscriber.person
                     effective = canceled_enrollment.effective_on
@@ -51,3 +50,5 @@ class ShopEnrollmentDataUpdate < MongoidMigrationTask
     end
   end
 end
+
+
