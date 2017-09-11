@@ -11,25 +11,28 @@ module WellsFargo
   module BillPay
     class SingleSignOn
 
+
+      #TODO Move this to config/init files
       API_URL = "https://demo.e-billexpress.com:443/PayIQ/Api/SSO"
       API_KEY = "e2dab122-114a-43a3-aaf5-78caafbbec02"
-      COMPANY_NAME = "DCHBX"
       BILLER_KEY = "3741"
-      EMAIL = "antonio.schaffert@dc.gov"
       SECRET = "dchbx 2017"
       API_VERSION = "3000"
       PRIVATE_KEY_LOCATION = "/wfpk.pem" #TEMP
+      DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.0000000%z"
 
-      def initialize(reference_number, external_id)
+      def initialize(reference_number, external_id, company_name, email)
          @reference_number = reference_number
          @external_id = external_id
+         @company_name = company_name
+         @email = email
       end
 
       def token
 
         return @token if defined? @token
 
-        @creation_date = Time.now.strftime("%Y-%m-%dT%H:%M:%S.0000000%z")
+        @creation_date = Time.now.strftime(DATE_FORMAT)
         private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION))
 
         message = SECRET + @creation_date
@@ -41,14 +44,14 @@ module WellsFargo
         request.set_form_data(
           "APIKey" => API_KEY,
           "ReferenceNumber" => @reference_number,
-          "NameCompany" => COMPANY_NAME,
+          "NameCompany" => @company_name,
           "APIVersion" => API_VERSION,
-          "OtherData" => "Other",
+          "OtherData" => @reference_number,
           "Role" => "SSOCustomer",
           "ExternalID" => @external_id,
           "CreationDate" => @creation_date,
           "BillerKey" => BILLER_KEY,
-          "Email" => EMAIL,
+          "Email" => @email,
           "Signature" => Base64.strict_encode64(signature)
         )
 
