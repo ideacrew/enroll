@@ -973,6 +973,34 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
+  def create_cobra_dependent(employee, cobra_options,cobra_begin_date)
+    primary_cobra = cobra_options.detect{|id,dependency_type| dependency_type == 'primary'}
+    primar_cobra_dependent = employee.census_dependent_find(primary_cobra.first)
+    cobra_options.delete(primary_cobra.first)
+    if primar_cobra_dependent 
+      cobra_dependent= CensusEmployee.create!(aasm_state: CensusEmployee::COBRA_DEPENDENT,
+                                             employer_profile_id: self.id,
+                                             encrypted_ssn: primar_cobra_dependent.encrypted_ssn,
+                                             first_name: primar_cobra_dependent.first_name,
+                                             last_name: primar_cobra_dependent.last_name,
+                                             dob: primar_cobra_dependent.dob,
+                                             gender: primar_cobra_dependent.gender,
+                                             cobra_begin_date: cobra_begin_date,
+                                             hired_on: TimeKeeper.date_of_record)
+      
+      cobra_options.each do |id,dependency_type|
+        cobra_record = employee.census_dependent_find(id)
+        cobra_dependent.census_dependents << CensusDependent.new( first_name: cobra_record.first_name,
+                                                                  last_name: cobra_record.last_name,
+                                                                  name_sfx: cobra_record.name_sfx,
+                                                                  dob: cobra_record.dob,
+                                                                  gender: cobra_record.gender,
+                                                                  encrypted_ssn: cobra_record.encrypted_ssn,
+                                                                  employee_relationship:cobra_record.employee_relationship)
+      end
+    end
+  end
+
 private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)

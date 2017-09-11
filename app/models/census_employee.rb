@@ -10,12 +10,13 @@ class CensusEmployee < CensusMember
 
   require 'roo'
 
-  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
+  EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending cobra_dependent)
   EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated rehired cobra_terminated)
   NEWLY_DESIGNATED_STATES = %w(newly_designated_eligible newly_designated_linked)
   LINKED_STATES = %w(employee_role_linked newly_designated_linked cobra_linked)
-  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending)
+  ELIGIBLE_STATES = %w(eligible newly_designated_eligible cobra_eligible employee_termination_pending cobra_termination_pending cobra_dependent)
   COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
+  COBRA_DEPENDENT = "cobra_dependent"
   PENDING_STATES = %w(employee_termination_pending cobra_termination_pending)
 
   EMPLOYEE_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.terminated"
@@ -409,6 +410,10 @@ class CensusEmployee < CensusMember
     logger.error(e)
   end
 
+  def census_dependent_find(id)
+    self.census_dependents.detect{|cd| cd.id.to_s == id}
+  end
+
   class << self
 
     def enrolled_count(benefit_group)
@@ -577,11 +582,11 @@ class CensusEmployee < CensusMember
 
   aasm do
     state :eligible, initial: true
+    state :cobra_dependent, initial: true
     state :cobra_eligible
     state :newly_designated_eligible    # congressional employee state with certain new hire rules
     state :employee_role_linked
     state :cobra_linked
-    state :cobra_dependent
     state :employment_terminated_with_cobra_dependent
     state :newly_designated_linked
     state :cobra_termination_pending

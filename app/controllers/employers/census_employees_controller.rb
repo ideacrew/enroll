@@ -187,6 +187,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def cobra
     cobra_date = params["cobra_date"]
+    cobra_options = params["cobra_options"]
     if cobra_date.present?
       @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
     else
@@ -194,10 +195,18 @@ class Employers::CensusEmployeesController < ApplicationController
     end
 
     if @cobra_date.present? && @census_employee.can_elect_cobra?
-      if @census_employee.update_for_cobra(@cobra_date, current_user)
-        flash[:notice] = "Successfully update Census Employee."
-      else
-        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+      if census_employee_is_cobra_primary 
+        if @census_employee.update_for_cobra(@cobra_date, current_user)
+          flash[:notice] = "Successfully update Census Employee."
+        else
+          flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
+        end
+      elsif census_employee_spouse_is_cobra_primary
+        if @employer_profile.create_cobra_dependent(@census_employee, cobra_options, cobra_date)
+          flash[:notice] = "Successfully created cobra dependent."
+        else
+          flash[:error] = "Unable to create cobra dependent."
+        end
       end
     else
       flash[:error] = "Please enter cobra date."
@@ -255,6 +264,14 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   private
+
+  def census_employee_is_cobra_primary
+    params["cobra_options"].detect{|id,dependency_type| id == @census_employee.id.to_s}
+  end
+
+  def census_employee_spouse_is_cobra_primary
+    params["cobra_options"].detect{|id,dependency_type| @census_employee.census_dependent_find(id) && dependency_type.downcase == "primary"}
+  end
 
   def updateable?
     authorize ::EmployerProfile, :updateable?
