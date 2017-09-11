@@ -266,6 +266,17 @@ class EmployerProfile
     renewing_published_plan_year || active_plan_year || published_plan_year
   end
 
+  def active_or_published_plan_year
+     published_plan_year
+  end
+
+  def active_and_renewing_published
+    result = []
+    result <<active_plan_year  if active_plan_year.present? 
+    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
+    result
+  end
+
   def dt_display_plan_year
     plan_years.where(:aasm_state.ne => "canceled").order_by(:"start_on".desc).first || latest_plan_year
   end
@@ -975,6 +986,20 @@ class EmployerProfile
     org = Organization.where(hbx_id: an_hbx_id, employer_profile: {"$exists" => true})
     return nil unless org.any?
     org.first.employer_profile
+  end
+
+  def is_conversion?
+    self.profile_source == "conversion"
+  end
+
+  def generate_and_deliver_checkbook_urls_for_employees
+    census_employees.each do |census_employee|
+      census_employee.generate_and_deliver_checkbook_url
+    end
+  end
+
+  def generate_checkbook_notices
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "out_of_pocker_url_notifier")
   end
 
   def trigger_notices(event)
