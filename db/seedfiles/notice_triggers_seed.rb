@@ -786,17 +786,17 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
-    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    hbx_id: 'IVL_PRE_1',
+    title: 'Update your information at DC Health Link by October 15',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'ivl_renewal_notice_1',
+    event_name: 'projected_eligibility_notice_1',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::IvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR1',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -808,17 +808,17 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
+    hbx_id: 'IVL_PRE_2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'ivl_renewal_notice_1_second_batch',
+    event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr1_notice_second_batch_without_ea_data',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::IvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR1B',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -838,9 +838,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR2',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -860,9 +860,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR3',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -882,9 +882,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR4',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -979,47 +979,110 @@ ivl_notice_triggers = [
     ]
   },
   {
-     hbx_id: 'DB0048',
-     title: 'You have been Hired as a Broker',
-     description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
-     resource_name: 'broker_role',
-     event_name: 'broker_hired',
-     notice_triggers: [
-       {
-         name: 'Broker Hired',
-         notice_template: 'notices/shop_broker_notices/broker_hired_notice',
-         notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
-         mpi_indicator: 'SHOP_DB0048',
-         notice_trigger_element_group: {
-           market_places: ['shop'],
-           primary_recipients: ["broker"],
-           primary_recipient_delivery_method: ["secure_message"],
-           secondary_recipients: []
-          }
+    hbx_id: 'IVL_ELA',
+    title: 'ACTION REQUIRED - HEALTH COVERAGE ELIGIBILITY',
+    description: 'Notice will be sent to all the individuals eligible for coverage through DC Health Link',
+    resource_name: 'consumer_role',
+    event_name: 'eligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Eligibilty Notice',
+        notice_template: 'notices/ivl/eligibility_notice',
+        notice_builder: 'IvlNotices::EligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_ELA',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
         }
-      ]
-    },
-    {
-     hbx_id: 'DY0047',
-     title: 'You have been Hired as their Broker Agency',
-     description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
-     resource_name: 'broker_role',
-     event_name: 'broker_agency_hired',
-     notice_triggers: [
-       {
-         name: 'Broker Agency Hired',
-         notice_template: 'notices/shop_broker_notices/broker_agency_hired_notice',
-         notice_builder: 'ShopBrokerNotices::BrokerAgencyHiredNotice',
-         mpi_indicator: 'SHOP_DY0047',
-         notice_trigger_element_group: {
-           market_places: ['shop'],
-           primary_recipients: ["broker"],
-           primary_recipient_delivery_method: ["secure_message"],
-           secondary_recipients: []
-          }
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_NEL',
+    title: 'IMPORTANT NOTICE - INELIGIBLE FOR COVERAGE THROUGH DC HEALTH LINK',
+    description: 'Notice will be sent to the household if everyone in the household is ineligible',
+    resource_name: 'consumer_role',
+    event_name: 'ineligibility_notice',
+    notice_triggers: [
+      {
+        name: 'Ineligibilty Notice',
+        notice_template: 'notices/ivl/ineligibility_notice',
+        notice_builder: 'IvlNotices::IneligibilityNoticeBuilder',
+        mpi_indicator: 'IVL_NEL',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
         }
-      ]
-    },
+      }
+    ]
+  },
+  {
+    hbx_id: 'IVL_ENR',
+    title: 'Enrollment notice',
+    description: 'Notice will be sent to families after their enrollment is done.',
+    resource_name: 'consumer_role',
+    event_name: 'enrollment_notice',
+    notice_triggers: [
+      {
+        name: 'Enrollment Notice',
+        notice_template: 'notices/ivl/enrollment_notice',
+        notice_builder: 'IvlNotices::EnrollmentNoticeBuilder',
+        mpi_indicator: 'IVL_ENR',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DB0048',
+    title: 'You have been Hired as a Broker',
+    description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+    resource_name: 'broker_role',
+    event_name: 'broker_hired',
+    notice_triggers: [
+      {
+        name: 'Broker Hired',
+        notice_template: 'notices/shop_broker_notices/broker_hired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerHiredNotice',
+        mpi_indicator: 'SHOP_DB0048',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["broker"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
+    hbx_id: 'DY0047',
+    title: 'You have been Hired as their Broker Agency',
+    description: "When a Broker Agency is hired by an employer, they receive this notification letting them know they have a new client assigned to them.",
+    resource_name: 'broker_role',
+    event_name: 'broker_agency_hired',
+    notice_triggers: [
+      {
+        name: 'Broker Agency Hired',
+        notice_template: 'notices/shop_broker_notices/broker_agency_hired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerAgencyHiredNotice',
+        mpi_indicator: 'SHOP_DY0047',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["broker"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 shop_notice_triggers.each do |trigger_params|
