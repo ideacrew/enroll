@@ -434,7 +434,7 @@ shop_notice_triggers = [
 
    {
     hbx_id: 'SHOP26',
-    title: 'Action Required to complete Employer Application',
+    title: 'Action Required to Complete Health Connector Application',
     description: 'All the initial employers with draft plan years will be notified to publish their plan year 2 days prior to soft deadline of 1st.',
     resource_name: 'employer',
     event_name: 'initial_employer_first_reminder_to_publish_plan_year',
