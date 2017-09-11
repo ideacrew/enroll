@@ -146,9 +146,8 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
     
-    if (@qualified_date) == false && params[:qle_id].present? && params[:notice_gen] == "true"
+    if (@qualified_date) == false && params[:qle_id].present?
       sep_request_denial_notice
-      params[:notice_gen] = false
     end
   end
 
