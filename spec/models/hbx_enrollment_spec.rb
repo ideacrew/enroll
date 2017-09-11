@@ -2608,28 +2608,4 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
-  describe HbxEnrollment, dbclean: :after_all do
-   let(:person) { FactoryGirl.create(:person) }
-   let(:employee_role) { FactoryGirl.create(:employee_role, person: person, employer_profile: organization.employer_profile)}
-   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-   let(:organization) { FactoryGirl.create(:organization, :with_active_and_renewal_plan_years)}
-   let(:census_employee) {FactoryGirl.create(:census_employee)}
-   let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment,
-                          household: family.active_household,
-                          kind: "employer_sponsored",
-                          employee_role_id: employee_role.id,
-                          enrollment_kind: "special_enrollment",
-                          aasm_state: 'coverage_selected') }
-   context 'trigger employee terminate coverage notice' do
-     before do
-       hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_month + 2.month, aasm_state: 'coverage_termination_pending')
-       allow(hbx_enrollment).to receive(:census_employee).and_return(census_employee)
-     end
-     it "trigger when employee terminate coverage" do
-       expect(hbx_enrollment.aasm_state).to eq 'coverage_termination_pending'
-       expect(hbx_enrollment).to receive(:notify_employee_confirming_coverage_termination)
-       hbx_enrollment.notify_employee_confirming_coverage_termination
-     end
-   end
  end 
-end
