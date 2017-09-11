@@ -94,6 +94,10 @@ class IvlNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'dchl_rights.pdf')]
   end
 
+  def attach_voter_application
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'voter_application.pdf')]
+  end
+
   def attach_taglines
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
   end
@@ -134,6 +138,10 @@ class IvlNotice < Notice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def check(value)
+    (value.try(:upcase) == "YES") ? true : false
   end
 
   def capitalize_quadrant(address_line)
