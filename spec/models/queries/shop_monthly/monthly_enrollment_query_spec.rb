@@ -33,7 +33,8 @@ describe "a monthly shop enrollment query" do
       }
 
       let!(:enrollment_1) {
-        create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A, submitted_at: effective_on - 20.days) 
+        create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
+                            submitted_at: employee_A.census_employee.active_benefit_group_assignment.plan_year.open_enrollment_end_on - 10.day) 
       }
 
       let(:employee_B) {
@@ -67,7 +68,8 @@ describe "a monthly shop enrollment query" do
       }
 
       let!(:enrollment_7) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: effective_on - 22.days)
+        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C,
+                            submitted_at: employee_A.census_employee.active_benefit_group_assignment.plan_year.open_enrollment_end_on - 1.day)
       }
 
       let(:feins) {
