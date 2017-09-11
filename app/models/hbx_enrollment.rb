@@ -1222,7 +1222,7 @@ class HbxEnrollment
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing,
                          :enrolled_contingent, :coverage_enrolled],
-                    to: :coverage_termination_pending, after: [:set_coverage_termination_date, :notify_employee_confirming_coverage_termination]
+                    to: :coverage_termination_pending, after: [:set_coverage_termination_date]
 
       transitions from: [:renewing_waived, :inactive], to: :inactive
     end
@@ -1453,18 +1453,6 @@ class HbxEnrollment
     end
   end
 
-  def notify_employee_confirming_coverage_termination
-    if is_shop? && self.census_employee.present?
-      if self.coverage_kind == "health"
-        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
-      elsif self.coverage_kind != "health"
-        ShopNoticesNotifierJob.perform_later(self.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-      else self.coverage_kind != "health" && self.coverage_kind != "dental"
-        # ShopNoticesNotifierJob.perform(self.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-      end
-    end
-  end
-  
 
   private
 
