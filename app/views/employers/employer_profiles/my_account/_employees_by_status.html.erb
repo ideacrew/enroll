@@ -160,8 +160,8 @@
           </tr>
           <%end%>
          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="col-md-6">
-             COBRA/Continuation Effective Date:
+            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
+              <%=cobra_effective_date(census_employee) %>
             </td>
             <td class="col-md-6">
             <input name='name' value="" type="text" class="form-control date-picker col-md-2"
