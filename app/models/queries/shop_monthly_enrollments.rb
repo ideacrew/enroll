@@ -140,13 +140,13 @@ module Queries
         if employer.present?
           plan_years = employer.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE + ['expired'])
           plan_year = plan_years.where(:start_on => effective_on || @effective_on).first
-        end 
+        end
 
         if plan_year.blank? || plan_year.external_plan_year?
           id_list
         else
           id_list += plan_year.benefit_groups.map(&:id)
-        end     
+        end
       end
     end
 
