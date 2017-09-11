@@ -12,7 +12,7 @@ RSpec.describe ShopBrokerNotices::BrokerAgencyHiredNotice do
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Broker Agency Hired',
-                            :notice_template => 'notices/shop_broker_notices/broker_agency_hired_notice.html.erb',
+                            :notice_template => 'notices/shop_broker_notices/broker_agency_hired_notice',
                             :notice_builder => 'ShopBrokerNotices::BrokerAgencyHiredNotice',
                             :event_name => 'broker_agency_hired',
                             :mpi_indicator => 'SHOP_DY0047',
@@ -64,7 +64,26 @@ RSpec.describe ShopBrokerNotices::BrokerAgencyHiredNotice do
       expect(@broker_notice.notice.employer.employer_last_name).to eq employer_profile.staff_roles.first.last_name
     end
     it "should return employer phone" do
-      expect(@broker_notice.notice.employer.employer_phone).to eq broker_agency_profile.phone
+      expect(@broker_notice.notice.employer.employer_phone).to eq employer_profile.staff_roles.first.work_phone_or_best
+    end
+  end
+
+  describe "Rendering broker_agency_hired template" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      allow(employer_profile).to receive(:broker_agency_profile).and_return(broker_agency_profile)
+      allow(employer_profile).to receive_message_chain("broker_agency_accounts.detect").and_return(broker_agency_account)
+      @broker_notice = ShopBrokerNotices::BrokerAgencyHiredNotice.new(employer_profile, valid_parmas)
+    end
+
+    it "should render broker_agency_hired" do
+      expect(@broker_notice.template).to eq "notices/shop_broker_notices/broker_agency_hired_notice"
+    end
+
+    it "should generate pdf" do
+      @broker_notice.build
+      file = @broker_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
   

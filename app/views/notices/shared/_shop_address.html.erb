@@ -26,12 +26,12 @@
       <td style="text-align: right;">Notice No: <%= notice.mpi_indicator %></td>
     <% end %>
     </tr>
-    <% if (notice.primary_address.street_2.blank? || (notice.shop? && !notice.employee_notice?) == false) %>
+    <% if (notice.primary_address.street_2.blank? || (notice.shop? && !notice.employee_notice? && !notice.broker?) == false) %>
     <tr>
       <td><br></td>
     </tr>
     <% end %>
-    <% if (notice.shop? && !notice.employee_notice?) == false %>
+    <% if (notice.shop? && !notice.employee_notice? && !notice.broker?) == false %>
     <tr>
       <td><br></td>
     </tr>

@@ -24,7 +24,6 @@ class ShopBrokerNotices::BrokerAgencyHiredNotice < ShopBrokerNotice
     non_discrimination_attachment
     attach_envelope
     upload_and_send_secure_message
-    send_generic_notice_alert
   end
 
   def build
