@@ -7,7 +7,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
   let(:end_on) { Date.new(calender_year+1, 4, 30) }
   let(:open_enrollment_start_on) { Date.new(calender_year, 4, 1) }
   let(:open_enrollment_end_on) { Date.new(calender_year, 4, 10) }
-  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
+  let!(:active_plan_year) { FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: "renewing_enrolling", start_on: start_on, end_on: end_on, open_enrollment_start_on: open_enrollment_start_on, open_enrollment_end_on: open_enrollment_end_on}
   let(:person){ create :person}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'PlanYear Renewal',
@@ -63,21 +63,12 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
       @employer_notice = ShopEmployerNotices::RenewalEmployerEligibilityNotice.new(employer_profile, valid_parmas)
       @employer_notice.build_plan_year
     end
- 
-    it "should append employer active_plan_year " do
-      expect(employer_profile.active_plan_year).to eq active_plan_year
-    end  
+
     it "should append open enrollment start on info" do  
       expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq active_plan_year.open_enrollment_start_on
     end
     it "should append open enrollment end on info" do 
       expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq active_plan_year.open_enrollment_end_on
-    end
-    it "should append plan year start on info" do  
-      expect(@employer_notice.notice.plan_year.start_on).to eq active_plan_year.start_on
-    end  
-    it "should append plan year end on info" do
-      expect(@employer_notice.notice.plan_year.end_on).to eq active_plan_year.end_on
     end
   end 
 
