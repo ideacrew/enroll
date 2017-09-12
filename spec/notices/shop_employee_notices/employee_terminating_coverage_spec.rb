@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverage, :dbclean => :after_each do
+
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
   let!(:person){ create :person}
@@ -29,6 +30,8 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverage, :dbclean => :af
         :event_name => application_event.event_name,
         :template => application_event.notice_template
     }}
+
+let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household, aasm_state:'coverage_termination_selected')}
 
 describe "New" do
     before do
@@ -65,10 +68,12 @@ describe "Build" do
   end
 
 describe "append data" do
+
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
 
     it "should append data" do
@@ -81,7 +86,8 @@ describe "Rendering terminating_coverage_notice template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
     it "should render terminating_coverage_notice" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_coverage"

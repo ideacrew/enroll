@@ -393,6 +393,7 @@ end
     let(:census_employee) {FactoryGirl.create(:census_employee)}
     it "should trigger notify_employee_confirming_coverage_termination job in queue" do
       allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:coverage_kind).and_return("health")
       allow(enrollment).to receive(:enrollment_kind).and_return('health')
       allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
       allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
