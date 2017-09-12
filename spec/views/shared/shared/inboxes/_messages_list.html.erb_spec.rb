@@ -9,8 +9,8 @@ describe "shared/inboxes/_message_list.html.erb" do
      }
     end
 
-  let(:message_1) { instance_double(Message, {:id => "11111", :created_at=>DateTime.new(2016,1,10)}.merge(shared_message_properties)) }
-  let(:message_2) { instance_double(Message, {:id => "22222", :created_at=>DateTime.new(2016,11,1)}.merge(shared_message_properties)) }
+  let(:message_1) { instance_double(Message, {:id => "11111", :created_at=>Time.new(2016,1,10)}.merge(shared_message_properties)) }
+  let(:message_2) { instance_double(Message, {:id => "22222", :created_at=>Time.new(2016,11,1)}.merge(shared_message_properties)) }
   let(:mock_inbox) { instance_double(Inbox, {:messages => [message_1, message_2], :unread_messages => [message_1, message_2]}) }
   let(:mock_provider) { instance_double(EmployerProfile,{:id => "12345", :model_name => EmployerProfile, :inbox => mock_inbox} ) }
   before :each do
