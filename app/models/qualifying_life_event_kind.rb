@@ -171,6 +171,10 @@ class QualifyingLifeEventKind
     %w(birth adoption marriage divorce domestic_partnership).include? reason
   end
 
+  def is_loss_of_other_coverage?
+    reason == "lost_access_to_mec"
+  end
+
   class << self
     def shop_market_events
       where(:market_kind => "shop").and(:is_self_attested.ne => false).active.to_a

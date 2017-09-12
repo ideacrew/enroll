@@ -180,34 +180,23 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
           context "and termination is outside open enrollment" do
             let(:compare_date)                  { (benefit_coverage_period.start_on + 3.months).beginning_of_month }
-            let(:equalToTerminationMinimum)     { compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum }
-            let(:lessThanTerminationMinimum)    { ((compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum) - 1.day) }
-            let(:greaterThanTerminationMinimum) { ((compare_date + HbxProfile::IndividualEnrollmentTerminationMinimum) + 1.day) }
 
             before :each do
               TimeKeeper.set_date_of_record_unprotected!(compare_date)
             end
 
-            it "termination date should be set to (today + TerminationMinumum days) if selected date is less than (today + TerminationMinumum days)" do
-              expect(benefit_coverage_period.termination_effective_on_for(lessThanTerminationMinimum)).to eq(equalToTerminationMinimum)
+            it "termination date should be set to today if selected date is today " do
+              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record)).to eq(TimeKeeper.date_of_record)
             end
 
-            it "termination date should be set to the date selected if selected date is equal to (today + TerminationMinumum days)" do
-              expect(benefit_coverage_period.termination_effective_on_for(equalToTerminationMinimum)).to eq(equalToTerminationMinimum)
+            it "termination date should be set to the date selected if selected date is greater than today" do
+              expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record+7.day)).to eq(TimeKeeper.date_of_record+7.day)
             end
 
-            it "termination date should be set to the date selected if selected date is greater than (today + TerminationMinumum days)" do
-              expect(benefit_coverage_period.termination_effective_on_for(greaterThanTerminationMinimum)).to eq(greaterThanTerminationMinimum)
-            end
-
-            context "and the effective date would " do
-              let(:termination_minimum)  { HbxProfile::IndividualEnrollmentTerminationMinimum }
-              let(:late_date)            { ((benefit_coverage_period.end_on - termination_minimum) + 1.day) }
-
-              before { TimeKeeper.set_date_of_record_unprotected!(late_date) }                
+            context "and the effective date would " do               
 
               it "termination date should be set to end_on date" do
-                expect(benefit_coverage_period.termination_effective_on_for(late_date)).to eq benefit_coverage_period.end_on
+                expect(benefit_coverage_period.termination_effective_on_for(TimeKeeper.date_of_record.next_year)).to eq benefit_coverage_period.end_on
               end
 
             end

@@ -11,6 +11,8 @@ describe ChangeEnrollmentDetails do
       term_enrollment.terminated_on
     when "termination_submitted_on"
       term_enrollment.termination_submitted_on
+    when "termination_submitted_on"
+      term_enrollment.generate_hbx_signature
     end
   end
 
@@ -101,6 +103,20 @@ describe ChangeEnrollmentDetails do
 
       it "should cancel the enrollment" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+    end
+
+    context "generate_hbx_signature" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "generate_hbx_signature"
+        hbx_enrollment.update_attribute(:enrollment_signature, "")
+      end
+
+      it "should have a enrollment_signature" do
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
       end
     end
   end
