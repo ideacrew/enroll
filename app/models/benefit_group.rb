@@ -360,14 +360,12 @@ class BenefitGroup
       estimate_composite_rates
     end
     targeted_census_employees.active.collect do |ce|
-      if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce))
+      pcd = if is_congress
+        PlanCostDecoratorCongress.new(plan, member_provider, self)
+      elsif self.sole_source? && (!plan.dental?)
+        CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        if plan.coverage_kind == 'dental'
-          pcd = PlanCostDecorator.new(plan, ce, self, dental_reference_plan)
-        else
-          pcd = PlanCostDecorator.new(plan, ce, self, reference_plan)
-        end
+        PlanCostDecorator.new(plan, ce, self, reference_plan)
       end
       pcd.total_employer_contribution
     end.sum
