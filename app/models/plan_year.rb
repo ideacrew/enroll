@@ -800,7 +800,7 @@ class PlanYear
     event :advance_date, :after => :record_transition do
       transitions from: :enrolled,  to: :active,                  :guard  => :is_event_date_valid?
       transitions from: :published, to: :enrolling,               :guard  => :is_event_date_valid?
-      transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :initial_employee_plan_selection_confirmation
+      transitions from: :enrolling, to: :enrolled,                :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
       transitions from: :enrolling, to: :application_ineligible,  :guard => :is_open_enrollment_closed?, :after => [:initial_employer_ineligibility_notice, :notify_employee_of_initial_employer_ineligibility]
       # transitions from: :enrolling, to: :canceled,  :guard  => :is_open_enrollment_closed?, :after => :deny_enrollment  # Talk to Dan
 
@@ -1096,17 +1096,6 @@ class PlanYear
   def employer_renewal_eligibility_denial_notice
     if application_eligibility_warnings.include?(:primary_office_location)
       ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
-    end
-  end
-
-  def initial_employee_plan_selection_confirmation
-    return true if (benefit_groups.any?{|bg| bg.is_congress?})
-    self.employer_profile.census_employees.non_terminated.each do |ce|
-      begin
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
-      rescue Exception => e
-        puts "Unable to send Employee Open Enrollment begin notice to #{ce.full_name}" unless Rails.env.test?
-      end
     end
   end
 
