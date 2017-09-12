@@ -15,19 +15,5 @@ module Parsers::Xml::Cv
     # element :is_active, Boolean
     # element :created_at, DateTime
 
-    # def to_hash
-    #   {
-    #     id: id,
-    #     primary_applicant_id: primary_applicant_id,
-    #     allocated_aptcs: allocated_aptcs.map(&:to_hash),
-    #     tax_household_members: tax_household_members.map(&:to_hash),
-    #     tax_household_size: tax_household_size,
-    #     eligibility_determinations: eligibility_determinations.map(&:to_hash),
-    #     start_date: start_date,
-    #     submitted_at: submitted_at,
-    #     is_active: is_active,
-    #     created_at: created_at
-    #   }
-    # end
   end
 end
