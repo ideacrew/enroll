@@ -41,10 +41,4 @@ describe "HavenVerifiedFamilyParser" do
       expect(subject.primary_family_member_id).to eq primary_family_member_id.text.strip
     end
   end
-
-  context "verified member family to hash" do
-    # it 'should return the elements as a hash' do
-    #   # expect(subject.to_hash).to include(:integrated_case_id, :family_members, :primary_family_member_id, :households, :e_case_id, :fin_app_id, :haven_app_id)
-    # end
-  end
 end
