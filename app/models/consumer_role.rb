@@ -748,12 +748,4 @@ class ConsumerRole
                     :vlp_authority => authority
                    })
   end
-
-  def income_verification_present?
-    assisted_verification_documents.where(kind: 'Income').present?
-  end
-
-  def mec_verification_present?
-    assisted_verification_documents.where(kind: 'MEC').present?
-  end
 end
