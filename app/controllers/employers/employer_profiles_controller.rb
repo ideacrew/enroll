@@ -293,8 +293,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def employer_account_creation_notice
     begin
       ShopNoticesNotifierJob.perform_later(@organization.employer_profile.id.to_s, "employer_account_creation_notice")
-      rescue Exception => e
-      puts "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" unless Rails.env.test?
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver Employer Notice to #{@organization.employer_profile.legal_name} due to #{e}" }
     end
   end
 
