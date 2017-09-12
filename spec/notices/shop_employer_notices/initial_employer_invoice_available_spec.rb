@@ -68,4 +68,22 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
     end
   end
 
+  describe "#generate_pdf_notice" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+    end
+
+    it "should render the template" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_invoice_available_notice"
+    end
+
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
+
 end
