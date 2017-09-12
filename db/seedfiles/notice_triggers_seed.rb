@@ -779,6 +779,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP10066',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
+    resource_name: 'employee_role',
+    event_name: 'ee_plan_selection_confirmation_sep_new_hire',
+    notice_triggers: [
+      {
+        name: 'Notification to employees regarding plan purchase during Open Enrollment or an SEP.',
+        notice_template: 'notices/shop_employee_notices/ee_plan_selection_confirmation_sep_new_hire',
+        notice_builder: 'ShopEmployeeNotices::EePlanConfirmationSepNewHire',
+        mpi_indicator: 'MPI_SHOPDAE074',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 ivl_notice_triggers = [
