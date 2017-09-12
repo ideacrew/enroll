@@ -31,21 +31,5 @@ module Parsers::Xml::Cv
 
     # has_many :phones, Parsers::Xml::Cv::PhoneParser, :tag => "phone", :namespace => 'ridp'
 
-    # def to_hash
-    #   response = {
-    #       id: id,
-    #       first_name: name_first,
-    #       last_name: name_last,
-    #       :name_pfx => name_pfx,
-    #       :name_sfx => name_sfx,
-    #       :middle_name => name_middle,
-    #       :full_name => name_full,
-    #   }
-
-    #   response[:addresses] = addresses.map(&:to_hash) if addresses
-    #   response[:emails] = emails.map(&:to_hash) if emails
-    #   response[:phones] = phones.map(&:to_hash) if phones
-    #   response
-    # end
   end
 end

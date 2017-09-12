@@ -18,9 +18,10 @@ class Household
   field :is_active, type: Boolean, default: true
 
   embeds_many :hbx_enrollments
+  embeds_many :tax_households
   embeds_many :coverage_households, cascade_callbacks: true
 
-  accepts_nested_attributes_for :hbx_enrollments, :coverage_households
+  accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
 
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
@@ -79,71 +80,137 @@ class Household
   #   hh
   # end
 
-  def build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-    verified_tax_household = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }.first
-    if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
-      verified_primary_tax_household_member = verified_tax_household.tax_household_members.select{|thm| thm.id == verified_primary_family_member.id }.first
-      primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
+  def build_or_update_tax_households_and_eligibility_determinations(verified_family, primary_person, active_verified_household, new_dependents)
+    verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.id == verified_family.primary_family_member_id }
+    verified_tax_households = active_verified_household.tax_households.select{|th| th.id == th.primary_applicant_id && th.primary_applicant_id == verified_primary_family_member.id.split('#').last }
 
-      if tax_households.present?
-        latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_household.start_date)
+    if tax_households.present?
+      latest_tax_households = tax_households.where(effective_ending_on: nil)
+      latest_tax_households.each do |thh|
+        thh.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
       end
+    end
 
-      th = tax_households.build(
-        allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
-        effective_starting_on: verified_tax_household.start_date,
-        is_eligibility_determined: true,
-        submitted_at: verified_tax_household.submitted_at
-      )
+    verified_tax_households.each do |verified_tax_household|
+      if verified_tax_household.present? && verified_tax_household.eligibility_determinations.present?
 
-      th.tax_household_members.build(
-        family_member: primary_family_member,
-        is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
-      )
+        th = tax_households.build(
+          allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
+          effective_starting_on: verified_tax_household.start_date,
+          is_eligibility_determined: true,
+          submitted_at: verified_tax_household.submitted_at
+        )
 
-      # verified_primary_family_member.financial_statements.each do |fs|
-      #   th.tax_household_members.first.financial_statements.build(
-      #     tax_filing_status: fs.tax_filing_status.split('#').last,
-      #     is_tax_filing_together: fs.is_tax_filing_together
-      #   )
+        new_dependents << [primary_person, "self", [verified_primary_family_member.id]]
 
-      #   th.tax_household_members.first.financial_statements.last.incomes.each do |i|
-      #     th.tax_household_members.first.financial_statements.last.incomes.build(
-      #       amount:
-      #       end_date:
-      #       frequency:
-      #       start_date:
-      #       submitted_date:
-      #       type:
-      #     )
-      #   end
-      # end
+        verified_tax_household.tax_household_members.each do |tax_household_member|
+          family_member = nil
+          new_dependents.each do |dependent|
+            if dependent[2][0] == tax_household_member.id
+              family_member = family.family_members.select{|fm| fm if fm.person.id.to_s == dependent[0].id.to_s}.first
+            end
+          end
 
-      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+          th.tax_household_members.build(
+            family_member: family_member,
+            applicant_id: family_member.id,
+            is_subscriber: true,
+            is_ia_eligible: tax_household_member.is_insurance_assistance_eligible ? tax_household_member.is_insurance_assistance_eligible : false,
+            is_medicaid_chip_eligible: tax_household_member.is_medicaid_chip_eligible,
+            is_without_assistance: tax_household_member.is_without_assistance
+          )
+        end
 
-      latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
-      th.eligibility_determinations.build(
-        e_pdc_id: latest_eligibility_determination.id,
-        benchmark_plan_id: benchmark_plan_id,
-        max_aptc: latest_eligibility_determination.maximum_aptc,
-        csr_percent_as_integer: latest_eligibility_determination.csr_percent,
-        determined_on: latest_eligibility_determination.determination_date
-      )
-
-      th.save!
+        benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+        latest_eligibility_determination = verified_tax_household.eligibility_determinations.max_by(&:determination_date)
+        th.eligibility_determinations.build(
+          e_pdc_id: latest_eligibility_determination.id,
+          benchmark_plan_id: benchmark_plan_id,
+          max_aptc: latest_eligibility_determination.maximum_aptc,
+          csr_percent_as_integer: latest_eligibility_determination.csr_percent,
+          determined_on: latest_eligibility_determination.determination_date,
+          source: "Curam"
+        )
+        th.save!
+      end
     end
   end
 
-  def add_tax_household_family_member(family_member, verified_tax_household_member)
-    th = latest_active_tax_household
-    th.tax_household_members.build(
-      family_member: family_member,
-      is_subscriber: false,
-      is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
-    )
-    th.save!
+  def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household, application_in_context)
+    verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+    verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
+    if verified_tax_households.present?# && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+      if latest_active_tax_households.present?
+        latest_active_tax_households.each do |latest_tax_household|
+          latest_tax_household.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
+        end
+      end
+
+      tax_households_hbx_assigned_ids = []
+      tax_households.each { |th| tax_households_hbx_assigned_ids << th.hbx_assigned_id.to_s}
+      benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+      verified_tax_households.each do |vthh|
+        #If taxhousehold exists in our DB
+        if tax_households_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
+          tax_household = tax_households.where(hbx_assigned_id: vthh.hbx_assigned_id).first
+          #Update required attributes for that particular TaxHouseHold
+          tax_household.update_attributes(effective_starting_on: vthh.start_date)
+          #Applicant/TaxHouseholdMember block start
+          applicants_persons_hbx_ids = []
+          application_in_context.applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
+          vthh.tax_household_members.each do |thhm|
+            #If applicant exisits in our db.
+            if applicants_persons_hbx_ids.include?(thhm.person_id)
+              applicant = application_in_context.applicants.select { |applicant| applicant.person.hbx_id == thhm.person_id }.first
+              verified_family.family_members.each do |verified_family_member|
+                if verified_family_member.person.hbx_id == thhm.person_id
+                  applicant.update_attributes({
+                    medicaid_household_size: verified_family_member.medicaid_household_size,
+                    magi_medicaid_category: verified_family_member.magi_medicaid_category,
+                    magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
+                    magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
+                    magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
+                    is_without_assistance: verified_family_member.is_without_assistance,
+                    is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
+                    is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
+                    is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
+                    is_totally_ineligible: verified_family_member.is_totally_ineligible})
+                end
+              end
+            end
+          end
+          #Applicant/TaxHouseholdMember block end
+          #Eligibility determination start.
+          if !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+            verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
+
+            #TODO find the right source Curam/Haven.
+            source = "Haven"
+
+            if tax_household.eligibility_determinations.build(
+              benchmark_plan_id: benchmark_plan_id,
+              max_aptc: verified_eligibility_determination.maximum_aptc,
+              csr_percent_as_integer: verified_eligibility_determination.csr_percent,
+              csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s ,
+              determined_at: verified_eligibility_determination.determination_date,
+              determined_on: verified_eligibility_determination.determination_date,
+              aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
+              aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
+              csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
+              source: source
+              ).save!
+            else
+              throw(:processing_issue, "Failed to create Eligibility Determinations")
+            end
+          end
+          #Eligibility determination end
+        else
+          #When taxhousehold does not exist in your DB
+          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
+        end
+      end
+      self.save!
+    end
   end
 
   def effective_ending_on_gt_effective_starting_on
@@ -181,29 +248,23 @@ class Household
     coverage_households.sort_by(&:submitted_at).last.submitted_at
   end
 
-  # This following method will move to the FinancialAssistance::Application Model and
-  # also return all active tax_households in the 'active' Application
-  # as part of handeling multiple TaxHousehold.
-
-  # def latest_active_tax_households
-  #   return tax_households.first if tax_households.length == 1
-  #   tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
-  # end
-
-  def last_application_with_determination
-    applications.where(aasm_state: 'submitted', :eligibility_determination_id.ne => nil).order_by(:submitted_at => 'desc').first
+  def latest_active_tax_households
+    return tax_households if tax_households.length == 1
+    tax_households.where(effective_ending_on: nil)
   end
 
-  def last_application_with_determination_by_year(year)
-    applications.where(aasm_state: 'submitted', :eligibility_determination_id.ne => nil, :assistance_year => year).order_by(:submitted_at => 'desc').first
+  def latest_active_tax_households_with_year(year)
+    tax_households = self.tax_households.tax_household_with_year(year)
+    if TimeKeeper.date_of_record.year == year
+      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
+    end
+    tax_households unless tax_households.empty?
   end
 
-  # TODO: Move to Aplication model and refactor accordingly.
   def latest_tax_household_with_year(year)
     tax_households.tax_household_with_year(year).try(:last)
   end
-  
-  # TODO: This can probably go away. I do not see it being used.
+
   def applicant_ids
     th_applicant_ids = tax_households.inject([]) do |acc, th|
       acc + th.applicant_ids
@@ -329,13 +390,10 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
-  # def eligibility_determinations_for_year(year)
-  #   eds = []
-  #   applications.where(assistance_year: year).each do |app|
-  #     app.eligibility_determinations.each do |ed|
-  #       eds << ed
-  #     end
-  #   end
-  #   eds
-  # end
+  def eligibility_determinations_for_year(year)
+    tax_households.tax_household_with_year(year).inject([]) do |ed, th|
+      ed << th.eligibility_determinations
+      ed.flatten
+    end
+  end
 end

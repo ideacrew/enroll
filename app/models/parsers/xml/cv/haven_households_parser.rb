@@ -14,17 +14,5 @@ module Parsers::Xml::Cv
     # element :is_active, Boolean
     # element :created_at, DateTime
 
-    # def to_hash
-    #   {
-    #     integrated_case_id: integrated_case_id,
-    #     irs_group_id: irs_group_id,
-    #     start_date: start_date,
-    #     coverage_households: coverage_households.map(&:to_hash),
-    #     tax_households: tax_households.map(&:to_hash),
-    #     submitted_at: submitted_at,
-    #     is_active: is_active,
-    #     created_at: created_at
-    #   }
-    # end
   end
 end

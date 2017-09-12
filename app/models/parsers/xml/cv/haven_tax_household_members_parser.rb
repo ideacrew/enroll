@@ -13,17 +13,5 @@ module Parsers::Xml::Cv
     # element :is_insurance_assistance_eligible, Boolean
     # element :is_medicaid_chip_eligible, Boolean
 
-    # def to_hash
-    #   {
-    #     id: id,
-    #     person_name:{
-    #       person_surname: person_surname,
-    #       person_given_name: person_given_name
-    #     },
-    #     is_without_assistance: is_without_assistance,
-    #     is_insurance_assistance_eligible: is_insurance_assistance_eligible,
-    #     is_medicaid_chip_eligible: is_medicaid_chip_eligible
-    #   }
-    # end
   end
 end
