@@ -42,11 +42,21 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
   end
 
   describe "binder methods" do
-    let(:user) { double("user")}
-    let(:person) { double("person")}
-    let(:hbx_profile) { double("HbxProfile") }
-    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryGirl.create(:permission))}
-    let(:employer_profile){ FactoryGirl.create(:employer_profile, aasm_state: "enrolling") }
+    let!(:user) { double("user")}
+    let!(:person) { double("person")}
+    let!(:hbx_profile) { double("HbxProfile") }
+    let!(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryGirl.create(:permission))}
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', aasm_state: "enrolling", start_on: start_on)}
+    let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let!(:benefit_group) { employer_profile.published_plan_year.benefit_groups.first}
+    let!(:organization) {FactoryGirl.create(:organization, employer_profile: employer_profile)}
+    let!(:census_employee){
+      employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+      employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+      employee
+    }
+    let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
 
     before(:each) do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -68,6 +78,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       expect(response).to render_template("exchanges/hbx_profiles/binder_index_datatable")
     end
 
+    it "should receive binder_paid action" do
+      census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+      hbx_enrollment.save!
+      xhr :get, :binder_paid, ids: [organization.id]
+      organization.reload
+      expect(organization.employer_profile.aasm_state).to eq "binder_paid"
+      expect(flash["notice"]).to match(/Successfully submitted the selected/)
+    end
   end
 
   describe "new" do

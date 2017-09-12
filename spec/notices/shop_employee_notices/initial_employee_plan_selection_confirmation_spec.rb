@@ -75,4 +75,24 @@ RSpec.describe ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation, :d
     end
   end
 
+  describe "render template and generate pdf" do
+    before do
+      @employee_notice = ShopEmployeeNotices::InitialEmployeePlanSelectionConfirmation.new(census_employee, valid_params)
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollments).and_return [hbx_enrollment]
+      @employee_notice.build
+      @employee_notice.append_data
+      @employee_notice.generate_pdf_notice
+    end
+
+    it "should render initial_employee_plan_selection_confirmation" do
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/initial_employee_plan_selection_confirmation"
+    end
+
+    it "should generate pdf" do
+      file = @employee_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
+
 end
