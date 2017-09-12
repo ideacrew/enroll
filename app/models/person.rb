@@ -420,8 +420,7 @@ class Person
     else
       verification_types << 'Immigration status'
     end
-    # Add 'Income' & 'MEC' types if assisted / FAA
-    verification_types << "Incom" << "Minimal Essential Coverage"  if families.any?{ |family| family.financial_assisted_verification? }
+    verification_types << "Income" << "Minimal Essential Coverage"  if families.any?{ |family| family.financial_assisted_verification? }
     verification_types
   end
 
