@@ -360,9 +360,7 @@ class BenefitGroup
       estimate_composite_rates
     end
     targeted_census_employees.active.collect do |ce|
-      pcd = if is_congress
-        PlanCostDecoratorCongress.new(plan, member_provider, self)
-      elsif self.sole_source? && (!plan.dental?)
+      pcd = if self.sole_source? && (!plan.dental?)
         CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
         PlanCostDecorator.new(plan, ce, self, reference_plan)
@@ -371,36 +369,25 @@ class BenefitGroup
     end.sum
   end
 
-  def monthly_min_employee_cost(coverage_kind = nil)
+  def monthly_employee_cost(coverage_kind=nil)
+    rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
     return 0 if targeted_census_employees.count > 100
     targeted_census_employees.active.collect do |ce|
-      if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
+      pcd = if self.sole_source? && (!rp.dental?)
+        CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
-        if coverage_kind == 'dental'
-          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
-        else
-          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-        end
+        PlanCostDecorator.new(rp, ce, self, rp)
       end
       pcd.total_employee_cost
-    end.min
+    end
+  end
+
+  def monthly_min_employee_cost(coverage_kind = nil)
+    monthly_employee_cost(coverage_kind).min
   end
 
   def monthly_max_employee_cost(coverage_kind = nil)
-    return 0 if targeted_census_employees.count > 100
-    targeted_census_employees.active.collect do |ce|
-      if plan_option_kind == 'sole_source'
-        pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
-      else
-        if coverage_kind == 'dental'
-          pcd = PlanCostDecorator.new(dental_reference_plan, ce, self, dental_reference_plan)
-        else
-          pcd = PlanCostDecorator.new(reference_plan, ce, self, reference_plan)
-        end
-      end
-      pcd.total_employee_cost
-    end.max
+    monthly_employee_cost(coverage_kind).max
   end
 
   def targeted_census_employees
@@ -411,8 +398,8 @@ class BenefitGroup
   def employee_cost_for_plan(ce, plan = reference_plan)
     pcd = if @is_congress
       decorated_plan(plan, ce)
-    elsif(plan_option_kind == 'sole_source')
-      CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
+    elsif plan_option_kind == 'sole_source' && !plan.dental?
+      CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
     else
       PlanCostDecorator.new(plan, ce, self, reference_plan)
     end
