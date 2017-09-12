@@ -91,13 +91,13 @@
 <!-- SSN -->
 <% if notice.ssa_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "<strong>Social Security Number:</strong> The Social Security Administration could not confirm that the social security number provided for the following applicant(s) is correct:", top_margin: '5px', bottom_margin: '5px'} %>
+   content: "<strong>Social Security Number:</strong> The Social Security Administration could not confirm that the Social Security number provided for the following applicant(s) is correct:", top_margin: '5px', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
    rows: [notice.ssa_unverified], top_margin: '5px', bottom_margin: '2px'} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-     content: "You must use a social security card to verify the social security number(s) you provided to us. If you do not have a social security number, or cannot find your card, we can help you obtain one. You may not need to provide a social security number if you have a confirmed religious objection."} %>
+     content: "You must use a Social Security card to verify the Social Security number(s) you provided to us. If you do not have a Social Security number, or cannot find your card, we can help you obtain one. You may not need to provide a Social Security number if you have a confirmed religious objection."} %>
 <% end %>
 <!-- SSN -->
 
@@ -132,7 +132,7 @@
                 Consular report of birth abroad of US citizen
               </li>
               <li>
-                A valid driver’s license from a state that requires proof of citizenship and verification of social security number prior to issuance of the license
+                A valid driver’s license from a state that requires proof of citizenship and verification of Social Security number prior to issuance of the license
               </li>
               <li>
                 A Tribal document issued by a federally recognized Tribe - for example, a Tribal enrollment card, certificate of degree of American Indian blood, or a Tribal census document, which must:
@@ -189,7 +189,7 @@
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "These documents can include:",
-    listings: ["A copy of your most recent tax return, if you expect the income for <coverage year> to be the same as the income reported in that tax return"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, social security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in <coverage year>"]} %>
+    listings: ["A copy of your most recent tax return, if you expect the income for <coverage year> to be the same as the income reported in that tax return"," Recent pay stubs (showing at least 4 weeks in a row)","A letter from the employer stating salary","Business ledgers or contracts for self-employment income","Award letters and statements (for example: for civil service retirement, Social Security, railroad retirement, and unemployment)","Statements from financial institutions (for example: for interest, capital gains, dividends, and annuities)","Documentation of any adjustments to income (for example, alimony payments, payments for self-employed health insurance, student loan interest) that you intend to take on your federal tax return in <coverage year>"]} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "If your income has changed since your documents were issued, or you expect it to change, you should include an explanation of why you expect your income to be different from what the documents show.", top_margin: '-5px'} %>
@@ -249,7 +249,7 @@
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
 "Eligibility standards:  45 CFR §155.305",
-"Social security number requests/use:  45 CFR §155.305(f)(6)",
+"Social Security number requests/use:  45 CFR §155.305(f)(6)",
 "Eligibility process:  45 CFR §155.310",
 "Eligibility for enrollment in a qualified health plan:  45 CFR §155.315",
 "Document requests:  45 CFR §155.315(f)(2)(ii)",

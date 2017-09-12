@@ -758,6 +758,26 @@ class Family
     def advance_day(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
+      send_enrollment_notice_for_ivl(new_date)
+    end
+
+    def send_enrollment_notice_for_ivl(new_date)
+      start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+      end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
+      families = Family.where({
+        "households.hbx_enrollments" => {
+          "$elemMatch" => {
+            "kind" => "individual",
+            "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+            "created_at" => { "$gte" => start_time, "$lte" => end_time},
+        } }
+      })
+      families.each do |family|
+        person = family.primary_applicant.person
+        if person.consumer_role.present?
+          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice")
+        end
+      end
     end
 
     def find_by_employee_role(employee_role)
