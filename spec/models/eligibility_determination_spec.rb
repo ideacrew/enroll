@@ -5,9 +5,11 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
+  let!(:plan)                         { FactoryGirl.create(:plan, active_year: 2017, hios_id: "86052DC0400001-01") }
   let(:family)                        { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:household)                     { family.active_household }
   let(:application)                   { FactoryGirl.create(:application, family: family) }
-  let(:tax_household)                 { FactoryGirl.create(:tax_household, application: application) }
+  let(:tax_household)                 { FactoryGirl.create(:tax_household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil, household: household, application_id: application.id) }
   let(:determined_on)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }
@@ -21,7 +23,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:valid_params){
       {
-        application: application,
+        tax_household: tax_household,
         determined_on: determined_on,
         max_aptc: max_aptc,
         csr_percent_as_integer: csr_percent_as_integer,
@@ -42,7 +44,9 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       end
 
       it "should not save" do
-        expect(EligibilityDetermination.create(**params).valid?).to be_falsey
+        eligibility_determination = EligibilityDetermination.new(**params)
+        eligibility_determination.tax_household = tax_household
+        expect(eligibility_determination.save).to be_falsey
       end
     end
 
@@ -65,7 +69,7 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
     context "with all required attributes" do
       let(:params)                    { valid_params }
-      let(:eligibility_determination) { EligibilityDetermination.new(**params) }
+      let(:eligibility_determination) { tax_household.eligibility_determinations.new(**params) }
 
       it "should be valid" do
         expect(eligibility_determination.valid?).to be_truthy
@@ -80,9 +84,9 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       end
 
       context "and it is saved" do
-        before { eligibility_determination.save }
-
         it "should exist for the family" do
+          application.reload
+          eligibility_determination.save
           expect(family.active_approved_application.eligibility_determinations.first).to eq eligibility_determination
         end
       end
