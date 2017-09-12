@@ -1098,27 +1098,27 @@ describe Person do
 
     describe "financial assistance" do
       context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship", "Incom", "Minimal Essential Coverage"], 4, "2222222222", true, nil, true
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship", "Income", "Minimal Essential Coverage"], 4, "2222222222", true, nil, true
       end
 
       context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status", "Incom", "Minimal Essential Coverage"], 4, "2222222222", false, nil, true
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status", "Income", "Minimal Essential Coverage"], 4, "2222222222", false, nil, true
       end
 
       context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship", "Incom", "Minimal Essential Coverage"], 5, "2222222222", true, "native", true
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship", "Income", "Minimal Essential Coverage"], 5, "2222222222", true, "native", true
       end
 
       context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Citizenship", "Incom", "Minimal Essential Coverage"], 3, nil, true, nil, true
+        it_behaves_like "collecting verification types for person", ["Citizenship", "Income", "Minimal Essential Coverage"], 3, nil, true, nil, true
       end
 
       context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Immigration status", "Incom", "Minimal Essential Coverage"], 3, nil, false, nil, true
+        it_behaves_like "collecting verification types for person", ["Immigration status", "Income", "Minimal Essential Coverage"], 3, nil, false, nil, true
       end
 
       context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship", "Incom", "Minimal Essential Coverage"], 4, nil, true, "native", true
+        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship", "Income", "Minimal Essential Coverage"], 4, nil, true, "native", true
       end
     end
 
