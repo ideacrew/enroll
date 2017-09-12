@@ -6,6 +6,7 @@ module PdfTemplates
     attribute :premium, String
     attribute :employee_cost, String
     attribute :employer_cost, String
+    attribute :employer_contribution, String
     attribute :phone, String
     attribute :effective_on, Date
     attribute :terminated_on, Date
