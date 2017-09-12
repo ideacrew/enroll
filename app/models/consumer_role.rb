@@ -93,6 +93,8 @@ class ConsumerRole
 
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
+  embeds_many :assisted_verification_documents, as: :documentable
+
   embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
@@ -745,5 +747,13 @@ class ConsumerRole
     OpenStruct.new({:determined_at => Time.now,
                     :vlp_authority => authority
                    })
+  end
+
+  def income_verification_present?
+    assisted_verification_documents.where(kind: 'Income').present?
+  end
+
+  def mec_verification_present?
+    assisted_verification_documents.where(kind: 'MEC').present?
   end
 end

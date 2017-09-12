@@ -420,6 +420,11 @@ class Person
     else
       verification_types << 'Immigration status'
     end
+    # Add 'Income' & 'MEC' types if assisted / FAA
+    if consumer_role.assisted_verification_documents.present?
+      verification_types <<  'Income' if consumer_role.income_verification_present?
+      verification_types <<  'MEC' if consumer_role.mec_verification_present?
+    end
     verification_types
   end
 
