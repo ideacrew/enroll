@@ -120,7 +120,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
 
         #grab url for WellsFargoSSO and store in insance variable
-        email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.person.emails.first &&
+        email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
           @employer_profile.staff_roles.first.emails.first.address) || nil
 
         if email.present?
