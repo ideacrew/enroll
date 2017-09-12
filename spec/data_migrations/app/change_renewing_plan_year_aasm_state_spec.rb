@@ -53,6 +53,8 @@ describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
     end
 
     it "should update aasm_state of plan year to renewing_enrolled when ENV['py_state_to'] present" do
+      allow_any_instance_of(PlanYear).to receive("renewal_employer_open_enrollment_completed").and_return(true)
+      allow_any_instance_of(PlanYear).to receive(:is_enrollment_valid?).and_return(true)
       allow(ENV).to receive(:[]).with("py_state_to").and_return('renewing_enrolled')
       census_employee.reload
       subject.migrate

@@ -12,8 +12,12 @@ class ReinstatePlanYear < MongoidMigrationTask
 
     plan_year = organizations.first.employer_profile.plan_years.where(start_on: plan_year_start_on).first
     if plan_year.present? && plan_year.may_reinstate_plan_year?
-      plan_year.reinstate_plan_year!
-      puts "Plan Year Reinstated" unless Rails.env.test?
+      begin
+        plan_year.reinstate_plan_year!
+        puts "Plan Year Reinstated" unless Rails.env.test
+      rescue Exception => e
+        puts "Error: #{e.message}" unless Rails.env.test?
+      end
     else
       puts "Unable to reinstate plan year/Plan Year not found." unless Rails.env.test?
     end
