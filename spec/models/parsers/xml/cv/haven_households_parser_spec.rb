@@ -37,7 +37,7 @@ describe "haven households parser" do
 
     it 'should get tax_households' do
       subject.each_with_index do |sub, index|
-          expect(sub.tax_households.class).to eq Array
+        expect(sub.tax_households.class).to eq Array
       end
     end
   end

@@ -154,13 +154,3 @@ describe "HavenFamilyMembersParser" do
     end
   end
 end
-
-context "verified member family to hash" do
-  # let(:xml) {File.read(Rails.root.join("spec", "test_data", "haven_eligibility_response_payloads", "verified_1_member_family.xml"))}
-  #
-  # it 'should return the elements as a hash' do
-  #   expect(sub.to_hash).to include(:id, :person, :person_demographics, :is_primary_applicant, :is_coverage_applicant, :is_without_assistance, :is_insurance_assistance_eligible, :is_medicaid_chip_eligible, :is_non_magi_medicaid_eligible, :magi_medicaid_monthly_household_income, :magi_medicaid_monthly_income_limit, :magi_as_percentage_of_fpl, :magi_medicaid_category, :medicaid_household_size, :is_totally_ineligible, :created_at)
-  # end
-end
-
-
