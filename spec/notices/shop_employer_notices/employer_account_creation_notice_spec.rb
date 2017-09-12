@@ -52,4 +52,20 @@ RSpec.describe ShopEmployerNotices::EmployerAccountCreationNotice, :dbclean => :
       expect(@employer_notice.notice.employer_name).to eq employer_profile.organization.legal_name
     end
   end
+
+  describe "Rendering notice template and generate pdf" do
+    before do
+      allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      @employer_notice = ShopEmployerNotices::EmployerAccountCreationNotice.new(employer_profile, valid_params)
+    end
+    it "should render notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/employer_account_creation_notice"
+    end
+    it "should generate pdf" do
+      @employer_notice.append_hbe
+      @employer_notice.build
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
+  end
 end
