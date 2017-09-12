@@ -94,7 +94,7 @@ namespace :load_rating_factors do
     when 2017
       return 4
     when 2018
-      return 7
+      return 8
     end
   end
 
