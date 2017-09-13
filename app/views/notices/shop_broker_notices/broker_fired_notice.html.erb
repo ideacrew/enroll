@@ -4,10 +4,15 @@
 <br>
 <%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 <br>
-<%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "SUBJECT: <strong>#{notice.employer_name.titleize }</strong> HAS REMOVED YOU AS THEIR BROKER"} %>
-<br>
 
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td class="notice-font">SUBJECT: <%= notice.employer_name.upcase %> HAS REMOVED YOU AS THEIR BROKER</td>
+    </tr>
+  </tbody>
+</table>
+<br>
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -15,6 +20,7 @@
     </tr>
   </tbody>
 </table>
+<br>
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "This notice is to inform you that #{notice.first_name} #{notice.last_name} is no longer the broker of record for #{notice.employer_name} as of #{notice.termination_date}. You will no longer be authorized to access #{notice.employer_name}’s  Account or take action on behalf of #{notice.employer_name} or any employees of #{notice.employer_name}."} %>
   <br> 
