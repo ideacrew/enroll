@@ -25,12 +25,12 @@ class EmployerProfile
   NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
 
 
-  ACTIVE_STATES   = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
+  ACTIVE_STATES = ["applicant", "registered", "eligible", "binder_paid", "enrolled"]
   INACTIVE_STATES = ["suspended", "ineligible"]
 
-  PROFILE_SOURCE_KINDS  = ["self_serve", "conversion"]
+  PROFILE_SOURCE_KINDS = ["self_serve", "conversion"]
 
-  INVOICE_VIEW_INITIAL  = %w(published enrolling enrolled active suspended)
+  INVOICE_VIEW_INITIAL = %w(published enrolling enrolled active suspended)
   INVOICE_VIEW_RENEWING = %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
 
   ENROLLED_STATE = %w(enrolled suspended)
@@ -41,13 +41,14 @@ class EmployerProfile
 #  field :converted_from_carrier_at, type: DateTime, default: nil
 #  field :conversion_carrier_id, type: BSON::ObjectId, default: nil
 
-  # Workflow attributes
+# Workflow attributes
   field :aasm_state, type: String, default: "applicant"
 
 
   field :profile_source, type: String, default: "self_serve"
   field :contact_method, type: String, default: "Only Electronic communications"
   field :registered_on, type: Date, default: ->{ TimeKeeper.date_of_record }
+  field :registered_on, type: Date, default: -> {TimeKeeper.date_of_record}
   field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
@@ -57,16 +58,16 @@ class EmployerProfile
   delegate :is_active, :is_active=, to: :organization, allow_nil: false
   delegate :updated_by, :updated_by=, to: :organization, allow_nil: false
 
-  # TODO: make these relative to enrolling plan year
-  # delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
-  # delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
-  # delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
-  # delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
-  # delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
-  # delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
+# TODO: make these relative to enrolling plan year
+# delegate :eligible_to_enroll_count, to: :enrolling_plan_year, allow_nil: true
+# delegate :non_business_owner_enrollment_count, to: :enrolling_plan_year, allow_nil: true
+# delegate :total_enrolled_count, to: :enrolling_plan_year, allow_nil: true
+# delegate :enrollment_ratio, to: :enrolling_plan_year, allow_nil: true
+# delegate :is_enrollment_valid?, to: :enrolling_plan_year, allow_nil: true
+# delegate :enrollment_errors, to: :enrolling_plan_year, allow_nil: true
 
-  embeds_one  :inbox, as: :recipient, cascade_callbacks: true
-  embeds_one  :employer_profile_account
+  embeds_one :inbox, as: :recipient, cascade_callbacks: true
+  embeds_one :employer_profile_account
   embeds_many :plan_years, cascade_callbacks: true, validate: true
   embeds_many :broker_agency_accounts, cascade_callbacks: true, validate: true
   embeds_many :general_agency_accounts, cascade_callbacks: true, validate: true
@@ -79,27 +80,27 @@ class EmployerProfile
   validates_presence_of :entity_kind
 
   validates :profile_source,
-    inclusion: { in: EmployerProfile::PROFILE_SOURCE_KINDS },
-    allow_blank: false
+            inclusion: {in: EmployerProfile::PROFILE_SOURCE_KINDS},
+            allow_blank: false
 
   validates :entity_kind,
-    inclusion: { in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-    allow_blank: false
+            inclusion: {in: Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind"},
+            allow_blank: false
 
   after_initialize :build_nested_models
   after_save :save_associated_nested_models
 
-  scope :active,      ->{ any_in(aasm_state: ACTIVE_STATES) }
-  scope :inactive,    ->{ any_in(aasm_state: INACTIVE_STATES) }
+  scope :active, -> {any_in(aasm_state: ACTIVE_STATES)}
+  scope :inactive, -> {any_in(aasm_state: INACTIVE_STATES)}
 
-  scope :all_renewing, ->{ Organization.all_employers_renewing }
-  scope :all_with_next_month_effective_date,  ->{ Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day) }
+  scope :all_renewing, -> {Organization.all_employers_renewing}
+  scope :all_with_next_month_effective_date, -> {Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)}
 
   alias_method :is_active?, :is_active
 
-  # def self.all_with_next_month_effective_date
-    # Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
-  # end
+# def self.all_with_next_month_effective_date
+# Organization.all_employers_by_plan_year_start_on(TimeKeeper.date_of_record.end_of_month + 1.day)
+# end
 
   def parent
     raise "undefined parent Organization" unless organization?
@@ -116,7 +117,7 @@ class EmployerProfile
   end
 
   def owners #business owners
-    staff_roles.select{|p| p.try(:employee_roles).try(:any?){|ee| ee.census_employee.is_business_owner? }}
+    staff_roles.select {|p| p.try(:employee_roles).try(:any?) {|ee| ee.census_employee.is_business_owner?}}
   end
 
   def staff_roles #managing profile staff
@@ -137,7 +138,7 @@ class EmployerProfile
     @today = TimeKeeper.date_of_record
   end
 
-  # for broker agency
+# for broker agency
   def hire_broker_agency(new_broker_agency, start_on = today)
     start_on = start_on.to_date.beginning_of_day
     if active_broker_agency_account.present?
@@ -154,7 +155,12 @@ class EmployerProfile
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
     employer_broker_fired
+    send_broker_notice
     notify_broker_terminated
+  end
+
+  def send_broker_notice
+    trigger_notices("broker_agency_termination_notice")
   end
 
   def employer_broker_fired
@@ -170,7 +176,7 @@ class EmployerProfile
 
   def active_broker_agency_account
     return @active_broker_agency_account if defined? @active_broker_agency_account
-    @active_broker_agency_account = broker_agency_accounts.detect { |account| account.is_active? }
+    @active_broker_agency_account = broker_agency_accounts.detect {|account| account.is_active?}
   end
 
   def active_broker
@@ -187,14 +193,16 @@ class EmployerProfile
 
   def memoize_active_broker active_broker_memo
     return unless account = active_broker_agency_account
-    if memo = active_broker_memo[account.broker_agency_profile_id] then return memo end
+    if memo = active_broker_memo[account.broker_agency_profile_id] then
+      return memo
+    end
     active_broker_memo[account.broker_agency_profile.id] = active_broker
   end
 
-  # for General Agency
+# for General Agency
   def hashed_active_general_agency_legal_name gaps
-    return  unless account = active_general_agency_account
-    gap = gaps.detect{|gap| gap.id == account.general_agency_profile_id}
+    return unless account = active_general_agency_account
+    gap = gaps.detect {|gap| gap.id == account.general_agency_profile_id}
     gap && gap.legal_name
   end
 
@@ -234,6 +242,7 @@ class EmployerProfile
     general_agency_accounts.active.update_all(aasm_state: "inactive", end_on: terminate_on)
     notify_general_agent_terminated
   end
+
   alias_method :general_agency_profile=, :hire_general_agency
 
   def employee_roles
@@ -245,7 +254,7 @@ class EmployerProfile
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
-  # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
+# TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size
     @roster_size = census_employees.active.size
@@ -264,7 +273,7 @@ class EmployerProfile
   end
 
   def draft_plan_year
-    plan_years.select{ |py| py.aasm_state == "draft" }
+    plan_years.select {|py| py.aasm_state == "draft"}
   end
 
   def published_plan_year
@@ -291,7 +300,7 @@ class EmployerProfile
   end
 
   def plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "draft"; set }
+    plan_years.reduce([]) {|set, py| set << py if py.aasm_state == "draft"; set}
   end
 
   def is_conversion?
@@ -311,13 +320,13 @@ class EmployerProfile
   end
 
   def earliest_plan_year_start_on_date
-   plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
-   plan_years.reject!{|py| py.can_be_migrated? }
-   plan_year = plan_years.sort_by {|test| test[:start_on]}.first
-   if !plan_year.blank?
-     plan_year.start_on
-   end
- end
+    plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
+    plan_years.reject! {|py| py.can_be_migrated?}
+    plan_year = plan_years.sort_by {|test| test[:start_on]}.first
+    if !plan_year.blank?
+      plan_year.start_on
+    end
+  end
 
   def billing_plan_year(billing_date = nil)
     billing_report_date = billing_date || TimeKeeper.date_of_record.next_month
@@ -325,7 +334,7 @@ class EmployerProfile
 
     if billing_date.blank?
       if plan_year.blank?
-        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record) }
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect {|py| py.start_on > billing_report_date && py.open_enrollment_contains?(TimeKeeper.date_of_record)}
           billing_report_date = plan_year.start_on
         end
       end
@@ -337,7 +346,7 @@ class EmployerProfile
       end
 
       if plan_year.blank?
-        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect{|py| py.start_on > billing_report_date }
+        if plan_year = (plan_years.published + plan_years.renewing_published_state).detect {|py| py.start_on > billing_report_date}
           billing_report_date = plan_year.start_on
         end
       end
@@ -376,8 +385,8 @@ class EmployerProfile
 
   def binder_criteria_satisfied?
     show_plan_year.present? &&
-    participation_count == 0 &&
-    non_owner_participation_criteria_met?
+        participation_count == 0 &&
+        non_owner_participation_criteria_met?
   end
 
   def participation_count
@@ -389,7 +398,7 @@ class EmployerProfile
   end
 
   def renewing_plan_year_drafts
-    plan_years.reduce([]) { |set, py| set << py if py.aasm_state == "renewing_draft"; set }
+    plan_years.reduce([]) {|set, py| set << py if py.aasm_state == "renewing_draft"; set}
   end
 
   def is_primary_office_local?
@@ -403,16 +412,16 @@ class EmployerProfile
     if quote.present? && !quote_claim_code.blank? && quote.published?
 
       plan_year = self.plan_years.build({
-        start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
-        open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
-        fte_count: quote.member_count
-        })
+                                            start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month, end_on: ((TimeKeeper.date_of_record + 2.months).beginning_of_month + 1.year) - 1.day,
+                                            open_enrollment_start_on: TimeKeeper.date_of_record, open_enrollment_end_on: (TimeKeeper.date_of_record + 1.month).beginning_of_month + 9.days,
+                                            fte_count: quote.member_count
+                                        })
 
       benefit_group_mapping = Hash.new
 
       # Build each quote benefit group from quote
       quote.quote_benefit_groups.each do |quote_benefit_group|
-        benefit_group = plan_year.benefit_groups.build({plan_option_kind: quote_benefit_group.plan_option_kind, title: quote_benefit_group.title, description: "Linked from Quote with claim code " + quote_claim_code })
+        benefit_group = plan_year.benefit_groups.build({plan_option_kind: quote_benefit_group.plan_option_kind, title: quote_benefit_group.title, description: "Linked from Quote with claim code " + quote_claim_code})
 
         # map quote benefit group to newly created plan year benefit group so it can be assigned to census employees if imported
         benefit_group_mapping[quote_benefit_group.id.to_s] = benefit_group.id
@@ -423,13 +432,13 @@ class EmployerProfile
         benefit_group.highest_cost_plan_id = quote_benefit_group.published_highest_cost_plan
         benefit_group.elected_plan_ids.push(quote_benefit_group.published_reference_plan)
         benefit_group.dental_plan_option_kind = quote_benefit_group.dental_plan_option_kind
-        benefit_group.relationship_benefits = quote_benefit_group.quote_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+        benefit_group.relationship_benefits = quote_benefit_group.quote_relationship_benefits.map {|x| x.attributes.slice(:offered, :relationship, :premium_pct)}
 
         # Assign benefit group plan information (DENTAL )
         benefit_group.dental_reference_plan_id = quote_benefit_group.published_dental_reference_plan
         benefit_group.elected_dental_plan_ids = quote_benefit_group.elected_dental_plan_ids
 
-        benefit_group.dental_relationship_benefits = quote_benefit_group.quote_dental_relationship_benefits.map{|x| x.attributes.slice(:offered,:relationship, :premium_pct)}
+        benefit_group.dental_relationship_benefits = quote_benefit_group.quote_dental_relationship_benefits.map {|x| x.attributes.slice(:offered, :relationship, :premium_pct)}
 
       end
 
@@ -441,16 +450,16 @@ class EmployerProfile
           quote.quote_households.each do |qhh|
             qhh_employee = qhh.employee
             if qhh.employee.present?
-                quote_employee = qhh.employee
-                ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
-                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
+              quote_employee = qhh.employee
+              ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
+              ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
 
-                qhh.dependents.each do |qhh_dependent|
-                  ce.census_dependents << CensusDependent.new(
+              qhh.dependents.each do |qhh_dependent|
+                ce.census_dependents << CensusDependent.new(
                     last_name: qhh_dependent.last_name, first_name: qhh_dependent.first_name, dob: qhh_dependent.dob, employee_relationship: qhh_dependent.employee_relationship
-                    )
-                end
-                ce.save(:validate => false)
+                )
+              end
+              ce.save(:validate => false)
             end
           end
         end
@@ -476,11 +485,11 @@ class EmployerProfile
     end
   end
 
-  ## Class methods
+## Class methods
   class << self
 
     def list_embedded(parent_list)
-      parent_list.reduce([]) { |list, parent_instance| list << parent_instance.employer_profile }
+      parent_list.reduce([]) {|list, parent_instance| list << parent_instance.employer_profile}
     end
 
     def all
@@ -533,91 +542,91 @@ class EmployerProfile
 
     def organizations_for_low_enrollment_notice(new_date)
       Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"aasm_state".in => ["enrolling", "renewing_enrolling"],
-          :"open_enrollment_end_on" => new_date+2.days
-          }
-      })
+                             {:$elemMatch => {
+                                 :"aasm_state".in => ["enrolling", "renewing_enrolling"],
+                                 :"open_enrollment_end_on" => new_date+2.days
+                             }
+                             })
 
     end
 
     def organizations_for_open_enrollment_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
-          { :$elemMatch => {
-           :"open_enrollment_start_on".lte => new_date,
-           :"open_enrollment_end_on".gte => new_date,
-           :"aasm_state".in => ['published', 'renewing_published']
-         }
-      })
+                             {:$elemMatch => {
+                                 :"open_enrollment_start_on".lte => new_date,
+                                 :"open_enrollment_end_on".gte => new_date,
+                                 :"aasm_state".in => ['published', 'renewing_published']
+                             }
+                             })
     end
 
     def organizations_for_open_enrollment_end(new_date)
       Organization.where(:"employer_profile.plan_years" =>
-          { :$elemMatch => {
-           :"open_enrollment_end_on".lt => new_date,
-           :"start_on".gt => new_date,
-           :"aasm_state".in => ['published', 'renewing_published', 'enrolling', 'renewing_enrolling']
-         }
-      })
+                             {:$elemMatch => {
+                                 :"open_enrollment_end_on".lt => new_date,
+                                 :"start_on".gt => new_date,
+                                 :"aasm_state".in => ['published', 'renewing_published', 'enrolling', 'renewing_enrolling']
+                             }
+                             })
     end
 
     def organizations_for_plan_year_begin(new_date)
       Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"start_on".lte => new_date,
-          :"end_on".gt => new_date,
-          :"aasm_state".in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE - ['active'])
-        }
-      })
+                             {:$elemMatch => {
+                                 :"start_on".lte => new_date,
+                                 :"end_on".gt => new_date,
+                                 :"aasm_state".in => (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE - ['active'])
+                             }
+                             })
     end
 
     def organizations_for_plan_year_end(new_date)
       Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"end_on".lt => new_date,
-          :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
-        }
-      })
+                             {:$elemMatch => {
+                                 :"end_on".lt => new_date,
+                                 :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE
+                             }
+                             })
     end
 
     def initial_employers_reminder_to_publish(start_on)
       Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"start_on" => start_on,
-          :"aasm_state" => "draft"
-        }
-      })
+                             {:$elemMatch => {
+                                 :"start_on" => start_on,
+                                 :"aasm_state" => "draft"
+                             }
+                             })
     end
 
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
 
       Organization.where(:"employer_profile.plan_years" =>
-        { :$elemMatch => {
-          :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
-          :"aasm_state".in => PlanYear::PUBLISHED
-        }
-      })
+                             {:$elemMatch => {
+                                 :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
+                                 :"aasm_state".in => PlanYear::PUBLISHED
+                             }
+                             })
     end
 
     def organizations_for_force_publish(new_date)
       Organization.where({
-        :'employer_profile.plan_years' =>
-        { :$elemMatch => {
-          :start_on => new_date.next_month.beginning_of_month,
-          :aasm_state => 'renewing_draft'
-          }}
-      })
+                             :'employer_profile.plan_years' =>
+                                 {:$elemMatch => {
+                                     :start_on => new_date.next_month.beginning_of_month,
+                                     :aasm_state => 'renewing_draft'
+                                 }}
+                         })
     end
 
     def renewal_employers_reminder_to_publish(start_on)
       Organization.where({
-        :'employer_profile.plan_years' =>
-        { :$elemMatch => {
-          :start_on => start_on,
-          :aasm_state => 'renewing_draft'
-          }}
-      })
+                             :'employer_profile.plan_years' =>
+                                 {:$elemMatch => {
+                                     :start_on => start_on,
+                                     :aasm_state => 'renewing_draft'
+                                 }}
+                         })
     end
 
     def advance_day(new_date)
@@ -646,7 +655,7 @@ class EmployerProfile
           begin
             plan_year = organization.employer_profile.plan_years.where(:aasm_state.in => ["enrolling", "renewing_enrolling"]).first
             #exclude congressional employees
-            next if ((plan_year.benefit_groups.any?{|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
+            next if ((plan_year.benefit_groups.any? {|bg| bg.is_congress?}) || (plan_year.effective_date.yday == 1))
             if plan_year.enrollment_ratio < Settings.aca.shop_market.employee_participation_ratio_minimum
               organization.employer_profile.trigger_notices("low_enrollment_notice_for_employer")
             end
@@ -767,40 +776,40 @@ class EmployerProfile
 
       # Find employers with events today and trigger their respective workflow states
       appeal_period = (Settings.
-                          aca.
-                          shop_market.
-                          initial_application.
-                          appeal_period_after_application_denial.
-                          to_hash
-                        )
+          aca.
+          shop_market.
+          initial_application.
+          appeal_period_after_application_denial.
+          to_hash
+      )
 
       # Negate period value to query past date
-      appeal_period.each {|k,v| appeal_period[k] = (v * -1) }
+      appeal_period.each {|k, v| appeal_period[k] = (v * -1)}
 
       ineligible_period = (Settings.
-                              aca.
-                              shop_market.
-                              initial_application.
-                              ineligible_period_after_application_denial.
-                              to_hash
-                            )
+          aca.
+          shop_market.
+          initial_application.
+          ineligible_period_after_application_denial.
+          to_hash
+      )
 
       # Negate period value to query past date
-      ineligible_period.each {|k,v| ineligible_period[k] = (v * -1) }
+      ineligible_period.each {|k, v| ineligible_period[k] = (v * -1)}
 
       orgs = Organization.or(
-        {:"employer_profile.plan_years.start_on" => new_date},
-        {:"employer_profile.plan_years.end_on" => new_date - 1.day},
-        {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
-        {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
-        {:"employer_profile.workflow_state_transitions".elem_match => {
-            "$and" => [
-              {:transition_at.gte => (new_date.advance(ineligible_period).beginning_of_day )},
-              {:transition_at.lte => (new_date.advance(ineligible_period).end_of_day)},
-              {:to_state => "ineligible"}
-            ]
+          {:"employer_profile.plan_years.start_on" => new_date},
+          {:"employer_profile.plan_years.end_on" => new_date - 1.day},
+          {:"employer_profile.plan_years.open_enrollment_start_on" => new_date},
+          {:"employer_profile.plan_years.open_enrollment_end_on" => new_date - 1.day},
+          {:"employer_profile.workflow_state_transitions".elem_match => {
+              "$and" => [
+                  {:transition_at.gte => (new_date.advance(ineligible_period).beginning_of_day)},
+                  {:transition_at.lte => (new_date.advance(ineligible_period).end_of_day)},
+                  {:to_state => "ineligible"}
+              ]
           }
-        }
+          }
       )
 
       orgs.each do |org|
@@ -842,7 +851,7 @@ class EmployerProfile
   def default_benefit_group
     plan_year_with_default = plan_years.where("benefit_groups.default" => true).first
     return unless plan_year_with_default
-    plan_year_with_default.benefit_groups.detect{|bg| bg.default }
+    plan_year_with_default.benefit_groups.detect {|bg| bg.default}
   end
 
 ## TODO - anonymous shopping
@@ -854,16 +863,16 @@ class EmployerProfile
 # sample census profiles
 # ability to create library of templates for employer profiles
 
-  # Workflow for self service
+# Workflow for self service
   aasm do
     state :applicant, initial: true
-    state :registered                 # Employer has submitted valid application
-    state :eligible                   # Employer has completed enrollment and is eligible for coverage
-    state :binder_paid, :after_enter => [:notify_binder_paid,:notify_initial_binder_paid]
-    state :enrolled                   # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
-  # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
-  state :suspended                  # Employer's benefit coverage has lapsed due to non-payment
-    state :ineligible                 # Employer is unable to obtain coverage on the HBX per regulation or policy
+    state :registered # Employer has submitted valid application
+    state :eligible # Employer has completed enrollment and is eligible for coverage
+    state :binder_paid, :after_enter => [:notify_binder_paid, :notify_initial_binder_paid]
+    state :enrolled # Employer has completed eligible enrollment, paid the binder payment and plan year has begun
+    # state :lapsed                     # Employer benefit coverage has reached end of term without renewal
+    state :suspended # Employer's benefit coverage has lapsed due to non-payment
+    state :ineligible # Employer is unable to obtain coverage on the HBX per regulation or policy
 
     event :advance_date do
       transitions from: :ineligible, to: :applicant, :guard => :has_ineligible_period_expired?
@@ -948,7 +957,7 @@ class EmployerProfile
   def within_open_enrollment_for?(t_date, effective_date)
     plan_years.any? do |py|
       py.open_enrollment_contains?(t_date) &&
-        py.coverage_period_contains?(effective_date)
+          py.coverage_period_contains?(effective_date)
     end
   end
 
@@ -959,21 +968,21 @@ class EmployerProfile
   def enrollment_ineligible_period_expired?
     if latest_workflow_state_transition.to_state == "ineligible"
       (latest_workflow_state_transition.transition_at.to_date.advance(Settings.
-                                                                          aca.
-                                                                          shop_market.
-                                                                          initial_application.
-                                                                          ineligible_period_after_application_denial.
-                                                                          to_hash
-                                                                        )
-                                                                      ) <= TimeKeeper.date_of_record
+          aca.
+          shop_market.
+          initial_application.
+          ineligible_period_after_application_denial.
+          to_hash
+      )
+      ) <= TimeKeeper.date_of_record
     else
       true
     end
   end
 
-  # def is_eligible_to_shop?
-  #   registered? or published_plan_year.enrolling?
-  # end
+# def is_eligible_to_shop?
+#   registered? or published_plan_year.enrolling?
+# end
 
   def self.update_status_to_binder_paid(organization_ids)
     organization_ids.each do |id|
@@ -988,7 +997,7 @@ class EmployerProfile
   end
 
   def is_renewing_employer?
-     renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
+    renewing_plan_year.present? #&& TimeKeeper.date_of_record.day > 13
   end
 
   def has_next_month_plan_year?
@@ -1009,7 +1018,7 @@ class EmployerProfile
 
   def notify_broker_added
     changed_fields = broker_agency_accounts.map(&:changed_attributes).map(&:keys).flatten.compact.uniq
-    if changed_fields.present? &&  changed_fields.include?("start_on")
+    if changed_fields.present? && changed_fields.include?("start_on")
       notify("acapi.info.events.employer.broker_added", {employer_id: self.hbx_id, event_name: "broker_added"})
     end
   end
@@ -1077,7 +1086,7 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
-private
+  private
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end
@@ -1096,13 +1105,13 @@ private
 
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
-      from_state: aasm.from_state,
-      to_state: aasm.to_state,
-      event: aasm.current_event
+        from_state: aasm.from_state,
+        to_state: aasm.to_state,
+        event: aasm.current_event
     )
   end
 
-  # TODO - fix premium amount
+# TODO - fix premium amount
   def initialize_account
     if employer_profile_account.blank?
       self.build_employer_profile_account

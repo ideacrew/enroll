@@ -160,7 +160,6 @@ class Notice
       format: "application/pdf",
       description: mpi_indicator
     })
-
     if notice.save
       notice
     else

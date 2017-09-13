@@ -12,6 +12,5 @@ class ShopNoticesNotifierJob < ActiveJob::Base
               event_name: event,
               mpi_indicator: notice_trigger.mpi_indicator,
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
-
   end
 end

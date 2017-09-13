@@ -40,8 +40,16 @@ module PdfTemplates
       false
     end
 
+    def broker?
+      return false
+    end
+     
     def employee_notice?
       false
+    end
+
+    def broker?
+      return false
     end
 
     def verified_individuals

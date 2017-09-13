@@ -177,6 +177,17 @@ RSpec.describe Employers::BrokerAgencyController do
       @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
       @org2.broker_agency_profile.save
       expect(controller).to receive(:send_general_agency_assign_msg)
+      expect(controller).to receive(:broker_hired)
+      expect(controller).to receive(:broker_agency_hired)
+      post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
+
+    end
+
+    it "should send notice to broker and agency" do
+      @org2.broker_agency_profile.default_general_agency_profile = general_agency_profile
+      @org2.broker_agency_profile.save
+      expect(controller).to receive(:broker_hired)
+      expect(controller).to receive(:broker_agency_hired)#.with(no_args)
       post :create, employer_profile_id: @employer_profile.id, broker_role_id: @broker_role2.id, broker_agency_id: @org2.broker_agency_profile.id
     end
 
