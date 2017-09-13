@@ -610,7 +610,6 @@ RSpec.describe Insured::FamiliesController do
         qle = FactoryGirl.create(:qualifying_life_event_kind, market_kind: 'shop')
         date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
         expect(controller).to receive(:sep_request_denial_notice)
-        controller.sep_request_denial_notice
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
       end  
 
@@ -620,6 +619,7 @@ RSpec.describe Insured::FamiliesController do
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
         expect(response).to have_http_status(:success)
+        expect(controller).not_to receive(:sep_request_denial_notice)
         expect(assigns(:qualified_date)).to eq true
         expect(assigns(:future_qualified_date)).to eq(nil)
       end
