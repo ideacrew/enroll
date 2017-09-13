@@ -140,7 +140,7 @@ module Insured
       active_bg = employee_role.census_employee.active_benefit_group
 
       if change_plan != "change_by_qle"
-        if change_plan == "change_plan" && enrollment.present?
+        if change_plan == "change_plan" && enrollment.present? && enrollment.is_shop?
           enrollment.benefit_group.is_offering_dental?
         elsif employee_role.can_enroll_as_new_hire?
           active_bg.present? && active_bg.is_offering_dental?
