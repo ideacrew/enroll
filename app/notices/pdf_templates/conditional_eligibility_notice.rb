@@ -9,7 +9,8 @@ module PdfTemplates
     attribute :primary_identifier, String
     attribute :request_full_determination, Boolean, :default => false
     attribute :is_family_totally_ineligibile, Boolean, :default => false
-    attribute :has_applied_for_assistance, Boolean, :default => false
+    attribute :has_applied_for_assistance, Boolean
+    attribute :irs_consent_needed, Boolean, :default => false
     attribute :notice_date, Date
     attribute :hbe, PdfTemplates::Hbe
     attribute :ivl_open_enrollment_start_on, Date
@@ -107,16 +108,24 @@ module PdfTemplates
       individuals.select{ |individual| individual.is_ia_eligible == true  }
     end
 
+    def aqhp_or_non_magi_medicaid_eligible
+      individuals.select{ |individual| individual.is_ia_eligible == true || individual.is_non_magi_medicaid_eligible == true  }
+    end
+
     def uqhp_individuals
-      individuals.select{ |individual| individual.is_without_assistance == true  }
+      individuals.select{ |individual| individual.is_without_assistance == true }
     end
 
     def ineligible_applicants
       individuals.select{ |individual| individual.is_totally_ineligible == true  }
     end
 
+    def uqhp_or_non_magi_medicaid_individuals
+      individuals.select{ |individual| individual.is_without_assistance == true || individual.is_non_magi_medicaid_eligible == true }
+    end
+
     def non_magi_medicaid_eligible
-      individuals.select{ |individual| individual.is_non_magi_medicaid_eligible == true  }
+      individuals.select{ |individual| individual.is_non_magi_medicaid_eligible == true }
     end
 
     def aqhp_enrollments
@@ -125,7 +134,7 @@ module PdfTemplates
 
     #FIX ME
     def tax_hh_with_csr
-      tax_households.select { |thh| thh.csr_percent_as_integer != 100}
+      tax_households.select{ |thh| thh.csr_percent_as_integer != 100}
     end
 
     def enrollment_notice_subject

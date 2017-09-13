@@ -786,17 +786,17 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
-    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
+    hbx_id: 'IVL_PRE_1',
+    title: 'Update your information at DC Health Link by October 15',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'ivl_renewal_notice_1',
+    event_name: 'projected_eligibility_notice_1',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr_1_uqhp_projected_renewal_notice',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::IvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR1',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -808,17 +808,17 @@ ivl_notice_triggers = [
   },
 
   {
-    hbx_id: 'IVLR1',
+    hbx_id: 'IVL_PRE_2',
     title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
     description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
     resource_name: 'consumer_role',
-    event_name: 'ivl_renewal_notice_1_second_batch',
+    event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr1_notice_second_batch_without_ea_data',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::IvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR1B',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -838,9 +838,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/ivlr_2_projected_renewal_notice',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR2',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -860,9 +860,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/IVLR_3_APTC_Medicaid',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR3',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -882,9 +882,9 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
-        notice_template: 'notices/ivl/IVLR4_APTC_uqhp',
+        notice_template: 'notices/ivl/projected_eligibility_notice',
         notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
-        mpi_indicator: 'MPI_IVLR4',
+        mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
