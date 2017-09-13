@@ -2,6 +2,8 @@ module Queries
   class ShopMonthlyEnrollments
     include QueryHelpers
 
+    attr_accessor :enrollment_statuses
+
     def initialize(feins, effective_on)
       @feins = feins
       @effective_on = effective_on
@@ -14,6 +16,19 @@ module Queries
 
     def evaluate
       Family.collection.aggregate(@pipeline)
+    end
+
+    def query_families_with_quiet_period_enrollments
+      add({
+        "$match" => {
+          "$and" => [
+            "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
+            "households.hbx_enrollments.workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
+          ]
+        }
+      })
+
+      self
     end
 
     def query_families_with_active_enrollments
@@ -33,6 +48,18 @@ module Queries
         "$match" => {
           "$or" => [
             new_coverage_expression
+          ]
+        }
+      })
+
+      self
+    end
+
+    def query_quiet_period_enrollments
+      add({
+        "$match" => {
+          "$or" => [
+            quiet_period_coverage_expression
           ]
         }
       })
@@ -64,6 +91,27 @@ module Queries
 
     def existing_enrollment_statuses
       HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + ['coverage_expired']
+    end
+
+    def quiet_period_expression
+      {
+        "to_state" => {"$in" => @enrollment_statuses},
+        "transition_at" => { 
+          "$gte" => (@effective_on.prev_month + 10.days).beginning_of_day, 
+          "$lt" => (@effective_on.prev_month + 27.days).end_of_day
+        }
+      }
+    end
+
+    def quiet_period_coverage_expression
+      {
+        "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
+        "households.hbx_enrollments.aasm_state" => {"$in" => @enrollment_statuses},
+        "households.hbx_enrollments.kind" => "employer_sponsored",
+        "households.hbx_enrollments.workflow_state_transitions" => { 
+          "$elemMatch" => quiet_period_expression 
+        }
+      }
     end
 
     def new_coverage_expression
