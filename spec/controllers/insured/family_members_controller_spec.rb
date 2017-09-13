@@ -7,8 +7,9 @@ RSpec.describe Insured::FamilyMembersController do
   let(:person) { test_family.primary_family_member.person }
   let(:published_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: :published)}
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person ) }
+  let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
   let(:employee_role_id) { employee_role.id }
+  let(:census_employee) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -64,6 +65,7 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     it "with qle_id" do
+      allow_any_instance_of(SpecialEnrollmentPeriod).to receive(:is_eligible?).and_return(true)
       allow(person).to receive(:primary_family).and_return(test_family)
       allow(person).to receive(:broker_role).and_return(nil)
       allow(employee_role).to receive(:save!).and_return(true)

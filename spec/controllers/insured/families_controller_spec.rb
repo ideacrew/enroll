@@ -454,7 +454,8 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "POST record_sep" do
-    let(:employee_role2) { FactoryGirl.create(:employee_role) }
+    let(:employee_role2) { FactoryGirl.create(:employee_role, census_employee: census_employee) }
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
     
     before :each do
       date = TimeKeeper.date_of_record - 10.days

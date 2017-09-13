@@ -378,14 +378,13 @@ RSpec.describe ApplicationHelper, :type => :helper do
     let(:census_employee){FactoryGirl.build(:census_employee)}
     let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
     it "should trigger ee_sep_request_accepted_notice job in queue" do
-      allow(employee_role).to receive_message_chain("census_employee.id.to_s").and_return("2873452")
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
       helper.ee_sep_request_accepted_notice(employee_role)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq ["2873452", 'ee_sep_request_accepted_notice']
+      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
     end
   end
 end
