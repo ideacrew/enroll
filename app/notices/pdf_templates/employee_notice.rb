@@ -11,6 +11,7 @@ module PdfTemplates
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :census_employee, PdfTemplates::CensusEmployee
     attribute :employer_name, String
+    attribute :employer_full_name, String
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan

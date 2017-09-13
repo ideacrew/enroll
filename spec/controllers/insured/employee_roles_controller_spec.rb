@@ -125,6 +125,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       allow(user).to receive(:person).and_return(person)
       allow(Forms::EmployeeRole).to receive(:new).and_return(person)
       allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
+      allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(census_employee).to receive(:address).and_return(address)
       allow(person).to receive(:addresses).and_return(addresses)
       allow(person).to receive(:primary_family).and_return(family)
