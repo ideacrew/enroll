@@ -973,7 +973,7 @@ class EmployerProfile
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
 
-  def create_cobra_dependent(employee, cobra_options,cobra_begin_date)
+  def create_cobra_dependent(employee, cobra_options, cobra_begin_date)
     primary_cobra = cobra_options.detect{|id,dependency_type| dependency_type == 'primary'}
     primar_cobra_dependent = employee.census_dependent_find(primary_cobra.first)
     cobra_options.delete(primary_cobra.first)
@@ -986,7 +986,7 @@ class EmployerProfile
                                              dob: primar_cobra_dependent.dob,
                                              gender: primar_cobra_dependent.gender,
                                              cobra_begin_date: cobra_begin_date,
-                                             hired_on: TimeKeeper.date_of_record)
+                                             hired_on: cobra_begin_date)
       
       cobra_options.each do |id,dependency_type|
         cobra_record = employee.census_dependent_find(id)
