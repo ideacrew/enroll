@@ -3,7 +3,7 @@ module Effective
     class EmployerDatatable < Effective::MongoidDatatable
       datatable do
 
-        bulk_actions_column do
+        bulk_actions_column(partial: 'datatables/employers/bulk_actions_column') do
            bulk_action 'Generate Invoice', generate_invoice_exchanges_hbx_profiles_path, data: { confirm: 'Generate Invoices?', no_turbolink: true }
            bulk_action 'Mark Binder Paid', binder_paid_exchanges_hbx_profiles_path, data: {  confirm: 'Mark Binder Paid?', no_turbolink: true }
         end
@@ -149,7 +149,7 @@ module Effective
             {scope: 'employer_attestations_pending', label: 'Pending'},
             {scope: 'employer_attestations_approved', label: 'Approved'},
             {scope: 'employer_attestations_denied', label: 'Denied'},
-          ],  
+          ],
         employers:
          [
            {scope:'all', label: 'All'},
