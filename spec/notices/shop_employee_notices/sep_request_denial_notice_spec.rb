@@ -90,12 +90,10 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
 
     it "should append data" do
       sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
-      
       @employee_notice.append_data
       expect(@employee_notice.notice.qle.qle_on).to eq qle_on
       expect(@employee_notice.notice.qle.title).to eq "Married"
-      
-      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on+1.year
+      expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
       expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
     end
 
