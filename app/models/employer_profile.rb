@@ -153,6 +153,15 @@ class EmployerProfile
     active_broker_agency_account.save!
     notify_broker_terminated
     broker_fired_confirmation_to_broker
+    broker_agency_fired_confirmation
+  end
+
+  def broker_agency_fired_confirmation
+    begin
+      trigger_notices("broker_agency_fired_confirmation")
+    rescue Exception => e
+      puts "Unable to deliver broker agency fired confirmation notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
+    end
   end
 
   def broker_fired_confirmation_to_broker
@@ -162,7 +171,7 @@ class EmployerProfile
       puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
     end
   end
-  
+
   alias_method :broker_agency_profile=, :hire_broker_agency
 
   def broker_agency_profile
@@ -561,7 +570,7 @@ class EmployerProfile
       }
     })
     end
-  
+
 
     def organizations_eligible_for_renewal(new_date)
       months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
@@ -662,7 +671,7 @@ class EmployerProfile
               puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
             end
           end
-        else 
+        else
           plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
           if (start_on +2.days == plan_year_due_date)
             initial_employer_reminder_to_publish(start_on_1).each do |organization|
@@ -673,7 +682,7 @@ class EmployerProfile
               end
             end
           end
-        end     
+        end
 
       end
 
@@ -915,11 +924,11 @@ class EmployerProfile
   end
 
   def transmit_initial_eligible_event
-    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_eligible_event
-    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def notify_broker_added
@@ -1053,9 +1062,9 @@ class EmployerProfile
       end
     end
   end
-  
+
   private
-  
+
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end
