@@ -12,7 +12,6 @@ module PdfTemplates
     attribute :hbe, PdfTemplates::Hbe
     attribute :employer_profile, EmployerProfile
     attribute :broker_agency_profile, BrokerAgencyProfile
-    attribute :terminated_broker_account, BrokerAgencyAccount
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :employer_name
     attribute :first_name, String

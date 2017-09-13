@@ -1062,7 +1062,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
   context "trigger broker_fired_notice" do
     let(:params)  { {} }
     let(:employer_profile) {EmployerProfile.new(**params)}
-    it "should trigger ee_plan_selection_confirmation_sep_new_hire job in queue" do
+    it "should trigger When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client." do
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
       employer_profile.trigger_notices("broker_fired_confirmation_to_broker")
