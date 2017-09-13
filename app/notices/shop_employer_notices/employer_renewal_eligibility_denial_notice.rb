@@ -12,7 +12,7 @@ class ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice < ShopEmployer
   end
 
   def append_data
-    active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
+     active_plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
     renewing_plan_year = employer_profile.plan_years.where(:aasm_state => "renewing_publish_pending").first
     plan_year_warnings = []
     if renewing_plan_year.application_eligibility_warnings.include?(:primary_office_location)
