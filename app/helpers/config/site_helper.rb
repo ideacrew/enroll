@@ -10,7 +10,7 @@ module Config::SiteHelper
   def site_website_name
     Settings.site.website_name
   end
-  
+
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
@@ -57,6 +57,14 @@ module Config::SiteHelper
 
   def site_main_web_link
     link_to site_main_web_address, site_main_web_address
+  end
+
+  def health_care_website
+      Settings.site.health_care_website
+  end
+
+  def health_care_website_url
+      Settings.site.health_care_website_url
   end
 
   def site_uses_default_devise_path?
