@@ -17,12 +17,12 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
                             :event_name => 'planyear_renewal_3a',
                             :title => "Plan Offerings Finalized"})
                           }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
 
   describe "New" do
     before do
@@ -84,18 +84,10 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerEligibilityNotice do
 
     it "should generate pdf" do
       @employer_notice.build
-       @employer_notice.build_plan_year
-       file = @employer_notice.generate_pdf_notice
-       expect(File.exist?(file.path)).to be true
-     end
+      @employer_notice.build_plan_year
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
+    end
   end
    
 end
-
-
-
-
-
-
-
-
