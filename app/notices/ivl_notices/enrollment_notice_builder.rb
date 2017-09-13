@@ -109,12 +109,13 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
   def check_for_unverified_individuals
     family = recipient.primary_family
+    date = TimeKeeper.date_of_record
+    start_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+    end_time = (date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
     enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-        (
-          hbx_en.terminated_on.blank? ||
-          hbx_en.terminated_on >= TimeKeeper.date_of_record
-        )
+      (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record) &&
+      (hbx_en.created_at >= start_time && hbx_en.created_at <= end_time)
     end
     enrollments.reject!{|e| e.coverage_terminated? }
     family_members = enrollments.inject([]) do |family_members, enrollment|
@@ -129,8 +130,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
         outstanding_people << person
       end
     end
-    enrollments.each {|e| e.update_attributes(special_verification_period: TimeKeeper.date_of_record + 95.days)}
-    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
 
     hbx_enrollments = []
     en = enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}
@@ -140,8 +139,11 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     hbx_enrollments << dental_enrollment
 
     hbx_enrollments.compact.each do |enrollment|
+      enrollment.update_attributes(special_verification_period: date + Settings.aca.individual_market.verification_due.days)
       notice.enrollments << append_enrollment_information(enrollment)
     end
+
+    family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
     notice.due_date = hbx_enrollments.compact.first.special_verification_period.strftime("%B %d, %Y")
     outstanding_people.uniq!
@@ -165,6 +167,21 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
   end
 
+  def phone_number(legal_name)
+    case legal_name
+    when "BestLife"
+      "(800) 433-0088"
+    when "CareFirst"
+      "(855) 444-3119"
+    when "Delta Dental"
+      "(800) 471-0236"
+    when "Dominion"
+      "(855) 224-3016"
+    when "Kaiser"
+      "(844) 524-7370"
+    end
+  end
+
   def append_enrollment_information(enrollment)
     plan = PdfTemplates::Plan.new({
       plan_name: enrollment.plan.name,
@@ -178,7 +195,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       premium: enrollment.total_premium.round(2),
       aptc_amount: enrollment.applied_aptc_amount.round(2),
       responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-      phone: enrollment.phone_number,
+      phone: phone_number(enrollment.plan.carrier_profile.legal_name),
       is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
       coverage_kind: enrollment.coverage_kind,
       kind: enrollment.kind,
