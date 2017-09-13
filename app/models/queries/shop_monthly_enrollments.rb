@@ -93,12 +93,19 @@ module Queries
       HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + ['coverage_expired']
     end
 
+    def quiet_period
+      qp_end_date = Settings.aca.shop_market.initial_application.quiet_period_end_on
+      oe_end_date = Settings.aca.shop_market.open_enrollment.monthly_end_on
+      prev_month = @effective_on.prev_month
+      Date.new(prev_month.year, prev_month.month, oe_end_date+1).beginning_of_day..Date.new(prev_month.year, prev_month.month, qp_end_date).end_of_day
+    end
+
     def quiet_period_expression
       {
         "to_state" => {"$in" => @enrollment_statuses},
         "transition_at" => { 
-          "$gte" => (@effective_on.prev_month + 10.days).beginning_of_day, 
-          "$lt" => (@effective_on.prev_month + 27.days).end_of_day
+          "$gte" => quiet_period.begin, 
+          "$lt" => quiet_period.end
         }
       }
     end
@@ -106,7 +113,6 @@ module Queries
     def quiet_period_coverage_expression
       {
         "households.hbx_enrollments.benefit_group_id" => { "$in" => collect_benefit_group_ids },
-        "households.hbx_enrollments.aasm_state" => {"$in" => @enrollment_statuses},
         "households.hbx_enrollments.kind" => "employer_sponsored",
         "households.hbx_enrollments.workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
