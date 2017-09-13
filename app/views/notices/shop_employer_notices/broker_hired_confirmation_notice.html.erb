@@ -18,7 +18,7 @@
   { content: "Your broker now has full access to your #{site_short_name} account. They can update your information, change your plan offerings, manage your employee roster, and enroll your employees into your medical and dental insurance offerings."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "If you would like to remove your broker at anytime you may do so by going to the “Broker” tab in your account and clicking “Change Broker”, then “Terminate Broker”. You can also follow the steps to making changes to your broker in our <strong>Employer guide to assigning, changing and terminating a broker,</strong> available in our online Business Resource Center."} %>
+  { content: "If you would like to remove your broker at anytime you may do so by going to the “Broker” tab in your account and clicking “Change Broker”, then “Terminate Broker”. You can also follow the steps to making changes to your broker in our <strong>Employer guide to assigning, changing and terminating a broker,</strong> available in our online #{link_to_site_business_resource_center}."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
   { contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
