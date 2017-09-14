@@ -191,6 +191,7 @@ class PeopleController < ApplicationController
   def update
     sanitize_person_params
     @person = find_person(params[:id])
+    @family = @person.primary_family
     clean_duplicate_addresses
     @person.updated_by = current_user.oim_id unless current_user.nil?
     if @person.has_active_consumer_role? && request.referer.include?("insured/families/personal")
@@ -201,6 +202,7 @@ class PeopleController < ApplicationController
     end
     if @person.has_active_consumer_role?
       @person.consumer_role.check_for_critical_changes(person_params)
+      @person.consumer_role.retrigger_residency! if can_retrigger_residency?(params["person"]["no_dc_address"])
     end
     respond_to do |format|
       if @person.update_attributes(person_params.except(:is_applying_coverage))

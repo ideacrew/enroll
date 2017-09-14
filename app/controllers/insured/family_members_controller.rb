@@ -127,6 +127,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     consumer_role.check_for_critical_changes(params[:dependent]) if consumer_role
+    @person.consumer_role.retrigger_residency! if @person.consumer_role.present? && can_retrigger_residency?(params["dependent"]["no_dc_address"], @dependent.family_member.person)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|

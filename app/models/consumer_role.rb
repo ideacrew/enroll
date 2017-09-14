@@ -438,6 +438,15 @@ class ConsumerRole
       transitions from: :fully_verified, to: :verification_outstanding
     end
 
+    event :retrigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process] do
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :sci_verified, to: :sci_verified
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
+    end
+
     #this event rejecting the status if admin rejects any verification type but it DOESN'T work backwards - we don't move all the types to unverified by triggering this event
     event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :verification_outstanding
