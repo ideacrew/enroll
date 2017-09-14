@@ -21,12 +21,11 @@
     </div>
   <% end %>
 
-  <% if @applicant.has_self_employment_income %>
-    <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-      <div class="col-md-8">Is this person self employed?</div>
-      <div class="col-md-4">Yes</div>
-    </div>
-  <% end %>
+
+
+
+
+  
 
   <% if @applicant.has_other_income %>
     <div class="row row-form-wrapper ptb no-buffer row-height form-content">
@@ -37,35 +36,76 @@
   <br>
   <p>Incomes were created for you below based on your answers above, complete each income and then click CONTINUE.</p>
   <br>
-  <div class="incomes-list">
-    <% @applicant.incomes.each do |income| %>
-      <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
-    <% end %>
+  <div id="job_income">
+    <div class="incomes-list">
+      <% @applicant.incomes.jobs.each do |income| %>
+        <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
+      <% end %>
+    </div>
+
+    <a class='new-income btn btn-default'>Add Another Income</a>
+
+    <div class='new-income-form hidden'>
+      <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
+    </div>
   </div>
 
-  <a class='new-income btn btn-default'>Add Another Income</a>
 
-  <div class='new-income-form hidden'>
-    <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
+  <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+      <label>Is this person self employed?</label>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= radio_button_tag :has_self_employment_income, true, required: true, class: "required floatlabel" %>
+        <%= label :has_self_employment_income, :value => true do %>
+        <span>Yes</span>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+      <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <%= radio_button_tag :has_self_employment_income, false, required: true, class: "required floatlabel" %>
+        <%= label :has_self_employment_income, :value => false do %>
+        <span>No</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  </br>
+
+  <div id="self_employed_incomes">
+    <div class="self-employed-incomes-list incomes-list">
+      <% @applicant.self_employed_incomes.each do |income| %>
+        <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income } %>
+      <% end %>
+    </div>
+
+    <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
+
+    <div class='new-income-form hidden'>
+      <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: @applicant.incomes.build } %>
+    </div>
   </div>
 
+  <!-- Hidden unsaved income modal -->
   <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
-				</div>
-				<div class="modal-body">
-					You have made changes to an income that are not yet saved. Are you sure you want to continue?
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-danger">Continue</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+        </div>
+        <div class="modal-body">
+          You have made changes to an income that are not yet saved. Are you sure you want to continue?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class='col-md-2'>

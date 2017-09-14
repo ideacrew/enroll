@@ -62,14 +62,14 @@ $(document).ready(function() {
       stopEditingIncome();
     });
 
-    /* new incomes */
+    /* new job incomes */
     $('a.new-income.btn').click(function(e) {
       e.preventDefault();
       startEditingIncome();
       $(this).siblings('.new-income-form')
         .clone(true)
         .removeClass('hidden')
-        .appendTo('.incomes-list');
+        .appendTo($(this).siblings('.incomes-list'));
     });
   }
 });

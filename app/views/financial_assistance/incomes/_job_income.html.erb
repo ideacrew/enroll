@@ -33,33 +33,33 @@
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 1</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.address_1 %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.try(:address_1) %></span>
         </div>
         <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 2</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.address_2 %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.try(:address_2) %></span>
         </div>
       </div>
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">CITY</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.city %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.try(:city) %></span>
         </div>
         <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">STATE</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.state %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.try(:state) %></span>
         </div>
         <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">ZIP</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.zip %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_address.try(:zip) %></span>
         </div>
       </div>
 
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-12 no-pd form-group-lg no-pd class-fa-household">
           <label class="static_label label-floatlabel">EMPLOYER PHONE</label>
-          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_phone.full_phone_number %></span>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.employer_phone.try(:full_phone_number) %></span>
         </div>
       </div>
     </div>
