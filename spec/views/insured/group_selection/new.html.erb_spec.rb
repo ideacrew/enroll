@@ -127,6 +127,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member4).to receive(:first_name).and_return('joey')
       allow(family_member4).to receive(:gender).and_return('female')
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
       sign_in current_user
     end
 
@@ -403,7 +406,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should display effective on date" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/EFFECTIVE DATE/)
+      expect(rendered).to match(/Effective Date/)
     end
   end
 
