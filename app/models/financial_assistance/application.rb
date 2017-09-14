@@ -9,6 +9,7 @@ class FinancialAssistance::Application
   belongs_to :family, class_name: "::Family"
 
   before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id, :set_external_identifiers
+  after_create :end_date_latest_active_tax_households
   validates :application_submission_validity, presence: true, on: :submission
   validates :before_attestation_validity, presence: true, on: :before_attestation
   validate :attestation_terms_on_parent_living_out_of_home
@@ -321,24 +322,19 @@ class FinancialAssistance::Application
     return true
   end
 
+  def active_determined_tax_households
+    tax_households.where(is_eligibility_determined: true)
+  end
+
   def tax_households
     family.active_household.tax_households.where(application_id: id.to_s)
   end
 
   def eligibility_determinations
-    eligibility_determinations = []
-    tax_households.each do |tax_household|
-      eligibility_determinations << tax_household.preferred_eligibility_determination
+    tax_households.inject([]) do |ed, th|
+      ed << th.eligibility_determinations
+      ed.flatten
     end
-    eligibility_determinations
-  end
-
-  def all_tax_households
-    tax_households = []
-    applicants.each do |applicant|
-       tax_households << applicant.tax_household
-    end
-    tax_households.uniq
   end
 
   def populate_applicants_for(family)
@@ -354,17 +350,16 @@ class FinancialAssistance::Application
 
   def eligibility_determination_for_tax_household(tax_household_id)
     family.active_household.tax_households.where(id: tax_household_id).first.preferred_eligibility_determination
-    # eligibility_determinations.where(tax_household_id: tax_household_id).first
   end
 
   def tax_household_for_family_member(family_member_id)
-    tax_households.select {|th| th if th.applicants.where(family_member_id: family_member_id).present? }.first
+    tax_households.where(is_eligibility_determined: true).select {|th| th if th.applicants.where(family_member_id: family_member_id).present? }.first
   end
 
   def latest_active_tax_households_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
+    tax_households = active_determined_tax_households.tax_household_with_year(year)
     if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
+      tax_households = active_determined_tax_households.tax_household_with_year(year).active_tax_household
     end
     tax_households
   end
@@ -567,6 +562,11 @@ private
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def end_date_latest_active_tax_households
+    latest_tax_households = family.active_household.latest_active_tax_households
+    latest_tax_households.each { |th| th.update_attributes(effective_ending_on: TimeKeeper.date_of_record) } if latest_tax_households.present?
   end
 
   def set_submit

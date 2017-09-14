@@ -15,8 +15,8 @@ RSpec.describe FinancialAssistance::Application, type: :model do
   let!(:application) { FactoryGirl.create(:application, family: family) }
   let!(:household) { family.households.first }
   let!(:tax_household) { FactoryGirl.create(:tax_household, household: household) }
-  let!(:tax_household1) { FactoryGirl.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil) }
-  let!(:tax_household2) { FactoryGirl.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil) }
+  let!(:tax_household1) { FactoryGirl.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
+  let!(:tax_household2) { FactoryGirl.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
   let!(:tax_household3) { FactoryGirl.create(:tax_household, application_id: application.id, household: household) }
   let!(:eligibility_determination1) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household1) }
   let!(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household2) }
@@ -67,6 +67,8 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       end
 
       it "should return the latest tax households" do
+        tax_household1.update_attributes(:effective_ending_on => nil)
+        tax_household2.update_attributes(:effective_ending_on => nil)
         expect(application.latest_active_tax_households_with_year(year).count).to eq 2
         expect(application.latest_active_tax_households_with_year(year)).to eq [tax_household1, tax_household2]
       end
@@ -89,18 +91,18 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       end
 
       it "should return unique tax households where the active_approved_application's applicants are present" do
-        expect(application.all_tax_households.count).to eq 3
-        expect(application.all_tax_households).to eq [tax_household1, tax_household2,tax_household3]
+        expect(application.tax_households.count).to eq 3
+        expect(application.tax_households).to eq [tax_household1, tax_household2,tax_household3]
       end
 
       it "should only return all unique tax_households" do
-        expect(application.all_tax_households.count).not_to eq 2
-        expect(application.all_tax_households).not_to eq [tax_household1, tax_household1, tax_household2]
+        expect(application.tax_households.count).not_to eq 2
+        expect(application.tax_households).not_to eq [tax_household1, tax_household1, tax_household2]
       end
 
       it "should not return all tax_households" do
-        expect(application.all_tax_households).not_to eq applicant1.tax_household.to_a
-        expect(application.all_tax_households).not_to eq applicant1.tax_household.to_a
+        expect(application.tax_households).not_to eq applicant1.tax_household.to_a
+        expect(application.tax_households).not_to eq applicant1.tax_household.to_a
       end
     end
 

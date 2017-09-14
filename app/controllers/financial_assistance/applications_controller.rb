@@ -185,7 +185,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
       applicant.update_attributes!(is_ia_eligible: true)
     end
     @model.tax_households.each do |txh|
-      txh.update_attributes!(allocated_aptc: 200.00)
+      txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true)
       txh.eligibility_determinations.build(max_aptc: 200.00,
                                               csr_percent_as_integer: 73,
                                               csr_eligibility_kind: "csr_73",

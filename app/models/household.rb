@@ -154,7 +154,7 @@ class Household
         if tax_households_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
           tax_household = tax_households.where(hbx_assigned_id: vthh.hbx_assigned_id).first
           #Update required attributes for that particular TaxHouseHold
-          tax_household.update_attributes(effective_starting_on: vthh.start_date)
+          tax_household.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
           #Applicant/TaxHouseholdMember block start
           applicants_persons_hbx_ids = []
           application_in_context.applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
@@ -249,8 +249,7 @@ class Household
   end
 
   def latest_active_tax_households
-    return tax_households if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil)
+    tax_households.where(effective_ending_on: nil, is_eligibility_determined: true)
   end
 
   def latest_active_tax_households_with_year(year)
@@ -261,8 +260,8 @@ class Household
     tax_households unless tax_households.empty?
   end
 
-  def latest_tax_household_with_year(year)
-    tax_households.tax_household_with_year(year).try(:last)
+  def latest_tax_households_with_year(year)
+    tax_households.tax_household_with_year(year)
   end
 
   def applicant_ids

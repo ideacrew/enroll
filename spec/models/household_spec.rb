@@ -51,7 +51,7 @@ RSpec.describe Household, :type => :model do
   context "latest_active_tax_household_with_year" do
     let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
     let!(:household) {FactoryGirl.create(:household, family: family)}
-    let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+    let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil, is_eligibility_determined: true)}
     let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
     let!(:hbx1) {FactoryGirl.create(:hbx_enrollment, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (TimeKeeper.date_of_record.beginning_of_month + 10.days))}
 
@@ -137,9 +137,9 @@ RSpec.describe Household, :type => :model do
       let(:year) { TimeKeeper.date_of_record.year }
       let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
       let!(:household) {FactoryGirl.create(:household, family: family)}
-      let(:tax_household1) {FactoryGirl.create(:tax_household, household: household)}
-      let(:tax_household2) {FactoryGirl.create(:tax_household, household: household)}
-      let(:tax_household3) {FactoryGirl.create(:tax_household, household: household)}
+      let(:tax_household1) {FactoryGirl.create(:tax_household, household: household, is_eligibility_determined: true)}
+      let(:tax_household2) {FactoryGirl.create(:tax_household, household: household, is_eligibility_determined: true)}
+      let(:tax_household3) {FactoryGirl.create(:tax_household, household: household, is_eligibility_determined: true)}
       let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1)}
       let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household2)}
       let(:eligibility_determination3) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household3)}

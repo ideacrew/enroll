@@ -194,6 +194,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:employer_profile) { FactoryGirl.create(:employer_profile) }
 
     before do
+      allow(family).to receive(:application_in_progress).and_return(false)
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(Plan).to receive(:find).with("plan_id").and_return(plan)
@@ -407,6 +408,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:coverage_kind){"health"}
 
     before :each do
+      allow(family).to receive(:application_in_progress).and_return(false)
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)

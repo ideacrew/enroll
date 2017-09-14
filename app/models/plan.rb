@@ -462,30 +462,33 @@ class Plan
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-
         csr_kinds = []
         csr_kind = nil
 
         if tax_households.present?
-          if family_member_ids.present?
-            app_ids = tax_households.map(&:application_id)
-            if !app_ids.include?(nil)
-              tax_households.each do |tax_household|
-                tax_household.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
-                  if applicant.non_ia_eligible?
-                    csr_kinds << "csr_100"
-                  else
-                    csr_kinds << tax_household.current_csr_eligibility_kind
+          if tax_households.first.family.application_in_progress.present?
+            csr_kinds << "csr_100"
+          else
+            if family_member_ids.present?
+              app_ids = tax_households.map(&:application_id)
+              if !app_ids.include?(nil)
+                tax_households.each do |tax_household|
+                  tax_household.applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+                    if applicant.non_ia_eligible?
+                      csr_kinds << "csr_100"
+                    else
+                      csr_kinds << tax_household.current_csr_eligibility_kind
+                    end
                   end
                 end
-              end
-            else
-              tax_households.each do |tax_household|
-                tax_household.tax_household_members.where(:applicant_id.in => family_member_ids).each do |tax_household_member|
-                  if tax_household_member.non_ia_eligible?
-                    csr_kinds << "csr_100"
-                  else
-                    csr_kinds << tax_household.current_csr_eligibility_kind
+              else
+                tax_households.each do |tax_household|
+                  tax_household.tax_household_members.where(:applicant_id.in => family_member_ids).each do |tax_household_member|
+                    if tax_household_member.non_ia_eligible?
+                      csr_kinds << "csr_100"
+                    else
+                      csr_kinds << tax_household.current_csr_eligibility_kind
+                    end
                   end
                 end
               end
