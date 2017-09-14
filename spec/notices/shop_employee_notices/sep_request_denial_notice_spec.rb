@@ -94,6 +94,7 @@ RSpec.describe ShopEmployeeNotices::SepRequestDenialNotice, :dbclean => :after_e
       expect(@employee_notice.notice.qle.qle_on).to eq qle_on
       expect(@employee_notice.notice.qle.title).to eq "Married"
       expect(@employee_notice.notice.plan_year.start_on).to eq plan_year.start_on
+      expect(@employee_notice.notice.plan_year.renewing_start_on).to eq plan_year.start_on+1.year
       expect(@employee_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
     end
 

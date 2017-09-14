@@ -29,11 +29,12 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   	   :title => title,
   	   :reporting_deadline => reporting_deadline
   	   })
-
   	active_plan_year = census_employee.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED || PlanYear::RENEWING).first
+    renewing_plan_year_start_on = active_plan_year.end_on+1
   	notice.plan_year = PdfTemplates::PlanYear.new({
   	   :open_enrollment_end_on => active_plan_year.open_enrollment_end_on,
-  	   :start_on => active_plan_year.start_on
+  	   :start_on => active_plan_year.start_on,
+       :renewing_start_on => renewing_plan_year_start_on
   	   })
   end	
 end

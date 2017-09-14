@@ -12,7 +12,7 @@
   </tbody>
 </table>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-   content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.qle.title}. Upon review of the information you provided on #{notice.qle.qle_reported_on.to_date}, your request has been denied. The date you submitted does not qualify you for a special enrollment period. <strong>You had through #{notice.qle.reporting_deadline} to report the event, based on the date you experienced this event, #{notice.qle.qle_on}.</strong> Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{site_short_name} Contact Center at #{notice.hbe.phone} [TTY #{contact_center_tty_number}] for additional assistance."} %>
+   content: "You recently requested a special enrollment period due to experiencing a qualifying event, #{notice.qle.title}. Upon review of the information you provided on #{notice.qle.qle_reported_on.to_date}, your request has been denied. The date you submitted does not qualify you for a special enrollment period. <strong>You had through #{notice.qle.reporting_deadline} to report the event, based on the date you experienced this event, #{notice.qle.qle_on}.</strong> Qualifying events cannot be reported prior to the date of the event. If you are trying to report a future event, please come back on or after the actual date of the event. If you believe this decision is the result of an error, please contact the #{site_short_name} Contact Center at #{contact_center_phone_number} [TTY #{contact_center_tty_number}] for additional assistance."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 	content: "This means that, although you may be eligible to participate in the #{site_short_name}, you are not eligible to enroll in or make changes to your current plan through a special enrollment period.  This is because the annual open enrollment period is closed and you reported your qualifying event after #{notice.qle.reporting_deadline} or before the qualifying event occurred."} %>
@@ -143,7 +143,7 @@
 	content: "<strong>Annual Open Enrollment Period</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-	content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through the #{site_short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.start_on}."} %>
+	content: "If you do not qualify for a new Special Enrollment Period, your next opportunity to enroll in employer-sponsored coverage through the #{site_short_name} is your employer’s annual open enrollment period. You will receive a notification once your annual open enrollment period has begun. This coverage will be effective #{notice.plan_year.renewing_start_on}."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 	content: "<strong>Individual Market Enrollment</strong>"} %>
