@@ -30,7 +30,14 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
     let!(:initial_employee_enrollments) {
       initial_employees.inject([]) do |enrollments, ce|
         employee_role = create_person(ce, initial_employer)
-        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 20.days)
+        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: effective_on - 30.days)
+      end
+    }
+
+    let!(:initial_employee_quiet_enrollments) {
+      initial_employees.inject([]) do |enrollments, ce|
+        employee_role = create_person(ce, initial_employer)
+        enrollments << create_enrollment(family: employee_role.person.primary_family, benefit_group_assignment: ce.active_benefit_group_assignment, employee_role: employee_role, submitted_at: ce.active_benefit_group_assignment.plan_year.open_enrollment_end_on + 4.days)
       end
     }
 
@@ -78,13 +85,19 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
 
     context ".shop_monthly_enrollments" do
 
-      context 'When passed employer FEINs and plan year effective date' do
+      context 'When passed employer FEINs and plan year effective date', dbclean: :after_each do
 
         it 'should return coverages under given employers' do
           enrollment_hbx_ids = (initial_employee_enrollments + renewing_employee_passives).map(&:hbx_id)
           result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
 
           expect(result.sort).to eq enrollment_hbx_ids.sort
+        end
+
+        it 'should not return coverages under given employers if they are in quiet period' do
+          quiet_enrollment_hbx_ids = (initial_employee_quiet_enrollments).map(&:hbx_id)
+          result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+          expect(result & quiet_enrollment_hbx_ids).to eq []
         end
 
         context 'When enrollments purchased with QLE' do
@@ -96,10 +109,21 @@ describe Queries::NamedPolicyQueries, "Policy Queries", dbclean: :after_each do
             end
           }
 
-          it 'should not return QLE enrollments' do
-            result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+          let!(:qle_coverages_in_quiet_period) {
+            renewing_employees[0..4].inject([]) do |enrollments, ce|
+              family = ce.employee_role.person.primary_family
+              enrollments << create_enrollment(family: family, benefit_group_assignment: ce.renewal_benefit_group_assignment, employee_role: ce.employee_role, submitted_at: ce.renewal_benefit_group_assignment.plan_year.open_enrollment_end_on + 1.day, enrollment_kind: 'special_enrollment')
+            end
+          }
 
-            expect(result & qle_coverages.map(&:hbx_id)).to eq []
+          it 'should return QLE enrollments' do
+            result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+            expect((result & qle_coverages.map(&:hbx_id)).sort).to eq qle_coverages.map(&:hbx_id).sort
+          end
+
+          it 'should not return QLE enrollments that are in quiet period' do
+            result = Queries::NamedPolicyQueries.shop_monthly_enrollments(feins, effective_on)
+            expect((result & qle_coverages_in_quiet_period.map(&:hbx_id)).sort).to eq []
           end
         end
 

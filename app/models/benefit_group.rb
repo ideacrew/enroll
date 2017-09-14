@@ -383,6 +383,27 @@ class BenefitGroup
     default
   end
 
+  def carriers_offered
+    case plan_option_kind
+    when "single_plan"
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
+    when "single_carrier"
+      Plan.where(id: reference_plan_id).pluck(:carrier_profile_id)
+    when "metal_level"
+      Plan.where(:id => {"$in" => elected_plan_ids}).pluck(:carrier_profile_id).uniq
+    end
+  end
+  
+  def dental_carriers_offered
+    return [] unless is_offering_dental?
+
+    if dental_plan_option_kind == 'single_plan'
+      Plan.where(:id => {"$in" => elected_dental_plan_ids}).pluck(:carrier_profile_id).uniq
+    else
+      Plan.where(id: dental_reference_plan_id).pluck(:carrier_profile_id)
+    end
+  end
+
   def elected_plans_by_option_kind
     case plan_option_kind
     when "single_plan"
@@ -429,8 +450,31 @@ class BenefitGroup
         end
 
         benefit_groups = self.plan_year.benefit_groups.select { |bg| bg.id != self.id}
-        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+        ce.find_or_create_benefit_group_assignment(benefit_groups)
       end
+    end
+  end
+
+  def renewal_elected_plan_ids
+    start_on_year = (start_on.next_year).year
+    if plan_option_kind == "single_carrier"
+      Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
+    else 
+      if plan_option_kind == "metal_level"
+        Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
+      else
+        Plan.where(:id.in => elected_plan_ids).map(&:renewal_plan_id).compact
+      end
+    end
+  end
+
+  def renewal_elected_dental_plan_ids
+    return [] unless is_offering_dental?
+    start_on_year = (start_on.next_year).year
+    if plan_option_kind == "single_carrier"
+      Plan.by_active_year(start_on_year).shop_market.dental_coverage.by_carrier_profile(dental_reference_plan.carrier_profile).map(&:id)
+    else
+      Plan.where(:id.in => elected_dental_plan_ids).map(&:renewal_plan_id).compact
     end
   end
 

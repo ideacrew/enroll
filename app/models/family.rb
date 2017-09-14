@@ -35,6 +35,7 @@ class Family
   field :submitted_at, type: DateTime # Date application was created on authority system
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
+  field :min_verification_due_date, type: Date, default: nil
 
   belongs_to  :person
 
@@ -187,6 +188,11 @@ class Family
   scope :non_enrolled,                          ->{ where(:"households.hbx_enrollments.aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :sep_eligible,                          ->{ where(:"active_seps.count".gt => 0) }
   scope :coverage_waived,                       ->{ where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::WAIVED_STATUSES) }
+  scope :having_unverified_enrollment,          ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
+  scope :with_all_verifications,                ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "ready"}})}
+  scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
+  scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
+  scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
 
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
@@ -833,15 +839,6 @@ class Family
     end
   end
 
-  def enrolled_hbx_enrollments
-    latest_household.try(:enrolled_hbx_enrollments)
-  end
-
-  def enrolled_including_waived_hbx_enrollments
-    latest_household.try(:enrolled_including_waived_hbx_enrollments)
-  end
-
-
   def save_relevant_coverage_households
     households.each do |household|
       household.coverage_households.each{|hh| hh.save }
@@ -930,6 +927,54 @@ class Family
       dependents.each do |member|
         build_consumer_role(member)
       end
+    end
+  end
+
+  def min_verification_due_date_on_family
+    due_dates = []
+    contingent_enrolled_active_family_members.each do |family_member|
+      family_member.person.verification_types.each do |v_type|
+        due_dates << document_due_date(family_member, v_type)
+      end
+    end
+    due_dates.compact!
+    due_dates.min.to_date if due_dates.present?
+  end
+
+  def contingent_enrolled_active_family_members
+    enrolled_family_members = []
+    family_members.active.each do |family_member|
+      if enrolled_policy(family_member).present?
+        enrolled_family_members << family_member
+      end
+    end
+    enrolled_family_members
+  end
+
+  def document_due_date(family_member, v_type)
+    return nil if family_member.person.consumer_role.is_type_verified?(v_type)
+    sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
+    enrollment = enrolled_policy(family_member)
+    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : nil )
+  end
+
+  def enrolled_policy(family_member)
+    enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
+  end
+
+  def verification_due_date_from_enrollment(enrollment)
+    if enrollment.special_verification_period
+      enrollment.special_verification_period.to_date
+    else
+      nil
+    end
+  end
+
+  def review_status
+    if active_household.hbx_enrollments.verification_needed.any?
+      active_household.hbx_enrollments.verification_needed.first.review_status
+    else
+      "no enrollment"
     end
   end
 
