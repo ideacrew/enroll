@@ -299,6 +299,10 @@ class FinancialAssistance::Applicant
     self.application.tax_households.find(tax_household_id)
   end
 
+  def self_employed_incomes
+    incomes.where(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
+  end
+
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = family_member.person.dob
