@@ -542,6 +542,18 @@ module ApplicationHelper
     end
   end
 
+  def mid_year_plan_change(census_employee)
+    employer_ids = Organization.where(:"employer_profile.plan_years.benefit_groups.is_congress" => true).map{|org| org.employer_profile.id}
+      begin 
+        employee_roles = employer_ids.exclude?(census_employee.employee_role.employer_profile_id)
+        if employee_roles.present? && census_employee.active_benefit_group_assignment.present? && (census_employee.active_benefit_group_assignment.hbx_enrollment.enrollment_kind != "open_enrollment" || has_new_hire_enrollment_period?(census_employee)) 
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_mid_year_plan_change_non_congressional")
+        end
+        rescue Exception => e
+        log("#{e.message}; person_id: #{census_employee.employee_role.person.hbx_id}")
+    end
+  end
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
