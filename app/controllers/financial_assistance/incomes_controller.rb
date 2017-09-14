@@ -50,6 +50,25 @@
     end
   end
 
+  def create
+    @income = @applicant.incomes.build permit_params(params[:financial_assistance_income])
+
+    if @income.save
+      render :update
+    else
+      render :error
+    end
+  end
+
+  def update
+    @income = @applicant.incomes.find params[:id]
+    if @income.update_attributes permit_params(params[:financial_assistance_income])
+      render :update
+    else
+      render :error
+    end
+  end
+
   def destroy
     income = @applicant.incomes.find(params[:id])
     income.destroy!
