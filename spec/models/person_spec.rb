@@ -1053,7 +1053,7 @@ describe Person do
     shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, fin_assist|
       before do
         allow(person).to receive(:families).and_return([primary_family])
-        allow(primary_family).to receive(:fin_assisted_verification?).and_return fin_assist
+        allow(primary_family).to receive(:has_financial_assistance_verification?).and_return fin_assist
         allow(person).to receive(:ssn).and_return(ssn) if ssn
         allow(person).to receive(:us_citizen).and_return(citizen)
         allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
