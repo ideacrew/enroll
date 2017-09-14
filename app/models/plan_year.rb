@@ -1050,11 +1050,14 @@ class PlanYear
 
   def renewal_employee_enrollment_confirmation
     begin
-      self.employer_profile.census_employees.enrolled.each do |ce|
-        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        enrollment = ce.active_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && enrollment.aasm_state == "coverage_selected"
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+        end
       end
     rescue Exception => e
-      Rails.logger.error { "Unable to deliver notice to census_employee #{ce.id} due to #{e}" }
+      Rails.logger.error { "Unable to deliver notice due to '#{e}' " }
     end
   end
 
