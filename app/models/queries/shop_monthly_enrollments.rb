@@ -71,7 +71,6 @@ module Queries
         "households.hbx_enrollments.benefit_group_id" => {"$in" => collect_benefit_group_ids},
         "households.hbx_enrollments.aasm_state" => {"$in" => new_enrollment_statuses},
         "households.hbx_enrollments.effective_on" => @effective_on,
-        "households.hbx_enrollments.enrollment_kind" => "open_enrollment",
         # Exclude COBRA, for now
         "households.hbx_enrollments.kind" => "employer_sponsored"
       }
@@ -91,7 +90,7 @@ module Queries
       add({
         "$match" => {
           "$or" => [
-            new_coverage_expression, 
+            new_coverage_expression.merge!("households.hbx_enrollments.enrollment_kind" => "open_enrollment"),
             existing_coverage_expression
           ]
         }
@@ -109,7 +108,8 @@ module Queries
             "bga_id" => "$households.hbx_enrollments.benefit_group_assignment_id",
             "coverage_kind" => "$households.hbx_enrollments.coverage_kind"
           },
-          "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"}
+          "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
+          "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"}
         }
       })
 
@@ -127,7 +127,8 @@ module Queries
       add({
         "$project" => {
          "_id" => 1,
-         "enrollment_hbx_id" => "$hbx_enrollment_id"
+         "enrollment_hbx_id" => "$hbx_enrollment_id",
+         "enrollment_submitted_at" => "$submitted_at"
         }
       })
       self
@@ -139,13 +140,13 @@ module Queries
         if employer.present?
           plan_years = employer.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE + ['expired'])
           plan_year = plan_years.where(:start_on => effective_on || @effective_on).first
-        end 
+        end
 
         if plan_year.blank? || plan_year.external_plan_year?
           id_list
         else
           id_list += plan_year.benefit_groups.map(&:id)
-        end     
+        end
       end
     end
 

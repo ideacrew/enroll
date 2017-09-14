@@ -14,7 +14,7 @@ describe ReinstatePlanYear, dbclean: :after_each do
 
   describe "reinstate_plan_year", dbclean: :after_each do
 
-    let!(:plan_year)         { FactoryGirl.build(:plan_year, aasm_state:'terminated') }
+    let!(:plan_year)         { FactoryGirl.build(:plan_year, aasm_state:'terminated', terminated_on: TimeKeeper.date_of_record - 30.days) }
     let!(:employer_profile)  { FactoryGirl.build(:employer_profile,plan_years:[plan_year]) }
     let!(:organization)  { FactoryGirl.create(:organization,employer_profile:employer_profile)}
 
@@ -28,13 +28,19 @@ describe ReinstatePlanYear, dbclean: :after_each do
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq 'active'
+      expect(plan_year.end_on).to eq plan_year.start_on + 364.days
+      expect(plan_year.terminated_on).to eq nil
     end
 
     it "should not reinstate plan year" do
+      end_on = plan_year.end_on
+      terminated_on = plan_year.terminated_on
       plan_year.update_attributes!(aasm_state:'canceled')
       subject.migrate
       plan_year.reload
       expect(plan_year.aasm_state).to eq 'canceled'
+      expect(plan_year.end_on).to eq end_on
+      expect(plan_year.terminated_on).to eq terminated_on
     end
   end
 end
