@@ -142,4 +142,23 @@ module FinancialAssistanceHelper
     end
   end
 
+  def frequency_kind_options
+    %w(biweekly daily half_yearly monthly quarterly weekly yearly)
+  end
+
+  def state_options
+    %w(AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NY NC ND OH OK OR PA PR RI SC SD TN TX UT VA VI VT WA WV WI WY)
+  end
+
+  def income_form_for(application, applicant, income)
+    url = if income.new_record?
+      financial_assistance_application_applicant_incomes_path(application, applicant)
+    else
+      financial_assistance_application_applicant_income_path(@application, @applicant, income)
+    end
+
+    form_for income, url: url, remote: true do |f|
+      yield f
+    end
+  end
 end
