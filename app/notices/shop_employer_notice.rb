@@ -13,7 +13,7 @@ class ShopEmployerNotice < Notice
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
     self.key = args[:key]
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
@@ -23,9 +23,11 @@ class ShopEmployerNotice < Notice
     attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
+    send_generic_notice_alert_to_broker_and_ga
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
     notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
@@ -71,6 +73,19 @@ class ShopEmployerNotice < Notice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def send_generic_notice_alert_to_broker_and_ga
+    if employer_profile.broker_agency_profile.present?
+      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
+    end
+    if employer_profile.general_agency_profile.present?
+      ga_staff_name = employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
+      ga_staff_email = employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, employer_profile.legal_name.titleize).deliver_now
+    end
   end
 
   def append_broker(broker)
