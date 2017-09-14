@@ -1009,6 +1009,7 @@ describe Person do
       let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household_id: tax_household.id, csr_percent_as_integer: 10)}
 
       before :each do
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
         family1.applications<<application
         family1.applications.first.tax_households<<tax_household
         family1.save
