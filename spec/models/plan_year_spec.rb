@@ -657,10 +657,10 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
         end
 
         it "and plan year should be in publish pending state" do
