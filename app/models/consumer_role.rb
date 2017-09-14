@@ -21,6 +21,7 @@ class ConsumerRole
 
   SSN_VALIDATION_STATES = %w(na valid outstanding pending)
   NATIVE_VALIDATION_STATES = %w(na valid outstanding pending)
+  LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
   US_CITIZEN_STATUS_KINDS = %W(
@@ -72,6 +73,10 @@ class ConsumerRole
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
   field :native_validation, type: String, default: nil
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => true
+
+  # DC residency
+  field :local_residency_validation, type: String
+  validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
   field :lawful_presence_update_reason, type: Hash
@@ -185,6 +190,8 @@ class ConsumerRole
         !ssn_verified? && !has_docs_for_type?(type)
       when 'American Indian Status'
         !native_verified? && !has_docs_for_type?(type)
+      when 'Local residency'
+        # !local_residency_verified && !has_docs_for_type?(type)
       else
         !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
@@ -639,6 +646,10 @@ class ConsumerRole
     citizen_status == "indian_tribe_member"
   end
 
+  def local_residency_verified?
+    ["valid", "attested"].include?(local_residency_validation)
+  end
+
   def mark_doc_type_uploaded(v_type)
     case v_type
       when "Social Security Number"
@@ -734,13 +745,16 @@ class ConsumerRole
   end
 
   def update_verification_type(v_type, update_reason, *authority)
-    if v_type == "Social Security Number"
-      update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
-    elsif v_type == "American Indian Status"
-      update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
-    else
-      lawful_presence_determination.authorize!(verification_attr(authority.first))
-      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
+    case v_type
+      when "Social Security Number"
+        update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
+      when "American Indian Status"
+        update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
+      when "Local residency"
+        # handle local residency verificatio
+      else
+        lawful_presence_determination.authorize!(verification_attr(authority.first))
+        update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason} )
     end
     (all_types_verified? && !fully_verified?) ? verify_ivl_by_admin(authority.first) : "#{v_type} successfully verified."
   end

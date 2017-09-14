@@ -33,6 +33,14 @@ module VerificationHelper
         else
           "outstanding"
         end
+      when 'Local residency'
+        if consumer.local_residency_verified?
+          consumer.local_residency_validation
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
+          "in review"
+        else
+          "outstanding"
+        end
       else
         if consumer.lawful_presence_verified?
           "verified"
@@ -53,6 +61,8 @@ module VerificationHelper
       when "outstanding"
         member.consumer_role.processing_hub_24h? ? "info" : "danger"
       when "curam"
+        "default"
+      when "attested"
         "default"
     end
   end
