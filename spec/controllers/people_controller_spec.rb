@@ -53,9 +53,12 @@ RSpec.describe PeopleController do
     end
 
     context "when individual" do
-      it "update person" do
+
+      before do
         allow(request).to receive(:referer).and_return("insured/families/personal")
         allow(person).to receive(:has_active_consumer_role?).and_return(true)
+      end
+      it "update person" do
         allow(consumer_role).to receive(:find_document).and_return(vlp_document)
         allow(vlp_document).to receive(:save).and_return(true)
         consumer_role_attributes[:vlp_documents_attributes] = vlp_documents_attributes
@@ -68,13 +71,16 @@ RSpec.describe PeopleController do
       end
 
       it "should update is_applying_coverage" do
-        allow(request).to receive(:referer).and_return("insured/families/personal")
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
         allow(person).to receive(:update_attributes).and_return(true)
         person_attributes.merge!({"is_applying_coverage" => "false"})
 
         post :update, id: person.id, person: person_attributes
         expect(assigns(:person).consumer_role.is_applying_coverage).to eq false
+      end
+
+      it "should call can_retrigger_residency?!" do
+        expect(subject).to receive(:can_retrigger_residency?)
+        post :update, id: person.id, person: person_attributes
       end
     end
 
@@ -87,6 +93,11 @@ RSpec.describe PeopleController do
         post :update, id: person.id, person: person_attributes
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
+      end
+
+      it "should not call can_retrigger_residency?!" do
+        expect(subject).not_to receive(:can_retrigger_residency?)
+        post :update, id: person.id, person: person_attributes
       end
     end
   end

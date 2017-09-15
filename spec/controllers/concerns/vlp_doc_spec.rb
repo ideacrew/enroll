@@ -63,4 +63,81 @@ describe FakesController do
       it_behaves_like "returns vlp document subject", document, "eligible_immigration_status"
     end
   end
+
+  context "can_retrigger_residency?" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_role.person)}
+    let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+    before do
+      subject.instance_variable_set("@person", consumer_role.person)
+      subject.instance_variable_set("@family", family)
+    end
+
+    context "when person has age > 19 & has an active coverage" do
+
+      before :each do
+        allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+        allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      end
+
+      it "should return true if there is a change in address from non-dc to dc" do
+        consumer_role.person.update_attributes(no_dc_address: true)
+        expect(subject.can_retrigger_residency?("false")).to eq true
+      end
+
+      it "should return false if there is a change in address from dc to non-dc" do
+        consumer_role.person.update_attributes(no_dc_address: false)
+        expect(subject.can_retrigger_residency?("true")).to eq false
+      end
+
+      it "should return false if there is a change in address from dc to dc" do
+        consumer_role.person.update_attributes(no_dc_address: false)
+        expect(subject.can_retrigger_residency?("false")).to eq false
+      end
+
+      it "should return false if there is a change in address from non-dc to non-dc" do
+        consumer_role.person.update_attributes(no_dc_address: true)
+        expect(subject.can_retrigger_residency?("true")).to eq false
+      end
+    end
+
+    context "when has an active coverage & address change from non-dc to dc", dbclean: :after_each do
+
+      before do
+        consumer_role.person.update_attributes(no_dc_address: true)
+        allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+        allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      end
+
+      it "should return true if age > 18" do
+        expect(subject.can_retrigger_residency?("false")).to eq true
+      end
+
+      it "should return false if age = 18" do
+        consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
+        expect(subject.can_retrigger_residency?("false")).to eq false
+      end
+
+      it "should return false if age < 18" do
+        consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
+        expect(subject.can_retrigger_residency?("false")).to eq false
+      end
+    end
+
+    context "when age > 18 & address change from non-dc to dc" do
+      before do
+        consumer_role.person.update_attributes(no_dc_address: true)
+        allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+      end
+
+      it "should return true if has an active coverage" do
+        allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+        expect(subject.can_retrigger_residency?("false")).to eq true
+      end
+
+      it "should return false if no active coverage" do
+        allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
+        expect(subject.can_retrigger_residency?("false")).to eq false
+      end
+    end
+  end
 end
