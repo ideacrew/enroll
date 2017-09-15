@@ -397,7 +397,7 @@ RSpec.describe Employers::EmployerProfilesController do
 
     let(:save_result) { false }
 
-    let(:organization) { double(:employer_profile => double) }
+    let(:organization) { double(:employer_profile => double(:id => "emp pro id")) }
 
     before(:each) do
       @user = FactoryGirl.create(:user)
@@ -471,7 +471,7 @@ RSpec.describe Employers::EmployerProfilesController do
     let(:user) { double("User", :idp_verified? => true) }
     let(:person) { double("Person", :id => "SOME PERSON ID") }
     let(:employer_parameters) { { :first_name => "SOMDFINKETHING" } }
-    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double) }
+    let(:found_employer) { double("test", :save => validation_result, :employer_profile => double(:id => "emp pro id") ) }
     let(:office_locations){[double(address: double("address"), phone: double("phone"), email: double("email"))]}
     let(:organization) {double(office_locations: office_locations)}
 
@@ -484,8 +484,6 @@ RSpec.describe Employers::EmployerProfilesController do
       allow(Forms::EmployerProfile).to receive(:new).and_return(found_employer)
       
       allow(@user).to receive(:switch_to_idp!)
-#      allow(EmployerProfile).to receive(:find_by_fein).and_return(found_employer)
-#      allow(found_employer).to receive(:organization).and_return(organization)
       post :create, :organization => employer_parameters
     end
 
