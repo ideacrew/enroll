@@ -214,7 +214,13 @@ GEM
       coffee-rails (>= 3.2)
       railties (>= 3.0)
       sass-rails (>= 3.2)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
+    climate_control (0.2.0)
     cliver (0.3.2)
+    cocaine (0.5.8)
+      climate_control (>= 0.0.3, < 1.0)
     coderay (1.1.1)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -673,6 +679,7 @@ DEPENDENCIES
   carrierwave-mongoid
   certified
   chosen-rails
+  ckeditor
   coffee-rails (~> 4.1.0)
   combine_pdf
   config (~> 1.0.0)

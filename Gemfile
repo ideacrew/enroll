@@ -117,7 +117,7 @@ gem 'chosen-rails'
 # gem 'rails_semantic_logger'
 # gem 'rocketjob', '~> 3.0'
 
-# gem 'ckeditor'
+gem 'ckeditor'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
