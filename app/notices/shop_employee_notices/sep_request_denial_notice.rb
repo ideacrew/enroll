@@ -22,7 +22,7 @@ class ShopEmployeeNotices::SepRequestDenialNotice < ShopEmployeeNotice
   	title = self.qle.title
     qle_reported_on = TimeKeeper.date_of_record
     qle_on = Date.strptime(self.qle_reported_date.to_s, "%m/%d/%Y").to_date
-  	reporting_deadline = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
+  	reporting_deadline = qle_on > TimeKeeper.date_of_record ? qle_reported_on : qle_on + 30.days
   	notice.qle = PdfTemplates::QualifyingLifeEventKind.new({
   	   :qle_on => qle_on,
   	   :qle_reported_on => qle_reported_on,
