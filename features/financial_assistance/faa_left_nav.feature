@@ -3,11 +3,11 @@ Feature: A dedicated page that gives the user access to household member creatio
 Background: Left Nav
   Given that an FA application is in the draft state
   And the user is on the FAA Household Info: Family Members page
-  And the left column will present the following sections Financial Assistance, Household Info & Review & Submit
+  And the left column will present the following sections View My Applications, Household Info & Review & Submit
 
 Scenario: Left Nav Links
   Given that the user is on the FAA Household Info: Family Members page
-  When the user clicks the Financial Applications link in left nav
+  When the user clicks the View My Applications link in left nav
   Then the user will navigate to the household's Application Index page
 
 Scenario: Left Nav Links
