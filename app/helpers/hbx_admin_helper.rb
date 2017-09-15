@@ -42,9 +42,8 @@ module HbxAdminHelper
     ((aptc_applied/max_aptc)*100).round
   end
 
-  def inactive_and_without_aptc_enrollments(family, year)
-    family.active_household.hbx_enrollments.canceled_and_terminated.with_plan.with_aptc.by_year(year) +
-    family.active_household.hbx_enrollments.with_plan.without_aptc.by_year(year)
+  def inactive_enrollments(family, year)
+    family.active_household.hbx_enrollments.canceled_and_terminated.with_plan.by_year(year)
   end
 
   def primary_member(person_id)

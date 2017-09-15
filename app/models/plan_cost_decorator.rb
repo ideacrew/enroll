@@ -9,6 +9,7 @@ class PlanCostDecorator < SimpleDelegator
     @benefit_group = benefit_group
     @reference_plan = reference_plan
     @max_contribution_cache = max_cont_cache
+    @plan = plan
   end
 
   def plan_year_start_on
@@ -54,6 +55,7 @@ class PlanCostDecorator < SimpleDelegator
       "guardian" => nil,
       "court_appointed_guardian" => nil,
       "collateral_dependent" => "child_under_26",
+      "domestic_partner" => "domestic_partner",
       "life_partner" => "domestic_partner",
       "child" => "child_under_26",
       "grandchild" => nil,
@@ -105,6 +107,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def employer_contribution_for(member)
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     ([max_employer_contribution(member), premium_for(member)].min * large_family_factor(member)).round(2)
   end
 
@@ -117,6 +120,7 @@ class PlanCostDecorator < SimpleDelegator
   end
 
   def total_employer_contribution
+    return 0 if @member_provider.present? && @member_provider.is_cobra_status?
     (members.reduce(0.00) do |sum, member|
       (sum + employer_contribution_for(member)).round(2)
     end).round(2)

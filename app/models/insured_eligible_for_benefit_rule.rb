@@ -13,9 +13,10 @@ class InsuredEligibleForBenefitRule
 
   def initialize(role, benefit_package, options = {})
     @role = role
-    @family = options[:family]
+    @family = options[:family] || @role.person.families.first
     @benefit_package = benefit_package
     @coverage_kind = options[:coverage_kind].present? ? options[:coverage_kind] : 'health'
+    @new_effective_on = options[:new_effective_on]
   end
 
   def setup
@@ -37,7 +38,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def satisfied?
-    if @role.class.name == "ConsumerRole" 
+    if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
         if self.public_send("is_#{element}_satisfied?")
@@ -48,9 +49,20 @@ class InsuredEligibleForBenefitRule
         end
       end
       status = false if is_age_range_satisfied_for_catastrophic? == false
+      status = set_status_and_error_if_not_applying_coverage if @role.class.name == "ConsumerRole" && is_applying_coverage_status_satisfied? == false
       return status, @errors
     end
     [false]
+  end
+
+  def set_status_and_error_if_not_applying_coverage
+    status = false
+    @errors = ["Did not apply for coverage."]
+    return status
+  end
+
+  def is_applying_coverage_status_satisfied?
+    @role.is_applying_coverage?
   end
 
   def is_age_range_satisfied_for_catastrophic?
@@ -64,7 +76,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_cost_sharing_satisfied?
-    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year)
+    tax_household = @role.latest_active_tax_household_with_year(@benefit_package.effective_year, @family)
     return true if tax_household.blank?
 
     cost_sharing = @benefit_package.cost_sharing
@@ -82,8 +94,17 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_family_relationships_satisfied?
-    age = age_on_next_effective_date(@role.dob)
-    relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    return true unless relation_ship_with_primary_applicant == 'child'
+    is_child_age_satisfied?
+  end
+
+  def is_child_age_satisfied?
+    unless @new_effective_on.nil?
+      relation_ship_with_primary_applicant == 'child' && @new_effective_on.kind_of?(Date) && @new_effective_on < @role.dob+26.years ? true : false
+    else
+      age = age_on_next_effective_date(@role.dob)
+      relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    end
   end
 
   def is_benefit_categories_satisfied?
@@ -91,7 +112,9 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_citizenship_status_satisfied?
-    @role.citizen_status == "not_lawfully_present_in_us" ? false : true
+    return true if @role.is_a?(ResidentRole)
+    return false if @role.citizen_status.blank?
+    !ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.include? @role.citizen_status
   end
 
   def is_ethnicity_satisfied?
@@ -106,7 +129,7 @@ class InsuredEligibleForBenefitRule
       return true if person.is_dc_resident?
 
       #TODO person can have more than one families
-      person.families.last.family_members.active.each do |family_member|
+      @family.family_members.active.each do |family_member|
         if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
           return true
         end
@@ -122,7 +145,6 @@ class InsuredEligibleForBenefitRule
 
   def is_age_range_satisfied?
     return true if @benefit_package.age_range == (0..0)
-
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)
   end

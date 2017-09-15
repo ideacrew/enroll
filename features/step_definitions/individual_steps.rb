@@ -94,7 +94,7 @@ Then (/Individual resumes enrollment/) do
 end
 
 Then (/Individual sees previously saved address/) do
-  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD')
+  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -564,5 +564,4 @@ Then(/Aptc user should see aptc amount on individual home page/) do
   expect(@browser.strong(text: "$20.00").visible?).to be_truthy
   expect(@browser.label(text: /APTC AMOUNT/).visible?).to be_truthy
   screenshot("aptc_ivl_home")
-
 end
