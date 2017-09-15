@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
 
-  mount TransportGateway::Engine, at: "/transport_gateway"
-  mount TransportProfiles::Engine, at: "/transport_profiles"
+  #mount TransportGateway::Engine, at: "/transport_gateway"
+  #mount TransportProfiles::Engine, at: "/transport_profiles"
   mount Notifier::Engine, at: "/notifier" 
-  mount RocketJobMissionControl::Engine => 'rocketjob'
+  #mount RocketJobMissionControl::Engine => 'rocketjob'
 
   require 'resque/server'
   mount Resque::Server, at: '/jobs'

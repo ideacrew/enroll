@@ -4,6 +4,12 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
 
+# Mount Enroll App component engines
+#not using transport_gateway, transport_profiles
+#gem "transport_gateway",  path: "components/transport_gateway"
+gem "notifier",           path: "components/notifier"
+#gem "transport_profiles", path: "components/transport_profiles"
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 
