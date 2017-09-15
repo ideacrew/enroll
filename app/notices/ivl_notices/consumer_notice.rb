@@ -45,7 +45,6 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def append_unverified_family_members
-    enrollments = recipient.primary_family.households.flat_map(&:hbx_enrollments)
     family = recipient.primary_family
     enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
       (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
@@ -98,9 +97,9 @@ class IvlNotices::ConsumerNotice < IvlNotice
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
       is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.plan.is_csr?) ? true : false,
-      enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
-        names << member.person.full_name.titleize
-      end
+      # enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
+      #   names << member.person.full_name.titleize
+      # end
     })
   end
 
