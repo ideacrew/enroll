@@ -32,7 +32,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
         person.consumer_role.verify_ivl_by_admin
         puts "Person state verified person: #{person.id}" unless Rails.env.test?
       rescue => e
-        puts "Issue migrating person #{person.id}"
+        puts "Issue migrating person #{person.id}" unless Rails.env.test?
       end
     end
   end
