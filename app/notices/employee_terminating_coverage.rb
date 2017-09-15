@@ -27,9 +27,9 @@ class EmployeeTerminatingCoverage < Notice
   end
 
   def append_data
-    terminated_enrollment = census_employee.active_benefit_group_assignment.hbx_enrollment
+    terminated_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.aasm_state == 'coverage_termination_pending'}
     notice.enrollment = PdfTemplates::Enrollment.new({
-      :terminated_on => terminated_enrollment.set_coverage_termination_date,
+      :terminated_on => terminated_enrollment.terminated_on,
       :enrolled_count => terminated_enrollment.humanized_dependent_summary
       })
   end

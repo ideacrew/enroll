@@ -69,12 +69,12 @@ RSpec.describe EmployeeTerminatingCoverage do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = EmployeeTerminatingCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
     end
 
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.set_coverage_termination_date
+      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe EmployeeTerminatingCoverage do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = EmployeeTerminatingCoverage.new(census_employee, valid_params)
-      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should render terminating_coverage_notice" do
       expect(@employee_notice.template).to eq "notices/employee_terminating_coverage"
