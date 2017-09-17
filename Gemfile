@@ -118,6 +118,9 @@ gem 'chosen-rails'
 # gem 'rocketjob', '~> 3.0'
 
 gem 'ckeditor'
+gem 'redcarpet', '3.4.0'
+gem 'slim', '3.0.8'
+gem 'curl'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

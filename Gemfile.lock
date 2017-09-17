@@ -708,6 +708,7 @@ DEPENDENCIES
   combine_pdf
   config (~> 1.0.0)
   cucumber-rails (~> 1.4.2)
+  curl
   database_cleaner (= 1.5.3)
   devise (>= 3.5.4)
   effective_datatables!
@@ -759,6 +760,7 @@ DEPENDENCIES
   rails-i18n (= 4.0.8)
   recaptcha (= 4.3.1)
   recurring_select!
+  redcarpet (= 3.4.0)
   redis-rails
   resque
   roo (~> 2.1.0)
@@ -772,6 +774,7 @@ DEPENDENCIES
   shoulda-matchers (= 3.1.1)
   simple_calendar!
   simplecov (= 0.14.1)
+  slim (= 3.0.8)
   spring (= 1.6.3)
   sprockets (~> 2.12.3)
   symmetric-encryption (~> 3.6.0)
