@@ -131,8 +131,6 @@ class FinancialAssistance::Applicant
   field :has_eligible_health_coverage, type: Boolean
 
   field :workflow, type: Hash, default: { }
-
-  default_scope -> {where(:is_active => true)}
   
   embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
@@ -201,7 +199,7 @@ class FinancialAssistance::Applicant
     spouse_relationship  = self.person.person_relationships.where(kind: 'spouse').first
     if spouse_relationship.present?
       spouse = Person.find(spouse_relationship.successor_id)
-      spouse_applicant = application.applicants.detect {|applicant| spouse == applicant.person }
+      spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
       return spouse_applicant.tax_household
     end
     return nil

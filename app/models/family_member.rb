@@ -145,7 +145,7 @@ class FamilyMember
   end
 
   def applicant_of_application(application)
-    application.applicants.where(family_member_id: self.id).first
+    application.active_applicants.where(family_member_id: self.id).first
   end
 
   private

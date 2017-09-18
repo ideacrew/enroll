@@ -79,6 +79,8 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
+      financial_application = @dependent.family_member.family.application_in_progress
+      @application = financial_application if financial_application.present?
       @created = true
       @missing_relation_url = insured_family_relationships_path(consumer_role_id: params[:consumer_role_id], employee_role_id: params[:employee_role_id])
       @matrix = @dependent.family.build_relationship_matrix
@@ -107,9 +109,9 @@ class Insured::FamilyMembersController < ApplicationController
     @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
     family_member = @dependent.family_member
-    application = family_member.family.application_in_progress
+    @application = family_member.family.application_in_progress
     # Set corresponding Applicant to Inactive if you have a FAA application in progress
-    family_member.applicant_of_application(application).update_attribute("is_active", false) if application
+    family_member.applicant_of_application(@application).update_attribute("is_active", false) if @application
 
     respond_to do |format|
       format.html { render 'index' }
