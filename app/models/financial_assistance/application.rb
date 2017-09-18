@@ -392,14 +392,31 @@ class FinancialAssistance::Application
   end
 
   def send_failed_response
-    message = "Timed-out waiting for eligibility determination response" if !has_eligibility_response
-    message = "Invalid schema eligibility determination response provided" if has_eligibility_response && determination_http_status_code == 422
-    notify("acapi.info.events.eligibility_determination.rejected",
+    if !has_eligibility_response
+      message = "Timed-out waiting for eligibility determination response"
+      return_status = 504
+      notify("acapi.info.events.eligibility_determination.rejected",
           {:correlation_id => SecureRandom.uuid.gsub("-",""),
             :body => { error_message: message },
             :family_id => family_id.to_s,
             :assistance_application_id => _id.to_s,
-            :return_status => 422})
+            :return_status => return_status.to_s,
+            :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
+    end
+
+    if has_eligibility_response && determination_http_status_code == 422
+      message = "Invalid schema eligibility determination response provided"
+      notify("acapi.info.events.eligibility_determination.rejected",
+          {:correlation_id => SecureRandom.uuid.gsub("-",""),
+            :body => { error_message: message },
+            :family_id => family_id.to_s,
+            :assistance_application_id => _id.to_s,
+            :return_status => determination_http_status_code.to_s,
+            :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
+            :haven_application_id => haven_app_id,
+            :haven_ic_id => haven_ic_id,
+            :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
+    end
   end
 
   def ready_for_attestation?

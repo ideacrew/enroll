@@ -167,6 +167,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
+    @application.update_attributes(determination_http_status_code: 504) if @application.determination_http_status_code.nil?
     @application.send_failed_response
 
     render layout: 'financial_assistance'
