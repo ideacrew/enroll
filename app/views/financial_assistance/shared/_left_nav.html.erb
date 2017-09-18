@@ -53,7 +53,16 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
+          <%= link_to @applicant.incomes.present? ? other_financial_assistance_application_applicant_incomes_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.incomes.present?)}" do %>
+            <% if @applicant.has_other_income && @applicant.other_incomes_complete? %>
+              <span class="fa fa-check applicant-check"></span>
+            <% end %>
+            Other Income
+          <% end %>
+        </li>
+
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %>">
           <%= link_to @applicant.deductions.present? ? financial_assistance_application_applicant_deductions_path(@application, @applicant) : "#", class: "#{left_nav_css(@applicant.deductions.present?)}" do %>
             <% if @applicant.deductions_complete? && @applicant.deductions.present? %>
               <span class="fa fa-check applicant-check"></span>
