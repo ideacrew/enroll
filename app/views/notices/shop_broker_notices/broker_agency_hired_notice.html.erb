@@ -6,7 +6,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-top: 10px"><%= notice.employer_name%> HAS HIRED YOU AS THEIR BROKER</td>
+      <td style="padding-top: 10px"><%= notice.employer_name.upcase %> HAS HIRED YOU AS THEIR BROKER</td>
     </tr>
   </tbody>
 </table>
@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! <strong>#{notice.broker.full_name}</strong> has been selected as the broker for <strong>#{notice.employer_name}</strong> as of #{notice.broker.assignment_date}, The primary contact for <strong>#{notice.employer_name}</strong>  is #{notice.employer.employer_first_name} #{notice.employer.employer_last_name}, #{notice.employer.employer_phone}, #{notice.employer.employer_email}.", top_margin: '10px'} %>
+  { content: "Congratulations! <strong>#{notice.broker.full_name}</strong> has been selected as the broker for <strong>#{notice.employer_name}</strong> as of #{notice.broker.assignment_date}. The primary contact for <strong>#{notice.employer_name}</strong> is #{notice.employer.employer_first_name} #{notice.employer.employer_last_name}, #{notice.employer.employer_phone}, #{notice.employer.employer_email}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Please remember that as a registered broker with #{Settings.site.short_name}, you are agreeing to the #{Settings.site.short_name} Statement of Producer Attestations when logging into <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>.",  top_margin: '10px'} %>
