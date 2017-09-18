@@ -12,13 +12,13 @@ Given(/^the user is on the FAA Household Info: Family Members page$/) do
   end
 end
 
-Given(/^the left column will present the following sections Financial Assistance, Household Info & Review & Submit$/) do
-  expect(page).to have_content('Financial Applications')
+Given(/^the left column will present the following sections View My Applications, Household Info & Review & Submit$/) do
+  expect(page).to have_content('View My Applications')
   expect(page).to have_content('Household Info')
   expect(page).to have_content('Review and Submit')
 end
 
-When(/^the user clicks the Financial Applications link in left nav$/) do
+When(/^the user clicks the View My Applications link in left nav$/) do
   find(:xpath,'//*[@id="left-navigation"]/li[1]/a').click
 end
 
