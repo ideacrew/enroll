@@ -167,6 +167,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     @family = @person.primary_family
     @application = @person.primary_family.applications.find(params[:id])
+    @application.send_failed_response
 
     render layout: 'financial_assistance'
   end
