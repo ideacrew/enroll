@@ -20,6 +20,8 @@ class CarrierProfile
   field :issuer_state, type: String, default: "DC"
   field :market_coverage, type: String, default: "shop (small group)" # or individual
   field :dental_only_plan, type: Boolean, default: false
+  
+  embeds_many :carrier_contacts
 
 
   delegate :hbx_id, to: :organization, allow_nil: true
