@@ -95,5 +95,16 @@ module Notifier
     # def to_html
     #   self.markdown.render(template.body)
     # end
+
+    def self.to_csv
+
+      CSV.generate(headers: true) do |csv|
+        csv << ['Notice Number', 'Title', 'Description', 'Notice Template']
+
+        all.each do |notice|
+          csv << [notice.notice_number, notice.title, notice.description, notice.template.try(:raw_body)]
+        end
+      end
+    end
   end
 end

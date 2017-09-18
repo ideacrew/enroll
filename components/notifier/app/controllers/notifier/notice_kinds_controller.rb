@@ -55,6 +55,14 @@ module Notifier
       redirect_to notice_kinds_path
     end
 
+    def download_notices
+      notices = Notifier::NoticeKind.where(:id.in => params['ids'])
+
+      send_data Notifier::NoticeKind.to_csv, 
+        :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
+        :disposition => 'inline'
+    end
+
     def get_tokens
       builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
       tokens = builder.constantize.new.editor_tokens
