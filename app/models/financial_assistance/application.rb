@@ -438,6 +438,10 @@ class FinancialAssistance::Application
     self.aasm_state == "determined" ? true : false
   end
 
+  def active_applicants
+    applicants.where(is_active: true)
+  end
+
   def incomplete_applicants?
     active_applicants.each do |applicant|
       return true if applicant.applicant_validation_complete? == false
@@ -636,6 +640,27 @@ class FinancialAssistance::Application
 
   def has_atleast_one_assisted_but_no_medicaid_applicant?
     active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
+  end
+
+  def copy_application
+    if self.family.application_in_progress.blank?
+      self.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      new_application = self.dup
+      new_application.applicants.each do |applicant|
+        applicant.person.person_relationships.each do |pr|
+          puts pr.inspect
+        end
+      end
+      new_application.aasm_state = "draft"
+      new_application.submitted_at = nil
+      new_application.created_at = nil
+      new_application.save!
+      new_application
+    end
   end
 
 private

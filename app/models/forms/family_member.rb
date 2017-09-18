@@ -32,14 +32,14 @@ module Forms
 
     attr_reader :dob
 
-    HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
+    HUMANIZED_ATTRIBUTES = {relationship: "Select Relationship Type "}
 
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
     end
 
     def consumer_fields_validation
-      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
+      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true") #only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -78,14 +78,16 @@ module Forms
       return false unless valid?
       existing_inactive_family_member = family.find_matching_inactive_member(self)
       if existing_inactive_family_member
+        puts "IN EXISTING INACTIVE FAMILY"
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
         existing_inactive_family_member.save!
         family.save!
-        return true
+        return create_application_and_return
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
+        puts "IN Existing Person"
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
           family_member.family.build_consumer_role(family_member)
@@ -96,7 +98,7 @@ module Forms
         family_member.save!
         family.save!
         self.id = family_member.id
-        return true
+        return create_application_and_return
       end
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
@@ -111,7 +113,16 @@ module Forms
       family.save!
       family.build_relationship_matrix
       self.id = family_member.id
-      true
+      create_application_and_return
+    end
+
+    def create_application_and_return
+      current_applicant = family.family_members.find(self.id).try(:person)
+      if !family.application_in_progress.present? && current_applicant.present?
+        application = family.applications.order_by(:submitted_at => 'desc').first
+        application.copy_application if application.present? && application.applicants.select{ |applicant| applicant.person.id == current_applicant.id }.count == 0
+      end
+     return true
     end
 
     def try_create_person(person)
@@ -197,6 +208,17 @@ module Forms
     def destroy!
       family.remove_family_member(family_member.person)
       family.save!
+      application = family.application_in_progress
+      if application.present?
+        applicant = application.applicants.where(family_member_id: self.family_member.id).first
+        applicant.update_attributes(is_active: false) if applicant.present?
+      else
+        if family.applications.present?
+          application = family.applications.order_by(:submitted_at => 'desc').first.copy_application
+          dependent_applicant = application.applicants.where(family_member_id: self.family_member.id).first
+          dependent_applicant.update_attribute("is_active", false)
+        end
+      end
     end
 
     def family
@@ -296,6 +318,11 @@ module Forms
       family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
       family.build_relationship_matrix
       family_member.save!
+      if family.applications.present?
+        unless family.application_in_progress || family_member.person.is_a_valid_faa_update?(attr)
+          family.applications.order_by(:submitted_at => 'desc').first.copy_application
+        end
+      end
       true
     end
 
@@ -304,11 +331,18 @@ module Forms
       return if family.blank? || family.family_members.blank?
 
       relationships = Hash.new
-      family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}
+      family.active_family_members.each {|fm| relationships[fm._id.to_s]=fm.relationship}
       relationships[self.id.to_s] = self.relationship
-      if relationships.values.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
+      if relationships.values.count {|rs| rs=='spouse' || rs=='life_partner'} > 1
         self.errors.add(:base, "can not have multiple spouse or life partner")
       end
     end
+
+    private
+
+    def copy_financial_application
+    end
+
+
   end
 end
