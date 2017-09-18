@@ -10,7 +10,7 @@ class CorrectNotLawfullyCitizenStatus < MongoidMigrationTask
   end
 
   def get_enrollments(family)
-    family.active_household.hbx_enrollments.active.enrolled_and_renewing
+    family.active_household.hbx_enrollments.individual_market.active.enrolled_and_renewing
   end
 
   def get_members(enrollment)
