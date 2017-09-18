@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Deduction, type: :model do
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-  let (:household) {family.households.first}
+  let(:household) {family.households.first}
   let(:application) { FactoryGirl.create(:application, family: family) }
   let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil, application_id: application.id )}
   let(:family_member) { family.primary_applicant }
@@ -11,10 +11,10 @@ RSpec.describe FinancialAssistance::Deduction, type: :model do
 
   let(:valid_params){
     {
-        applicant: applicant,
-        amount: 1000,
-        frequency_kind: 'monthly',
-        start_on: Date.today
+      applicant: applicant,
+      amount: 1000,
+      frequency_kind: 'monthly',
+      start_on: Date.today
     }
   }
 
