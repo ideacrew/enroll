@@ -22,7 +22,6 @@
           <th> POC No. </th>
           <th> Username </th>
           <th> eMail </th>
-          <th> User Roles </th>
           <th> Last Sign In </th>
           <th> Person Created Date </th>
           <th> Phone Number </th>
@@ -39,7 +38,6 @@
             <td></td>
             <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
             <td> <%= user.present? ? user.email : "Nil" %> </td>
-            <td> <%= user.present? ? user.roles.collect(&:humanize).join(", ") : "Nil" %> </td>
             <% if user.present? %>
               <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
             <% else %>
