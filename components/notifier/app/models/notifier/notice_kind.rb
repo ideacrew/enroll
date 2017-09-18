@@ -22,7 +22,8 @@ module Notifier
     embeds_one :merge_data_model
 
     def receipient_class_name
-      receipient.constantize.class_name.underscore
+      # receipient.constantize.class_name.underscore
+      receipient.to_s.split('::').last.underscore.to_sym
     end
 
     def to_html(options = {})
