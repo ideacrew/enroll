@@ -66,7 +66,7 @@ class EmployerInvoice
   def send_invoice_available_notice
      #   Triggers this Notice if it is an initial invoice
     if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+      @organization.employer_profile.trigger_notices("initial_employer_first_invoice_available")
     else
     #   Triggers this Notice if it is not an initial invoice or it is a renewal invoice
       @organization.employer_profile.trigger_notices("renewal_employer_invoice_available")

@@ -1,4 +1,4 @@
-class ShopEmployerNotices::RenewalEmployerInvoiceAvailable < ShopEmployerNotice
+class ShopEmployerNotices::EmployerInvoiceAvailable < ShopEmployerNotice
   def deliver
     build
     append_data

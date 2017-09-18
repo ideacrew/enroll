@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
+RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
@@ -8,8 +8,8 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
       :name =>'Employer monthly invoice available in the account',
-      :notice_template => 'notices/shop_employer_notices/renewal_employer_invoice_available_notice',
-      :notice_builder => 'ShopEmployerNotices::RenewalEmployerInvoiceAvailable',
+      :notice_template => 'notices/shop_employer_notices/employer_invoice_available_notice',
+      :notice_builder => 'ShopEmployerNotices::EmployerInvoiceAvailable',
       :event_name => 'renewal_employer_invoice_available',
       :mpi_indicator => 'SHOP_D021',
       :title => "YYour Renewal Invoice for Employer Sponsored Coverage is Now Available"})
@@ -27,7 +27,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,7 +57,7 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should append necessary information" do
       plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
@@ -71,13 +71,14 @@ RSpec.describe ShopEmployerNotices::RenewalEmployerInvoiceAvailable do
   describe "Render template & Generate PDF" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::RenewalEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should render renewal_employer_available_notice" do
-      expect(@employer_notice.template).to eq "notices/shop_employer_notices/renewal_employer_invoice_available_notice"
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/employer_invoice_available_notice"
     end
     it "should generate pdf" do
-      @employer_notice.deliver
+      @employer_notice.build
+      @employer_notice.append_data
       file = @employer_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end

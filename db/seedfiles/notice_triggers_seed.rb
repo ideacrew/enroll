@@ -385,12 +385,12 @@ shop_notice_triggers = [
     title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
     description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
     resource_name: 'employer',
-    event_name: 'initial_employer_invoice_available',
+    event_name: 'initial_employer_first_invoice_available',
     notice_triggers: [
       {
         name: 'Initial Employer first invoice available in the account',
-        notice_template: 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-        notice_builder: 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
+        notice_template: 'notices/shop_employer_notices/initial_employer_first_invoice_available_notice',
+        notice_builder: 'ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable',
         mpi_indicator: 'MPI_SHOP20',
         notice_trigger_element_group: {
           market_places: ['shop'],
@@ -410,8 +410,8 @@ shop_notice_triggers = [
       notice_triggers: [
           {
               name: 'Employer monthly invoice available in the account',
-              notice_template: 'notices/shop_employer_notices/renewal_employer_invoice_available_notice',
-              notice_builder: 'ShopEmployerNotices::RenewalEmployerInvoiceAvailable',
+              notice_template: 'notices/shop_employer_notices/employer_invoice_available_notice',
+              notice_builder: 'ShopEmployerNotices::EmployerInvoiceAvailable',
               mpi_indicator: 'SHOP_D021',
               notice_trigger_element_group: {
                   market_places: ['shop'],
