@@ -288,6 +288,7 @@ Rails.application.routes.draw do
         get "download_invoice"
         post 'generate_checkbook_urls'
         get "show_invoice"
+        get 'wells_fargo_sso'
       end
       collection do
         get 'welcome'
