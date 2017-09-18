@@ -60,38 +60,9 @@ input[type="radio"]:checked + label span {
     top: 3px;
 }
 
-#left-navigation {
-  a {
-    color:#C3C3C3;
-  }
-
-  li:not(.activer) a:not(.disabled) {
-    color:#0088cc;
-  }
-
-  .active {
-    border-left: 16px solid #92aae0
-  }
-
-  .disabled {
-    background-color: white;
-  }
-
-  .active a {
-    font-weight: bolder;
-    color: white;
-  }
-
-  li {
-    background-color: #fff
-  }
-
-  .applicant-check {
-    color: limegreen;
-  }
-  .cna{
-  cursor: not-allowed !important;
-  }
+.nav-stacked > li + li {
+  margin-top: 0px;
+  margin-left: 0;
 }
 
 .incomes-table, .deductions-table, .benefits-table {
@@ -288,5 +259,3 @@ input.radio-yml {
 .fa-text-color {
   font-weight: lighter;
 }
-
-

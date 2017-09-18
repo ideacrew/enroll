@@ -15,7 +15,7 @@ module Subscribers
       application = FinancialAssistance::Application.find(stringed_key_payload["assistance_application_id"]) if stringed_key_payload["assistance_application_id"].present?
       if application.present?
         payload_http_status_code = stringed_key_payload["return_status"]
-        application.update_attributes(determination_http_status_code: payload_http_status_code)
+        application.update_attributes(determination_http_status_code: payload_http_status_code, has_eligibility_response: true)
         if application.success_status_codes?(payload_http_status_code.to_i)
           if eligibility_payload_schema_valid?(xml)
             sc = ShortCircuit.on(:processing_issue) do |err|

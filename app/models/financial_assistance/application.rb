@@ -72,6 +72,7 @@ class FinancialAssistance::Application
   field :is_ridp_verified, type: Boolean
   field :determination_http_status_code, type: Integer
   field :determination_error_message, type: String
+  field :has_eligibility_response, type: Boolean, default: false
 
   field :workflow, type: Hash, default: { }
 
@@ -388,6 +389,17 @@ class FinancialAssistance::Application
       false
     end
     validity
+  end
+
+  def send_failed_response
+    message = "Timed-out waiting for eligibility determination response" if !has_eligibility_response
+    message = "Invalid schema eligibility determination response provided" if has_eligibility_response && determination_http_status_code == 422
+    notify("acapi.info.events.eligibility_determination.rejected",
+          {:correlation_id => SecureRandom.uuid.gsub("-",""),
+            :body => { error_message: message },
+            :family_id => family_id.to_s,
+            :assistance_application_id => _id.to_s,
+            :return_status => 422})
   end
 
   def ready_for_attestation?
