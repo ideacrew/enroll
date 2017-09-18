@@ -119,19 +119,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         @pay_bill = params[:pay_my_bill]
-        #grab url for WellsFargoSSO and store in insance variable
-        #email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
-        #  @employer_profile.staff_roles.first.emails.first.address) || nil
-
-        #if email.present?
-        #  wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
-        #end
-
-        #if wells_fargo_sso.present?
-        #  if wells_fargo_sso.token.present?
-        #    @wf_url = wells_fargo_sso.url
-        #  end
-        #end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -165,7 +152,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       end
     end
     #need to make error message if connection fails
-    redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts', :pay_my_bill => 'true')
+    if @wf_url.present?
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts', :pay_my_bill => 'true')
+    else
+      flash[:error] = 'Connecting to the Wells Fargo server failed. Please try to pay your bill again later.'
+      redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts')
+
+    end
   end
 
   def show_profile
