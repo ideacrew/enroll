@@ -63,7 +63,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.save
         @created = true
@@ -78,6 +77,7 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
+
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       financial_application = @dependent.family_member.family.application_in_progress
       @application = financial_application if financial_application.present?
@@ -147,7 +147,7 @@ class Insured::FamilyMembersController < ApplicationController
     #Application when in draft state
     @application = @dependent.family_member.family.application_in_progress
     if @application.present?
-    load_support_texts
+      load_support_texts
     end
 
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
