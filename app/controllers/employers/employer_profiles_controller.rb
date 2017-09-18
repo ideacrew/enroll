@@ -155,7 +155,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if @wf_url.present?
       redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts', :pay_my_bill => 'true')
     else
-      flash[:error] = 'Connecting to the Wells Fargo server failed. Please try to pay your bill again later.'
+      flash[:error] = 'Connection to bill pay server failed'
       redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts')
 
     end
