@@ -113,6 +113,10 @@ gem 'interactor-rails', '2.0.2'
 gem 'httparty'
 
 gem 'ckeditor'
+gem 'redcarpet', '3.4.0'
+gem 'slim', '3.0.8'
+gem 'curl'
+gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

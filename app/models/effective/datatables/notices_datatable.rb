@@ -17,7 +17,7 @@ module Effective
           row.description
         }, :filter => false, :sortable => false
         table_column :receipient, :proc => Proc.new { |row|
-         row.receipient_class_name.titleize
+         row.receipient_class_name.to_s.titleize
         }, :filter => false, :sortable => false
         table_column :created_date, :proc => Proc.new { |row|
          row.created_at.strftime('%m/%d/%Y')
