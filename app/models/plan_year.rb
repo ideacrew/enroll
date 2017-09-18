@@ -1052,7 +1052,7 @@ class PlanYear
     begin
       self.employer_profile.census_employees.non_terminated.each do |ce|
         enrollment = ce.active_benefit_group_assignment.hbx_enrollment
-        if enrollment.present? && enrollment.aasm_state == "coverage_selected"
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on == self.start_on
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
         end
       end
