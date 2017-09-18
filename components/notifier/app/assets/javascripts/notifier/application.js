@@ -11,5 +11,4 @@
 // about supported directives.
 //= require notifier/ckeditor/basepath.js.erb
 //= require ckeditor/init
-//= require_tree ./ckeditor/plugins
 //= require_tree .
