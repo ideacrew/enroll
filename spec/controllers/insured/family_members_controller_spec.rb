@@ -128,7 +128,8 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "POST create" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
+    let(:family_member) { double("FamilyMember")}
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:save_result) { false }
     let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
@@ -143,6 +144,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(test_family).to receive(:build_relationship_matrix).and_return([])
       allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
+      allow(family_member).to receive_message_chain(:family, :application_in_progress).and_return nil
       post :create, :dependent => dependent_properties
     end
 

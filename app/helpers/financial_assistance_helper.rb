@@ -23,7 +23,7 @@ module FinancialAssistanceHelper
 
   def eligible_applicants application_id, eligibility_flag
     application = FinancialAssistance::Application.find(application_id)
-    application.applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
+    application.active_applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
   end
 
   def applicant_age applicant
@@ -39,6 +39,8 @@ module FinancialAssistanceHelper
       else
         :review_and_submit
       end
+    elsif controller_name == 'family_members'
+      :household_info
     elsif controller_name == 'applicants'
       if action_name == 'step' and @current_step.try(:to_i) == 1
         :income_and_coverage
@@ -128,7 +130,7 @@ module FinancialAssistanceHelper
   end
 
   def claim_eligible_tax_dependents
-    @application.applicants.inject({}) do |memo, applicant|
+    @application.active_applicants.inject({}) do |memo, applicant|
       memo.merge! applicant.person.full_name => applicant.id.to_s if (applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id)
       memo
     end

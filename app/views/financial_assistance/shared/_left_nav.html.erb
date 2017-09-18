@@ -4,7 +4,6 @@
     <li class="activer list-box step-tabs">
       <a href="<%= financial_assistance_applications_path %>">Financial Applications</a>
     </li>
-
     <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %>">
     <% if  @application.is_draft? %>
         <a href="<%= edit_financial_assistance_application_path(@application) %>">Household Info</a>
@@ -12,12 +11,6 @@
         <a href="javascript:void(0);" class="cna">Household Info</a>
     <% end %>
 </li>
-
-    <% if defined?(@matrix) %>
-      <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %>'>
-        <%= link_to 'Household Relationships', insured_family_relationships_path %>
-      </li>
-    <% end %>
 
     <% if defined?(@applicant) %>
       <ul class="nav nav-stacked">
@@ -75,7 +68,17 @@
           <% end %>
         </li>
       </ul>
+
     <% else %>
+
+      <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %>'>
+        <% if @application.incomplete_applicants? == false and @application.active_applicants.count > 1 and @application.is_draft? %>
+        <%= link_to 'Family Relationships', insured_family_relationships_path %>
+        <% else %>
+          <a class="cna">Family Relationships</a>
+        <% end %> 
+      </li>
+
       <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %>">
         <% if @application.ready_for_attestation? and @application.is_draft? %>
           <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
