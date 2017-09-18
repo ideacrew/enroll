@@ -5,6 +5,7 @@ module Effective
 
         bulk_actions_column do
           bulk_action 'Delete', notifier.delete_notices_notice_kinds_path, data: { confirm: 'Are you sure?', no_turbolink: true }
+          # bulk_action 'Download', notifier.download_notices_notice_kinds_path, target: '_blank'
         end
 
         table_column :notice_number, :proc => Proc.new { |row|

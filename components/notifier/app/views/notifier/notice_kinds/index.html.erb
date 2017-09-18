@@ -17,6 +17,7 @@
 
                   <span class="pull-right">
                     <%= link_to 'Add Notice', new_notice_kind_path, class: "btn btn-primary notice-preview", remote: true %>
+                    <%= link_to 'Download Notices', download_notices_notice_kinds_path, class: "btn btn-primary", target: '_blank' %>
                   </span>
                 <%= render_datatable(@datatable) %>
               </div>
