@@ -66,6 +66,7 @@ PATH
       non-stupid-digest-assets
       rails (~> 4.2.3)
       redcarpet (~> 3.4.0)
+      roo (~> 2.1.0)
       slim (= 3.0.8)
       virtus (~> 1.0.5)
       wicked_pdf (= 1.0.6)
