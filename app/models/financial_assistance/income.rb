@@ -34,8 +34,15 @@ class FinancialAssistance::Income
 
   JOB_INCOME_TYPE_KIND = "wages_and_salaries"
   NET_SELF_EMPLOYMENT_INCOME_KIND = "net_self_employment"
-
   FREQUENCY_KINDS = %W(biweekly daily half_yearly monthly quarterly weekly yearly)
+  OTHER_INCOME_TYPE_KIND = {
+    alimony_and_maintenance: 'Alimony received',
+    capital_gains: 'Capital gains',
+    dividend: 'Dividends',
+    interest: 'Interest',
+    pension_retirement_benefits: 'Pension or retirement',
+    rental_and_royalty: 'Rent and royalties',
+  }
 
   #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
 
@@ -64,6 +71,7 @@ class FinancialAssistance::Income
   scope :jobs, -> { where(kind: JOB_INCOME_TYPE_KIND)}
   scope :self_employment, -> { where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
   scope :other, -> { where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND]) }
+  scope :by_income_kind, -> (kind) { where(kind: kind) }
 
 
   embeds_one :employer_address, class_name: "::Address"

@@ -12,6 +12,11 @@
     render layout: 'financial_assistance'
   end
 
+  def other
+    save_faa_bookmark(@person, request.original_url)
+    render layout: 'financial_assistance'
+  end
+
   def new
     @model = @applicant.incomes.build
     load_steps

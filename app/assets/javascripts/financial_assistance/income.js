@@ -42,7 +42,7 @@ $(document).ready(function() {
     /* edit existing incomes */
     $('.incomes-list').on('click', 'a.income-edit:not(.disabled)', function(e) {
       e.preventDefault();
-      incomeEl = $(this).parents('.income');
+      var incomeEl = $(this).parents('.income');
       incomeEl.find('.display-income').addClass('hidden');
       incomeEl.find('.income-edit-form').removeClass('hidden');
       startEditingIncome();
@@ -55,21 +55,45 @@ $(document).ready(function() {
       if ($(this).parents('.new-income-form').length) {
         $(this).parents('.new-income-form').remove();
       } else {
-        incomeEl = $(this).parents('.income');
+        var incomeEl = $(this).parents('.income');
         incomeEl.find('.income-edit-form').addClass('hidden');
         incomeEl.find('.display-income').removeClass('hidden');
       }
       stopEditingIncome();
+
+      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
     /* new job incomes */
     $('a.new-income.btn').click(function(e) {
       e.preventDefault();
+
       startEditingIncome();
       $(this).siblings('.new-income-form')
         .clone(true)
         .removeClass('hidden')
         .appendTo($(this).siblings('.incomes-list'));
+    });
+
+    /* new other job incomes */
+    $('.other-income-checkbox:not(:checked)').click(function(e) {
+      if (currentlyEditing()) {
+        e.preventDefault();
+        return false;
+      }
+
+      var incomeListEl = $(this).parents('.income-row').find('.incomes-list');
+
+      startEditingIncome();
+      $(this).parents('.incomes').find('.new-income-form')
+        .clone(true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
+    });
+
+    /* unchecking other income checkboxes */
+    $('.other-income-checkbox:checked').click(function(e) {
+
     });
   }
 });

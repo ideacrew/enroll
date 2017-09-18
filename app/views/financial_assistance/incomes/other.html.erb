@@ -1,0 +1,1483 @@
+<div class="col-md-7">
+  <div class="row">
+    <div class="col-md-10">
+      <h1 class="darkblue"><%= "Other " if @applicant.has_other_income %>Income for <%= @applicant.family_member.person.first_name.titleize %></h1>
+    </div>
+  </div>
+
+  <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+    <div class="col-md-11 form-heading">Income</div>
+    <div class="col-md-1">
+      <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
+      <i class="glyphicon glyphicon-pencil grey-font"></i>
+      <% end %>
+    </div>
+  </div>
+
+
+
+
+  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+    <div class="col-md-8">Does this person expect to have other types of income in 2017?</div>
+    <div class="col-md-4">Yes</div>
+  </div>
+
+  <div class="container">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingOne">
+          <h4 class="panel-title">
+            <a role="button"  class="newanchor" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <i class="more-less glyphicon glyphicon-plus"></i>
+              Common types of income you must report.
+            </a>
+          </h4>
+        </div>
+
+        <div id="collapseOne" role="tabpanel" aria-labelledby="headingOne">
+          <div class="panel-body incomes">
+            Check any boxes that apply to this person and enter details when requested.
+            <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |kind, label| %>
+              <div class="border-square mt-10">
+                <div class="row income-row">
+                  <div class="col-xs-12">
+                    <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"><%= label %></label>
+                  </div>
+                  <div class="col-xs-12">
+                    <div class="incomes-list">
+                      <% @applicant.incomes.by_income_kind(kind).each do |income| %>
+                        <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } %>
+                      <% end %>
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            <% end %>
+            <div class='new-income-form hidden'>
+              <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- panel-group -->
+  </div><!-- container -->
+
+
+  <!-- Hidden unsaved income modal -->
+  <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+        </div>
+        <div class="modal-body">
+          You have made changes to an income that are not yet saved. Are you sure you want to continue?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='col-md-2'>
+  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+    previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
+    next_url: find_applicant_path(@application, @applicant, current: 'incomes')
+  } %>
+</div>
+<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+
+
+<style type="text/css">
+  .panel-group .panel {
+    width: 635px;
+    border-radius: 0;
+    box-shadow: none;
+    border-color: #EEEEEE;
+  }
+
+  .panel-default > .panel-heading {
+    padding: 0;
+    border-radius: 0;
+    color: #212121;
+    background-color: #FAFAFA;
+    border-color: #EEEEEE;
+  }
+
+  .panel-title {
+    font-size: 14px;
+
+  }
+
+  .panel-title > a {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    background-color: white;
+    margin-left: -17px;
+  }
+
+  .more-less {
+    float: right;
+    color: #212121;
+  }
+
+  .panel-default > .panel-heading + .panel-collapse > .panel-body {
+    border-top-color: #EEEEEE;
+  }
+
+
+
+
+
+
+
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Mar 13, 2017, 3:55:51 PM
+    Author     :
+    */
+
+    .glossary_lookup {
+      border-bottom: 1px dashed #007bc4;
+      color: #909090;
+    }
+    .glossary_lookup:hover {
+      color: #007bc4;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Styling for User Card */
+    .div-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .left-nav .div-disabled {
+      opacity: 0.8;
+      /*pointer-events: none;*/
+    }
+    .left-nav .div-disabled a:hover {
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+
+    .usercard,
+    .knowmore {
+      background-color: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px 10px 0 0;
+    }
+
+/*.usercard{
+    padding-bottom: 5px;
+  }*/
+
+  .border-thick-top.blueborder {
+    border-top: 10px solid #007BC4;
+  }
+
+  .fa, .knowmore h4 {
+    color: #007BC4;
+  }
+
+  .usercard hr {
+    margin: 15px -15px 5px -15px;
+  }
+
+  .usercard .card-title {
+    padding-bottom: 15px;
+  }
+
+  .usercard .card-detail-titles {
+    font-weight: bold;
+    color: #909090;    
+  }
+
+  .usercard .card-details {
+    color: #414141;
+  }
+
+  .usercard .card-title .fa-trash-o {
+    color: #c3c3c3;
+  }
+
+  /* Overwriting 30 px with 10 px*/
+  .usercard h4 {
+    margin-top: 5px;
+  }
+
+  /* Overwriting alert margins */
+  .usercard .alert {
+    margin-bottom: 0px;
+    padding: 10px;
+    color: #909090;
+    
+  }
+
+  /* Adjusting the 3 font awesome icons overlay positioning */
+  .knowmore .fa-arrow-down.adjustments {
+    position: relative;
+    left: 20px;
+    top: 20px;
+  }
+
+  .knowmore .fa-info-circle.adjustments {
+    font-size: 0.65em;
+    top: 3px;
+  }
+
+  .no-pd {
+    padding: 0;
+  }
+
+  .form-group-lg .form-control {
+    border-radius: 0;
+    border:none;
+  }
+
+  .row-form-wrapper {
+    background-color: #fff;
+  }
+
+  /* Application Status folder corner */
+  .application-status-card {
+    position: relative;
+    width: 100%;
+    padding: 1em 1.5em;
+    margin: 2em auto;
+    color: #909090;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .application-status-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-width: 0 17px 17px 0;
+    border-style: solid;
+    border-color: #c2c2c2 #eee;
+    display: block;
+    width: 0;
+  } 
+
+  /* Plan Preview card */
+  .total-you-pay , .total-you-pay:hover{
+    background-color: #007BC4;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  /* Padding adjutsmenet on table */
+  .table-responsive .col-lg-12 {
+    padding: 8px;
+  }
+
+
+  .btn-default {
+    text-transform: none;
+  }
+  .btn-default:hover, .btn-default:focus {
+    background-color: #007bc4;
+    color: #ffffff;
+  }
+  .active .btn-default, .active .btn-default:hover, .active .btn-default:focus,
+  .household-details .btn-default, .household-details .btn-default:hover, .household-details .btn-default:focus {
+    background-color: #eeeeee;
+    color: #007bc4;
+    text-transform: uppercase;
+  }
+  .btn-def-white {
+    background-color: #ffffff !important;
+  }
+  .border-square {
+    border-radius: 0 !important;
+  }
+  .border-top-none {
+    border-top: noen !important;
+  }
+  .col-ccc {
+    color: #c2c2c2;
+  }
+  .col-green {
+    color: #69A30D;
+  }
+  .col-white {
+    color: #ffffff;
+  }
+  .col-gray {
+    color: #cccccc;
+  }
+  .bg-col-blue {
+    background-color: #007bc4;
+  }
+  .mt-5 {
+    margin-top: 5px;
+  }
+  .mt-8 {
+    margin-top: 8px;
+  }
+  .mt-10 {
+    margin-top: 10px;
+  }
+  .mt-15 {
+    margin-top: 15px;
+  }
+  .mt-20 {
+    margin-top: 20px;
+  }
+  .mt-30 {
+    margin-top: 30px;
+  }
+  .mt-40 {
+    margin-top: 40px;
+  }
+  .mb-0 {
+    margin-bottom: 0;
+  }
+  .mb-5 {
+    margin-bottom: 5px;
+  }
+  .mb-10 {
+    margin-bottom: 10px;
+  }
+  .mb-15 {
+    margin-bottom: 15px;
+  }
+  .mb-20 {
+    margin-bottom: 20px;
+  }
+  .mb-30 {
+    margin-bottom: 30px;
+  }
+  .mb-40 {
+    margin-bottom: 40px;
+  }
+  .pb-10 {
+    padding-bottom: 10px;
+  }
+  .pb-20 {
+    padding-bottom: 20px;
+  }
+  .pb-30 {
+    padding-bottom: 30px;
+  }
+
+  .radio label {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    /* padding-left: 5px; */
+  }
+
+  .radio label {
+    padding-left: 30px;
+    margin-right: 15px;
+    line-height: 18px;
+  }
+
+  .radio input[type="radio"] {
+    opacity: 0;
+    z-index: 1;
+    visibility: hidden;
+  }
+  .radio {
+    padding-left: 0px;
+  }
+
+  .radio label::before {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    left: 0;
+    /* margin-left: -20px; */
+    border: 2px solid #cccccc;
+    border-radius: 50%;
+    background-color: #fff;
+    -webkit-transition: border 0.15s ease-in-out;
+    -o-transition: border 0.15s ease-in-out;
+    transition: border 0.15s ease-in-out;
+  }
+
+  .radio label::after {
+    display: inline-block;
+    position: absolute;
+    content: " ";
+    width: 11px;
+    height: 11px;
+    left: 3px;
+    top: 3px;
+    /* margin-left: -20px; */
+    border-radius: 50%;
+    background-color: #555555;
+    -webkit-transform: scale(0, 0);
+    -ms-transform: scale(0, 0);
+    -o-transform: scale(0, 0);
+    transform: scale(0, 0);
+    -webkit-transition: -webkit-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
+    -moz-transition: -moz-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
+    -o-transition: -o-transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
+    transition: transform 0.1s cubic-bezier(0.8, -0.33, 0.2, 1.33);
+  }
+
+  .radio input[type="radio"]:checked + label::after {
+    -webkit-transform: scale(.8, .8);
+    -ms-transform: scale(.8, .8);
+    -o-transform: scale(.8, .8);
+    transform: scale(.8, .8);
+  }
+
+  .radio label::after {
+    background-color: #77AA25;
+  }
+  .radio {
+    padding-left: 0px;
+  }
+
+  .household .radio label span {
+    color: #909090;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .household .que-sec .labelforcoverage, .household .que-sec .radio, .household .que-sec .notsure {
+    display: inline-block;
+  }
+  .household .labelforcoverage {
+    color: #909090;
+    font-size: 12px;
+    /*margin: 10px 20px 10px 10px;*/
+    margin: 10px 15px;
+    width: 50%;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+  }
+  a, p {
+    letter-spacing: 0.04em;
+  }
+  .household .notsure {
+    border-left: 1px solid #aaa;
+    display: inline-block;
+    font-size: 12px;
+    padding-left: 20px;
+  }
+  .info-blk .hh-sub-blk {
+    padding-bottom: 0;
+  }
+  .info-blk .card-title h4 {
+    line-height: 45px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+/*.info-blk .fa-pencil {
+    line-height: 45px;
+  }*/
+  .info-blk .fa-pencil-square-o, .info-blk .fa-question, .info-blk .fa-stethoscope {
+    font-size: 36px;
+  }
+  .fa-pencil-square-o {
+    padding-top: 2px;
+  }
+
+  .border-bottom-1px {
+    border-bottom: 1px solid #ddd;
+  }
+  .border-bottom-2px {
+    border-bottom: 2px solid #ddd;
+  }
+  .border-right-1px {
+    border-right: 1px solid #dddddd;
+  }
+  .household .usercard {
+    padding: 15px;
+    padding-top: 10px;
+  }
+  .household .card-title {
+    padding-bottom: 0;
+    margin-bottom: 5px;
+    border-bottom: 2px solid #c2c2c2;
+  }
+  .household .card-title h4 {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 24px;
+  }
+  .household .card-detail-titles {
+    font-weight: bold;
+    font-size: 10px;
+    /*margin-bottom: 5px;*/
+    text-transform: uppercase;
+  }
+/*.household .card-details {
+    font-size: 12px;
+}
+.in-active {
+
+}*/
+
+.hh-title {
+  margin-top: 0;
+  color: #003260;
+}
+.hh-sub-blk {
+  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-top: 10px;
+}
+.hh-sub-blk .left, .hh-sub-blk .right {
+  vertical-align: middle;
+}
+/*.hh-sub-blk .left {
+    min-height: 35px;
+  }*/
+  .hh-sub-blk .left .fa-icon {
+    width: 50px;
+    text-align: center;
+  }
+  .fa-icon .fa-rectangle {
+    border: 3px solid #007bc4;
+    padding: 0 4px 2px 3px;
+    border-radius: 4px;
+  }
+  .hh-sub-blk .left .fa {
+    vertical-align: middle;
+  }
+  .hh-sub-blk .left .sub-blk-info {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  .hh-sub-blk.in-active .left .sub-blk-info {
+    color: #aaaaaa;
+  }
+  .hh-sub-blk .left .fa-icon, .hh-sub-blk.in-active .left .sub-blk-info {
+    line-height: 40px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .hh-sub-blk.active .left .fa {
+    color: #69a30d;
+  }
+  .hh-sub-blk.active .left .fa-icon .fa-rectangle {
+    border: 3px solid #69a30d;
+  }
+  .hh-sub-blk .left .sub-blk-info .hh-subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .hh-sub-blk.active .left .sub-blk-info .hh-subtitle {
+    /*color: #007bc4;*/
+    color: #414141;
+  }
+  .hh-sub-blk.active .left .sub-blk-info .hh-status {
+    color: #69A30D;
+  }
+  .hh-sub-blk .right {
+    text-align: right;
+    line-height: 43px;
+  }
+  .hh-sub-blk .right button {
+    text-transform: uppercase;
+    padding-right: 20px;
+  }
+  .hh-sub-blk .right .fa {
+    margin-right: 10px;
+  }
+  .fa-suitcase + .fa-usd {
+    margin-top: 3px;
+  }
+  .in-active .fa-suitcase,
+  .in-active .fa-circle-thin,
+  .in-active .fa-usd,
+  .in-active .fa-sliders,
+  .in-active .fa-stethoscope
+  {
+    color: #cccccc;
+  }
+  .in-active .fa-suitcase + .fa-usd {
+    color: #ffffff;
+  }
+  .in-active .fa-rectangle {
+    border: 3px solid #cccccc;
+  }
+
+  /* Income & Coverage Info */
+
+  .left-nav ul {
+    background-color: #ffffff;
+    list-style-type: none;
+    padding: 0;
+  }
+  .left-nav ul li {
+    padding: 0;
+    border: 1px solid #c3c3c3;
+    border-bottom: none;
+  }
+  .left-nav ul li:last-child {
+    border-bottom: 1px solid #c3c3c3;
+  }
+
+  .left-nav ul li a {
+    color: #909090;
+    padding: 10px 10px 10px 13px;
+    text-align: left;
+    width: 100%;
+    border-left: 7px solid #ffffff;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    line-height: 16px;
+    /*display: inline-block;*/
+    display: table-cell;
+    vertical-align: middle;
+    height: 50px;
+    cursor: pointer;
+  }
+  .left-nav ul li.active-p {
+    border-left: 1px solid #cbe6ff;
+    background-color: #0079C0;
+  }
+  .left-nav ul li.active-p.visited a {
+    border-left: 7px solid #0079C0;
+    color: #CBE6FF;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .left-nav ul li.active-p.nactive a {
+    border-left: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .left-nav ul li.active-p.nactive-w a {
+    border-left: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .left-nav ul li.active-p:nth-child(n+2) {
+    border-top: 1px solid #ffffff;
+  }
+
+  .left-nav ul li.nchild a {
+    padding-left: 38px;
+  }
+
+
+  .left-nav ul li.ndisabled a {
+    pointer-events: none;
+  }
+  .left-nav ul li.nenabled a {
+    color: #0079C0;
+  }
+  .left-nav ul li.ncompleted a {
+    border-left: 0;
+    color: #0079C0;
+    display: table-cell;
+    padding-left: 4px;
+    vertical-align: middle;
+  }
+  .ncompleted i {
+    color: #69A30D;
+    padding: 10px;
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 16px;
+  }
+
+  .left-nav .active-p.visited i {
+    color: #cbe6ff;
+    padding: 10px;
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 24px;
+  }
+  .left-nav .active-p.visited i + a {
+    padding-left: 0;
+    border-left: none !important;
+  }
+
+  .left-nav ul li.nactive {
+    border-left: 7px solid #cbe6ff;
+  }
+  .left-nav ul li.nactive a {
+    border-left: 0;
+    font-weight: bold;
+    color: #0079C0;
+    padding-left: 14px;
+  }
+  .left-nav ul li.nactive-w {
+    border-left: 7px solid #ffffff;
+  }
+  .left-nav ul li.nactive-w a {
+    border-left: 0;
+    font-weight: bold;
+    color: #0079C0;
+    padding-left: 14px;
+  }
+  .left-nav ul li.nactive-b {
+    border-left: 7px solid #007bc4;
+  }
+  .left-nav ul li.nactive-b a {
+    border-left: 0;
+    font-weight: bold;
+    color: #0079C0;
+    padding-left: 14px;
+  }
+  .left-nav ul li.nchild.nactive a, .left-nav ul li.nchild.nactive-w a,
+  .left-nav ul li.nchild.nactive-b a {
+    padding-left: 38px;
+  }
+  .left-nav ul li.nchild.nactive.ncompleted a, .left-nav ul li.nchild.nactive-w.ncompleted a,
+  .left-nav ul li.nchild.nactive-b.ncompleted a {
+    padding-left: 4px;
+  }
+  .left-nav ul li.nchild.ncompleted {
+    padding-left: 6px
+  }
+  .left-nav ul li.nchild.nactive.ncompleted, .left-nav ul li.nchild.nactive-w.ncompleted,
+  .left-nav ul li.nchild.nactive-b.ncompleted {
+    padding-left: 0;
+  }
+
+  /* right section */
+  /* == FOLDED CORNERS */
+
+  .note {
+    position:relative;
+    width:480px;
+    padding:1em 1.5em;
+    margin:2em auto;
+    color:#fff;
+    background:#97C02F;
+    overflow:hidden;
+    background-clip:padding-box;
+  }
+
+  .note:before {
+    content:"";
+    position:absolute;
+    top:0;
+    right:0;
+    /*border-width:0 16px 16px 0;*/
+    border-width:0 18px 18px 0; /* This trick side-steps a webkit bug */
+    border-style:solid;
+    border-color:#fff #fff #658E15 #658E15; /* A bit more verbose to work with .rounded too */
+    background:#658E15; /* For when also applying a border-radius */
+    display:block; width:0; /* Only for Firefox 3.0 damage limitation */
+    /* Optional: shadow */
+    -webkit-box-shadow:0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow:0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+    box-shadow:0 1px 1px rgba(0,0,0,0.3), -1px 1px 1px rgba(0,0,0,0.2);
+          /*-webkit-box-shadow:0 1px 0 #007bc4, -1px 1px 0 #007bc4;
+          -moz-box-shadow:0 1px 0 #007bc4, -1px 1px 0 #007bc4;
+          box-shadow: 0 1px 0 #007bc4, -1px 1px 0 #007bc4;*/
+        }
+
+        .whitebox {
+          position:relative;
+          padding:1em 1.5em;
+          margin: 0 auto 1.5em;
+          color:#414141;
+          background:#fff;
+          overflow:hidden;
+          background-clip:padding-box;
+          border: 1px solid #EAAA00;
+        }
+
+        .note.purple {background:#ffffff; color: #414141; margin-top: -1px; margin-bottom: 0px; padding: 9px;
+          width: 9px; position: absolute; z-index: 1; margin-left: 197px;}
+          .note.purple:before {border-color:#fff #eee #EAAA00 #EAAA00; background:transparent;}
+          .note.white {background:#ffffff; color: #414141; border: 1px solid red;}
+          .note.white:before {border-color:#fff #fff #EAAA00 #EAAA00; background: #EAAA00;}
+
+          .note p {margin:0;}
+          .note p + p {margin:1.5em 0 0;}
+
+          /*ready for review*/
+          .ready-4-review .whitebox {
+            border-color: #69A30D;
+          }
+          .ready-4-review .note.purple::before { border-color:#fff #eee #69A30D #69A30D; }
+
+
+
+          .right-section .button {
+            margin-bottom: 20px;
+          }
+          .previous, .saveexit {
+            text-transform: uppercase;
+            margin-bottom: 5px;
+          }
+          .previous a, .saveexit a {
+            color: #929292;
+            background-image: url("../img/icons/previous_save_icon.png");
+            background-repeat: no-repeat;
+            background-size: 10px;
+            background-position: left 2px;
+            padding-left: 20px;
+            cursor: pointer;
+          }
+          .text-saveexit {
+            font-size: 12px;
+            margin-top: 15px;
+            border-bottom: 3px solid #d2d2d2;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+          }
+          .need-help {
+            background-color: #aaaaaa;
+            color: #fff;
+            font-weight: bold;
+            padding: 5px 10px;
+            text-align: center;
+            border: 1px solid #aaaaaa;
+          }
+          .call-customer {
+            background-color: #ffffff;
+            border: 1px solid #c3c3c3;
+
+            font-weight: 600;
+            padding: 10px;
+            text-align: center;
+          }
+          .call-customer a:hover {
+            text-decoration: none;
+          }
+          .call-customer .header-text {
+            color: #aaaaaa;
+          }
+          .call-customer strong.phone-number {
+            color: #414141;
+          }
+          .call-customer strong.phone-number:hover {
+            text-decoration: underline;
+          }
+          .checklist {
+            border: 1px solid #c3c3c3;
+            border-top: none;
+            background-color: #ffffff;
+            padding: 10px;
+            text-align: center;
+            line-height: 18px;
+          }
+          .checklist a:hover {
+            text-decoration: none;
+          }
+          .checklist span {
+            font-size: 12px;
+            margin-left: 5px;
+            vertical-align: middle;
+          }
+          .checklist span:hover {
+            text-decoration: underline;
+          }
+
+          .right-section .my-broker {
+            border: 1px solid #c3c3c3;
+            background-color: #ffffff;
+            margin-top: 1.5em;
+          }
+          .right-section .my-broker .sub-title {
+            padding: 8px 15px;
+            border-bottom: 1px solid #c3c3c3;
+            color: #aaaaaa;
+            font-weight: bold;
+          }
+          .brok-det {
+            padding: 10px 15px 5px;
+          }
+          .brok-det .text-center, .brok-det .text-left {
+            display: inline-block;
+            vertical-align: top;
+          }
+          .brok-det .text-center {
+            color: #007bc4;
+            margin-top:7px;
+          }
+          .brok-det .text-left {
+            margin-left: 10px;
+          }
+          .brok-det .text-left span {
+            color: #aaaaaa;
+            font-size: 12px;
+          }
+          .brok-det .text-left a {
+            margin-top: 5px;
+            display: block;
+            font-size: 12px;
+          }
+          .see-more-opts .btn {
+            /*font-size: 12px;*/
+            margin-bottom: 15px;
+            box-shadow: none;
+            padding: 5px 20px;
+          }
+
+
+
+          .whitebox {
+            padding: 0;
+          }
+          .whitebox .info-needed {
+            border-top: 1px solid #EAAA00;
+            border-bottom: 1px solid #EAAA00;
+            color: #ffffff;
+            background-color: #EAAA00;
+          }
+          .whitebox .info-needed .fa {
+            font-size: 22px;
+            margin-right: 10px;
+            color: #ffffff;
+          }
+          .whitebox .info-needed span {
+            font-weight: 600;
+          }
+          .whitebox .sub-desc {
+            font-size: 12px;
+          }
+          .whitebox p {
+            padding-left: 1.5em;
+            padding-right: 1.5em;
+            margin-bottom: 0;
+          }
+          .whitebox p:first-child {
+            padding-top: .7em;
+            padding-bottom: .7em;
+          }
+          .whitebox p:nth-child(n+2) {
+            padding-top: .7em;
+            padding-bottom: .7em;
+          }
+          .whitebox p:last-child {
+            padding: .7em 1.5em 1em;
+          }
+          .ready-4-review .whitebox .info-needed {
+            border-top: 1px solid #69A30D;
+            border-bottom: 1px solid #69A30D;
+            background-color: #69A30D;
+          }
+
+          /* Houserhold info */
+          .household-details .usercard {
+            padding: 5px 15px 0;
+          }
+          .household-details .usercard .card-details, .household-details .usercard .card-value {
+            margin-bottom: 10px;
+          }
+          .hh-edit {
+            background-color: #ffffff;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-top: 1px solid #dddddd;
+          }
+          .hh-edit .right {
+            text-align: right;
+          }
+          .hh-edit .hh-status {
+            line-height: 35px;
+          }
+          .hh-edit .btn {
+            margin-top: 0;
+          }
+          .hh-edit .btn .fa {
+            margin-right: 10px;
+          }
+          .household-details .usercard .hh-status.completed,
+          .household-details .usercard .hh-status.completed .fa {
+            color: #69A30D;
+          }
+          .household-details .usercard .hh-status.completed {
+            font-weight: bold;
+          }
+          .household-details .usercard .hh-status.in-progress,
+          .household-details .usercard .hh-status.in-progress .fa {
+            color: #eaaa00;
+          }
+          .household-details .usercard .hh-status .fa-refresh {
+            font-size: 1.5em;
+          }
+
+          .add-new-person, .help-to-decide {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 10px;
+          }
+          .add-new-person {
+            border-right: 1px solid #007bc4;
+            padding-right: 12px;
+            margin-right: 10px;
+          }
+          .add-new-person .fa-plus-circle {
+            font-size: 1.5em;
+            margin-right: 5px;
+          }
+
+          .card-title .ct-icon {
+            margin-bottom: 12px;
+            line-height: 45px;
+          }
+          .single-fld {
+            float: right;
+            margin-top: 12px;
+          }
+
+
+
+          /* Eligibility Results */
+          .er-medicaid, .er-phi, .er-summary {
+            background-color: #ffffff;
+            border: 1px solid #c3c3c3;
+          }
+          .er-title h3 {
+            margin: 10px 15px 12px;
+            font-weight: 600;
+          }
+
+          .er-medicaid-prsn, .er-summary {
+            padding: 20px 30px 15px;
+          }
+          .er-medicaid-prsn span {
+            font-weight: bold;
+          }
+          .er-medicaid-prsn p, .er-summary p {
+            color: #909090;
+          }
+          .er-prsn i, .er-prsn h4 {
+            display: inline-block;
+            vertical-align: middle;
+          }
+          .er-prsn i {
+            margin-right: 10px;
+          }
+          .er-prsn h4 {
+            margin-top: 0;
+            margin-bottom: 0;
+          }
+
+          .er-warning {
+            padding: 10px 30px;
+          }
+          .er-warning div {
+            display: table-cell;
+            vertical-align: top;
+          }
+          .er-warning i, .er-success i {
+            margin-right: 10px;
+          }
+          .text-warning {
+            /*color: #EAAA00;*/
+            color: #8a6d3b
+          }
+          .text-warning span {
+            font-weight: bold;
+          }
+          .text-success {
+            color: #69a30d;
+          }
+
+          .er-success {
+            padding: 10px 30px 13px;
+          }
+          .er-success div {
+            display: table-cell;
+            vertical-align: middle;
+          }
+          .er-success .text-success span {
+            width: 415px;
+            display: block;
+          }
+
+          .er-downhist a i {
+            margin-right: 10px;
+          }
+          .er-downhist a:hover {
+            text-decoration: none;
+          }
+          .er-downhist a span:hover {
+            text-decoration: underline;
+          }
+          .er-downhist i {
+            font-size: 1.5em;
+          }
+
+
+          /* Family Relationships */
+          .dd-rel, .icon-rel {
+            display: inline-block;
+          }
+          .dd-rel {
+            vertical-align: top;
+          }
+          .icon-rel {
+            vertical-align: middle;
+            margin-left: 10px;
+            margin-top: -2px;
+            line-height: 22px;
+          }
+          .icon-rel .fa {
+            vertical-align: middle;
+            margin-right: 3px;
+          }
+          .uyfr {
+            background-color: #007bc4;
+            color: #ffffff;
+            text-align: center;
+            padding: 5px;
+            position: absolute;
+            margin-top: 5px;
+            margin-left: -25px;
+            display: none;
+          }
+
+          /* Other Income */
+          .other-income .hh-title .fa-icon {
+            font-size: 20px;
+          }
+          .other-income .usercard {
+            padding: 0;
+          }
+          .required-field {
+            font-size: 12px;
+            color: #909090;
+            text-align: right;
+            letter-spacing: 0.05em;
+          }
+          .other-income .usercard .sub-title {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 15px;
+          }
+          .sub-title .fa-plus-circle {
+            vertical-align: bottom;
+            margin-left: 10px;
+            font-size: 16px;
+          }
+          .other-income-desc .fa-minus-circle {
+            margin-left: 10px;
+            font-size: 16px;
+          }
+          .other-income .usercard .sub-title span {
+            color: #909090;
+            font-size: 14px;
+            font-weight: normal;
+          }
+          .other-income .usercard .sub-title .fa-icon {
+            font-size: 12px;
+            margin-left: 5px;
+          }
+          .other-income .usercard .other-income-desc {
+            padding: 10px 15px;
+            /*font-size: 12px;*/
+            color: #909090;
+            /*letter-spacing: 0.04em;*/
+          }
+          .other-income .usercard .inc-opts {
+            padding-left: 15px;
+            padding-right: 15px;
+            /*font-size: 14px;*/
+          }
+          .inc-opts .checkbox span {
+            display: block;
+            /*padding-top: 2px;*/
+            color: #909090;
+          }
+          .oth-inc-link, .back-link, .anp-htd, .add-more {
+            margin-left: 15px;
+          }
+          .oth-inc-link i, .back-link i {
+            margin-right: 10px;
+          }
+          .oth-inc-link .see-more {
+            font-weight: bold;
+          }
+          .back-link i {
+            height: 31px;
+            vertical-align: middle;
+          }
+          .back-link a {
+            font-weight: bold;
+          }
+          .back-link span {
+            /*font-size: 12px;*/
+            color: #909090;
+          }
+
+          .other-income .button {
+            text-align: right;
+          }
+          .other-income .button .btn-danger {
+            padding-left: 25px;
+            padding-right: 25px;
+            margin-left: 10px;
+            font-weight: 600;
+          }
+          .hs_alimony_received {
+            display: none;
+          }
+          .hs_alimony_received .usercard.wo-data, .hs_alimony_received .usercard.e-data {
+            border: 2px solid #007bc4;
+          }
+          .hs_alimony_received label {
+            /*padding-left: 15px;*/
+            padding-top: 15px;
+            color: #909090;
+            font-weight: normal;
+          }
+          .how-often {
+            font-size: 10px;
+            color: #909090;
+            font-weight: bold;
+          }
+          .how-often-opt {
+            margin-bottom: 5px;
+            display: block;
+          }
+          .other-income.household .labelforcoverage,
+          .other-income.household .radio label span,
+          .other-income.household .notsure {
+            font-size: 14px;
+          }
+          .other-income .card-detail-titles {
+            margin-top: 5px;
+          }
+          .not-entered {
+            line-height: 48px;
+          }
+          .e-data, .saved-data {
+            display: none;
+          }
+          .e-data .card-value {
+            color: #007bc4;
+          }
+          .hs_alimony_received .e-data {
+            display: none;
+          }
+          .hs_alimony_received .e-data.active {
+            display: block;
+          }
+          .add-more .fa-icon {
+            font-size: 12px;
+            margin-right: 10px;
+          }
+          .add-more a {
+            cursor: pointer;
+          }
+          .active .fa {
+            cursor: pointer;
+          }
+          .div-disabled .active .fa {
+            color: #ccc;
+          }
+
+          /* address-card */
+          .address-card {
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            padding: 10px 0 0;
+          }
+          .address-card p {
+            color: #909090;
+          }
+          .frm-fld {
+            padding: 10px 15px;
+          }
+          .address-card .labelforcoverage {
+            width: 70%;
+            display: inline-block;
+            vertical-align: middle;
+            padding-right: 20px;
+          }
+          .address-card .radio {
+            display: inline-block;
+            vertical-align: middle;
+          }
+          .address-card .radio + .radio {
+            margin-top: 10px;
+          }
+          .button-ma {
+            margin-top: 10px;
+          }
+          .button-ma .fa-envelope-o {
+            font-size: 16px;
+            margin-right: 5px;
+          }
+          .button-ma .btn-default {
+            background-color: #ffffff;
+          }
+          .button-ma .btn-default:hover {
+            color: #007bc4;
+          }
+          .nondc {
+            display: none;
+          }
+          .dcres {
+            display: block;
+          }
+
+          .other-income-desc i {
+            margin-right: 10px;
+          }
+          .hpc .other-income .usercard .other-income-desc {
+            font-size: 14px;
+          }
+
+          .card-title .i-child {
+            height: 22px;
+            vertical-align: middle;
+          }
+          .con-rem {
+            text-transform: uppercase;
+            font-weight: 600;
+          }
+          .modal-header {
+            border-bottom: none;
+          }
+          .modal-footer {
+            border-top: none;
+          }
+          .trash .modal-title {
+            color: #003260;
+          }
+          .trash .modal-dialog button.close {
+            background-image: url("/sites/all/themes/dchl/img/ico-sm-close.png");
+            opacity: 1;
+            width: 24px;
+            margin-top: 2px;
+          }
+          .modal-header {
+            padding: 25px 25px 15px;
+          }
+          .modal-body {
+            padding: 5px 25px 25px;
+          }
+
+          /* income adjustments */
+          .fa-icon.gray, .income-adjustments h2.hh-title {
+            display: inline-block;
+            vertical-align: middle;
+          }
+          .fa-icon.gray .fa-rectangle {
+            border-color: #ccc;
+          }
+          .fa-icon.gray .fa {
+            color: #ccc;
+          }
+          .fa-icon.gray {
+            margin-bottom: 10px;
+            margin-right: 10px;
+          }
+
+          .title-icon, .title-text {
+            display: inline-block;
+            vertical-align: middle;
+          }
+          .title-icon {
+            margin-right: 10px;
+          }
+          .title-icon.icn-default i {
+            color: #cccccc;
+          }
+          .title-text {
+            color: #003260;
+            font-size: 30px;
+            margin: 0;
+            line-height: 42px;
+          }
+
+    /*.title-tax-info .title-icon i {
+        font-size: 1.3em;
+      }*/
+      .title-icon.icn-default .fa-rectangle {
+        border-color: #cccccc;
+      }
+
+
+      /* Submit your application */
+      .agree-block {
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
+      }
+      .agree-block .agree-headline {
+        /*font-size: 12px;*/
+        font-weight: bold;
+        padding: 10px 15px 0;
+      }
+      .agree-block .agree-terms {
+        /*font-size: 12px;*/
+        padding: 10px 15px;
+      }
+      .agree-terms a, .agree-terms a:hover, .agree-terms a:focus {
+        color: #414141;
+        text-decoration: none;
+      }
+      .agree-terms.gradient-text {
+        background: -webkit-linear-gradient(#414141, #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .agree-checkbox {
+        padding: 0 15px;
+      }
+      .agree-checkbox .checkbox p {
+        font-size: 12px;
+        line-height: 20px;
+      }
+      .agree-checkbox .checkbox, .radio {
+        margin-top: 5px;
+        margin-bottom: 6px;
+      }
+      .agree-radio {
+        padding: 0 15px;
+      }
+      .agree-radio + .agree-terms {
+        padding-top: 0;
+      }
+      .agree-radio .radio {
+        display: inline-block;
+      }
+      .agree-radio .radio label {
+        padding-left: 25px;
+      }
+      .agree-radio .radio label span {
+        font-size: 12px !important;
+      }
+      .morecontent {
+        display: none;
+      }
+      .dis-text {
+        cursor: pointer;
+      }
+    /*.i-agree .field-label {
+        font-size: 12px;
+      }*/
+      @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { 
+       .morecontent {
+        display: inline;
+      }
+      .dis-text {
+        cursor: text;
+      }
+    }
+  </style>
+
+
+

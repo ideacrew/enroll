@@ -363,6 +363,12 @@ class FinancialAssistance::Applicant
     end
   end
 
+  def other_incomes_complete?
+    self.incomes.all? do |other_incomes|
+      other_incomes.valid? :submission
+    end
+  end
+
   def benefits_complete?
     self.benefits.all? do |benefit|
       benefit.valid? :submission
