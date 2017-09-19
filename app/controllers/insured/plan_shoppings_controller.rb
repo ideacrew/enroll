@@ -57,7 +57,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
-
+    employee_mid_year_plan_change(@person, @change_plan)
     send_receipt_emails if @person.emails.first
   end
 
@@ -123,6 +123,28 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+  end
+
+  def employee_waiver_notice(hbx_enrollment)
+    begin
+      census_employee = CensusEmployee.find(hbx_enrollment.employee_role.census_employee_id.to_s)
+      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_waiver_notice")
+    rescue Exception => e
+      puts "Unable to send Employee Waiver notice to #{census_employee.full_name}" unless Rails.env.test?
+    end
+  end
+
+    def employee_mid_year_plan_change(person,change_plan)
+     begin
+      employee_role_id = person.active_employee_roles.first.census_employee.id
+      if employee_role_id.present?
+        if change_plan.present? or person.active_employee_roles.first.census_employee.new_hire_enrollment_period.present?
+          ShopNoticesNotifierJob.perform_later(employee_role_id.to_s, "employee_mid_year_plan_change")
+        end
+      end
+     rescue Exception => e
+       log("#{e.message}; person_id: #{person.id}")
+     end
   end
 
   def terminate
