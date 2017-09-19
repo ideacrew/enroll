@@ -1,0 +1,51 @@
+<div class="row row-form-wrapper no-buffer row-height">
+	<div class="col-md-9">
+	  <span> <b> What type of coverage is this person currently enrolled in? * </b></span>
+	</div>
+</div>
+<div class="row row-form-wrapper no-buffer row-height">
+  <div class="col-md-12">
+    <span>  Check any boxes that apply to this person and enter details when requested. </span>
+  </div>
+</div>
+
+<br />
+
+<% insurance_kinds.each do |insurance_kind| %>
+<div class="benefit-kind">
+  <div class="row row-form-wrapper no-buffer row-height">
+    <div class="col-md-1">
+      <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> 
+    </div>
+
+    <div class="col-md-8">
+      <%= insurance_kind.gsub('_',' ').capitalize %>
+    </div>
+  </div>
+
+  <div class="benefits-list">
+    <% @applicant.benefits.of_insurance_kind(insurance_kind).each do |benefit| %>
+      <div class="benefit">
+        <%if benefit.insurance_kind == 'employer_sponsored_insurance'%>
+          <%= render partial: 'esi_benefit', locals: { benefit: benefit } %>
+        <% else %>
+          <%= render partial: 'non_esi_benefit', locals: { benefit: benefit } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+
+  <div class='new-benefit-form hidden'>
+    <% if insurance_kind == 'employer_sponsored_insurance' %>
+      <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: insurance_kind} %>
+    <% else %>
+      <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, kind: insurance_kind} %>
+    <% end %>
+  </div>
+
+  <br />
+</div>
+<% end %>
+
+<br />

@@ -114,12 +114,6 @@
     @applicant = @application.active_applicants.find(params[:applicant_id])
   end
 
-  def create
-    @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.active_applicants.find(params[:applicant_id])
-    @model = @applicant.incomes.build
-  end
-
   def permit_params(attributes)
     attributes.permit!
   end

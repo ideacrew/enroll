@@ -161,4 +161,16 @@ module FinancialAssistanceHelper
       yield f
     end
   end
+
+  def benefit_form_for(application, applicant, benefit)
+    url = if benefit.new_record?
+      financial_assistance_application_applicant_benefits_path(application, applicant)
+    else
+      financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit)
+    end
+
+    form_for benefit, url: url, remote: true do |f|
+      yield f
+    end
+  end
 end

@@ -1,78 +1,61 @@
 <div class="col-md-7 ">
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
       <h1 class="darkblue">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
+      <small>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</small>
+    </div>
+  </div>
+  <br />
+
+  <!--is enrolled driver question-->
+  <div class="row row-form-wrapper no-buffer row-height">
+    <div class="col-md-5">
+      <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage" value="true" class="radio-yml">
+      <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage" value="false" class="radio-yml" required="required">
+      <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+    </div>
+    <div class="col-md-3">
+       | &nbsp; <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+    </div>
+  </div>
+  <br />
+
+
+  <div class='benefit-kinds'>
+    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, insurance_kinds_for: "enrolled_health_coverage"} %>
+  </div>
+
+  <!--is eligible driver question-->
+  <div class="row row-form-wrapper no-buffer row-height">
+    <div class="col-md-5">
+      <span class="fa-text-color">Does this person currently have access to other health coverage, including through another person? *</span>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage" value="true" class="radio-yml">
+      <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage" value="false" class="radio-yml" required="required">
+      <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
+    </div>
+    <div class="col-md-3">
+       | &nbsp; <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
     </div>
   </div>
 
-  <div>
-    <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-      <div class="col-md-11 form-heading">Health Coverage</div>
-      <div class="col-md-1">
-        <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
-          <i class="glyphicon glyphicon-pencil grey-font"></i>
-        <% end %>
-      </div>
-    </div>
-
-    <% if @applicant.has_enrolled_health_coverage%>
-      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-        <div class="col-md-8">Is this person currently enrolled in health coverage?</div>
-        <div class="col-md-4">Yes</div>
-      </div>
-    <% end %>
-
-    <% if @applicant.has_eligible_health_coverage%>
-      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-        <div class="col-md-8">Does this person currently have access to other health coverage, including through another person?</div>
-        <div class="col-md-4">Yes</div>
-      </div>
-    <% end %>
-
-    <br>
-    <p>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</p>
-    <br>
-
-    <% if @applicant.has_enrolled_health_coverage || @applicant.has_eligible_health_coverage %>
-      <table class="benefits-table table">
-        <tr class="form-heading">
-          <th class="form-heading">Benefit Type</th>
-          <th class="form-heading">Benefit Insurance Type</th>
-          <th class="form-heading">Status</th>
-          <th></th>
-          <th></th>
-        </tr>
-        <% @applicant.benefits.each do |benefit| %>
-          <tr>
-            <td><%= benefit.kind.split('_').second.capitalize! %></td>
-            <td><%= benefit.insurance_kind.titleize if benefit.insurance_kind.present? %></td>
-            <td>
-              <% if benefit.valid? :submission %>
-                <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Info Complete</span>
-              <% else %>
-                <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">Info Needed</span>
-              <% end %>
-            </td>
-            <td><%= link_to go_to_step_financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit, 1), class: "btn btn-default" do %>
-                <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
-                EDIT
-              <% end %>
-            </td>
-            <td>
-              <%= link_to financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit), method: :delete, data: { confirm: "Are you sure?" } do %>
-                <span class='fa fa-trash-o'></span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    <%end%>
-  </div>
   <div class="col-md-4 col-sm-4 col-xs-4">
-  <%= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+  <%#= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
   </div>
 </div>
 
+
+<!--Right NAV-->
 <div class='col-md-2'>
   <%= render partial: 'financial_assistance/shared/right_nav', locals: {
     previous_url: find_previous_applicant_path(@application, @applicant, current: 'benefits'),

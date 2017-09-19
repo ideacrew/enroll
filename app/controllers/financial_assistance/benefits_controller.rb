@@ -10,6 +10,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   def index
     save_faa_bookmark(@person, request.original_url)
     render layout: 'financial_assistance'
+    @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_KINDS
   end
 
   def new
@@ -49,6 +50,16 @@ class FinancialAssistance::BenefitsController < ApplicationController
     end
   end
 
+  def create
+    @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
+
+    if @benefit.save
+      render :update
+    else
+      render :error
+    end
+  end
+
   def destroy
     benefit = @applicant.benefits.find(params[:id])
     benefit.destroy!
@@ -79,12 +90,6 @@ class FinancialAssistance::BenefitsController < ApplicationController
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
     @applicant = @application.active_applicants.find(params[:applicant_id])
-  end
-
-  def create
-    @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.active_applicants.find(params[:applicant_id])
-    @model = @applicant.benefits.build
   end
 
   def permit_params(attributes)

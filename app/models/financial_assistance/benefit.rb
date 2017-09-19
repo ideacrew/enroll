@@ -67,6 +67,8 @@ class FinancialAssistance::Benefit
   scope :eligible, -> { where(kind: "is_eligible")}
   scope :enrolled, -> { where(kind: "is_enrolled")}
 
+  scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
+
   validates_length_of :title, 
                       in: TITLE_SIZE_RANGE, 
                       allow_nil: true,
