@@ -674,30 +674,27 @@ shop_notice_triggers = [
       }
     ]
   },
-  
   {
-        hbx_id: 'SHOP51',
-        title: 'You have been removed as a Broker',
-        description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
-        resource_name: 'broker_role',
-        event_name: 'broker_fired_confirmation_to_broker',
-        notice_triggers: [
-           {
-              name: 'Broker Fired',
-              notice_template: 'notices/shop_broker_notices/broker_fired_notice',
-              notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
-              mpi_indicator: 'SHOP_D051',
-              notice_trigger_element_group: {
-                market_places: ['shop'],
-                primary_recipients: ["broker"],
-                primary_recipient_delivery_method: ["secure_message"],
-                secondary_recipients: []
-              }
-            }
-        ]
-    },
-
-
+    hbx_id: 'SHOP51',
+    title: 'You have been removed as a Broker',
+    description: "When a Broker is fired by an employer, the broker receives this notification letting them know they are no longer the broker for the client.",
+    resource_name: 'broker_role',
+    event_name: 'broker_fired_confirmation_to_broker',
+    notice_triggers: [
+      {
+        name: 'Broker Fired',
+        notice_template: 'notices/shop_broker_notices/broker_fired_notice',
+        notice_builder: 'ShopBrokerNotices::BrokerFiredNotice',
+        mpi_indicator: 'SHOP_D051',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["broker"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
   {
     hbx_id: 'SHOP36',
     title: 'Special Enrollment Period Approval',
