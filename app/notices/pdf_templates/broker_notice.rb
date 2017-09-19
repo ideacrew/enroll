@@ -17,6 +17,12 @@ module PdfTemplates
     attribute :terminated_broker_account, BrokerAgencyAccount
     attribute :first_name, String
     attribute :last_name, String
+    attribute :termination_date, Date
+    attribute :first_name, String
+    attribute :last_name, String
+    attribute :hbx_id, String
+    attribute :employer_first_name, String
+    attribute :employer_last_name, String
 
     def shop?
       return true
@@ -29,5 +35,10 @@ module PdfTemplates
     def broker?
       return true
     end
+
+    def employee_notice?
+      false
+    end
+
   end
 end

@@ -157,6 +157,11 @@ class EmployerProfile
     employer_broker_fired
     send_broker_notice
     notify_broker_terminated
+    broker_fired_confirmation_to_broker
+  end
+
+  def broker_fired_confirmation_to_broker
+      trigger_notices('broker_fired_confirmation_to_broker')   
   end
 
   def send_broker_notice
