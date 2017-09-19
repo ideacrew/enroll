@@ -10,7 +10,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
-  after_action :wells_fargo_sso, only: [:show]
+  before_action :wells_fargo_sso, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -322,9 +322,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   private
 
   def wells_fargo_sso
+    id_params = params.permit(:id, :employer_profile_id, :tab)
+    id = id_params[:id] || id_params[:employer_profile_id]
+    employer_profile = EmployerProfile.find(id)
     #grab url for WellsFargoSSO and store in insance variable
-    email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
-      @employer_profile.staff_roles.first.emails.first.address) || nil
+    email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.emails.first &&
+      employer_profile.staff_roles.first.emails.first.address) || nil
 
     if email.present?
       wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
