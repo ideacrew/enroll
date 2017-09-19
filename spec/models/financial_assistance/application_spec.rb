@@ -166,4 +166,15 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       end
     end
   end
+
+  describe "generates hbx_id for application" do
+    let(:new_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+    let(:new_application) { FactoryGirl.build(:application, family: new_family) }
+
+    it "creates an hbx id if doesn't exists" do
+      expect(new_application.hbx_id).to eq nil
+      new_application.save
+      expect(new_application.hbx_id).not_to eq nil
+    end
+  end
 end
