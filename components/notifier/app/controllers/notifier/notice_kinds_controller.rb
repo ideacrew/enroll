@@ -99,11 +99,13 @@ module Notifier
 
     def get_tokens
       builder = params['builder'] || 'Notifier::MergeDataModels::EmployerProfile'
-      tokens = builder.constantize.new.editor_tokens
+      token_builder = builder.constantize.new
+      tokens = token_builder.editor_tokens
+      # placeholders = token_builder.place_holders
 
       respond_to do |format|
         format.html
-        format.json {render json: tokens}
+        format.json { render json: {tokens: tokens} }
       end
     end
 

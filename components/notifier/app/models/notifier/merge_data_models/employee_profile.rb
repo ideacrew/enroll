@@ -4,37 +4,25 @@ module Notifier
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
 
-    # attribute :notification_type, String
-    # attribute :subject, String
-    # attribute :mpi_indicator, String
-    # attribute :primary_fullname, String
-    # attribute :primary_identifier, String
-    # attribute :mpi_indicator, String
-    # attribute :primary_address, PdfTemplates::NoticeAddress
-    # attribute :employer_name, String
-    # attribute :broker, PdfTemplates::Broker
-    # attribute :hbe, PdfTemplates::Hbe
-    # attribute :plan, PdfTemplates::Plan
-    # attribute :enrollment, PdfTemplates::Enrollment
-    # attribute :email, String
-    # attribute :plan_year, PdfTemplates::PlanYear
-
-    attribute :primary_fullname, String, default: 'John Whitmore'
     attribute :notice_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-    attribute :primary_address, MergeDataModels::Address
+    attribute :first_name, String, default: 'John'
+    attribute :last_name, String, default: 'Whitmore'
+    attribute :mailing_address, MergeDataModels::Address
+    attribute :ivl_sep_begin_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :ivl_sep_end_date, Date, default: (TimeKeeper.date_of_record + 60.days).strftime('%m/%d/%Y')
     attribute :employer_name, String, default: 'MA Health Connector'
-    attribute :date_of_hire, String, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-    attribute :new_hire_coverage_begin_date, String, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-    attribute :new_hire_oe_end_date, String, default: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y')
+    attribute :coverage_begin_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :broker, MergeDataModels::Broker
 
-    attribute :primary_identifier, String
-    attribute :mpi_indicator, String
-    attribute :application_date, Date
+    attribute :date_of_hire, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y') 
+    attribute :earliest_coverage_begin_date, Date, default: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y')
+    attribute :new_hire_oe_end_date, Date, default: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y')
 
   
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployeeProfile.new
-      notice.primary_address = Notifier::MergeDataModels::Address.new
+      notice.mailing_address = Notifier::MergeDataModels::Address.new
+      notice.broker = Notifier::MergeDataModels::Broker.new
       notice
     end
 

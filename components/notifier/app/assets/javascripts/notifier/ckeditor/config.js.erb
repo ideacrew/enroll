@@ -6,25 +6,23 @@ CKEDITOR.editorConfig = function( config )
     dataType:"json",
     data: {builder: $('#notice_kind_receipient').val()},
     success:function(result){
-       config.availableTokens = result;
-         // Configure token string
-        config.tokenStart = '#{';
-         config.tokenEnd = '}';
+
+      config.tokenStart = '#{';
+      config.tokenEnd = '}';
+      config.availableTokens = result.tokens;
+
+      // config.placeholder_selects = [
+      //   config.placeholder_select = {
+      //     key: 'placeholder_select',
+      //     title: 'Place Holder Select',
+      //     placeholders: <%= Notifier::MergeDataModels::EmployerProfile.new.place_holders.to_json %>
+      //   }
+      // ];
     }
   });
 
-  // var placeholders = [];
-  // $.ajax({
-  //   type:"GET",
-  //   url:"notice_kinds/get_placeholders",
-  //   dataType:"json",
-  //   data: {builder: $('#notice_kind_receipient').val()},
-  //   success:function(result){
-  //      placeholders = result;
-
-  //      alert('hell3');
-  //   }
-  // })
+  config.tokenStart = '#{';
+  config.tokenEnd = '}';
 
   config.removeButtons = "Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,About,Print,Save,NewPage,Preview,Templates,Save,Language,Flash,Smiley,Image,Iframe";
 
