@@ -88,6 +88,7 @@ class ConsumerRole
   field :ssn_rejected, type: Boolean, default: false
   field :native_rejected, type: Boolean, default: false
   field :lawful_presence_rejected, type: Boolean, default: false
+  field :residency_rejected, type: Boolean, default: false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -612,8 +613,7 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = false
+    update_attributes(:residency_determined_at => Time.now, :is_state_resident => false)
   end
 
   def mark_residency_pending(*args)
@@ -622,8 +622,7 @@ class ConsumerRole
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = true
+    update_attributes(:residency_determined_at => Time.now, :is_state_resident => true)
   end
 
   def lawful_presence_pending?
@@ -744,13 +743,17 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
-    if v_type == "Social Security Number"
-      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
-    elsif v_type == "American Indian Status"
-      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
-    else
-      lawful_presence_determination.deny!(verification_attr(authority.first))
-      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
+    case v_type
+      when "Residency"
+        update_attributes(:local_residency_validation => "outstanding", :residency_update_reason => update_reason, :residency_rejected => true)
+        mark_residency_denied
+      when "Social Security Number"
+        update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
+      when "American Indian Status"
+        update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
+      else
+        lawful_presence_determination.deny!(verification_attr(authority.first))
+        update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
     end
     reject!(verification_attr(authority.first))
     "#{v_type} was rejected."

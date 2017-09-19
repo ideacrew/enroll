@@ -36,7 +36,7 @@ module VerificationHelper
       when 'Residency'
         if consumer.residency_verified?
           consumer.local_residency_validation
-        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
+        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
           "in review"
         else
           "outstanding"
