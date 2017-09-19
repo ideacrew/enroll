@@ -975,29 +975,34 @@ class EmployerProfile
 
   def create_cobra_dependent(employee, cobra_options, cobra_begin_date)
     primary_cobra = cobra_options.detect{|id,dependency_type| dependency_type == 'primary'}
-    primar_cobra_dependent = employee.census_dependent_find(primary_cobra.first)
+    primary_cobra_dependent = employee.census_dependent_find(primary_cobra.first)
     cobra_options.delete(primary_cobra.first)
-    if primar_cobra_dependent 
-      cobra_dependent= CensusEmployee.create!(aasm_state: CensusEmployee::COBRA_DEPENDENT,
-                                             employer_profile_id: self.id,
-                                             encrypted_ssn: primar_cobra_dependent.encrypted_ssn,
-                                             first_name: primar_cobra_dependent.first_name,
-                                             last_name: primar_cobra_dependent.last_name,
-                                             dob: primar_cobra_dependent.dob,
-                                             gender: primar_cobra_dependent.gender,
-                                             cobra_begin_date: cobra_begin_date,
-                                             hired_on: cobra_begin_date)
-      
-      cobra_options.each do |id,dependency_type|
-        cobra_record = employee.census_dependent_find(id)
-        cobra_dependent.census_dependents << CensusDependent.new( first_name: cobra_record.first_name,
-                                                                  last_name: cobra_record.last_name,
-                                                                  name_sfx: cobra_record.name_sfx,
-                                                                  dob: cobra_record.dob,
-                                                                  gender: cobra_record.gender,
-                                                                  encrypted_ssn: cobra_record.encrypted_ssn,
-                                                                  employee_relationship:cobra_record.employee_relationship)
-      end
+    if primary_cobra_dependent
+      begin
+        cobra_dependent= CensusEmployee.create!(aasm_state: CensusEmployee::COBRA_DEPENDENT,
+                                         employer_profile_id: self.id,
+                                         encrypted_ssn: primary_cobra_dependent.encrypted_ssn,
+                                         first_name: primary_cobra_dependent.first_name,
+                                         last_name: primary_cobra_dependent.last_name,
+                                         dob: primary_cobra_dependent.dob,
+                                         gender: primary_cobra_dependent.gender,
+                                         cobra_begin_date: cobra_begin_date,
+                                         hired_on: cobra_begin_date)
+        primary_cobra_dependent.update_attribute(:cobra_dependent_id,employee.id.to_s)
+        cobra_options.each do |id,dependency_type|
+          cobra_record = employee.census_dependent_find(id)
+          cobra_dependent.census_dependents << CensusDependent.new( first_name: cobra_record.first_name,
+                                                                    last_name: cobra_record.last_name,
+                                                                    name_sfx: cobra_record.name_sfx,
+                                                                    dob: cobra_record.dob,
+                                                                    gender: cobra_record.gender,
+                                                                    encrypted_ssn: cobra_record.encrypted_ssn,
+                                                                    employee_relationship:cobra_record.employee_relationship)
+          cobra_record.update_attribute(:cobra_dependent_id,cobra_dependent.id.to_s)
+        end
+       rescue Exception => e
+         
+       end 
     end
   end
 

@@ -11,6 +11,10 @@ module Employers::EmployerHelper
     end
   end
 
+  def is_cobra_dependent?(census_dependent)
+    census_dependent.cobra_dependent_id.present? ? true : false 
+  end
+
   def enrollment_state(census_employee=nil)
     humanize_enrollment_states(census_employee.active_benefit_group_assignment)
   end

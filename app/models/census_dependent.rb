@@ -4,6 +4,8 @@ class CensusDependent < CensusMember
 
   embedded_in :census_employee
 
+  field :cobra_dependent_id, type: String
+
   validates :employee_relationship,
             presence: true,
             allow_blank: false,

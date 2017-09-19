@@ -6,21 +6,21 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="row row-form-wrapper no-buffer">
             <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true %>
+              <%= f.text_field :first_name, class: "floatlabel form-control border-bottom-none", placeholder: 'FIRST NAME', required: true , disabled: is_cobra_dependent?(f.object)%>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' %>
+              <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME' ,disabled: is_cobra_dependent?(f.object) %>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true %>
+              <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: 'LAST NAME', required: true ,disabled: is_cobra_dependent?(f.object)%>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}  %>
+              <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "floatlabel mask-ssn form-control", input_html: {value: "", maxlength: 11}  ,disabled: is_cobra_dependent?(f.object)%>
             </div>
             <div class="col-md-1 col-sm-1 col-xs-12 form-group form-group-lg no-pd">
               <%= f.hidden_field :_destroy %>
-              <%= link_to '#', :class => "remove_fields close-2" do %>
-              <%= image_tag("delete.png") %>
+              <%= link_to_if !is_cobra_dependent?(f.object), '#', :class => "remove_fields close-2" do %>
+                <%= image_tag("delete.png") %>
               <% end %>
             </div>
           </div>
@@ -28,7 +28,7 @@
           <div class="row row-form-wrapper no-buffer">
             <div class="col-md-2 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <%= datepicker_control f, :dob, {:class => "dob-picker floatlabel form-control", :placeholder => "DATE OF BIRTH",
-                                         :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true} %>
+                                         :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true, disabled: is_cobra_dependent?(f.object)} %>
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd no-border-xs">
@@ -40,7 +40,7 @@
                   <div class="n-radio-group">
                     <div class="n-radio-row">
                       <%= f.label :gender, 'male', :value => 'Male', class: 'n-radio' do %>
-                      <%= f.radio_button :gender, "male", class: "n-radio" %>
+                      <%= f.radio_button :gender, "male", class: "n-radio", disabled: is_cobra_dependent?(f.object) %>
                       <span class="n-radio"></span>
                       Male
                       <% end %>
@@ -49,7 +49,7 @@
                   <div class="n-radio-group">
                     <div class="n-radio-row">
                       <%= f.label :gender, 'female', :value => 'Female', class: 'n-radio' do %>
-                      <%= f.radio_button :gender, "female", class: "n-radio" %>
+                      <%= f.radio_button :gender, "female", class: "n-radio", disabled: is_cobra_dependent?(f.object)%>
                       <span class="n-radio"></span>
                       Female
                       <% end %>
@@ -68,7 +68,7 @@
               <% end %>
               <div class="selectric-labeled">
                 <span><strong>Relationship</strong></span>
-                <%= f.select :employee_relationship, options_for_select(relationships, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true} %>
+                <%= f.select :employee_relationship, options_for_select(relationships, selected: f.object.employee_relationship), {include_blank: "SELECT RELATIONSHIP", required: true}, disabled: is_cobra_dependent?(f.object) %>
               </div>
             </div>
           </div>
