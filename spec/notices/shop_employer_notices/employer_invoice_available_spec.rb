@@ -12,7 +12,7 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
       :notice_builder => 'ShopEmployerNotices::EmployerInvoiceAvailable',
       :event_name => 'employer_invoice_available',
       :mpi_indicator => 'SHOP_D021',
-      :title => "DC Health Link Invoice Available"})
+      :title => "Monthly Invoice Available"})
   }
   let(:valid_parmas) {{
       :subject => application_event.title,

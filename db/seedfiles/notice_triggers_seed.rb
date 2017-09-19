@@ -446,7 +446,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOP21',
-    title: 'DC Health Link Invoice Available',
+    title: 'Monthly Invoice Available',
     description: 'When groups invoice is available in their account, this notice is sent to them.',
     resource_name: 'employer',
     event_name: 'employer_invoice_available',
