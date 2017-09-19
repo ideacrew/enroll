@@ -17,6 +17,10 @@ describe HbxIdGenerator do
     it "generates family id's" do
       expect(HbxIdGenerator.generate_family_id).not_to eq nil
     end
+
+    it "generates tax_household id's" do
+      expect(HbxIdGenerator.generate_tax_household_id).not_to eq nil
+    end
   end
 
   describe "with an amqp source" do
@@ -62,6 +66,15 @@ describe HbxIdGenerator do
 
       it "returns the expected family id's" do
         expect(generator.generate_family_id).to eq sequence_number
+      end
+    end
+
+    describe "for tax_household id's" do
+      let(:sequence_name) { "tax_household_id" }
+      let(:sequence_number) { "86748765433" }
+
+      it "returns the expected family id's" do
+        expect(generator.generate_tax_household_id).to eq sequence_number
       end
     end
 

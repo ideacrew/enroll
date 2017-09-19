@@ -57,7 +57,9 @@ describe Family, "generate_family_id if hbx_assigned_id blank", dbclean: :after_
   let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
 
   it "generate_family_id" do
-    family.generate_family_id
+    expect(family.hbx_assigned_id).to eq nil
+    family.save
+    expect(family.hbx_assigned_id).not_to eq nil
   end
 end
 
