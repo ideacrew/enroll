@@ -142,4 +142,40 @@ $(document).ready(function() {
     $( "#financial_assistance_income_start_on" ).datepicker();
     $( "#financial_assistance_income_end_on" ).datepicker();
   }
+
+  /* Condtional Display Other Income Question */
+
+  $("#collapseOne").addClass('hide');
+  $("#has_other_income_true").prop('checked', false)
+  $("#has_other_income_false").prop('checked', false)
+
+  $("body").on("change", "#has_other_income_true", function(){
+    if ($('#has_other_income_true').is(':checked')) {
+      $("#collapseOne").removeClass('hide');
+    } else{
+      $("#collapseOne").addClass('hide');
+    }
+  });
+
+  $("body").on("change", "#has_other_income_false", function(){
+    if ($('#has_other_income_false').is(':checked')) {
+      $("#collapseOne").addClass('hide');
+    } else{
+      $("#collapseOne").removeClass('hide');
+    }
+  });
+
+  $('.other-income-checkbox').change(function(){
+    var income_form = $('.new-income-form').clone().removeClass('hidden');
+    income_form.find('.selectric-wrapper selectric-interaction-choice-control-financial-assistance-income-frequency-kind').selectric();
+    if($(this).is(':checked')){
+      console.log(income_form);
+      $(this).parent().parent().append(income_form);
+    }
+    else
+    {
+      var ele = $(this).parent().parent().find('.new-income-form');
+      ele.remove();
+    }
+  })
 });

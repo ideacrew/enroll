@@ -42,6 +42,16 @@ class FinancialAssistance::Income
     interest: 'Interest',
     pension_retirement_benefits: 'Pension or retirement',
     rental_and_royalty: 'Rent and royalties',
+    unemployment_insurance: 'Unemployment',
+    social_security_benefit: 'Social Security',
+    american_indian_and_alaskan_native: 'American Indian/Alaska Native income',
+    employer_funded_disability: 'Employer-funded disability payments',
+    estate_trust: 'Estate and trust',
+    farming_and_fishing: 'Farming or fishing',
+    foreign: 'Foreign income',
+    other: 'Other taxable income',
+    prizes_and_awards: 'Prizes and awards',
+    scholorship_payments: 'Scholarships',
   }
 
   #TAX_FORM_KINDS = %W(1040 1040A 1040EZ 1040NR 1040NR-EZ )
