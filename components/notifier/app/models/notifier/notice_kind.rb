@@ -27,6 +27,12 @@ module Notifier
     end
 
     def to_html(options = {})
+      params = { receipient_class_name.to_sym => receipient.constantize.stubbed_object }
+
+      if receipient_class_name.to_sym != :employer_profile
+        params.merge!({employer_profile: receipient.constantize.stubbed_object})
+      end
+
       Notifier::NoticeKindsController.new.render_to_string({
         :template => 'notifier/notice_kinds/template.html.erb', 
         :layout => false,
@@ -34,7 +40,7 @@ module Notifier
       }) + Notifier::NoticeKindsController.new.render_to_string({ 
         :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
         :layout => 'notifier/pdf_layout',
-        :locals => { receipient_class_name.to_sym => receipient.constantize.stubbed_object }
+        :locals => params
       })
     end
 
