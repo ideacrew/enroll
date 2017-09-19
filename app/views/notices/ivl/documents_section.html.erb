@@ -102,11 +102,11 @@
 <!-- SSN -->
 
 <!-- Citizneship -->
-<% if notice.dhs_unverified.any? %>
+<% if notice.citizenstatus_unverified.any? %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
      content: "<strong>Citizenship:</strong> We need proof of US citizenship for the following applicant(s):", top_margin: '5px', bottom_margin: '5px'} %>
   <%= render partial: 'notices/shared/household_member_details', :locals => {
-   rows: [notice.dhs_unverified], top_margin: '5px'} %>
+   rows: [notice.citizenstatus_unverified], top_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
      content: "There are two types of documents you can use to prove citizenship status. We call the two types “primary” and “secondary”. If you provide primary documentation, no other documents are needed. If you provide secondary documentation, other identification (ID) is required for verification. Secondary documentation must include a copy of an identification card that has a recent photo and other identifying information.", bottom_margin: '5px'} %>
