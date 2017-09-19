@@ -24,7 +24,7 @@ module Notifier
       notice.plan_year = Notifier::MergeDataModels::PlanYear.new
       # notice.plan = Notifier::MergeDataModels::Plan.new
       notice.broker = Notifier::MergeDataModels::Broker.new
-      notice.addresses = [ notice.primary_address ]
+      notice.addresses = [ notice.mailing_address ]
       notice
     end
 

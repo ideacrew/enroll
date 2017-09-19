@@ -17,6 +17,13 @@ module Notifier
     attribute :employer_poc_lastname, String, default: 'Samules'
 
 
+    def self.stubbed_object
+      notice = Notifier::MergeDataModels::BrokerProfile.new
+      notice.mailing_address = Notifier::MergeDataModels::Address.new
+      notice
+    end
+
+
     def collections
       []
     end

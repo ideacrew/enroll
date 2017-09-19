@@ -17,12 +17,14 @@ module Notifier
     attribute :date_of_hire, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y') 
     attribute :earliest_coverage_begin_date, Date, default: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y')
     attribute :new_hire_oe_end_date, Date, default: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y')
+    attribute :addresses, Array[MergeDataModels::Address]
 
   
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployeeProfile.new
       notice.mailing_address = Notifier::MergeDataModels::Address.new
       notice.broker = Notifier::MergeDataModels::Broker.new
+      notice.addresses = [ notice.mailing_address ]
       notice
     end
 
