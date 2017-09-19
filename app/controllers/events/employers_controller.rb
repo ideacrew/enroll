@@ -10,7 +10,7 @@ module Events
       manual_gen = headers["manual_gen"].present? && (headers["manual_gen"] == "true" || headers["manual_gen"] == true) ? true : false
       if !employer_org.nil?
         employer = employer_org.employer_profile
-        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { :employer => employer, manual_gen: manual_gen }
+        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { employer: employer, manual_gen: manual_gen }
         with_response_exchange(connection) do |ex|
           ex.publish(
             event_payload,
@@ -21,7 +21,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       else
         with_response_exchange(connection) do |ex|
@@ -34,7 +34,7 @@ module Events
                 :employer_id => employer_id
               }
             }
-          ) 
+          )
         end
       end
     end
