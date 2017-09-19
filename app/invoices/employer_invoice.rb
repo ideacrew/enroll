@@ -69,7 +69,7 @@ class EmployerInvoice
       @organization.employer_profile.trigger_notices("initial_employer_first_invoice_available")
     else
     #   Triggers this Notice if it is not an initial invoice or it is a renewal invoice
-      @organization.employer_profile.trigger_notices("renewal_employer_invoice_available")
+      @organization.employer_profile.trigger_notices("employer_invoice_available")
     end
   end
 

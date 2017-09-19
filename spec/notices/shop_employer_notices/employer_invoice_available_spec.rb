@@ -10,9 +10,9 @@ RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
       :name =>'Employer monthly invoice available in the account',
       :notice_template => 'notices/shop_employer_notices/employer_invoice_available_notice',
       :notice_builder => 'ShopEmployerNotices::EmployerInvoiceAvailable',
-      :event_name => 'renewal_employer_invoice_available',
+      :event_name => 'employer_invoice_available',
       :mpi_indicator => 'SHOP_D021',
-      :title => "YYour Renewal Invoice for Employer Sponsored Coverage is Now Available"})
+      :title => "DC Health Link Invoice Available"})
   }
   let(:valid_parmas) {{
       :subject => application_event.title,
