@@ -11,6 +11,10 @@ module Config::ContactCenterHelper
     Settings.contact_center.alt_phone_number
   end
 
+  def contact_center_ivl_number
+    Settings.contact_center.ivl_number
+  end
+
   def contact_center_city
     Settings.contact_center.mailing_address.city
   end

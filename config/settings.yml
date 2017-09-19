@@ -5,6 +5,7 @@ site:
   home_url: "https://enroll.mhc.hbxshop.org"
   help_url: "https://www.mahealthconnector.org/business/help-center"
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
+  main_web_address_url: "https://www.MAhealthconnector.org"
   main_web_address: "www.MAhealthconnector.org"
   main_web_address_url: "https://www.MAhealthconnector.org"
   website_name: "MAhealthconnector.org"
@@ -36,6 +37,7 @@ contact_center:
   fax: "1-617-933-3099"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
+  ivl_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
   small_business_email: "smallbusiness@MAhealthconnector.org"
 
