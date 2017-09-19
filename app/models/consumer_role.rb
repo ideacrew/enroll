@@ -73,11 +73,10 @@ class ConsumerRole
   field :native_validation, type: String, default: nil
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
 
+  # DC residency
   field :is_state_resident, type: Boolean, default: nil
   field :residency_determined_at, type: DateTime
-
-  # DC residency
-  field :local_residency_validation, type: String
+  field :local_residency_validation, type: String, default: "attested"
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
@@ -495,10 +494,14 @@ class ConsumerRole
   end
 
   def verify_ivl_by_admin(*args)
-    if person.ssn || is_native?
-      self.ssn_valid_citizenship_valid! verification_attr(args.first)
+    if sci_verified?
+      pass_residency!
     else
-      self.pass_dhs! verification_attr(args.first)
+      if person.ssn || is_native?
+        self.ssn_valid_citizenship_valid! verification_attr(args.first)
+      else
+        self.pass_dhs! verification_attr(args.first)
+      end
     end
   end
 
@@ -756,7 +759,8 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
+        update_attributes(:local_residency_validation => "valid", :residency_update_reason => update_reason)
+        mark_residency_authorized
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"
