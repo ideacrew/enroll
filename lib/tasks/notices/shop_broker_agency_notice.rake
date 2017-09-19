@@ -1,10 +1,10 @@
 # This rake task used to send employer notices it expects FEIN and event_name as arguments.
-# RAILS_ENV=production bundle exec rake notice:shop_broker_agency_notice["464398642,043023600,821356381,263082892,261813097,384325339",broker_agency_hired_confirmation]
+# RAILS_ENV=production bundle exec rake notice:shop_broker_agency_notice["464398642 043023600 821356381 263082892 261813097 384325339",broker_agency_hired_confirmation]
 namespace :notice do
   desc "Generate shop broker agency hired notices"
   task :shop_broker_agency_notice, [:feins, :event_name] => :environment do |task, args|
 
-    feins = args[:feins].split(',').uniq 
+    feins = args[:feins].split(' ').uniq
     @event_name = args[:event_name].to_s
 
     if feins.present?
