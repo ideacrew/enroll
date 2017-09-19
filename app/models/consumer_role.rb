@@ -613,7 +613,9 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    update_attributes(:residency_determined_at => Time.now, :is_state_resident => false)
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => false,
+                      :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
@@ -622,7 +624,9 @@ class ConsumerRole
   end
 
   def mark_residency_authorized(*args)
-    update_attributes(:residency_determined_at => Time.now, :is_state_resident => true)
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => true,
+                      :local_residency_validation => "valid")
   end
 
   def lawful_presence_pending?
@@ -745,7 +749,7 @@ class ConsumerRole
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     case v_type
       when "Residency"
-        update_attributes(:local_residency_validation => "outstanding", :residency_update_reason => update_reason, :residency_rejected => true)
+        update_attributes(:residency_update_reason => update_reason, :residency_rejected => true)
         mark_residency_denied
       when "Social Security Number"
         update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
@@ -762,7 +766,7 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "Residency"
-        update_attributes(:local_residency_validation => "valid", :residency_update_reason => update_reason)
+        update_attributes(:residency_update_reason => update_reason)
         mark_residency_authorized
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
@@ -799,10 +803,10 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
-      self.native_validation = "outstanding" if native_validation == "na"
-    else
+    if (tribal_id.nil? || tribal_id.empty?)
       self.native_validation = "na"
+    else
+      self.native_validation = "outstanding" if native_validation == "na"
     end
   end
 

@@ -7,7 +7,7 @@ describe AddNativeVerification, :dbclean => :after_each do
 
   shared_examples_for "native american verification status" do |new_status, current_status, indian|
     it "assigns #{new_status} as native_validation status" do
-      person.consumer_role.update_attribute("citizen_status", indian) if indian
+      person.consumer_role.update_attribute("tribal_id", "444444444") if indian
       person.consumer_role.update_attribute("native_validation", current_status) if current_status
       subject.migrate
       person.reload

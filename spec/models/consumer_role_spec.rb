@@ -212,7 +212,7 @@ context "Verification process and notices" do
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
-        person.update_attributes!(:citizen_status=>"indian_tribe_member") if tribe
+        person.update_attributes!(:tribal_id=>"444444444") if tribe
         person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
         expect(person.consumer_role.native_validation).to eq(state)
       end
@@ -371,12 +371,20 @@ context "Verification process and notices" do
       end
     end
 
-    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
-    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
+    context "verify" do
+      it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
+      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "local_residency_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
 
+    end
+
+    context "return for deficiency" do
+      it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
+    end
   end
 
   describe "state machine" do
