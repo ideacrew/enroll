@@ -240,9 +240,12 @@ end
 
 describe Family, "generate_family_id if hbx_assigned_id blank", dbclean: :after_each do
   let(:person) { FactoryGirl.create(:person)}
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:tax_household) { TaxHousehold.new(household: family.households.first) }
 
   it "generate_family_id" do
-    family.generate_family_id
+    expect(tax_household.hbx_assigned_id).to eq nil
+    tax_household.save
+    expect(tax_household.hbx_assigned_id).not_to eq nil
   end
 end
