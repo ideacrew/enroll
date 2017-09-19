@@ -67,7 +67,8 @@ module Notifier
 
       send_data Notifier::NoticeKind.to_csv, 
         :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
-        :disposition => 'inline'
+        :disposition => 'attachment',
+        :type => 'text/csv'
     end
 
     def upload_notices
