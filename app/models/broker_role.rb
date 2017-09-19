@@ -348,7 +348,7 @@ class BrokerRole
     @orgs = Organization.by_broker_role(id)
     @employers = @orgs.map(&:employer_profile)
     # Remove broker from employers
-    @employers.each do |e|
+    @employers.in_groups_of(10) do |e|
       e.fire_broker_agency
       # Remove General Agency
       e.fire_general_agency!(TimeKeeper.datetime_of_record)
@@ -356,7 +356,7 @@ class BrokerRole
     # Remove broker from families
     if has_broker_agency_profile?
       families = self.broker_agency_profile.families
-      families.each do |f|
+      families.in_groups_of(40) do |f|
         f.terminate_broker_agency
       end
     end

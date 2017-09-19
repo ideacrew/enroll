@@ -4,7 +4,7 @@ class RemoveDuplicateBrokerAgencyAccounts < MongoidMigrationTask
   def migrate
     families = Family.where("broker_agency_accounts" => {"$exists" => true})
   
-    families.each do |fam|
+    families.in_groups_of(500) do |fam|
       broker_accounts = fam.broker_agency_accounts
       if broker_accounts.size > 1
         record_one = broker_accounts[0]
