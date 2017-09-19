@@ -13,9 +13,7 @@
 <h4>
   <ol>
     <li>
-      <!--<%= link_to "Pay Online", wells_fargo_sso_employers_employer_profile_path(@employer_profile), target: :_blank %> -->
-      <!-- <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, wells_fargo_sso_employers_employer_profile_path(@employer_profile) %> -->
-      <!-- <%= link_to 'Pay Online', @wf_url, target: :_blank %> -->
+      
       <% if @wf_url.present? %>
         <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %>
       <% else %>
