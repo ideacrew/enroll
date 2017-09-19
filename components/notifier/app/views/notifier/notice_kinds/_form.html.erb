@@ -1,3 +1,5 @@
+<%= link_to "<i class='fa fa-backward' aria-hidden='true'></i> Back".html_safe, notice_kinds_path, class: 'btn btn-primary' %>
+
 <h2><%= notice_kind.persisted? ? 'Edit' : 'Create' %> Notice Template</h2>
 
 <div class="row">
@@ -30,16 +32,19 @@
   </div>
 
   <%= hidden_field_tag 'notice_preview_url', preview_notice_kind_path(id: notice_kind.id) %>
-  <div class="col-xs-12">
+  <div class="form-group col-xs-12">
+    <div class="pull-right">
+    <%= link_to 'Cancel', notice_kinds_path, class: "btn btn-primary" %>
     <button type="submit" class="btn btn-primary">Submit</button>
-   </div>
+  </div>
+  </div>
 <% end %>
 </div>
-<span>
-<%= link_to preview_notice_kind_path(id: notice_kind.id), class: "btn btn-primary notice-preview", target: '_blank' do %>
+<!-- <span>
+<%#= link_to preview_notice_kind_path(id: notice_kind.id), class: "btn btn-primary notice-preview", target: '_blank' do %>
     <span class="glyphicon glyphicon-eye-open"></span> Preview
-<% end %>
-</span>
+<%# end %>
+</span> -->
 
 <!-- <a href="#" class="btn btn-primary notice-preview"><span class="glyphicon glyphicon-eye-open"></span> Preview</a>
  -->
