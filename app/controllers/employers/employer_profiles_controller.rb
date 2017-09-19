@@ -1,7 +1,7 @@
 class Employers::EmployerProfilesController < Employers::EmployersController
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :show_invoice, :link_from_quote, :generate_checkbook_urls, :wells_fargo_sso]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :generate_checkbook_urls]
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
   before_action :check_employer_staff_role, only: [:new]
@@ -10,6 +10,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  after_action :wells_fargo_sso, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -118,7 +119,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'accounts'
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-        @pay_bill = params[:pay_my_bill]
+        #only exists if coming from redirect from sso failing
+        @bill_pay_authenticated = params[:bill_pay_authenticated]
+        if @bill_pay_authenticated == "false"
+          flash[:error] = 'Connection to bill pay server failed'
+        end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
@@ -134,30 +139,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
         set_flash_by_announcement if @tab == 'home'
       end
-    end
-  end
-
-  def wells_fargo_sso
-    #grab url for WellsFargoSSO and store in insance variable
-    email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
-      @employer_profile.staff_roles.first.emails.first.address) || nil
-
-    if email.present?
-      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
-    end
-
-    if wells_fargo_sso.present?
-      if wells_fargo_sso.token.present?
-        @wf_url = wells_fargo_sso.url
-      end
-    end
-    #need to make error message if connection fails
-    if @wf_url.present?
-      redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts', :pay_my_bill => 'true')
-    else
-      flash[:error] = 'Connection to bill pay server failed'
-      redirect_to employers_employer_profile_path(@employer_profile, :tab => 'accounts')
-
     end
   end
 
@@ -339,6 +320,22 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   private
+
+  def wells_fargo_sso
+    #grab url for WellsFargoSSO and store in insance variable
+    email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
+      @employer_profile.staff_roles.first.emails.first.address) || nil
+
+    if email.present?
+      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
+    end
+
+    if wells_fargo_sso.present?
+      if wells_fargo_sso.token.present?
+        @wf_url = wells_fargo_sso.url
+      end
+    end
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
