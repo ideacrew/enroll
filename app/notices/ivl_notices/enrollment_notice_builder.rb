@@ -132,7 +132,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
 
     hbx_enrollments = []
-    en = enrollments.select{ |en| HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}
+    en = enrollments.select{ |en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
     health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:effective_on).last
     dental_enrollment = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:effective_on).last
     hbx_enrollments << health_enrollment
