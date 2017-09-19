@@ -2,3 +2,4 @@ stopEditingIncome();
 //need to dynamcially handle different income types
 //<%# if @income.type == 'job' %>
 $('#<%= dom_id @income %>').html("<%= escape_javascript render(partial: 'job_income', locals: { income: @income }) %>");
+$('#<%= dom_id @income %>').html("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");

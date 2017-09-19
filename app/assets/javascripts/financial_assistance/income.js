@@ -95,5 +95,51 @@ $(document).ready(function() {
     $('.other-income-checkbox:checked').click(function(e) {
 
     });
+
+    /* Condtional Display Job Income Question */
+    $("#job_income").addClass('hide');
+    $("#has_job_income_true").prop('checked', false)
+    $("#has_job_income_false").prop('checked', false)
+
+    $("body").on("change", "#has_job_income_true", function(){
+      if ($('#has_job_income_true').is(':checked')) {
+        $("#job_income").removeClass('hide');
+      } else{
+        $("#job_income").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_job_income_false", function(){
+      if ($('#has_job_income_false').is(':checked')) {
+        $("#job_income").addClass('hide');
+      } else{
+        $("#job_income").removeClass('hide');
+      }
+    });
+
+
+    /* Condtional Display Self Employed Income Question */
+    $("#self_employed_incomes").addClass('hide');
+    $("#has_self_employment_income_true").prop('checked', false)
+    $("#has_self_employment_income_false").prop('checked', false)
+
+    $("body").on("change", "#has_self_employment_income_true", function(){
+      if ($('#has_self_employment_income_true').is(':checked')) {
+        $("#self_employed_incomes").removeClass('hide');
+      } else{
+        $("#self_employed_incomes").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_self_employment_income_false", function(){
+      if ($('#has_self_employment_income_false').is(':checked')) {
+        $("#self_employed_incomes").addClass('hide');
+      } else{
+        $("#self_employed_incomes").removeClass('hide');
+      }
+    });
+
+    $( "#financial_assistance_income_start_on" ).datepicker();
+    $( "#financial_assistance_income_end_on" ).datepicker();
   }
 });
