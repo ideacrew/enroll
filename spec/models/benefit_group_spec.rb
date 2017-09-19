@@ -455,14 +455,26 @@ describe BenefitGroup, type: :model do
       let(:organization)            { FactoryGirl.create(:organization) }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
       let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
-      let(:elected_plan_set) do
+      let!(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+      let!(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+      let!(:elected_plan_set) do
         plans = [1, 2, 3].collect do
           FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice])
         plans
+      end
+
+      context '.carriers_offered' do    
+        before do
+          benefit_group.plan_option_kind = :metal_level
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = elected_plan_set
+        end
+
+        it "should return the carrier ids" do
+          expect(benefit_group.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+        end
       end
 
       context "and the reference plan is not in the elected plan set" do
@@ -488,8 +500,7 @@ describe BenefitGroup, type: :model do
 
         it "should be invalid" do
           expect(benefit_group.valid?).to be_falsey
-          expect(benefit_group.errors[:elected_plans].any?)
-          .to be_truthy
+          expect(benefit_group.errors[:elected_plans].any?).to be_truthy
           expect(benefit_group.errors[:elected_plans].first).to match(/not all from the same carrier as reference plan/)
         end
       end

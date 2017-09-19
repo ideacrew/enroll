@@ -63,7 +63,6 @@ describe HbxEnrollment do
       expect(employer_profile.census_employees.size).to eq fte_count
     end
 
-
     context "and employees create employee roles and families" do
       let(:blue_collar_employee_roles) do
         bc_employees = blue_collar_census_employees.collect do |census_employee|
@@ -1339,7 +1338,7 @@ context "Benefits are terminated" do
                                                  submitted_at: effective_on_date - 10.days
                                                  )
                               }
-    let(:ivl_termination_date)  { TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum }
+    let(:ivl_termination_date)  { TimeKeeper.date_of_record}
 
     it "should be open enrollment" do
       expect(ivl_enrollment.is_open_enrollment?).to be_truthy

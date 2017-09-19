@@ -8,13 +8,13 @@
       -ms-text-size-adjust:100%;
       margin:0;
       padding:0;
-      color:rgb(0,0,0);
+      color:#808080;
       font-family: "TimesNewRoman", Times, serif;
     }
     
     .page_numbers{
      text-align: right; 
-     font-size: 9pt
+     font-size: 7pt
     }
   </style>
 
@@ -28,11 +28,11 @@
         var y = document.getElementsByClassName(x[i]);
         for(var j=0; j<y.length; ++j){
           if(j == 0 ){
-            if(x[i] == 'page' && vars[x[i]] == 1){
+            if(x[i] == 'page' && vars[x[i]] > 3){
               continue;
             }
           }
-          y[j].textContent = "Page "+vars[x[i]]+ " of " + vars[x[1]];// ;
+        y[j].textContent =  "Page "+vars[x[i]]+ " of " + vars[x[1]];
         }
       }
     }
