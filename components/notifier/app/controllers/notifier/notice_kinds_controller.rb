@@ -79,8 +79,8 @@ module Notifier
         next if notice_row[0] == 'Notice Number'
 
         if Notifier::NoticeKind.where(notice_number: notice_row[0]).blank?
-          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2])
-          notice.template = Template.new(raw_body: notice_row[3])
+          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], receipient: notice_row[3])
+          notice.template = Template.new(raw_body: notice_row[4])
           notice.save
         else
           @errors << "Notice #{notice_row[0]} already exists."
