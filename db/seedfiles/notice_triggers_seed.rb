@@ -759,6 +759,27 @@ shop_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'SHOP43',
+    title: 'Welcome to DC Health Link',
+    description: 'ER creates an account in DC Health',
+    resource_name: 'employer',
+    event_name: 'employer_account_creation_notice',
+    notice_triggers: [
+      {
+        name: 'Welcome Notice sent to Employer',
+        notice_template: 'notices/shop_employer_notices/employer_account_creation_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerAccountCreationNotice',
+        mpi_indicator: 'MPI_SHOP43',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'SHOP10066',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
