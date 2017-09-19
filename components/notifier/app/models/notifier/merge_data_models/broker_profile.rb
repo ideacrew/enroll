@@ -5,17 +5,24 @@ module Notifier
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
 
+    attribute :notice_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+    attribute :first_name, String, default: 'John'
+    attribute :last_name, String, default: 'Whitmore'
+    attribute :mailing_address, MergeDataModels::Address
+
+    attribute :borker_agency_name, String, default: 'Best Brokers LLC'
+    attribute :assignment_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y') 
+    attribute :employer_name, String, default: 'North America Football Federation'
+    attribute :employer_poc_firstname, String, default: 'David'
+    attribute :employer_poc_lastname, String, default: 'Samules'
+
 
     def collections
-      %w{addresses}
+      []
     end
 
     def conditions
-      %w{broker_present?}
-    end
-
-    def broker_present?
-      self.broker.present?
+      []
     end
   end
 end

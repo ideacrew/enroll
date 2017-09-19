@@ -8,6 +8,6 @@ module Notifier
     attribute :end_on, Date, default: '09/30/2018'
     attribute :carrier_name, String, default: 'Kaiser'
     attribute :warnings, Array[String]
-    attribute :binder_payment_due_date, Date, default: '09/25/2017'
+    attribute :binder_due_date, Date, default: '09/25/2017'
   end
 end

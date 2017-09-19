@@ -20,8 +20,8 @@ module Effective
         table_column :receipient, :proc => Proc.new { |row|
          row.receipient_class_name.to_s.titleize
         }, :filter => false, :sortable => false
-        table_column :created_date, :proc => Proc.new { |row|
-         row.created_at.strftime('%m/%d/%Y')
+        table_column :last_updated_at, :proc => Proc.new { |row|
+         row.updated_at.in_time_zone('Eastern Time (US & Canada)').strftime('%m/%d/%Y %H:%M')
         }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
