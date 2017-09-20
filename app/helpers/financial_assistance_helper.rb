@@ -129,6 +129,12 @@ module FinancialAssistanceHelper
     'cna disabled' unless conditional
   end
 
+  def show_faa_status
+    return true if (controller_name == 'applications' and action_name == 'edit') or controller_name == 'family_relationships'
+    return true if ( controller_name == 'family_members' and (action_name == 'create' or action_name == 'destroy')) # On AJAX renders for create / destory
+    return false
+  end
+
   def claim_eligible_tax_dependents
     @application.active_applicants.inject({}) do |memo, applicant|
       memo.merge! applicant.person.full_name => applicant.id.to_s if (applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id)
