@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual")}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days), household: family.households.first, kind: "individual")}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
                             :notice_template => 'notices/ivl/enrollment_notice',

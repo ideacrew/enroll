@@ -44,6 +44,8 @@ aca:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
       days: 0
+    verification_due:
+      days: 95
 
     open_enrollment:
       benefit_year_2016:
