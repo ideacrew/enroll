@@ -5,6 +5,7 @@ module PdfTemplates
     attribute :enrollees, Array[Individual]
     attribute :premium, String
     attribute :employee_cost, String
+    attribute :employer_cost, String
     attribute :employer_contribution, String
     attribute :phone, String
     attribute :effective_on, Date
