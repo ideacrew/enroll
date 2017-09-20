@@ -13,11 +13,12 @@
 <h4>
   <ol>
     <li>
-
       <% if @wf_url.present? %>
         <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %>
       <% else %>
-        <%= link_to_if(@wf_url.present?, '<button class="btn btn-default">Pay Online Unavailable</button>'.html_safe, @wf_url, target: :_blank) %>
+      <div>
+        <button class="btn btn-default disabled">Pay Online unavailable</button>
+      </div>
       <% end %>
       <div class="row col-md-offset-1">
         <%= link_to 'How to Pay Online - Instructions', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%>
