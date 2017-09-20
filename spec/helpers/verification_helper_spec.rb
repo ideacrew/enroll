@@ -402,8 +402,8 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", "4 weeks"
     it_behaves_like "reject reason dropdown list", "Immigration status", "Expired", "Too old"
     it_behaves_like "reject reason dropdown list", "Citizenship", "Expired", nil
-    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible Doc", "Expired"
-    it_behaves_like "reject reason dropdown list", "Social Security Number", "Member Data Change", "Too old"
-    it_behaves_like "reject reason dropdown list", "American Indian Status", "Document Expired", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Illegible", "Expired"
+    it_behaves_like "reject reason dropdown list", "Social Security Number", "Wrong Type", "Too old"
+    it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
 end
