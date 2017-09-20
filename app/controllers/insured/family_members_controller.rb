@@ -121,6 +121,7 @@ class Insured::FamilyMembersController < ApplicationController
 
   def show
     @dependent = Forms::FamilyMember.find(params.require(:id))
+    @application = @dependent.family_member.family.application_in_progress
     @matrix = @dependent.family.build_relationship_matrix
     @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
