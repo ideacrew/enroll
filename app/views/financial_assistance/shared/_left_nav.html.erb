@@ -86,7 +86,7 @@
       <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w'>
         <% if @application.incomplete_applicants? == false and @application.active_applicants.count > 1 and @application.is_draft? %>
         <%= link_to 'Family Relationships', insured_family_relationships_path %>
-        <% else %>
+        <% elsif @application.active_applicants.count > 1 %>
           <a class="cna">Family Relationships</a>
         <% end %> 
       </li>
