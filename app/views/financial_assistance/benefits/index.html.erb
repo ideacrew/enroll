@@ -2,26 +2,29 @@
   <div class="row">
     <div class="col-md-12">
       <h1 class="darkblue">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
+      <br />
       <small>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</small>
     </div>
   </div>
   <br />
 
   <!--is enrolled driver question-->
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class="col-md-5">
+  <div class="row row-form-wrapper radio-align no-buffer row-height">
+    <div class="col-md-6 labelforcoverage">
       <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
     </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_yes" value="true" class="radio-yml">
-      <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
-    </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_no" value="false" class="radio-yml" required="required">
-      <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
-    </div>
-    <div class="col-md-3">
-       | &nbsp; <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+    <div class="col-md-6">
+      <div class="col-md-4">
+        <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_yes" value="true" class="radio-yml">
+        <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+      </div>
+      <div class="col-md-4">
+        <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_no" value="false" class="radio-yml" required="required">
+        <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+      </div>
+      <div class="col-md-4">
+          <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+      </div>
     </div>
   </div>
   <br />
@@ -31,20 +34,22 @@
   </div>
 
   <!--is eligible driver question-->
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class="col-md-5">
+  <div class="row row-form-wrapper radio-align no-buffer row-height">
+    <div class="col-md-6 labelforcoverage">
       <span class="fa-text-color">Does this person currently have access to other health coverage, including through another person? *</span>
     </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_yes" value="true" class="radio-yml">
-      <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
-    </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_no" value="false" class="radio-yml" required="required">
-      <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
-    </div>
-    <div class="col-md-3">
-       | &nbsp; <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+    <div class="col-md-6">
+      <div class="col-md-4">
+        <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_yes" value="true" class="radio-yml">
+        <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
+      </div>
+      <div class="col-md-4">
+        <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_no" value="false" class="radio-yml" required="required">
+        <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
+      </div>
+      <div class="col-md-4">
+         <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+      </div>
     </div>
   </div>
 
