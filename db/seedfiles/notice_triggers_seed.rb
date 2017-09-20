@@ -801,6 +801,7 @@ shop_notice_triggers = [
     ]
   },
   {
+<<<<<<< HEAD
     hbx_id: 'SHOP_D049',
     title: 'Broker Hired Confirmation Notice',
     description: 'Confirmation of Broker Hired Sent to Employer',
@@ -821,6 +822,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOPDAE074',
     title: 'Employee Plan Selection Confirmation',
@@ -842,6 +844,28 @@ shop_notice_triggers = [
       }
     ]
   },
+
+    hbx_id: 'SHOPDRE076',
+    title: 'Employee Enrollment Confirmation',
+    description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
+    resource_name: 'employee_role',
+    event_name: 'renewal_employee_enrollment_confirmation',
+    notice_triggers: [
+      {
+        name: 'Notify Employees Enrollment confirmation',
+        notice_template: 'notices/shop_employee_notices/renewal_employee_enrollment_confirmation',
+        notice_builder: 'ShopEmployeeNotices::RenewalEmployeeEnrollmentConfirmation',
+        mpi_indicator: 'MPI_SHOPDRE076',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
       hbx_id: 'SHOP_D050',
       title: 'Broker Agency Fired',

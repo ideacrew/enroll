@@ -826,7 +826,7 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
@@ -1004,6 +1004,19 @@ class PlanYear
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  def renewal_employee_enrollment_confirmation
+    begin
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        enrollment = ce.active_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on == self.start_on
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver notice due to '#{e}' " }
+    end
   end
 
   alias_method :external_plan_year?, :can_be_migrated?
