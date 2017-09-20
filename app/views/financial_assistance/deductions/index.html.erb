@@ -2,67 +2,37 @@
   <div class="row">
     <div class="col-md-10">
       <h1 class="darkblue">Income Adjustments for <%= @applicant.family_member.person.first_name.titleize %></h1>
+      <small>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</small>
     </div>
   </div>
+  <br />
 
-  <div>
-    <% if @applicant.has_deductions %>
-      <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-        <div class="col-md-11 form-heading">Adjustments</div>
-        <div class="col-md-1">
-          <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
-            <i class="glyphicon glyphicon-pencil grey-font"></i>
-          <% end %>
-        </div>
-      </div>
-      <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-        <div class="col-md-8">Does this person expect to have adjustments to income in 2017?</div>
-        <div class="col-md-4">Yes</div>
-      </div>
-    <% end %>
-
-    <br>
-    <p>Income deductions were created for you below based on your answers above, complete each deduction and then click CONTINUE.</p>
-    <br>
-
-    <% if @applicant.deductions.present?%>
-      <table class="deductions-table table">
-        <tr class="form-heading">
-          <th class="form-heading">Deduction Type</th>
-          <th class="form-heading">Status</th>
-          <th></th>
-          <th></th>
-        </tr>
-        <% @applicant.deductions.each do |deduction| %>
-          <tr>
-            <td><%= deduction.kind.nil? ? "--" : deduction.kind.titleize %></td>
-            <td>
-              <% if deduction.valid? :submission %>
-                <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Info Complete</span>
-              <% else %>
-                <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">Info Needed</span>
-              <% end %>
-            </td>
-            <td><%= link_to go_to_step_financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction, 1), class: "btn btn-default" do %>
-                <i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
-                EDIT
-              <% end %>
-            </td>
-            <td>
-              <%= link_to financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction), method: :delete, data: { confirm: "Are you sure?" } do %>
-                <span class='fa fa-trash-o'></span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    <%end%>
+  <!--income adjustment driver question-->
+  <div class="row row-form-wrapper no-buffer row-height">
+    <div class="col-md-5">
+      <span class="fa-text-color">Does this person expect to have income adjustments in <%=@application.assistance_year%> *</span>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_deductions]" id="has_deductions" value="true" class="radio-yml">
+      <label class="radio-yml" for="has_deductions_yes">Yes</label>
+    </div>
+    <div class="col-md-2">
+      <input type="radio" name="applicant[has_deductions]" id="has_deductions" value="false" class="radio-yml" required="required">
+      <label class="radio-yml" for="has_deductions_no">No</label>
+    </div>
+    <div class="col-md-3">
+       | &nbsp; <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions" class="interaction-click-control-not-sure?">Not Sure?</a>
+    </div>
   </div>
-  <div class="col-md-4 col-sm-4 col-xs-4">
-  <%= link_to "Add Income Adjustment", new_financial_assistance_application_applicant_deduction_path(@application, @applicant), class: "btn btn-default center-block" %>
+  <br />
+
+  <!--Deduction Kinds-->
+  <div class='deduction-kinds'>
+    <%= render partial: 'financial_assistance/deductions/deduction_kinds', locals: { deduction_kinds: FinancialAssistance::Deduction::KINDS} %>
   </div>
 </div>
 
+<!-- Right NAV -->
 <div class='col-md-2'>
   <%= render partial: 'financial_assistance/shared/right_nav', locals: {
     previous_url: find_previous_applicant_path(@application, @applicant, current: 'deductions'),

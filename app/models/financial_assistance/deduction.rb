@@ -54,7 +54,7 @@ class FinancialAssistance::Deduction
 
   before_create :set_submission_timestamp
 
-
+  scope :of_kind, ->(deduction_kind) { where(kind: deduction_kind) }
 
 private
 

@@ -173,4 +173,16 @@ module FinancialAssistanceHelper
       yield f
     end
   end
+
+  def deduction_form_for(application, applicant, deduction)
+    url = if deduction.new_record?
+      financial_assistance_application_applicant_deductions_path(application, applicant)
+    else
+      financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction)
+    end
+
+    form_for deduction, url: url, remote: true do |f|
+      yield f
+    end
+  end
 end
