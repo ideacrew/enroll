@@ -16,10 +16,10 @@
         <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), required: true %>
       </div>
       <div class="col-md-3">
-        <%= datepicker_control f, :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
       </div>
       <div class="col-md-3">
-        <%= datepicker_control f, :end_on, placeholder: 'TO', required: true, class: "floatlabel" %>
+        <%= f.text_field :end_on, placeholder: 'TO', required: true, class: "floatlabel" %>
       </div>
     </div>
 
