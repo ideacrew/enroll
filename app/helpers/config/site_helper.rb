@@ -11,10 +11,6 @@ module Config::SiteHelper
     Settings.site.website_name
   end
 
-  def site_website_link
-    link_to site_website_name, site_website_name
-  end
-
   def site_find_expert_link
     link_to site_find_expert_url, site_find_expert_url
   end
@@ -57,6 +53,10 @@ module Config::SiteHelper
 
   def site_registration_path(resource_name, params)
     Settings.site.registration_path.present? ? Settings.site.registration_path : new_registration_path(resource_name, :invitation_id => params[:invitation_id])
+  end
+
+  def site_long_name
+    Settings.site.long_name
   end
 
   def site_long_name
@@ -111,27 +111,23 @@ module Config::SiteHelper
     Settings.site.main_web_address_text
   end
 
-  def site_document_verification_checklist_url
-    Settings.site.document_verification_checklist_url
-  end
-
-  def site_main_web_address_text
-   Settings.site.main_web_address_text
-  end
-
   def site_website_address
     link_to site_website_name, site_main_web_address_url
   end
 
-   def non_discrimination_notice_url
-     link_to site_nondiscrimination_notice_url, site_nondiscrimination_notice_url
-   end
+  def non_discrimination_notice_url
+    link_to site_nondiscrimination_notice_url, site_nondiscrimination_notice_url
+  end
 
-   def mail_non_discrimination_email
-      mail_to non_discrimination_email, non_discrimination_email
-   end
+  def mail_non_discrimination_email
+    mail_to non_discrimination_email, non_discrimination_email
+  end
 
-   def site_non_discrimination_complaint_url
-      link_to non_discrimination_complaint_url, non_discrimination_complaint_url
-   end
+  def site_non_discrimination_complaint_url
+    link_to non_discrimination_complaint_url, non_discrimination_complaint_url
+  end
+    
+  def site_document_verification_checklist_url
+    Settings.site.document_verification_checklist_url
+  end
 end
