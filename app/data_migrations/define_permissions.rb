@@ -53,11 +53,14 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_update_ssn
-    Permission.hbx_staff.update_attributes(can_update_ssn: true)
+    Permission.hbx_staff.update_attributes!(can_update_ssn: true)
   end
 
   def hbx_admin_can_complete_resident_application
-    Permission.hbx_staff.update_attributes(can_complete_resident_application: true)
+    Permission.hbx_staff.update_attributes!(can_complete_resident_application: true)
+  end
+  def hbx_admin_can_add_sep
+    Permission.hbx_staff.update_attributes!(can_add_sep: true)
   end
 
   def hbx_admin_can_lock_unlock

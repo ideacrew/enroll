@@ -26,6 +26,11 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_lock_unlock => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can add sep'
+  DefinePermissions.define_task :hbx_admin_can_add_sep => :environment
+end
+
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn

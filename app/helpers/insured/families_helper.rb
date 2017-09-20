@@ -193,12 +193,13 @@ module Insured::FamiliesHelper
   def build_link_for_sep_type(sep, link_title=nil)
     return if sep.blank?
     qle = QualifyingLifeEventKind.find(sep.qualifying_life_event_kind_id)
+    return if qle.blank?
     if qle.date_options_available && sep.optional_effective_on.present?
       # Take to the QLE like flow of choosing Option dates if available
        qle_link_generator_for_an_existing_qle(qle, link_title)
     else
       # Take straight to the Plan Shopping - Add Members Flow. No date choices.
-      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
+      link_to link_title.present? ? link_title: 'Shop for Plans', insured_family_members_path(sep_id: sep.id, qle_id: qle.id), class: "btn btn-default"
     end
   end
 
