@@ -17,7 +17,7 @@ RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional do
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Ee Mid Year Plan Change Notice',
-                            :notice_template => 'notices/ee_mid_year_plan_change_notice',
+                            :notice_template => 'notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional',
                             :notice_builder => 'ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional',
                             :event_name => 'ee_mid_year_plan_change_notice',
                             :mpi_indicator => 'MPI_SHOP37',
@@ -83,6 +83,32 @@ RSpec.describe ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional do
       sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
       @employer_notice.append_data
       expect(@employer_notice.notice.sep.effective_on).to eq effective_on
+    end
+  end
+
+  describe "Rendering notice template and genearte pdf" do
+    let(:effective_on) {Date.new(TimeKeeper.date_of_record.year, 07, 14)}
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+    let(:sep) {family.special_enrollment_periods.new}
+    let(:order) {[sep]}
+    before do
+     allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
+      allow(census_employee.employee_role.person.primary_family).to receive_message_chain("special_enrollment_periods.order_by").and_return(order)
+      @employer_notice = ShopEmployerNotices::EeMidYearPlanChangeNoticeCongressional.new(census_employee, valid_params)
+      sep.effective_on = effective_on
+      allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+    end
+
+    it "should render notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/ee_mid_year_plan_change_notice_congressional"
+    end
+
+    it "should generate pdf" do
+      sep = census_employee.employee_role.person.primary_family.special_enrollment_periods.order_by(:"created_at".desc)[0]
+      @employer_notice.build
+      @employer_notice.append_data
+      file = @employer_notice.generate_pdf_notice
+      expect(File.exist?(file.path)).to be true
     end
   end
 end
