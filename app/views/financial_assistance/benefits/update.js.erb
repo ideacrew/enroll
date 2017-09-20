@@ -1,0 +1,6 @@
+stopEditingBenefit();
+
+$('#<%= dom_id @benefit %>').html("<%= escape_javascript render(partial: 'esi_benefit', locals: { benefit: @benefit, kind: kind }) %>");
+$('#<%= dom_id @benefit %>').html("<%= escape_javascript render(partial: 'non_esi_benefit', locals: { benefit: @benefit, kind: kind }) %>");
+
+window.location.reload();

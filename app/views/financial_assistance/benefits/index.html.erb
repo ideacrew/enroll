@@ -13,11 +13,11 @@
       <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
     </div>
     <div class="col-md-2">
-      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage" value="true" class="radio-yml">
+      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_yes" value="true" class="radio-yml">
       <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
     </div>
     <div class="col-md-2">
-      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage" value="false" class="radio-yml" required="required">
+      <input type="radio" name="applicant[has_enrolled_health_coverage]" id="enrolled_in_health_coverage_no" value="false" class="radio-yml" required="required">
       <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
     </div>
     <div class="col-md-3">
@@ -26,9 +26,8 @@
   </div>
   <br />
 
-
-  <div class='benefit-kinds'>
-    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, insurance_kinds_for: "enrolled_health_coverage"} %>
+  <div class='benefit-kinds', id='enrolled-benefit-kinds'>
+    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled"} %>
   </div>
 
   <!--is eligible driver question-->
@@ -37,16 +36,20 @@
       <span class="fa-text-color">Does this person currently have access to other health coverage, including through another person? *</span>
     </div>
     <div class="col-md-2">
-      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage" value="true" class="radio-yml">
+      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_yes" value="true" class="radio-yml">
       <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
     </div>
     <div class="col-md-2">
-      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage" value="false" class="radio-yml" required="required">
+      <input type="radio" name="applicant[has_eligible_health_coverage]" id="eligible_for_health_coverage_no" value="false" class="radio-yml" required="required">
       <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
     </div>
     <div class="col-md-3">
        | &nbsp; <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
     </div>
+  </div>
+
+  <div class='benefit-kinds', id='eligible-benefit-kinds'>
+    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible"} %>
   </div>
 
   <div class="col-md-4 col-sm-4 col-xs-4">

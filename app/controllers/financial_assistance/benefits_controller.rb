@@ -54,9 +54,10 @@ class FinancialAssistance::BenefitsController < ApplicationController
     @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
 
     if @benefit.save
-      render :update
+      render :update, :locals => { kind: params[:financial_assistance_benefit][:kind] }
     else
       render :error
+      flash[:error] = @benefit.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
     end
   end
 
