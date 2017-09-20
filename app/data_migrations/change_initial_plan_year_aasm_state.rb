@@ -19,7 +19,6 @@ class ChangeInitialPlanYearAasmState< MongoidMigrationTask
           end
           plan_year.withdraw_pending! if plan_year.renewing_publish_pending?  # for plan year in publish_pending state
           plan_year.force_publish! if plan_year.may_force_publish?
-
           puts "Plan year aasm state changed to #{plan_year.aasm_state}" unless Rails.env.test?
         end
       else
