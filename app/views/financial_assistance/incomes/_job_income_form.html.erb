@@ -1,5 +1,5 @@
 <%= income_form_for @application, @applicant, income do |f| %>
-  <!--- TODO: Hidden field tag needed here for income type of job --->
+  <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
   <div class="focus_effect_module">
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-12">
@@ -24,6 +24,7 @@
     </div>
 
     <%= f.fields_for :employer_address do |income_fields| %>
+      <%= income_fields.hidden_field :kind, value: 'primary' %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
           <%= income_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: income.employer_address.try(:address_1), required: true, class: "floatlabel" %>
@@ -47,6 +48,7 @@
     <% end %>
 
     <%= f.fields_for :employer_phone do |phone_fields| %>
+      <%= phone_fields.hidden_field :kind, value: "phone main" %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-12">
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: income.employer_phone.try(:full_phone_number), class: "floatlabel" %>
