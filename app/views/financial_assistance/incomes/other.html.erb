@@ -1,33 +1,39 @@
 <div class="col-md-7">
   <div class="row">
     <div class="col-md-10">
-      <h1 class="darkblue">
-        <span class="fa-icon fa-stack">
+      <div class="title-icon">
+        <span class="fa-icon fa-stack suitcase">
           <i class="fa fa-circle-thin fa-stack-2x"></i>
-          <i class="fa fa-usd fa-stack-1x fa-inverse"></i>
+          <i class="fa fa-usd fa-stack-1x"></i>
         </span>
+      </div>
+      <h1 class="darkblue">
         <%= "Other " if @applicant.has_other_income %>Income for <%= @applicant.family_member.person.first_name.titleize %>
       </h1>
     </div>
   </div>
-  <p>Tell us about this person's other income. When you're finished, select CONTINUE.</p> <br><br>
+  <p>Tell us about this person's other income. When you're finished, select CONTINUE.</p>
+  <br>
 
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class='col-md-6'>
+  <div class="row row-form-wrapper radio-align no-buffer">
+    <div class='col-md-6 labelforcoverage'>
       <span class="fa-text-color">Does this person expect to have <b> income from other sources in 2017 ?</span>
     </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_other_income", true, class: "radio-yml", id: "has_other_income_yes", required: true) %>
-      <label class="radio-yml" for="has_other_income_yes">Yes</label>
+    <div class='col-md-6' style="line-height: 30px;">
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_other_income", true, class: "radio-yml", id: "has_other_income_yes", required: true) %>
+        <label class="radio-yml" for="has_other_income_yes">Yes</label>
+      </div>
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_other_income", false, class: "radio-yml", id: "has_other_income_no", required: true )%>
+        <label class="radio-yml" for="has_other_income_no">No</label>
+      </div>
+      <div class='col-md-6'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
     </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_other_income", false, class: "radio-yml", id: "has_other_income_no", required: true )%>
-      <label class="radio-yml" for="has_other_income_no">No</label>
-    </div>
-    <div class='col-md-2'>
-      <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
-    </div>
-  </div> <br>
+  </div>
+  <br>
 
   <div id="collapseOne">
     <div class="row row-form-wrapper no-buffer row-height">
@@ -39,36 +45,32 @@
       </div>
     </div>
     <div class="row row-form-wrapper no-buffer row-height">
-      <div class='col-md-12'>
+      <div class='col-md-12 lightgray fa-text-color'>
         Check any boxes that apply to this person and enter details when requested.
       </div>
     </div> <br>
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |kind, label| %>
-      <div class="row row-form-wrapper no-buffer row-height income-option-container">
-        <div class='col-md-12'>
-          <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"> &nbsp &nbsp <%= label %></label>
+      <div class="other-income">
+        <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
+          <div class='col-md-12'>
+            <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"> &nbsp &nbsp <%= label %></label>
+          </div>
         </div>
-        <div class="other_income-container <%= kind %>">
-            <div class="incomes-list hidden">
-              <% if @applicant.incomes.by_income_kind(kind).present? %>
-                <%= render partial: 'financial_assistance/incomes/other_income', collection: @applicant.incomes.by_income_kind(kind), as: :income %>
-              <% end %>
-              <div class='new-income-form hidden'>
-                <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build(kind: kind), disabled: true } %>
-              </div>
-              <a class='add-new-income btn btn-default hidden'>Add Another Income</a>
-            </div>
-        </div>
-      </div> <br>
-    <% end %>
-  </div> <br>
 
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class='col-md-12'>
-       Optional types of income you can report. (Not included in seeing if you qualify for help.) &nbsp
-      <i class="fa fa-plus-circle" aria-hidden="true"></i>
-    </div>
-  </div> </br>
+        <div class="incomes-list">
+          <% if @applicant.incomes.by_income_kind(kind).present? %>
+            <%= render partial: 'financial_assistance/incomes/other_income', collection: @applicant.incomes.by_income_kind(kind), as: :income %>
+          <% end %>
+          <a class='add-new-income btn btn-default hidden'>Add Another Income</a>
+        </div>
+        <div class='new-income-form hidden'>
+          <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build(kind: kind), disabled: true } %>
+        </div>
+        <br>
+      </div>
+    <% end %>
+  </div>
+  <br>
 
   <div class="col-xs-12">
     <span> <i class="glyphicon glyphicon-triangle-left" aria-hidden="true"></i> </span> <a href=" <%= edit_financial_assistance_application_path(@application) %> ">BACK TO ALL HOUSEHOLD MEMBERS</a>

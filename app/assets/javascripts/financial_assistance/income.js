@@ -183,23 +183,20 @@ $(document).ready(function() {
   $('.other-income-checkbox').change(function(){
     if($(this).is(':checked')){
       startEditingIncome();
-      $('.income-option-container').not($(this).parents('.row-form-wrapper')).addClass('disabled-container');
-      $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list').removeClass('hidden');
-      if ($(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list > .focus_effect_module').length <= 0){
-        $(this).parents('.row-form-wrapper').find('.add-new-income').addClass('hidden');
-        $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list > .new-income-form').removeClass('hidden');
-        // $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form > form > #financial_assistance_income_start_on').datepicker();
-        // $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form > form > #financial_assistance_income_end_on').datepicker();
-      } else {
-        $(this).parents('.row-form-wrapper').find('.add-new-income').removeClass('hidden');
-      }
-    }
-    else
-    {
+      var newIncomeFormEl = $(this).parents('.other-income').find('.new-income-form'),
+          incomeListEl = $(this).parents('.other-income').find(".incomes-list");
+
+      newIncomeFormEl.clone(true)
+        .removeClass('hidden')
+        .appendTo(incomeListEl);
+        //$(this).parents('.row-form-wrapper').find('.add-new-income').addClass('hidden');
+        //$(this).parents('.row-form-wrapper').find('.other-income > .incomes-list > .new-income-form').removeClass('hidden');
+        // $(this).parents('.row-form-wrapper').find('.other-income > .new-income-form > form > #financial_assistance_income_start_on').datepicker();
+        // $(this).parents('.row-form-wrapper').find('.other-income > .new-income-form > form > #financial_assistance_income_end_on').datepicker();
+    } else {
       stopEditingIncome();
-      $('.income-option-container').removeClass('disabled-container');
-      $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list').addClass('hidden');
-      $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form').addClass('hidden');
+      $(this).parents('.row-form-wrapper').find('.other-income > .incomes-list').addClass('hidden');
+      $(this).parents('.row-form-wrapper').find('.other-income > .new-income-form').addClass('hidden');
       $(this).parents('.row-form-wrapper').find('.add-new-income').addClass('hidden');
     }
   })
