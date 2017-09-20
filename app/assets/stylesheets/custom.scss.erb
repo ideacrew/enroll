@@ -3791,6 +3791,8 @@ ul.list-right-section li a img {
     width: 0;
 }
 .row-form-wrapper .radio {margin: 6px 0;}
+.row-form-wrapper input[type="radio"] {display: none;}
+.row-form-wrapper.radio-align input[type="radio"] {display: inline;}
 .row-form-wrapper input[type="radio"] + label span {
     background: rgba(0, 0, 0, 0) url("<%= asset_path('icons/check_radio_sheet.png') %>") no-repeat scroll left top;
     cursor: pointer;
@@ -4893,6 +4895,7 @@ input:required:valid {
   margin-top: 14px;
   margin-left: -15px;
 }
+
 .no-padding {
   padding: 0px;
 }

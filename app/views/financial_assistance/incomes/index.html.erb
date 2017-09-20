@@ -1,32 +1,36 @@
 <div class="col-md-7">
   <div class="row">
     <div class="col-md-10">
-      <h1>
-        <span class="fa-icon fa-stack fa-sm">
+      <div class="title-icon">
+        <span class="fa-icon fa-stack fa-sm suitcase">
           <i class="fa fa-suitcase fa-stack-2x"></i>
           <i class="fa fa-usd fa-stack-1x fa-inverse col-white"></i>
         </span>
+      </div>
+      <h1 class ="darkblue">
         Job Income for <%= @applicant.family_member.person.first_name.titleize %>
       </h1>
     </div>
   </div>
-  <p>Answer the following question for this person. When your finished, select CONTINUE</p> <br><br>
+  <p>Answer the following question for this person. When your finished, select CONTINUE</p> <br>
 
   <% if @applicant.has_job_income %>
-  <div class="row row-form-wrapper no-buffer">
-    <div class='col-md-6'>
-      <span class="fa-text-color">Does this person have <b> income from an employer </b>(wages, tips, bonuses, etc) in 2017 ?</span>
+  <div class="row row-form-wrapper radio-align no-buffer">
+    <div class='col-md-6 labelforcoverage'>
+      <span class="fa-text-color">Does this person have <b> income from an employer </b>(wages, tips, bonuses, etc) in 2017? *</span>
     </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_job_income", true, class: "radio-yml" ) %>
-      <label class="radio-yml" for="has_job_income_yes">Yes</label>
-    </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_job_income", false, class: "radio-yml" )%>
-      <label class="radio-yml" for="has_job_income_no">No</label>
-    </div>
-    <div class='col-md-2'>
-      <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+    <div class='col-md-6' style="line-height: 30px;">
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_job_income", true, class: "radio-yml" ) %>
+        <label class="radio-yml" for="has_job_income_yes">Yes</label>
+      </div>
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_job_income", false, class: "radio-yml" )%>
+        <label class="radio-yml" for="has_job_income_no">No</label>
+      </div>
+      <div class='col-md-6'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
     </div>
   </div>
   <% end %>
@@ -39,7 +43,8 @@
       <% end %>
     </div>
 
-    <a class='new-income btn btn-default'>Add Another Income</a>
+    <a class='new-income btn btn-default' style="
+      margin-top: 10px; margin-bottom: 25px;">Add Another Income</a>
 
     <div class='new-income-form hidden'>
       <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
@@ -47,20 +52,22 @@
   </div>
 
   <% if @applicant.has_self_employment_income %>
-  <div class="row row-form-wrapper no-buffer">
-    <div class='col-md-6'>
-      <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017 ?</span>
+  <div class="row row-form-wrapper radio-align no-buffer">
+    <div class='col-md-6 labelforcoverage'>
+      <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017? *</span>
     </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_self_employment_income", true, class: "radio-yml" ) %>
-      <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
-    </div>
-    <div class='col-md-2'>
-      <%= radio_button_tag("has_self_employment_income", false, class: "radio-yml" )%>
-      <label class="radio-yml" for="has_self_employment_income_no">No</label>
-    </div>
-    <div class='col-md-2'>
-      <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+    <div class='col-md-6' style="line-height: 30px;">
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_self_employment_income", true, class: "radio-yml" ) %>
+        <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
+      </div>
+      <div class='col-md-3'>
+        <%= radio_button_tag("has_self_employment_income", false, class: "radio-yml" )%>
+        <label class="radio-yml" for="has_self_employment_income_no">No</label>
+      </div>
+      <div class='col-md-6'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
     </div>
   </div>
   <% end %>
@@ -73,7 +80,7 @@
     <% end %>
   </div>
 
-  <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
+<a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
 
   <div class='new-income-form hidden'>
     <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: @applicant.incomes.build } %>
@@ -81,10 +88,9 @@
 </div>
 </br>
 
-<div class="row">
-  <span class="glyphicon glyphicon-triangle-left  " aria-hidden="true">
-    <a class= "darkblue" href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(go back and work on another person)</span>
-  </span>
+<div>
+  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+    <a class= "" href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
 </div>
 
 <!-- Hidden unsaved income modal -->
@@ -99,7 +105,7 @@
         You have made changes to an income that are not yet saved. Are you sure you want to continue?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Canscel</button>
         <button type="button" class="btn btn-danger">Continue</button>
       </div>
     </div>
