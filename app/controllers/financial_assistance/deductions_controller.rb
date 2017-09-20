@@ -48,6 +48,16 @@ class FinancialAssistance::DeductionsController < ApplicationController
     end
   end
 
+  def create
+    @deduction = @applicant.deductions.build permit_params(params[:financial_assistance_deduction])
+
+    if @deduction.save
+      render :update
+    else
+      render :error
+    end
+  end
+
   def destroy
     deduction = @applicant.deductions.find(params[:id])
     deduction.destroy!
@@ -69,10 +79,6 @@ class FinancialAssistance::DeductionsController < ApplicationController
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
     @applicant = @application.active_applicants.find(params[:applicant_id])
-  end
-
-  def create
-    FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).deductions.build
   end
 
   def find_application_and_applicant

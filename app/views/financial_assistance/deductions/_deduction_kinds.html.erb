@@ -1,0 +1,43 @@
+<div class="row row-form-wrapper no-buffer row-height">
+	<div class="col-md-9">
+	  <span> <b> What type of coverage is this person currently enrolled in? * </b></span>
+	</div>
+</div>
+<div class="row row-form-wrapper no-buffer row-height">
+  <div class="col-md-12">
+    <span>  Check any boxes that apply to this person and enter details when requested. </span>
+  </div>
+</div>
+
+<br />  
+
+<% deduction_kinds.each do |deduction_kind| %>
+<div class="deduction-kind">
+  <div class="row row-form-wrapper no-buffer row-height">
+    <div class="col-md-1">
+      <%=check_box_tag "dedection_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox" %> 
+    </div>
+
+    <div class="col-md-8">
+      <%= deduction_kind.gsub('_',' ').capitalize %>
+    </div>
+  </div>
+
+  <div class="deductions-list">
+    <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>
+      <div class="deduction">
+          <%= render partial: 'deduction', locals: { deduction: deduction } %>
+      </div>
+    <% end %>
+  </div>
+
+
+  <div class='new-deduction-form hidden'>
+    <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: @applicant.deductions.build, kind: deduction_kind} %>
+  </div>
+
+  <br />
+</div>
+<% end %>
+
+<br />
