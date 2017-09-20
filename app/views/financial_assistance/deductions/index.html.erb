@@ -1,27 +1,36 @@
 <div class="col-md-7">
   <div class="row">
     <div class="col-md-10">
+      <div class="title-icon">
+        
+            <span class="fa-rectangle fa-lg deducticon-rectangle">
+              <i class="fa fa-usd"></i>
+              <i class="fa fa-sliders"></i>
+            </span>
+        
+      </div>
       <h1 class="darkblue">Income Adjustments for <%= @applicant.family_member.person.first_name.titleize %></h1>
-      <small>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</small>
     </div>
   </div>
-  <br />
-
+  
+  <p>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</p>
   <!--income adjustment driver question-->
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class="col-md-5">
+  <div class="row row-form-wrapper radio-align no-buffer">
+    <div class="col-md-6 labelforcoverage">
       <span class="fa-text-color">Does this person expect to have income adjustments in <%=@application.assistance_year%> *</span>
     </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_deductions]" id="has_deductions" value="true" class="radio-yml">
-      <label class="radio-yml" for="has_deductions_yes">Yes</label>
-    </div>
-    <div class="col-md-2">
-      <input type="radio" name="applicant[has_deductions]" id="has_deductions" value="false" class="radio-yml" required="required">
-      <label class="radio-yml" for="has_deductions_no">No</label>
-    </div>
-    <div class="col-md-3">
-       | &nbsp; <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions" class="interaction-click-control-not-sure?">Not Sure?</a>
+    <div class="col-md-6" style="line-height: 30px;">
+      <div class="col-md-3">
+        <%= radio_button_tag("has_deductions", true, class: "radio-yml" ) %>
+        <label class="radio-yml" for="has_deductions_yes">Yes</label>
+      </div>
+      <div class="col-md-3">
+        <%= radio_button_tag("has_deductions", false, class: "radio-yml" ) %>
+        <label class="radio-yml" for="has_deductions_no">No</label>
+      </div>
+      <div class="col-md-6">
+         <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
     </div>
   </div>
   <br />
