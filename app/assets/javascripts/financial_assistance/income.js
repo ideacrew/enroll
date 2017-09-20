@@ -64,6 +64,21 @@ $(document).ready(function() {
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
+    $(document).on('click','a.other-income-cancel', function(e) {
+      e.preventDefault();
+
+      if ($(this).parents('.new-income-form').length) {
+        $(this).parents('.new-income-form').addClass('hidden');
+      } else {
+        var incomeEl = $(this).parents('.income');
+        // incomeEl.find('.income-edit-form').addClass('hidden');
+        // incomeEl.find('.display-income').removeClass('hidden');
+      }
+      stopEditingIncome();
+
+      /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
+    });
+
     /* new job incomes */
     $('a.new-income.btn').click(function(e) {
       e.preventDefault();
@@ -76,25 +91,25 @@ $(document).ready(function() {
     });
 
     /* new other job incomes */
-    $('.other-income-checkbox:not(:checked)').click(function(e) {
-      if (currentlyEditing()) {
-        e.preventDefault();
-        return false;
-      }
+    // $('.other-income-checkbox:not(:checked)').click(function(e) {
+    //   if (currentlyEditing()) {
+    //     e.preventDefault();
+    //     return false;
+    //   }
 
-      var incomeListEl = $(this).parents('.income-row').find('.incomes-list');
+    //   var incomeListEl = $(this).parents('.income-row').find('.incomes-list');
 
-      startEditingIncome();
-      $(this).parents('.incomes').find('.new-income-form')
-        .clone(true)
-        .removeClass('hidden')
-        .appendTo(incomeListEl);
-    });
+    //   startEditingIncome();
+    //   $(this).parents('.incomes').find('.new-income-form')
+    //     .clone(true)
+    //     .removeClass('hidden')
+    //     .appendTo(incomeListEl);
+    // });
 
     /* unchecking other income checkboxes */
-    $('.other-income-checkbox:checked').click(function(e) {
+    // $('.other-income-checkbox:checked').click(function(e) {
 
-    });
+    // });
 
     /* Condtional Display Job Income Question */
     $("#job_income").addClass('hide');
@@ -139,8 +154,8 @@ $(document).ready(function() {
       }
     });
 
-    $( "#financial_assistance_income_start_on" ).datepicker();
-    $( "#financial_assistance_income_end_on" ).datepicker();
+    $( "#financial_assistance_income_start_on" ).datepicker({dateFormat: "yy-mm-dd"});
+    $( "#financial_assistance_income_end_on" ).datepicker({dateFormat: "yy-mm-dd"});
   }
 
   /* Condtional Display Other Income Question */
@@ -166,16 +181,75 @@ $(document).ready(function() {
   });
 
   $('.other-income-checkbox').change(function(){
-    var income_form = $('.new-income-form').clone().removeClass('hidden');
-    income_form.find('.selectric-wrapper selectric-interaction-choice-control-financial-assistance-income-frequency-kind').selectric();
     if($(this).is(':checked')){
-      console.log(income_form);
-      $(this).parent().parent().append(income_form);
+      startEditingIncome();
+      $('.income-option-container').not($(this).parents('.row-form-wrapper')).addClass('disabled-container');
+      $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list').removeClass('hidden');
+      if ($(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list > .focus_effect_module').length <= 0){
+        $(this).parents('.row-form-wrapper').find('.add-new-income').addClass('hidden');
+        $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list > .new-income-form').removeClass('hidden');
+        // $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form > form > #financial_assistance_income_start_on').datepicker();
+        // $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form > form > #financial_assistance_income_end_on').datepicker();
+      } else {
+        $(this).parents('.row-form-wrapper').find('.add-new-income').removeClass('hidden');
+      }
     }
     else
     {
-      var ele = $(this).parent().parent().find('.new-income-form');
-      ele.remove();
+      stopEditingIncome();
+      $('.income-option-container').removeClass('disabled-container');
+      $(this).parents('.row-form-wrapper').find('.other_income-container > .incomes-list').addClass('hidden');
+      $(this).parents('.row-form-wrapper').find('.other_income-container > .new-income-form').addClass('hidden');
+      $(this).parents('.row-form-wrapper').find('.add-new-income').addClass('hidden');
     }
   })
+
+  $('.add-new-income').on('click', function(e){
+    $(this).siblings('.new-income-form').removeClass("hidden");
+  })
+
+  $(document).on("click", ".edit-income", function(e){
+      var _this = $(this);
+      var income_id = $(this).data('income-id');
+      var application_id = $(this).data('application-id');
+      var applicant_id = $(this).data('applicant-id');
+      $.ajax({
+        url: "/financial_assistance/applications/"+application_id+"/applicants/"+applicant_id+"/incomes/"+income_id+"/edit",
+        method: 'get',
+        dataType: 'script',
+        data: { id: income_id },
+        success: function(result) {
+         console.log(result)
+        },
+        error: function(result) {
+          alert("error");
+          console.log(result.responseText)
+        }
+      });
+    })
+
+  function disableSave(form){
+    form.find('.interaction-click-control-save').addClass("disabled");
+  }
+
+  function enableSave(form){
+    form.find('.interaction-click-control-save').removeClass('disabled');
+  }
+  $(':input[required=""],:input[required]').on('change', function(){
+    var form = $(this).closest('form');
+    if (validateForm(form)){
+      enableSave(form)
+    }else{
+      disableSave(form)
+    }
+  });
+
+  function validateForm(form) {
+    var isValid = true;
+    form.find('#financial_assistance_income_start_on, #financial_assistance_income_end_on , #financial_assistance_income_amount').each(function() {
+      if ( $(this).val() == '' ||  $(this).val()=='0')
+          isValid = false;
+    });
+    return isValid;
+  }
 });

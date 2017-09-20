@@ -24,6 +24,13 @@
     render 'workflow/step', layout: 'financial_assistance'
   end
 
+  def edit
+    @income = @applicant.incomes.find params[:id]
+    respond_to do |format|
+      format.js { render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } }
+    end
+  end
+
   def step
     save_faa_bookmark(@person, request.original_url.gsub(/\/step.*/, "/step/#{@current_step.to_i}"))
     flash[:error] = nil
