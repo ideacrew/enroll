@@ -8,8 +8,8 @@ module PdfTemplates
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
     attribute :plan, PdfTemplates::Plan
-    attribute :employer_first_name, String
-    attribute :employer_last_name, String
+    attribute :er_first_name, String
+    attribute :er_last_name, String
     attribute :employer_name, String
     attribute :broker_agency, String
     attribute :mpi_indicator, String

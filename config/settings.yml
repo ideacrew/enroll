@@ -11,8 +11,6 @@ site:
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "Health Connector"
-  main_web_address_url: "https://www.MAhealthconnector.org"
-  website_name: "MAhealthconnector.org"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
   copyright_period_start: "2017"
