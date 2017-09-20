@@ -269,6 +269,48 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "#ee_mid_year_plan_change_notice_congressional" do
+    let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
+    let(:organization) {FactoryGirl.create(:organization)}
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
+    let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
+    let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+    let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
+    let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
+    let!(:employee_role){FactoryGirl.build(:employee_role, employer_profile: employer_profile)}
+    let(:hbx_enrollment) {HbxEnrollment.new(
+        kind: 'open_enrollment',
+        effective_on: TimeKeeper.date_of_record - 10.days
+    )}
+    describe "# with all required data" do
+      before do
+        allow(Organization).to receive(:where).and_return([organization])
+        allow(census_employee).to receive_message_chain("employee_role") { employee_role }
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollment") { hbx_enrollment }
+      end
+
+      it "should have queued job" do
+        helper.ee_mid_year_plan_change_notice_congressional(census_employee)
+        ActiveJob::Base.queue_adapter = :test
+        expect {
+          ShopNoticesNotifierJob.perform_later
+        }.to have_enqueued_job.on_queue("default")
+      end
+    end
+    describe "# with out all required data" do
+      before do
+        allow(Organization).to receive(:where).and_return([organization])
+        allow(census_employee).to receive_message_chain("active_benefit_group_assignment.hbx_enrollment") { hbx_enrollment }
+      end
+
+      it "should have log error" do
+        expect(Rails.logger).to receive(:error)
+        helper.ee_mid_year_plan_change_notice_congressional(census_employee)
+      end
+    end
+  end
+
   describe "disable_purchase?" do
     it "should return true when disabled is true" do
       expect(helper.disable_purchase?(true, nil)).to eq true
