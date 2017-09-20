@@ -8,6 +8,18 @@ Given that the user is on the FAA Household Info: Family Members page
 When at least one applicant is in the Info Needed state
 Then the CONTINUE button will be disabled
 
+Scenario:
+Given that the user is on the FAA Household Info: Family Members page
+And the primary member exists
+And NO other household members exist
+Then Family Relationships left section will NOT display
+
+Scenario:
+Given that the user is on the FAA Household Info: Family Members page
+And the primary member exists
+And at least one other household members exist
+Then Family Relationships left section WILL display
+
 Scenario: CONTINUE button navigation
 Given that the user is on the FAA Household Info: Family Members page
 When all applicants are in Info Completed state
@@ -18,5 +30,4 @@ Given that the user is on the FAA Household Info: Family Members page
 When all applicants are in Info Completed state
 And user clicks CONTINUE
 Then the user will navigate to Family Relationships page
-
 
