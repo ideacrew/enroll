@@ -44,16 +44,23 @@
       </div>
     </div> <br>
     <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |kind, label| %>
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class='col-md-12'>
-        <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"> &nbsp &nbsp <%= label %></label>
-      </div>
-    </div><br>
-
+      <div class="row row-form-wrapper no-buffer row-height income-option-container">
+        <div class='col-md-12'>
+          <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"> &nbsp &nbsp <%= label %></label>
+        </div>
+        <div class="other_income-container <%= kind %>">
+            <div class="incomes-list hidden">
+              <% if @applicant.incomes.by_income_kind(kind).present? %>
+                <%= render partial: 'financial_assistance/incomes/other_income', collection: @applicant.incomes.by_income_kind(kind), as: :income %>
+              <% end %>
+              <div class='new-income-form hidden'>
+                <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build(kind: kind), disabled: true } %>
+              </div>
+              <a class='add-new-income btn btn-default hidden'>Add Another Income</a>
+            </div>
+        </div>
+      </div> <br>
     <% end %>
-    <div class='new-income-form hidden'>
-      <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build } %>
-    </div>
   </div> <br>
 
   <div class="row row-form-wrapper no-buffer row-height">
