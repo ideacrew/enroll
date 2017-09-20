@@ -26,7 +26,6 @@
     <% end %>
       </div>
       <div class="modal-footer">
-
         <% unless plan_year.no_documents_uploaded? %>
           <%= link_to 'Cancel', employers_employer_profile_path(@employer_profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
           <%= link_to 'Publish Anyways', employers_employer_profile_plan_year_force_publish_path(@employer_profile,plan_year), method: :post, :class => 'btn btn-danger' %>
