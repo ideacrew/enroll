@@ -1,14 +1,26 @@
 <div class="focus_effect_module">
-  <div class="row row-form-wrapper no-buffer row-height">
-    <div class="col-md-6">
-      <label class="static_label label-floatlabel">FROM</label>
-      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+  <% if kind == "is_enrolled" %>
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">FROM</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+      </div>
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">TO</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+      </div>
     </div>
-    <div class="col-md-6">
-      <label class="static_label label-floatlabel">TO</label>
-      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+  <% end %>
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">FROM</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+      </div>
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">TO</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+      </div>
     </div>
-  </div>
 </div>
 
 <p> TODO : Add ESI Related Fields Here </p>
