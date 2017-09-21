@@ -1,121 +1,122 @@
-<div class="col-md-7">
-  <div class="row">
-    <div class="col-md-10">
-      <div class="title-icon">
-        <span class="fa-icon fa-stack fa-sm suitcase">
-          <i class="fa fa-suitcase fa-stack-2x"></i>
-          <i class="fa fa-usd fa-stack-1x fa-inverse col-white"></i>
-        </span>
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+    <div class="row">
+      <div class="col-md-10">
+        <div class="title-icon">
+          <span class="fa-icon fa-stack fa-sm suitcase">
+            <i class="fa fa-suitcase fa-stack-2x"></i>
+            <i class="fa fa-usd fa-stack-1x fa-inverse col-white"></i>
+          </span>
+        </div>
+        <h1 class="darkblue">
+          Job Income for <%= @applicant.family_member.person.first_name.titleize %>
+        </h1>
       </div>
-      <h1 class="darkblue">
-        Job Income for <%= @applicant.family_member.person.first_name.titleize %>
-      </h1>
     </div>
-  </div>
-  <p>Answer the following question for this person. When your finished, select CONTINUE</p>
-  <br>
+    <p>Answer the following question for this person. When your finished, select CONTINUE</p>
+    <br>
 
-  <div class="row row-form-wrapper radio-align no-buffer">
-    <div class='col-md-6 labelforcoverage'>
-      <span class="fa-text-color">Does this person have <b> income from an employer </b>(wages, tips, bonuses, etc) in 2017? *</span>
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-6 labelforcoverage'>
+        <span class="fa-text-color">Does this person have <b> income from an employer </b>(wages, tips, bonuses, etc) in 2017? *</span>
+      </div>
+      <div class='col-md-6' style="line-height: 30px;">
+        <div class='col-md-3'>
+          <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_job_income_yes">Yes</label>
+        </div>
+        <div class='col-md-3'>
+          <%= radio_button_tag("has_job_income", false, false, class: "radio-yml" )%>
+          <label class="radio-yml" for="has_job_income_no">No</label>
+        </div>
+        <div class='col-md-6'>
+          <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+        </div>
+      </div>
     </div>
-    <div class='col-md-6' style="line-height: 30px;">
-      <div class='col-md-3'>
-        <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml" ) %>
-        <label class="radio-yml" for="has_job_income_yes">Yes</label>
-      </div>
-      <div class='col-md-3'>
-        <%= radio_button_tag("has_job_income", false, false, class: "radio-yml" )%>
-        <label class="radio-yml" for="has_job_income_no">No</label>
-      </div>
-      <div class='col-md-6'>
-        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
-      </div>
-    </div>
-  </div>
-  <br>
+    <br>
 
-  <div id="job_income">
-    <div class="incomes-list">
-      <% @applicant.incomes.jobs.each do |income| %>
-      <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
-      <% end %>
-    </div>
-
-    <a class='new-income btn btn-default' style="
-      margin-top: 10px; margin-bottom: 25px;">Add Another Income</a>
-
-    <div class='new-income-form hidden'>
-      <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
-    </div>
-  </div>
-
-  <% if @applicant.has_self_employment_income %>
-  <div class="row row-form-wrapper radio-align no-buffer">
-    <div class='col-md-6 labelforcoverage'>
-      <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017? *</span>
-    </div>
-    <div class='col-md-6' style="line-height: 30px;">
-      <div class='col-md-3'>
-        <%= radio_button_tag("has_self_employment_income", true, false, class: "radio-yml" ) %>
-        <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
+    <div id="job_income">
+      <div class="incomes-list">
+        <% @applicant.incomes.jobs.each do |income| %>
+        <%= render partial: 'financial_assistance/incomes/job_income', locals: { income: income } %>
+        <% end %>
       </div>
-      <div class='col-md-3'>
-        <%= radio_button_tag("has_self_employment_income", false, false, class: "radio-yml" )%>
-        <label class="radio-yml" for="has_self_employment_income_no">No</label>
-      </div>
-      <div class='col-md-6'>
-        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+
+      <a class='new-income btn btn-default' style="
+        margin-top: 10px; margin-bottom: 25px;">Add Another Income</a>
+
+      <div class='new-income-form hidden'>
+        <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
       </div>
     </div>
-  </div>
-  <% end %>
 
-</br>
-<div id="self_employed_incomes">
-  <div class="self-employed-incomes-list incomes-list">
-    <% @applicant.self_employed_incomes.each do |income| %>
-      <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income } %>
+    <% if @applicant.has_self_employment_income %>
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-6 labelforcoverage'>
+        <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017? *</span>
+      </div>
+      <div class='col-md-6' style="line-height: 30px;">
+        <div class='col-md-3'>
+          <%= radio_button_tag("has_self_employment_income", true, false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
+        </div>
+        <div class='col-md-3'>
+          <%= radio_button_tag("has_self_employment_income", false, false, class: "radio-yml" )%>
+          <label class="radio-yml" for="has_self_employment_income_no">No</label>
+        </div>
+        <div class='col-md-6'>
+          <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+        </div>
+      </div>
+    </div>
     <% end %>
-  </div>
 
-<a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
-
-  <div class='new-income-form hidden'>
-    <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: @applicant.incomes.build } %>
-  </div>
-</div>
-</br>
-
-<div>
-  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
-    <a class= "" href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
-</div>
-
-<!-- Hidden unsaved income modal -->
-<div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+    </br>
+    <div id="self_employed_incomes">
+      <div class="self-employed-incomes-list incomes-list">
+        <% @applicant.self_employed_incomes.each do |income| %>
+          <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: income } %>
+        <% end %>
       </div>
-      <div class="modal-body">
-        You have made changes to an income that are not yet saved. Are you sure you want to continue?
+
+    <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
+
+      <div class='new-income-form hidden'>
+        <%= render partial: 'financial_assistance/incomes/self_employed_income', locals: { income: @applicant.incomes.build } %>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Canscel</button>
-        <button type="button" class="btn btn-danger">Continue</button>
+    </div>
+    </br>
+
+    <div>
+      <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+        <a class= "" href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+    </div>
+
+    <!-- Hidden unsaved income modal -->
+    <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+          </div>
+          <div class="modal-body">
+            You have made changes to an income that are not yet saved. Are you sure you want to continue?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Canscel</button>
+            <button type="button" class="btn btn-danger">Continue</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
+      next_url: find_applicant_path(@application, @applicant, current: 'incomes')
+    } %>
+  </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>
-</div>
-
-<div class='col-md-2'>
-  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-    previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
-    next_url: find_applicant_path(@application, @applicant, current: 'incomes')
-  } %>
-</div>
-<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>

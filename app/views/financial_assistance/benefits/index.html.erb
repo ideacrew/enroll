@@ -1,75 +1,77 @@
-<div class="col-md-7 ">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="title-icon">
-        <span class="fa-icon fa fa-stethoscope fa-3x">
-        </span>
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="title-icon">
+          <span class="fa-icon fa fa-stethoscope fa-3x">
+          </span>
+        </div>
+        <h1 class="darkblue">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
+        <br />
+        <small>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</small>
       </div>
-      <h1 class="darkblue">Health Coverage for <%= @applicant.family_member.person.first_name.titleize %></h1>
-      <br />
-      <small>Tell Us about other health coverage options for this person. When you're finished, select CONTINUE</small>
     </div>
-  </div>
-  <br />
+    <br />
 
-  <!--is enrolled driver question-->
-  <div class="row row-form-wrapper radio-align no-buffer">
-    <div class="col-md-6 labelforcoverage">
-      <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
-    </div>
-    <div class="col-md-6" style="line-height: 30px;">
-      <div class="col-md-3">
-        <%= radio_button_tag("has_enrolled_health_coverage", true, class: "radio-yml" ) %>
-        <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+    <!--is enrolled driver question-->
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
       </div>
-      <div class="col-md-3">
-        <%= radio_button_tag("has_enrolled_health_coverage", false, class: "radio-yml" ) %>
-        <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+      <div class="col-md-6" style="line-height: 30px;">
+        <div class="col-md-3">
+          <%= radio_button_tag("has_enrolled_health_coverage", true, class: "radio-yml" ) %>
+          <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+        </div>
+        <div class="col-md-3">
+          <%= radio_button_tag("has_enrolled_health_coverage", false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+        </div>
+        <div class="col-md-6">
+            <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class='benefit-kinds', id='enrolled-benefit-kinds'>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled"} %>
+    </div>
+
+    <!--is eligible driver question-->
+    <div class="row row-form-wrapper radio-align no-buffer row-height">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">Does this person currently have access to other health coverage, including through another person? *</span>
       </div>
       <div class="col-md-6">
-          <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+        <div class="col-md-3">
+          <%= radio_button_tag("has_eligible_health_coverage", true, class: "radio-yml" ) %>
+          <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
+        </div>
+        <div class="col-md-3">
+          <%= radio_button_tag("has_eligible_health_coverage", false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
+        </div>
+        <div class="col-md-6">
+           <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
+        </div>
       </div>
     </div>
-  </div>
-  <br />
+    <br />
 
-  <div class='benefit-kinds', id='enrolled-benefit-kinds'>
-    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled"} %>
-  </div>
-
-  <!--is eligible driver question-->
-  <div class="row row-form-wrapper radio-align no-buffer row-height">
-    <div class="col-md-6 labelforcoverage">
-      <span class="fa-text-color">Does this person currently have access to other health coverage, including through another person? *</span>
+    <div class='benefit-kinds', id='eligible-benefit-kinds'>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible"} %>
     </div>
-    <div class="col-md-6">
-      <div class="col-md-3">
-        <%= radio_button_tag("has_eligible_health_coverage", true, class: "radio-yml" ) %>
-        <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
-      </div>
-      <div class="col-md-3">
-        <%= radio_button_tag("has_eligible_health_coverage", false, class: "radio-yml" ) %>
-        <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
-      </div>
-      <div class="col-md-6">
-         <a href="#has_job_income" data-toggle="modal" data-target="#has_job_income" class="interaction-click-control-not-sure?">Not Sure?</a>
-      </div>
+
+    <div class="col-md-4 col-sm-4 col-xs-4">
+    <%#= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
-  </div>
-  <br />
-
-  <div class='benefit-kinds', id='eligible-benefit-kinds'>
-    <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible"} %>
-  </div>
-
-  <div class="col-md-4 col-sm-4 col-xs-4">
-  <%#= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
   </div>
 </div>
 
 
 <!--Right NAV-->
-<div class='col-md-2'>
+<div class='col-md-3'>
   <%= render partial: 'financial_assistance/shared/right_nav', locals: {
     previous_url: find_previous_applicant_path(@application, @applicant, current: 'benefits'),
     next_url: other_questions_financial_assistance_application_applicant_path(@application, @applicant)
