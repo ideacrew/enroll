@@ -20,11 +20,11 @@
       </div>
       <div class="col-md-6" style="line-height: 30px;">
         <div class="col-md-3">
-          <%= radio_button_tag("has_enrolled_health_coverage", true, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_enrolled_health_coverage", true, @applicant.has_enrolled_health_coverage?, class: "radio-yml" ) %>
           <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
         </div>
         <div class="col-md-3">
-          <%= radio_button_tag("has_enrolled_health_coverage", false, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_enrolled_health_coverage", false, !@applicant.has_enrolled_health_coverage?, class: "radio-yml" ) %>
           <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
         </div>
         <div class="col-md-6">
@@ -45,11 +45,11 @@
       </div>
       <div class="col-md-6">
         <div class="col-md-3">
-          <%= radio_button_tag("has_eligible_health_coverage", true, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_eligible_health_coverage", true, @applicant.has_eligible_health_coverage?, class: "radio-yml" ) %>
           <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
         </div>
         <div class="col-md-3">
-          <%= radio_button_tag("has_eligible_health_coverage", false, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_eligible_health_coverage", false, !@applicant.has_eligible_health_coverage?, class: "radio-yml" ) %>
           <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
         </div>
         <div class="col-md-6">
@@ -69,12 +69,31 @@
   </div>
 </div>
 
+  <!-- Hidden unsaved income modal -->
+  <div class="modal fade" id="destroyBenefit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Destroy this benefit?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to destroy this benefit?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!--Right NAV-->
-<div class='col-md-3'>
-  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-    previous_url: find_previous_applicant_path(@application, @applicant, current: 'benefits'),
-    next_url: other_questions_financial_assistance_application_applicant_path(@application, @applicant)
-  } %>
+  <!--Right NAV-->
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: find_previous_applicant_path(@application, @applicant, current: 'benefits'),
+      next_url: other_questions_financial_assistance_application_applicant_path(@application, @applicant)
+    } %>
+  </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>
-<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>

@@ -1,16 +1,26 @@
-<div class="focus_effect_module">
-  <% if kind == "is_enrolled" %>
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">FROM</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+<div id="<%= dom_id benefit %>" class="benefit">
+  <div class="focus_effect_module benefit-show">
+    <% if kind == "is_enrolled" %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">FROM</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+        </div>
+        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">TO</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+        </div>
+        <div class="col-md-2 no-pd form-group-lg no-pd class-fa-household">
+          <a class="benefit-edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+          <a class="benefit-delete"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+        </div>
       </div>
-      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">TO</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
-      </div>
-    </div>
-  <% end %>
-</div>
+    <% end %>
 
-<p> TODO : Add ESI Related Fields Here </p>
+    <p> TODO : Add ESI Related Fields Here </p>
+  </div>
+
+  <div class="edit-benefit-form hidden">
+    <%= render partial: 'financial_assistance/benefits/esi_benefit_form' , locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind}%>
+  </div>
+</div>
