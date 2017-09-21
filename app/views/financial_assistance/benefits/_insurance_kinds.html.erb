@@ -4,7 +4,7 @@
 	  <span> <b> What type of coverage is this person currently enrolled in? * </b></span>
 	</div>
 </div>
-<div class="row row-form-wrapper no-buffer row-height">
+<div class="row row-form-wrapper lightgray no-buffer row-height">
   <div class="col-md-12">
     <span>  Check any boxes that apply to this person and enter details when requested. </span>
   </div>
@@ -14,7 +14,7 @@
 
 <% insurance_kinds.each do |insurance_kind| %>
 <div class="benefit-kind">
-  <div class="row row-form-wrapper no-buffer row-height">
+  <div class="row row-form-wrapper radio-align lightgray no-buffer row-height">
     <div class="col-md-12 benefits-check">
       <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
       <%= insurance_kind.gsub('_',' ').capitalize %>
@@ -25,9 +25,9 @@
     <% @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).each do |benefit| %>
       <div class="benefit">
         <%if benefit.insurance_kind == 'employer_sponsored_insurance'%>
-          <%= render partial: 'esi_benefit', locals: { benefit: benefit, kind: kind } %>
+          <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
         <% else %>
-          <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, kind: kind } %>
+          <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
         <% end %>
       </div>
     <% end %>

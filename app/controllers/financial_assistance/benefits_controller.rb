@@ -54,18 +54,27 @@ class FinancialAssistance::BenefitsController < ApplicationController
     @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
 
     if @benefit.save
-      render :update, :locals => { kind: params[:financial_assistance_benefit][:kind] }
+      render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
     else
       render :error
       flash[:error] = @benefit.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
     end
   end
 
+  def update
+    @benefit = @applicant.benefits.find params[:id]
+    if @benefit.update_attributes permit_params(params[:financial_assistance_benefit])
+      render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+    else
+      render :error
+    end
+  end
+
   def destroy
     benefit = @applicant.benefits.find(params[:id])
     benefit.destroy!
-    flash[:success] = "Benefit deleted - (#{benefit.kind}, #{benefit.insurance_kind})"
-    redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)
+
+    render head: 'ok'
   end
 
   private
