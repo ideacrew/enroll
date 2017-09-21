@@ -52,7 +52,17 @@ class FinancialAssistance::DeductionsController < ApplicationController
     @deduction = @applicant.deductions.build permit_params(params[:financial_assistance_deduction])
 
     if @deduction.save
-      render :update
+      render :update, :locals => { kind: params[:financial_assistance_deduction][:kind]}
+    else
+      render :error
+      flash[:error] = @deduction.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+    end
+  end
+
+  def update
+    @deduction = @applicant.deductions.find params[:id]
+    if @deduction.update_attributes permit_params(params[:financial_assistance_deduction])
+      render :update, :locals => { kind: params[:financial_assistance_deduction][:kind]}
     else
       render :error
     end
@@ -61,8 +71,8 @@ class FinancialAssistance::DeductionsController < ApplicationController
   def destroy
     deduction = @applicant.deductions.find(params[:id])
     deduction.destroy!
-    flash[:success] = "Deduction deleted - (#{deduction.kind})"
-    redirect_to financial_assistance_application_applicant_deductions_path(@application, @applicant)
+
+    render head: 'ok'
   end
 
   private
