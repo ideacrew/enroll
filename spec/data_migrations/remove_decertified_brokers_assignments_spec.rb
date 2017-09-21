@@ -15,7 +15,7 @@ describe RemoveDecertifiedBrokersAssignments do
   
   subject { RemoveDecertifiedBrokersAssignments.new(given_task_name, double(:current_scope => nil)) }
   
-  it "should get remove duplicate broker agency accounts from families" do
+  it "should get remove decertified/pending brokers from families/general agencies/employers" do
     expect(family.current_broker_agency.is_active).to eq true
     expect(organization.employer_profile.active_broker_agency_account.present?).to eq true
     expect(organization.employer_profile.active_general_agency_account.present?).to eq true
