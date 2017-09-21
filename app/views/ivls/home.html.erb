@@ -1,19 +1,19 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>IVL Dashboard</title>
+    <meta charset="utf-8">
+    <title>IVL Dashboard</title>
 
-  <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
     <!-- <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
-    <link rel="stylesheet" type="text/css" href="dashStyle.css">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="dashStyle.css"> -->
     
 <script type="text/javascript">
     $(function () {
     Highcharts.setOptions({ lang: { thousandsSep: ',' }});
         $('#barYr1').highcharts({
-            chart: {
+        chart: {
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
@@ -41,13 +41,14 @@
                 'Sep',
                 'Oct',
                 'Nov',
-                'Dec',
+                'Dec'
             ],
             crosshair: true
         },
         yAxis: {
             min: 0,
             title: {
+                offset: 50,
                 text: 'Covered Lives'
             }
         },
@@ -76,10 +77,12 @@
         },
         series: [{
             showInLegend: false,
+            <% @annual_covered.each do |annual| %>
             name: '2017',
-            data: [22000, 22000, 22000, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= annual.count_jan_current%>, <%= annual.count_feb_current%>, <%= annual.count_mar_current%>, <%= annual.count_apr_current%>, <%= annual.count_may_current%>, <%= annual.count_jun_current%>, <%= annual.count_jul_current%>, <%= annual.count_aug_current%>, <%= annual.count_sep_current%>, <%= annual.count_oct_current%>, <%= annual.count_nov_current%>, <%= annual.count_dec_current%>]
 
             }]
+            <% end %>
         });
     });
 </script>
@@ -100,7 +103,8 @@
         },
         legend: {
         align: 'center',
-        verticalAlign: 'center'
+        verticalAlign: 'center',
+        itemDistance: 50
         },
         xAxis: {
             categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -125,15 +129,17 @@
             }
         },
         series: [{
+            <% @covered_lives.each do |covered_lives| %>
             name: 'Cancel',
-            data: [750, 855, 402, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.cancel_jan%>, <%= covered_lives.cancel_feb%>, <%= covered_lives.cancel_mar%>, <%= covered_lives.cancel_apr%>, <%= covered_lives.cancel_may%>, <%= covered_lives.cancel_jun%>, <%= covered_lives.cancel_jul%>, <%= covered_lives.cancel_aug%>, <%= covered_lives.cancel_sep%>, <%= covered_lives.cancel_oct%>, <%= covered_lives.cancel_nov%>, <%= covered_lives.cancel_dec%>]
         }, {
             name: 'Term',
-            data: [981, 1042, 699, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.term_jan%>, <%= covered_lives.term_feb%>, <%= covered_lives.term_mar%>, <%= covered_lives.term_apr%>, <%= covered_lives.term_may%>, <%= covered_lives.term_jun%>, <%= covered_lives.term_jul%>, <%= covered_lives.term_aug%>, <%= covered_lives.term_sep%>, <%= covered_lives.term_oct%>, <%= covered_lives.term_nov%>, <%= covered_lives.term_dec%>]
         }, {
             name: 'Reinstate',
-            data: [24, 13, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            data: [<%= covered_lives.reinstate_jan%>, <%= covered_lives.reinstate_feb%>, <%= covered_lives.reinstate_mar%>, <%= covered_lives.reinstate_apr%>, <%= covered_lives.reinstate_may%>, <%= covered_lives.reinstate_jun%>, <%= covered_lives.reinstate_jul%>, <%= covered_lives.reinstate_aug%>, <%= covered_lives.reinstate_sep%>, <%= covered_lives.reinstate_oct%>, <%= covered_lives.reinstate_nov%>, <%= covered_lives.reinstate_dec%>]
             }]
+             <% end %>
         });
     });
 </script>
@@ -142,255 +148,359 @@
 <body>
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/heatmap.js"></script>
 
-<div class="module">
+    <div class="module">
 <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
 <ul class="nav nav-pills">
-  <li><a href="https://enroll-dashboard.dchbx.org/ivl/covered" >IVL Covered Lives</a></li>
-  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" >IVL Policies</a></li>
-  <li><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+  <li class="active"><a href="covered">IVL Covered Lives</a></li>
+  <li><a href="policy">IVL Policies</a></li>
+   <li><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
   <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
 </ul>
 
 <div class="row row-content">
-<% @annual_covered_lives.each do |covered| %>
+<% @annual_covered_lives.each do |coverd_lives| %>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_total)%> Total Covered</b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_new)%> New Coverage YTD</b></div>
+  <div class="panel-body"><b><%= number_with_delimiter(coverd_lives.covered_lives_total) %> Total Covered</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_terminations)%> Terminations YTD</b></div>
+  <div class="panel-body"><b><%= number_with_delimiter(coverd_lives.covered_lives_new) %> New Coverage YTD</b></div>
 </div>
 </div>
 <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
 <div class="panel panel-default">
-  <div class="panel-body"><b><%=number_with_delimiter(covered.covered_lives_cancellations)%> Cancellations YTD</b></div>
+  <div class="panel-body"><b><%= number_with_delimiter(coverd_lives.covered_lives_terminations) %> Terminations YTD</b></div>
+</div>
+</div>
+<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+<div class="panel panel-default">
+  <div class="panel-body"><b><%= number_with_delimiter(coverd_lives.covered_lives_cancellations) %> Cancellations YTD</b></div>
 </div>
 </div>
 <% end %>
+        
 </div>
 
     <div class="row row-content">
-    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="box-shadow: 0px 0px 5px gray;">
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"  style="box-shadow: 0px 0px 5px gray;">
 
     <table class="table table-hover table-condensed" style="margin-top: 10px;">
-    
     <thead>
+    <tr class="tabSpc1">
+        <th class="texLef" colspan="4">Covered Lives <a href="ivl_dd_live1.htm"></a></th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+        <th>&nbsp;</th>
+      </tr>
+      <tr>
+      <% @annual_enrollments.each do |enrollment| %>
+        <th class="texLef">Enrollment</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr>
+        <td class="texLef">Auto Renewals</td>
+        <td><%= enrollment.auto_renewals_select %></td>
+        <td><%= enrollment.auto_renewals_effectuate %></td>
+        <td><%= enrollment.auto_renewals_paying %></td>
+        <td><%= (enrollment.auto_renewals_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Active Renewals</td>
+        <td><%= enrollment.active_renewals_select %></td>
+        <td><%= enrollment.active_renewals_effectuate %></td>
+        <td><%= enrollment.active_renewals_paying %></td>
+        <td><%= (enrollment.active_renewals_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">New Customers</td>
+        <td><%= enrollment.new_customers_select %></td>
+        <td><%= enrollment.new_customers_effectuate %></td>
+        <td><%= enrollment.new_customers_paying %></td>
+        <td><%= (enrollment.new_customers_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">SEP</td>
+        <td><%= enrollment.sep_select %></td>
+        <td><%= enrollment.sep_effectuate %></td>
+        <td><%= enrollment.sep_paying %></td>
+        <td><%= (enrollment.sep_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      </tbody>
+
+      <thead>
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Employer <a href="/moreinfo">More Information</a></th>
+        <th class="texLef" colspan="4">Coverage <a href="ivl_dd_live2.htm"></a></th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
+        <th>&nbsp;</th>
       </tr>
       <tr>
-        <th class="texLef"># of Employees</th>
-        <th>#</th>
-        <th>%</th>
+      <% @annual_carriers.each do |carrier| %>
+        <th class="texLef">Carrier</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
       <tr>
-        <td class="texLef">1 - 9</td>
-        <td>2,895</td>
-        <td>71%</td>
-      </tr>
-      <tr>
-        <td class="texLef">10 - 24</td>
-        <td>878</td>
-        <td>22%</td>
-      </tr>
-      <tr>
-        <td class="texLef">25 - 50</td>
-        <td>298</td>
-        <td>7%</td>
+        <td class="texLef"><%= carrier.carrier_first_name %></td>
+        <td><%= number_with_delimiter(carrier.carrier_first_select) %></td>
+        <td><%= number_with_delimiter(carrier.carrier_first_effectuate) %></td>
+        <td><%= number_with_delimiter(carrier.carrier_first_paying) %></td>
+        <td><%= (carrier.carrier_first_pay_share.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
-        <td class="texLef">51 - 100</td>
-        <td>3</td>
-        <td>0%</td>
-      </tr>
-      <tr>
-        <td class="texLef">100+</td>
-        <td>2</td>
-        <td>0%</td>
+        <td class="texLef"><%= carrier.carrier_second_name %></td>
+        <td><%= number_with_delimiter(carrier.carrier_second_select) %></td>
+        <td><%= number_with_delimiter(carrier.carrier_second_effectuate) %></td>
+        <td><%= number_with_delimiter(carrier.carrier_second_paying) %></td>
+        <td><%= (carrier.carrier_second_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <td>&nbsp;</td>
       </tr>
-    </tbody>
+      </tbody>
 
-    <thead>
+      <thead>
       <tr>
-        <th class="texLef">Broker</th>
-        <th>#</th>
-        <th>%</th>
+      <% @metal_types.each do |metal| %>
+        <th class="texLef">Metal</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
       <tr>
-        <td class="texLef">Yes</td>
-        <td>3,385</td>
-        <td>90%</td>
+        <td class="texLef">Platinum</td>
+        <td><%= number_with_delimiter(metal.platinum_select) %></td>
+        <td><%= number_with_delimiter(metal.platinum_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.platinum_paying) %></td>
+        <td><%= (metal.platinum_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
       <tr>
-        <td class="texLef">No</td>
-        <td>391</td>
-        <td>2%</td>
+        <td class="texLef">Gold</td>
+        <td><%= number_with_delimiter(metal.gold_select) %></td>
+        <td><%= number_with_delimiter(metal.gold_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.gold_paying) %></td>
+        <td><%= (metal.gold_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
       <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <td class="texLef">Silver</td>
+        <td><%= number_with_delimiter(metal.silver_select) %></td>
+        <td><%= number_with_delimiter(metal.silver_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.silver_paying) %></td>
+        <td><%= (metal.silver_pay_share.to_f * 100).to_i  %>%</td>
       </tr>
-    </tbody>
+      </tr>
+      <tr>
+        <td class="texLef">Bronze</td>
+        <td><%= number_with_delimiter(metal.bronze_select) %></td>
+        <td><%= number_with_delimiter(metal.bronze_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.bronze_paying) %></td>
+        <td><%= (metal.bronze_pay_share.to_f * 100).to_i  %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Catastrophic</td>
+        <td><%= number_with_delimiter(metal.catastrophic_select) %></td>
+        <td><%= number_with_delimiter(metal.catastrophic_effectuate) %></td>
+        <td><%= number_with_delimiter(metal.catastrophic_paying) %></td>
+        <td><%= (metal.catastrophic_pay_share.to_f * 100).to_i  %>%</td>
+        <% end %>
+      </tr>
+      </tbody>
 
-    <thead>
-      <tr>
-        <th class="texLef">Choice</th>
-        <th>#</th>
-        <th>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="texLef">1-Plan</td>
-        <td>1,852</td>
-        <td>45%</td>
-      </tr>
-      <tr>
-        <td class="texLef">1-Carrier</td>
-        <td>1,942</td>
-        <td>48%</td>
-      </tr>
-      <tr>
-        <td class="texLef">1-Metal</td>
-        <td>282</td>
-        <td>7%</td>
-      </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-      </tr>
-    </tbody>
-
-    <thead>
-      <tr>
-        <th class="texLef">Employer Contribution</th>
-        <th>#</th>
-        <th>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="texLef">100%</td>
-        <td>1,925</td>
-        <td>47%</td>
-      </tr>
-      <tr>
-        <td class="texLef">51-99%</td>
-        <td>1.075</td>
-        <td>26%</td>
-      </tr>
-      <tr>
-        <td class="texLef">50%</td>
-        <td>1,076</td>
-        <td>26%</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-    </tbody>
-
-    <thead>
-      <tr>
-        <th class="texLef">New Hire Benefits</th>
-        <th>#</th>
-        <th>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="texLef">Date of Hire</td>
-        <td>5</td>
-        <td>0%</td>
-      </tr>
-      <tr>
-        <td class="texLef">1st of Month</td>
-        <td>3,214</td>
-        <td>79%</td>
-      </tr>
-      <tr>
-        <td class="texLef">1st After 30 Days</td>
-        <td>352</td>
-        <td>9%</td>
-      </tr>
-      <tr>
-        <td class="texLef">1st After 60 Days</td>
-        <td>505</td>
-        <td>12%</td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-      </tr>
-    </tbody>
-
-    <thead>
+        
+      <thead> 
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Employee</th>
-        <th>&nbsp;</th>
-        <th>&nbsp;</th>
-      </tr>
-      <tr>
-        <th class="texLef">Census</th>
-        <th>#</th>
-        <th>%</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="texLef">Enrolled</td>
-        <td>32,938</td>
-        <td>62%</td>
-      </tr>
-      <tr>
-        <td class="texLef">Not-Enrolled</td>
-        <td>10,062</td>
-        <td>38%</td>
-      </tr>
-      <tr>
+        <td class="texLef" colspan="4">Demographic <a href="ivl_dd_live3.htm"></a></td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
       </tr>
-    </tbody>
+      <tr>
+      <% @annual_status.each do |status| %>
+        <th class="texLef">Status</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
+      </tr>
+      </thead>
 
+      <tbody>
+      <tr>
+        <td class="texLef">Primary</td>
+        <td><%= number_with_delimiter(status.primary_select) %></td>
+        <td><%= number_with_delimiter(status.primary_effectuate) %></td>
+        <td><%= number_with_delimiter(status.primary_paying) %></td>
+        <td><%= (status.primary_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Dependent</td>
+        <td><%= number_with_delimiter(status.dependent_select) %></td>
+        <td><%= number_with_delimiter(status.dependent_effectuate) %></td>
+        <td><%= number_with_delimiter(status.dependent_paying) %></td>
+        <td><%= (status.dependent_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
+      </tr>
+      </tbody>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+      <thead>
+      <% @age_groups.each do |age| %>
+        <th class="texLef">Age Group</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr>
+        <td class="texLef">< 1</td>
+        <td><%= number_with_delimiter(age.zero_select) %></td>
+        <td><%= number_with_delimiter(age.zero_effectuate) %></td>
+        <td><%= number_with_delimiter(age.zero_paying) %></td>
+        <td><%= (age.zero_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">1-17</td>
+        <td><%= number_with_delimiter(age.one_select) %></td>
+        <td><%= number_with_delimiter(age.one_effectuate) %></td>
+        <td><%= number_with_delimiter(age.one_paying) %></td>
+        <td><%= (age.one_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">18-25</td>
+        <td><%= number_with_delimiter(age.eighteen_select) %></td>
+        <td><%= number_with_delimiter(age.eighteen_effectuate) %></td>
+        <td><%= number_with_delimiter(age.eighteen_paying) %></td>
+        <td><%= (age.eighteen_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">26-34</td>
+        <td><%= number_with_delimiter(age.twentysix_select) %></td>
+        <td><%= number_with_delimiter(age.twentysix_effectuate) %></td>
+        <td><%= number_with_delimiter(age.twentysix_paying) %></td>
+        <td><%= (age.twentysix_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">35-44</td>
+        <td><%= number_with_delimiter(age.thirtyfive_select) %></td>
+        <td><%= number_with_delimiter(age.thirtyfive_effectuate) %></td>
+        <td><%= number_with_delimiter(age.thirtyfive_paying) %></td>
+        <td><%= (age.thirtyfive_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">45-54</td>
+        <td><%= number_with_delimiter(age.fortyfive_select) %></td>
+        <td><%= number_with_delimiter(age.fortyfive_effectuate) %></td>
+        <td><%= number_with_delimiter(age.fortyfive_paying) %></td>
+        <td><%= (age.fortyfive_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">55-64</td>
+        <td><%= number_with_delimiter(age.fiftyfive_select) %></td>
+        <td><%= number_with_delimiter(age.fiftyfive_effectuate) %></td>
+        <td><%= number_with_delimiter(age.fiftyfive_paying) %></td>
+        <td><%= (age.fiftyfive_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">65+</td>
+        <td><%= number_with_delimiter(age.sixtyfive_select) %></td>
+        <td><%= number_with_delimiter(age.sixtyfive_effectuate) %></td>
+        <td><%= number_with_delimiter(age.sixtyfive_paying) %></td>
+        <td><%= (age.sixtyfive_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
+      </tr>
+      </tbody>
+
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+      <thead>
+      <% @overall_genders.each do |genders| %>
+        <th class="texLef">Gender</th>
+        <th>Select</th>
+        <th>Effectuate</th>
+        <th>Paying</th>
+        <th>Pay %</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr>
+        <td class="texLef">Male</td>
+        <td><%= number_with_delimiter(genders.male_select) %></td>
+        <td><%= number_with_delimiter(genders.male_effectuate) %></td>
+        <td><%= number_with_delimiter(genders.male_paying) %></td>
+        <td><%= (genders.male_pay_share.to_f * 100).to_i %>%</td>
+      </tr>
+      <tr>
+        <td class="texLef">Female</td>
+        <td><%= number_with_delimiter(genders.female_select) %></td>
+        <td><%= number_with_delimiter(genders.female_effectuate) %></td>
+        <td><%= number_with_delimiter(genders.female_paying) %></td>
+        <td><%= (genders.female_pay_share.to_f * 100).to_i %>%</td>
+        <% end %>
+      </tr>
+      </tbody>
+    </tbody>
     </table>
+
     </div>
 
 <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">   
 
-<h6>Active Covered Lives</h6>
+<h6><b>Active Covered Lives</b></h6>
 <div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-<h6>Covered Lives by Effective Month</h6>
-    <table class="table table-hover table-condensed">
+<h6><b>Covered Lives by Effective Month</b></h6>
+    <table class="table table-hover table-condensed" style="margin-top: 10px;">
     <thead>
+    <% @enrollments.each do |enrollment| %>
       <tr>
         <th class="texLef">Enrollment</th>
         <th>Jan</th>
@@ -411,109 +521,106 @@
     <tbody>
       <tr>
         <td class="texLef">Selected</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= number_with_delimiter(enrollment.selected_jan) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_feb) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_mar) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_apr) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_may) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_jun) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_jul) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_aug) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_sep) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_oct) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_nov) %></td>
+        <td><%= number_with_delimiter(enrollment.selected_dec) %></td>
+        
       </tr>
       <tr>
         <td class="texLef">Effectuated</td> 
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= number_with_delimiter(enrollment.effectuated_jan) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_feb) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_mar) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_apr) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_may) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_jun) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_jul) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_aug) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_sep) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_oct) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_nov) %></td>
+        <td><%= number_with_delimiter(enrollment.effectuated_dec) %></td>
+
       </tr>
       <tr>
         <td class="texLef">Effectuation %</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <!-- <td class="texLef">Effectuated</td>  -->
+        <td>83%</td>
+        <td>86%</td>
+        <td>74%</td>
+        <td>31%</td>
+        <td>15%</td>
+        <td><%= (enrollment.effectuation_share_jun) %></td>
+        <td><%= (enrollment.effectuation_share_jul) %></td>
+        <td><%= (enrollment.effectuation_share_aug) %></td>
+        <td><%= (enrollment.effectuation_share_sep) %></td>
+        <td><%= (enrollment.effectuation_share_oct) %></td>
+        <td><%= (enrollment.effectuation_share_nov) %></td>
+        <td><%= (enrollment.effectuation_share_dec) %></td>
       </tr>
       <tr>
         <td class="texLef">Paying</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= number_with_delimiter(enrollment.paying_jan) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_feb) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_mar) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_apr) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_may) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_jun) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_jul) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_aug) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_sep) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_oct) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_nov) %></td>
+        <td><%= number_with_delimiter(enrollment.paying_dec) %></td>
       </tr>
       <tr>
         <td class="texLef">Terminated</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= number_with_delimiter(enrollment.terminated_jan) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_feb) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_mar) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_apr) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_may) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_jun) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_jul) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_aug) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_sep) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_oct) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_nov) %></td>
+        <td><%= number_with_delimiter(enrollment.terminated_dec) %></td>
       </tr>
       <tr>
         <td class="texLef">Canceled</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
+        <td><%= number_with_delimiter(enrollment.canceled_jan) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_feb) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_mar) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_apr) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_may) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_jun) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_jul) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_aug) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_sep) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_oct) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_nov) %></td>
+        <td><%= number_with_delimiter(enrollment.canceled_dec) %></td>
+        <% end %>
       </tr>
     </tbody>
     </table>
 
- <h6>Discontinued or Reinstated Covered Lives by Transaction Month</h6>
- <div id="lineT1" style="min-width: 310px; height: 195px; margin: 0 auto"></div>
+ <h6><b>Discontinued or Reinstated Covered Lives by Transaction Month</b></h6>
+ <div id="lineT1" style="min-width: 310px; height: 205px; margin: 0 auto"></div>
 
     </div>
     </div>
 
-  </body>
+    </body>
 </html>
-
