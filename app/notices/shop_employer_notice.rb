@@ -28,6 +28,7 @@ class ShopEmployerNotice < Notice
 
   def build
     notice.notification_type = self.event_name
+    notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id
@@ -80,7 +81,7 @@ class ShopEmployerNotice < Notice
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
     return if person.blank? || location.blank?
-    
+
     notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,

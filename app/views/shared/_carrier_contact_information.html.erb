@@ -10,7 +10,7 @@
         <i class="fa fa-phone fa-3x"></i>
         <% if plan.coverage_kind == 'health' %>
           <div class="carrier-numbers">
-            <% if plan.carrier_profile.legal_name == "Boston Medical Center HealthNet Plan" %>
+            <% if plan.carrier_profile.legal_name == "BMC HealthNet Plan" %>
               <div>
                 <strong> Call: </strong>
                 <strong><a href="tel:+18558338120"> 1-855-833-8120 </a></strong> <br>
@@ -20,7 +20,7 @@
                 <br>
                 <strong> Email: </strong> memberquestions@bmchp.org <br/>
               </div>
-            <% elsif plan.carrier_profile.legal_name == "Fallon Community Health Plan" %>
+            <% elsif plan.carrier_profile.legal_name == "Fallon Health" %>
               <div>
                 <strong> Call: </strong>
                 <strong><a href="tel:+18008685200"> 1-800-868-5200 </a></strong> <br>
