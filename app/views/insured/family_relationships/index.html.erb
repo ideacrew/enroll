@@ -10,7 +10,7 @@
     <% if @resident_role.present?%>
       <% redirect_url = (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)%>
     <% end %>
-    <%= render partial: 'form', locals: {form_remote: false, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: redirect_url}%>
+    <%= render partial: 'form', locals: {form_remote: false, all_relationships: @all_relationships, existing_relationships: @existing_relationships, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: redirect_url}%>
   </div>
   <!--       <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
       <%#= render  partial: 'shared/individual_progress', locals: {

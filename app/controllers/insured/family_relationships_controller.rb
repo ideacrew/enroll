@@ -23,6 +23,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @people = @family.family_members.where(is_active: true).map(&:person)
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
+    @existing_relationships = @family.find_existing_relationships(@matrix)
+    @all_relationships = @family.find_all_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
 
     render layout: 'financial_assistance'
