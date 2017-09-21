@@ -70,14 +70,16 @@
             }
             }
         },
-        series: [{
+        series: [
+          <% @annual_covered.each do |annual| %>
+          {
             showInLegend: false,
-             <% @annual_covered.each do |annual| %>
+             
             name: '2017',
             data: [<%= annual.count_jan_current%>, <%= annual.count_feb_current%>, <%= annual.count_mar_current%>, <%= annual.count_apr_current%>, <%= annual.count_may_current%>, <%= annual.count_jun_current%>, <%= annual.count_jul_current%>, <%= annual.count_aug_current%>, <%= annual.count_sep_current%>, <%= annual.count_oct_current%>, <%= annual.count_nov_current%>, <%= annual.count_dec_current%>]
-
-            }]
-            <% end %>
+            },
+          <% end %>
+        ]
         });
     });
 </script>
@@ -123,18 +125,20 @@
                 enableMouseTracking: false
             }
         },
-        series: [{
+        series: [
              <% @covered_lives.each do |covered_lives| %>
+             {
             name: 'Cancel',
             data: [<%= covered_lives.cancel_jan%>, <%= covered_lives.cancel_feb%>, <%= covered_lives.cancel_mar%>, <%= covered_lives.cancel_apr%>, <%= covered_lives.cancel_may%>, <%= covered_lives.cancel_jun%>, <%= covered_lives.cancel_jul%>, <%= covered_lives.cancel_aug%>, <%= covered_lives.cancel_sep%>, <%= covered_lives.cancel_oct%>, <%= covered_lives.cancel_nov%>, <%= covered_lives.cancel_dec%>]
-        }, {
+            }, {
             name: 'Term',
             data: [<%= covered_lives.term_jan%>, <%= covered_lives.term_feb%>, <%= covered_lives.term_mar%>, <%= covered_lives.term_apr%>, <%= covered_lives.term_may%>, <%= covered_lives.term_jun%>, <%= covered_lives.term_jul%>, <%= covered_lives.term_aug%>, <%= covered_lives.term_sep%>, <%= covered_lives.term_oct%>, <%= covered_lives.term_nov%>, <%= covered_lives.term_dec%>]
-        }, {
+            }, {
             name: 'Reinstate',
             data: [<%= covered_lives.reinstate_jan%>, <%= covered_lives.reinstate_feb%>, <%= covered_lives.reinstate_mar%>, <%= covered_lives.reinstate_apr%>, <%= covered_lives.reinstate_may%>, <%= covered_lives.reinstate_jun%>, <%= covered_lives.reinstate_jul%>, <%= covered_lives.reinstate_aug%>, <%= covered_lives.reinstate_sep%>, <%= covered_lives.reinstate_oct%>, <%= covered_lives.reinstate_nov%>, <%= covered_lives.reinstate_dec%>]
-            }]
-             <% end %>
+            }
+        <% end %>
+        ]
         });
     });
 </script>
