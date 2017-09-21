@@ -1,13 +1,13 @@
 function stopEditingIncome() {
   $('a.new-income.btn').removeClass('disabled');
   $('a.income-edit').removeClass('disabled');
-  $('.col-md-2 > .interaction-click-control-continue').removeClass('disabled');
+  $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
 function startEditingIncome() {
   $('a.new-income.btn').addClass('disabled');
   $('a.income-edit').addClass('disabled');
-  $('.col-md-2 > .interaction-click-control-continue').addClass('disabled');
+  $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
 };
 
 function currentlyEditing() {
