@@ -24,13 +24,12 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
                             :title => "Termination of Employer’s Health Coverage Offered through DC Health Link"})
                           }
 
-
-    let(:valid_params) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+  let(:valid_params) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
 
   describe "New" do
     before do
@@ -67,6 +66,8 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
   describe "append data" do
     before do
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
     it "should append data" do
       @employee_notice.append_data
@@ -79,6 +80,8 @@ RSpec.describe ShopEmployeeNotices::TerminationOfEmployersHealthCoverage, :dbcle
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::TerminationOfEmployersHealthCoverage.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
+      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
+      allow(hbx_profile).to receive_message_chain(:benefit_sponsorship, :benefit_coverage_periods).and_return([bcp, renewal_bcp])
     end
     it "should render termination_of_employers_health_coverage" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/termination_of_employers_health_coverage"
