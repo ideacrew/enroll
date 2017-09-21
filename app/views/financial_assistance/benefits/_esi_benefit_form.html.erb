@@ -1,10 +1,106 @@
-<p> TODO : Add ESI Related Fields Here </p>
 <%= benefit_form_for @application, @applicant, benefit do |f| %>
   <div class="focus_effect_module">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: insurance_kind %>
-    <% if kind == "is_enrolled" %>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-12">
+        <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
+      </div>
+    </div>
+
+    <%= f.fields_for :employer_address do |benefit_fields| %>
+      <%= benefit_fields.hidden_field :kind, value: 'primary' %>
       <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6">
+          <%= benefit_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: benefit.employer_address.try(:address_1), required: true, class: "floatlabel" %>
+        </div>
+        <div class="col-md-6">
+          <%= benefit_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2', value: benefit.employer_address.try(:address_2), class: "floatlabel" %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-4">
+          <%= benefit_fields.text_field :city, placeholder: 'CITY *', required: true, value: benefit.employer_address.try(:city), class: "floatlabel" %>
+        </div>
+        <div class="col-md-4">
+          <%= benefit_fields.label :state, 'State *' %>
+          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), required: true %>
+        </div>
+        <div class="col-md-4">
+          <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel" %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= f.fields_for :employer_phone do |phone_fields| %>
+      <%= phone_fields.hidden_field :kind, value: "phone main" %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6">
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel" %>
+        </div>
+        <div class="col-md-6">
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel" %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</label>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_waiting_period, true, class: "required floatlabel" %>
+          <%= f.label :is_esi_waiting_period, :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_waiting_period, false, class: "required floatlabel" %>
+          <%= f.label :is_esi_waiting_period, :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+      <div class='col-md-2 not-sure-margin'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</label>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_mec_met, true, class: "required floatlabel" %>
+          <%= f.label :is_esi_mec_met, :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_mec_met, false, class: "required floatlabel" %>
+          <%= f.label :is_esi_mec_met, :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+      <div class='col-md-2 not-sure-margin'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6">
+        <%= f.label :esi_covered, 'Who Can be Covered? *' %>
+        <%= f.select :esi_covered, options_for_select(["self", "self_and_spouse", "family" ], selected: benefit.esi_covered), required: true %>
+      </div>
+      <div class="col-md-6">
         <div class="col-md-6">
           <%= f.text_field :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
         </div>
@@ -12,7 +108,27 @@
           <%= f.text_field :end_on, placeholder: 'TO', class: "floatlabel" %>
         </div>
       </div>
-    <% end %>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-9 labelforcoverage'>
+        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
+      </div>
+      <div class='col-md-3 not-sure-margin'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-3">
+        <%= f.text_field :employee_cost, placeholder: 'AMOUNT*', required: true, class: "floatlabel" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :employee_cost_frequency, 'How Often *' %>
+        <%= f.select :employee_cost_frequency, options_for_select(["biweekly", "daily", "half_yearly", "monthly", "quarterly", "weekly", "yearly" ], selected: benefit.employee_cost_frequency), required: true %>
+      </div>
+    </div>
+
     <div class="row">
       <div class="col-md-3 pull-right">
         <a class="btn btn-default benefit-cancel">Cancel</a>
