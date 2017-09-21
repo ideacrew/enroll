@@ -57,7 +57,6 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
     end
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
     notice.irs_consent_needed = check(primary_member["irs_consent"])
-    binding.pry
     notice.primary_firstname = primary_member["first_name"]
   end
 
