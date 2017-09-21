@@ -399,7 +399,7 @@ Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
 end
 
 Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
-  expect(find('.modal-body')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
+  expect(find('.modal-body')).to have_content("Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})")
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
@@ -413,7 +413,7 @@ end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
-  expect(find('.alert-plan-year')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
+  expect(find('.alert-plan-year')).to have_content("Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})")
 end
 
 Then(/^.+ updates the address location with correct address$/) do
