@@ -106,7 +106,7 @@ class Notice
     rescue Exception => e
       puts "#{e} #{e.backtrace}"
     end
-
+    # notice_path
     # clear_tmp
   end
 

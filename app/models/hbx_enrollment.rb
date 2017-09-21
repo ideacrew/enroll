@@ -1084,7 +1084,6 @@ class HbxEnrollment
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
-
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).enrolled.to_a

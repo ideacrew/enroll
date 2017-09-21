@@ -696,6 +696,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOP_DAE042',
+    title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
+    description: 'Employee Terminating coverage after QLE',
+    resource_name: 'employer',
+    event_name: 'notify_employee_confirming_health_coverage_termination',
+    notice_triggers: [
+      {
+        name: 'Notice to employer when employee terminates coverage',
+        notice_template: 'notices/shop_employee_notices/employee_terminating_health_coverage',
+        notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingHealthCoverage',
+        mpi_indicator: 'SHOP_DAE042',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

@@ -397,19 +397,33 @@ RSpec.describe ApplicationHelper, :type => :helper do
   describe ".notify_employee_confirming_coverage_termination" do
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
     let(:census_employee) {FactoryGirl.create(:census_employee)}
-    it "should trigger notify_employee_confirming_coverage_termination job in queue" do
+
+    before :each do
       allow(enrollment).to receive(:is_shop?).and_return(true)
-      allow(enrollment).to receive(:coverage_kind).and_return("health")
-      allow(enrollment).to receive(:enrollment_kind).and_return('health')
       allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
       allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
+    end
+
+    it "should enqueue a notify_employee_confirming_health_coverage_termination job when coverage_kind is health" do
+      allow(enrollment).to receive(:coverage_kind).and_return("health")
+      allow(enrollment).to receive(:enrollment_kind).and_return('health')
       helper.notify_employee_confirming_coverage_termination(enrollment)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
+      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_health_coverage_termination']
+    end
+
+    it "should enqueue a notify_employee_confirming_dental_coverage_termination job when coverage_kind is dental" do
+      allow(enrollment).to receive(:coverage_kind).and_return("dental")
+      allow(enrollment).to receive(:enrollment_kind).and_return('dental')
+      helper.notify_employee_confirming_coverage_termination(enrollment)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_dental_coverage_termination']
     end
   end
 end

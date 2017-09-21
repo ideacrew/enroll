@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverage, :dbclean => :after_each do
+RSpec.describe ShopEmployeeNotices::EmployeeTerminatingHealthCoverage, :dbclean => :after_each do
 
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.month - 1.year}
   let!(:employer_profile){ create :employer_profile, aasm_state: "active"}
@@ -18,8 +18,8 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverage, :dbclean => :af
   let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, :renewal_plan_id => renewal_plan.id)}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Employee must be notified when they successfully match to their employer',
-                            :notice_template => 'notices/shop_employee_notices/employee_terminating_coverage',
-                            :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
+                            :notice_template => 'notices/shop_employee_notices/employee_terminating_health_coverage',
+                            :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingHealthCoverage',
                             :event_name => 'notify_employee_confirming_coverage_termination',
                             :mpi_indicator => 'SHOP_DAE042',
                             :title => "CONFIRMATION OF ELECTION TO TERMINATE COVERAGE"})
@@ -36,11 +36,11 @@ let(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_
 describe "New" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)}.not_to raise_error
+        expect{ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
@@ -48,7 +48,7 @@ describe "New" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_params.delete(key)
-          expect{ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -57,7 +57,7 @@ describe "New" do
 describe "Build" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)
     end
 
     it "should build notice with all necessory info" do
@@ -68,31 +68,38 @@ describe "Build" do
   end
 
 describe "append data" do
-
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)
+      allow(enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
+      allow(enrollment).to receive(:coverage_kind).and_return("health")
+      # allow(enrollment).to receive(:set_coverage_termination_date).and_return("12/12/2012")
+      # allow(enrollment).to receive(:humanized_dependent_summary).and_return("1")
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
 
     it "should append data" do
       @employee_notice.append_data
-      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.set_coverage_termination_date
+      expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
       expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
     end
   end
 describe "Rendering terminating_coverage_notice template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverage.new(census_employee, valid_params)
+      @employee_notice = ShopEmployeeNotices::EmployeeTerminatingHealthCoverage.new(census_employee, valid_params)
+      allow(enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
+      allow(enrollment).to receive(:coverage_kind).and_return("health")
       allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
+      # allow_any_instance_of(CensusEmployee).to receive_message_chain(:published_benefit_group_assignment,:hbx_enrollments,:detect).and_return enrollment
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
     it "should render terminating_coverage_notice" do
-      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_coverage"
+      expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_health_coverage"
     end
     it "should generate pdf" do
+      census_employee.published_benefit_group_assignment.hbx_enrollments.detect
       @employee_notice.build
       @employee_notice.append_data
       file = @employee_notice.generate_pdf_notice
