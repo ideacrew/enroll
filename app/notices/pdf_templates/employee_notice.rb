@@ -3,8 +3,6 @@ module PdfTemplates
     include Virtus.model
 
     attribute :notification_type, String
-    attribute :subject, String
-    attribute :mpi_indicator, String
     attribute :primary_fullname, String
     attribute :primary_identifier, String
     attribute :mpi_indicator, String
