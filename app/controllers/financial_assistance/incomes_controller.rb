@@ -64,9 +64,8 @@
 
   def create
     @income = @applicant.incomes.build permit_params(params[:financial_assistance_income])
-
     if @income.save
-      render :update
+      render :create
     else
       render :error
     end
@@ -81,11 +80,14 @@
     end
   end
 
+
   def destroy
     income = @applicant.incomes.find(params[:id])
     income.destroy!
-    flash[:success] = "Income deleted - (#{income.kind})"
-    redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+
+    render head: 'ok'
+    # flash[:success] = "Income deleted - (#{income.kind})"
+    # redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
   end
 
   private

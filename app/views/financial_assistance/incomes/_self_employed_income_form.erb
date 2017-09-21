@@ -1,5 +1,5 @@
 <%= income_form_for @application, @applicant, income do |f| %>
-  <!--- TODO: Hidden field tag needed here for income type of job -->
+  <%= f.hidden_field :kind, value: 'net_self_employment' %>
   <div class="focus_effect_module">
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3">
