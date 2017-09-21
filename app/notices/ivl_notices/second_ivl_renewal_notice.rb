@@ -72,7 +72,7 @@ class IvlNotices::SecondIvlRenewalNotice < IvlNotice
           :taxhh_count => datum["tax_hh_count"],
           :uqhp_reason => datum["uqhp_reason"],
           :tax_status => filer_type(datum["filer_type"]),
-          :mec => datum["mec"].try(:upcase) == "N" ? "No" : "Yes",
+          :mec => datum["mec"].try(:upcase) == "Yes" ? "Yes" : "No",
           :is_ia_eligible => check(datum["aqhp_elig"]),
           :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
           :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
