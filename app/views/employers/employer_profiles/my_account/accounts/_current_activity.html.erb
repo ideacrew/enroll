@@ -1,5 +1,5 @@
 <br>
-<h4><strong>Activity</strong></h4>
+<h4><strong> Recent Activity</strong></h4>
 <br>
 <table class="table">
   <thead>
@@ -7,16 +7,16 @@
       <th>Date</th>
       <th>Description</th>
       <th>Amount</th>
-      <th>Balance</th>
     </tr>
   </thead>
   <tbody>
     <!-- Starting Balance -->
     <tr>
+      <td>&ltInvoice Date&gt</td>
+      <td>Amount due from &ltMM/DD/YYYY&gtinvoice <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Amount Due is the total amount due on the last invoice.  Invoices must be paid in full or else the group is at risk of going into arrears.  Any payment or enrollment activity that occurs after the invoice date will be reflected on the next invoice."></i>
+      </th>
+      </td>
       <td></td>
-      <td><strong>Previous Balance</strong></td>
-      <td></td>
-      <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:previous_balance)) || "-" %></td>
     </tr>
     <!-- Payments -->
     <tr>
@@ -24,13 +24,11 @@
       <td>Payments since last invoice</td>
       <!-- <td><%= (@employer_profile.try(:employer_profile_account).try(:payments)) || "Data not available" %></td> -->
       <td></td>
-      <td></td>
     </tr>
     <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity) == nil %>
     <tr class="payments">
       <td></td>
       <td>There have been no payments since the last invoice.</td>
-      <td></td>
       <td></td>
     </tr>
     <% else %>
@@ -40,7 +38,6 @@
             <td><%= activity.posting_date %></td>
             <td>Payment Type: <%= activity.payment_method %></td>
             <td><%= number_to_currency(activity.amount) %></td>
-            <td></td>
           </tr>
         <% end %>
       <% end %>
@@ -51,13 +48,11 @@
       <td></td>
       <td>New Charges</td>
       <td><%= (@employer_profile.try(:employer_profile_account).try(:new_charges)) || "-" %></td>
-      <td></td>
     </tr>
     <!-- Adjustments -->
     <tr>
       <td class="adjustments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
       <td>Adjustments since last invoice</td>
-      <td></td>
       <td></td>
     </tr>
 
@@ -65,7 +60,6 @@
     <tr class="adjustments">
       <td></td>
       <td>There have been no adjustments since the last invoice.</td>
-      <td></td>
       <td></td>
     </tr>
     <% else %>
@@ -75,7 +69,6 @@
             <td><%= activity.coverage_month %></td>
             <td><%= activity.name %></td>
             <td><%= number_to_currency(activity.amount) %></td>
-            <td></td>
           </tr>
         <% end %>
       <% end %>
