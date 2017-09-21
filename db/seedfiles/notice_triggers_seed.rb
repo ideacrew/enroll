@@ -801,7 +801,6 @@ shop_notice_triggers = [
     ]
   },
   {
-<<<<<<< HEAD
     hbx_id: 'SHOP_D049',
     title: 'Broker Hired Confirmation Notice',
     description: 'Confirmation of Broker Hired Sent to Employer',
