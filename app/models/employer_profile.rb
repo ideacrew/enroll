@@ -656,10 +656,9 @@ class EmployerProfile
         end
 
         #initial employers reminder notices to publish plan year.
-        start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
         if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
-          initial_employers_reminder_to_publish(start_on).each do|organization|
+          initial_employers_reminder_to_publish(start_on_1).each do|organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
