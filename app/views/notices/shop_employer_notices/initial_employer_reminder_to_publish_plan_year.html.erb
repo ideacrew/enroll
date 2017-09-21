@@ -13,7 +13,6 @@
     </tr>
   </tbody>
 </table>
-
 <% case notice.notification_type %>
 <% when "initial_employer_first_reminder_to_publish_plan_year" %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -25,7 +24,6 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Action is needed to complete your application for employer-sponsored health coverage with the #{aca_state_name} #{site_short_name}. To apply for coverage starting on #{notice.plan_year.start_on}, please complete your application before #{(notice.plan_year.start_on-1.month).strftime("%m/#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}/%Y")}."} %>
 <% end %>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "For detailed information on how to complete your application for employer-sponsored coverage, please review our <strong>Employer guide to applying for coverage</strong> in our <a href= '#{site_business_resource_center_url}'>Business Resource Center.</a>"} %>
 <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -39,7 +37,6 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: [""],
     heading: 'Next Steps', sub_heading: ''} %>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -57,7 +54,6 @@
     </tbody>
   </table>
 </div>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -76,7 +72,6 @@
     </tbody>
   </table>
 </div>
-
 <div style="display:block; page-break-inside: avoid;">
   <table class="total_table" border="0">
     <tbody>
@@ -86,8 +81,8 @@
            <li class="notice-font">
             <strong>Finalize Coverage and Pay First Month’s Premium</strong><br><br>
             Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received no later than 5:00 p.m. Eastern on <%= notice.plan_year.binder_payment_due_date %> in order for your coverage to take effect on <%= notice.plan_year.start_on %>.  Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br></br>
-            If your first month’s premium is not received and cleared by 5:00 p.m. Eastern on <%= notice.plan_year.binder_payment_due_date %>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards. 
-             <% unless notice.notification_type == "initial_employer_first_reminder_to_publish_plan_year" %> 
+            If your first month’s premium is not received and cleared by 5:00 p.m. Eastern on <%= notice.plan_year.binder_payment_due_date %>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.
+             <% unless notice.notification_type == "initial_employer_first_reminder_to_publish_plan_year" %>
                 You may need to submit correct documentation if you did not when you submitted your initial application.
              <%end%>
           </li>
@@ -113,7 +108,7 @@
             By calling <%=contact_center_phone_number%>  &nbsp;TTY: <%=contact_center_tty_number%><br>
         </li>
         <li class="notice-font">
-            By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%> 
+            By email: <%= mail_to "#{small_businesss_email}", "#{small_businesss_email}"%>
         </li>
         </ul>
       </td>
@@ -122,7 +117,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "You can also find more information on our website at <a href = '#{site_main_web_address_url}'>#{site_website_name}</a>"}%> 
+  { content: "You can also find more information on our website at <a href = '#{site_main_web_address_url}'>#{site_website_name}</a>"}%>
 <br>
 
 <% if notice.broker.present? %>
@@ -131,7 +126,5 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.ma_phone_number}."} %>
 <% end %>
-
 <%= render partial: 'notices/shared/paragraph', :locals => {
  content: "This notice is being provided in accordance with 45 C.F.R. 155.720."} %>
-

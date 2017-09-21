@@ -11,12 +11,12 @@ module Config::ContactCenterHelper
     Settings.contact_center.alt_phone_number
   end
 
-  def contact_center_ivl_number
-    Settings.contact_center.ivl_number
-  end
-
   def contact_center_alt_fax_number
     Settings.contact_center.alt_fax
+  end
+
+  def contact_center_ivl_number
+    Settings.contact_center.ivl_number
   end
 
   def contact_center_city
