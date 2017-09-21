@@ -21,13 +21,13 @@ class ShopEmployerNotice < Notice
     build
     generate_pdf_notice
     attach_envelope
+    non_discrimination_attachment
     upload_and_send_secure_message
     send_generic_notice_alert
   end
 
   def build
     notice.notification_type = self.event_name
-    notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
     notice.primary_identifier = employer_profile.hbx_id
