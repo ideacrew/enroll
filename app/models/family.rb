@@ -779,9 +779,11 @@ class Family
         } }
       })
       families.each do |family|
-        person = family.primary_applicant.person
-        if person.consumer_role.present?
-          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice")
+        begin
+          person = family.primary_applicant.person
+          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
       end
     end
