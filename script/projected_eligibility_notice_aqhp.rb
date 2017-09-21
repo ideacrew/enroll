@@ -49,7 +49,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             )
         builder.deliver
       rescue Exception => e
-        puts "Unable to deliver to #{person.hbx_id} due to the following error #{e}"
+        puts "Unable to deliver to #{person.hbx_id} due to the following error #{e.backtrace}"
       end
       csv << [
         family_id,
