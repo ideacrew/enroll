@@ -48,8 +48,55 @@ $(document).ready(function() {
       startEditingIncome();
     });
 
+
+    /* destroy existing job incomes */
+    $('.incomes-list').on('click', 'a.income-delete:not(.disabled)', function(e) {
+      var self = this;
+      e.preventDefault();
+      $("#DestroyJobIncomeWarning").modal();
+
+      $("#DestroyJobIncomeWarning .modal-cancel-button").click(function(e) {
+        $("#DestroyJobIncomeWarning").modal('hide');
+      });
+
+      $("#DestroyJobIncomeWarning .modal-continue-button").click(function(e) {
+        $("#DestroyJobIncomeWarning").modal('hide');
+        $(self).parents('.income').remove();
+
+        var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
+        $.ajax({
+          type: 'delete',
+          url: url
+        })
+      });
+    });
+
+    /* destroy existing Self Employed Incomes */
+    $('.self-employed-incomes-list').on('click', 'a.self-employed-income-delete:not(.disabled)', function(e) {
+      var self = this;
+      e.preventDefault();
+      $("#DestroySelfEmplyedIncomeWarning").modal();
+
+      $("#DestroySelfEmplyedIncomeWarning .modal-cancel-button").click(function(e) {
+        $("#DestroySelfEmplyedIncomeWarning").modal('hide');
+      });
+
+      $("#DestroySelfEmplyedIncomeWarning .modal-continue-button").click(function(e) {
+        $("#DestroySelfEmplyedIncomeWarning").modal('hide');
+        $(self).parents('.income').remove();
+
+        var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
+        $.ajax({
+          type: 'delete',
+          url: url
+        })
+      });
+    });
+
+
+
     /* cancel income edits */
-    $('a.income-cancel').click(function(e) {
+    $('.incomes-list').on('click', 'a.income-cancel', function(e) {
       e.preventDefault();
 
       if ($(this).parents('.new-income-form').length) {
@@ -130,12 +177,6 @@ $(document).ready(function() {
         $("#job_income").removeClass('hide');
       }
     });
-
-
-    /* Condtional Display Self Employed Income Question */
-    $("#self_employed_incomes").addClass('hide');
-    $("#has_self_employment_income_true").prop('checked', false)
-    $("#has_self_employment_income_false").prop('checked', false)
 
     $("body").on("change", "#has_self_employment_income_true", function(){
       if ($('#has_self_employment_income_true').is(':checked')) {

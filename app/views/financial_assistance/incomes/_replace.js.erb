@@ -1,0 +1,10 @@
+stopEditingIncome();
+//need to dynamcially handle different income types
+<% if @income.kind == 'wages_and_salaries' %>
+	$('<%= id %>').html("<%= escape_javascript render(partial: 'job_income', locals: { income: @income }) %>");
+<% elsif @income.kind == 'self_employed_income' %>
+	$('<%= id %>').html("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
+<% else %>
+	// handle other income here!
+	$("<%= id %>").replaceWith("<%==j render(partial: 'other_income', locals: { income: @income }) %>");
+<% end %>
