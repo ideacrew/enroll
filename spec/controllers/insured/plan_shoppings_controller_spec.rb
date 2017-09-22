@@ -36,7 +36,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
     let(:person) { FactoryGirl.build_stubbed(:person) }
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
-  
+
     context "GET plans" do
       before :each do
         allow(hbx_enrollment_one).to receive(:is_shop?).and_return(false)
@@ -299,6 +299,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
+      allow(hbx_enrollment).to receive(:census_employee).and_return(double)
+      allow(subject).to receive(:notify_employer_when_employee_terminate_coverage).and_return(true)
+      allow(subject).to receive(:notify_employee_confirming_coverage_termination).and_return(true)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end
@@ -504,7 +507,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
         allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
-        allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([]) 
+        allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
       end
 
       context "with tax_household" do
@@ -586,24 +589,24 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
   end
 
   describe ".build_same_plan_premiums" do
-    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) } 
+    let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
     let(:dob) { Date.new(1985, 4, 10) }
     let(:person) { FactoryGirl.create(:person, :with_family,  :with_consumer_role, dob: dob) }
     let(:family) { person.primary_family }
     let(:household) { family.active_household }
     let(:individual_plans) { FactoryGirl.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
     let(:plan) { individual_plans.first }
-    let!(:previous_hbx_enrollment) { 
+    let!(:previous_hbx_enrollment) {
       FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: TimeKeeper.date_of_record.beginning_of_year, kind: 'individual')
     }
 
-    let!(:new_hbx_enrollment) { 
-      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual', aasm_state: 'shopping') 
+    let!(:new_hbx_enrollment) {
+      FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual', aasm_state: 'shopping')
     }
 
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
 
-    before do 
+    before do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 4, 10))
       allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile)
       allow(benefit_coverage_period).to receive(:elected_plans_by_enrollment_members).and_return(individual_plans)
@@ -627,8 +630,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
         expect(matching_plan.total_premium).to eq premium
       end
     end
-      
-    context "When plan is different from existing coverage plan" do 
+
+    context "When plan is different from existing coverage plan" do
 
       let(:current_age) {
         person.age_on(new_hbx_enrollment.effective_on)

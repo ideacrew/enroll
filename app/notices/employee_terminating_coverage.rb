@@ -1,24 +1,24 @@
-class ShopEmployerNotice < Notice
+class EmployeeTerminatingCoverage < Notice
 
   Required= Notice::Required + []
 
-  attr_accessor :employer_profile, :key
+  attr_accessor :census_employee
 
-  def initialize(employer_profile, args = {})
-    self.employer_profile = employer_profile
-    args[:recipient] = employer_profile
+  def initialize(census_employee, args = {})
+    self.census_employee = census_employee
+    args[:recipient] = census_employee.employer_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::EmployerNotice.new
-    args[:to] = employer_profile.staff_roles.first.work_email_or_best
-    args[:name] = employer_profile.staff_roles.first.full_name.titleize
-    args[:recipient_document_store]= employer_profile
-    self.key = args[:key]
+    args[:to] = census_employee.employer_profile.staff_roles.first.work_email_or_best
+    args[:name] = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    args[:recipient_document_store]= census_employee.employer_profile
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
   end
 
   def deliver
     build
+    append_data
     generate_pdf_notice
     attach_envelope
     non_discrimination_attachment
@@ -26,31 +26,23 @@ class ShopEmployerNotice < Notice
     send_generic_notice_alert
   end
 
+  def append_data
+    terminated_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.aasm_state == 'coverage_termination_pending'}
+    notice.enrollment = PdfTemplates::Enrollment.new({
+      :terminated_on => terminated_enrollment.terminated_on,
+      :enrolled_count => terminated_enrollment.humanized_dependent_summary
+      })
+  end
+
   def build
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
-    notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
+    notice.primary_fullname = census_employee.employer_profile.staff_roles.first.full_name.titleize
+    notice.employee_fullname = census_employee.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
-    notice.primary_identifier = employer_profile.hbx_id
-    append_address(employer_profile.organization.primary_office_location.address)
-    append_hbe
-    append_broker(employer_profile.broker_agency_profile)
-  end
-
-  def append_hbe
-    notice.hbe = PdfTemplates::Hbe.new({
-      url: "www.dhs.dc.gov",
-      phone: "(855) 532-5465",
-      fax: "(855) 532-5465",
-      email: "#{Settings.contact_center.email_address}",
-      address: PdfTemplates::NoticeAddress.new({
-        street_1: "100 K ST NE",
-        street_2: "Suite 100",
-        city: "Washington DC",
-        state: "DC",
-        zip: "20005"
-      })
-    })
+    notice.primary_identifier = census_employee.employer_profile.hbx_id
+    append_address(census_employee.employer_profile.organization.primary_office_location.address)
+    append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
   def attach_envelope
@@ -87,9 +79,6 @@ class ShopEmployerNotice < Notice
       phone: location.phone.try(:to_s),
       email: (person.home_email || person.work_email).try(:address),
       web_address: broker.home_page,
-      first_name: person.first_name,
-      last_name: person.last_name,
-      assignment_date: employer_profile.active_broker_agency_account.present? ? employer_profile.active_broker_agency_account.start_on : "",
       address: PdfTemplates::NoticeAddress.new({
         street_1: location.address.address_1,
         street_2: location.address.address_2,
@@ -99,5 +88,4 @@ class ShopEmployerNotice < Notice
       })
     })
   end
-
 end

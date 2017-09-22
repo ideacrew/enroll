@@ -5,7 +5,7 @@ require File.join(Rails.root, "app", "data_migrations", "change_renewing_plan_ye
 describe ChangeRenewingPlanYearAasmState, dbclean: :after_each do
 
   let(:given_task_name) { "change_renewing_plan_year_aasm_state" }
-  let!(:rating_area) { FactoryGirl.create(:rating_area)  }
+  let!(:rating_area) { RatingArea.first || FactoryGirl.create(:rating_area)  }
   subject { ChangeRenewingPlanYearAasmState.new(given_task_name, double(:current_scope => nil)) }
 
   describe "given a task name" do
