@@ -519,6 +519,28 @@ shop_notice_triggers = [
         ]
     },
 
+   {
+   hbx_id: 'SHOP46',
+   title: 'Broker Hired Confirmation Notice',
+   description: 'Confirmation of Broker Hired Sent to Employer',
+   resource_name: 'employer',
+   event_name: 'broker_hired_confirmation',
+   notice_triggers: [
+     {
+       name: 'Boker Hired Confirmation',
+       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
+       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
+       mpi_indicator: 'SHOP_M046',
+       notice_trigger_element_group: {
+         market_places: ['shop'],
+         primary_recipients: ["employer"],
+         primary_recipient_delivery_method: ["secure_message"],
+         secondary_recipients: []
+       }
+      }
+     ]
+   },
+
     {
         hbx_id: 'SHOP45',
         title: 'You have been Hired as a Broker',
@@ -540,6 +562,28 @@ shop_notice_triggers = [
           }
       ]
     },
+    {
+        hbx_id: 'SHOP44',
+        title: 'You have been Hired as a Broker',
+        description: "When a broker is hired to a group, a notice is sent to the broker's broker mail inbox alerting them of the hire.",
+        resource_name: 'broker_role',
+        event_name: 'broker_agency_hired_confirmation',
+        notice_triggers: [
+           {
+              name: 'Broker Hired',
+              notice_template: 'notices/shop_broker_agency_notices/broker_agency_hired_notice.html.erb',
+              notice_builder: 'ShopBrokerAgencyNotices::BrokerAgencyHiredNotice',
+              mpi_indicator: 'SHOP_M044',
+              notice_trigger_element_group: {
+                market_places: ['shop'],
+                primary_recipients: ["broker"],
+                primary_recipient_delivery_method: ["secure_message"],
+                secondary_recipients: []
+              }
+            }
+        ]
+    },
+
     {
         hbx_id: 'SHOP_M068',
         title: 'Employee Plan Selection Confirmation',
