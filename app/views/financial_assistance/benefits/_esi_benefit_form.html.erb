@@ -23,9 +23,9 @@
         <div class="col-md-4">
           <%= benefit_fields.text_field :city, placeholder: 'CITY *', required: true, value: benefit.employer_address.try(:city), class: "floatlabel" %>
         </div>
-        <div class="col-md-4">
-          <%= benefit_fields.label :state, 'State *' %>
-          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), required: true %>
+        <div class="col-md-4 fa-select">
+          <%= benefit_fields.label :state, 'State *', class: "label-color" %>
+          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), prompt: 'choose', required: true %>
         </div>
         <div class="col-md-4">
           <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel" %>
@@ -96,9 +96,9 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6">
-        <%= f.label :esi_covered, 'Who Can be Covered? *' %>
-        <%= f.select :esi_covered, options_for_select(["self", "self_and_spouse", "family" ], selected: benefit.esi_covered), required: true %>
+      <div class="col-md-6 fa-select">
+        <%= f.label :esi_covered, 'Who Can be Covered? *', class: "label-color" %>
+        <%= f.select :esi_covered, options_for_select(["self", "self_and_spouse", "family" ], selected: benefit.esi_covered), prompt: 'choose',  required: true %>
       </div>
       <div class="col-md-6">
         <div class="col-md-6">
@@ -123,9 +123,9 @@
       <div class="col-md-3">
         <%= f.text_field :employee_cost, placeholder: 'AMOUNT*', required: true, class: "floatlabel" %>
       </div>
-      <div class="col-md-3">
-        <%= f.label :employee_cost_frequency, 'How Often *' %>
-        <%= f.select :employee_cost_frequency, options_for_select(["biweekly", "daily", "half_yearly", "monthly", "quarterly", "weekly", "yearly" ], selected: benefit.employee_cost_frequency), required: true %>
+      <div class="col-md-3 fa-select">
+        <%= f.label :employee_cost_frequency, 'How Often *', class: "label-color" %>
+        <%= f.select :employee_cost_frequency, options_for_select(["biweekly", "daily", "half_yearly", "monthly", "quarterly", "weekly", "yearly" ], selected: benefit.employee_cost_frequency), required: true, prompt: 'choose' %>
       </div>
     </div>
 

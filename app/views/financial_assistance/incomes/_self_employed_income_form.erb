@@ -6,9 +6,9 @@
         <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
       </div>
 
-      <div class="col-md-3">
-        <%= f.label :frequency_kind, 'How Often *' %>
-        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), required: true %>
+      <div class="col-md-3 fa-select">
+        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), prompt: 'choose',required: true %>
       </div>
 
       <div class="col-md-3">

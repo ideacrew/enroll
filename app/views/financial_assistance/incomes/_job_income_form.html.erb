@@ -11,9 +11,9 @@
       <div class="col-md-3">
         <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
       </div>
-      <div class="col-md-3">
-        <%= f.label :frequency_kind, 'How Often *' %>
-        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), required: true %>
+      <div class="col-md-3 fa-select">
+        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+        <%= f.select :frequency_kind, options_for_select(frequency_kind_options, selected: income.frequency_kind), required: true, prompt: 'choose' %>
       </div>
       <div class="col-md-3">
         <%= f.text_field :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
@@ -37,8 +37,8 @@
         <div class="col-md-4">
           <%= income_fields.text_field :city, placeholder: 'CITY *', required: true, value: income.employer_address.try(:city), class: "floatlabel" %>
         </div>
-        <div class="col-md-4">
-          <%= income_fields.label :state, 'State *' %>
+        <div class="col-md-4 fa-select">
+          <%= income_fields.label :state, 'State *', class: 'label-color' %>
           <%= income_fields.select :state, options_for_select(state_options, selected: income.employer_address.try(:state)), required: true %>
         </div>
         <div class="col-md-4">
