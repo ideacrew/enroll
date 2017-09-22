@@ -403,11 +403,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to_not have_selector('h3', text: 'Marketplace')
     end
-
-    it "should display effective on date" do
-      render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/Effective Date/)
-    end
   end
 
   context "waive plan" do
