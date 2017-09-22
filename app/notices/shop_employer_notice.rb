@@ -57,6 +57,10 @@ class ShopEmployerNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
   end
 
+  def shop_dchl_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_dchl_rights.pdf')]
+  end
+
   def non_discrimination_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
   end
@@ -80,7 +84,7 @@ class ShopEmployerNotice < Notice
     location = broker.organization.primary_office_location
     broker_role = broker.primary_broker_role
     person = broker_role.person if broker_role
-    return if person.blank? || location.blank? 
+    return if person.blank? || location.blank?
     notice.broker = PdfTemplates::Broker.new({
       primary_fullname: person.full_name,
       organization: broker.legal_name,

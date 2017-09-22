@@ -10,8 +10,8 @@ RSpec.describe ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice, :dbcle
                             :name =>'Renewal Open Enrollment available for Employee',
                             :notice_template => 'notices/shop_employee_notices/8b_renewal_open_enrollment_notice_for_employee',
                             :notice_builder => 'ShopEmployeeNotices::EmployeeOpenEnrollmentReminderNotice',
-                            :event_name => 'employee_open_enrollment_reminder',
                             :mpi_indicator => 'MPI_SHOP8B',
+                            :event_name => 'employee_open_enrollment_reminder',
                             :title => "Your Health Plan Open Enrollment Period has Begun"})
                           }
     let(:valid_parmas) {{
