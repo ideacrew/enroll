@@ -13,7 +13,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def new
-    @model = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).deductions.build
+    @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
     load_steps
     current_step
     render 'workflow/step', layout: 'financial_assistance'
@@ -69,8 +69,9 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def destroy
-    deduction = @applicant.deductions.find(params[:id])
-    deduction.destroy!
+    @deduction = @applicant.deductions.find(params[:id])
+    @deduction_kind = @deduction.kind
+    @deduction.destroy!
 
     render head: 'ok'
   end
@@ -88,12 +89,12 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.active_applicants.find(params[:applicant_id])
+    @applicant = @application.applicants.find(params[:applicant_id])
   end
 
   def find_application_and_applicant
     @application = FinancialAssistance::Application.find(params[:application_id])
-    @applicant = @application.active_applicants.find(params[:applicant_id])
+    @applicant = @application.applicants.find(params[:applicant_id])
   end
 
   def permit_params(attributes)
@@ -102,7 +103,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   def find
     begin
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).deductions.find(params[:id])
+      FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.find(params[:id])
     rescue
       nil
     end
