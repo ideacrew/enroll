@@ -68,14 +68,14 @@ class ConsumerRole
 
   field :ssn_validation, type: String, default: "pending"
   validates_inclusion_of :ssn_validation, :in => SSN_VALIDATION_STATES, :allow_blank => false
-  field :native_validation, type: String, default: nil
 
+  field :native_validation, type: String, default: nil
   validates_inclusion_of :native_validation, :in => NATIVE_VALIDATION_STATES, :allow_blank => false
-  field :is_state_resident, type: Boolean, default: nil
-  field :residency_determined_at, type: DateTime
 
   # DC residency
-  field :local_residency_validation, type: String
+  field :is_state_resident, type: Boolean, default: nil
+  field :residency_determined_at, type: DateTime
+  field :local_residency_validation, type: String, default: "attested"
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
@@ -87,6 +87,7 @@ class ConsumerRole
   field :ssn_rejected, type: Boolean, default: false
   field :native_rejected, type: Boolean, default: false
   field :lawful_presence_rejected, type: Boolean, default: false
+  field :residency_rejected, type: Boolean, default: false
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
   delegate :ssn,    :ssn=,    to: :person, allow_nil: true
@@ -196,8 +197,6 @@ class ConsumerRole
         !ssn_verified? && !has_docs_for_type?(type)
       when 'American Indian Status'
         !native_verified? && !has_docs_for_type?(type)
-      when 'Local residency'
-        # !local_residency_verified && !has_docs_for_type?(type)
       else
         !lawful_presence_authorized? && !has_docs_for_type?(type)
     end
@@ -495,10 +494,14 @@ class ConsumerRole
   end
 
   def verify_ivl_by_admin(*args)
-    if person.ssn || is_native?
-      self.ssn_valid_citizenship_valid! verification_attr(args.first)
+    if sci_verified?
+      pass_residency!
     else
-      self.pass_dhs! verification_attr(args.first)
+      if person.ssn || is_native?
+        self.ssn_valid_citizenship_valid! verification_attr(args.first)
+      else
+        self.pass_dhs! verification_attr(args.first)
+      end
     end
   end
 
@@ -609,8 +612,9 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = false
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => false,
+                      :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
@@ -619,8 +623,9 @@ class ConsumerRole
   end
 
   def mark_residency_authorized(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = true
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => true,
+                      :local_residency_validation => "valid")
   end
 
   def lawful_presence_pending?
@@ -661,10 +666,6 @@ class ConsumerRole
 
   def indian_conflict?
     citizen_status == "indian_tribe_member"
-  end
-
-  def local_residency_verified?
-    ["valid", "attested"].include?(local_residency_validation)
   end
 
   def mark_doc_type_uploaded(v_type)
@@ -745,13 +746,17 @@ class ConsumerRole
   end
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
-    if v_type == "Social Security Number"
-      update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
-    elsif v_type == "American Indian Status"
-      update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
-    else
-      lawful_presence_determination.deny!(verification_attr(authority.first))
-      update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
+    case v_type
+      when "Residency"
+        update_attributes(:residency_update_reason => update_reason, :residency_rejected => true)
+        mark_residency_denied
+      when "Social Security Number"
+        update_attributes(:ssn_validation => "outstanding", :ssn_update_reason => update_reason, :ssn_rejected => true)
+      when "American Indian Status"
+        update_attributes(:native_validation => "outstanding", :native_update_reason => update_reason, :native_rejected => true)
+      else
+        lawful_presence_determination.deny!(verification_attr(authority.first))
+        update_attributes(:lawful_presence_update_reason => {:v_type => v_type, :update_reason => update_reason}, :lawful_presence_rejected => true )
     end
     reject!(verification_attr(authority.first))
     "#{v_type} was rejected."
@@ -760,7 +765,8 @@ class ConsumerRole
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
       when "Residency"
-        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
+        update_attributes(:residency_update_reason => update_reason)
+        mark_residency_authorized
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"
