@@ -21,7 +21,6 @@ namespace :migrations do
     end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
 
     organizations.each do |organization|
-
       # Expire previous year plan years
       organization.employer_profile.plan_years.published.where(:"end_on".lte => TimeKeeper.date_of_record).each do |plan_year|
         enrollments = enrollments_for_plan_year(plan_year)
@@ -38,7 +37,6 @@ namespace :migrations do
 
       # Terminate current active plan years
       organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
-
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
           puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
@@ -51,14 +49,19 @@ namespace :migrations do
             # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
-
+       
       if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
-            if generate_termination_notice
-               send_notice_to_employer(organization)
-            end
-        end
+          send_notice_to_employer(organization) if generate_termination_notice
+          bg_ids = plan_year.benefit_groups.map(&:id)
+          census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+             census_employees.each do |census_employee|
+               census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+                assignment.update(end_on: plan_year.end_on) if assignment.end_on.present? && assignment.end_on > plan_year.end_on     
+                end 
+              end 
+          end
       end
 
       # organization.employer_profile.census_employees.non_terminated.each do |census_employee|
