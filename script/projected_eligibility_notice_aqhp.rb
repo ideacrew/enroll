@@ -1,12 +1,12 @@
 begin
   @data_hash = {}
   CSV.foreach('proj_elig_report_aqhp.csv',:headers =>true).each do |d|
-    if @data_hash[d["applid"]].present?
-      hbx_ids = @data_hash[d["applid"]].collect{|r| r['member_id']}
+    if @data_hash[d["ic_number"]].present?
+      hbx_ids = @data_hash[d["ic_number"]].collect{|r| r['member_id']}
       next if hbx_ids.include?(d["member_id"])
-      @data_hash[d["applid"]] << d
+      @data_hash[d["ic_number"]] << d
     else
-      @data_hash[d["applid"]] = [d]
+      @data_hash[d["ic_number"]] = [d]
     end
   end
 rescue Exception => e
@@ -14,7 +14,7 @@ rescue Exception => e
 end
 
 field_names  = %w(
-        family.id
+        ic_number
         hbx_id
         full_name
       )
@@ -26,10 +26,9 @@ bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp 
 
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
-
   event_kind = ApplicationEventKind.where(:event_name => 'projected_eligibility_notice_2').first
   notice_trigger = event_kind.notice_triggers.first
-  @data_hash.each do |family_id , members|
+  @data_hash.each do |ic_number , members|
     primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
     next if primary_member.nil?
     person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
@@ -39,7 +38,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
-            :event_name => event_kind.event_name,
+            event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
             open_enrollment_start_on: bc_period.open_enrollment_start_on,
@@ -52,7 +51,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         puts "Unable to deliver to #{person.hbx_id} due to the following error #{e.backtrace}"
       end
       csv << [
-        family_id,
+        ic_number,
         person.hbx_id,
         person.full_name
       ]

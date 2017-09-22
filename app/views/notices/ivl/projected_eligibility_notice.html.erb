@@ -45,8 +45,7 @@
 <% if notice.notification_type == "projected_eligibility_notice_2" %>
   <% if notice.irs_consent_needed %>
     <%= render partial: 'notices/shared/unordered_list', locals: {
-    listings: ["Call us as soon as possible if you still need help paying for coverage in #{notice.coverage_year}",
-               "Review your household information, and make sure it’s correct",
+    listings: ["Review your household information, and make sure it’s correct",
                "Let us know by October 15, 2017 if you need to update your household information for #{notice.coverage_year}",  
                "Review your projected eligibility results for #{notice.coverage_year}"]} %>
   <% else %>
@@ -117,16 +116,6 @@
       listings: notice.aqhp_or_non_magi_medicaid_eligible} %>
     <% notice.tax_households.each do |thh|%>
       <% if thh.max_aptc.present? %>
-        <% if thh.max_aptc > 0 %>
-          <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-           contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
-             heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
-        <% else %>
-          <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-           contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
-             heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
-        <% end %>
-      <% else %>
         <%= render partial: 'notices/shared/paragraph', :locals => {
           content: "<strong>Advance Premium Tax Credit Savings:</strong> The people listed above are projected to be eligible for a tax credit to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. We’ll let you know the amount of your tax credit before open enrollment begins.", bottom_margin: '5px'} %>
       <% end %>
