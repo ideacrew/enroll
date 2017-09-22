@@ -54,8 +54,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     if @deduction.save
       render :create
     else
-      render :error
-      flash[:error] = @deduction.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
+      render head: 'ok'
     end
   end
 
@@ -64,7 +63,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     if @deduction.update_attributes permit_params(params[:financial_assistance_deduction])
       render :update
     else
-      render :error
+      render head: 'ok'
     end
   end
 

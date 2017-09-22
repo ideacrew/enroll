@@ -67,7 +67,7 @@
     if @income.save
       render :create
     else
-      render :error
+      render head: 'ok'
     end
   end
 
@@ -76,7 +76,7 @@
     if @income.update_attributes permit_params(params[:financial_assistance_income])
       render :update
     else
-      render :error
+      render head: 'ok'
     end
   end
 
