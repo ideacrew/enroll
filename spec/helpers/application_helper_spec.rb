@@ -388,4 +388,21 @@ end
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
+
+  describe ".notify_employer_when_employee_terminate_coverage" do
+    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
+    it "should trigger notify_employer_when_employee_terminate_coverage job in queue" do
+      allow(enrollment).to receive(:is_shop?).and_return(true)
+      allow(enrollment).to receive(:enrollment_kind).and_return('health')
+      allow(enrollment).to receive_message_chain("census_employee.present?").and_return(true)
+      allow(enrollment).to receive_message_chain("census_employee.id.to_s").and_return("8728346")
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      helper.notify_employer_when_employee_terminate_coverage(enrollment)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+      expect(queued_job[:args]).to eq ["8728346", 'notify_employer_when_employee_terminate_coverage']
+    end
+  end
 end

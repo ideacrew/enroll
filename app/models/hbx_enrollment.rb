@@ -1222,7 +1222,7 @@ class HbxEnrollment
     event :schedule_coverage_termination, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :coverage_selected, :auto_renewing,
                          :enrolled_contingent, :coverage_enrolled],
-                    to: :coverage_termination_pending, after: :set_coverage_termination_date
+                    to: :coverage_termination_pending, after: [:set_coverage_termination_date]
 
       transitions from: [:renewing_waived, :inactive], to: :inactive
     end
