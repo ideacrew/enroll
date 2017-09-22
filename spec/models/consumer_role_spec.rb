@@ -594,17 +594,17 @@ context "Verification process and notices" do
       end
     end
 
-    context "retrigger_residency" do
+    context "trigger_residency" do
       [nil, "111111111"].each do |ssn|
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "retrigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "retrigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "retrigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "retrigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "retrigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "retrigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "trigger_residency!"
         it "updates residency status with callback" do
           consumer.is_state_resident = true
-          consumer.retrigger_residency!
+          consumer.trigger_residency!
           expect(consumer.is_state_resident).to be nil
         end
       end
@@ -734,7 +734,7 @@ describe "#build_nested_models_for_person" do
   end
 end
 
-describe "can_retrigger_residency?" do
+describe "can_trigger_residency?" do
   let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
   let(:consumer_role) { person.consumer_role }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
@@ -748,22 +748,22 @@ describe "can_retrigger_residency?" do
 
     it "should return true if there is a change in address from non-dc to dc" do
       person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
     end
 
     it "should return false if there is a change in address from dc to non-dc" do
       person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_retrigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
     end
 
     it "should return false if there is a change in address from dc to dc" do
       person.update_attributes(no_dc_address: false)
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
 
     it "should return false if there is a change in address from non-dc to non-dc" do
       person.update_attributes(no_dc_address: true)
-      expect(consumer_role.can_retrigger_residency?("true", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
     end
   end
 
@@ -775,17 +775,17 @@ describe "can_retrigger_residency?" do
     end
 
     it "should return true if age > 18" do
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
     end
 
     it "should return false if age = 18" do
       person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
 
     it "should return false if age < 18" do
       consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
 
@@ -797,12 +797,12 @@ describe "can_retrigger_residency?" do
 
     it "should return true if has an active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq true
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
     end
 
     it "should return false if no active coverage" do
       allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
-      expect(consumer_role.can_retrigger_residency?("false", family)).to eq false
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
 end
