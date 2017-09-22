@@ -86,8 +86,6 @@
     income.destroy!
 
     render head: 'ok'
-    # flash[:success] = "Income deleted - (#{income.kind})"
-    # redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
   end
 
   private
