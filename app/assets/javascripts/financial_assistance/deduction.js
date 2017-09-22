@@ -20,12 +20,13 @@ $(document).ready(function() {
     if (value) {
       var newDeductionFormEl = $(this).parents('.deduction-kind').children('.new-deduction-form'),
           deductionListEl = $(this).parents('.deduction-kind').find('.deductions-list');
-      newDeductionFormEl.clone(true)
+      if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
+      var clonedForm = newDeductionFormEl.clone(true, true)
         .removeClass('hidden')
         .appendTo(deductionListEl);
       startEditingDeduction();
-      $(newDeductionFormEl).find("#financial_assistance_deduction_start_on").datepicker();
-      $(newDeductionFormEl).find("#financial_assistance_deduction_end_on").datepicker();
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker();
     } else {
       // prompt to delete all these dedcutions
     }
@@ -38,6 +39,9 @@ $(document).ready(function() {
     deductionEl.find('.deduction-show').addClass('hidden');
     deductionEl.find('.edit-deduction-form').removeClass('hidden');
     startEditingDeduction();
+
+    $(deductionEl).find(".datepicker-js").datepicker();
+    $(deductionEl).find(".datepicker-js").datepicker();
   });
 
     /* destroy existing deducitons */

@@ -52,7 +52,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
     @deduction = @applicant.deductions.build permit_params(params[:financial_assistance_deduction])
 
     if @deduction.save
-      render :update, :locals => { kind: params[:financial_assistance_deduction][:kind]}
+      render :create
     else
       render :error
       flash[:error] = @deduction.errors.messages.first.flatten.flatten.join(',').gsub(",", " ").titleize
@@ -62,7 +62,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
   def update
     @deduction = @applicant.deductions.find params[:id]
     if @deduction.update_attributes permit_params(params[:financial_assistance_deduction])
-      render :update, :locals => { kind: params[:financial_assistance_deduction][:kind]}
+      render :update
     else
       render :error
     end

@@ -10,10 +10,10 @@
         <%= f.select(:frequency_kind, options_for_select(FinancialAssistance::Deduction::FREQUENCY_KINDS, selected: deduction.frequency_kind), {include_blank: "SELECT FREQUENCY"}, {:disabled => false})  %>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
+        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{deduction.id}", class: "datepicker-js floatlabel" %>
       </div>
       <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', required: true, class: "floatlabel" %>
+        <%= f.text_field :end_on, placeholder: 'TO', required: true, id: "end_on_#{deduction.id}", class: "datepicker-js floatlabel" %>
       </div>
     </div>
     <div class="row">

@@ -1,5 +1,1 @@
-stopEditingDeduction();
-
-$('#<%= dom_id @deduction %>').html("<%= escape_javascript render(partial: 'deduction', locals: { deduction: @deduction, kind: @deduction.kind }) %>");
-
-window.location.reload();
+<%= render partial: 'replace', locals: { id: "##{dom_id(@deduction)}" } %>
