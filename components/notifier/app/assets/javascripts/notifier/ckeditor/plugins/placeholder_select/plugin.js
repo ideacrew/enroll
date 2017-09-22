@@ -29,6 +29,7 @@ CKEDITOR.plugins.add('placeholder_select',
 
 		// merge defaults with the passed in items		
 		var config = CKEDITOR.tools.extend(defaultConfig, editor.config.placeholder_selects[p] || {}, true);
+
 		// run through an create the set of items to use
 		for (var i = 0; i < config.placeholders.length; i++) {
 			// get our potentially custom placeholder format
@@ -56,6 +57,7 @@ CKEDITOR.plugins.add('placeholder_select',
 
 		var title = config.title;
 
+
 		// add the menu to the editor
 		editor.ui.addRichCombo(config.key,
 		{
@@ -74,7 +76,8 @@ CKEDITOR.plugins.add('placeholder_select',
 			init: function()
 			{
 				this.startGroup( this.title );
-				for (var i in placeholders)
+
+				for (var i in this.placeholders)
 				{
 					this.add(this.placeholders[i][0], this.placeholders[i][1], this.placeholders[i][2]);
 				}
