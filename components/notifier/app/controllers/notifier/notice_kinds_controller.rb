@@ -32,8 +32,15 @@ module Notifier
 
       if notice_kind.save
         flash[:notice] = 'Notice created successfully'
+        redirect_to notice_kinds_path
+      else
+        @errors = notice_kind.errors.messages
+        
+        @notice_kinds = Notifier::NoticeKind.all
+        @datatable = Effective::Datatables::NoticesDatatable.new
+
+        render :action => 'index'
       end
-      redirect_to notice_kinds_path
     end
 
     def update
