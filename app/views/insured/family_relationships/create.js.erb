@@ -2,3 +2,4 @@ $("#<%=params[:predecessor_id]%>_<%=params[:successor_id]%>").removeClass("missi
 $(".update_status").html("");
 $("#<%=params[:predecessor_id]%>_<%=params[:successor_id]%> .update_status").html(" Updated Relation !!!")
 $("#family-matrix").html("<%= escape_javascript(render '/insured/family_relationships/form', form_remote: true, missing_relationships: @missing_relationships, all_relationships: @all_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: '') %>");
+$(".faa-status").html("<%= escape_javascript(render 'financial_assistance/shared/status', application: @application) %>");

@@ -31,6 +31,7 @@ class Insured::FamilyRelationshipsController < ApplicationController
 	end
 
   def create
+    @application = @family.application_in_progress
     predecessor = Person.where(id: params[:predecessor_id]).first
     successor = Person.where(id: params[:successor_id]).first
     predecessor.add_relationship(successor, params[:kind], @family.id, true)
