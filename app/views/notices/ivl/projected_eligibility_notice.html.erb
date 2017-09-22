@@ -8,13 +8,13 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <% if notice.notification_type == "projected_eligibility_notice_1" %>
-        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
-      <% else %>
-        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
-        IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %>
-        </h3>
+      <% if notice.notification_type == "projected_eligibility_notice_2" && !notice.irs_consent_needed %>
+        <td>
+          <h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017<br>
+            IT'S URGENT THAT YOU CALL US IF YOU NEED HELP PAYING FOR COVERAGE IN <%= notice.coverage_year %></h3>
         </td>
+      <% else %>
+        <td><h3>UPDATE YOUR INFORMATION AT <%= Settings.site.short_name.upcase %> BY OCTOBER 15, 2017</h3></td>
       <% end %>
     </tr>
   </tbody>
