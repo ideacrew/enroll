@@ -671,7 +671,50 @@ shop_notice_triggers = [
         ]
     },
 
+    {
+        hbx_id: 'SHOP_M040',
+        title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
+        description: 'Employee Terminating coverage after QLE',
+        resource_name: 'employer',
+        event_name: 'notify_employee_confirming_coverage_termination',
+        notice_triggers: [
+            {
+                name: 'Notice to employer when employee terminates coverage',
+                notice_template: 'notices/shop_employee_notices/employee_terminating_coverage',
+                notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
+                mpi_indicator: 'SHOP_M040',
+                notice_trigger_element_group: {
+                    market_places: ['shop'],
+                     primary_recipients: ["employer"],
+                    primary_recipient_delivery_method: ["secure_message"],
+                    secondary_recipients: []
+                }
+            }
+        ]
+    },
 
+    {
+        hbx_id: 'SHOP_M040',
+        title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
+        description: 'Employee Terminating coverage after QLE',
+        resource_name: 'employer',
+        event_name: 'notify_employee_confirming_dental_coverage_termination',
+        notice_triggers: [
+            {
+                name: 'Notice to employer when employee terminates coverage',
+                notice_template: 'notices/shop_employee_notices/employee_terminating_dental_coverage',
+                notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingDentalCoverage',
+                mpi_indicator: 'SHOP_M040',
+                notice_trigger_element_group: {
+                    market_places: ['shop'],
+                     primary_recipients: ["employer"],
+                    primary_recipient_delivery_method: ["secure_message"],
+                    secondary_recipients: []
+                }
+            }
+        ]
+    },
+    
     {
         hbx_id: 'SHOP_M050',
         title: 'Eligible to Apply for Employer-sponsored Health Insurance',

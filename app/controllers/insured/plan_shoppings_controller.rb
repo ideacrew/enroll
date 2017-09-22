@@ -77,7 +77,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrollment.reset_dates_on_previously_covered_members(@plan)
     @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
     @family = @person.primary_family
-    
+
     #FIXME need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
@@ -157,6 +157,7 @@ class Insured::PlanShoppingsController < ApplicationController
       hbx_enrollment.schedule_coverage_termination!(@person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment))
       hbx_enrollment.update_renewal_coverage
       notify_employer_when_employee_terminate_coverage(hbx_enrollment)
+      notify_employee_confirming_coverage_termination(hbx_enrollment)
       redirect_to family_account_path
     else
       redirect_to :back
@@ -289,7 +290,7 @@ class Insured::PlanShoppingsController < ApplicationController
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
-    
+
       @enrolled_plans.each do |enrolled_plan|
         if plan_index = @plans.index{|e| e.id == enrolled_plan.id}
           @plans[plan_index] = enrolled_plan
