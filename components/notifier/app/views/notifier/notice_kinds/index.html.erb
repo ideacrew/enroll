@@ -1,6 +1,6 @@
 <% if @errors.any? %>
   <div class="alert alert-error">
-    <h4><%= pluralize(@errors.count, "notice") %> failed to upload:</h4>
+    <h4><%= pluralize(@errors.count, "notice error") %> found:</h4>
     <ul>
       <% @errors.each do |msg| %>
         <li><%= msg %></li>
