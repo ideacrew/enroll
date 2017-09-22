@@ -6,5 +6,6 @@ stopEditingIncome();
 	$('<%= id %>').html("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
 <% else %>
 	// handle other income here!
-	$("<%= id %>").replaceWith("<%==j render(partial: 'other_income', locals: { income: @income }) %>");
+	stopEditingIncome();
+	$("<%= id %>").html("<%==j render(partial: 'other_income', locals: { other_income: @income, kind: @income.kind}) %>");
 <% end %>

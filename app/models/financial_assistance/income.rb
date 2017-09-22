@@ -81,7 +81,7 @@ class FinancialAssistance::Income
   scope :jobs, -> { where(kind: JOB_INCOME_TYPE_KIND)}
   scope :self_employment, -> { where(kind: NET_SELF_EMPLOYMENT_INCOME_KIND)}
   scope :other, -> { where(:kind.nin => [JOB_INCOME_TYPE_KIND, NET_SELF_EMPLOYMENT_INCOME_KIND]) }
-  scope :by_income_kind, -> (kind) { where(kind: kind) }
+  scope :of_kind, -> (kind) { where(kind: kind) }
 
 
   embeds_one :employer_address, class_name: "::Address"
