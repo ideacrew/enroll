@@ -15,6 +15,7 @@ function currentlyEditing() {
 };
 
 $(document).ready(function() {
+
   $('input[type="checkbox"]').click(function(e){
     var value = e.target.checked;
     if (value) {
@@ -32,6 +33,19 @@ $(document).ready(function() {
     }
   });
 
+  $(document).on('click', "#add_new_deduction_kind", function(e){
+      $(this).addClass("hidden");
+      var newDeductionFormEl = $(this).closest('.deduction-kind').children('.new-deduction-form'),
+          deductionListEl = $(this).closest('.deduction-kind').find('.deductions-list');
+      if (newDeductionFormEl.find('select').data('selectric')) newDeductionFormEl.find('select').selectric('destroy');
+      var clonedForm = newDeductionFormEl.clone(true, true)
+          .removeClass('hidden')
+          .appendTo(deductionListEl);
+      startEditingDeduction();
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker();
+  });
+
   /* edit existing deductions */
   $('.deductions-list').on('click', 'a.deduction-edit:not(.disabled)', function(e) {
     e.preventDefault();
@@ -40,7 +54,6 @@ $(document).ready(function() {
     deductionEl.find('.edit-deduction-form').removeClass('hidden');
     startEditingDeduction();
 
-    $(deductionEl).find(".datepicker-js").datepicker();
     $(deductionEl).find(".datepicker-js").datepicker();
   });
 
@@ -68,22 +81,26 @@ $(document).ready(function() {
 
 
 
-  /* cancel benefit edits */
+ /* cancel benefit edits */
   $('.deductions-list').on('click', 'a.deduction-cancel', function(e) {
     e.preventDefault();
     stopEditingDeduction();
 
     var benefitEl = $(this).parents('.deduction');
     if (benefitEl.length) {
+      $(this).closest('.deduction-kind').find('a#add_new_deduction_kind').removeClass("hidden");
       benefitEl.find('.deduction-show').removeClass('hidden');
       benefitEl.find('.edit-deduction-form').addClass('hidden');
     } else {
       if (!$(this).parents('.deductions-list > div.deduction').length) {
         $(this).parents('.deduction-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).closest('.deduction-kind').find('a#add_new_deduction_kind').removeClass("hidden");
       }
+
       $(this).parents('.new-deduction-form').remove();
       $(this).parents('.edit-deduction-form').remove();
     }
+
   });
 
 });

@@ -15,11 +15,15 @@
 <div class="deduction-kind">
   <div class="row row-form-wrapper no-buffer row-height">
     <div class="col-md-1">
-      <%=check_box_tag "dedection_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox" %> 
+      <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
     </div>
 
-    <div class="col-md-8">
+    <div class="col-md-9">
       <%= deduction_kind.gsub('_',' ').capitalize %>
+    </div>
+
+    <div class="col-md-2 add-more-link-<%=deduction_kind%>">
+      <%= link_to "Add More", "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
     </div>
   </div>
 
@@ -31,8 +35,7 @@
     <% end %>
   </div>
 
-
-  <div class='new-deduction-form hidden'>
+  <div class='new-deduction-form hidden <%= deduction_kind %>'>
     <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: @applicant.deductions.build, kind: deduction_kind} %>
   </div>
 
