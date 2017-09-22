@@ -61,6 +61,16 @@ describe Family, "generate_family_id if hbx_assigned_id blank", dbclean: :after_
     family.save
     expect(family.hbx_assigned_id).not_to eq nil
   end
+
+  it "should generate hbx_id" do
+    expect(family.generate_family_id).not_to be nil
+  end
+
+  it "should not generate a new hbx_id if one exists" do
+    family.save
+    expect(family.hbx_assigned_id).not_to be nil
+    expect(family.generate_family_id).to be nil
+  end
 end
 
 describe Family, type: :model, dbclean: :after_each do
