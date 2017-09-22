@@ -21,6 +21,9 @@ module Notifier
     embeds_one :template, class_name: "Notifier::Template"
     embeds_one :merge_data_model
 
+    validates_presence_of :title, :notice_number, :receipient
+    validates_uniqueness_of :notice_number
+
     def receipient_class_name
       # receipient.constantize.class_name.underscore
       receipient.to_s.split('::').last.underscore.to_sym
@@ -58,6 +61,9 @@ module Notifier
       File.open(notice_path, 'wb') do |file|
         file << self.to_pdf
       end
+
+      attach_envelope
+      non_discrimination_attachment
       # clear_tmp
     end
 
@@ -86,6 +92,20 @@ module Notifier
 
     def notice_path
       Rails.root.join("public", "NoticeTemplate.pdf")
+    end
+
+    def non_discrimination_attachment
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
+    end
+
+    def attach_envelope
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
+    end
+
+    def join_pdfs(pdfs)
+      pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+      pdf << CombinePDF.load(pdfs[1])
+      pdf.save notice_path
     end
 
     # def self.markdown
