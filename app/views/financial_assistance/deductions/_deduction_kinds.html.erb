@@ -1,10 +1,12 @@
 <div class="row row-form-wrapper no-buffer row-height">
 	<div class="col-md-9">
-	  <span> <b> Income adjustments you must report </b></span>
+    <h4 class="panel-title">
+	     <b> Income adjustments you must report </b>
+    </h4>
 	</div>
 </div>
 <div class="row row-form-wrapper no-buffer row-height">
-  <div class="col-md-12">
+  <div class="col-md-12 lightgray fa-text-color">
     <span>  Check any boxes that apply to this person and enter details when requested. </span>
   </div>
 </div>
@@ -13,7 +15,7 @@
 
 <% deduction_kinds.each do |deduction_kind| %>
 <div class="deduction-kind">
-  <div class="row row-form-wrapper no-buffer row-height">
+  <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
     <div class="col-md-1">
       <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
     </div>
