@@ -843,7 +843,7 @@ shop_notice_triggers = [
       }
     ]
   },
-
+  {
     hbx_id: 'SHOPDRE076',
     title: 'Employee Enrollment Confirmation',
     description: 'We will notify renewal EEs that their ER successfully completed open enrollment and they are going to be enrolled in their selected plan for the upcoming PY',
