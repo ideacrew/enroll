@@ -31,7 +31,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice confirms you have elected to terminate #{notice.employer_name}’s employer sponsored coverage offered through the Health Connector. Your group’s coverage, including coverage for all employees, will end on #{notice.plan_year.end_on}.", top_margin: '10px'} %>
+  content: "This notice confirms you have elected to terminate #{notice.employer_name}’s employer sponsored coverage offered through the #{Settings.site.short_name}. Your group’s coverage, including coverage for all employees, will end on #{notice.plan_year.end_on}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "You are able to reapply for employer-sponsored coverage for a later coverage effective date at any time through #{Settings.site.website_name}.", top_margin: '10px'} %>  
