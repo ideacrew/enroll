@@ -120,9 +120,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         #only exists if coming from redirect from sso failing
-        @bill_pay_authenticated = params[:bill_pay_authenticated]
-        if @bill_pay_authenticated == "false"
-          flash[:error] = 'Connection to bill pay server failed'
+        @page_num = params[:page_num] if params[:page_num].present?
+        if @page_num.present?
+          retrieve_payments_for_page(@page_num)
+        else
+          retrieve_payments_for_page(1)
         end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
@@ -338,6 +340,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         @wf_url = wells_fargo_sso.url
       end
     end
+  end
+
+  def retrieve_payments_for_page(page_no)
+    @payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).skip((page_no.to_i - 1)*10).limit(10)
   end
 
   def updateable?
