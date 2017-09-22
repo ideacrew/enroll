@@ -35,41 +35,8 @@
       </div>
     </div>
     <br>
-
-    <div id="collapseOne">
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class='col-md-12'>
-          <h4 class="panel-title">
-            <b> Common types of income you must report. </b> &nbsp
-            <i class="fa fa-minus-circle" aria-hidden="true"></i>
-          </h4>
-        </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class='col-md-12 lightgray fa-text-color'>
-          Check any boxes that apply to this person and enter details when requested.
-        </div>
-      </div> <br>
-      <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |kind, label| %>
-        <div class="other-income">
-          <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
-            <div class='col-md-12'>
-              <label><input type="checkbox" class="other-income-checkbox" title="Select this box to enter details" value="<%= kind %>"> &nbsp &nbsp <%= label %></label>
-            </div>
-          </div>
-
-          <div class="incomes-list">
-            <% if @applicant.incomes.by_income_kind(kind).present? %>
-              <%= render partial: 'financial_assistance/incomes/other_income', collection: @applicant.incomes.by_income_kind(kind), as: :income %>
-            <% end %>
-            <a class='add-new-income btn btn-default hidden'>Add Another Income</a>
-          </div>
-          <div class='new-income-form hidden'>
-            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { income: @applicant.incomes.build(kind: kind), disabled: true } %>
-          </div>
-          <br>
-        </div>
-      <% end %>
+    <div class='other_income_kinds hide'>
+      <%= render partial: 'financial_assistance/incomes/other_income_kinds', locals: { other_income_kinds: FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND} %>
     </div>
     <br>
 
@@ -78,7 +45,7 @@
       <span>(Go back and work on another person)</span>
     </div>
 
-    <!-- Hidden unsaved income modal -->
+    <!-- Hidden unsaved other income modal -->
     <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -98,11 +65,30 @@
     </div>
   </div>
 
-<div class='col-md-3'>
-  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-    previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
-    next_url: find_applicant_path(@application, @applicant, current: 'incomes')
-  } %>
-</div>
-<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+  <!-- Hidden destroy other income modal -->
+  <div class="modal fade" id="destroyOtherIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Destroy this other income?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to destroy this other income?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
+      next_url: find_applicant_path(@application, @applicant, current: 'incomes')
+    } %>
+  </div>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>

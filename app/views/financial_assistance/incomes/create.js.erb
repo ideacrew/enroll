@@ -1,1 +1,5 @@
-<%= render partial: 'replace', locals: { id: ".incomes-list .new-income-form" } %>
+<% if @income.kind == 'wages_and_salaries' || @income.kind == 'self_employed_income' %>
+	<%= render partial: 'replace', locals: { id: ".incomes-list .new-income-form" } %>
+<% else %>
+  <%= render partial: 'replace', locals: { id: ".other-incomes-list .#{ @income.kind }" } %>
+<% end %>

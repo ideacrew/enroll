@@ -82,8 +82,8 @@
 
 
   def destroy
-    income = @applicant.incomes.find(params[:id])
-    income.destroy!
+    @income = @applicant.incomes.find(params[:id])
+    @income.destroy!
 
     render head: 'ok'
   end

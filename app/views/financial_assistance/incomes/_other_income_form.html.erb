@@ -1,27 +1,26 @@
-<%= income_form_for @application, @applicant, income do |f| %>
-  <div class="focus_effect_module">
-    <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-3">
-        <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
-      </div>
-      <div class="col-md-3">
-        <%= f.label :frequency_kind, 'How Often *' %>
-        <%= f.select :frequency_kind, options_for_select(%w(daily half_yearly monthly quarterly weekly yearly), selected: income.frequency_kind), required: true %>
-      </div>
-      <div class="col-md-3">
-        <%= f.text_field :start_on, placeholder: 'FROM *', required: true, class: "floatlabel" %>
-      </div>
-      <div class="col-md-3">
-        <%= f.text_field :end_on, placeholder: 'TO', required: true, class: "floatlabel" %>
-      </div>
-        <%= f.hidden_field :kind, value: income.kind %>
+<%= income_form_for @application, @applicant, other_income do |f| %>
+<div class="focus_effect_module">
+  <div class="row row-form-wrapper no-buffer row-height">
+    <%= f.hidden_field :kind, value: kind %>
+    <div class="col-md-3">
+      <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
     </div>
-    <div class="row">
-      <div class="col-md-3 pull-right">
-        <a class="btn btn-default other-income-cancel">Cancel</a>
-        <% disable = (disabled ? "disabled": '') %>
-        <%= f.submit 'Save', class: "btn btn-danger #{disable}" %>
-      </div>
+    <div class="col-md-3">
+      <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
+      <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: other_income.frequency_kind), {include_blank: "SELECT FREQUENCY"}, {:disabled => false})  %>
+    </div>
+    <div class="col-md-3">
+      <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{other_income.id}", class: "datepicker-js floatlabel" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.text_field :end_on, placeholder: 'TO', required: true, id: "end_on_#{other_income.id}", class: "datepicker-js floatlabel" %>
     </div>
   </div>
+  <div class="row">
+    <div class="col-md-3 pull-right">
+      <a class="btn btn-default other-income-cancel">Cancel</a>
+      <%= f.submit 'Save', class: 'btn btn-danger' %>
+    </div>
+  </div>
+</div>
 <% end %>
