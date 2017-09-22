@@ -176,11 +176,6 @@ $(document).ready(function() {
   }
 
   /* Condtional Display Other Income Question */
-
-  $("#collapseOne").addClass('hide');
-  $("#has_other_income_true").prop('checked', false)
-  $("#has_other_income_false").prop('checked', false)
-
   $("body").on("change", "#has_other_income_true", function(){
     if ($('#has_other_income_true').is(':checked')) {
       $(".other_income_kinds").removeClass('hide');
