@@ -39,6 +39,8 @@ class Insured::FamilyRelationshipsController < ApplicationController
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
+    @people = @family.family_members.where(is_active: true).map(&:person)
+    @all_relationships = @family.find_all_relationships(@matrix)
 
     respond_to do |format|
       format.html {
