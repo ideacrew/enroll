@@ -11,6 +11,8 @@ module Notifier
     field :raw_footer, type: String
     field :template_key, type: String
 
+    validates_presence_of :raw_body
+
     def to_s
       [raw_header, raw_body, raw_footer].join('\n\n')
     end
