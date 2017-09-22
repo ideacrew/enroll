@@ -90,7 +90,7 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
+      previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant, current: 'incomes'),
       next_url: find_applicant_path(@application, @applicant, current: 'incomes')
     } %>
   </div>
