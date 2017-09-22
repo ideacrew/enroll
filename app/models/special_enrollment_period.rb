@@ -15,6 +15,7 @@ class SpecialEnrollmentPeriod
 
   # Date Qualifying Life Event occurred
   field :qle_on, type: Date
+  field :is_valid, type: Boolean
 
   # Comments made by admin_comment
   # field :admin_comment, type: String  #Removing this, using polymorphic comment association.

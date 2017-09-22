@@ -157,6 +157,7 @@ $(function () {
   });
 
 	/* QLE Date Validator */
+  $(document).off('click', '#qle_submit')
   $(document).on('click', '#qle_submit', function() {
     if(check_qle_date()) {
       $('#qle_date').removeClass('input-error');

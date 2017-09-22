@@ -475,10 +475,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
       census_employee.update_attribute(:ssn, census_employee.employee_role.person.ssn)
     end
 
-    it "should return a sep with an effective date that equals to sep date" do
-       expect(sep.effective_on).to eq sep.qle_on
-    end
-
     it "should return a sep with an effective date that equals to first of month" do
       sep.update_attribute(:effective_on_kind, "first_of_month")
       expect(sep.effective_on).to eq Date.new(2016,10,1)
