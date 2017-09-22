@@ -15,17 +15,18 @@
     </div>
     
     <p>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</p>
+    <br>
     <!--income adjustment driver question-->
     <div class="row row-form-wrapper radio-align no-buffer">
       <div class="col-md-6 labelforcoverage">
         <span class="fa-text-color">Does this person expect to have income adjustments in <%=@application.assistance_year%> *</span>
       </div>
-      <div class="col-md-6" style="line-height: 30px;">
-        <div class="col-md-3">
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_deductions", true, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_deductions_yes">Yes</label>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 no-padding">
           <%= radio_button_tag("has_deductions", false, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_deductions_no">No</label>
         </div>

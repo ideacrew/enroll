@@ -18,14 +18,14 @@
 
     <div class="row row-form-wrapper radio-align no-buffer">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this person expect to have <b> income from other sources in 2017 ?</span>
+        <span class="fa-text-color">Does this person expect to have <b> income from other sources </b> in 2017 ?</span>
       </div>
-      <div class='col-md-6' style="line-height: 30px;">
-        <div class='col-md-3'>
+      <div class='col-md-6 mt11'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_other_income", true, class: "radio-yml", id: "has_other_income_yes", required: true) %>
           <label class="radio-yml" for="has_other_income_yes">Yes</label>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_other_income", false, class: "radio-yml", id: "has_other_income_no", required: true )%>
           <label class="radio-yml" for="has_other_income_no">No</label>
         </div>
@@ -40,9 +40,13 @@
     </div>
     <br>
 
-    <div class="col-xs-12">
-      <span> <i class="glyphicon glyphicon-triangle-left" aria-hidden="true"></i> </span> <a href=" <%= edit_financial_assistance_application_path(@application) %> ">BACK TO ALL HOUSEHOLD MEMBERS</a>
-      <span>(Go back and work on another person)</span>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+        <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
     </div>
 
     <!-- Hidden unsaved other income modal -->

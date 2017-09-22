@@ -20,12 +20,12 @@
       <div class='col-md-6 labelforcoverage'>
         <span class="fa-text-color">Does this person have <b> income from an employer </b>(wages, tips, bonuses, etc) in 2017? *</span>
       </div>
-      <div class='col-md-6' style="line-height: 30px;">
-        <div class='col-md-3'>
+      <div class='col-md-6 mt11'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_job_income", true, @applicant.has_job_income, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_job_income_yes">Yes</label>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_job_income", false, false, class: "radio-yml" )%>
           <label class="radio-yml" for="has_job_income_no">No</label>
         </div>
@@ -56,12 +56,12 @@
       <div class='col-md-6 labelforcoverage'>
         <span class="fa-text-color">Does this person expect to recieve <b>self employment income</b> in 2017? *</span>
       </div>
-      <div class='col-md-6' style="line-height: 30px;">
-        <div class='col-md-3'>
+      <div class='col-md-6 mt11'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_self_employment_income", true, @applicant.incomes.self_employment.present?, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-3 no-padding'>
           <%= radio_button_tag("has_self_employment_income", false, false, class: "radio-yml" )%>
           <label class="radio-yml" for="has_self_employment_income_no">No</label>
         </div>
@@ -88,9 +88,13 @@
     </div>
     </br>
 
-    <div>
-      <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
-        <a class= "" href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+        <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
     </div>
 
     <!-- Hidden unsaved income modal -->

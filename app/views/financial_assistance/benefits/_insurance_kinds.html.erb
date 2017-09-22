@@ -14,7 +14,7 @@
 
 <% insurance_kinds.each do |insurance_kind| %>
 <div class="benefit-kind">
-  <div class="row row-form-wrapper radio-align lightgray no-buffer row-height">
+  <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
     <div class="col-md-12 benefits-check">
       <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
       <%= insurance_kind.gsub('_',' ').capitalize %>
