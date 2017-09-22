@@ -8,7 +8,7 @@ module Effective
           # bulk_action 'Download', notifier.download_notices_notice_kinds_path, target: '_blank'
         end
 
-        table_column :notice_number, :proc => Proc.new { |row|
+        table_column :mpi_indicator, :proc => Proc.new { |row|
           link_to row.notice_number, preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
         table_column :title, :proc => Proc.new { |row|
