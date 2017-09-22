@@ -52,12 +52,4 @@ module VlpDoc
     docs_for_status_uploaded = consumer_role.vlp_documents.where(:subject=>{"$in" => docs_for_status})
     docs_for_status_uploaded.any? ? docs_for_status_uploaded.order_by(:updated_at => 'desc').first.subject : nil
   end
-
-  def can_retrigger_residency?(no_dc_address, fm_person=nil)
-    @person = fm_person if fm_person.present?
-    @person.age_on(TimeKeeper.date_of_record) > 18 &&
-    @person.no_dc_address == true &&
-    no_dc_address == "false" &&
-    @family.active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(@person)
-  end
 end

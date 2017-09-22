@@ -77,11 +77,6 @@ RSpec.describe PeopleController do
         post :update, id: person.id, person: person_attributes
         expect(assigns(:person).consumer_role.is_applying_coverage).to eq false
       end
-
-      it "should call can_retrigger_residency?!" do
-        expect(subject).to receive(:can_retrigger_residency?)
-        post :update, id: person.id, person: person_attributes
-      end
     end
 
     context "when employee" do
@@ -93,11 +88,6 @@ RSpec.describe PeopleController do
         post :update, id: person.id, person: person_attributes
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
-      end
-
-      it "should not call can_retrigger_residency?!" do
-        expect(subject).not_to receive(:can_retrigger_residency?)
-        post :update, id: person.id, person: person_attributes
       end
     end
   end

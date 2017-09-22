@@ -489,7 +489,7 @@ class ConsumerRole
   end
 
   def invoke_verification!(*args)
-    start_residency_verification_process unless person.no_dc_address
+    # start_residency_verification_process unless person.no_dc_address
     if person.ssn || is_native?
       invoke_ssa
     else
@@ -592,10 +592,19 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
-  def check_for_critical_changes(person_params)
+  def check_for_critical_changes(person_params, family)
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine_verification!(verification_attr) if Person.person_has_an_active_enrollment?(person)
+      redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
     end
+
+    retrigger_residency! if can_retrigger_residency?(person_params["no_dc_address"], family)
+  end
+
+  def can_retrigger_residency?(no_dc_address, family)
+    person.age_on(TimeKeeper.date_of_record) > 18 &&
+    person.no_dc_address == true &&
+    no_dc_address == "false" &&
+    family.person_has_an_active_enrollment?(person)
   end
 
   #class methods
