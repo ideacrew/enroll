@@ -29,12 +29,12 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   event_kind = ApplicationEventKind.where(:event_name => 'projected_eligibility_notice_2').first
   notice_trigger = event_kind.notice_triggers.first
   @data_hash.each do |ic_number , members|
-    primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
-    next if primary_member.nil?
-    person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
-    consumer_role = person.consumer_role
-    if person.present? && consumer_role.present?
-      begin
+    begin
+      primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
+      next if primary_member.nil?
+      person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      consumer_role = person.consumer_role
+      if person.present? && consumer_role.present?
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
@@ -47,16 +47,17 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
         builder.deliver
-      rescue Exception => e
-        puts "Unable to deliver to #{person.hbx_id} due to the following error #{e.backtrace}"
+        csv << [
+          ic_number,
+          person.hbx_id,
+          person.full_name
+        ]
+      else
+        puts "No consumer role for #{person.hbx_id} -- #{e}"
       end
-      csv << [
-        ic_number,
-        person.hbx_id,
-        person.full_name
-      ]
-    else
-      puts "No consumer role for #{person.hbx_id} -- #{e}"
+    rescue Exception => e
+      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}"
     end
+
   end
 end

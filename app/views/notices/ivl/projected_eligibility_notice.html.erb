@@ -23,7 +23,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname.titleize %>:  </td>
     </tr>
   </tbody>
 </table>
@@ -84,7 +84,7 @@
      contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. We also need to verify any cost savings you may qualify for in #{notice.coverage_year}.","Please review your household information. If it’s correct, you don’t need to do anything right now. If this information needs to be updated for #{notice.coverage_year}, or if you need to add or remove someone, please let us know by October 15, 2017. To make updates, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}."], heading: '', sub_heading: '', bottom_margin: '5px'} %>
     <% notice.aqhp_individuals.each do |member| %>
       <%= render partial: 'notices/shared/table_for_ivlr_notices', locals: {
-                                 rows: [['Household Member:', "#{member.first_name} #{member.last_name}  Age: #{member.age}"],
+                                 rows: [['Household Member:', "#{member.first_name.titleize} #{member.last_name.titleize}  Age: #{member.age}"],
                                     ['DC Resident:', "#{member.residency_verified}"],
                                     ['Citizenship/Lawful Presence:', "#{member.citizen_status}"],
                                     ['Incarcerated:',"#{member.incarcerated}"],
