@@ -146,11 +146,11 @@
   <% end %>
 <% end %>
 
-
-<%= render partial: 'notices/shared/unordered_family_listing', locals: {
-  previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
-  listings: notice.uqhp_individuals} %>
-
+<% if notice.uqhp_or_non_magi_medicaid_individuals.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance without Savings:</strong>",
+    listings: notice.uqhp_or_non_magi_medicaid_individuals} %>
+<% end %>
 
 <% if notice.notification_type == "projected_eligibility_notice_2" && notice.ineligible_applicants.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
