@@ -2,11 +2,9 @@
 # when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
-  require 'autoinc'
 
   include Mongoid::Document
   include Mongoid::Timestamps
-  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
   include SetCurrentUser
