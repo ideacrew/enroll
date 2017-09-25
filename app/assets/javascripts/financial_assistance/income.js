@@ -15,7 +15,7 @@ function currentlyEditing() {
 };
 
 $(document).ready(function() {
-  if ($('.incomes-list').length) {
+  if ($('.incomes-list, .other-incomes-list').length) {
     $(window).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedIncomeChangesWarning:visible').length)
         return undefined;
@@ -195,13 +195,13 @@ $(document).ready(function() {
 });
 
 function stopEditingOtherIncome() {
-  $('input.other-income-checkbox').prop('disabled', false);
+  $('input.interaction-choice-control-value-other-income-kind').prop('disabled', false);
   $('a.other-income-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
 function startEditingOtherIncome() {
-  $('input.other-income-checkbox').prop('disabled', true);
+  $('input.interaction-choice-control-value-other-income-kind').prop('disabled', true);
   $('a.other-income-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
 };
@@ -257,6 +257,20 @@ $(document).ready(function() {
       // prompt to delete all these other incomes
     }
   });
+  // add more for other income
+
+   $(document).on('click', "#add_new_other_income_kind", function(e){
+       var newOtherIncomeFormEl = $(this).parents('.other-income-kind').children('.new-other-income-form'),
+           otherIncomeListEl = $(this).parents('.other-income-kind').find('.other-incomes-list');
+       if (newOtherIncomeFormEl.find('select').data('selectric')) newOtherIncomeFormEl.find('select').selectric('destroy');
+       var clonedForm = newOtherIncomeFormEl.clone(true, true)
+           .removeClass('hidden')
+           .appendTo(otherIncomeListEl);
+       startEditingOtherIncome();
+       $(clonedForm).find('select').selectric();
+       $(clonedForm).find(".datepicker-js").datepicker({dateFormat: "dd-mm-yy"});
+       $(this).addClass("hidden");
+   });
 
   /* edit existing other income */
   $('.other-incomes-list').on('click', 'a.other-income-edit:not(.disabled)', function(e) {
@@ -288,7 +302,8 @@ $(document).ready(function() {
       console.log(url);
       $.ajax({
         type: 'DELETE',
-        url: url
+        url: url,
+        dataType: 'script',
       })
     });
   });
@@ -300,14 +315,42 @@ $(document).ready(function() {
 
     var otherIncomeEl = $(this).parents('.other-income');
     if (otherIncomeEl.length) {
+      $(this).closest('.other-income-kind').find('a#add_new_other_income_kind').removeClass("hidden");
       otherIncomeEl.find('.other-income-show').removeClass('hidden');
       otherIncomeEl.find('.edit-other-income-form').addClass('hidden');
     } else {
       if (!$(this).parents('.other-incomes-list > div.other-income').length) {
         $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).closest('.other-income-kind').find('a#add_new_other_income_kind').removeClass("hidden");
       }
       $(this).parents('.new-other-income-form').remove();
       $(this).parents('.edit-other-income-form').remove();
     }
   });
+// disable save button logic
+  function disableSave(form){
+    form.find('.interaction-click-control-save').addClass("disabled");
+  }
+
+  function enableSave(form){
+    form.find('.interaction-click-control-save').removeClass('disabled');
+  }
+
+  $(':input[required]').on('change', function(){
+    var form = $(this).closest('form');
+    if (validateForm(form)){
+      enableSave(form)
+    }else{
+      disableSave(form)
+    }
+  });
+
+  function validateForm(form) {
+    var isValid = true;
+    form.find(':input[required]').each(function() {
+      if ( $(this).val() == '' ||  $(this).val()=='0')
+        isValid = false;
+    });
+    return isValid;
+  }
 });
