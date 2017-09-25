@@ -9,16 +9,16 @@
         </li>
 
   <li class="brokers-dropdown dropdown">
-        <a href="#" class="broker dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
+        <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
             <ul class="dropdown-menu">
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                            tab_name: 'brokers',
+                                                                            tab_name: 'families',
                                                                             link_path: family_index_dt_exchanges_hbx_profiles_path,
                                                                             display_name: 'Families',
                                                                             active_tab: active_tab
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                              tab_name: 'broker-agencies',
+                                                                              tab_name: 'outstanding-verifications',
                                                                               link_path: outstanding_verification_dt_exchanges_hbx_profiles_path,
                                                                               display_name: 'Outstanding Verifications',
                                                                               active_tab: active_tab

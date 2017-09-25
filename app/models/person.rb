@@ -207,7 +207,6 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
-
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
@@ -215,6 +214,25 @@ class Person
   after_create :notify_created
   after_update :notify_updated
 
+  
+  def vlp_documents_status
+    @s = []
+    primary_family.active_family_members.each do |member|
+      member.person.verification_types.all? do |type|
+        @s << member.person.consumer_role.vlp_documents.any?{ |doc| doc.identifier && doc.verification_type == type }
+      end
+    end
+    case 
+    when @s.include?(true) && @s.include?(false)
+      return "Partially Uploaded" 
+    when @s.include?(true) && !@s.include?(false)      
+      return "Fully Uploaded"
+    when !@s.include?(true) && @s.include?(false)
+      return "None"
+    end
+  end
+
+  
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
   end
