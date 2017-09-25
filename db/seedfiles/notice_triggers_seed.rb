@@ -686,7 +686,7 @@ shop_notice_triggers = [
                 name: " Notice to EEs that active ER is terminated from SHOP",
                 notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
                 notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
-                mpi_indicator: 'SHOP_D044',
+                mpi_indicator: 'MPI_SHOPDAE044',
                 notice_trigger_element_group: {
                     market_places: ['shop'],
                     primary_recipients: ["employee"],

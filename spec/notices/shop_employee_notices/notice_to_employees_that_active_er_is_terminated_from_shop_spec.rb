@@ -20,7 +20,7 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
       :notice_template => 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
       :notice_builder => 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
       :event_name => 'notify_employee_when_employer_requests_advance_termination',
-      :mpi_indicator => 'SHOP_D044',
+      :mpi_indicator => 'MPI_SHOPDAE044',
       :title => "Termination of Employer’s Health Coverage Offered Through The Health Connector"})
   }
 
