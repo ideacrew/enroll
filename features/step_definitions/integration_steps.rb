@@ -270,7 +270,7 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
 
-Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
+Given(/^(.*)Employer for (.*) exists with a published health plan year$/) do |kind, named_person|
   person = people[named_person]
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
   employer_profile = FactoryGirl.create :employer_profile, organization: organization
@@ -282,7 +282,7 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
     dob: person[:dob_date]
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
-  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
+  benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year, is_congress: (kind == "Congressional " ? true : false)
   employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
   FactoryGirl.create(:qualifying_life_event_kind, market_kind: "shop")
   Caches::PlanDetails.load_record_cache!
@@ -926,6 +926,25 @@ And(/I should not see any plan which premium is 0/) do
   page.all("h2.plan-premium").each do |premium|
     expect(premium).not_to have_content("$0.00")
   end
+end
+
+Then(/Employee should see the correct employee contribution on plan tile/) do
+  enrollment = Person.all.first.primary_family.active_household.hbx_enrollments.where(:"aasm_state".ne => "shopping").first
+  expect(page).to have_content "$#{enrollment.total_employee_cost.round(2)}"
+end
+
+Then(/Employee should see their current plan/) do
+  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+end
+
+And(/Employee should have a ER sponsored enrollment/) do
+  person = Person.all.first
+  bg = Organization.all.first.employer_profile.plan_years[0].benefit_groups[0]
+  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected", 
+                                    plan: Plan.all.first, benefit_group_id: bg.id
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id, 
+                                        eligibility_date: TimeKeeper.date_of_record - 1.month, coverage_start_on: TimeKeeper.date_of_record)
+  enrollment.save
 end
 
 Then(/Devops can verify session logs/) do
