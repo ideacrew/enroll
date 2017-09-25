@@ -11,7 +11,7 @@ RSpec.describe ShopEmployerNotices::GroupAdvanceTerminationConfirmation do
         name: 'Notice to employee after they select a plan Annual Open Enrollment',
         notice_template: 'notices/shop_employer_notices/group_advance_termination_confirmation',
         notice_builder: 'ShopEmployerNotices::GroupAdvanceTerminationConfirmation',
-        mpi_indicator: 'SHOP_DAG043',
+        mpi_indicator: 'MPI_SHOPDAG043',
         event_name: 'group_advance_termination_confirmation',
         title: 'Notice Confirmation for Group termination due to ER advance request'
       }
