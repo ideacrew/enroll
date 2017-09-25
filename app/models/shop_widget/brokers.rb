@@ -4,12 +4,10 @@ module ShopWidget
     store_in collection: "shopPolicies"
 
     field :tile , type: String
-    field :yes_count, type: Integer
-    field :yes_share, type: String
-    field :yes_yoy, type: String
-    field :no_count, type: Integer
-    field :no_share, type: String
-    field :no_yoy, type: String
+    field :num_100, type: String
+    field :broker_yes_pct, type: String
+    field :broker_no_num, type: String
+    field :broker_no_pct, type: String
 
     default_scope ->{where(tile: "left_broker" )}
   end
