@@ -144,10 +144,8 @@ class Insured::FamilyMembersController < ApplicationController
 
   def update
     @dependent = Forms::FamilyMember.find(params.require(:id))
-
-    #fix for application when in draft state
+    #Application when in draft state
     @application = @dependent.family_member.family.application_in_progress
-
     if @application.present?
     load_support_texts
     end
