@@ -691,4 +691,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.14.4
+   1.14.6
