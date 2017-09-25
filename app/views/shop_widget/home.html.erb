@@ -212,24 +212,26 @@
     </thead>
     <tbody>
       <tr>
+        <% @total_carriers_count.each do |carrier| %>
         <td class="texLef">1-Plan</td>
-        <td>1,852</td>
-        <td>45%</td>
+         <td><%= carrier.1plan_num %></td>
+         <td><%= carrier.1plan_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1-Carrier</td>
-        <td>1,942</td>
-        <td>48%</td>
+        <td><%= carrier.1carrier_num %></td>
+        <td><%= carrier.1carrier_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1-Metal</td>
-        <td>282</td>
-        <td>7%</td>
+         <td><%= carrier.1metal_num %></td>
+        <td><%= carrier.1metal_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+         <% end %>
       </tr>
     </tbody>
 
