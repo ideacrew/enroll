@@ -269,7 +269,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
-  describe "#ee_mid_year_plan_change_notice_congressional" do
+  describe "#mid_year_plan_change" do
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
     let(:organization) {FactoryGirl.create(:organization)}
     let!(:employer_profile) { FactoryGirl.create(:employer_profile, organization: organization) }
@@ -291,7 +291,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
       end
 
       it "should have queued job" do
-        helper.ee_mid_year_plan_change_notice_congressional(census_employee)
+        helper.mid_year_plan_change(census_employee)
         ActiveJob::Base.queue_adapter = :test
         expect {
           ShopNoticesNotifierJob.perform_later
@@ -306,7 +306,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
       it "should have log error" do
         expect(Rails.logger).to receive(:error)
-        helper.ee_mid_year_plan_change_notice_congressional(census_employee)
+        helper.mid_year_plan_change(census_employee)
       end
     end
   end
