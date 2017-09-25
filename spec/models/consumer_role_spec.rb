@@ -596,16 +596,17 @@ context "Verification process and notices" do
 
     context "trigger_residency" do
       [nil, "111111111"].each do |ssn|
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "trigger_residency!"
         it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "trigger_residency!"
         it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "trigger_residency!"
         it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "trigger_residency!"
         it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "trigger_residency!"
-        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :sci_verified, "trigger_residency!"
         it "updates residency status with callback" do
-          consumer.is_state_resident = true
-          consumer.trigger_residency!
-          expect(consumer.is_state_resident).to be nil
+          if consumer.may_trigger_residency?
+            consumer.is_state_resident = true
+            consumer.trigger_residency!
+            expect(consumer.is_state_resident).to be nil
+          end
         end
       end
     end
