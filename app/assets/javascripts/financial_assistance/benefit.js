@@ -16,21 +16,41 @@ function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
 
+function afterDestroyHide(selector_id, kind){
+  $(".benefits #"+selector_id+" input[type='checkbox'][value='"+kind+"']").prop('checked', false);
+  $(".benefits #"+selector_id+" .add-more-link-"+kind).addClass('hidden');
+};
+
 $(document).ready(function() {
   $('input[type="checkbox"]').click(function(e){
     var value = e.target.checked;
     if (value) {
       var newBenefitFormEl = $(this).parents('.benefit-kind').children('.new-benefit-form'),
           benefitListEl = $(this).parents('.benefit-kind').find('.benefits-list');
-      newBenefitFormEl.clone(true)
+      if (newBenefitFormEl.find('select').data('selectric')) newBenefitFormEl.find('select').selectric('destroy');
+      var clonedForm = newBenefitFormEl.clone(true, true)
         .removeClass('hidden')
         .appendTo(benefitListEl);
       startEditingBenefit();
-      $(newBenefitFormEl).find("#financial_assistance_benefit_start_on").datepicker();
-      $(newBenefitFormEl).find("#financial_assistance_benefit_end_on").datepicker();
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker();
     } else {
       // prompt to delete all these benefits
     }
+  });
+
+  /* Add more benefits */
+  $(document).on('click', "#add_new_insurance_kind", function(e){
+      $(this).addClass("hidden");
+      var newBenefitFormEl = $(this).closest('.benefit-kind').children('.new-benefit-form'),
+        benefitListEl = $(this).closest('.benefit-kind').find('.benefits-list');
+      if (newBenefitFormEl.find('select').data('selectric')) newBenefitFormEl.find('select').selectric('destroy');
+      var clonedForm = newBenefitFormEl.clone(true, true)
+        .removeClass('hidden')
+        .appendTo(benefitListEl);
+        startEditingBenefit();
+      $(clonedForm).find('select').selectric();
+      $(clonedForm).find(".datepicker-js").datepicker();
   });
 
   /* edit existing benefits */
@@ -40,6 +60,9 @@ $(document).ready(function() {
     benefitEl.find('.benefit-show').addClass('hidden');
     benefitEl.find('.edit-benefit-form').removeClass('hidden');
     startEditingBenefit();
+
+    $(clonedForm).find('select').selectric();
+    $(clonedForm).find(".datepicker-js").datepicker();
   });
 
 
@@ -72,16 +95,20 @@ $(document).ready(function() {
 
     var benefitEl = $(this).parents('.benefit');
     if (benefitEl.length) {
+      $(this).closest('.benefit-kind').find('a#add_new_insurance_kind').removeClass("hidden");
       benefitEl.find('.benefit-show').removeClass('hidden');
       benefitEl.find('.edit-benefit-form').addClass('hidden');
     } else {
-      if (!$(this).parents('.benefits-list > div.benefit').length) {
+      if (!$(this).parents('.benefits-list').find('div.benefit').length) {
         $(this).parents('.benefit-kind').find('input[type="checkbox"]').prop('checked', false);
+        $(this).closest('.benefit-kind').find('a#add_new_insurance_kind').addClass("hidden");
+      }else{
+        $(this).closest('.benefit-kind').find('a#add_new_insurance_kind').removeClass("hidden");
       }
       $(this).parents('.new-benefit-form').remove();
       $(this).parents('.edit-benefit-form').remove();
     }
-  });
+  });   
 
 /* Condtional Display Enrolled Benefit Questions */
 

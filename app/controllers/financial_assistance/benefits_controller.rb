@@ -52,9 +52,11 @@ class FinancialAssistance::BenefitsController < ApplicationController
 
   def create
     @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
+    @benefit_kind = @benefit.kind
+    @benefit_insurance_kind = @benefit.insurance_kind
 
     if @benefit.save
-      render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+      render :create, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
     else
       render head: 'ok'
     end
@@ -70,8 +72,10 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def destroy
-    benefit = @applicant.benefits.find(params[:id])
-    benefit.destroy!
+    @benefit = @applicant.benefits.find(params[:id])
+    @benefit_kind = @benefit.kind
+    @benefit_insurance_kind = @benefit.insurance_kind
+    @benefit.destroy!
 
     render head: 'ok'
   end
