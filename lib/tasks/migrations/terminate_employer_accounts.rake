@@ -135,7 +135,7 @@ def send_notice_to_employees(org)
   puts "Notification generated for employee"
   org.employer_profile.census_employees.active.each do |ce|
     begin
-      ShopNoticesNotifierJob.perform(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
     rescue Exception => e
       (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
     end
