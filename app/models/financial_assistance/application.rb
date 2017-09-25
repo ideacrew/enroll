@@ -410,7 +410,7 @@ class FinancialAssistance::Application
             :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')})
     end
 
-    if has_eligibility_response && determination_http_status_code == 422
+    if has_eligibility_response && determination_http_status_code == 422 && determination_error_message == "Failed to validate Eligibility Determination response XML"
       message = "Invalid schema eligibility determination response provided"
       notify("acapi.info.events.eligibility_determination.rejected",
           {:correlation_id => SecureRandom.uuid.gsub("-",""),
