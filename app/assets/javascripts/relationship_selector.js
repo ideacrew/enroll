@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(document).on("change", ".selected_relationship", function () {
+    $("body").on("change", ".selected_relationship", function () {
         // console.log($(this).val());
         // console.log($(this).data("predecessor"));
         // console.log($(this).data("successor"));
@@ -7,6 +7,7 @@ $(document).ready(function () {
             url: "/insured/family_relationships",
             method: "POST",
             dataType: 'script',
+            cache: false,
             data: {
                 "kind": $(this).val(),
                 "predecessor_id": $(this).data("predecessor"),
@@ -14,4 +15,4 @@ $(document).ready(function () {
             }
         })
     });
-});
+})
