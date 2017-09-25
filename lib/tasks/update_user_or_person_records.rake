@@ -51,6 +51,10 @@ require File.join(Rails.root, "app", "data_migrations", "update_user_or_person_r
 # To update work email address on person by finding person through user oim_id & say "yes" oR "y" to create a new one
 # RAILS_ENV=production bundle exec rake migrations:update_user_or_person_records action="update_person_work_email" person_email="my_home1198@test.com" find_user_by="username" user_name="valid_oim_id"
 
+
+# To update DOB on person
+# RAILS_ENV=production bundle exec rake migrations:update_user_or_person_records action="person_dob" dob="dd/mm/yyyy" hbx_id="2394023"
+
 namespace :migrations do
   desc "destroying headless user records & updating user name, oim id on user & also updating email on person"
   UpdateUserOrPersonRecords.define_task :update_user_or_person_records => :environment

@@ -11,6 +11,8 @@ describe ChangeEnrollmentDetails do
       term_enrollment.terminated_on
     when "termination_submitted_on"
       term_enrollment.termination_submitted_on
+    when "termination_submitted_on"
+      term_enrollment.generate_hbx_signature
     end
   end
 
@@ -27,10 +29,12 @@ describe ChangeEnrollmentDetails do
 
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
+    let(:hbx_enrollment2) { FactoryGirl.create(:hbx_enrollment, household: family.active_household)}
     let(:term_enrollment) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
+    let(:term_enrollment2) { FactoryGirl.create(:hbx_enrollment, :terminated, household: family.active_household)}
 
     before(:each) do
-      allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+      allow(ENV).to receive(:[]).with("hbx_id").and_return("#{hbx_enrollment.hbx_id},#{hbx_enrollment2.hbx_id}")
       allow(ENV).to receive(:[]).with("new_effective_on").and_return(hbx_enrollment.effective_on + 1.month)
       allow(ENV).to receive(:[]).with("action").and_return "change_effective_date"
     end
@@ -39,7 +43,9 @@ describe ChangeEnrollmentDetails do
       effective_on = hbx_enrollment.effective_on
       subject.migrate
       hbx_enrollment.reload
+      hbx_enrollment2.reload
       expect(hbx_enrollment.effective_on).to eq effective_on + 1.month
+      expect(hbx_enrollment2.effective_on).to eq effective_on + 1.month
     end
 
     it "should move enrollment to enrolled status from canceled status" do
@@ -47,21 +53,25 @@ describe ChangeEnrollmentDetails do
       hbx_enrollment.cancel_coverage!
       subject.migrate
       hbx_enrollment.reload
+      hbx_enrollment2.reload
       expect(hbx_enrollment.aasm_state).to eq "coverage_enrolled"
+      expect(hbx_enrollment2.aasm_state).to eq "coverage_enrolled"
     end
 
     context "revert enrollment termination" do
 
       before do
-        allow(ENV).to receive(:[]).with("hbx_id").and_return(term_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("hbx_id").and_return("#{term_enrollment.hbx_id},#{term_enrollment2.hbx_id}")
         allow(ENV).to receive(:[]).with("action").and_return "revert_termination"
         subject.migrate
         term_enrollment.reload
+        term_enrollment2.reload
       end
 
       shared_examples_for "revert termination" do |val, result|
         it "should equals #{result}" do
           expect(actual_result(term_enrollment, val)).to eq result
+          expect(actual_result(term_enrollment2, val)).to eq result
         end
       end
 
@@ -101,6 +111,20 @@ describe ChangeEnrollmentDetails do
 
       it "should cancel the enrollment" do
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+    end
+
+    context "generate_hbx_signature" do
+      before do
+        allow(ENV).to receive(:[]).with("hbx_id").and_return(hbx_enrollment.hbx_id)
+        allow(ENV).to receive(:[]).with("action").and_return "generate_hbx_signature"
+        hbx_enrollment.update_attribute(:enrollment_signature, "")
+      end
+
+      it "should have a enrollment_signature" do
+        subject.migrate
+        hbx_enrollment.reload
+        expect(hbx_enrollment.enrollment_signature.present?).to be_truthy
       end
     end
   end
