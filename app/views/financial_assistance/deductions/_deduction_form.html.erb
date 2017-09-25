@@ -5,9 +5,10 @@
       <div class="col-md-3">
         <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 fa-select">
         <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
-        <%= f.select(:frequency_kind, options_for_select(FinancialAssistance::Deduction::FREQUENCY_KINDS, selected: deduction.frequency_kind), {include_blank: "SELECT FREQUENCY"}, {:disabled => false})  %>
+        <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
+        <%= f.select(:frequency_kind, options_for_select(FinancialAssistance::Deduction::FREQUENCY_KINDS, selected: deduction.frequency_kind), {include_blank: "Choose"}, {:disabled => false})  %>
       </div>
       <div class="col-md-3">
         <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{deduction.id}", class: "datepicker-js floatlabel" %>
