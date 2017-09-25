@@ -15,15 +15,16 @@ describe ChangePersonFamilyMemberLinkage, dbclean: :after_each do
     end
   end
 
-  before(:each) do 
-    allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-    allow(ENV).to receive(:[]).with("family_member_id").and_return(family_2.primary_applicant._id)
-  end
-
   describe "changing the person to family member linkage" do
-    subject.migrate
-    family_member.reload
-    expect(family_member.person_id).to eq person.id
+    before(:each) do 
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+      allow(ENV).to receive(:[]).with("family_member_id").and_return(family_2.primary_applicant._id)
+    end
+
+    it 'should change the linkage' do 
+      subject.migrate
+      family_member.reload
+      expect(family_member.person_id).to eq person.id
+    end
   end
 end
-
