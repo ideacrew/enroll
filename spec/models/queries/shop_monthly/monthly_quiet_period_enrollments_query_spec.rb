@@ -12,6 +12,8 @@ describe "a monthly inital employer quiet period enrollments query" do
          - One health enrollment during Quiet Period(Enrollment 4)
          - One dental enrollment during Quiet Period(Enrollment 5)
          - Then another health enrollment outside Quiet Period(Enrollment 6)
+       - employee D has purchased:
+         - One health enrollment early hours of 29th UTC time
     " do
 
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
@@ -34,7 +36,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:initial_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_assignment, 3, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
+        FactoryGirl.create_list(:census_employee_with_active_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
           benefit_group: plan_year.benefit_groups.first)
       }
 
@@ -75,9 +77,17 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let!(:enrollment_6) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date.next_day)
+        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date + 2.days)
       }
 
+      let(:employee_D) {
+        ce = initial_employees[3]
+        create_person(ce, initial_employer)
+      }
+
+      let!(:enrollment_7) {
+        create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, submitted_at: quiet_period_end_date.end_of_day + 1.hour)
+      }
    
       it "does not include enrollment 1" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
@@ -107,6 +117,11 @@ describe "a monthly inital employer quiet period enrollments query" do
       it "does not include enrollment 6" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).not_to include(enrollment_6.hbx_id)
+      end
+
+      it "includes enrollment 7" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_7.hbx_id)
       end
     end
 
@@ -250,6 +265,17 @@ describe "a monthly inital employer quiet period enrollments query" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, term_statuses)
         expect(result).not_to include(enrollment_9.hbx_id)
       end
+    end
+
+    describe '.queit_period' do
+      let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
+
+      it 'should be in exchange local time' do 
+        qs = Queries::ShopMonthlyEnrollments.new([], effective_on)
+
+        expect(qs.quiet_period.begin.in_time_zone(TimeKeeper.exchange_zone).strftime("%H:%M")).to eq ("00:00")
+        expect(qs.quiet_period.end.in_time_zone(TimeKeeper.exchange_zone).strftime("%H:%M")).to eq ("00:00")        
+      end 
     end
   end
 
