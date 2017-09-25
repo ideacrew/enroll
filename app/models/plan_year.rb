@@ -979,7 +979,9 @@ class PlanYear
   end
 
   def deny_enrollment
-    employer_profile.enrollment_denied!
+    if employer_profile.may_enrollment_denied?
+      employer_profile.enrollment_denied!
+    end
   end
 
   def is_eligible_to_match_census_employees?
