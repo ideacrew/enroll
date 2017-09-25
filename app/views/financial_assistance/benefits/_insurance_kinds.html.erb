@@ -15,10 +15,13 @@
 <% insurance_kinds.each do |insurance_kind| %>
 <div class="benefit-kind">
   <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
-    <div class="col-md-12 benefits-check">
+    <div class="col-md-10 benefits-check">
       <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp
       <%= insurance_kind.gsub('_',' ').capitalize %>
     </div>
+    <div class="col-md-2 add-more-link-<%=insurance_kind%>">
+      <%= link_to "Add More", "javascript:void(0);", :id => "add_new_insurance_kind", :class => "#{'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? }" %>
+     </div>
   </div>
 
   <div class="benefits-list">
@@ -33,7 +36,7 @@
     <% end %>
   </div>
                           
-  <div class='new-benefit-form hidden'>
+  <div class='new-benefit-form hidden <%= insurance_kind %>'>
     <% if insurance_kind == 'employer_sponsored_insurance'%>
       <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
     <% else %>

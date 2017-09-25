@@ -1,6 +1,3 @@
-stopEditingBenefit();
-
-$('#<%= dom_id @benefit %>').html("<%= escape_javascript render(partial: 'esi_benefit', locals: { benefit: @benefit, insurance_kind: insurance_kind, kind: kind }) %>");
-$('#<%= dom_id @benefit %>').html("<%= escape_javascript render(partial: 'non_esi_benefit', locals: { benefit: @benefit, insurance_kind: insurance_kind, kind: kind }) %>");
-
-window.location.reload();
+<%= render partial: 'replace', locals: { id: "##{dom_id(@benefit)}" } %>
+$('a.esi_benefit-edit').removeClass('disabled')
+$('a.non_esi_benefit-edit').removeClass('disabled');;
