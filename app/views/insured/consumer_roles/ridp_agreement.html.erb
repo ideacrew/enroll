@@ -37,17 +37,17 @@
         <%= "Please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number} for more information" %>
       </div>
       <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
-        <div class="col-lg-12 radio skinned-form-controls skinned-form-controls-mac">
+        <div class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "agree", class: "required floatlabel"  %>
           <label for="agreement_agree"><span style="white-space: nowrap;">I agree</span></label>
         </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-12 radio skinned-form-controls skinned-form-controls-mac">
+
+        <div class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac no-padding">
           <%= radio_button_tag :agreement, "disagree", class: "required floatlabel"  %>
           <label for="agreement_disagree"><span style="white-space: nowrap;">I Disagree</span></label>
         </div>
       </div>
+
       <div class="row row-form-wrapper no-buffer">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 aut_cons_text " style="margin-top: 10px">
           <p>
