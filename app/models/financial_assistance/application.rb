@@ -48,6 +48,7 @@ class FinancialAssistance::Application
   field :aasm_state, type: String, default: :draft
   field :submitted_at, type: DateTime
   field :effective_date, type: DateTime # Date they want coverage
+  field :timeout_response_last_submitted_at, type: DateTime
 
   field :assistance_year, type: Integer
 
@@ -106,6 +107,7 @@ class FinancialAssistance::Application
 
 
   scope :submitted, ->{ any_in(aasm_state: SUBMITTED_STATUS) }
+  scope :determined, ->{ any_in(aasm_state: "determined") }
 
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
   alias_method :is_renewal_authorized?, :is_renewal_authorized
@@ -201,7 +203,7 @@ class FinancialAssistance::Application
     end
 
     event :determine, :after => :record_transition do
-      transitions from: :submitted, to: :determined, :after => :trigger_eligibilility_notice
+      transitions from: :submitted, to: :determined, :after => [:trigger_eligibilility_notice, :verification_update_for_applicants]
     end
 
   end
@@ -451,7 +453,7 @@ class FinancialAssistance::Application
 
   def active_applicants
     applicants.where(:is_active => true)
-  end 
+  end
 
   def build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household)
     verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
@@ -585,6 +587,44 @@ class FinancialAssistance::Application
 
   def success_status_codes?(payload_http_status_code)
     [200, 203].include?(payload_http_status_code)
+  end
+
+  def check_verification_response
+    if !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.date_of_record.prev_day > submitted_at)
+      if timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.date_of_record.prev_day > timeout_response_last_submitted_at))
+        self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.date_of_record)
+        active_applicants.each do |applicant|
+          notify("acapi.info.events.verification.rejected",
+                    {:correlation_id => SecureRandom.uuid.gsub("-",""),
+                      :body => JSON.dump({error: "Timed-out waiting for verification response",
+                                          applicant_first_name: applicant.person.first_name,
+                                          applicant_last_name: applicant.person.last_name,
+                                          applicant_id: applicant.person.hbx_id}),
+                      :assistance_application_id => self._id.to_s,
+                      :family_id => self.family_id.to_s,
+                      :haven_application_id => haven_app_id,
+                      :haven_ic_id => haven_ic_id,
+                      :reject_status => 504,
+                      :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')}) if !applicant.has_verification_response
+        end
+      end
+    end
+  end
+
+  def has_all_verified_applicants?
+    !active_applicants.map(&:has_verification_response).include?(false)
+  end
+
+  def has_atleast_one_medicaid_applicant?
+    active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
+  end
+
+  def has_all_uqhp_applicants?
+    !active_applicants.map(&:is_without_assistance).include?(false)
+  end
+
+  def has_atleast_one_assisted_applicant_no_medicaid_applicant?
+    active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
   end
 
 private
@@ -737,11 +777,30 @@ private
     )
   end
 
+  def verification_update_for_applicants
+    if aasm_state == "determined"
+      if has_atleast_one_medicaid_applicant?
+        update_verifications_of_applicants("external_source")
+      elsif has_all_uqhp_applicants?
+        update_verifications_of_applicants("not_required")
+      elsif has_atleast_one_assisted_applicant_no_medicaid_applicant?
+        update_verifications_of_applicants("pending")
+      end
+    end
+  end
+
+  def update_verifications_of_applicants(status)
+    active_applicants.each do |applicant|
+      applicant.assisted_verification.each { |verification| verification.update_attributes(status: status) }
+    end
+  end
+
   def set_submit
     set_submission_date
     set_assistance_year
     set_effective_date
     create_tax_households
+    create_verification_documents
   end
 
   def unset_submit
@@ -749,6 +808,7 @@ private
     unset_assistance_year
     unset_effective_date
     delete_tax_households
+    delete_verification_documents
   end
 
   def create_tax_households
@@ -786,5 +846,23 @@ private
   def delete_tax_households
     tax_households.destroy_all
   end
+
+  def create_verification_documents
+    applicants.each do |applicant|
+      income_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "Income")
+      mec_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "MEC")
+
+      applicant.person.consumer_role.assisted_verification_documents.create!(application_id: self.id, applicant_id: applicant.id,
+        assisted_verification_id: income_assisted_verification.id, kind: income_assisted_verification.verification_type)
+      applicant.person.consumer_role.assisted_verification_documents.create!(application_id: self.id, applicant_id: applicant.id,
+        assisted_verification_id: mec_assisted_verification.id, kind: mec_assisted_verification.verification_type)
+    end
+  end
+
+  def delete_verification_documents
+    applicants.each do |applicant|
+      applicant.assisted_verifications.destroy_all
+      applicant.person.consumer_role.assisted_verification_documents.destroy_all
+    end
+  end
 end
-# eligibility_determinations.build( benchmark_plan_id: benchmark_plan_id, max_aptc: verified_eligibility_determination.maximum_aptc, csr_percent_as_integer: verified_eligibility_determination.csr_percent, csr_eligibility_kind: "csr_" + verified_eligibility_determination.csr_percent.to_s, determined_on: verified_eligibility_determination.determination_date, aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income, aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit, csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit, source: source ).save!

@@ -7,6 +7,6 @@ module Parsers::Xml::Cv
     tag 'individual'
     element :individual_id, String, tag: 'id/n1:id'
     has_one :person, Parsers::Xml::Cv::HavenPersonParser, tag: 'person', namespace: 'n1'
-    # has_one :person_demographics, Parsers::Xml::Cv::HavenPersonDemographicsParser, tag: 'person_demographics'
+    has_one :person_demographics, Parsers::Xml::Cv::HavenPersonDemographicsParser, tag: 'person_demographics'
   end
 end
