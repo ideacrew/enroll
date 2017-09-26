@@ -628,30 +628,32 @@
         <th>%</th>
       </tr>
       <tr>
+        <% @shop_covered_lives_carrier.each do |carrier| %>
         <td class="texLef">CareFirst</td>
-        <td>42,139</td>
-        <td>82%</td>
+        <td><%=carrier.aetna_num%></td>
+        <td><%=carrier.aetna_pct%></td>
       </tr>
       <tr>
         <td class="texLef">United</td>
-        <td>6,721</td>
-        <td>13%</td>
+        <td><%=carrier.cf_num%></td>
+        <td><%=carrier.cf_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Kaiser</td>
-        <td>1,993</td>
-        <td>4%</td>
+        <td><%=carrier.kp_num%></td>
+        <td><%=carrier.kp_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Aetna</td>
-        <td>360</td>
-        <td>1%</td>
+        <td><%=carrier.united_num%></td>
+        <td><%=carrier.united_pct%></td>
       </tr>
 
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
       <tr>
         <th class="texLef">Metal</th>

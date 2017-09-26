@@ -12,6 +12,7 @@ class ShopWidgetController < ApplicationController
     @age_grps=ShopWidget::ShopAgeGroups.all
     @shop_genders=ShopWidget::ShopGenders.all
     @employee_status=ShopWidget::EmployeeStatus.all
+    @shop_covered_lives_carrier=ShopWidget::ShopCoveredLivesCarrier.all
   end
 
   def moreinfo
