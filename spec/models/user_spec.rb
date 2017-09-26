@@ -377,6 +377,28 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
     end
   end
 
+  describe "#handle_headless_records", dbclean: :after_each do
+    let(:user) { User.new(**valid_params) }
+    let!(:headless_user_with_oim_id) { FactoryGirl.create(:user, oim_id: user.oim_id)}
+    let!(:headless_user_with_email) { FactoryGirl.create(:user, email: user.email)}
+
+    it "should destroy the headless user record which matches with the email" do
+      user.handle_headless_records
+      expect(User.where(email: user.email).first).to eq nil
+    end
+
+    it "should destroy the headless user record which matches with the oim_id" do
+      user.handle_headless_records
+      expect(User.where(email: user.email).first).to eq nil
+    end
+
+    it "should return nil if no headless records found" do
+      headless_user_with_oim_id.update_attribute(:oim_id, "some_other_stuff")
+      headless_user_with_email.update_attribute(:email, "some_other_stuff")
+      expect(user.handle_headless_records).to eq []
+    end
+  end
+
   describe "can_change_broker?", dbclean: :after_each do
     let(:person) { FactoryGirl.create(:person) }
     let(:user) { FactoryGirl.create(:user, person: person) }

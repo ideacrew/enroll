@@ -4,6 +4,7 @@ require 'spec_helper'
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
+require 'kaminari'
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -66,8 +67,3 @@ RSpec.configure do |config|
   config.include Capybara::DSL
 
 end
-
-# These are included here because map/reduce flips out if the collections don't exist
-# This interacts strangely with db cleaner in some circumstances (i.e. multiple dbs)
-Person.create_indexes
-Family.create_indexes

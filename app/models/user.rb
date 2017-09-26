@@ -354,6 +354,15 @@ class User
     where(authentication_token: token).first
   end
 
+  def handle_headless_records
+    headless_with_email = User.where(email: /^#{Regexp.quote(email)}$/i)
+    headless_with_oim_id = User.where(oim_id: /^#{Regexp.quote(oim_id)}$/i)
+    headless_users = headless_with_email + headless_with_oim_id
+    headless_users.each do |headless|
+      headless.destroy if !headless.person.present?
+    end
+  end
+
   class << self
 
     def by_email(email)
