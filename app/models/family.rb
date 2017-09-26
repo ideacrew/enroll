@@ -1012,6 +1012,10 @@ class Family
     end
   end
 
+  def person_has_an_active_enrollment?(person)
+    active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
+  end
+
 private
   def build_household
     if households.size == 0

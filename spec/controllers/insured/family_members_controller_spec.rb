@@ -221,7 +221,8 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
+    let(:family_member) { double }
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }

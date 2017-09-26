@@ -603,6 +603,23 @@ context "Verification process and notices" do
       end
     end
 
+    context "trigger_residency" do
+      [nil, "111111111"].each do |ssn|
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :sci_verified, "trigger_residency!"
+        it "updates residency status with callback" do
+          if consumer.may_trigger_residency?
+            consumer.is_state_resident = true
+            consumer.trigger_residency!
+            expect(consumer.is_state_resident).to be nil
+          end
+        end
+      end
+    end
+
     context "revert" do
       before :each do
         consumer.import! verification_attr
@@ -632,6 +649,7 @@ context "Verification process and notices" do
     all_fields = FactoryGirl.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
     mask_hash = all_fields.map{|v| [v, (sensitive_fields.include?(v) ? "call" : "don't call")]}.to_h
     subject { ConsumerRole.new(:person => person) }
+    let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
     shared_examples_for "reping the hub fo critical changes" do |field, call, params|
       it "#{call} the hub if #{field} record was changed" do
         allow(Person).to receive(:person_has_an_active_enrollment?).and_return true
@@ -640,7 +658,7 @@ context "Verification process and notices" do
         else
           expect(subject).to_not receive(:redetermine_verification!)
         end
-        subject.check_for_critical_changes(params)
+        subject.check_for_critical_changes(params, family)
       end
     end
     mask_hash.each do |field, action|
@@ -722,6 +740,79 @@ describe "#build_nested_models_for_person" do
   it "should get emails" do
     Email::KINDS.each do |kind|
       expect(person.emails.map(&:kind)).to include kind
+    end
+  end
+end
+
+describe "can_trigger_residency?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when person has age > 19 & has an active coverage" do
+
+    before :each do
+      allow(family).to receive(:person_has_an_active_enrollment?).and_return true
+    end
+
+    it "should return true if there is a change in address from non-dc to dc" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if there is a change in address from dc to non-dc" do
+      person.update_attributes(no_dc_address: false)
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+    end
+
+    it "should return false if there is a change in address from dc to dc" do
+      person.update_attributes(no_dc_address: false)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+
+    it "should return false if there is a change in address from non-dc to non-dc" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+    end
+  end
+
+  context "when has an active coverage & address change from non-dc to dc", dbclean: :after_each do
+
+    before do
+      person.update_attributes(no_dc_address: true)
+      allow(family).to receive(:person_has_an_active_enrollment?).and_return true
+    end
+
+    it "should return true if age > 18" do
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if age = 18" do
+      person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+
+    it "should return false if age < 18" do
+      consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+  end
+
+  context "when age > 18 & address change from non-dc to dc" do
+    before do
+      person.update_attributes(no_dc_address: true)
+      allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+    end
+
+    it "should return true if has an active coverage" do
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if no active coverage" do
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
 end
