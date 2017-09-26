@@ -145,34 +145,37 @@
     </thead>
     <tbody>
       <tr>
+        <% @shop_employees.each do |employee| %>
         <td class="texLef">1 - 9</td>
-        <td>2,895</td>
-        <td>71%</td>
+        <td><%= employee.num_1_9%></td>
+        <td><%= employee.pct_1_9%></td>
       </tr>
       <tr>
         <td class="texLef">10 - 24</td>
-        <td>878</td>
-        <td>22%</td>
+        <td><%= employee.num_10_24%></td>
+        <td><%= employee.pct_10_24%></td>
       </tr>
       <tr>
         <td class="texLef">25 - 50</td>
-        <td>298</td>
-        <td>7%</td>
+        <td><%= employee.num_25_50%></td>
+        <td><%= employee.pct_25_50%></td>
+      </tr>
       </tr>
       <tr>
         <td class="texLef">51 - 100</td>
-        <td>3</td>
-        <td>0%</td>
+        <td><%= employee.num_51_100%></td>
+        <td><%= employee.pct_51_100%></td>
       </tr>
       <tr>
         <td class="texLef">100+</td>
-        <td>2</td>
-        <td>0%</td>
+        <td><%= employee.num_100%></td>
+        <td><%= employee.pct_100%></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 

@@ -7,6 +7,7 @@ class ShopWidgetController < ApplicationController
     @employer_contribution=ShopWidget::EmployerContributions.all
     @new_hire_benefits=ShopWidget::ShopBenefits.all
     @census_employees=ShopWidget::ShopCensusEmployees.all
+    @shop_employees=ShopWidget::ShopEmployees.all
   end
 
   def moreinfo
