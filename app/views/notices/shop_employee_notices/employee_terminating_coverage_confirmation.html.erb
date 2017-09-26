@@ -5,7 +5,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td>Email notification sent to:<%= notice.employee_email %></td>
+      <td>Email notification sent to:<%= notice.primary_email %></td>
     </tr>
   </tbody>
 </table>
@@ -29,7 +29,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice confirms your election to terminate your employer-sponsored dental insurance with #{notice.employer_name}.
+  content: "This notice confirms your election to terminate your employer-sponsored #{notice.enrollment.coverage_kind} insurance with #{notice.employer_name}.
     Your coverage into #{notice.plan.plan_name} for you and any covered dependents will end on #{notice.enrollment.terminated_on}. ", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {

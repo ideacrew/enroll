@@ -547,11 +547,7 @@ module ApplicationHelper
 
   def notify_employee_confirming_coverage_termination(hbx_enrollment)
      if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
-       if hbx_enrollment.coverage_kind == "health"
-         ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_health_coverage_termination")
-       elsif hbx_enrollment.coverage_kind == "dental"
-         ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_dental_coverage_termination")
-       end
+       ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
      end
   end
 

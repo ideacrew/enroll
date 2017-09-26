@@ -395,7 +395,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe ".notify_employee_confirming_coverage_termination" do
-    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
+    let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0, coverage_kind: "health") }
     let(:census_employee) {FactoryGirl.create(:census_employee)}
 
     before :each do
@@ -406,24 +406,14 @@ RSpec.describe ApplicationHelper, :type => :helper do
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
     end
 
-    it "should enqueue a notify_employee_confirming_health_coverage_termination job when coverage_kind is health" do
+    it "should enqueue a notify_employee_confirming_coverage_termination job" do
       allow(enrollment).to receive(:coverage_kind).and_return("health")
       allow(enrollment).to receive(:enrollment_kind).and_return('health')
       helper.notify_employee_confirming_coverage_termination(enrollment)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_health_coverage_termination']
-    end
-
-    it "should enqueue a notify_employee_confirming_dental_coverage_termination job when coverage_kind is dental" do
-      allow(enrollment).to receive(:coverage_kind).and_return("dental")
-      allow(enrollment).to receive(:enrollment_kind).and_return('dental')
-      helper.notify_employee_confirming_coverage_termination(enrollment)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_dental_coverage_termination']
-    end
+      expect(queued_job[:args]).to eq ["8728346", 'notify_employee_confirming_coverage_termination']
+    end                                            
   end
 end
