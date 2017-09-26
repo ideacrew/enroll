@@ -5,17 +5,6 @@ module Importers::Mhc
       super(opts)
     end
 
-    def employer_attributes
-      {
-        :broker_agency_accounts => assign_brokers,
-        :general_agency_accounts => assign_general_agencies,
-        :entity_kind => "c_corporation",
-        :profile_source => "conversion",
-        :sic_code => sic_code,
-        :registered_on => registered_on
-      }
-    end
-  
     def save
       if valid?
         new_organization = Organization.where(:fein => fein).first
@@ -42,6 +31,17 @@ module Importers::Mhc
         propagate_errors(new_organization)
         return save_result
       end
+    end
+
+    def employer_attributes
+      {
+        :broker_agency_accounts => assign_brokers,
+        :general_agency_accounts => assign_general_agencies,
+        :entity_kind => "c_corporation",
+        :profile_source => "conversion",
+        :sic_code => sic_code,
+        :registered_on => registered_on
+      }
     end
   end
 end

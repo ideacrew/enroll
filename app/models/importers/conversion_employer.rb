@@ -126,9 +126,8 @@ module Importers
       end
     end
 
-    def map_office_locations
-      locations = []
-      main_address = Address.new(
+    def build_primary_address
+      Address.new(
         :kind => "work",
         :address_1 => primary_location_address_1,
         :address_2 => primary_location_address_2,
@@ -136,8 +135,11 @@ module Importers
         :state => primary_location_state,
         :county => primary_location_county,
         :zip => primary_location_zip
-      )
-      mailing_address = Address.new(
+        )
+    end
+
+    def build_mailing_address
+      Address.new(
         :kind => "mailing",
         :address_1 => mailing_location_address_1,
         :address_2 => mailing_location_address_2,
@@ -145,6 +147,12 @@ module Importers
         :state => mailing_location_state,
         :zip => mailing_location_zip
       )
+    end
+
+    def map_office_locations
+      locations = []
+      main_address = build_primary_address
+      mailing_address = build_mailing_address
       main_location = OfficeLocation.new({
         :address => main_address,
         :phone => Phone.new({
