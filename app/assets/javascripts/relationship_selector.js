@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("body").on("change", ".selected_relationship", function () {
+    $("#family-matrix").on("change", ".selected_relationship", function () {
         // console.log($(this).val());
         // console.log($(this).data("predecessor"));
         // console.log($(this).data("successor"));
