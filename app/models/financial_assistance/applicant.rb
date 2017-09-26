@@ -142,7 +142,7 @@ class FinancialAssistance::Applicant
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
   validate :presence_of_attr_step_1, on: :step_1
-  validate :presence_of_attr_step_2, on: :step_2
+
   validate :presence_of_attr_other_qns, on: :other_qns
   validates :validate_applicant_information, presence: true, on: :submission
 
@@ -156,9 +156,6 @@ class FinancialAssistance::Applicant
   alias_method :is_medicaid_chip_eligible?, :is_medicaid_chip_eligible
   alias_method :is_medicare_eligible?, :is_medicare_eligible
   alias_method :is_joint_tax_filing?, :is_joint_tax_filing
-
-  after_update :delete_embedded_documents_on_driver_qns_update
-  after_update :create_embedded_documents_on_driver_qns_update
 
   def is_ia_eligible?
     is_ia_eligible
@@ -381,91 +378,12 @@ class FinancialAssistance::Applicant
     has_job_income || has_self_employment_income || has_other_income
   end
 
-
-  def delete_embedded_documents_on_driver_qns_update
-    if !has_job_income
-      incomes.jobs.destroy_all
-    end
-
-    if !has_self_employment_income
-      incomes.self_employment.destroy_all
-    end
-
-    if !has_other_income
-      incomes.other.destroy_all
-    end
-
-    if !has_enrolled_health_coverage
-      benefits.enrolled.destroy_all
-    end
-
-    if !has_eligible_health_coverage
-      benefits.eligible.destroy_all
-    end
-
-    if !has_deductions
-      deductions.destroy_all
-    end
-  end
-
-  def create_embedded_documents_on_driver_qns_update
-    if has_job_income
-      incomes.find_or_create_by(kind: FinancialAssistance::Income::JOB_INCOME_TYPE_KIND)
-    end
-
-    if has_self_employment_income
-      incomes.find_or_create_by(kind: FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND)
-    end
-
-    if has_other_income
-      incomes.create(kind: nil) if incomes.other.blank?
-    end
-
-    if has_enrolled_health_coverage
-      benefits.find_or_create_by(kind: "is_enrolled") if benefits.where(kind: "is_enrolled").blank?
-    end
-
-    if has_eligible_health_coverage
-      benefits.find_or_create_by(kind: "is_eligible") if benefits.where(kind: "is_eligible").blank?
-    end
-
-    if has_deductions
-      deductions.find_or_create_by(kind: nil) if deductions.blank?
-    end
-  end
-
 private
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
   end
 
   def presence_of_attr_step_1
-    if has_job_income.nil?
-      errors.add(:has_job_income, "' Does this person have income from an employer?' can't be blank")
-    end
-
-    if has_self_employment_income.nil?
-      errors.add(:has_self_employment_income, "' Is this person self employed?' can't be blank")
-    end
-
-    if has_other_income.nil?
-      errors.add(:has_other_income, "' Does this person expect to have other types of income in 2017?' can't be blank")
-    end
-
-    if has_deductions.nil?
-      errors.add(:has_deductions, "' Does this person expect to have adjustments to income in 2017?' can't be blank")
-    end
-
-    if has_enrolled_health_coverage.nil?
-      errors.add(:has_enrolled_health_coverage, "' Is this person currently enrolled in health coverage?' can't be blank")
-    end
-
-    if has_eligible_health_coverage.nil?
-      errors.add(:has_eligible_health_coverage, "' Does this person currently have access to other health coverage, including through another person?' can't be blank")
-    end
-  end
-
-  def presence_of_attr_step_2
     if is_required_to_file_taxes && is_joint_tax_filing.nil? && has_spouse
       errors.add(:is_joint_tax_filing, "' Will this person be filling jointly?' can't be blank")
     end

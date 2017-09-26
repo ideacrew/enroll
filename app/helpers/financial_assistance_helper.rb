@@ -185,4 +185,18 @@ module FinancialAssistanceHelper
       yield f
     end
   end
+
+  def redirect_path_after_applicant_update(request_referrer_url, application, applicant)
+    url_key = request_referrer_url.split('/').last
+    case url_key
+    when 'incomes'
+      other_financial_assistance_application_applicant_incomes_path(application, applicant)
+    when 'other'
+      financial_assistance_application_applicant_deductions_path(application, applicant)
+    when 'deductions'
+      financial_assistance_application_applicant_benefits_path(application, applicant)
+    when 'benefits'
+      other_questions_financial_assistance_application_applicant_path(application, applicant)
+    end
+  end
 end
