@@ -449,19 +449,21 @@
     <thead>
     <tbody>
       <tr>
+        <% @employee_status.each do |status| %>
         <td class="texLef">Employee</td>
-        <td>30,798</td>
-        <td>62%</td>
+        <td><%= status.status_empl_num %></td>
+        <td><%= (status.status_empl_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td>20,445</td>
-        <td>38%</td>
+        <td><%= status.status_dep_num %></td>
+        <td><%= (status.status_dep_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 
@@ -477,37 +479,37 @@
         <% @family_members.each do |family| %>
         <td class="texLef">1-Member</td>
         <td><%= family.mem1_num %></td>
-        <td><%= family.mem1_pct %></td>
+        <td><%= (family.mem1_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">2-Members</td>
         <td><%= family.mem2_num %></td>
-        <td><%= family.mem2_pct %></td>
+        <td><%= (family.mem2_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">3-Members</td>
         <td><%= family.mem3_num %></td>
-        <td><%= family.mem3_pct %></td>
+        <td><%= (family.mem3_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">4-Members</td>
         <td><%= family.mem4_num %></td>
-        <td><%= family.mem4_pct %></td>
+        <td><%= (family.mem4_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">5-Members</td>
         <td><%= family.mem5_num %></td>
-        <td><%= family.mem5_pct %></td>
+        <td><%= (family.mem5_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">6-Members</td>
         <td><%= family.mem6_num %></td>
-        <td><%= family.mem6_pct %></td>
+        <td><%= (family.mem6_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td class="texLef">7+ Members</td>
        <td><%= family.mem7_num %></td>
-       <td><%= family.mem7_pct %></td>
+       <td><%= (family.mem7_pct.to_f * 100).to_i %>%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -594,15 +596,17 @@
     </thead>
     <tbody>
       <tr>
+        <% @shop_genders.each do |gender| %>
         <td class="texLef">Male</td>
-        <td>23,472</td>
-        <td>46%</td>
+        <td><%= gender.male_num%></td>
+        <td><%= gender.male_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td>27,741</td>
-        <td>54%</td>
+        <td><%= gender.female_num%></td>
+        <td><%= gender.female_pct%></td>
       </tr>
+      <% end %>
     </tbody>
 
     </table>

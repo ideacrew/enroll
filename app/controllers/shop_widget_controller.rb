@@ -10,6 +10,8 @@ class ShopWidgetController < ApplicationController
     @shop_employees=ShopWidget::ShopEmployees.all
     @family_members=ShopWidget::ShopFamilyMembers.all
     @age_grps=ShopWidget::ShopAgeGroups.all
+    @shop_genders=ShopWidget::ShopGenders.all
+    @employee_status=ShopWidget::EmployeeStatus.all
   end
 
   def moreinfo
