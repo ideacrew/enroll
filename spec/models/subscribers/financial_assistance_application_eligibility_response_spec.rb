@@ -3,6 +3,7 @@ require "rails_helper"
 describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:eligibility_determinations)
   end
 
   let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
@@ -141,9 +142,54 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
                 subject.call(nil, nil, nil, nil, message)
               end
             end
+
+        context "with primary person, family, body, a valid application, return status and Failed to update tax household" do
+          let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+          let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+          let!(:person) { FactoryGirl.create(:person) }
+          let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+          let!(:application) {
+            FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          }
+
+          it "logs Failure to update tax household" do
+            allow(Person).to receive(:where).and_return([person])
+            allow(HbxProfile).to receive(:current_hbx).and_return(nil)
+            expect(subject).to receive(:log) do |arg1, arg2|
+              expect(arg1).to eq message["body"]
+              expect(arg2[:error_message]).to match(/Failure to update tax household/)
+              expect(arg2[:severity]).to eq("critical")
+            end
+            subject.call(nil, nil, nil, nil, message)
+          end
+        end
+
+        context "with primary person, family, body, a valid application, return status and eligibility_determinations notfound for tax_household" do
+          let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
+          let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+          let!(:person) { FactoryGirl.create(:person) }
+          let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+          let!(:application) {
+            FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          }
+
+          before do
+            allow(Person).to receive(:where).and_return([person])
+            family.active_household.tax_households << TaxHousehold.new(application_id: application.id, effective_ending_on: nil, effective_starting_on: TimeKeeper.date_of_record - 1.years)
+            tax_household = family.active_household.tax_households.first
+            tax_household.update_attribute("hbx_assigned_id", "#{parser.households.first.tax_households.first.hbx_assigned_id}")
+          end
+
+          it "logs Failure to update tax household" do
+            expect(subject).to receive(:log) do |arg1|
+              expect(arg1).to match(/ERROR: No eligibility_determinations found for tax_household: #{xml}/)
+            end
+            subject.call(nil, nil, nil, nil, message)
           end
         end
       end
+    end
+  end
 
       context "with a valid application primary person and family" do
         let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 203 } }
@@ -268,7 +314,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
               subject.call(nil, nil, nil, nil, message)
             end
 
-              context "with primary person, family, body, a valid application, return status and failed to create Eligibility Determination" do
+            context "with primary person, family, body, a valid application, return status and failed to create Eligibility Determination" do
               let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
               let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
               let!(:person) { FactoryGirl.create(:person) }
@@ -311,9 +357,82 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
                 subject.call(nil, nil, nil, nil, message)
               end
             end
+
+        context "with primary person, family, body, a valid application, return status, connected to application and Failed to find dependent" do
+          let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+          let(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+          let(:primary_person) { FactoryGirl.create(:person) }
+          let!(:primary_person_family)  { FactoryGirl.create(:family, :with_primary_family_member, person: primary_person) }
+          let(:person) { FactoryGirl.create(:person) }
+          let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+          let!(:household) { family.households.first }
+          let!(:application) {
+            FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          }
+
+          it "logs failed to find application for person in xml error" do
+            verified_primary_family_member = parser.family_members.detect{ |fm| fm.person.hbx_id == parser.primary_family_member_id }
+            ssn = verified_primary_family_member.person_demographics.ssn
+            dob = verified_primary_family_member.person_demographics.birth_date
+            allow(Person).to receive(:where).and_call_original
+            allow(Person).to receive(:where).with({:encrypted_ssn => Person.encrypt_ssn(ssn), :dob => dob}).and_return([person])
+            expect(subject).to receive(:log) do |arg1, arg2|
+              expect(arg1).to eq message["body"]
+              expect(arg2[:error_message]).to match(/Failed to find dependent from xml/)
+              expect(arg2[:severity]).to eq("critical")
+            end
+            subject.call(nil, nil, nil, nil, message)
+          end
+        end
+
+
+        context "with primary person, family, body, a valid application, return status and Failed to update tax household" do
+          let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+          let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+          let!(:person) { FactoryGirl.create(:person) }
+          let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+          let!(:application) {
+            FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+          }
+
+          it "logs Failure to update tax household" do
+            allow(Person).to receive(:where).and_return([person])
+            allow(HbxProfile).to receive(:current_hbx).and_return(nil)
+            expect(subject).to receive(:log) do |arg1, arg2|
+              expect(arg1).to eq message["body"]
+              expect(arg2[:error_message]).to match(/Failure to update tax household/)
+              expect(arg2[:severity]).to eq("critical")
+            end
+            subject.call(nil, nil, nil, nil, message)
+          end
+        end
+
+          context "with primary person, family, body, a valid application, return status and eligibility_determinations notfound for tax_household" do
+            let!(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
+            let!(:parser) { Parsers::Xml::Cv::HavenVerifiedFamilyParser.new.parse(xml) }
+            let!(:person) { FactoryGirl.create(:person) }
+            let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
+            let!(:application) {
+              FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
+            }
+
+            before do
+              allow(Person).to receive(:where).and_return([person])
+              family.active_household.tax_households << TaxHousehold.new(application_id: application.id, effective_ending_on: nil, effective_starting_on: TimeKeeper.date_of_record - 1.years)
+              tax_household = family.active_household.tax_households.first
+              tax_household.update_attribute("hbx_assigned_id", "#{parser.households.first.tax_households.first.hbx_assigned_id}")
+            end
+
+            it "logs Failure to update tax household" do
+              expect(subject).to receive(:log) do |arg1|
+                expect(arg1).to match(/ERROR: No eligibility_determinations found for tax_household: #{xml}/)
+              end
+              subject.call(nil, nil, nil, nil, message)
+            end
           end
         end
       end
+    end
 
       context "with a valid application primary person and family" do
         let(:message) { { "body" => xml, "assistance_application_id" => parser.fin_app_id, "return_status" => 200 } }
