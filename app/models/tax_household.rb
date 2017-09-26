@@ -13,7 +13,8 @@ class TaxHousehold
 
   embedded_in :household
 
-  field :hbx_assigned_id, type: String
+  field :hbx_assigned_id, type: Integer
+  increments :hbx_assigned_id, seed: 9999
 
   field :allocated_aptc, type: Money, default: 0.00
   field :is_eligibility_determined, type: Boolean, default: false
@@ -27,8 +28,6 @@ class TaxHousehold
   accepts_nested_attributes_for :tax_household_members
 
   embeds_many :eligibility_determinations
-
-  before_save :generate_tax_household_id
 
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
@@ -183,10 +182,6 @@ class TaxHousehold
     else
       false
     end
-  end
-
-  def generate_tax_household_id
-    write_attribute(:hbx_assigned_id, HbxIdGenerator.generate_tax_household_id) if hbx_assigned_id.blank?
   end
 
   #primary applicant is the tax household member who is the subscriber

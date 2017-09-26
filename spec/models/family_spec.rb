@@ -48,27 +48,6 @@ describe Family, "given a primary applicant and a dependent" do
   end
 end
 
-describe Family, "generate_family_id if hbx_assigned_id blank", dbclean: :after_each do
-  let(:person) { FactoryGirl.create(:person)}
-  let(:family) { FactoryGirl.build(:family, :with_primary_family_member, person: person)}
-
-  it "generate_family_id" do
-    expect(family.hbx_assigned_id).to eq nil
-    family.save
-    expect(family.hbx_assigned_id).not_to eq nil
-  end
-
-  it "should generate hbx_id" do
-    expect(family.generate_family_id).not_to be nil
-  end
-
-  it "should not generate a new hbx_id if one exists" do
-    family.save
-    expect(family.hbx_assigned_id).not_to be nil
-    expect(family.generate_family_id).to be nil
-  end
-end
-
 describe Family, type: :model, dbclean: :after_each do
 
   let(:spouse)  { FactoryGirl.create(:person)}
