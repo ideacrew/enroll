@@ -474,44 +474,46 @@
     </thead>
     <tbody>
       <tr>
+        <% @family_members.each do |family| %>
         <td class="texLef">1-Member</td>
-        <td>19,850</td>
-        <td>82%</td>
+        <td><%= family.mem1_num %></td>
+        <td><%= family.mem1_pct %></td>
       </tr>
       <tr>
         <td class="texLef">2-Members</td>
-        <td>2,445</td>
-        <td>18%</td>
+        <td><%= family.mem2_num %></td>
+        <td><%= family.mem2_pct %></td>
       </tr>
       <tr>
         <td class="texLef">3-Members</td>
-        <td>19,850</td>
-        <td>82%</td>
+        <td><%= family.mem3_num %></td>
+        <td><%= family.mem3_pct %></td>
       </tr>
       <tr>
         <td class="texLef">4-Members</td>
-        <td>2,445</td>
-        <td>18%</td>
+        <td><%= family.mem4_num %></td>
+        <td><%= family.mem4_pct %></td>
       </tr>
       <tr>
         <td class="texLef">5-Members</td>
-        <td>19,850</td>
-        <td>82%</td>
+        <td><%= family.mem5_num %></td>
+        <td><%= family.mem5_pct %></td>
       </tr>
       <tr>
         <td class="texLef">6-Members</td>
-        <td>2,445</td>
-        <td>18%</td>
+        <td><%= family.mem6_num %></td>
+        <td><%= family.mem6_pct %></td>
       </tr>
       <tr>
         <td class="texLef">7+ Members</td>
-        <td>2,445</td>
-        <td>18%</td>
+       <td><%= family.mem7_num %></td>
+       <td><%= family.mem7_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 
@@ -535,49 +537,51 @@
     </thead>
     <tbody>
       <tr>
+       <% @age_grps.each do |age| %>
         <td class="texLef">< 1</td>
-        <td>140</td>
-        <td>0%</td>
+       <td><%= age.age1_num %></td>
+       <td><%= age.age1_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-        <td>9,506</td>
-        <td>19%</td>
+       <td><%= age.age17_num %></td>
+       <td><%= age.age17_pct %></td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-        <td>5,283</td>
-        <td>10%</td>
+       <td><%= age.age25_num %></td>
+       <td><%= age.age25_pct %></td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-        <td>12,024</td>
-        <td>23%</td>
+       <td><%= age.age34_num %></td>
+       <td><%= age.age34_pct %></td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-        <td>9,444</td>
-        <td>18%</td>
+       <td><%= age.age44_num %></td>
+       <td><%= age.age44_pct %></td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-        <td>7,651</td>
-        <td>15%</td>
+       <td><%= age.age54_num %></td>
+       <td><%= age.age54_pct %></td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-        <td>5,655</td>
-        <td>11%</td>
+       <td><%= age.age64_num %></td>
+       <td><%= age.age64_pct %></td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-        <td>1,510</td>
-        <td>3%</td>
+       <td><%= age.age65_num %></td>
+       <td><%= age.age65_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 

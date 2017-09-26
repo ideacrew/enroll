@@ -8,6 +8,8 @@ class ShopWidgetController < ApplicationController
     @new_hire_benefits=ShopWidget::ShopBenefits.all
     @census_employees=ShopWidget::ShopCensusEmployees.all
     @shop_employees=ShopWidget::ShopEmployees.all
+    @family_members=ShopWidget::ShopFamilyMembers.all
+    @age_grps=ShopWidget::ShopAgeGroups.all
   end
 
   def moreinfo
