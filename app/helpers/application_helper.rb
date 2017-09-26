@@ -648,4 +648,9 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
+  def documents_index_enabled?
+    Settings.aca.documents_index_enabled
+  end
 end
+

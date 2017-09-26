@@ -84,14 +84,14 @@
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Configuration"></span>
          <% end %>
         </li>
-
-        <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
-          <%= link_to(verification_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
-              <span class="hidden-xs">Documents</span>
-              <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
-          <% end %>
-        </li>
-
+        <% if documents_index_enabled? %>
+          <li role="presentation"<%= menu_tab_class(active_tab, "vlp-docs-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+            <%= link_to(verification_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "  aria-controls" => "vlp-docs", "role" => "tab" ) do  %>
+                <span class="hidden-xs">Documents</span>
+                <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="VLP Docs"></span>
+            <% end %>
+          </li>
+        <% end %>
         <li role="presentation"<%= menu_tab_class(active_tab, "staff-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
          <%= link_to(staff_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "staff", "role" => "tab" ) do  %>
             <span class="hidden-xs">Staff</span>
