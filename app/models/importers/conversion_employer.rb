@@ -4,6 +4,15 @@ module Importers
     include ActiveModel::Model
     include ::Etl::ValueParsers
 
+    CARRIER_MAPPING = {
+      "aetna" => "AHI",
+      "carefirst bluecross blueshield" => "GHMSI",
+      "kaiser permanente" => "KFMASI",
+      "united healthcare" => "UHIC",
+      "united health care" => "UHIC",
+      "unitedhealthcare" => "UHIC"
+    }
+
     attr_converter :fein, :as => :optimistic_ssn
     attr_converter :tpa_fein, :as => :optimistic_ssn
 
@@ -36,8 +45,8 @@ module Importers
     validates_presence_of :contact_first_name, :allow_blank => false
     validates_presence_of :contact_last_name, :allow_blank => false
     validates_presence_of :legal_name, :allow_blank => false
-    validates_length_of :fein, is: 9
 
+    validate :validate_fein_length
     validate :validate_new_fein
     validate :broker_exists_if_specified
     validate :validate_tpa_if_specified
@@ -87,6 +96,15 @@ module Importers
       }).first
       return nil unless org
       org.general_agency_profile
+    end
+
+    def validate_fein_length
+      return true if fein.blank?
+      self.fein = prepend_zeros(fein.gsub('-', '').strip, 9)
+
+      if fein.length != 9
+        errors.add(:fein, "is the wrong length (should be 9 characters)")
+      end
     end
 
     def validate_new_fein
@@ -263,6 +281,11 @@ module Importers
           errors.add("office_location_#{idx}_" + attr.to_s, err)
         end
       end
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times { number.prepend('0') }
+      number
     end
   end
 end
