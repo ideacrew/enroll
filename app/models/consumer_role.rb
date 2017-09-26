@@ -99,6 +99,7 @@ class ConsumerRole
   embeds_many :documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :person, :workflow_state_transitions, :vlp_documents
 
@@ -534,8 +535,8 @@ class ConsumerRole
     end
   end
 
-  def latest_active_tax_household_with_year(year)
-    person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+  def latest_active_tax_household_with_year(year, family)
+    family.latest_household.latest_active_tax_household_with_year(year)
   rescue => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
@@ -797,7 +798,8 @@ class ConsumerRole
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      event: aasm.current_event
+      event: aasm.current_event,
+      user_id: SAVEUSER[:current_user_id]
     )
   end
 
