@@ -13,6 +13,8 @@ class ShopWidgetController < ApplicationController
     @shop_genders=ShopWidget::ShopGenders.all
     @employee_status=ShopWidget::EmployeeStatus.all
     @shop_covered_lives_carrier=ShopWidget::ShopCoveredLivesCarrier.all
+    @metal_level=ShopWidget::ShopMetalLevel.all
+    
   end
 
   def moreinfo

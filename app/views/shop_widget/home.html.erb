@@ -661,24 +661,25 @@
         <th>%</th>
       </tr>
       <tr>
+        <% @metal_level.each do |metal| %>
         <td class="texLef">Platinum</td>
-        <td>25,901</td>
-        <td>51%</td>
+        <td><%= metal.plat_num%></td>
+        <td><%= metal.plat_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td>14,672</td>
-        <td>29%</td>
+        <td><%= metal.gold_num%></td>
+        <td><%= metal.gold_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td>9,603</td>
-        <td>19%</td>
+        <td><%= metal.silver_num%></td>
+        <td><%= metal.silver_pct%></td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td>1,037</td>
-        <td>2%</td>
+        <td><%= metal.bronze_num%></td>
+        <td><%= metal.bronze_pct%></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -689,6 +690,7 @@
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
     </table>
