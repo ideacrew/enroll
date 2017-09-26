@@ -40,7 +40,6 @@ class FinancialAssistance::ApplicantsController < ApplicationController
     model_params = params[model_name]
     @model.clean_conditional_params(model_params) if model_params.present?
     @model.assign_attributes(permit_params(model_params)) if model_params.present?
-
     if params.key?(model_name)
       if @model.save(context: "step_#{@current_step.to_i}".to_sym)
         @applicant.reload
@@ -48,7 +47,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
         @current_step = @current_step.next_step if @current_step.next_step.present?
         if params.key? :last_step
           @model.update_attributes!(workflow: { current_step: 1 })
-          redirect_to find_applicant_path(@application, @applicant)
+          redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
         else
           @model.update_attributes!(workflow: { current_step: @current_step.to_i })
           render 'workflow/step', layout: 'financial_assistance'
@@ -72,6 +71,11 @@ class FinancialAssistance::ApplicantsController < ApplicationController
   def primary_applicant_has_spouse
     has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
     render :text => "#{has_spouse}"
+  end
+
+  def update
+    @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
+    redirect_to redirect_path_after_applicant_update(request.referrer, @application, @applicant)
   end
 
   private

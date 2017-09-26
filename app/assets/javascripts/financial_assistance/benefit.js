@@ -112,18 +112,18 @@ $(document).ready(function() {
 
 /* Condtional Display Enrolled Benefit Questions */
 
-  if (!$("#has_enrolled_health_coverage_true").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
+  if ($("#has_enrolled_health_coverage_no").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
 
-  $("body").on("change", "#has_enrolled_health_coverage_true", function(){
-    if ($('#has_enrolled_health_coverage_true').is(':checked')) {
+  $("body").on("change", "#has_enrolled_health_coverage_yes", function(){
+    if ($('#has_enrolled_health_coverage_yes').is(':checked')) {
       $("#enrolled-benefit-kinds").removeClass('hide');
     } else{
       $("#enrolled-benefit-kinds").addClass('hide');
     }
   });
 
-  $("body").on("change", "#has_enrolled_health_coverage_false", function(){
-    if ($('#has_enrolled_health_coverage_false').is(':checked')) {
+  $("body").on("change", "#has_enrolled_health_coverage_no", function(){
+    if ($('#has_enrolled_health_coverage_no').is(':checked')) {
       $("#enrolled-benefit-kinds").addClass('hide');
     } else{
       $("#enrolled-benefit-kinds").removeClass('hide');
@@ -131,18 +131,18 @@ $(document).ready(function() {
   });
 
 /* Condtional Display Eligible Benefit Questions */
-  if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
+  if ($("#has_eligible_health_coverage_no").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
 
-  $("body").on("change", "#has_eligible_health_coverage_true", function(){
-    if ($('#has_eligible_health_coverage_true').is(':checked')) {
+  $("body").on("change", "#has_eligible_health_coverage_yes", function(){
+    if ($('#has_eligible_health_coverage_yes').is(':checked')) {
       $("#eligible-benefit-kinds").removeClass('hide');
     } else{
       $("#eligible-benefit-kinds").addClass('hide');
     }
   });
 
-  $("body").on("change", "#has_eligible_health_coverage_false", function(){
-    if ($('#has_eligible_health_coverage_false').is(':checked')) {
+  $("body").on("change", "#has_eligible_health_coverage_no", function(){
+    if ($('#has_eligible_health_coverage_no').is(':checked')) {
       $("#eligible-benefit-kinds").addClass('hide');
     } else{
       $("#eligible-benefit-kinds").removeClass('hide');
