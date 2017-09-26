@@ -1043,11 +1043,12 @@ describe Person do
   end
 
   describe "verification types" do
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role) }
 
-    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
-        allow(person).to receive(:ssn).and_return(ssn) if ssn
+        allow(person).to receive(:ssn).and_return(nil) unless ssn
+        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
         allow(person).to receive(:us_citizen).and_return(citizen)
         allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
@@ -1064,30 +1065,57 @@ describe Person do
       end
     end
 
-    context "SSN + Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true
-    end
+    describe "19 plus y.o." do
+      context "SSN + Citizen" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
+      end
 
-    context "SSN + Immigrant" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false
-    end
+      context "SSN + Immigrant" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+      end
 
-    context "SSN + Native Citizen" do
-      it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native"
-    end
+      context "SSN + Native Citizen" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+      end
 
-    context "Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true
-    end
+      context "Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "Citizenship"], 2, nil, true, nil, 20
+      end
 
-    context "Immigrant with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false
-    end
+      context "Immigrant with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "Immigration status"], 2, nil, false, nil, 20
+      end
 
-    context "Native Citizen with NO SSN" do
-      it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native"
+      context "Native Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Local residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
+      end
     end
+    describe "less then 19y.o." do
+      context "SSN + Citizen" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true, nil, 18
+      end
 
+      context "SSN + Immigrant" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false, nil, 16
+      end
+
+      context "SSN + Native Citizen" do
+        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native", 5
+      end
+
+      context "Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true, nil, 13
+      end
+
+      context "Immigrant with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false, nil, 14
+      end
+
+      context "Native Citizen with NO SSN" do
+        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native", 15
+      end
+
+    end
   end
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
