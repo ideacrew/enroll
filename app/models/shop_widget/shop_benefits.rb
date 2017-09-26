@@ -1,23 +1,18 @@
 module ShopWidget
   class ShopBenefits
     include Mongoid::Document
-    store_in collection: "shopPolicies"
+    store_in collection: "shp"
 
     field :tile , type: String
-    field :date_of_count, type: Integer
-    field :date_of_share, type: String
-    field :date_of_yoy, type: String
-    field :first_month_count, type: Integer
-    field :first_month_share, type: String
-    field :first_month_yoy, type: String
-
-    field :first_thirty_count, type: Integer
-    field :first_thirty_share, type: String
-    field :first_thirty_yoy, type: String
-    field :first_sixty_count, type: Integer
-    field :first_sixty_share, type: String
-    field :first_sixty_yoy, type: String
+    field :date_hire_num, type: Integer
+    field :date_hire_pct, type: String
+    field :first_mth_num, type: String
+    field :first_mth_pct, type: Integer
+    field :day30_num, type: String
+    field :day30_pct, type: String
+    field :day60_num, type: Integer
+    field :day60_pct, type: String
     
-    default_scope ->{where(tile: "left_benefits" )}
+    default_scope ->{where(tile: "left_hire" )}
   end
 end

@@ -1,7 +1,7 @@
 module ShopWidget
   class Brokers
     include Mongoid::Document
-    store_in collection: "shopPolicies"
+    store_in collection: "shp"
 
     field :tile , type: String
     field :num_100, type: String

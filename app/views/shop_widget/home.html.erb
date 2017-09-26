@@ -214,18 +214,18 @@
       <tr>
         <% @total_carriers_count.each do |carrier| %>
         <td class="texLef">1-Plan</td>
-         <td><%= carrier.1plan_num %></td>
-         <td><%= carrier.1plan_pct %></td>
+         <td><%= carrier.plan1_num %></td>
+         <td><%= carrier.plan1_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1-Carrier</td>
-        <td><%= carrier.1carrier_num %></td>
-        <td><%= carrier.1carrier_pct %></td>
+        <td><%= carrier.carrier1_num %></td>
+        <td><%= carrier.carrier1_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1-Metal</td>
-         <td><%= carrier.1metal_num %></td>
-        <td><%= carrier.1metal_pct %></td>
+         <td><%= carrier.metal1_num %></td>
+        <td><%= carrier.metal1_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -244,24 +244,26 @@
     </thead>
     <tbody>
       <tr>
+         <% @employer_contribution.each do |contribution| %>
         <td class="texLef">100%</td>
-        <td>1,925</td>
-        <td>47%</td>
+        <td><%= contribution.broker_yes_num %></td>
+        <td><%= contribution.pct_100 %></td>
       </tr>
       <tr>
         <td class="texLef">51-99%</td>
-        <td>1.075</td>
-        <td>26%</td>
+        <td><%= contribution.carrier1_num %></td>
+        <td><%= contribution.carrier1_pct %></td>
       </tr>
       <tr>
         <td class="texLef">50%</td>
-        <td>1,076</td>
-        <td>26%</td>
+        <td><%= contribution.metal1_num %></td>
+        <td><%= contribution.metal1_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 
@@ -274,29 +276,31 @@
     </thead>
     <tbody>
       <tr>
+        <% @new_hire_benefits.each do |benefits| %>
         <td class="texLef">Date of Hire</td>
-        <td>5</td>
-        <td>0%</td>
+        <td><%= benefits.date_hire_num %></td>
+        <td><%= benefits.date_hire_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1st of Month</td>
-        <td>3,214</td>
-        <td>79%</td>
+        <td><%= benefits.first_mth_num %></td>
+        <td><%= benefits.first_mth_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1st After 30 Days</td>
-        <td>352</td>
-        <td>9%</td>
+        <td><%= benefits.day30_num %></td>
+        <td><%= benefits.day30_pct %></td>
       </tr>
       <tr>
         <td class="texLef">1st After 60 Days</td>
-        <td>505</td>
-        <td>12%</td>
+        <td><%= benefits.day60_num %></td>
+        <td><%= benefits.day60_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 
@@ -314,19 +318,21 @@
     </thead>
     <tbody>
       <tr>
+        <% @census_employees.each do |census_employees| %>
         <td class="texLef">Enrolled</td>
-        <td>32,938</td>
-        <td>62%</td>
+        <td><%= census_employees.num_100 %></td>
+        <td><%= census_employees.pct_100 %></td>
       </tr>
       <tr>
         <td class="texLef">Not-Enrolled</td>
-        <td>10,062</td>
-        <td>38%</td>
+        <td><%= census_employees.carrier1_num %></td>
+        <td><%= census_employees.carrier1_pct %></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
+        <% end %>
       </tr>
     </tbody>
 

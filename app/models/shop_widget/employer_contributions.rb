@@ -1,19 +1,16 @@
 module ShopWidget
   class EmployerContributions
     include Mongoid::Document
-    store_in collection: "shopPolicies"
+    store_in collection: "shp"
 
     field :tile , type: String
-    field :hundred_count, type: Integer
-    field :hundred_share, type: String
-    field :hundred_yoy, type: String
-    field :fiftyone_count, type: Integer
-    field :fiftyone_share, type: String
-    field :fiftyone_yoy, type: String
-    field :fifty_count, type: Integer
-    field :fifty_share, type: String
-    field :fifty_yoy, type: String
+    field :broker_yes_num, type: Integer
+    field :pct_100, type: String
+    field :carrier1_num, type: String
+    field :carrier1_pct, type: Integer
+    field :metal1_num, type: String
+    field :metal1_pct, type: String
 
-    default_scope ->{where(tile: "left_contribution" )}
+    default_scope ->{where(tile: "left_contrib" )}
   end
 end
