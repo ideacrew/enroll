@@ -81,7 +81,6 @@ describe "append data" do
     it "should append data" do
       @employee_notice.append_data
       expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
-      expect(@employee_notice.notice.enrollment.enrolled_count).to eq hbx_enrollment.humanized_dependent_summary.to_s
     end
   end
 describe "Rendering terminating_coverage_notice template and generate pdf" do

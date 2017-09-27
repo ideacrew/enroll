@@ -18,7 +18,6 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmploye
                                          })
     notice.enrollment = PdfTemplates::Enrollment.new({
       :terminated_on => terminated_enrollment.terminated_on,
-      :enrolled_count => terminated_enrollment.humanized_dependent_summary,
       :coverage_kind => terminated_enrollment.coverage_kind
       })
   end

@@ -677,7 +677,7 @@ shop_notice_triggers = [
   },
   {
     hbx_id: 'SHOPDAE042',
-    title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
+    title: 'Confirmation of Election To Terminate Coverage',
     description: 'Employee Terminating coverage after QLE',
     resource_name: 'employer',
     event_name: 'notify_employee_confirming_coverage_termination',
