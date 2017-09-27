@@ -3,7 +3,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class EmployerStaffRoleAasmFix < MongoidMigrationTask
 
   def migrate
-    Person.where(:"employer_staff_roles".exists => true, :"employer_staff_roles.aasm_state".exists => false).each do |person|
+    Person.where("employer_staff_roles": { "$exists": true, "$not": {"$size": 0}},
+                 "employer_staff_roles.aasm_state": { "$exists": false }).each do |person|
       begin
         person.employer_staff_roles.each do |esr|
           esr.update_attributes!({:aasm_state => employer_staff_role_aasm_state(esr)})
