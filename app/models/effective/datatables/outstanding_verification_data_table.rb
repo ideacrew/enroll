@@ -24,7 +24,7 @@ module Effective
       def collection
         unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
           @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-          #@families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").send(attributes[:documents_uploaded]) if attributes[:documents_uploaded].present?
+          @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").send(attributes[:documents_uploaded]) if attributes[:documents_uploaded].present?
         end
         @families
       end
@@ -42,9 +42,9 @@ module Effective
       def nested_filter_definition
         filters = {
         documents_uploaded: [
-          {scope: 'fully_uploaded', label: 'Fully Uploaded'},
-          {scope: 'partially_uploaded', label: 'Partially Uploaded'},
-          {scope: 'none_uploaded', label: 'None Uploaded'},
+          {scope: 'vlp_fully_uploaded', label: 'Fully Uploaded'},
+          {scope: 'vlp_partially_uploaded', label: 'Partially Uploaded'},
+          {scope: 'vlp_none_uploaded', label: 'None Uploaded'},
           {scope: 'all', label: 'All'},
         ],
         top_scope: :documents_uploaded

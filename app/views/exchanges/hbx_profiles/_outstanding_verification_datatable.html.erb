@@ -3,13 +3,19 @@
 <div class='container'>
   <h1> Outstanding Verifications </h1>
   <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
-</div>
+</div><div>
+        Verification Due
+            <input type="text" id="custom_datatable_date_from" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
+            &nbsp;&nbsp;To
+            <input type="text" id="custom_datatable_date_to" class="datepicker">&nbsp;<i class="fa fa-calendar datepicker" aria-hidden="true"></i>
+        </div> 	
    <%= raw render_datatable(@datatable,"lengthMenu": [[10, 25, 50], [10, 25, 50]], buttons: [
             'excel','csv','print'
         ]) %>
 </div>
 
 <script type="text/javascript" charset="utf-8">
+	    $('.datepicker').datepicker();
  initializeDataTables();
  <% if @selector == 'assited' %>
     $('#Tab\\:by_enrollment_individual_market').click();

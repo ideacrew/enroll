@@ -36,7 +36,8 @@ class Family
   field :updated_by, type: String
   field :status, type: String, default: "" # for aptc block
   field :min_verification_due_date, type: Date, default: nil
-
+  field :vlp_documents_status, type: String
+  
   belongs_to  :person
 
   # Collection of insured:  employees, consumers, residents
@@ -194,7 +195,10 @@ class Family
   scope :with_partial_verifications,            ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "in review"}})}
   scope :with_no_verifications,                 ->{ where(:"households.hbx_enrollments" => {:"$elemMatch" => {:"aasm_state" => "enrolled_contingent", :"review_status" => "incomplete"}})}
   scope :with_reset_verifications,              ->{ where(:"households.hbx_enrollments.aasm_state" => "enrolled_contingent")}
-
+  scope :vlp_fully_uploaded,                    ->{ where(vlp_documents_status: "Fully Uploaded")}
+  scope :vlp_partially_uploaded,                ->{ where(vlp_documents_status: "Partially Uploaded")}
+  scope :vlp_none_uploaded,                     ->{ where(vlp_documents_status: "None")}
+   
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -982,6 +986,12 @@ class Family
       "no enrollment"
     end
   end
+  
+  def self.update_vlp_documents_status
+    Family.each do |f|
+      f.update_attributes(vlp_documents_status: f.primary_applicant.person.vlp_documents_status) if f.primary_applicant.person.consumer_role
+   end
+  end 
 
   def person_has_an_active_enrollment?(person)
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
