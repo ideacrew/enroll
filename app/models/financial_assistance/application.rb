@@ -791,7 +791,7 @@ private
 
   def update_verifications_of_applicants(status)
     active_applicants.each do |applicant|
-      applicant.assisted_verification.each { |verification| verification.update_attributes(status: status) }
+      applicant.assisted_verifications.each { |verification| verification.update_attributes(status: status) }
     end
   end
 
