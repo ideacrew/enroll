@@ -49,7 +49,7 @@ Rails.application.routes.draw do
         get :primary_applicant_has_spouse
         get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
         get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
-
+        post :update, on: :member
 
         resources :incomes do
           get 'other', on: :collection
