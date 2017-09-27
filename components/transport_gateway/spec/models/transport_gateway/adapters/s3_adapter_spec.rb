@@ -245,4 +245,92 @@ module TransportGateway
       end
     end
   end
+
+  describe Adapters::S3Adapter, "#receive_message" do
+    let(:message) { ::TransportGateway::Message.new(from: from, source_credentials: source_credentials) }
+
+    describe "given:
+      - no 'from'
+    " do
+
+      let(:from) { nil }
+      let(:source_credentials) { nil }
+
+      it "raises an error" do
+        expect{ subject.receive_message(message) }.to raise_error(ArgumentError, /source data not provided/)
+      end
+    end
+
+    describe "given:
+      - a valid 'from'
+      - no credential provider
+      - no source credentials 
+    " do
+
+      let(:from) { URI.parse("s3://bucket@place/object_key") }
+      let(:source_credentials) { nil }
+
+      it "raises an error" do
+        expect { subject.receive_message(message) }.to raise_error(ArgumentError, /credentials not found for uri/)
+      end
+    end
+
+    describe "given:
+      - a valid 'from'
+      - a message with source credentials
+    " do
+
+      let(:from) { URI.parse("s3://bucket@service_endpoint/object_key") }
+      let(:source_credentials) { double }
+
+      let(:s3_client) do
+        instance_double(Aws::S3::Client)
+      end
+
+      let(:s3_resource) do
+        instance_double(Aws::S3::Resource)
+      end
+
+      let(:bucket) do
+        instance_double(Aws::S3::Bucket)
+      end
+
+      let(:object) do
+        instance_double(Aws::S3::Object)
+      end
+
+      let(:tempfile) do
+        instance_double(Tempfile)
+      end
+
+      let(:s3_credential_options) do
+        {
+          access_key_id: "ACCESS KEY",
+          secret_access_key: "SECRET ACCESS KEY"
+        }
+      end
+
+      let(:temp_file_source) { instance_double(TransportGateway::Sources::TempfileSource) }
+
+      before :each do
+        allow(source_credentials).to receive(:s3_options).and_return(s3_credential_options)
+        allow(Aws::S3::Client).to receive(:new).with({region: "service_endpoint"}.merge(s3_credential_options)).and_return(s3_client)
+        allow(Aws::S3::Resource).to receive(:new).with({client: s3_client}).and_return(s3_resource)
+        allow(s3_resource).to receive(:bucket).with("bucket").and_return(bucket)
+        allow(bucket).to receive(:object).with("object_key").and_return(object)
+        allow(Tempfile).to receive(:new).with("object_key").and_return(tempfile)
+        allow(object).to receive(:get).with({:response_target => tempfile})
+        allow(TransportGateway::Sources::TempfileSource).to receive(:new).with(tempfile).and_return(temp_file_source)
+      end
+
+      it "download the file" do
+        expect(object).to receive(:get).with({:response_target => tempfile})
+        subject.receive_message(message)
+      end
+
+      it "provides the download as a source" do
+        expect(subject.receive_message(message)).to eq temp_file_source
+      end
+    end
+  end
 end

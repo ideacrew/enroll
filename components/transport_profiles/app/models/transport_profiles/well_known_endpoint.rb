@@ -12,7 +12,7 @@ module TransportProfiles
 
     validates_presence_of :title, :site_key, :key, :uri
 
-    MARKET_KINDS = ["shop", "individual"]
+    MARKET_KINDS = ["shop", "individual", "any"]
 
     validates_inclusion_of :market_kind, in: MARKET_KINDS, message: '%{value} is not a valid market kind', :allow_nil => false
 
