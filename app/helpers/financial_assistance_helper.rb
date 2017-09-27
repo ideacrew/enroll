@@ -50,7 +50,11 @@ module FinancialAssistanceHelper
         :other_questions
       end
     elsif controller_name == 'incomes'
-      :income
+      if action_name == 'other'
+        :other_income
+      else
+        :income
+      end
     elsif controller_name == 'deductions'
       :income_adjustments
     elsif controller_name == 'benefits'
@@ -59,7 +63,7 @@ module FinancialAssistanceHelper
       :relationships
     end
 
-    order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
+    order = [:applications, :household_info, :relationships, :income_and_coverage, :tax_info, :income, :other_income, :income_adjustments, :health_coverage, :other_questions, :review_and_submit]
 
     unless current.blank?
       if target == current

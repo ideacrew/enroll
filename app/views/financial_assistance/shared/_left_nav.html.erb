@@ -44,7 +44,7 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %>">
           <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
             <% if @applicant.has_other_income && @applicant.other_incomes_complete? %>
               <span class="fa fa-check applicant-check"></span>
