@@ -37,7 +37,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>  applicant-nav">
           <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
-            <% if embedded_document_section_entry_complete?(@applicant, :income)%>
+            <% if @applicant.embedded_document_section_entry_complete?(:income)%>
               <span class="fa fa-check applicant-check"></span>
             <% end %>
             &nbsp Income
@@ -46,7 +46,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %>">
           <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
-            <% if embedded_document_section_entry_complete?(@applicant, :other_income)%>
+            <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
               <span class="fa fa-check applicant-check"></span>
             <% end %>
             Other Income
@@ -55,7 +55,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %>">
           <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant), class: "" do %>
-            <% if embedded_document_section_entry_complete?(@applicant, :income_adjustment)%>
+            <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
               <span class="fa fa-check applicant-check"></span>
             <% end %>
             &nbsp Income Adjustments
@@ -64,7 +64,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant), class: "" do %>
-            <% if embedded_document_section_entry_complete?(@applicant, :health_coverage)%>
+            <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
               <span class="fa fa-check applicant-check"></span>
             <% end %>
             &nbsp Health Coverage

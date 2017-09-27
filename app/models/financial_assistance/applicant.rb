@@ -378,6 +378,47 @@ class FinancialAssistance::Applicant
     has_job_income || has_self_employment_income || has_other_income
   end
 
+  def embedded_document_section_entry_complete?(embedded_document)
+    case embedded_document
+    when :income
+      return false if has_job_income.nil? || has_self_employment_income.nil?
+      if has_job_income && has_self_employment_income
+        return incomes.jobs.present? && incomes.self_employment.present?
+      elsif has_job_income && !has_self_employment_income
+        return incomes.jobs.present? && incomes.self_employment.blank?
+      elsif !has_job_income && has_self_employment_income
+        return incomes.jobs.blank? && incomes.self_employment.present?
+      else
+        return incomes.jobs.blank? && incomes.self_employment.blank?
+      end
+    when :other_income
+      return false if has_other_income.nil?
+      if has_other_income
+        return incomes.other.present?
+      else
+        return incomes.other.blank?
+      end
+    when :income_adjustments
+      return false if has_deductions.nil?
+      if has_deductions
+        return deductions.present?
+      else
+        return deductions.blank?
+      end
+    when :health_coverage
+      return false if has_enrolled_health_coverage.nil? || has_eligible_health_coverage.nil?
+      if has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.eligible.present?
+      elsif has_enrolled_health_coverage && !has_eligible_health_coverage
+        return benefits.enrolled.present? && benefits.eligible.blank?
+      elsif !has_enrolled_health_coverage && has_eligible_health_coverage
+        return benefits.enrolled.blank? && benefits.eligible.present?
+      else
+        return benefits.enrolled.blank? && benefits.eligible.blank?
+      end
+    end
+  end
+
 private
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
