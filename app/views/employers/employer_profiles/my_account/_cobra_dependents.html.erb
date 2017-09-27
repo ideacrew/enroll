@@ -1,138 +1,133 @@
 <% if census_employee.can_elect_cobra? %>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="3">
-              <span>Employment Termination Date: </span>
-              <span><%= format_date census_employee.employment_terminated_on %></span>
-            </td>
-            <td class="confirm-cobra-wrapper" colspan="6" id="enter-date">
-              <%=cobra_effective_date(census_employee) %>
-            </td>
-          </tr>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="12">
-              <span>Please Choose how the COBRA/Continuation enrollment(s) will be grouped</span>
-            </td>
-          </tr>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td colspan="2">
-              <a class="btn btn-primary">
-                <span>Family Enrollment</span>
-              </a>
-            </td>
-            <td colspan="2">
-              <a class="btn btn-primary">
-                <span>Child(ren) Only</span>
-              </a> 
-            </td>
-            <td colspan="8">
-            </td>
-          </tr>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <th> Member Name </th>
-            <th>Enroll as Cobra/Continuation?</th>
-            <th>Relationship:</th>
-          </tr>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td>
-               <%= census_employee.full_name %>
-            </td>
-            <td>
-              <input name="cobra_options_is_cobra" type="checkbox">
-              <input type="hidden" name="cobra_options_id" data-dependent="false" value="<%= census_employee.id %>">
-            </td>
-            <td>
-              <div class="container">
-                <div class="dropdown">
-                  <select name="cobra_options_type" >
-                    <option value="primary">Primary</option>
-                    <option value="Dependent">Dependent</option>
-                  </select>
-                </div>
-              </div>
-            </td>
-          </tr>
-          <%census_employee.census_dependents.each do |dependent| %>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td>
-               <%= dependent.full_name %>
-            </td>
-            <td>
-              <input name="cobra_options_is_cobra" type="checkbox">
-              <input type="hidden" name="cobra_options_id" data-dependent="true" value="<%= dependent.id %>">
-            </td>
-            <td>
-              <div class="container">
-                <div class="dropdown">
-                  <select name="cobra_options_type">
-                    <% if ['spouse'].include?(dependent.employee_relationship.downcase) %>
-                      <option value="primary">Primary</option>
-                    <%end%>
-                    <option value="Dependent">Dependent</option>
-                  </select>
-                </div>
-              </div>
-            </td>
-          </tr>
-          <%end%>
-         <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
-              <%=cobra_effective_date(census_employee) %>
-            </td>
-            <td class="col-md-6">
-            <input name='name' value="" type="text" class="form-control date-picker col-md-2"
-               data-date-format="yyyy-mm-dd"/>
-            </td>
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="4">
-              <span>Please enter the maximum number of months the enrollee is eligible for COBRA/Continuation coverage,up to a maximum of 36 months.You can end this coverage earlier,however coverage will automatically be terminated after this many months:</span>
-            </td>
-          </tr>
-           </tr>
+  <!-- <tr class="">
+    <td class="confirm-terminate-wrapper" colspan="3">
+      <span>Employment Termination Date: </span>
+      <span><%= format_date census_employee.employment_terminated_on %></span>
+    </td>
+    <td class="confirm-cobra-wrapper" colspan="6" id="enter-date">
+      <%=cobra_effective_date(census_employee) %>
+    </td>
+  </tr> -->
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td class="confirm-terminate-wrapper" colspan="9">
+      <span>Please Choose how the COBRA/Continuation enrollment(s) will be grouped</span>
+    </td>
+  </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td colspan="2">
+      <a class="btn btn-primary">
+        <span>Family Enrollment</span>
+      </a>
+    </td>
+    <td colspan="2">
+      <a class="btn btn-primary">
+        <span>Child(ren) Only</span>
+      </a> 
+    </td>
+    <td colspan="5">
+    </td>
+  </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <th>Member Name </th>
+    <th>Enroll as Cobra/Continuation?</th>
+    <th>Relationship:</th>
+  </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td>
+      <%= census_employee.full_name %>
+    </td>
+    <td>
+      <input name="cobra_options_is_cobra" type="checkbox">
+      <input type="hidden" name="cobra_options_id" data-dependent="false" value="<%= census_employee.id %>">
+    </td>
+    <td colspan="2">
+        <div class="dropdown">
+          <select name="cobra_options_type" >
+            <option value="primary">Primary</option>
+            <option value="Dependent">Dependent</option>
+          </select>
+        </div>
+    </td>
+  </tr>
+  <%census_employee.census_dependents.each do |dependent| %>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td>
+       <%= dependent.full_name %>
+    </td>
+    <td>
+      <input name="cobra_options_is_cobra" type="checkbox">
+      <input type="hidden" name="cobra_options_id" data-dependent="true" value="<%= dependent.id %>">
+    </td>
+    <td>
+        <div class="dropdown">
+          <select name="cobra_options_type">
+            <% if ['spouse'].include?(dependent.employee_relationship.downcase) %>
+              <option value="primary">Primary</option>
+            <%end%>
+            <option value="Dependent">Dependent</option>
+          </select>
+        </div>
+    </td>
+  </tr>
+  <%end%>
+ <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
+      <%=cobra_effective_date(census_employee) %>
+    </td>
+    <!-- <td class="col-md-6" colspan="4">
+    <input name='name' value="" type="text" class="form-control date-picker col-md-2"
+       data-date-format="yyyy-mm-dd"/>
+    </td> -->
+  </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td class="confirm-terminate-wrapper" colspan="9">
+      <span>Please enter the maximum number of months the enrollee is eligible for COBRA/Continuation coverage,up to a maximum of 36 months.You can end this coverage earlier,however coverage will automatically be terminated after this many months:</span>
+    </td>
+  </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td colspan="2">
+      <label>Maximum COBRA Months</label>
+    </td>
+    <td colspan="5">
+      <div  class="input-spinner" >
+        <%= number_field_tag "cobra_max_months", "1" %>
+        <div class="input-group-btn-vertical"> 
+          <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+          <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+        </div>
+      </div>
+     </td>
+   </tr>
 
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td colspan="2">
-              <label>Maximum COBRA Months</label>
-            </td>
-            <td colspan="3">
-              <div  class="input-spinner" >
-                <%= number_field_tag "cobra_max_months", "1" %>
-                <div class="input-group-btn-vertical"> 
-                  <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
-                  <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
-                </div>
-              </div>
-             </td>
-           </tr>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td colspan="9">
+      <span>Maximum COBRA/contination end date:</span><label  id="max_cobra_date"></label>
+    </td>
+  </tr>
 
-          <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td colspan="4">
-              <span>Maximum COBRA/contination end date:</span><label  id="max_cobra_date"></label>
-            </td>
-          </tr>
-
-           <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-            <td colspan="12">
-             <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
-                <strong>&nbsp;Cancel</strong>
-              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </td>
-          </tr>
-        <% end %>
-        <% if census_employee.may_reinstate_eligibility? %>
-         <tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
-            <td class="confirm-terminate-wrapper" colspan="3">
-              <span>Employment Termination Date: </span>
-              <span><%= format_date census_employee.employment_terminated_on %></span>
-            </td>
-            <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
-              <%=cobra_effective_date(census_employee) %>
-            </td>
-            <td colspan="2">
-              <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_reinstate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_reinstate', '<%= census_employee.id %>')">
-                <strong>&nbsp;Submit</strong>
-              </a>
-            </td>
-          </tr>
-          <%end%>
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td colspan="9">
+     <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
+        <strong>&nbsp;Cancel</strong>
+      <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
+        <strong>&nbsp;Submit</strong>
+      </a>
+    </td>
+  </tr>
+<% end %>
+<% if census_employee.may_reinstate_eligibility? %>
+<tr class="unbrd cobra_confirm cobra_reinstate_<%= census_employee.id %> dn">
+  <td class="confirm-terminate-wrapper" colspan="3">
+    <span>Employment Termination Date: </span>
+    <span><%= format_date census_employee.employment_terminated_on %></span>
+  </td>
+  <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
+    <%=cobra_effective_date(census_employee) %>
+  </td>
+  <td colspan="2">
+    <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_reinstate_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_reinstate', '<%= census_employee.id %>')">
+      <strong>&nbsp;Submit</strong>
+    </a>
+  </td>
+</tr>
+<%end%>
