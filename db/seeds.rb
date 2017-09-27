@@ -155,7 +155,7 @@ puts "::: complete :::"
 
 puts "*"*80
 puts "Loading benefit packages."
-require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
+# require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2016_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2017_seed')
 puts "::: benefit packages seed complete :::"
