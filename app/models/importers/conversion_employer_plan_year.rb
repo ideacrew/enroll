@@ -22,8 +22,8 @@ module Importers
       "united health care" => "UHIC",
       "unitedhealthcare" => "UHIC"
     }
+    validates_length_of :fein, is: 9
 
-    validate :validate_fein_length
     validate :validate_fein
     validate :validate_new_coverage_policy
     validate :validate_is_conversion_employer
@@ -68,17 +68,12 @@ module Importers
       @new_coverage_policy_value = HIRE_COVERAGE_POLICIES[val.strip.downcase]
     end
 
-    def plan_selection=(val)
-      @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
     end
 
-    def validate_fein_length
-      return true if fein.blank?
-      self.fein = prepend_zeros(fein.gsub('-', '').strip, 9)
-
-      if fein.length != 9
-        errors.add(:fein, "is the wrong length (should be 9 characters)")
-      end
+    def plan_selection=(val)
+      @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
     end
 
     def validate_fein
@@ -163,6 +158,11 @@ module Importers
           puts "\n#{employer.fein} - #{employer.legal_name} - #{ce.full_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"
         end
       end
+    end
+
+    def prepend_zeros(number, n)
+      (n - number.to_s.size).times { number.prepend('0') }
+      number
     end
 
     def propagate_errors(plan_year)

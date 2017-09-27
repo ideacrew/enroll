@@ -14,50 +14,17 @@ module Importers::Mhc
       PlanYear.new(plan_year_attrs)
     end
 
-    def select_most_common_plan(available_plans, most_expensive_plan)
-      if !most_common_hios_id.blank?
-        mc_hios = most_common_hios_id.strip
-        found_single_plan = available_plans.detect { |pl| (pl.hios_id == mc_hios) || (pl.hios_id == "#{mc_hios}-01") }
-        return found_single_plan if found_single_plan
-        warnings.add(:most_common_hios_id, "hios id #{most_common_hios_id.strip} not found for most common plan, defaulting to most expensive plan")
-      else
-        warnings.add(:most_common_hios_id, "no most common hios id specified, defaulting to most expensive plan")
-      end
-      most_expensive_plan
-    end
-
-    def select_reference_plan(available_plans)
-      plans_by_cost = available_plans.sort_by { |plan| plan.premium_tables.first.cost }
-      most_expensive_plan = plans_by_cost.last
-
-      if (plan_selection == "single_plan")
-        if !single_plan_hios_id.blank?
-          sp_hios = single_plan_hios_id.strip
-          found_single_plan = available_plans.detect { |pl| (pl.hios_id == sp_hios) || (pl.hios_id == "#{sp_hios}-01") }
-          return found_single_plan if found_single_plan
-          warnings.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group defaulting to most common plan")
-        else
-          warnings.add(:single_plan_hios_id, "no hios id specified for single plan benefit group, defaulting to most common plan")
-        end
-      end
-      select_most_common_plan(available_plans, most_expensive_plan)
-    end
-
     def map_benefit_group(found_carrier)
-
-      binding.pry
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
 
       begin
         reference_plan = select_reference_plan(available_plans)
-        elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
 
         benefit_group_properties = {
           :title => "Standard",
           :plan_option_kind => plan_selection,
-          :relationship_benefits => map_relationship_benefits,
           :reference_plan_id => reference_plan.id,
-          :elected_plan_ids => elected_plan_ids
+          :elected_plan_ids => [reference_plan.id],
         }
 
         if !new_coverage_policy_value.blank?
@@ -65,21 +32,47 @@ module Importers::Mhc
           benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
         end
 
-        BenefitGroup.new(benefit_group_properties)
+        benefit_group = BenefitGroup.new(benefit_group_properties)
+        benefit_group.composite_tier_contributions = build_composite_tier_contributions(benefit_group)
+        benefit_group.build_relationship_benefits
+        benefit_group
       rescue => e
         puts available_plans.inspect
         raise e
       end
     end
 
-    def map_relationship_benefits
-      BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map do |rel|
-        RelationshipBenefit.new({
-          :relationship => rel,
-          :offered => true,
-          :premium_pct => 50.00
+    def tier_offered?(preference)
+      (preference.present? && eval(preference.downcase)) ? true : false
+    end
+
+    def build_employee_rating_tier(benefit_group)
+      benefit_group.composite_tier_contributions.build({
+        composite_rating_tier: 'employee_only',
+        offered: true,
+        employer_contribution_percent: employee_only_rt_contribution,
+        estimated_tier_premium: employee_only_rt_premium
+      })
+    end
+
+    def build_composite_tier_contributions(benefit_group)
+      composite_tiers = []
+      composite_tiers << build_employee_rating_tier(benefit_group)
+
+      rating_tier_names = CompositeRatingTier::NAMES.reject{|rating_tier| rating_tier == 'employee_only'}
+
+      family_offered = tier_offered?(family_rt_offered.to_s)
+
+      rating_tier_names.each do |rating_tier|
+        composite_tiers << benefit_group.composite_tier_contributions.build({
+          composite_rating_tier: rating_tier, 
+          offered: (family_offered ? true : tier_offered?(eval("#{rating_tier}_rt_offered").to_s)),
+          employer_contribution_percent: (family_offered ? family_rt_contribution : eval("#{rating_tier}_rt_contribution")),
+          estimated_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium"))
         })
       end
+
+      composite_tiers
     end
 
     def save
@@ -87,6 +80,7 @@ module Importers::Mhc
       record = map_plan_year
       save_result = record.save
       propagate_errors(record)
+
       if save_result
         employer = find_employer
         begin
