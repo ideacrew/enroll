@@ -13,7 +13,7 @@
       <span>Please Choose how the COBRA/Continuation enrollment(s) will be grouped</span>
     </td>
   </tr>
-  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+  <!-- <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <td colspan="2">
       <a class="btn btn-primary">
         <span>Family Enrollment</span>
@@ -26,7 +26,30 @@
     </td>
     <td colspan="5">
     </td>
+  </tr> -->
+
+  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
+    <td colspan="2">
+      <a class="btn btn-primary">
+        <span>Family Enrollment</span>
+      </a>
+    </td>
+    <td colspan="2">
+      <a class="btn btn-primary" data-toggle="collapse" data-target="#childrensMessage" aria-expanded="false" aria-controls="childrensMessage">
+        <span>Child(ren) Only</span>
+      </a> 
+    </td>
+    <td colspan="5">
+    </td>
   </tr>
+  <tr class="collapse" id="childrensMessage">
+    <td colspan="9" style="color:red">
+    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Please contact Customer Service  phone/email for assistance </br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;processing your request to create a child(ren) only household.</span>
+  <!-- </td> -->
+  </td>
+  </tr>
+</tr>
+
   <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <th>Member Name </th>
     <th>Enroll as Cobra/Continuation?</th>
@@ -40,7 +63,7 @@
       <input name="cobra_options_is_cobra" type="checkbox">
       <input type="hidden" name="cobra_options_id" data-dependent="false" value="<%= census_employee.id %>">
     </td>
-    <td colspan="2">
+    <td colspan="1">
         <div class="dropdown">
           <select name="cobra_options_type" >
             <option value="primary">Primary</option>
@@ -88,7 +111,7 @@
     <td colspan="2">
       <label>Maximum COBRA Months</label>
     </td>
-    <td colspan="5">
+    <td colspan="2">
       <div  class="input-spinner" >
         <%= number_field_tag "cobra_max_months", "1" %>
         <div class="input-group-btn-vertical"> 
