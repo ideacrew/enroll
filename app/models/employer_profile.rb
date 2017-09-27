@@ -269,8 +269,8 @@ class EmployerProfile
 
   def active_and_renewing_published
     result = []
-    result << active_plan_year  if active_plan_year.present?
-    result << renewing_published_plan_year  if renewing_published_plan_year.present?
+    result <<active_plan_year  if active_plan_year.present? 
+    result <<renewing_published_plan_year  if renewing_published_plan_year.present? 
     result
   end
 

@@ -11,7 +11,7 @@ class ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop < S
   end
 
   def append_data
-    plan_year = census_employee.employer_profile.plan_years.where(:aasm_state => "terminated").sort_by(&:start_on).last
+    plan_year = census_employee.employer_profile.plan_years.where(:aasm_state => "terminated").sort_by(&:updated_at).last
     notice.email = census_employee.email.address
     date_of_coverage_loss = plan_year.terminated_on+60.days
     notice.plan_year = PdfTemplates::PlanYear.new({
