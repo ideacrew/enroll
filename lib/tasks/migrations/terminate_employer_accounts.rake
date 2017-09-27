@@ -8,7 +8,7 @@ namespace :migrations do
   desc "Terminating active plan year and enrollments"
   task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
     fein = args[:fein]
-    generate_termination_notice = args[:generate_termination_notice]
+    generate_termination_notice = args[:generate_termination_notice] == "true"
     organizations = Organization.where(fein: fein)
 
     if organizations.size > 1
@@ -49,7 +49,7 @@ namespace :migrations do
             # hbx_enrollment.propogate_terminate(termination_date)
           end
         end
-       
+      
       if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
@@ -131,9 +131,9 @@ def enrollments_for_plan_year(plan_year)
 end
 
 def send_notice_to_employer(org)
-  puts "Notification generated for employer"
   begin
     ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
+    puts "Notification generated for employer"
   rescue Exception => e
     (Rails.logger.error { "Unable to deliver Notices to #{org.employer_profile.legal_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
   end
