@@ -164,7 +164,7 @@ class Employers::CensusEmployeesController < ApplicationController
           new_census_employee.build_address if new_census_employee.address.blank?
           new_census_employee.add_default_benefit_group_assignment
           new_census_employee.construct_employee_role_for_match_person
-
+          # there is an implicit save because of mongoid
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
