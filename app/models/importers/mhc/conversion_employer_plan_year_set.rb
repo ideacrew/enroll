@@ -1,7 +1,7 @@
 module Importers::Mhc
-  class ConversionEmployerSet
+  class ConversionEmployerPlanYearSet
     def headers
-      [
+     [
         "Action",
         "FEIN",
         "Doing Business As",
@@ -53,61 +53,69 @@ module Importers::Mhc
 
     def row_mapping
       [
-        :action,
-        :fein,
-        :dba,
-        :legal_name,
-        :assigned_employer_id,
-        :sic_code,
-        :primary_location_address_1,
-        :primary_location_address_2,
-        :primary_location_city,
-        :primary_location_county,
-        :primary_location_county_fips,
-        :primary_location_state,
-        :primary_location_zip,
-        :mailing_location_address_1,
-        :mailing_location_address_2,
-        :mailing_location_city,
-        :mailing_location_state,
-        :mailing_location_zip,
-        :contact_first_name,
-        :contact_last_name,
-        :contact_email,
-        :contact_phone,
-        :enrolled_employee_count,
-        :new_hire_count,
-        :ignore,
-        :ignore,
-        :ignore,
-        :ignore,
-        :ignore,
-        :broker_name,
-        :broker_npn,
-        :ignore,
-        :tpa_fein,
-        :ignore,
-        :carrier
-      ]
+      :action,
+      :fein,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :enrolled_employee_count,
+      :new_coverage_policy,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :ignore,
+      :coverage_start,
+      :carrier,
+      :plan_selection,
+      :ignore,
+      :reference_plan_hios_id,
+      :employee_only_rt,
+      :employee_only_rt_contribution,
+      :employee_only_rt_cost,
+      :family_rt,
+      :family_rt_contribution,
+      :family_rt_cost
+    ]
     end
 
     include ::Importers::RowSet
 
-    def initialize(file_name, o_stream, conversion_date)
+    def initialize(file_name, o_stream, default_py_start)
       @spreadsheet = Roo::Spreadsheet.open(file_name)
       @out_stream = o_stream
       @out_csv = CSV.new(o_stream)
-      @conversion_date = conversion_date
+      @default_plan_year_start = default_py_start
     end
 
     def create_model(record_attrs)
-      row_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
-      if row_action == 'add'
-        ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
-      elsif row_action == 'update'
-        ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
+      the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
+      case the_action
+      when "update"
+        ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       else
-        ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
+        ConversionEmployerPlanYearCreate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       end
     end
   end
