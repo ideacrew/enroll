@@ -33,6 +33,8 @@ module Importers::Mhc
       end
     end
 
+    # TODO: Issuer Assigned Employer ID (should be assigned)
+
     def employer_attributes
       {
         :broker_agency_accounts => assign_brokers,
