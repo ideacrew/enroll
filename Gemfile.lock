@@ -68,6 +68,7 @@ PATH
   remote: components/transport_profiles
   specs:
     transport_profiles (0.0.1)
+      acapi
       mongoid (= 5.0.1)
       rails (>= 4.2.0)
       symmetric-encryption (~> 3.6.0)
