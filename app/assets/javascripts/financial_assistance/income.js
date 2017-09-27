@@ -24,6 +24,18 @@ $(document).ready(function() {
       return 'You have an unsaved income, are you sure you want to proceed?';
     });
 
+    $('#has_job_income_true, #has_job_income_false').on('change', function(e) {
+      var attributes = {};
+      attributes[$(this).attr('name')] = $(this).val();
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/incomes', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
+
     $(document).on('click', 'a[href]:not(.disabled)', function(e) {
       if (currentlyEditing()) {
         e.preventDefault();

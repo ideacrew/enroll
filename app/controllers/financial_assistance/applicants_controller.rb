@@ -75,7 +75,7 @@ class FinancialAssistance::ApplicantsController < ApplicationController
 
   def update
     @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
-    redirect_to redirect_path_after_applicant_update(request.referrer, @application, @applicant)
+    head :ok, content_type: "text/html"
   end
 
   private
