@@ -1,12 +1,18 @@
-<div style='width: 400px; margin-left: 50px'>
-  Dear <%= first_name %>,
-  <br/><br/>
-  You have a new message from <%= Settings.site.short_name %> about your health coverage. This letter may be time sensitive and require action.<br/><br/>
-  The subject of the letter is <%= notice_subject %><br/><br/>
-  To read this letter, <a href="<%= Settings.site.home_url %>">login to your account</a> at dchealthlink.com.<br/><br/>
-  If you have any questions, we’re here to help. Give us a call at (855) 532-5465.<br/><br/>
-  The <%= Settings.site.short_name%> Team.<br><br/><br/>
-
+<div style='width: 500px; margin-left: 50px'>
+  <img src="/dc_health.png" style='margin-left: 200px; width: 100px;' title=<%= "#{Settings.site.short_name}" %>/>
+  <br>
+  <p>Dear <%= first_name %>,</p>
+  <p>
+    You have a new message from <%= Settings.site.short_name %> about your health coverage. This letter may be time sensitive and require action.
+  </p>
+  <p>
+    The subject of the letter is <%= notice_subject %>
+  </p>
+  <p>
+    To read this letter, <a href="<%= Settings.site.home_url %>">login to your account</a> at dchealthlink.com.
+  </p>
+  <p>If you have any questions, we’re here to help. Give us a call at (855) 532-5465.</p>
+  <p>The <%= Settings.site.short_name%> Team.<br/></p>
   <div style="font-size: 10px; color: #999999">
     <%= Settings.site.short_name %> is strongly committed to maintaining the privacy of your personal information and the security of our computer systems. With respect to the collection, use, and disclosure of personal information, <%= Settings.site.short_name %> makes every effort to ensure compliance with applicable federal law.<br/><br/>
     <html lang="zh-Hans">
@@ -31,4 +37,7 @@
     <br>
   </div>
   <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+  <p style='text-align: center; font-size: 70%'>
+    Questions? Call DC Health Link at (855) 532-5465, or go to www.dchealthlink.com.
+  </p>
 </div>
