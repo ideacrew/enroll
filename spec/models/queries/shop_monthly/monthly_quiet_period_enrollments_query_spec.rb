@@ -13,7 +13,11 @@ describe "a monthly inital employer quiet period enrollments query" do
          - One dental enrollment during Quiet Period(Enrollment 5)
          - Then another health enrollment outside Quiet Period(Enrollment 6)
        - employee D has purchased:
-         - One health enrollment early hours of 29th UTC time
+         - One health enrollment early hours of 29th UTC time(Enrollment 7)
+       - employee E has purchased:
+         - One health enrollment during OE(Enrollment 8)
+         - One health enrollment during Quiet Period(Enrollment 9)
+         - Another health enrollment during Quiet Period(Enrollment 10)
     " do
 
       let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
@@ -36,7 +40,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       }
 
       let(:initial_employees) {
-        FactoryGirl.create_list(:census_employee_with_active_assignment, 4, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
+        FactoryGirl.create_list(:census_employee_with_active_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: initial_employer,
           benefit_group: plan_year.benefit_groups.first)
       }
 
@@ -89,6 +93,24 @@ describe "a monthly inital employer quiet period enrollments query" do
         create_enrollment(family: employee_D.person.primary_family, benefit_group_assignment: employee_D.census_employee.active_benefit_group_assignment, employee_role: employee_D, submitted_at: quiet_period_end_date.end_of_day + 1.hour)
       }
    
+      let(:employee_E) {
+        ce = initial_employees[4]
+        create_person(ce, initial_employer)
+      }
+
+      let!(:enrollment_8) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: plan_year.open_enrollment_end_on - 10.day)
+      }
+
+      let!(:enrollment_9) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: quiet_period_end_date - 2.days, enrollment_kind: 'special_enrollment', parent: enrollment_8)
+      }
+
+      let!(:enrollment_10) {
+        create_enrollment(family: employee_E.person.primary_family, benefit_group_assignment: employee_E.census_employee.active_benefit_group_assignment, employee_role: employee_E, submitted_at: quiet_period_end_date.prev_day, enrollment_kind: 'special_enrollment', parent: enrollment_9)
+      }
+
+
       it "does not include enrollment 1" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).not_to include(enrollment_1.hbx_id)
@@ -122,6 +144,26 @@ describe "a monthly inital employer quiet period enrollments query" do
       it "includes enrollment 7" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).to include(enrollment_7.hbx_id)
+      end
+
+      it "includes enrollment 8" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_canceled', 'coverage_terminated', 'coverage_termination_pending'])
+        expect(result).to include(enrollment_8.hbx_id)
+      end
+
+      it "includes enrollment 9" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_canceled', 'coverage_terminated', 'coverage_termination_pending'])
+        expect(result).to include(enrollment_9.hbx_id)
+      end
+
+      it "does not include enrollment 10" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_canceled', 'coverage_terminated', 'coverage_termination_pending'])
+        expect(result).not_to include(enrollment_10.hbx_id)
+      end
+
+      it "includes enrollment 10" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(enrollment_10.hbx_id)
       end
     end
 
@@ -308,7 +350,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       enrollment.workflow_state_transitions.create(from_state: 'shopping', to_state: status, transition_at: submitted_at)
     end
 
-    if enrollment.inactive?
+    if (enrollment.inactive? || enrollment.coverage_selected?) && parent.present?
       parent.update(aasm_state: 'coverage_canceled')
       parent.workflow_state_transitions.create(from_state: parent.aasm_state, to_state: 'coverage_canceled', transition_at: submitted_at)
     end
