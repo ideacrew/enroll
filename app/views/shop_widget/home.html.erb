@@ -30,6 +30,9 @@
         },
         xAxis: {
             categories: [
+                'Jan',
+                'Feb',
+                'Mar',
                 'Apr',
                 'May',
                 'Jun',
@@ -39,9 +42,6 @@
                 'Oct',
                 'Nov',
                 'Dec',
-                'Jan',
-                'Feb',
-                'Mar',
             ],
             crosshair: true
         },
@@ -77,9 +77,11 @@
         },
         series: [{
             showInLegend: false,
+            <% @covered_lives_by_month.each do |month| %>
             name: 'Covered Lives',
-            data: [705, 368, 574, 3296, 3075, 3990, 4036, 5110, 22211, 5242, 3457, 2953]
+            data: [<%= month.jan_start %>, <%= month.feb_start %>, <%= month.mar_start %>, <%= month.apr_start %>, <%= month.may_start %>, <%= month.jul_start %>,<%= month.jul_start %>, <%= month.aug_start %>, <%= month.sep_start %>, <%= month.oct_start %>, <%= month.nov_start %>, <%= month.dec_start %>]
             }]
+            <% end %>
         });
     });
 </script>

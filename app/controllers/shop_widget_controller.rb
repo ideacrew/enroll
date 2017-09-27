@@ -14,6 +14,7 @@ class ShopWidgetController < ApplicationController
     @employee_status=ShopWidget::EmployeeStatus.all
     @shop_covered_lives_carrier=ShopWidget::ShopCoveredLivesCarrier.all
     @metal_level=ShopWidget::ShopMetalLevel.all
+    @covered_lives_by_month=ShopWidget::ShopCoveredLivesByMonth.all
     
   end
 
