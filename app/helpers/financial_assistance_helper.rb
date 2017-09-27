@@ -203,45 +203,4 @@ module FinancialAssistanceHelper
       other_questions_financial_assistance_application_applicant_path(application, applicant)
     end
   end
-
-  def embedded_document_section_entry_complete?(applicant, embedded_document)
-    case embedded_document
-    when :income
-      return false if  applicant.has_job_income.nil? || applicant.has_self_employment_income.nil?
-      if applicant.has_job_income && applicant.has_self_employment_income
-        return applicant.incomes.jobs.present? && applicant.incomes.self_employment.present?
-      elsif applicant.has_job_income && !applicant.has_self_employment_income
-        return applicant.incomes.jobs.present? && applicant.incomes.self_employment.blank?
-      elsif !applicant.has_job_income && applicant.has_self_employment_income
-        return applicant.incomes.jobs.blank? && applicant.incomes.self_employment.present?
-      else
-        return applicant.incomes.jobs.blank? && applicant.incomes.self_employment.blank?
-      end
-    when :other_income
-      return false if  applicant.has_other_income.nil?
-      if applicant.has_other_income
-        return applicant.incomes.other.present?
-      else
-        return applicant.incomes.other.blank?
-      end
-    when :income_adjustments
-      return false if  applicant.has_deductions.nil?
-      if applicant.has_deductions
-        return applicant.deductions.present?
-      else
-        return applicant.deductions.blank?
-      end
-    when :health_coverage
-      return false if  applicant.has_enrolled_health_coverage.nil? || applicant.has_eligible_health_coverage.nil?
-      if applicant.has_enrolled_health_coverage && applicant.has_eligible_health_coverage
-        return applicant.benefits.enrolled.present? && applicant.benefits.eligible.present?
-      elsif applicant.has_enrolled_health_coverage && !applicant.has_eligible_health_coverage
-        return applicant.benefits.enrolled.present? && applicant.benefits.eligible.blank?
-      elsif !applicant.has_enrolled_health_coverage && applicant.has_eligible_health_coverage
-        return applicant.benefits.enrolled.blank? && applicant.benefits.eligible.present?
-      else
-        return applicant.benefits.enrolled.blank? && applicant.benefits.eligible.blank?
-      end
-    end
-  end
 end
