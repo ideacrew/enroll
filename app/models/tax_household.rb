@@ -181,7 +181,7 @@ class TaxHousehold
     end
   end
 
-  def applicants
+  def active_applicants
     return nil unless application.active_applicants
     application.active_applicants.where(tax_household_id: self.id)
   end
