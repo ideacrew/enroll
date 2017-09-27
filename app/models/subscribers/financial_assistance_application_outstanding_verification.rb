@@ -53,9 +53,10 @@ module Subscribers
 
         person_in_context = search_person(verified_person)
         throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless person_in_context.present?
+
         applicant_in_context = FinancialAssistance::Application.find(verified_income_verification.fin_app_id).applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
         throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless applicant_in_context.present?
-        applicant_in_context.update_attributes(has_verification_response: true)
+        applicant_in_context.update_attributes(has_income_verification_response: true)
 
         income_assisted_verification = applicant_in_context.assisted_verifications.where(verification_type: "Income").first
         if income_assisted_verification.present?
@@ -65,6 +66,8 @@ module Subscribers
             new_income_assisted_verification = applicant_in_context.assisted_verifications.create!(verification_type: "Income", status: verified_income_verification.verifications.first.response_code.split('#').last, verification_failed: verified_income_verification.verifications.first.income_verification_failed)
             applicant_in_context.person.consumer_role.assisted_verification_documents.create(application_id: verified_income_verification.fin_app_id, applicant_id: applicant_in_context.id, assisted_verification_id: new_income_assisted_verification.id, status: new_income_assisted_verification.status, kind: new_income_assisted_verification.verification_type)
           end
+        else
+          throw(:processing_issue, "ERROR: Failed to find Income verification for the applicant") unless person_in_context.present?
         end
       elsif xml.include?('mec_verification_result')
         verified_mec_verfication = Parsers::Xml::Cv::OutstandingMecVerificationParser.new
@@ -76,6 +79,7 @@ module Subscribers
 
         applicant_in_context = FinancialAssistance::Application.find(verified_mec_verfication.fin_app_id).applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
         throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless applicant_in_context.present?
+        applicant_in_context.update_attributes(has_mec_verification_response: true)
 
         mec_assisted_verification = applicant_in_context.assisted_verifications.where(verification_type: "MEC").first
         if mec_assisted_verification.present?
@@ -85,6 +89,8 @@ module Subscribers
             new_mec_assisted_verification = applicant_in_context.assisted_verifications.create!(verification_type: "MEC", status: verified_mec_verfication.verifications.first.response_code.split('#').last, verification_failed: verified_mec_verfication.verifications.first.mec_verification_failed)
             applicant_in_context.person.consumer_role.assisted_verification_documents.create(application_id: verified_mec_verfication.fin_app_id, applicant_id: applicant_in_context.id, assisted_verification_id: new_mec_assisted_verification.id, status: new_mec_assisted_verification.status, kind: new_mec_assisted_verification.verification_type)
           end
+        else
+          throw(:processing_issue, "ERROR: Failed to find MEC verification for the applicant") unless person_in_context.present?
         end
       else
         log(xml, {:severity => "critical", :error_message => "ERROR: Failed to find the Income/MEC verification in XML"})

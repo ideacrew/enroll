@@ -62,7 +62,8 @@ class FinancialAssistance::Applicant
   field :is_non_magi_medicaid_eligible, type: Boolean, default: false
   field :is_totally_ineligible, type: Boolean, default: false
   field :is_without_assistance, type: Boolean, default: false
-  field :has_verification_response, type: Boolean, default: false
+  field :has_income_verification_response, type: Boolean, default: false
+  field :has_mec_verification_response, type: Boolean, default: false
 
   field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
   field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00

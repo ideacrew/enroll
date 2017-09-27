@@ -590,29 +590,40 @@ class FinancialAssistance::Application
   end
 
   def check_verification_response
-    if !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.date_of_record.prev_day > submitted_at)
-      if timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.date_of_record.prev_day > timeout_response_last_submitted_at))
-        self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.date_of_record)
+    if !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.datetime_of_record.prev_day > submitted_at)
+      if timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.datetime_of_record.prev_day > timeout_response_last_submitted_at))
+         self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
         active_applicants.each do |applicant|
+          if !applicant.has_income_verification_response && !applicant.has_mec_verification_response
+            type = "Income, MEC"
+          elsif applicant.has_income_verification_response && !applicant.has_mec_verification_response
+            type = "MEC"
+          else
+            type = "Income" if (!applicant.has_income_verification_response && applicant.has_mec_verification_response)
+          end
           notify("acapi.info.events.verification.rejected",
-                    {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                      :body => JSON.dump({error: "Timed-out waiting for verification response",
-                                          applicant_first_name: applicant.person.first_name,
-                                          applicant_last_name: applicant.person.last_name,
-                                          applicant_id: applicant.person.hbx_id}),
-                      :assistance_application_id => self._id.to_s,
-                      :family_id => self.family_id.to_s,
-                      :haven_application_id => haven_app_id,
-                      :haven_ic_id => haven_ic_id,
-                      :reject_status => 504,
-                      :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S')}) if !applicant.has_verification_response
+            { :correlation_id => SecureRandom.uuid.gsub("-",""),
+              :body => JSON.dump({
+                error: "Timed-out waiting for verification response",
+                applicant_first_name: applicant.person.first_name,
+                applicant_last_name: applicant.person.last_name,
+                applicant_id: applicant.person.hbx_id,
+                rejected_verification_types: type}),
+              :assistance_application_id => self._id.to_s,
+              :family_id => self.family_id.to_s,
+              :haven_application_id => haven_app_id,
+              :haven_ic_id => haven_ic_id,
+              :reject_status => 504,
+              :submitted_timestamp => TimeKeeper.datetime_of_record.strftime('%Y-%m-%dT%H:%M:%S')
+            }
+          )
         end
       end
     end
   end
 
   def has_all_verified_applicants?
-    !active_applicants.map(&:has_verification_response).include?(false)
+    !active_applicants.map(&:has_income_verification_response).include?(false) && !active_applicants.map(&:has_mec_verification_response).include?(false)
   end
 
   def has_atleast_one_medicaid_applicant?
@@ -623,7 +634,7 @@ class FinancialAssistance::Application
     !active_applicants.map(&:is_without_assistance).include?(false)
   end
 
-  def has_atleast_one_assisted_applicant_no_medicaid_applicant?
+  def has_atleast_one_assisted_but_no_medicaid_applicant?
     active_applicants.map(&:is_ia_eligible).include?(true) && !active_applicants.map(&:is_medicaid_chip_eligible).include?(true)
   end
 
@@ -783,7 +794,7 @@ private
         update_verifications_of_applicants("external_source")
       elsif has_all_uqhp_applicants?
         update_verifications_of_applicants("not_required")
-      elsif has_atleast_one_assisted_applicant_no_medicaid_applicant?
+      elsif has_atleast_one_assisted_but_no_medicaid_applicant?
         update_verifications_of_applicants("pending")
       end
     end
