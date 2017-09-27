@@ -6,6 +6,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   include NavigationHelper
 
   before_filter :find_application_and_applicant
+  before_filter :load_support_texts, only: [:index]
 
   def index
     save_faa_bookmark(@person, request.original_url)
@@ -115,6 +116,10 @@ class FinancialAssistance::BenefitsController < ApplicationController
     rescue
       nil
     end
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
   end
 
   def format_date_params model_params

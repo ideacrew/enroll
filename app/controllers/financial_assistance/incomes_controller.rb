@@ -6,6 +6,7 @@
   include NavigationHelper
 
   before_filter :find_application_and_applicant
+  before_filter :load_support_texts, only: [:index, :other]
 
   def index
     save_faa_bookmark(@person, request.original_url)
@@ -123,6 +124,10 @@
 
   def permit_params(attributes)
     attributes.permit!
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
   end
 
   def find
