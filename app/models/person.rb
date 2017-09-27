@@ -410,7 +410,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Local residency' if consumer_role && (age_on(TimeKeeper.date_of_record) >= 19)
+    verification_types << 'DC Residency' if consumer_role && (age_on(TimeKeeper.date_of_record) >= 19)
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
     if self.us_citizen

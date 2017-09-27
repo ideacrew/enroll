@@ -21,7 +21,7 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
       when "American Indian Status"
         person.consumer_role.update_attributes(:native_validation => "valid",
                                                :native_update_reason => "data_fix_hub_response")
-      when "Local residency"
+      when "DC Residency"
         # handle local residency
       else
         person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
