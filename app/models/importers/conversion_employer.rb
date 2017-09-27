@@ -45,8 +45,8 @@ module Importers
     validates_presence_of :contact_first_name, :allow_blank => false
     validates_presence_of :contact_last_name, :allow_blank => false
     validates_presence_of :legal_name, :allow_blank => false
+    validates_length_of :fein, is: 9
 
-    validate :validate_fein_length
     validate :validate_new_fein
     validate :broker_exists_if_specified
     validate :validate_tpa_if_specified
@@ -98,13 +98,8 @@ module Importers
       org.general_agency_profile
     end
 
-    def validate_fein_length
-      return true if fein.blank?
-      self.fein = prepend_zeros(fein.gsub('-', '').strip, 9)
-
-      if fein.length != 9
-        errors.add(:fein, "is the wrong length (should be 9 characters)")
-      end
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
     end
 
     def validate_new_fein

@@ -40,7 +40,6 @@ module Importers::Mhc
         "Plan Selection Category",
         "Plan Name",
         "Plan HIOS Id",
-        "Employee Only Rating Tier",
         "Employee Only Rating Tier Contribution",
         "Employee Only Rating Tier Cost",  
         "Family Rating Tier",
@@ -84,8 +83,6 @@ module Importers::Mhc
         :ignore,
         :broker_name,
         :broker_npn,
-        :ignore,
-        :tpa_fein,
         :ignore,
         :carrier
       ]
