@@ -170,6 +170,18 @@ module Queries
       self
     end
 
+    def group_enrollment_events
+      add({
+        "$group" => {
+          "_id" => "$households.hbx_enrollments.hbx_id",
+          "hbx_enrollment_id" => {"$last" => "$households.hbx_enrollments.hbx_id"},
+          "submitted_at" => {"$last" => "$households.hbx_enrollments.submitted_at"}
+        }
+      })
+
+      self
+    end
+
     def sort_enrollments
       add({
        "$sort" => {"households.hbx_enrollments.submitted_at" => 1}

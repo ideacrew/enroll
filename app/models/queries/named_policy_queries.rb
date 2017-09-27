@@ -33,7 +33,7 @@ module Queries
         .unwind_enrollments
         .query_quiet_period_enrollments
         .sort_enrollments
-        .group_enrollments
+        .group_enrollment_events
         .project_enrollment_ids
       qs.evaluate.collect{|r| r['enrollment_hbx_id']}
     end
