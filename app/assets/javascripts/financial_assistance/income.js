@@ -70,56 +70,60 @@ $(document).ready(function() {
     $('#has_job_income_false').on('change', function(e) {
       var self = this;
       //$('#DestroyExistingJobIncomesWarning').modal('show');
-      e.preventDefault();
-      // prompt to delete all these dedcutions
-      $("#destroyAllJobIncomes").modal();
+      if ($('.incomes-list:not(.self-employed-incomes-list) .income').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllJobIncomes").modal();
 
-      $("#destroyAllJobIncomes .modal-cancel-button").click(function(e) {
-        $("#destroyAllJobIncomes").modal('hide');
-        $('#has_job_income_true').prop('checked', true).trigger('change');
-      });
+        $("#destroyAllJobIncomes .modal-cancel-button").click(function(e) {
+          $("#destroyAllJobIncomes").modal('hide');
+          $('#has_job_income_true').prop('checked', true).trigger('change');
+        });
 
-      $("#destroyAllJobIncomes .modal-continue-button").click(function(e) {
-        $("#destroyAllJobIncomes").modal('hide');
-        //$(self).prop('checked', false);
+        $("#destroyAllJobIncomes .modal-continue-button").click(function(e) {
+          $("#destroyAllJobIncomes").modal('hide');
+          //$(self).prop('checked', false);
 
-        $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
-          var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
-          $(job_income).remove();
-          $.ajax({
-            type: 'DELETE',
-            url: url
+          $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
+            var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+            $(job_income).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
           });
         });
-      });
+      }
     });
 
     /* DELETING all Self Employment Incomes on selcting 'no' on Driver Question */
     $('#has_self_employment_income_false').on('change', function(e) {
       self = this;
       //$('#DestroyExistingJobIncomesWarning').modal('show');
-      e.preventDefault();
-      // prompt to delete all these dedcutions
-      $("#destroyAllSelfEmploymentIncomes").modal();
+      if ($('.self-employed-incomes-list .income').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllSelfEmploymentIncomes").modal();
 
-      $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function(e) {
-        $("#destroyAllSelfEmploymentIncomes").modal('hide');
-        $('#has_self_employment_income_true').prop('checked', true).trigger('change');
-      });
+        $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function(e) {
+          $("#destroyAllSelfEmploymentIncomes").modal('hide');
+          $('#has_self_employment_income_true').prop('checked', true).trigger('change');
+        });
 
-      $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function(e) {
-        $("#destroyAllSelfEmploymentIncomes").modal('hide');
-        //$(self).prop('checked', false);
+        $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function(e) {
+          $("#destroyAllSelfEmploymentIncomes").modal('hide');
+          //$(self).prop('checked', false);
 
-        $('#self_employed_incomes').find('.self-employed-incomes-list > .income').each(function(i, job_income) {
-          var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
-          $(job_income).remove();
-          $.ajax({
-            type: 'DELETE',
-            url: url
+          $('#self_employed_incomes').find('.self-employed-incomes-list > .income').each(function(i, job_income) {
+            var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+            $(job_income).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
           });
         });
-      });
+      }
     });
 
     /* edit existing incomes */
