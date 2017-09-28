@@ -4,6 +4,38 @@ module TransportGateway
   class Adapters::S3Adapter
     include ::TransportGateway::Adapters::Base
 
+    def receive_message(message)
+      if message.from.blank?
+        log(:error, "transport_gateway.s3_adapter ") { "source data not provided" }
+        raise ArgumentError.new "source data not provided"
+      end
+
+      credentials = check_source_credential_provider(message)
+      check_s3_uri(message.from)
+
+      bucket = message.from.bucket
+      region = message.from.region
+      key = message.from.key
+
+      tempfile = Tempfile.new(key)
+      begin
+        client = Aws::S3::Client.new({
+          :region => region
+        }.merge(credentials))
+        resource = Aws::S3::Resource.new(client: client)
+        bucket = resource.bucket(bucket)
+        object = bucket.object(key)
+
+        object.get({response_target: tempfile})
+        TransportGateway::Sources::TempfileSource.new(tempfile)
+      rescue Exception => e
+        log(:error, "transport_gateway.s3_adapter") { e }
+        tempfile.close
+        tempfile.unlink
+        raise e
+      end
+    end
+
     def send_message(message)
       if (message.from.blank? && message.body.blank?)
         log(:error, "transport_gateway.s3_adapter ") { "source data not provided" }
@@ -48,6 +80,15 @@ module TransportGateway
           content_length: message.body.bytesize
         })
       end
+    end
+
+    def check_source_credential_provider(message)
+      cr = CredentialResolvers::S3CredentialResolver.new(message, credential_provider)
+      credentials = cr.source_credentials
+      if credentials.blank?
+        raise ArgumentError.new("credentials not found for uri")
+      end
+      credentials.s3_options
     end
 
     def check_credential_provider(message)
