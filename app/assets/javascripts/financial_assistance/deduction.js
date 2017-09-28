@@ -24,6 +24,19 @@ $(document).ready(function() {
       return 'You have an unsaved deduction, are you sure you want to proceed?';
     });
 
+    /* Saving Responses to Deduction  Driver Questions */
+    $('#has_deductions_true, #has_deductions_false').on('change', function(e) {
+      var attributes = {};
+      attributes[$(this).attr('name')] = $(this).val();
+      $.ajax({
+        type: 'POST',
+        url: window.location.pathname.replace('/deductions', ''),
+        data: { financial_assistance_applicant: attributes },
+        success: function(response){
+        }
+      })
+    });
+
     $(document).on('click', 'a[href]:not(.disabled)', function(e) {
       if (currentlyEditing()) {
         e.preventDefault();
