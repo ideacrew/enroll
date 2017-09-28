@@ -1,4 +1,3 @@
-
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
   <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
     <div class="row">
@@ -27,7 +26,7 @@
           <label class="radio-yml" for="has_job_income_yes">Yes</label>
         </div>
         <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_job_income", false, !@applicant.has_job_income, class: "radio-yml" )%>
+          <%= radio_button_tag("has_job_income", false, @applicant.has_job_income == false, class: "radio-yml" )%>
           <label class="radio-yml" for="has_job_income_no">No</label>
         </div>
         <div class='col-md-6'>
@@ -59,15 +58,15 @@
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_self_employment_income", true, @applicant.incomes.self_employment.present?, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_self_employment_income", true, @applicant.has_self_employment_income, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_self_employment_income_yes">Yes</label>
         </div>
         <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_self_employment_income", false, false, class: "radio-yml" )%>
+          <%= radio_button_tag("has_self_employment_income", false, @applicant.has_self_employment_income == false, class: "radio-yml" )%>
           <label class="radio-yml" for="has_self_employment_income_no">No</label>
         </div>
         <div class='col-md-6'>
-          <a href="#has_self_employemnt_income" data-toggle="modal" data-target="#has_self_employment_income">Not Sure?</a>
+          <a href="#has_self_employment_income" data-toggle="modal" data-target="#has_self_employment_income">Not Sure?</a>
           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_self_employment_income"} %>
         </div>
       </div>
@@ -81,7 +80,7 @@
         <% end %>
       </div>
 
-    <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
+      <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build } %>
