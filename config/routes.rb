@@ -105,6 +105,7 @@ Rails.application.routes.draw do
         get :show_sep_history
         get :calendar_index
         get :user_account_index
+        get :get_user_info
       end
 
       member do
