@@ -300,6 +300,13 @@ function startEditingOtherIncome() {
 
 // otherincome checkbox fuctionality
 $(document).ready(function() {
+  $('#financial_assistance_income_amount').on('keypress', function(e){
+    $(this).priceFormat({
+      prefix: '$ ',
+      centsSeparator: '.',
+    });
+  })
+
   function disableSave(form){
     form.find('.interaction-click-control-save').addClass("disabled");
   }
@@ -441,29 +448,60 @@ $(document).ready(function() {
     }
   });
 // disable save button logic
-  function disableSave(form){
-    form.find('.interaction-click-control-save').addClass("disabled");
-  }
+function disableSave(form){
+  form.find('.interaction-click-control-save').addClass("disabled");
+}
 
-  function enableSave(form){
-    form.find('.interaction-click-control-save').removeClass('disabled');
-  }
+function enableSave(form){
+  form.find('.interaction-click-control-save').removeClass('disabled');
+}
 
-  $(':input[required]').on('change', function(){
-    var form = $(this).closest('form');
-    if (validateForm(form)){
-      enableSave(form)
-    }else{
-      disableSave(form)
-    }
+$(':input[required]').on('change', function(){
+  var form = $(this).closest('form');
+  if (validateForm(form)){
+    enableSave(form)
+  }else{
+    disableSave(form)
+  }
+});
+
+function validateForm(form) {
+  var isValid = true;
+  form.find(':input[required]').each(function() {
+    if ( $(this).val() == '' ||  $(this).val()=='0')
+      isValid = false;
   });
+  return isValid;
+}
 
-  function validateForm(form) {
-    var isValid = true;
-    form.find(':input[required]').each(function() {
-      if ( $(this).val() == '' ||  $(this).val()=='0')
-        isValid = false;
-    });
-    return isValid;
-  }
+
+$('#financial_assistance_income_employer_phone_full_phone_number').on('keyup keydown keypress', function (e) {
+  var key = e.which || e.keyCode || e.charCode;
+  $(this).attr('maxlength', '10');
+  return (key == 8 ||
+    key == 9 ||
+    key == 46 ||
+    (key >= 37 && key <= 40) ||
+    (key >= 48 && key <= 57) ||
+    (key >= 96 && key <= 105) );
+})
+.on('focus', function () {
+  $(this).val($(this).val().replace(/\W+/g, ''));
+})
+.on('blur', function () {
+  $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
+})
+.on('keypress', function () {
+  $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d{4})+$/, "($1)-$2-$3"));
+});
+$("#financial_assistance_income_employer_address_zip").on('keyup keydown keypress', function (e) {
+  var key = e.which || e.keyCode || e.charCode;
+  $(this).attr('maxlength', '5');
+  return (key == 8 ||
+    key == 9 ||
+    key == 46 ||
+    (key >= 37 && key <= 40) ||
+    (key >= 48 && key <= 57) ||
+    (key >= 96 && key <= 105) );
+});
 });
