@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <!-- Hidden unsaved income modal -->
+  <!-- Hidden destroy benefit modal -->
   <div class="modal fade" id="destroyBenefit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -79,6 +79,44 @@
         </div>
         <div class="modal-body">
           Are you sure you want to destroy this benefit?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy all benefits modal -->
+  <div class="modal fade" id="destroyAllBenefits" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Delete all benefits?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete all of these benefits?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden unsaved benefits modal -->
+  <div class="modal fade" id="unsavedBenefitChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Unsaved Benefit Changes</h4>
+        </div>
+        <div class="modal-body">
+          You have made changes to a benefit that are not yet saved. Are you sure you want to continue?
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
