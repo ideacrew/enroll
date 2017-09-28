@@ -37,7 +37,8 @@ module Subscribers
            :payments => response[:payments],
            :total_due => response[:total_due],
            :previous_balance => response[:previous_balance],
-           :new_charges => response[:new_charges]
+           :new_charges => response[:new_charges],
+           :current_statement_date => response[:current_statement_date]
            )
 
            employer_profile_account.current_statement_activity.destroy_all

@@ -16,6 +16,7 @@ class EmployerProfileAccount
   field :adjustments, type: Money
   field :payments, type: Money
   field :total_due, type: Money
+  field :current_statement_date, type: Date
 
   field :aasm_state, type: String, default: "binder_pending"
 
@@ -29,6 +30,13 @@ class EmployerProfileAccount
 
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 
+  def payments_since_last_invoice
+    (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments")).to_a
+  end
+
+  def adjustments_since_last_invoice
+    (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments")).to_a
+  end
 
   def last_premium_payment
     return premium_payments.first if premium_payments.size == 1
