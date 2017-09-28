@@ -226,7 +226,8 @@ $(document).ready(function() {
             .appendTo(incomeListEl);
         var length = incomeListEl.find(".income").length;
         $(clonedForm).find('select').selectric();
-        $(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+        //$(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
 
