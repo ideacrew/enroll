@@ -24,6 +24,21 @@ $(document).ready(function() {
       return 'You have an unsaved income, are you sure you want to proceed?';
     });
 
+    $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+      if (currentlyEditing()) {
+        e.preventDefault();
+        var self = this;
+
+        $('#unsavedIncomeChangesWarning').modal('show');
+        $('.btn.btn-danger').click(function() {
+          window.location.href = $(self).attr('href');
+        });
+
+        return false;
+      } else
+      return true;
+    });
+
     /* Saving Responses to Income  Driver Questions */
     $('#has_job_income_true, #has_job_income_false, #has_self_employment_income_true, #has_self_employment_income_false, #has_other_income_true, #has_other_income_false').on('change', function(e) {
       var attributes = {};
@@ -39,7 +54,7 @@ $(document).ready(function() {
 
     /* DELETING all Job Incomes on selcting 'no' on Driver Question */
     $('#has_job_income_false').on('change', function(e) {
-      self = this;
+      var self = this;
       //$('#DestroyExistingJobIncomesWarning').modal('show');
       e.preventDefault();
       // prompt to delete all these dedcutions
@@ -47,6 +62,7 @@ $(document).ready(function() {
 
       $("#destroyAllJobIncomes .modal-cancel-button").click(function(e) {
         $("#destroyAllJobIncomes").modal('hide');
+        $('#has_job_income_true').prop('checked', true).trigger('change');
       });
 
       $("#destroyAllJobIncomes .modal-continue-button").click(function(e) {
@@ -74,6 +90,7 @@ $(document).ready(function() {
 
       $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function(e) {
         $("#destroyAllSelfEmploymentIncomes").modal('hide');
+        $('#has_self_employment_income_true').prop('checked', true).trigger('change');
       });
 
       $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function(e) {
@@ -89,21 +106,6 @@ $(document).ready(function() {
           });
         });
       });
-    });
-
-    $(document).on('click', 'a[href]:not(.disabled)', function(e) {
-      if (currentlyEditing()) {
-        e.preventDefault();
-        var self = this;
-
-        $('#unsavedIncomeChangesWarning').modal('show');
-        $('.btn.btn-danger').click(function() {
-          window.location.href = $(self).attr('href');
-        });
-
-        return false;
-      } else
-      return true;
     });
 
     /* edit existing incomes */
@@ -250,25 +252,24 @@ $(document).ready(function() {
         $("#self_employed_incomes").removeClass('hide');
       }
     });
+
+    /* Condtional Display Other Income Question */
+    $("body").on("change", "#has_other_income_true", function(){
+      if ($('#has_other_income_true').is(':checked')) {
+        $(".other_income_kinds").removeClass('hide');
+      } else{
+        $(".other_income_kinds").addClass('hide');
+      }
+    });
+
+    $("body").on("change", "#has_other_income_false", function(){
+      if ($('#has_other_income_false').is(':checked')) {
+        $(".other_income_kinds").addClass('hide');
+      } else{
+        $(".other_income_kinds").removeClass('hide');
+      }
+    });
   }
-
-  /* Condtional Display Other Income Question */
-  $("body").on("change", "#has_other_income_true", function(){
-    if ($('#has_other_income_true').is(':checked')) {
-      $(".other_income_kinds").removeClass('hide');
-    } else{
-      $(".other_income_kinds").addClass('hide');
-    }
-  });
-
-  $("body").on("change", "#has_other_income_false", function(){
-    if ($('#has_other_income_false').is(':checked')) {
-      $(".other_income_kinds").addClass('hide');
-    } else{
-      $(".other_income_kinds").removeClass('hide');
-    }
-  });
-
 });
 
 function stopEditingOtherIncome() {
