@@ -1,3 +1,5 @@
+require 'services/checkbook_services'
+
 class CensusEmployee < CensusMember
   include AASM
   include Sortable
@@ -214,6 +216,56 @@ class CensusEmployee < CensusMember
     is_inactive? && (TimeKeeper.date_of_record - employment_terminated_on).to_i < 30
   end
 
+  def active_benefit_group_assignment
+    benefit_group_assignments.detect { |assignment| assignment.is_active? }
+  end
+
+  def renewal_benefit_group_assignment
+    benefit_group_assignments.order_by(:'updated_at'.desc).detect{ |assignment| assignment.plan_year && assignment.plan_year.is_renewing? }
+  end
+
+  def inactive_benefit_group_assignments
+    benefit_group_assignments.reject(&:is_active?)
+  end
+
+  def published_benefit_group_assignment
+    benefit_group_assignments.detect do |benefit_group_assignment|
+      benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+    end
+  end
+
+  def active_and_renewing_benefit_group_assignments
+    result = []
+    result << active_benefit_group_assignment if !active_benefit_group_assignment.nil? 
+    result << renewal_benefit_group_assignment if !renewal_benefit_group_assignment.nil?
+    result
+  end
+
+  def add_default_benefit_group_assignment
+    if plan_year = (self.employer_profile.plan_years.published_plan_years_by_date(hired_on).first || self.employer_profile.published_plan_year)
+      add_benefit_group_assignment(plan_year.benefit_groups.first)
+      if self.employer_profile.renewing_plan_year.present?
+        add_renew_benefit_group_assignment(self.employer_profile.renewing_plan_year.benefit_groups.first)
+      end
+    end
+  end
+
+  def active_benefit_group
+    if active_benefit_group_assignment.present?
+      active_benefit_group_assignment.benefit_group
+    end
+  end
+
+  def published_benefit_group
+    published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+  end
+
+  def renewal_published_benefit_group
+    if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      renewal_benefit_group_assignment.benefit_group
+    end
+  end
+
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
     return nil unless self.employment_terminated?
@@ -253,6 +305,42 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def generate_and_save_to_temp_folder
+    begin
+      url = Settings.checkbook_services.url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        event_name: event_kind.event_name,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.build_and_save
+    rescue Exception => e
+     Rails.logger.warn("Unable to build checkbook notice for #{e}")
+    end
+  end
+
+  def generate_and_deliver_checkbook_url
+    begin
+      url = Settings.checkbook_services.url
+      event_kind = ApplicationEventKind.where(:event_name => 'out_of_pocker_url_notifier').first
+      notice_trigger = event_kind.notice_triggers.first
+      builder = notice_trigger.notice_builder.camelize.constantize.new(self, {
+        template: notice_trigger.notice_template,
+        subject: event_kind.title,
+        event_name: event_kind.event_name,
+        mpi_indicator: notice_trigger.mpi_indicator,
+        data: url
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences))
+      builder.deliver
+   rescue Exception => e
+      Rails.logger.warn("Unable to deliver checkbook url #{e}")
+    end
+  end
+
   def terminate_employee_enrollments
     [self.active_benefit_group_assignment, self.renewal_benefit_group_assignment].compact.each do |assignment|
       enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(assignment)
@@ -270,7 +358,8 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def terminate_employment!(employment_terminated_on)
+
+   def terminate_employment!(employment_terminated_on)
     if may_schedule_employee_termination?
       self.employment_terminated_on = employment_terminated_on
       self.coverage_terminated_on = earliest_coverage_termination_on(employment_terminated_on)
@@ -279,7 +368,7 @@ class CensusEmployee < CensusMember
     if employment_terminated_on < TimeKeeper.date_of_record
       if may_terminate_employee_role?
         terminate_employee_role!
-        perform_employer_plan_year_count
+        # perform_employer_plan_year_count
       else
         message = "Error terminating employment: unable to terminate employee role for: #{self.full_name}"
         Rails.logger.error { message }
@@ -294,7 +383,6 @@ class CensusEmployee < CensusMember
   end
 
   def earliest_coverage_termination_on(employment_termination_date, submitted_date = TimeKeeper.date_of_record)
-
     employment_based_date = employment_termination_date.end_of_month
     submitted_based_date  = TimeKeeper.date_of_record.
                               advance(Settings.
@@ -457,7 +545,7 @@ class CensusEmployee < CensusMember
         begin
           Invitation.invite_future_employee_for_open_enrollment!(ce)
         rescue Exception => e
-          puts "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Unable to deliver open enrollment notice to #{ce.full_name} due to --- #{e}" }) unless Rails.env.test? 
         end
       end
     end
@@ -468,7 +556,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employment(census_employee.employment_terminated_on)
         rescue Exception => e
-          puts "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating cesus employee - #{census_employee.full_name} due to -- #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -479,7 +567,7 @@ class CensusEmployee < CensusMember
         begin
           employee.rebase_new_designee! if employee.may_rebase_new_designee?
         rescue Exception => e
-          puts "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while rebasing newly designated cesus employee - #{employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -490,7 +578,7 @@ class CensusEmployee < CensusMember
         begin
           census_employee.terminate_employee_role!
         rescue Exception => e
-          puts "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" unless Rails.env.test?
+          (Rails.logger.error { "Error while terminating future scheduled cesus employee - #{census_employee.full_name} due to #{e}" }) unless Rails.env.test?
         end
       end
     end
@@ -508,7 +596,7 @@ class CensusEmployee < CensusMember
             next if (ce.new_hire_enrollment_period.cover?(date) || ce.new_hire_enrollment_period.first > date)
             ShopNoticesNotifierJob.perform_later(ce.id.to_s, "employee_open_enrollment_reminder")
           rescue Exception => e
-            puts "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" unless Rails.env.test?
+            (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
         end
       end

@@ -28,6 +28,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
     allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
@@ -2383,8 +2384,31 @@ describe PlanYear, "plan year schedule changes" do
       end
     end
   end
-end
 
+  context '.carriers_offered' do 
+
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
+    let(:plan_year) { employer_profile.published_plan_year }
+    let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+    let!(:silver_ref_plan)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+    let!(:gold_ref_plan)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+    let(:silver_bg) { FactoryGirl.build(:benefit_group, title: "silver offerings", plan_year: plan_year, reference_plan_id: silver_ref_plan.id, plan_option_kind: 'single_carrier')}
+    let(:gold_bg) { FactoryGirl.build(:benefit_group, title: "gold offerings", plan_year: plan_year, reference_plan_id: gold_ref_plan.id, plan_option_kind: 'single_carrier')}
+
+    before do
+      plan_year.benefit_groups = [silver_bg, gold_bg]
+      plan_year.save(:validate => false)
+    end
+
+    context '.carriers_offered' do
+
+      it "should return carriers offered on multiple benefit groups" do
+        expect(plan_year.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+      end
+    end
+  end
+end
 
 describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
