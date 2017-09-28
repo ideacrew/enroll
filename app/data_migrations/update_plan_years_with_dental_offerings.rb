@@ -88,7 +88,8 @@ class UpdatePlanYearsWithDentalOfferings < MongoidMigrationTask
           factory.renewing_plan_year = renewing_plan_year
           factory.active_plan_year = active_plan_year
           factory.disable_notifications = true
-          factory.process_renewals_for('dental')
+          factory.coverage_kind = 'dental'
+          factory.generate_renewals
 
           family.reload
           family.active_household.hbx_enrollments.shop_market.where({

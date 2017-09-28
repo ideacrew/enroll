@@ -164,6 +164,8 @@ end
 
 describe "#latest_active_tax_household_with_year" do
   include_context "BradyBunchAfterAll"
+  let(:family) { FactoryGirl.build(:family)}
+  let(:consumer_role) { ConsumerRole.new }
   before :all do
     create_tax_household_for_mikes_family
     @consumer_role = mike.consumer_role
@@ -171,11 +173,11 @@ describe "#latest_active_tax_household_with_year" do
   end
 
   it "should rerturn active taxhousehold of this year" do
-    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq @taxhouhold
+    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, mikes_family)).to eq @taxhouhold
   end
 
   it "should rerturn nil when can not found taxhousehold" do
-    expect(ConsumerRole.new.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq nil
+    expect(consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year, family)).to eq nil
   end
 end
 
@@ -642,23 +644,6 @@ describe "#build_nested_models_for_person" do
     Email::KINDS.each do |kind|
       expect(person.emails.map(&:kind)).to include kind
     end
-  end
-end
-
-describe "#latest_active_tax_household_with_year" do
-  include_context "BradyBunchAfterAll"
-  before :all do
-    create_tax_household_for_mikes_family
-    @consumer_role = mike.consumer_role
-    @taxhouhold = mikes_family.latest_household.tax_households.last
-  end
-
-  it "should rerturn active taxhousehold of this year" do
-    expect(@consumer_role.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq @taxhouhold
-  end
-
-  it "should rerturn nil when can not found taxhousehold" do
-    expect(ConsumerRole.new.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year)).to eq nil
   end
 end
 

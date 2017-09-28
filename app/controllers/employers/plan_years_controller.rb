@@ -312,13 +312,12 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish! if @plan_year.may_publish?
-    if @plan_year.publish_pending? || @plan_year.renewing_publish_pending?
-      @plan_year.withdraw_pending!
+    if @plan_year.may_publish? && !@plan_year.is_application_eligible?
       respond_to do |format|
         format.js
       end
     else
+      @plan_year.publish! if @plan_year.may_publish?
       if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
 
         if @plan_year.assigned_census_employees_without_owner.present?

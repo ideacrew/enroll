@@ -107,6 +107,8 @@ class HbxEnrollment
   field :review_status, type: String, default: "incomplete"
   field :special_verification_period, type: DateTime
   field :termination_submitted_on, type: DateTime
+  # Checkbook url
+  field :checkbook_url , type: String
 
 
   # An external enrollment is one which we keep for recording purposes,
@@ -455,7 +457,7 @@ class HbxEnrollment
 
   def propogate_waiver
     return false unless is_shop? # there is no concept of waiver in ivl case
-    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
     shop_enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
@@ -486,7 +488,7 @@ class HbxEnrollment
   end
 
   def update_existing_shop_coverage
-    id_list = self.benefit_group.plan_year.benefit_groups.map(&:id)
+    id_list = self.benefit_group.plan_year.benefit_groups.pluck(:_id)
     shop_enrollments = household.hbx_enrollments.shop_market.by_coverage_kind(self.coverage_kind).where(:benefit_group_id.in => id_list).show_enrollments_sans_canceled.to_a
 
     terminate_proc = lambda do |enrollment|
@@ -614,7 +616,7 @@ class HbxEnrollment
   end
 
   def applicant_ids
-    hbx_enrollment_members.map(&:applicant_id)
+    hbx_enrollment_members.pluck(:applicant_id)
   end
 
   def employer_profile
@@ -736,7 +738,7 @@ class HbxEnrollment
   end
 
   def rebuild_members_by_coverage_household(coverage_household:)
-    applicant_ids = hbx_enrollment_members.map(&:applicant_id)
+    applicant_ids = hbx_enrollment_members.pluck(:applicant_id)
     coverage_household.coverage_household_members.each do |coverage_member|
       next if applicant_ids.include? coverage_member.family_member_id
       enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
@@ -1152,7 +1154,7 @@ class HbxEnrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
 
-    after_all_transitions :perform_employer_plan_year_count
+    # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
       transitions from: :shopping, to: :auto_renewing
