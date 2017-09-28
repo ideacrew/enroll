@@ -24,7 +24,8 @@ $(document).ready(function() {
       return 'You have an unsaved income, are you sure you want to proceed?';
     });
 
-    $('#has_job_income_true, #has_job_income_false').on('change', function(e) {
+    /* Saving Responses to Income  Driver Questions */
+    $('#has_job_income_true, #has_job_income_false, #has_self_employment_income_true, #has_self_employment_income_false, #has_other_income_true, #has_other_income_false').on('change', function(e) {
       var attributes = {};
       attributes[$(this).attr('name')] = $(this).val();
       $.ajax({
@@ -34,6 +35,60 @@ $(document).ready(function() {
         success: function(response){
         }
       })
+    });
+
+    /* DELETING all Job Incomes on selcting 'no' on Driver Question */
+    $('#has_job_income_false').on('change', function(e) {
+      self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      e.preventDefault();
+      // prompt to delete all these dedcutions
+      $("#destroyAllJobIncomes").modal();
+
+      $("#destroyAllJobIncomes .modal-cancel-button").click(function(e) {
+        $("#destroyAllJobIncomes").modal('hide');
+      });
+
+      $("#destroyAllJobIncomes .modal-continue-button").click(function(e) {
+        $("#destroyAllJobIncomes").modal('hide');
+        //$(self).prop('checked', false);
+
+        $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
+          var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+          $(job_income).remove();
+          $.ajax({
+            type: 'DELETE',
+            url: url
+          });
+        });
+      });
+    });
+
+    /* DELETING all Self Employment Incomes on selcting 'no' on Driver Question */
+    $('#has_self_employment_income_false').on('change', function(e) {
+      self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      e.preventDefault();
+      // prompt to delete all these dedcutions
+      $("#destroyAllSelfEmploymentIncomes").modal();
+
+      $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function(e) {
+        $("#destroyAllSelfEmploymentIncomes").modal('hide');
+      });
+
+      $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function(e) {
+        $("#destroyAllSelfEmploymentIncomes").modal('hide');
+        //$(self).prop('checked', false);
+
+        $('#self_employed_incomes').find('.self-employed-incomes-list > .income').each(function(i, job_income) {
+          var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+          $(job_income).remove();
+          $.ajax({
+            type: 'DELETE',
+            url: url
+          });
+        });
+      });
     });
 
     $(document).on('click', 'a[href]:not(.disabled)', function(e) {
