@@ -254,7 +254,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def notify_employee_of_termination
     begin
-      ShopNoticesNotifierJob.perfrom_later(@census_employee.id.to_s, "employee_termination_notice")
+      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
     rescue Exception => e
       (Rails.logger.error { "Unable to deliver termination notice to #{@census_employee.full_name} due to #{e.inspect}" }) unless Rails.env.test?
     end
