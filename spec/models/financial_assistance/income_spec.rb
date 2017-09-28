@@ -228,7 +228,7 @@ RSpec.describe FinancialAssistance::Income, type: :model do
         income.start_on = Date.today
         income.end_on = Date.yesterday
         income.valid?
-        expect(income.errors["end_on"]).to include("' End On' Date can't occur before start on date")
+        expect(income.errors["end_on"]).to include("Date can't occur before start on date")
       end
     end
   end

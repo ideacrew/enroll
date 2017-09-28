@@ -172,6 +172,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
           let!(:application) {
             FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
           }
+          let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
           before do
             allow(Person).to receive(:where).and_return([person])
@@ -200,6 +201,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
         let!(:application) {
           FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
+        let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
         before do
           allow(Person).to receive(:where).and_return([person])
@@ -415,6 +417,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
             let!(:application) {
               FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
             }
+            let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
             before do
               allow(Person).to receive(:where).and_return([person])
@@ -443,6 +446,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
         let!(:application) {
           FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "submitted")
         }
+        let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
 
         before do
           allow(Person).to receive(:where).and_return([person])

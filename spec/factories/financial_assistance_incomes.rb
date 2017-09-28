@@ -3,10 +3,10 @@ FactoryGirl.define do
 
     association :applicant
 
-    title 'Test Income'
+    title 'Test'
     amount 10
     frequency_kind 'monthly'
-    start_on (TimeKeeper.date_of_record.beginning_of_month)
-    end_on (TimeKeeper.date_of_record.end_of_month)
+    start_on Date.today.beginning_of_month
+    end_on Date.today.end_of_month
   end
 end
