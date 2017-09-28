@@ -39,7 +39,7 @@ $(document).ready(function() {
     $(document).on('click', 'a[href]:not(.disabled)', function(e) {
       if (currentlyEditing()) {
         e.preventDefault();
-        var self = this, warning = $.Deferred;
+        var self = this;
 
         $('#unsavedIncomeChangesWarning').modal('show');
         $('.btn.btn-danger').click(function() {
