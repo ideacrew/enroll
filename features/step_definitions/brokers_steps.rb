@@ -192,6 +192,7 @@ Then(/^.* creates and publishes a plan year$/) do
 
   find(:xpath, '//li/label[@for="plan_year_benefit_groups_attributes_0_plan_option_kind_single_carrier"]').click
   wait_for_ajax(10)
+  screenshot_and_save_page
   find('.carriers-tab a').click
   wait_for_ajax(10,2)
   find('.reference-plan label').click

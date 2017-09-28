@@ -7,4 +7,5 @@ Feature: Add searchbox on broker agencies
     And Hbx Admin click on Broker Agencies 
     Then Hbx Admin should see searchbox
     When he enters an broker agency name and clicks on the search button
-    Then he should see the one result with the agency name 
+    Then he should see the one result with the agency name
+    And Hbx Admin logs out

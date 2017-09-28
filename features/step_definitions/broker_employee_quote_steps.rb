@@ -166,24 +166,29 @@ end
 Then(/^the broker filters health plans$/) do
   find(:xpath, "//*[@id='quote-plan-list']/label[1]").trigger("click")
   find(:xpath, "//*[@id='quote-plan-list']/label[2]").trigger("click")
+  wait_for_ajax(3)
 end
 
 Then(/^the broker filters dental plans$/) do
   find(:xpath, "//*[@id='quote-dental-plan-list']/label[1]").trigger("click")
   find(:xpath, "//*[@id='quote-dental-plan-list']/label[2]").trigger("click")
+  wait_for_ajax(3)
 end
 
 Then(/^the broker clicks Compare Costs for health plans$/) do
   find('#CostComparison').trigger 'click'
+  wait_for_ajax(3)
 end
 
 Then(/^the broker clicks Compare Costs for dental plans$/) do
   find('#DentalCostComparison').trigger 'click'
+  wait_for_ajax(3)
 end
 
 When(/^the broker selects the Reference Health Plan$/) do
   wait_for_ajax(3)
   find('div#single_plan_1').trigger("click")
+  wait_for_ajax(3)
 end
 
 When(/^the broker selects the Reference Dental Plan$/) do
@@ -193,6 +198,7 @@ When(/^the broker selects the Reference Dental Plan$/) do
 end
 
 Then(/^the broker clicks Publish Quote button$/) do
+  wait_for_ajax(3)
   find('#publish_quote').trigger 'click'
 end
 

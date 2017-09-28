@@ -1,4 +1,19 @@
+begin
+  require 'database_cleaner'
+  require 'database_cleaner/cucumber'
+
+  DatabaseCleaner.strategy = :truncation
+  #DatabaseCleaner.strategy = :transaction
+rescue NameError
+  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
+end
+
 Before do |scenario|
+  page.driver.restart
+  Capybara.reset_sessions!
+  page.driver.clear_memory_cache
+  page.driver.clear_cookies
+  DatabaseCleaner.clean
   @count = 0
   case scenario
   when Cucumber::RunningTestCase::ScenarioOutlineExample

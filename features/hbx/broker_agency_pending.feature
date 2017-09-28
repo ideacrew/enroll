@@ -19,3 +19,4 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     And Hbx Admin checks Optimum Choice
     When Hbx Admin clicks pending button
     Then Hbx Admin sees a successful message
+    And Hbx Admin logs out

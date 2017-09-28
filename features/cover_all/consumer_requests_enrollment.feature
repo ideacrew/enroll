@@ -29,6 +29,7 @@ Feature: Consumer requests enrollment in CoverAll
     Then HBX Admin should see the enrollment receipt page
     When HBX Admin clicks go to my account button
     Then HBX Admin should see the home page with text coverage selected
+    And Hbx Admin logs out
 
    Scenario: When we login as Hbx admin with only read permissions then on family tab we should not see link New DC Resident Application
     Given a Hbx admin with read only permissions exists
@@ -36,3 +37,4 @@ Feature: Consumer requests enrollment in CoverAll
     Then Hbx Admin sees Families link
     When Hbx Admin clicks on Families link
     Then Hbx Admin should not see an New DC Resident Application link
+    And Hbx Admin logs out
