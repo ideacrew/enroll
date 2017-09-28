@@ -5,11 +5,12 @@ module Importers::Mhc
       super(opts)
     end
 
-# covered scenarios
-# if broker is hired/terminated, then updated_at column in employer_profile model is changed.
-# if office locations is updated, then updated_at column in organization model is changed.
-# if employer info is updated, then updated_at column in employer_profile model is changed.
-# if broker_agency_profile info is updated, then updated_at column in broker_agency_profile model is changed.
+    # covered scenarios
+    # if broker is hired/terminated, then updated_at column in employer_profile model is changed.
+    # if office locations is updated, then updated_at column in organization model is changed.
+    # if employer info is updated, then updated_at column in employer_profile model is changed.
+    # if broker_agency_profile info is updated, then updated_at column in broker_agency_profile model is changed.
+
     def has_data_not_changed_since_import
       has_organization_info_changed?
       has_employer_info_changed?

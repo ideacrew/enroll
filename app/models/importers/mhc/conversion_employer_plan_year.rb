@@ -37,9 +37,9 @@ module Importers::Mhc
           sp_hios = single_plan_hios_id.strip
           found_sole_source_plan = available_plans.detect { |pl| (pl.hios_id == sp_hios) || (pl.hios_id == "#{sp_hios}-01") }
           return found_sole_source_plan if found_sole_source_plan
-          warnings.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group defaulting to most common plan")
+          errors.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group")
         else
-          warnings.add(:single_plan_hios_id, "no hios id specified for single plan benefit group, defaulting to most common plan")
+          errors.add(:single_plan_hios_id, "no hios id specified for single plan benefit group")
         end
       end
     end
