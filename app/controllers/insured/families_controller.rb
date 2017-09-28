@@ -59,6 +59,7 @@ class Insured::FamiliesController < FamiliesController
     @matrix = @family.build_relationship_matrix
     @missing_relationships = @family.find_missing_relationships(@matrix)
     @relationship_kinds = PersonRelationship::Relationships_UI
+    @all_relationships = @family.find_all_relationships(@matrix)
     @tab = params['tab']
 
     respond_to do |format|
