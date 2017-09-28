@@ -62,7 +62,7 @@ class FinancialAssistance::Income
   field :kind, as: :income_type, type: String, default: 'wages_and_salaries'
   field :wage_type, type: String
   field :hours_per_week, type: Integer
-  field :amount, type: Integer, default: 0
+  field :amount, type: Integer
   field :amount_tax_exempt, type: Integer, default: 0
   field :frequency_kind, type: String
   field :start_on, type: Date

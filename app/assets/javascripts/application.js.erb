@@ -46,6 +46,7 @@
 //= require responsive
 //= require effective_datatables
 //= require jquery.steps
+//= jquery.priceformat
 //= require_tree .
 
 var disableSelectric = false;
@@ -527,6 +528,16 @@ $(document).ready(function () {
 
   $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
   $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
+
+  $(document).on('keypress', '.floatlabel', function(e) {
+    $(this).siblings('.label-floatlabel').css("opacity", 1).css('display', 'block');
+  });
+
+  $(document).on('keyup', '.floatlabel', function(e) {
+    if (!this.value) {
+      $(this).siblings('.label-floatlabel').css("opacity", 0).css('display', 'none');
+    }
+  });
 
   $(document).on('click', '.return_to_home', function() {
     $('#add_home_action').html('');
