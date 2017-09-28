@@ -37,13 +37,13 @@ namespace :reports do
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
 
-        brokers.each do |broker|  
+        brokers.each do |broker|
             csv << [
             broker.broker_role.npn,
             broker.broker_role.broker_agency_profile.try(:legal_name),
             broker.first_name,
-            broker.last_name, 
-            broker.broker_role.email_address, 
+            broker.last_name,
+            broker.broker_role.email_address,
             broker.broker_role.phone,
             broker.broker_role.broker_agency_profile.try(:market_kind),
             broker.broker_role.broker_agency_profile.try(:languages_spoken),
@@ -71,8 +71,8 @@ namespace :reports do
 
     def organization_info(broker)
       validate_broker = broker.broker_role.broker_agency_profile.nil? && broker.broker_role.broker_agency_profile.organization.primary_office_location.nil?
-      return ["","","","",""] if validate_broker 
-      return ["","","","",""] if broker.broker_role.broker_agency_profile.organization.primary_office_location.try(:address).nil?
+      return ["","","","",""] if validate_broker
+      return ["","","","",""] if broker.broker_role.broker_agency_profile.nil? or broker.broker_role.broker_agency_profile.organization.primary_office_location.try(:address).nil?
       [
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_1,
         broker.broker_role.broker_agency_profile.organization.primary_office_location.address.address_2,
