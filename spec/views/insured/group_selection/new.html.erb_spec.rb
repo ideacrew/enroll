@@ -405,7 +405,6 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should display effective on date" do
-      assign :new_effective_on, TimeKeeper.date_of_record.beginning_of_month
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to match(/Effective Date/)
     end
