@@ -4,11 +4,14 @@
     <div class="col-md-12 no-pd col-sm-12 col-xs-12">
       <div class="form-group form-group-lg">
         <%= f.fields_for :ach_record, errors: {}, fieldset: false do |ach_record| %>
+        <div class="row no-buffer row-form-wrapper">
+          <%= ach_record.text_field :account_number, value: f.object.ach_record.account_number, class: "floatlabel form-control", required: true, placeholder: 'Account #' %>
+        </div>
           <div class="row no-buffer row-form-wrapper">
-            <%= ach_record.text_field :routing_number, class: "floatlabel form-control", required: true, placeholder: '9 digit ACH Routing #', maxlength: 9 %>
+            <%= ach_record.text_field :routing_number, value: f.object.ach_record.routing_number, class: "floatlabel form-control", required: true, placeholder: '9 digit ACH Routing #', maxlength: 9 %>
           </div>
           <div class="row no-buffer row-form-wrapper">
-            <%= ach_record.text_field :routing_number_confirmation, class: "floatlabel form-control", required: true, placeholder: 'Confirm Routing #', maxlength: 9 %>
+            <%= ach_record.text_field :routing_number_confirmation, value: f.object.ach_record.routing_number, class: "floatlabel form-control", required: true, placeholder: 'Confirm Routing #', maxlength: 9 %>
           </div>
           <%= ach_record.hidden_field :id %>
         <% end %>

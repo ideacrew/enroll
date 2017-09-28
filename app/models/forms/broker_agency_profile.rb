@@ -29,6 +29,7 @@ module Forms
     def initialize(attrs = {})
       self.fein = Organization.generate_fein
       self.is_fake_fein=true
+      self.ach_record = attrs[:ach_record]
       super(attrs)
     end
 
@@ -48,6 +49,7 @@ module Forms
     end
 
     def validate_ach_record
+      return false unless @ach_record
       unless @ach_record.valid?
         errors = @ach_record.errors
         errors.each do |key, val|
@@ -78,6 +80,7 @@ module Forms
       self.broker_agency_profile = organization.broker_agency_profile
       self.broker_agency_profile.primary_broker_role = person.broker_role
       self.broker_agency_profile.ach_routing_number = @ach_record.routing_number
+      self.broker_agency_profile.ach_account_number = @ach_record.account_number
       self.broker_agency_profile.save!
       person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
       UserMailer.broker_application_confirmation(person).deliver_now
@@ -150,7 +153,7 @@ module Forms
       organization = broker_agency_profile.organization
       broker_role = broker_agency_profile.primary_broker_role
       person = broker_role.try(:person)
-
+      pp broker_agency_profile
       record = self.new({
         id: organization.id,
         legal_name: organization.legal_name,
@@ -167,6 +170,11 @@ module Forms
         languages_spoken: broker_agency_profile.languages_spoken,
         working_hours: broker_agency_profile.working_hours,
         accept_new_clients: broker_agency_profile.accept_new_clients,
+        ach_record: {
+          routing_number: broker_agency_profile.ach_routing_number,
+          routing_number_confirmation: broker_agency_profile.ach_routing_number,
+          account_number: broker_agency_profile.ach_account_number,
+        },
         office_locations: organization.office_locations
       })
     end
@@ -218,7 +226,8 @@ module Forms
         :languages_spoken => languages_spoken,
         :working_hours => working_hours,
         :accept_new_clients => accept_new_clients,
-        :ach_routing_number => @ach_record.routing_number
+        :ach_routing_number => ach_record.routing_number,
+        :ach_account_number => ach_record.account_number
       }
     end
 

@@ -2,6 +2,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
 
   Scenario: HBX Admin sends a Broker Applicant to a pending state
     When Primary Broker visits the HBX Broker Registration form
+    Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information

@@ -29,7 +29,8 @@ class BrokerAgencyProfile
   field :aasm_state_set_on, type: Date
 
   field :ach_routing_number, type: String
-
+  field :ach_account_number, type: String
+  
   delegate :hbx_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: false
   delegate :dba, :dba=, to: :organization, allow_nil: true

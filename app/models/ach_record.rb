@@ -4,6 +4,7 @@ class AchRecord
   ROUTING_NUMBER_LENGTH = 9
 
   field :routing_number, type: String
+  field :account_number, type: String
   field :bank_name, type: String
 
   validates_uniqueness_of :routing_number
