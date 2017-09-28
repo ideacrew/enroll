@@ -171,6 +171,7 @@ module Importers::Mhc
         :ignore,
         :ignore,
         :ignore,
+        :ignore,
         :subscriber_ssn,
         :subscriber_dob,
         :subscriber_gender,
@@ -310,7 +311,6 @@ module Importers::Mhc
     end
 
     def create_model(record_attrs)
-        binding.pry
       # puts "processing #{record_attrs[:subscriber_name_first]}--#{record_attrs[:subscriber_name_last]}"
       the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
       case the_action
