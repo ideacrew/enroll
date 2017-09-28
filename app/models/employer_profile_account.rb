@@ -31,11 +31,11 @@ class EmployerProfileAccount
   scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
 
   def payments_since_last_invoice
-    (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments")).to_a
+    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments")).to_a : []
   end
 
   def adjustments_since_last_invoice
-    (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments")).to_a
+    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Adjustments")).to_a : []  
   end
 
   def last_premium_payment
