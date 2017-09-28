@@ -98,16 +98,11 @@ $(document).ready(function() {
     /* cancel income edits */
     $('.incomes-list').on('click', 'a.income-cancel', function(e) {
       e.preventDefault();
-
-      if ($(this).parents('.new-income-form').length) {
-        $(this).parents('.new-income-form').remove();
-      } else {
-        var incomeEl = $(this).parents('.income');
-        incomeEl.find('.income-edit-form').addClass('hidden');
-        incomeEl.find('.display-income').removeClass('hidden');
-      }
+      var incomeEl = $(this).parents('.income');
+      $(this).parents('.new-income-form').addClass("hidden");
+      incomeEl.find('.income-edit-form').addClass('hidden');
+      incomeEl.find('.display-income').removeClass('hidden');
       stopEditingIncome();
-
       /* TODO: Handle unchecking boxes if there are no more incomes of that kind */
     });
 
@@ -126,14 +121,32 @@ $(document).ready(function() {
 
     /* new job incomes */
     $('a.new-income.btn').click(function(e) {
-      e.preventDefault();
+        e.preventDefault();
+        startEditingIncome();
+        var form = $(this).parents();
+        if ($(this).parents('#job_income').children('.new-income-form').length){
+           var  newIncomeForm = $(this).parents('#job_income').children('.new-income-form')
+        }
+        else{
+           var  newIncomeForm = $(this).parents('#self_employed_incomes').children('.new-income-form')
+        }
 
-      startEditingIncome();
-      $(this).siblings('.new-income-form')
-      .clone(true)
-      .removeClass('hidden')
-      .appendTo($(this).siblings('.incomes-list'));
+        if ($(this).parents('#job_income').find('.incomes-list').length){
+           var  incomeListEl =  $(this).parents('#job_income').find('.incomes-list');
+        }
+        else{
+           var  incomeListEl =  $(this).parents('#self_employed_incomes').find('.incomes-list');
+        }
+        if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
+        var clonedForm = newIncomeForm.clone(true, true)
+            .removeClass('hidden')
+            .appendTo(incomeListEl);
+        var length = incomeListEl.find(".income").length;
+        $(clonedForm).find('select').selectric();
+        $(newIncomeForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
+
+
 
     /* Condtional Display Job Income Question */
     if ($("has_job_income_true").is(':checked')) $("#job_income").addClass('hidden');
@@ -170,9 +183,6 @@ $(document).ready(function() {
         $("#self_employed_incomes").removeClass('hide');
       }
     });
-
-    $( "#financial_assistance_income_start_on" ).datepicker({dateFormat: "yy-mm-dd"});
-    $( "#financial_assistance_income_end_on" ).datepicker({dateFormat: "yy-mm-dd"});
   }
 
   /* Condtional Display Other Income Question */
@@ -252,7 +262,7 @@ $(document).ready(function() {
       .appendTo(otherIncomeListEl);
       startEditingOtherIncome();
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker({dateFormat: "dd-mm-yy"});
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     } else {
       // prompt to delete all these other incomes
     }
@@ -268,7 +278,7 @@ $(document).ready(function() {
            .appendTo(otherIncomeListEl);
        startEditingOtherIncome();
        $(clonedForm).find('select').selectric();
-       $(clonedForm).find(".datepicker-js").datepicker({dateFormat: "dd-mm-yy"});
+       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
        $(this).addClass("hidden");
    });
 
@@ -280,7 +290,7 @@ $(document).ready(function() {
     otherIncomeEl.find('.edit-other-income-form').removeClass('hidden');
     startEditingOtherIncome();
 
-    $(otherIncomeEl).find(".datepicker-js").datepicker({dateFormat: "dd-mm-yy"});
+    $(otherIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
   });
 
   /* destroy existing other income */

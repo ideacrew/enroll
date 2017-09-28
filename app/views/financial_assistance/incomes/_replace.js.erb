@@ -1,9 +1,11 @@
 stopEditingIncome();
 //need to dynamcially handle different income types
 <% if @income.kind == 'wages_and_salaries' %>
-	$('<%= id %>').html("<%= escape_javascript render(partial: 'job_income', locals: { income: @income }) %>");
-<% elsif @income.kind == 'self_employed_income' %>
-	$('<%= id %>').html("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
+  $('<%= id %>').parent().append("<%= escape_javascript render(partial: 'job_income', locals: { income: @income }) %>");
+  $('<%= id %>').remove();
+<% elsif @income.kind == 'self_employed_income' || @income.kind == 'net_self_employment'%>
+  $('<%= id %>').parent().append("<%= escape_javascript render(partial: 'self_employed_income', locals: { income: @income }) %>");
+  $('<%= id %>').remove();
 <% else %>
 	// handle other income here!
 	stopEditingIncome();
