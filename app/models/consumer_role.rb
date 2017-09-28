@@ -191,7 +191,7 @@ class ConsumerRole
   #check verification type status
   def is_type_outstanding?(type)
     case type
-      when "Residency"
+      when "DC Residency"
         residency_denied? && !has_docs_for_type?(type)
       when 'Social Security Number'
         !ssn_verified? && !has_docs_for_type?(type)
@@ -795,7 +795,7 @@ class ConsumerRole
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)
       when "American Indian Status"
         update_attributes(:native_validation => "valid", :native_update_reason => update_reason)
-      when "Local residency"
+      when "DC Residency"
         # handle local residency verificatio
       else
         lawful_presence_determination.authorize!(verification_attr(authority.first))
