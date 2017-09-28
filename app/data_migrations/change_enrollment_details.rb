@@ -16,6 +16,8 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
     when "revert_cancel"
       # When Enrollment with given policy ID is active in Glue & canceled in Enroll(Mostly you will see this with passive enrollments)
       revert_cancel(enrollment)
+    when "cancel_enrollment"
+      enrollment.cancel_coverage!
     end
   end
 
