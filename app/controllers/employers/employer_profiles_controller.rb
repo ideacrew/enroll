@@ -343,7 +343,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def retrieve_payments_for_page(page_no)
-    @payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).skip((page_no.to_i - 1)*10).limit(10)
+    @payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
   end
 
   def updateable?
