@@ -32,7 +32,7 @@
     { content: "This letter is notification that your employer, #{notice.employer_name}, is no longer offering health coverage to employees through the #{Settings.site.short_name}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "<strong>Health coverage for you, and any of your enrolled family members, will end on #{notice.plan_year.end_on}. </strong>", top_margin: '10px'} %>
+    { content: "<strong>Health coverage for you, and any of your enrolled family members, will end on #{notice.plan_year.terminated_on}. </strong>", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals =>
     { contents: [""], heading: 'You May be Eligible for Other Coverage', sub_heading: '', top_margin: '10px'} %>
@@ -41,7 +41,7 @@
     { content: "If you are enrolled in #{notice.employer_name}’s health coverage, you may be eligible for a Special Enrollment Period (SEP), during which you can purchase coverage for yourself and your family members  through the #{Settings.site.short_name}’s individual marketplace.  You may also be eligible for premium subsidies and other forms of financial assistance if you are unable to afford the full cost of health insurance.. \n"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-    { content: "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the loss of coverage, #{notice.plan_year.terminated_on}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment Period from #{notice.enrollment.ivl_open_enrollment_start_on} through #{notice.enrollment.ivl_open_enrollment_end_on}. Please into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance.. \n", top_margin: '10px'} %>
+    { content: "You can report your loss of coverage to enroll through a Special Enrollment Period up to 60 days prior to the date of the loss of coverage and must report it no later than 60 days after the loss of coverage, #{notice.plan_year.group_lost_on}. To assure continued coverage, you need to enroll during this Special Enrollment Period. If you do not enroll during this time, you may have to wait until the next Open Enrollment Period from #{notice.enrollment.ivl_open_enrollment_start_on} through #{notice.enrollment.ivl_open_enrollment_end_on}. Please into your #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to view health plan options available to you and to learn whether you qualify for financial assistance.. \n", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
     { content: "If you are not a resident of the District of Columbia, you should contact the Health Insurance Marketplace located in your state of residence to inquire about eligibility for a Special Enrollment Period and premium assistance programs. To find the Health Insurance Marketplace in your state go to #{Settings.site.website_url}</a>.\n", top_margin: '10px'} %>
@@ -53,7 +53,10 @@
     { contents: [""], heading: 'For Questions or Assistance:', sub_heading: '', top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
-    content: "Please contact your broker for further assistance. You can contact #{Settings.site.short_name} with any questions:"} %>
+    content: "Please contact your broker for further assistance."} %>
+
+<%= render partial: 'notices/shared/paragraph', locals: {
+    content: "You can also contact #{Settings.site.short_name} with any questions:", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
                                                                       ["By calling #{notice.hbe.phone}.",

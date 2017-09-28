@@ -72,7 +72,7 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
       allow(HbxProfile).to receive_message_chain("current_hbx").and_return(hbx_profile)
       allow(hbx_profile).to receive_message_chain("benefit_sponsorship.benefit_coverage_periods").and_return([bcp])
       @employee_notice.append_data
-      expect(@employee_notice.notice.plan_year.end_on).to eq plan_year.end_on
+      expect(@employee_notice.notice.plan_year.terminated_on).to eq plan_year.terminated_on
     end
   end
 
