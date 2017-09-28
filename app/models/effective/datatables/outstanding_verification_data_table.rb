@@ -37,7 +37,10 @@ module Effective
       def search_column(collection, table_column, search_term, sql_column)
           super
       end
-      
+
+      def date_filter_name_definition
+        "Verification Due Date Range"
+      end
 
       def nested_filter_definition
         filters = {
