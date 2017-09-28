@@ -63,10 +63,6 @@
             <div class="col-md-9">
               <%= deduction_kind.gsub('_',' ').capitalize %>
             </div>
-
-            <div class="col-md-2 add-more-link-<%=deduction_kind%>">
-              <%= link_to "Add More", "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
-            </div>
           </div>
 
           <div class="deductions-list">
@@ -79,7 +75,11 @@
             <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: @applicant.deductions.build, kind: deduction_kind} %>
           </div>
 
-          <br />
+          <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+             <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{deduction_kind.titleize}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
+          </div>
+
+          <br /><br />
         </div>
       <% end %>
     </div>
