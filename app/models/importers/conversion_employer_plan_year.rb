@@ -99,6 +99,7 @@ module Importers
     def validate_is_conversion_employer
       found_employer = find_employer
       return true unless found_employer
+      return true if action.to_s.downcase == 'update'
       if plan_years_are_active?(found_employer.plan_years) 
         errors.add(:fein, "already has active plan years")
       end

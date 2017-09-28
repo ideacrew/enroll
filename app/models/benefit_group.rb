@@ -671,6 +671,7 @@ class BenefitGroup
   def update_dependent_composite_tiers
     family_tier = self.composite_tier_contributions.where(composite_rating_tier: 'family')
     return unless family_tier.present?
+    return if plan_year.is_conversion
 
     contribution = family_tier.first.employer_contribution_percent
     estimated_tier_premium = family_tier.first.estimated_tier_premium
