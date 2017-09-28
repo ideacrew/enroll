@@ -76,12 +76,12 @@ $(document).ready(function() {
         $("#destroyAllJobIncomes").modal();
 
         $("#destroyAllJobIncomes .modal-cancel-button").click(function(e) {
-          $("#destroyAllJobIncomes").modal('hide');
+          $("#destroyAllJobIncomes").modal('hidden');
           $('#has_job_income_true').prop('checked', true).trigger('change');
         });
 
         $("#destroyAllJobIncomes .modal-continue-button").click(function(e) {
-          $("#destroyAllJobIncomes").modal('hide');
+          $("#destroyAllJobIncomes").modal('hidden');
           //$(self).prop('checked', false);
 
           $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
@@ -106,12 +106,12 @@ $(document).ready(function() {
         $("#destroyAllSelfEmploymentIncomes").modal();
 
         $("#destroyAllSelfEmploymentIncomes .modal-cancel-button").click(function(e) {
-          $("#destroyAllSelfEmploymentIncomes").modal('hide');
+          $("#destroyAllSelfEmploymentIncomes").modal('hidden');
           $('#has_self_employment_income_true').prop('checked', true).trigger('change');
         });
 
         $("#destroyAllSelfEmploymentIncomes .modal-continue-button").click(function(e) {
-          $("#destroyAllSelfEmploymentIncomes").modal('hide');
+          $("#destroyAllSelfEmploymentIncomes").modal('hidden');
           //$(self).prop('checked', false);
 
           $('#self_employed_incomes').find('.self-employed-incomes-list > .income').each(function(i, job_income) {
@@ -143,11 +143,11 @@ $(document).ready(function() {
       $("#DestroyJobIncomeWarning").modal();
 
       $("#DestroyJobIncomeWarning .modal-cancel-button").click(function(e) {
-        $("#DestroyJobIncomeWarning").modal('hide');
+        $("#DestroyJobIncomeWarning").modal('hidden');
       });
 
       $("#DestroyJobIncomeWarning .modal-continue-button").click(function(e) {
-        $("#DestroyJobIncomeWarning").modal('hide');
+        $("#DestroyJobIncomeWarning").modal('hidden');
         $(self).parents('.income').remove();
 
         var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
@@ -165,11 +165,11 @@ $(document).ready(function() {
       $("#DestroySelfEmplyedIncomeWarning").modal();
 
       $("#DestroySelfEmplyedIncomeWarning .modal-cancel-button").click(function(e) {
-        $("#DestroySelfEmplyedIncomeWarning").modal('hide');
+        $("#DestroySelfEmplyedIncomeWarning").modal('hidden');
       });
 
       $("#DestroySelfEmplyedIncomeWarning .modal-continue-button").click(function(e) {
-        $("#DestroySelfEmplyedIncomeWarning").modal('hide');
+        $("#DestroySelfEmplyedIncomeWarning").modal('hidden');
         $(self).parents('.income').remove();
 
         var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
@@ -364,11 +364,11 @@ $(document).ready(function() {
         // prompt to delete all these dedcutions
         $("#destroyAllOtherIncomes").modal();
         $("#destroyAllOtherIncomes .modal-cancel-button").click(function(e) {
-          $("#destroyAllOtherIncomes").modal('hide');
+          $("#destroyAllOtherIncomes").modal('hidden');
         });
 
         $("#destroyAllOtherIncomes .modal-continue-button").click(function(e) {
-          $("#destroyAllOtherIncomes").modal('hide');
+          $("#destroyAllOtherIncomes").modal('hidden');
           $(self).prop('checked', false);
           $(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').each(function(i, other_income) {
             var url = $(other_income).attr('id').replace('financial_assistance_income_', '');
@@ -415,11 +415,11 @@ $(document).ready(function() {
     $("#destroyOtherIncome").modal();
 
     $("#destroyOtherIncome .modal-cancel-button").click(function(e) {
-      $("#destroyOtherIncome").modal('hide');
+      $("#destroyOtherIncome").modal('hidden');
     });
 
     $("#destroyOtherIncome .modal-continue-button").click(function(e) {
-      $("#destroyOtherIncome").modal('hide');
+      $("#destroyOtherIncome").modal('hidden');
       $(self).parents('.other-income').remove();
       console.log("hello");
 
