@@ -123,6 +123,10 @@ When(/^.+ registers? with valid information$/) do
   click_button 'Create account'
 end
 
+Then(/^.+ should see bank information$/) do
+  expect(page).to have_content('Big Bank')
+end
+
 Then(/^.+ should see successful message with broker agency home page$/) do
   expect(page).to have_content("Welcome to #{Settings.site.short_name}. Your account has been created.")
 

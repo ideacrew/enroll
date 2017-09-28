@@ -111,7 +111,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
         :phone_attributes => [:kind, :area_code, :number, :extension]
       ],
       :ach_record => [
-        :routing_number, :routing_number_confirmation, :id
+        :routing_number, :routing_number_confirmation, :account_number
       ]
     )
   end

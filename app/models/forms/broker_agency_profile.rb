@@ -29,7 +29,7 @@ module Forms
     def initialize(attrs = {})
       self.fein = Organization.generate_fein
       self.is_fake_fein=true
-      self.ach_record = attrs[:ach_record]
+      self.ach_record = attrs[:ach_record] || {}
       super(attrs)
     end
 
@@ -153,7 +153,6 @@ module Forms
       organization = broker_agency_profile.organization
       broker_role = broker_agency_profile.primary_broker_role
       person = broker_role.try(:person)
-      pp broker_agency_profile
       record = self.new({
         id: organization.id,
         legal_name: organization.legal_name,
