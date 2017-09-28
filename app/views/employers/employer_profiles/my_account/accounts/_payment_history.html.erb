@@ -41,6 +41,8 @@
     <% end %>
   </tbody>
 </table>
+
+<!-- pagination UI -->
 <div class="container-flid text-center">
   <div class="btn-group" role="group" aria-label="...">
     <% num_of_payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).size %>
