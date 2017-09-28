@@ -1,12 +1,22 @@
-<h4><strong>Payment History</strong></h4>
-
+<h4><strong>Payment History</strong> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Payments made within the past year are displayed below.  If you have questions about payments made more than a year ago, please contact customer service."></i>
+</h4>
+<% if @wf_url %>
+  <p>
+    Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
+    <%= link_to 'Pay My Bill', @wf_url, id: :sso_enabled, target: :_blank %> to make an online payment now.
+  </p>
+<% else %>
+  <p>
+    Allow up to 2-3 business days for online or phone payments to be reflected below.  Allow up to 2 weeks for mailed payments to be reflected below.  For fastest processing, click on
+    <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> to make an online payment now.
+  </p>
+<% end %>
 <table class="table">
   <thead>
     <tr>
       <th>Date</th>
       <th>Amount</th>
       <th>Method</th>
-      <th>Check #</th>
     </tr>
   </thead>
   <tbody>
@@ -15,15 +25,17 @@
       <td></td>
       <td>There are no payments in your history.</td>
       <td></td>
-      <td></td>
     </tr>
     <% else %>
       <% @payments.each do |payment| %>
         <tr>
           <td><%= payment.paid_on %></td>
           <td><%= number_to_currency(payment.amount) %></td>
-          <td><%= payment.method_kind %></td>
-          <td></td>
+          <% if payment.method_kind == "SCN" %>
+            <td>CHK</td>
+          <% else %>
+            <td><%= payment.method_kind %></td>
+          <% end %>
         </tr>
       <% end %>
     <% end %>
@@ -48,3 +60,9 @@
     <% end %>
   </div>
 </div>
+
+<script>
+  $('#sso_disabled').click(function(e){
+    e.preventDefault();
+  });
+</script>

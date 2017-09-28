@@ -12,65 +12,61 @@
   <tbody>
     <!-- Starting Balance -->
     <tr>
-      <td>&ltInvoice Date&gt</td>
-      <td>Amount due from &ltMM/DD/YYYY&gtinvoice <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Amount Due is the total amount due on the last invoice.  Invoices must be paid in full or else the group is at risk of going into arrears.  Any payment or enrollment activity that occurs after the invoice date will be reflected on the next invoice."></i>
-      </th>
+      <td><%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %></td>
+      <td>Amount due from <%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %> invoice
+        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Amount Due is the total amount due on the last invoice.  Invoices must be paid in full or else the group is at risk of going into arrears.  Any payment or enrollment activity that occurs after the invoice date will be reflected on the next invoice."></i>
       </td>
-      <td></td>
+      <td>
+        <%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:total_due)) || "Data not available" %>
+      </td>
     </tr>
     <!-- Payments -->
     <tr>
       <td class="payments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
-      <td>Payments since last invoice</td>
+      <td>Payments since <%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %> invoice</td>
       <!-- <td><%= (@employer_profile.try(:employer_profile_account).try(:payments)) || "Data not available" %></td> -->
       <td></td>
     </tr>
-    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity) == nil %>
+    <% if @employer_profile.try(:employer_profile_account).try(:payments_since_last_invoice).try(:size) == 0 %>
     <tr class="payments">
       <td></td>
       <td>There have been no payments since the last invoice.</td>
       <td></td>
     </tr>
     <% else %>
-      <% @employer_profile.try(:employer_profile_account).try(:current_statement_activity).each do |activity| %>
-        <% if activity.type == "Payments" %>
-          <tr class="payments">
-            <td><%= activity.posting_date %></td>
-            <td>Payment Type: <%= activity.payment_method %></td>
-            <td><%= number_to_currency(activity.amount) %></td>
-          </tr>
-        <% end %>
+      <% @employer_profile.try(:employer_profile_account).try(:payments_since_last_invoice).each do |payment| %>
+        <tr class="payments">
+          <td><%= payment.posting_date %></td>
+          <% if payment.payment_method == "SCN" %>
+            <td>Payment Type: CHK</td>
+          <% else %>
+            <td>Payment Type: <%= payment.payment_method %></td>
+          <% end %>
+          <td><%= number_to_currency(payment.amount) %></td>
+        </tr>
       <% end %>
     <% end %>
 
-    <!-- New Charges -->
-    <tr>
-      <td></td>
-      <td>New Charges</td>
-      <td><%= (@employer_profile.try(:employer_profile_account).try(:new_charges)) || "-" %></td>
-    </tr>
     <!-- Adjustments -->
     <tr>
       <td class="adjustments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
-      <td>Adjustments since last invoice</td>
+      <td>Enrollment changes since <%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %> invoice</td>
       <td></td>
     </tr>
 
-    <% if @employer_profile.try(:employer_profile_account).try(:current_statement_activity) == nil %>
+    <% if @employer_profile.try(:employer_profile_account).try(:adjustments_since_last_invoice).try(:size) == 0 %>
     <tr class="adjustments">
       <td></td>
       <td>There have been no adjustments since the last invoice.</td>
       <td></td>
     </tr>
     <% else %>
-      <% @employer_profile.try(:employer_profile_account).try(:current_statement_activity).each do |activity| %>
-        <% if activity.type == "Adjustments" %>
-          <tr class="adjustments">
-            <td><%= activity.coverage_month %></td>
-            <td><%= activity.name %></td>
-            <td><%= number_to_currency(activity.amount) %></td>
-          </tr>
-        <% end %>
+      <% @employer_profile.try(:employer_profile_account).try(:adjustments_since_last_invoice).each do |adjustment| %>
+        <tr class="adjustments">
+          <td></td>
+          <td><%= adjustment.name%> <%= adjustment.coverage_month.strftime("%m/%Y") %> coverage</td>
+          <td><%= number_to_currency(adjustment.amount) %></td>
+        </tr>
       <% end %>
     <% end %>
 

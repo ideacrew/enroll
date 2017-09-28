@@ -14,17 +14,18 @@
   <ol>
     <li>
       <% if @wf_url.present? %>
-        <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %>
+        <%= link_to '<button class="btn btn-default">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="FASTEST payment option- up to 2-3 business days processing"></i>
       <% else %>
       <div>
-        <button class="btn btn-default disabled">Pay Online unavailable</button>
+        <button class="btn btn-default disabled">Pay Online unavailable</button> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="FASTEST payment option- up to 2-3 business days processing"></i>
+
       </div>
       <% end %>
       <div class="row col-md-offset-1">
         <%= link_to 'How to Pay Online - Instructions', asset_path("pdf/employers_paying_your_premiums_online.pdf") , target: "_blank"%>
       </div>
     </li>
-    <li>Pay by Phone
+    <li>Pay by Phone <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="SLOWEST payment option- up to 2 weeks processing"></i>
       <div class="row col-md-offset-1">
         <%=  Settings.contact_center.alt_phone_number %>, select "Small Business Employer" then "Make a Payment"
       </div>
