@@ -8,7 +8,6 @@ stopEditingIncome();
   $('<%= id %>').remove();
 <% else %>
 	// handle other income here!
-	stopEditingIncome();
-	$("<%= id %>").html("<%==j render(partial: 'other_income', locals: { other_income: @income, kind: @income.kind}) %>");
 	$("<%= id %>").closest(".other-income-kind").find('.add-more-link-<%= @income.kind %> > a').removeClass("hidden");
+	$("<%= id %>").replaceWith("<%==j render(partial: 'other_income', locals: { other_income: @income, kind: @income.kind}) %>");
 <% end %>
