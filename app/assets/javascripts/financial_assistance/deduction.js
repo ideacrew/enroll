@@ -1,13 +1,13 @@
 function stopEditingDeduction() {
   $('input.deduction-checkbox').prop('disabled', false);
-  $('a.deduciton-edit').removeClass('disabled');
-  $('.col-md-2 > .interaction-click-control-continue').removeClass('disabled');
+  $('a.deduction-edit').removeClass('disabled');
+  $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
 function startEditingDeduction() {
   $('input.deduction-checkbox').prop('disabled', true);
   $('a.deduction-edit').addClass('disabled');
-  $('.col-md-2 > .interaction-click-control-continue').addClass('disabled');
+  $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
 };
 
 function currentlyEditing() {
@@ -16,6 +16,29 @@ function currentlyEditing() {
 
 $(document).ready(function() {
   if ($('.deduction-kinds').length) {
+    $(window).bind('beforeunload', function(e) {
+      if (!currentlyEditing() || $('#unsavedDeductionChangesWarning:visible').length)
+        return undefined;
+
+      (e || window.event).returnValue = 'You have an unsaved deduction, are you sure you want to proceed?'; //Gecko + IE
+      return 'You have an unsaved deduction, are you sure you want to proceed?';
+    });
+
+    $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+      if (currentlyEditing()) {
+        e.preventDefault();
+        var self = this;
+
+        $('#unsavedDeductionChangesWarning').modal('show');
+        $('.btn.btn-danger').click(function() {
+          window.location.href = $(self).attr('href');
+        });
+
+        return false;
+      } else
+      return true;
+    });
+
     if (!$('#has_deductions_true').is(':checked')) $('.deduction-kinds').addClass('hidden');
 
     $("#has_deductions_true").change(function(e) {
@@ -27,7 +50,8 @@ $(document).ready(function() {
     });
 
     $('input[type="checkbox"]').click(function(e) {
-      var value = e.target.checked;
+      var value = e.target.checked,
+          self = this;
       if (value) {
         var newDeductionFormEl = $(this).parents('.deduction-kind').children('.new-deduction-form'),
             deductionListEl = $(this).parents('.deduction-kind').find('.deductions-list');
@@ -37,9 +61,30 @@ $(document).ready(function() {
           .appendTo(deductionListEl);
         startEditingDeduction();
         $(clonedForm).find('select').selectric();
-        $(clonedForm).find(".datepicker-js").datepicker();
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
       } else {
+        e.preventDefault();
         // prompt to delete all these dedcutions
+        $("#destroyAllDeductions").modal();
+
+        $("#destroyAllDeductions .modal-cancel-button").click(function(e) {
+          $("#destroyAllDeductions").modal('hide');
+        });
+
+        $("#destroyAllDeductions .modal-continue-button").click(function(e) {
+          $("#destroyAllDeductions").modal('hide');
+          $(self).prop('checked', false);
+
+          $(self).parents('.deduction-kind').find('.deductions-list > .deduction').each(function(i, deduction) {
+            var url = $(deduction).attr('id').replace('financial_assistance_deduction_', 'deductions/');
+            $(deduction).remove();
+
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
       }
     });
 
@@ -53,7 +98,7 @@ $(document).ready(function() {
           .appendTo(deductionListEl);
       startEditingDeduction();
       $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker();
+      $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
     /* edit existing deductions */
@@ -64,7 +109,7 @@ $(document).ready(function() {
       deductionEl.find('.edit-deduction-form').removeClass('hidden');
       startEditingDeduction();
 
-      $(deductionEl).find(".datepicker-js").datepicker();
+      $(deductionEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
     /* destroy existing deducitons */
