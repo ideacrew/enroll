@@ -238,50 +238,50 @@ $(document).ready(function() {
 
     $("body").on("change", "#has_job_income_true", function(){
       if ($('#has_job_income_true').is(':checked')) {
-        $("#job_income").removeClass('hide');
+        $("#job_income").removeClass('hidden');
       } else{
-        $("#job_income").addClass('hide');
+        $("#job_income").addClass('hidden');
       }
     });
 
     $("body").on("change", "#has_job_income_false", function(){
       if ($('#has_job_income_false').is(':checked')) {
-        $("#job_income").addClass('hide');
+        $("#job_income").addClass('hidden');
       } else{
-        $("#job_income").removeClass('hide');
+        $("#job_income").removeClass('hidden');
       }
     });
 
     $("body").on("change", "#has_self_employment_income_true", function(){
       if ($('#has_self_employment_income_true').is(':checked')) {
-        $("#self_employed_incomes").removeClass('hide');
+        $("#self_employed_incomes").removeClass('hidden');
       } else{
-        $("#self_employed_incomes").addClass('hide');
+        $("#self_employed_incomes").addClass('hidden');
       }
     });
 
     $("body").on("change", "#has_self_employment_income_false", function(){
       if ($('#has_self_employment_income_false').is(':checked')) {
-        $("#self_employed_incomes").addClass('hide');
+        $("#self_employed_incomes").addClass('hidden');
       } else{
-        $("#self_employed_incomes").removeClass('hide');
+        $("#self_employed_incomes").removeClass('hidden');
       }
     });
 
     /* Condtional Display Other Income Question */
     $("body").on("change", "#has_other_income_true", function(){
       if ($('#has_other_income_true').is(':checked')) {
-        $(".other_income_kinds").removeClass('hide');
+        $(".other_income_kinds").removeClass('hidden');
       } else{
-        $(".other_income_kinds").addClass('hide');
+        $(".other_income_kinds").addClass('hidden');
       }
     });
 
     $("body").on("change", "#has_other_income_false", function(){
       if ($('#has_other_income_false').is(':checked')) {
-        $(".other_income_kinds").addClass('hide');
+        $(".other_income_kinds").addClass('hidden');
       } else{
-        $(".other_income_kinds").removeClass('hide');
+        $(".other_income_kinds").removeClass('hidden');
       }
     });
   }
