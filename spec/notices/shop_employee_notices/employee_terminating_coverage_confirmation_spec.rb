@@ -22,7 +22,7 @@ RSpec.describe ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation, :db
                             :notice_builder => 'ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation',
                             :event_name => 'notify_employee_confirming_coverage_termination',
                             :mpi_indicator => 'MPI_SHOPDAE042',
-                            :title => "CONFIRMATION OF ELECTION TO TERMINATE COVERAGE"})
+                            :title => "Confirmation of Election To Terminate Coverage"})
                           }
     let(:valid_params) {{
         :subject => application_event.title,
@@ -68,7 +68,6 @@ describe "Build" do
   end
 
 describe "append data" do
-
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
@@ -83,21 +82,21 @@ describe "append data" do
       expect(@employee_notice.notice.enrollment.terminated_on).to eq hbx_enrollment.terminated_on
     end
   end
+  
 describe "Rendering terminating_coverage_notice template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
       @employee_notice = ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation.new(census_employee, valid_params)
       allow(enrollment).to receive(:aasm_state).and_return("coverage_termination_pending")
       allow(enrollment).to receive(:coverage_kind).and_return("dental")
-      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment
-      # allow_any_instance_of(CensusEmployee).to receive_message_chain(:published_benefit_group_assignment,:hbx_enrollments,:detect).and_return enrollment
+      allow(census_employee).to receive(:published_benefit_group_assignment).and_return benefit_group_assignment  
       allow(benefit_group_assignment).to receive(:hbx_enrollments).and_return [enrollment]
     end
     it "should render terminating_coverage_notice" do
       expect(@employee_notice.template).to eq "notices/shop_employee_notices/employee_terminating_coverage_confirmation"
     end
     it "should generate pdf" do
-      census_employee.published_benefit_group_assignment.hbx_enrollments.detect
+      census_employee.published_benefit_group_assignment.hbx_enrollments.select.sort_by(&:updated_at).last
       @employee_notice.build
       @employee_notice.append_data
       file = @employee_notice.generate_pdf_notice

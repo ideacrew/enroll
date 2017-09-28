@@ -11,7 +11,7 @@ class ShopEmployeeNotices::EmployeeTerminatingCoverageConfirmation < ShopEmploye
   end
 
   def append_data
-    terminated_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.detect{ |h| h.aasm_state == 'coverage_termination_pending'}
+    terminated_enrollment = census_employee.published_benefit_group_assignment.hbx_enrollments.select{ |h| h.aasm_state == 'coverage_termination_pending'}.sort_by(&:updated_at).last
     plan = terminated_enrollment.plan
     notice.plan = PdfTemplates::Plan.new({
                                              :plan_name => plan.name
