@@ -67,19 +67,22 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
   end
 
   def update_oim_id(user, user_name)
-    user.update_attributes!(oim_id: user_name)
+    user = user.user if user.class == Person
+    ENV['new_user_name'].present? ? user.update_attributes!(oim_id: ENV['new_user_name'].to_s) : user.update_attributes!(oim_id: user_name)
     puts "Succesfully updated username" unless Rails.env.test?
   end
 
   def update_email(user, email)
-    user.update_attributes!(email: email)
+    user = user.user if user.class == Person
+    ENV['new_user_email'].present? ? user.update_attributes!(email: ENV['new_user_email'].to_s) : user.update_attributes!(email: email)
     puts "Succesfully updated email" unless Rails.env.test?
   end
 
   def update_person_home_email(person, address)
+    person = person.person if person.class == User
     email = person.emails.detect { |email| email.kind == "home"}
     if email.blank?
-      puts "No Home Email Record Found" unless Rails.env.test?
+      create_email(__method__.to_s.split('_')[2], address, person)
     else
       email.update_attributes!(address: address)
       puts "Updated Home E-mail address on person record" unless Rails.env.test?
@@ -87,9 +90,10 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
   end
 
   def update_person_work_email(person, address)
+    person = person.person if person.class == User
     email = person.emails.detect { |email| email.kind == "work"}
     if email.blank?
-      puts "No Work Email Record Found" unless Rails.env.test?
+      create_email(__method__.to_s.split('_')[2], address, person)
     else
       email.update_attributes!(address: address)
       puts "Updated Work E-mail address on person record" unless Rails.env.test?
@@ -102,6 +106,18 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
       puts "Succesfully destroyed headless user record" unless Rails.env.test?
     else
       puts "This is not a headless user" unless Rails.env.test?
+    end
+  end
+
+  def create_email(kind, address, person)
+    puts "No Existing #{kind.capitalize} Email Record Found. Do you want to create a new #{kind.capitalize} Email?(y/n)" unless Rails.env.test?
+    result = STDIN.gets.chomp();
+    if result == "yes" || result == "y"
+      person.emails << Email.new(kind: kind, address: address)
+      person.save!
+      puts "Succesfully created #{kind.capitalize} Email" unless Rails.env.test?
+    else
+      "You selected not to create a new #{kind.capitalize} Email" unless Rails.env.test?
     end
   end
 end
