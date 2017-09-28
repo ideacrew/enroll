@@ -18,7 +18,6 @@ namespace :migrations do
     end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
 
     organizations.each do |organization|
-    binding.pry
 
       # Expire previous year plan years
       organization.employer_profile.plan_years.published.where(:"end_on".lte => TimeKeeper.date_of_record).each do |plan_year|
@@ -135,7 +134,7 @@ end
 def send_notice_to_employees(org)
   org.employer_profile.census_employees.active.each do |ce|
     begin
-      ShopNoticesNotifierJob.perform(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
       puts "Notification generated for employee"
     rescue Exception => e
       (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
