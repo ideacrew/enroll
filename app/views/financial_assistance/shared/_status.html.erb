@@ -1,4 +1,4 @@
-<% if application.ready_for_attestation? %>
+<% if (application.present? && application.ready_for_attestation?) %>
   <div class = "review-note">
     <span>Your Application <br> for Help Paying <br> for Coverage</span>
     <div class="review-middle-sec">

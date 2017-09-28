@@ -41,31 +41,12 @@
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
 
-<h1 class="darkblue">Household Relationships</h1>
-<div>
-  <% if params[:consumer_role_id].present? || params[:employee_role_id].present? || params[:resident_role_id].present? %>
-  <% end %>
-</div>
-<br/>
-<div>
-  <table id="relationship-matrix">
-    <thead>
-    <th></th>
-    <% @people.each do |person| %>
-        <th><%= person.full_name %></th>
-    <% end %>
-    </thead>
-    <tbody>
-    <% @matrix.each_with_index do |relationships_row, index_x| %>
-        <tr>
-          <td><b><%= @people[index_x].full_name %></b></td>
-          <% relationships_row.each_with_index do |rel, index_y| %>
-              <td>
-                <small><%= rel.titleize if rel.present? %></small>
-              </td>
-          <% end %>
-        </tr>
-    <% end %>
-    </tbody>
-  </table>
-</div>
+<script >
+  $(function() {
+    if(<%= missing_relationships.present? %>){
+      $('#btn-continue').addClass('disabled');
+    } else {
+      $('#btn-continue').removeClass('disabled');
+    }
+  });
+</script>
