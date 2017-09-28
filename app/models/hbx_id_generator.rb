@@ -28,6 +28,10 @@ class HbxIdGenerator
     provider.generate_tax_household_id
   end
 
+  def generate_case_id
+    provider.generate_case_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
@@ -50,6 +54,10 @@ class HbxIdGenerator
 
   def self.generate_tax_household_id
     self.instance.generate_tax_household_id
+  end
+
+  def self.generate_case_id
+    self.instance.generate_case_id
   end
 
   class AmqpSource
@@ -82,6 +90,10 @@ class HbxIdGenerator
     def self.generate_tax_household_id
       generate_id_from_sequence("tax_household_id")
     end
+
+    def self.generate_case_id
+      generate_id_from_sequence("case_id")
+    end
   end
 
   class SlugSource
@@ -102,6 +114,10 @@ class HbxIdGenerator
     end
 
     def self.generate_tax_household_id
+      random_uuid
+    end
+
+    def self.generate_case_id
       random_uuid
     end
 
