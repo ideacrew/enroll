@@ -232,6 +232,10 @@ class Person
     end
   end
 
+  def update_family_document_status!
+    @primary_family.vlp_documents_status = vlp_documents_status
+  end
+
   
   def active_general_agency_staff_roles
     general_agency_staff_roles.select(&:active?)
