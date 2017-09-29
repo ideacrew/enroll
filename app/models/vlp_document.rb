@@ -124,8 +124,6 @@ class VlpDocument < Document
   validates :receipt_number, length: { is: 13}, :allow_blank => true #first 3 alpha, remaining 10 string
   validates :card_number, length: { is: 13 }, :allow_blank => true#first 3 alpha, remaining 10 numeric
 
-  after_create :update_family_documents_status
- 
   # hash of doc type and necessary fields
   def required_fields
     {
@@ -153,9 +151,5 @@ class VlpDocument < Document
        errors.add(:base, "#{field} value is required") unless self.send(field).present?
      end
   end
-  
-  def update_family_documents_status
-    Family.update_vlp_documents_status
-  end  
-
+   
 end

@@ -997,9 +997,6 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
-  def self.min_verification_due_date_range(start_date,end_date)
-    where(min_verification_due_date_range: start_date..end_date)
-  end
 
 private
   def build_household
