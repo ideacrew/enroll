@@ -3,7 +3,7 @@
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel">AMOUNT *</label>
-        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= other_income.amount %></span>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= number_to_currency(other_income.amount) %></span>
       </div>
       <div class="col-md-3  no-pd form-group-lg no-pd class-fa-household">
         <label class="static_label label-floatlabel">HOW OFTEN *</label>

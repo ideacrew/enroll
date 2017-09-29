@@ -297,13 +297,6 @@ $(document).ready(function() {
 
 // otherincome checkbox fuctionality
 $(document).ready(function() {
-  $('#financial_assistance_income_amount').on('keypress', function(e){
-    $(this).priceFormat({
-      prefix: '$ ',
-      centsSeparator: '.',
-    });
-  })
-
   function disableSave(form){
     form.find('.interaction-click-control-save').addClass("disabled");
   }
