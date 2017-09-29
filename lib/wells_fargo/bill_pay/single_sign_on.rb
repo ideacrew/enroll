@@ -32,41 +32,51 @@ module WellsFargo
 
         return @token if defined? @token
 
-        @creation_date = Time.now.strftime(DATE_FORMAT)
-        private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION))
+        begin
 
-        message = SECRET + @creation_date
+          @creation_date = Time.now.strftime(DATE_FORMAT)
+          private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION))
 
-        signature = private_key.sign(OpenSSL::Digest::SHA512.new, message)
+          message = SECRET + @creation_date
 
-        uri = URI.parse(API_URL)
-        request = Net::HTTP::Post.new(uri)
-        request.set_form_data(
-          "APIKey" => API_KEY,
-          "ReferenceNumber" => @reference_number,
-          "NameCompany" => @company_name,
-          "APIVersion" => API_VERSION,
-          "OtherData" => @reference_number,
-          "Role" => "SSOCustomer",
-          "ExternalID" => @external_id,
-          "CreationDate" => @creation_date,
-          "BillerKey" => BILLER_KEY,
-          "Email" => @email,
-          "Signature" => Base64.strict_encode64(signature)
-        )
+          signature = private_key.sign(OpenSSL::Digest::SHA512.new, message)
 
-        req_options = {
-          use_ssl: uri.scheme == "https",
-        }
+          uri = URI.parse(API_URL)
+          request = Net::HTTP::Post.new(uri)
+          request.set_form_data(
+            "APIKey" => API_KEY,
+            "ReferenceNumber" => @reference_number,
+            "NameCompany" => @company_name,
+            "APIVersion" => API_VERSION,
+            "OtherData" => @reference_number,
+            "Role" => "SSOCustomer",
+            "ExternalID" => @external_id,
+            "CreationDate" => @creation_date,
+            "BillerKey" => BILLER_KEY,
+            "Email" => @email,
+            "Signature" => Base64.strict_encode64(signature)
+          )
 
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-          http.request(request)
+          req_options = {
+            use_ssl: uri.scheme == "https",
+          }
+
+          response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+            http.request(request)
+          end
+
+          @response_code = response.code
+          @response_body = JSON.parse(response.body)
+          @url = @response_body["Url"]
+          @token = @response_body["Token"] if @response_code == "200"
+
+        rescue => e
+          Rails.logger.error "WellsFargo SingleSignOn error: #{e.message}"
+          @response_code = nil
+          @response_body = nil
+          @url = nil
+          @token = nil
         end
-
-        @response_code = response.code
-        @response_body = JSON.parse(response.body)
-        @url = @response_body["Url"]
-        @token = @response_body["Token"] if @response_code == "200"
 
       end
 
