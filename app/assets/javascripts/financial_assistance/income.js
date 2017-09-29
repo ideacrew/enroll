@@ -136,6 +136,8 @@ $(document).ready(function() {
       var incomeEl = $(this).parents('.income');
       incomeEl.find('.display-income').addClass('hidden');
       incomeEl.find('.income-edit-form').removeClass('hidden');
+      $(incomeEl).find('select').selectric();
+      $(incomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
       startEditingIncome();
     });
 
