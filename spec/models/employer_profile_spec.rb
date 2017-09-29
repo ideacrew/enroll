@@ -1029,6 +1029,25 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
     end
   end
 
+  describe "#dt_display_plan_year", dbclean: :after_each do
+    let(:organization) { FactoryGirl.create(:organization, :with_draft_and_canceled_plan_years)}
+    let(:invalid_employer_profile) { FactoryGirl.create(:employer_profile)}
+    let!(:canceled_plan_year) { FactoryGirl.create(:plan_year, aasm_state: "canceled", employer_profile: invalid_employer_profile)}
+    let(:ineligible_employer_profile) { EmployerProfile.new }
+
+    it "should return draft plan year when employer profile has canceled and draft plan years with same py start on date" do
+      draft_plan_year = organization.employer_profile.plan_years.where(aasm_state: "draft").first
+      expect(organization.employer_profile.dt_display_plan_year).to eq draft_plan_year
+    end
+
+    it "should return canceled plan year when there is no other plan year associated with employer" do
+      expect(invalid_employer_profile.dt_display_plan_year).to eq canceled_plan_year
+    end
+
+    it "should return nil when there is no plan year associated with employer" do
+      expect(ineligible_employer_profile.dt_display_plan_year).to eq nil
+    end
+  end
 end
 
 describe EmployerProfile, ".is_converting?", dbclean: :after_each do
@@ -1083,7 +1102,7 @@ describe EmployerProfile, ".terminate", dbclean: :after_each do
   let(:plan_year_status) { 'enrolled' }
   let(:employer_status) { 'eligible' }
 
-  let!(:employer_profile) { 
+  let!(:employer_profile) {
     employer = create(:employer_with_planyear, plan_year_state: plan_year_status, start_on: start_on)
     employer.update(aasm_state: employer_status)
     employer
@@ -1133,14 +1152,14 @@ describe EmployerProfile, ".terminate", dbclean: :after_each do
 
     context "employer termination" do
       before do
-        employer_profile.terminate(terminated_on) 
+        employer_profile.terminate(terminated_on)
       end
 
       it 'should cancel plan year' do
         expect(plan_year.canceled?).to be_truthy
       end
 
-      it 'should cancel employee coverages' do 
+      it 'should cancel employee coverages' do
         enrollment.reload
         expect(enrollment.coverage_canceled?).to be_truthy
       end
@@ -1158,9 +1177,9 @@ describe EmployerProfile, ".terminate", dbclean: :after_each do
     let(:employer_status) { 'enrolled' }
 
     context "employer termination" do
-      context 'when termination date in future' do 
+      context 'when termination date in future' do
         before do
-          employer_profile.terminate(terminated_on) 
+          employer_profile.terminate(terminated_on)
         end
 
         it 'should schedule termination on active plan year' do
@@ -1188,7 +1207,7 @@ describe EmployerProfile, ".terminate", dbclean: :after_each do
         let(:terminated_on) { TimeKeeper.date_of_record.beginning_of_month.prev_day }
 
         before do
-          employer_profile.terminate(terminated_on) 
+          employer_profile.terminate(terminated_on)
         end
 
         it 'should terminate active plan year' do
