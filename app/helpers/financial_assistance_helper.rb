@@ -145,7 +145,7 @@ module FinancialAssistanceHelper
   end
 
   def frequency_kind_options
-    %w(biweekly daily half_yearly monthly quarterly weekly yearly)
+    { 'Bi Weekly' => 'biweekly', 'Daily' => 'daily', 'Half Yearly' => 'half_yearly', 'Monthly' => 'monthly',  'Quarterly' => 'quarterly', 'Weekly' => 'weekly', 'Yearly' => 'yearly' }
   end
 
   def state_options
