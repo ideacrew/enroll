@@ -28,6 +28,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   before do
     TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    allow_any_instance_of(CensusEmployee).to receive(:generate_and_deliver_checkbook_url).and_return(true)
     allow_any_instance_of(PlanYear).to receive(:trigger_renewal_notice).and_return(true)
   end
 
@@ -325,6 +326,21 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
             expect(plan_year.open_enrollment_date_errors[:open_enrollment_period].first).to match(/Open enrollment must end on or before/i)
           end
         end
+
+        context "when terminated plan year end_on is not end of month" do
+          let(:plan_year)       { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_year, aasm_state: :terminated)}
+
+          before do
+            plan_year.end_on = TimeKeeper.date_of_record.end_of_year - 30.days
+            plan_year.save!
+          end
+
+          it "should pass validation" do
+            expect(plan_year.open_enrollment_date_errors.present?).to be_falsey
+            expect(plan_year.errors.messages).to eq({})
+            expect(plan_year.open_enrollment_date_errors).to eq({})
+          end
+        end
       end
     end
   end
@@ -542,6 +558,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         py.save
         py
       end
+      let(:plan_year1) { FactoryGirl.create(:renewing_plan_year)}
 
       context "and at least one employee is present on the roster sans assigned benefit group" do
         let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
@@ -641,6 +658,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -2364,8 +2384,31 @@ describe PlanYear, "plan year schedule changes" do
       end
     end
   end
-end
 
+  context '.carriers_offered' do 
+
+    let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
+    let(:plan_year) { employer_profile.published_plan_year }
+    let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
+    let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+    let!(:silver_ref_plan)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
+    let!(:gold_ref_plan)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+    let(:silver_bg) { FactoryGirl.build(:benefit_group, title: "silver offerings", plan_year: plan_year, reference_plan_id: silver_ref_plan.id, plan_option_kind: 'single_carrier')}
+    let(:gold_bg) { FactoryGirl.build(:benefit_group, title: "gold offerings", plan_year: plan_year, reference_plan_id: gold_ref_plan.id, plan_option_kind: 'single_carrier')}
+
+    before do
+      plan_year.benefit_groups = [silver_bg, gold_bg]
+      plan_year.save(:validate => false)
+    end
+
+    context '.carriers_offered' do
+
+      it "should return carriers offered on multiple benefit groups" do
+        expect(plan_year.carriers_offered).to eq [carrier_profile.id, carrier_profile_1.id]
+      end
+    end
+  end
+end
 
 describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :after_all do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
