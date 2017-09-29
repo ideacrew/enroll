@@ -58,7 +58,7 @@ $(document).ready(function() {
           .appendTo(benefitListEl);
         startEditingBenefit();
         $(clonedForm).find('select').selectric();
-        $(clonedForm).find(".datepicker-js").datepicker();
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
       } else {
         // prompt to delete all these benefits
         e.preventDefault();
@@ -97,7 +97,7 @@ $(document).ready(function() {
           .appendTo(benefitListEl);
           startEditingBenefit();
         $(clonedForm).find('select').selectric();
-        $(clonedForm).find(".datepicker-js").datepicker();
+        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
     /* edit existing benefits */
@@ -108,8 +108,8 @@ $(document).ready(function() {
       benefitEl.find('.edit-benefit-form').removeClass('hidden');
       startEditingBenefit();
 
-      $(clonedForm).find('select').selectric();
-      $(clonedForm).find(".datepicker-js").datepicker();
+      //$(clonedForm).find('select').selectric();
+      $(benefitEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
 
