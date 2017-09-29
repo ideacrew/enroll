@@ -256,7 +256,7 @@ class BrokerRole
       transitions from: :broker_agency_pending, to: :denied
     end
 
-    event :decertify, :after => [:record_transition, :notify_broker_decertified]  do
+    event :decertify, :after => [:record_transition, :remove_broker_assignments]  do
       transitions from: :active, to: :decertified
     end
 
