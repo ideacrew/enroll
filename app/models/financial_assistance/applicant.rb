@@ -398,7 +398,7 @@ class FinancialAssistance::Applicant
       else
         return incomes.other.blank?
       end
-    when :income_adjustments
+    when :income_adjustment
       return false if has_deductions.nil?
       if has_deductions
         return deductions.present?
