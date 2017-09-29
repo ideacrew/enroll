@@ -12,6 +12,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   around_action :wrap_in_benefit_group_cache, only: [:show]
   skip_before_action :verify_authenticity_token, only: [:show], if: :check_origin?
   before_action :updateable?, only: [:create, :update]
+  before_action :wells_fargo_sso, only: [:show]
   layout "two_column", except: [:new]
 
   def link_from_quote
@@ -120,19 +121,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'accounts'
         collect_and_sort_invoices(params[:sort_order])
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-
-        #grab url for WellsFargoSSO and store in insance variable
-        email = (@employer_profile.staff_roles.first && @employer_profile.staff_roles.first.emails.first &&
-          @employer_profile.staff_roles.first.emails.first.address) || nil
-
-        if email.present?
-          wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
-        end
-
-        if wells_fargo_sso.present?
-          if wells_fargo_sso.token.present?
-            @wf_url = wells_fargo_sso.url
-          end
+        #only exists if coming from redirect from sso failing
+        @page_num = params[:page_num] if params[:page_num].present?
+        if @page_num.present?
+          retrieve_payments_for_page(@page_num)
+        else
+          retrieve_payments_for_page(1)
         end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
@@ -340,6 +334,29 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   private
+
+  def wells_fargo_sso
+    id_params = params.permit(:id, :employer_profile_id, :tab)
+    id = id_params[:id] || id_params[:employer_profile_id]
+    employer_profile = EmployerProfile.find(id)
+    #grab url for WellsFargoSSO and store in insance variable
+    email = (employer_profile.staff_roles.first && employer_profile.staff_roles.first.emails.first &&
+      employer_profile.staff_roles.first.emails.first.address) || nil
+
+    if email.present?
+      wells_fargo_sso = WellsFargo::BillPay::SingleSignOn.new(@employer_profile.hbx_id, @employer_profile.hbx_id, @employer_profile.dba, email)
+    end
+
+    if wells_fargo_sso.present?
+      if wells_fargo_sso.token.present?
+        @wf_url = wells_fargo_sso.url
+      end
+    end
+  end
+
+  def retrieve_payments_for_page(page_no)
+    @payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
+  end
 
   def updateable?
     authorize EmployerProfile, :updateable?
