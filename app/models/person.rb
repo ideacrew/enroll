@@ -216,18 +216,18 @@ class Person
 
   
   def vlp_documents_status
-    @s = []
+    @documents_list = []
     primary_family.active_family_members.each do |member|
       member.person.verification_types.all? do |type|
-        @s << member.person.consumer_role.vlp_documents.any?{ |doc| doc.identifier && doc.verification_type == type }
+        @documents_list << member.person.consumer_role.vlp_documents.any?{ |doc| doc.identifier && doc.verification_type == type }
       end
     end
     case 
-    when @s.include?(true) && @s.include?(false)
+    when @documents_list.include?(true) && @documents_list.include?(false)
       return "Partially Uploaded" 
-    when @s.include?(true) && !@s.include?(false)      
+    when @documents_list.include?(true) && !@documents_list.include?(false)      
       return "Fully Uploaded"
-    when !@s.include?(true) && @s.include?(false)
+    when !@documents_list.include?(true) && @documents_list.include?(false)
       return "None"
     end
   end
