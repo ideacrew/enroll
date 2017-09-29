@@ -29,54 +29,54 @@
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
           <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1) do %>
             <% if @applicant.tax_info_complete? %>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
-            &nbsp Tax Info
+            Tax Info
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %>  applicant-nav">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:income)%>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
-            &nbsp Income
+            Job Income
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %> applicant-nav">
           <%= link_to other_financial_assistance_application_applicant_incomes_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
             Other Income
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %>">
+        <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_deductions_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
-            &nbsp Income Adjustments
+            Income Adjustments
           <%end%>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
           <%= link_to financial_assistance_application_applicant_benefits_path(@application, @applicant), class: "" do %>
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
-            &nbsp Health Coverage
+            Health Coverage
           <% end %>
         </li>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
           <%= link_to other_questions_financial_assistance_application_applicant_path(@application, @applicant) do %>
             <% if @applicant.other_questions_complete? %>
-              <span class="fa fa-check applicant-check"></span>
+              <span class="fa fa-check applicant-check"></span> &nbsp
             <% end %>
-            &nbsp Other Questions
+            Other Questions
           <% end %>
         </li>
       </ul>

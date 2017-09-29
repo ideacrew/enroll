@@ -200,8 +200,8 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 2),
-      next_url:  other_financial_assistance_application_applicant_incomes_path(@application, @applicant, current: 'incomes')
+      previous_url: go_to_step_financial_assistance_application_applicant_path(@application, @applicant, 1),
+      next_url:  other_financial_assistance_application_applicant_incomes_path(@application, @applicant)
     } %>
   </div>
   <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
