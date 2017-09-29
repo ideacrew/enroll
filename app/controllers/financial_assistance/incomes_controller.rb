@@ -64,6 +64,7 @@
   end
 
   def create
+    format_date(params)
     @income = @applicant.incomes.build permit_params(params[:financial_assistance_income])
     if @income.save
       render :create
@@ -73,6 +74,7 @@
   end
 
   def update
+    format_date(params)
     @income = @applicant.incomes.find params[:id]
     if @income.update_attributes permit_params(params[:financial_assistance_income])
       render :update
@@ -90,6 +92,10 @@
   end
 
   private
+  def format_date params
+   params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
+   params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
+ end
 
   def job_income_type
     FinancialAssistance::Income::JOB_INCOME_TYPE_KIND
