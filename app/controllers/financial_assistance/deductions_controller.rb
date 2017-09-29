@@ -50,6 +50,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def create
+    format_date(params)
     @deduction = @applicant.deductions.build permit_params(params[:financial_assistance_deduction])
 
     if @deduction.save
@@ -78,6 +79,12 @@ class FinancialAssistance::DeductionsController < ApplicationController
 
   private
 
+  def format_date params
+    params[:financial_assistance_deduction][:start_on] = Date.strptime(params[:financial_assistance_deduction][:start_on].to_s, "%m/%d/%Y")
+    params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y")
+  end
+
+  # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
   def format_date_params model_params
     model_params["start_on"]=Date.strptime(model_params["start_on"].to_s, "%m/%d/%Y") if model_params.present?
     model_params["end_on"]=Date.strptime(model_params["end_on"].to_s, "%m/%d/%Y") if model_params.present? && model_params["end_on"].present?
