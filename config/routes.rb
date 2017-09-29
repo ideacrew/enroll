@@ -549,6 +549,7 @@ Rails.application.routes.draw do
       get :fed_hub_request
       post 'download_documents'
       post 'delete_documents'
+      # post :fed_hub_request
     end
 
     member do

@@ -351,6 +351,25 @@ context "Verification process and notices" do
     it_behaves_like "update update all verification types for consumer", "any", "hbx"
   end
 
+  describe "#admin_verification_action private" do
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "curam" })}
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "admin verification actions" do |admin_action, v_type, update_reason, upd_attr, result|
+      before do
+        consumer.admin_verification_action(admin_action, v_type, update_reason)
+      end
+      it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
+        expect(consumer.send(upd_attr)).to eq result
+      end
+    end
+
+    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
+    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding"
+    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
+    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
+
+  end
+
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
@@ -475,6 +494,17 @@ context "Verification process and notices" do
         expect(consumer.lawful_presence_determination.verification_successful?).to eq true
       end
 
+    end
+
+    context "reject" do
+      before :each do
+        consumer.lawful_presence_determination.authorize! verification_attr
+      end
+      all_states.each do |state|
+        it "change #{state} to verification_outstanding" do
+          expect(consumer).to transition_from(state).to(:verification_outstanding).on_event(:reject, verification_attr)
+        end
+      end
     end
 
     context "revert" do
