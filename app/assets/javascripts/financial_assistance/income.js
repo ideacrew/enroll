@@ -408,7 +408,7 @@ $(document).ready(function() {
     $("#destroyOtherIncome .modal-continue-button").click(function(e) {
       $("#destroyOtherIncome").modal('hide');
       $(self).parents('.other-income').remove();
-      console.log("hello");
+      $("a.interaction-click-control-add-more").addClass('hide');
 
       var url = $(self).parents('.other-income').attr('id').replace('financial_assistance_income_', '');
       console.log(url);
