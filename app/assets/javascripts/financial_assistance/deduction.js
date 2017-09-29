@@ -147,6 +147,36 @@ $(document).ready(function() {
       });
     });
 
+    /* DELETING all Deductions on selcting 'no' on Driver Question */
+    $('#has_deductions_false').on('change', function(e) {
+      self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      if ($('.deductions-list .deduction').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllDeductions").modal();
+
+        $("#destroyAllDeductions .modal-cancel-button").click(function(e) {
+          $("#destroyAllDeductions").modal('hide');
+          $('#has_deductions_true').prop('checked', true).trigger('change');
+        });
+
+        $("#destroyAllDeductions .modal-continue-button").click(function(e) {
+          $("#destroyAllDeductions").modal('hide');
+          //$(self).prop('checked', false);
+
+          $('.deductions-list > .deduction').each(function(i, deduction) {
+            var url = $(deduction).attr('id').replace('financial_assistance_deduction_', 'deductions/');
+            $(deduction).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
+      }
+    });
+
     /* cancel benefit edits */
     $('.deductions-list').on('click', 'a.deduction-cancel', function(e) {
       e.preventDefault();

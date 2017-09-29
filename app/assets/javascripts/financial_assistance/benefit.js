@@ -135,6 +135,64 @@ $(document).ready(function() {
       });
     });
 
+    /* DELETING all enrolled benefits on selcting 'no' on Driver Question */
+    $('#has_enrolled_health_coverage_false').on('change', function(e) {
+      self = this;
+      //$('#DestroyExistingJobIncomesWarning').modal('show');
+      if ($('.benefits-list.is_enrolled .benefit').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllBenefits").modal();
+
+        $("#destroyAllBenefits .modal-cancel-button").click(function(e) {
+          $("#destroyAllBenefits").modal('hide');
+          $('#has_enrolled_health_coverage_true').prop('checked', true).trigger('change');
+        });
+
+        $("#destroyAllBenefits .modal-continue-button").click(function(e) {
+          $("#destroyAllBenefits").modal('hide');
+          //$(self).prop('checked', false);
+
+          $('.benefits-list.is_enrolled .benefit').each(function(i, benefit) {
+            var url = $(benefit).attr('id').replace('financial_assistance_benefit_', 'benefits/');
+            $(benefit).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
+      }
+    });
+
+    /* DELETING all enrolled benefits on selcting 'no' on Driver Question */
+    $('#has_eligible_health_coverage_false').on('change', function(e) {
+      self = this;
+      if ($('.benefits-list.is_eligible .benefit').length) {
+        e.preventDefault();
+        // prompt to delete all these dedcutions
+        $("#destroyAllBenefits").modal();
+
+        $("#destroyAllBenefits .modal-cancel-button").click(function(e) {
+          $("#destroyAllBenefits").modal('hide');
+          $('#has_eligible_health_coverage_true').prop('checked', true).trigger('change');
+        });
+
+        $("#destroyAllBenefits .modal-continue-button").click(function(e) {
+          $("#destroyAllBenefits").modal('hide');
+          //$(self).prop('checked', false);
+
+          $('.benefits-list.is_eligible .benefit').each(function(i, benefit) {
+            var url = $(benefit).attr('id').replace('financial_assistance_benefit_', 'benefits/');
+            $(benefit).remove();
+            $.ajax({
+              type: 'DELETE',
+              url: url
+            });
+          });
+        });
+      }
+    });
     /* cancel benefit edits */
     $('.benefits-list').on('click', 'a.benefit-cancel', function(e) {
       e.preventDefault();

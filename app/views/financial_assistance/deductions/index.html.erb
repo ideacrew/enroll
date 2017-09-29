@@ -21,7 +21,7 @@
       </div>
       <div class="col-md-6 mt11">
         <div class="col-md-3 no-padding">
-          <%= radio_button_tag("has_deductions", true, @applicant.deductions.present?, class: "radio-yml" ) %>
+          <%= radio_button_tag("has_deductions", true, @applicant.has_deductions, class: "radio-yml" ) %>
           <label class="radio-yml" for="has_deductions_yes">Yes</label>
         </div>
         <div class="col-md-3 no-padding">
@@ -115,7 +115,7 @@
           Are you sure you want to delete all of these deductions?
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-default modal-cancel-button">Cancel</button>
           <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
         </div>
       </div>
