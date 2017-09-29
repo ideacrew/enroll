@@ -216,28 +216,6 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe "#verification due date" do
-    let(:family) { FactoryGirl.build(:family) }
-    let(:hbx_enrollment_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, :special_verification_period => Date.new(2016,5,6)) }
-    let(:hbx_enrollment_no_sp) { HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record) }
-    before :each do
-      assign(:family, family)
-    end
-    context "for special verification period" do
-      it "returns special verification period" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_sp])
-        expect(helper.verification_due_date(family)).to eq Date.new(2016,5,6)
-      end
-    end
-
-    context "with no special verification period" do
-      it "calls determine due date method" do
-        allow(family).to receive_message_chain("active_household.hbx_enrollments.verification_needed").and_return([hbx_enrollment_no_sp])
-        expect((helper.verification_due_date(family))).to eq TimeKeeper.date_of_record + 95.days
-      end
-    end
-  end
-
   describe "#documents uploaded" do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     it "returns true if any family member has uploaded docs" do
