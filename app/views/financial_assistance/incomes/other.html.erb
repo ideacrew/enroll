@@ -65,7 +65,7 @@
         <% end %>
       </div>
       <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
-        <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+        <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
       </div>
       <br>
 
@@ -83,7 +83,7 @@
     <div class="col-xs-12">
       <div class="back-link">
         <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-        <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
       </div>
     </div>
   </div>
