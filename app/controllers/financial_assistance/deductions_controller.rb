@@ -61,6 +61,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def update
+    format_date(params)
     @deduction = @applicant.deductions.find params[:id]
     if @deduction.update_attributes permit_params(params[:financial_assistance_deduction])
       render :update

@@ -52,6 +52,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def create
+    format_date(params)
     @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
     @benefit_kind = @benefit.kind
     @benefit_insurance_kind = @benefit.insurance_kind
@@ -64,6 +65,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   def update
+    format_date(params)
     @benefit = @applicant.benefits.find params[:id]
     if @benefit.update_attributes permit_params(params[:financial_assistance_benefit])
       render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
@@ -82,6 +84,10 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   private
+  def format_date params
+   params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
+   params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y")
+ end
 
   def update_employer_contact model, params
     if params[:employer_phone].present?
