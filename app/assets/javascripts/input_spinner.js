@@ -7,7 +7,7 @@ $(document).on('click', '.input-spinner .btn:first-of-type' , function() {
       d = d.setMonth(d.getMonth() + input_value+1);
       d = new Date(d);
       d = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-      $('#max_cobra_date').html(d);
+      $('#max_cobra_date').html((d.getMonth() + 1) + '/' + d.getDate() + '/' +  d.getFullYear());
     }
 });
 
@@ -22,7 +22,7 @@ $(document).on('click', '.input-spinner .btn:last-of-type' , function() {
       d = d.setMonth(d.getMonth() + input_value - 1);
       d = new Date(d);
       d = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-      $('#max_cobra_date').html(d);
+      $('#max_cobra_date').html((d.getMonth() + 1) + '/' + d.getDate() + '/' +  d.getFullYear());
       
     }
 });

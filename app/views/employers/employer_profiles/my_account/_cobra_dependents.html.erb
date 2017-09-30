@@ -130,8 +130,9 @@
 
   <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <td colspan="9">
-     <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
+     <a class="btn btn-default"  onclick='$(".cobra_confirm_<%=census_employee.id.to_s%>").toggle();'>
         <strong>&nbsp;Cancel</strong>
+      </a>
       <a class="btn btn-default cobra_confirm_submit" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, census_employee.id) %>" href="javascript:;" id="cobra_<%= census_employee.id %>" onclick="EmployerProfile.submitCobraDate('cobra_confirm', '<%= census_employee.id %>')">
         <strong>&nbsp;Submit</strong>
       </a>

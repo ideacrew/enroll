@@ -1353,12 +1353,23 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
   context "existing_cobra" do
     let(:census_employee) { FactoryGirl.create(:census_employee) }
+    let(:cobra_max_months) {"36"}
 
+    before do 
+      allow_any_instance_of(CensusEmployee).to receive(:cobra_max_months).and_return(cobra_max_months)
+      allow_any_instance_of(CensusEmployee).to receive(:cobra_begin_date).and_return(TimeKeeper.date_of_record)
+    end
+    
     it "should return true" do
       CensusEmployee::COBRA_STATES.each do |state|
         census_employee.aasm_state = state
         expect(census_employee.existing_cobra).to be_truthy
       end
+    end
+
+    it "should set cobra_end_date when census_employee has cobra_begin_date" do
+      expect(census_employee.cobra_end_date.present?).to be_truthy
+       expect(census_employee.cobra_end_date).to eq(TimeKeeper.date_of_record+ cobra_max_months.to_i.months)
     end
   end
 

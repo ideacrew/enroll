@@ -1024,6 +1024,36 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
   end
 end
 
+
+describe EmployerProfile, "create_cobra_dependent", dbclean: :after_each do
+  let(:employer_profile) {FactoryGirl.create(:employer_profile)}
+  let(:census_employee) {FactoryGirl.create(:census_employee, employer_profile_id: employer_profile.id)}
+  let(:dependent) { FactoryGirl.build(:census_dependent,employee_relationship: "spouse", ssn: 333333333, dob: TimeKeeper.date_of_record - 30.years, gender: "male") }
+  let(:cobra_options) {{dependent.id.to_s => "primary"}}
+  let(:cobra_begin_date) {TimeKeeper.date_of_record}
+  
+  before do
+    census_employee.update(aasm_state: 'employment_terminated')
+  end
+
+  it "should should convert a dependent to cobra dependent" do
+    census_employee.census_dependents = [dependent]
+    expect(employer_profile.census_employees.size).to eq(1)
+    employer_profile.create_cobra_dependent(census_employee, cobra_options, cobra_begin_date)
+    employer_profile.reload
+    expect(employer_profile.census_employees.size).to eq(2)
+    cobra_dependent = employer_profile.census_employees.detect{|census_employee| census_employee.aasm_state == CensusEmployee::COBRA_DEPENDENT}
+    expect(cobra_dependent).not_to be_nil
+  end
+
+  it "should should not convert when dependent is not releated" do
+    expect(employer_profile.census_employees.size).to eq(1)
+    employer_profile.create_cobra_dependent(census_employee, cobra_options, cobra_begin_date)
+    employer_profile.reload
+    expect(employer_profile.census_employees.size).to eq(1)
+  end
+end
+
 describe EmployerProfile, ".is_converting?", dbclean: :after_each do
 
   let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
