@@ -204,6 +204,7 @@ RSpec.describe "employers/census_employees/show.html.erb" do
     it "should get child relationship when child_under_26" do
       allow(view).to receive(:link_to_add_fields).and_return(true)
       allow(census_employee).to receive(:census_dependents).and_return([census_dependent1])
+      allow(census_dependent1).to receive(:cobra_dependent_id).and_return(true)
       render template: "employers/census_employees/show.html.erb"
       expect(rendered).to match /child/
     end

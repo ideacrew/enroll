@@ -437,21 +437,21 @@ RSpec.describe Employers::CensusEmployeesController do
     context 'Get cobra' do
       it "should be redirect" do
         allow(census_employee).to receive(:update_for_cobra).and_return true
-        xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+        xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s,  cobra_options: { census_employee.id.to_s => "self" }, :format => :js
         expect(flash[:notice]).to eq "Successfully update Census Employee."
         expect(response).to have_http_status(:success)
       end
 
       context "with cobra date" do
         it "should cobra census employee" do
-          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, cobra_options: { census_employee.id.to_s => "self" }, :format => :js
           expect(response).to have_http_status(:success)
           expect(assigns[:cobra_date]).to eq cobra_date
         end
 
         it "should not cobra census_employee" do
           allow(census_employee).to receive(:update_for_cobra).and_return false
-          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, :format => :js
+          xhr :get, :cobra, :census_employee_id => census_employee.id, :employer_profile_id => employer_profile_id, cobra_date: cobra_date.to_s, cobra_options: { census_employee.id.to_s => "self"}, :format => :js
           expect(response).to have_http_status(:success)
           expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact DC Health Link at 855-532-5465 for further assistance."
         end

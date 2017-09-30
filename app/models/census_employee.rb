@@ -741,8 +741,8 @@ class CensusEmployee < CensusMember
     end
 
     event :reinstate_eligibility, :after => [:record_transition] do
-      transitions from: :employment_terminated, to: :employment_terminated_with_cobra_dependent, to: :employee_role_linked, :guard => :has_employee_role_linked?
-      transitions from: :employment_terminated, to: :employment_terminated_with_cobra_dependent, to: :eligible
+      transitions from: [:employment_terminated, :employment_terminated_with_cobra_dependent], to: :employee_role_linked, :guard => :has_employee_role_linked?
+      transitions from: [:employment_terminated, :employment_terminated_with_cobra_dependent], to: :eligible
       transitions from: :cobra_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?
       transitions from: :cobra_terminated, to: :cobra_eligible
     end

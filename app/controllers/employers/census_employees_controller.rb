@@ -266,7 +266,7 @@ class Employers::CensusEmployeesController < ApplicationController
   private
 
   def census_employee_is_cobra_primary
-    params["cobra_options"].detect{|id,dependency_type| id == @census_employee.id.to_s}
+    params["cobra_options"].detect{|id,dependency_type| id == @census_employee.id.to_s} rescue nil
   end
 
   def census_employee_spouse_is_cobra_primary
