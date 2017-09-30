@@ -18,7 +18,8 @@ module Importers::Mhc
             :legal_name => legal_name,
             :dba => dba,
             :office_locations => map_office_locations,
-            :employer_profile => EmployerProfile.new(employer_attributes)
+            :employer_profile => EmployerProfile.new(employer_attributes),
+            :issuer_assigned_id => assigned_employer_id
             })
         end
 

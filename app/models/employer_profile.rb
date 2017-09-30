@@ -46,6 +46,7 @@ class EmployerProfile
   field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
+  delegate :issuer_assigned_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
