@@ -49,11 +49,14 @@ class ConsumerRole
 
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
+  field :is_barred, type: Boolean, default: nil
+  field :bar_met, type: Boolean, default: nil
+
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
   field :aasm_state
 
-  delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
-  delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
+  delegate :citizen_status, :citizenship_result, :vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
+  delegate :citizen_status=, :citizenship_result=, :vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
   field :is_state_resident, type: Boolean
   field :residency_determined_at, type: DateTime
@@ -401,11 +404,11 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+    event :fail_dhs, :after => [:fail_lawful_presence, :record_transition, :notify_of_eligibility_change, :five_year_bar_response] do
       transitions from: :dhs_pending, to: :verification_outstanding
     end
 
-    event :pass_dhs, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change] do
+    event :pass_dhs, :after => [:pass_lawful_presence, :record_transition, :notify_of_eligibility_change, :five_year_bar_response] do
       transitions from: :unverified, to: :fully_verified, :guard => [:call_dhs?]
       transitions from: :dhs_pending, to: :fully_verified
       transitions from: :verification_outstanding, to: :fully_verified
@@ -687,6 +690,13 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
+  end
+
+  def five_year_bar_response(*args)
+    self.five_year_bar = args.first.five_year_bar if args.first.five_year_bar
+    self.is_barred = args.first.is_barred if args.first.is_barred
+    self.bar_met = args.first.bar_met if args.first.bar_met
+    self.save
   end
 
   def revert_ssn

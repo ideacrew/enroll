@@ -381,7 +381,7 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     context "import" do
       before do
@@ -480,6 +480,14 @@ context "Verification process and notices" do
       it "changes state from dhs_pending to verification_outstanding" do
         expect(consumer).to transition_from(:dhs_pending).to(:verification_outstanding).on_event(:fail_dhs, verification_attr)
         expect(consumer.lawful_presence_determination.verification_outstanding?).to eq true
+      end
+
+      it "stores 5 year bar response" do
+        consumer.aasm_state="dhs_pending"
+        consumer.fail_dhs!(verification_attr)
+        expect(consumer.is_barred).to be true
+        expect(consumer.five_year_bar).to be true
+        expect(consumer.bar_met).to be true
       end
 
     end
