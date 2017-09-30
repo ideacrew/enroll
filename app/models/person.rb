@@ -233,7 +233,7 @@ class Person
   end
 
   def update_family_document_status!
-    @primary_family.vlp_documents_status = vlp_documents_status
+    primary_family.update_attributes(vlp_documents_status: self.vlp_documents_status)
   end
 
   
