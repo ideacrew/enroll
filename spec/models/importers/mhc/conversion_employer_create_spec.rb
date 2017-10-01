@@ -34,7 +34,6 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
   let(:fein) { record_attrs[:fein] }
   let(:employer) { EmployerProfile.find_by_fein(fein) }
   let(:carrier_profile) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
-  let!(:plan) { FactoryGirl.create(:plan, carrier_profile: carrier_profile, active_year: TimeKeeper.date_of_record.year) }
   
   subject { Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
 

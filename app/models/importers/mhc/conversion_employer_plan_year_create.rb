@@ -51,7 +51,8 @@ module Importers::Mhc
         composite_rating_tier: 'employee_only',
         offered: true,
         employer_contribution_percent: employee_only_rt_contribution,
-        estimated_tier_premium: employee_only_rt_premium
+        estimated_tier_premium: employee_only_rt_premium,
+        final_tier_premium: employee_only_rt_premium
       })
     end
 
@@ -68,7 +69,8 @@ module Importers::Mhc
           composite_rating_tier: rating_tier, 
           offered: (family_offered ? true : tier_offered?(eval("#{rating_tier}_rt_offered").to_s)),
           employer_contribution_percent: (family_offered ? family_rt_contribution : eval("#{rating_tier}_rt_contribution")),
-          estimated_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium"))
+          estimated_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium")),
+          final_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium"))
         })
       end
 
