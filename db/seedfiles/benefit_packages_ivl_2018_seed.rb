@@ -5,7 +5,7 @@ puts "::: Creating IVL 2018 benefit packages :::"
 hbx = HbxProfile.current_hbx
 
 # Second lowest cost silver plan
-slcsp_2018 = Plan.where(active_year: 2018).and(hios_id: "94506DC0390006-01").first
+slcsp_2018 = Plan.where(active_year: 2018).and(hios_id: "94506DC0390014-01").first
 
 # check if benefit package is present for 2018
 bc_period_2018 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2018 }.first
