@@ -1460,6 +1460,24 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
+  context "has_only_future_benefit_groups?" do 
+    let(:census_employee) { FactoryGirl.build(:census_employee) }
+    let(:employee_role) { FactoryGirl.build(:employee_role) }
+    let(:hbx_enrollment) { HbxEnrollment.new }
+    let(:future_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment , start_on: TimeKeeper.date_of_record + 2.months ) }
+    let(:past_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+
+    it "should return true when all benefit_group_assignments start in future date" do
+      allow(census_employee).to receive(:benefit_group_assignments).and_return [future_benefit_group_assignment]
+      expect(census_employee.has_only_future_benefit_groups?).to be_truthy
+    end
+
+    it "should return false when all benefit_group_assignments has future and past start_on dates" do
+      allow(census_employee).to receive(:benefit_group_assignments).and_return [past_benefit_group_assignment,future_benefit_group_assignment]
+      expect(census_employee.has_only_future_benefit_groups?).to be_falsey
+    end
+  end
+
   context "is_disabled_cobra_action?" do
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:employee_role) { FactoryGirl.build(:employee_role) }

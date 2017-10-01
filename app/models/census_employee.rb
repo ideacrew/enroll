@@ -796,10 +796,18 @@ class CensusEmployee < CensusMember
   # 1.waived
   # 2.do not have an enrollment
   # 3.census_employee is pending
+  # 4.Employer has only future date enrollments
   def is_disabled_cobra_action?
     employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
-      (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank?) ||
-      employee_termination_pending?
+    (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank? ) ||
+    employee_termination_pending? || 
+      has_only_future_benefit_groups?
+  end
+
+  def has_only_future_benefit_groups?
+    future_bg = self.benefit_group_assignments.detect{|bg| bg.start_on > TimeKeeper.date_of_record}
+    past_bg = self.benefit_group_assignments.detect{|bg| bg.start_on <= TimeKeeper.date_of_record}
+    future_bg.present? && !past_bg.present?
   end
 
   def has_cobra_hbx_enrollment?
