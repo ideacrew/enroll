@@ -145,7 +145,7 @@ class Insured::FamiliesController < FamiliesController
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
-    
+
     if (@qualified_date) == false && params[:qle_id].present?
       sep_request_denial_notice
     end
@@ -304,7 +304,7 @@ class Insured::FamiliesController < FamiliesController
            @qualifying_life_events += QualifyingLifeEventKind.fetch_applicable_market_events_admin
          else
            @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
-         end		
+         end
        end
     end
   end

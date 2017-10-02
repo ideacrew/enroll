@@ -33,6 +33,7 @@ class ShopEmployeeNotice < Notice
     notice.primary_identifier = census_employee.employee_role.person.hbx_id
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
+    append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
     append_address(census_employee.employee_role.person.mailing_address)
   end
