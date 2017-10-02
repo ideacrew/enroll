@@ -13,8 +13,8 @@ class ShopEnrollmentsPublisher
     notify(
       action_name, {
       :reply_to => reply_to,
-      "hbx_enrollment_id" => hbx_id,
-      "enrollment_action_uri" => action
+      :hbx_enrollment_id => hbx_id,
+      :enrollment_action_uri => action
     })
   end
 end
