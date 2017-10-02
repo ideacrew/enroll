@@ -244,7 +244,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
     let(:hired_on) { double }
     let(:employment_relationships) { double }
     let(:user_id) { "SOMDFINKETHING_ID"}
-    let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com" ) }
+    let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
 
     before(:each) do
       sign_in(user)
