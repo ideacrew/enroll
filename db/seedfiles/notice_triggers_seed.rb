@@ -149,7 +149,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP_Out_of_pocket_notice',
+    hbx_id: 'SHOP_D087',
     title: 'Plan Match Health Plan Comparison Tool – Instructions for Your Employees',
     description: 'Out of pocket calculator notifier',
     resource_name: 'employer',
@@ -157,12 +157,12 @@ shop_notice_triggers = [
     notice_triggers: [
       {
         name: 'Out of pocket Notice',
-        notice_template: "notices/shop_employer_notices/out_of_pocket_notice.html.erb",
+        notice_template: "notices/shop_employer_notices/out_of_pocket_notice",
         notice_builder: 'ShopEmployerNotices::OutOfPocketNotice',
-        mpi_indicator: 'MPI',
+        mpi_indicator: 'SHOP_D087',
         notice_trigger_element_group: {
           market_places: ['shop'],
-          primary_recipients: [""],
+          primary_recipients: ["employer"],
           primary_recipient_delivery_method: ["email"],
           secondary_recipients: []
         }
