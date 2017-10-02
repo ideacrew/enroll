@@ -83,9 +83,8 @@
                   <%= format_date ivl_enrollment_effective_date %>.
                 </p>
               <% end %>
-              
-              <% if @family.active_seps.last && !dual_role_without_shop_sep?%>
-                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.active_seps.last.qualifying_life_event_kind.title %>"
+              <% if @family.latest_active_sep && !dual_role_without_shop_sep?%>
+                <p>You qualify for a Special Enrollment Period (SEP) because you "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
                   <br/>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
                   <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>

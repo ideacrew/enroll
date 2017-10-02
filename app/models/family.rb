@@ -442,6 +442,11 @@ class Family
     special_enrollment_periods.find_all { |sep| sep.is_active? }
   end
 
+
+  def latest_active_sep
+    special_enrollment_periods.order_by(:submitted_at.desc).detect{ |sep| sep.is_active? }
+  end
+
   # Get list of HBX Admin assigned {SpecialEnrollmentPeriod} (SEP) eligibilities currently available to this family
   #
   # @example Get the list of HBX Admin assigned {SpecialEnrollmentPeriod SpecialEnrollmentPeriods}
