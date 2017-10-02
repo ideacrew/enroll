@@ -370,7 +370,6 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     group_size_factors.save!
   end
 
-
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
     open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
     fte_count: 2, aasm_state: :published, is_conversion: (kind.downcase == 'conversion' ? true : false)
