@@ -113,7 +113,14 @@ Rails.logger.info "-----purchased families #{purchase_ids}"
 purchase_families.each do |fam|
   purchases = fam.households.flat_map(&:hbx_enrollments).select { |en| purchase_ids.include?(en.hbx_id) }
   purchases.each do |purchase|
-    purchased_at = purchase.submitted_at
+    purchased_at = purchase.workflow_state_transitions.where({
+      "to_state" => {"$in" => ["coverage_selected", "auto_renewing"]},
+      "transition_at" => {
+        "$gte" => start_time,
+        "$lt" => end_time
+      }
+    }).first.transition_at
+
     Rails.logger.info "---processing #{purchase.hbx_id}---#{purchased_at}---#{Time.now}"
     if can_publish_enrollment?(purchase, purchased_at)
       Rails.logger.info "-----publishing #{purchase.hbx_id}"
