@@ -51,7 +51,7 @@ module Eligibility
     def add_benefit_group_assignment(new_benefit_group, start_on = nil)
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
       reset_active_benefit_group_assignments(new_benefit_group)
-      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: start_on || new_benefit_group.start_on)
+      benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))
     end
 
     def active_benefit_group_assignment
