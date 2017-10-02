@@ -196,7 +196,7 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: insured_family_relationships_path(@person.consumer_role.id),
+      previous_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : edit_financial_assistance_application_path(@application),
       next_url: go_to_step_financial_assistance_application_path(@application, 1)
     } %>
   </div>
