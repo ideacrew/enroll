@@ -14,27 +14,28 @@ module VerificationHelper
   end
 
   def verification_type_status(type, member)
+    consumer = member.consumer_role
     case type
       when 'Social Security Number'
-        if member.consumer_role.ssn_verified?
+        if consumer.ssn_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
           "in review"
         else
           "outstanding"
         end
       when 'American Indian Status'
-        if member.consumer_role.native_verified?
+        if consumer.native_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
           "in review"
         else
           "outstanding"
         end
       else
-        if member.consumer_role.lawful_presence_verified?
+        if consumer.lawful_presence_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
           "in review"
         else
           "outstanding"
@@ -159,7 +160,7 @@ module VerificationHelper
 
   def build_admin_actions_list(v_type, f_member)
     if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
