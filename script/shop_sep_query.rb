@@ -81,7 +81,7 @@ term_ids = Family.collection.aggregate([
 
 def quiet_period_enrollment?(plan_year, submitted_at)
   duration = (plan_year.is_renewing? ? 15 : 28)
-  submitted_at < (plan_year.start_on.prev_month + duration.days)
+  submitted_at.in_time_zone("UTC") < TimeKeeper.start_of_exchange_day_from_utc(plan_year.start_on.prev_month + duration.days)
 end
 
 def is_valid_plan_year?(plan_year)
