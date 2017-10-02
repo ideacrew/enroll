@@ -554,6 +554,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         py.save
         py
       end
+      let(:plan_year1) { FactoryGirl.create(:renewing_plan_year)}
 
       context "and at least one employee is present on the roster sans assigned benefit group" do
         let!(:census_employee_no_benefit_group)   { FactoryGirl.create(:census_employee, employer_profile: employer_profile) }
