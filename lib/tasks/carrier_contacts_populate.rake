@@ -25,7 +25,7 @@ namespace :carrier_contacts do
         carrier.carrier_contacts.create(kind:'main',country_code:'1',area_code:'800',number:'7777902')
       elsif carrier.legal_name == "MetLife"
         carrier.carrier_contacts.create(kind:'main',country_code:'1',area_code:'855',number:'6382221')
-      elsif carrier.legal_name == "United Health Care"
+      elsif carrier.legal_name == "UnitedHealthcare"
         carrier.carrier_contacts.create(kind:'main',country_code:'1',area_code:'877',number:'8562430')
       end
     end

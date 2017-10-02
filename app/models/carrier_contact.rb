@@ -65,6 +65,18 @@ class CarrierContact
   def set_full_phone_number
     self.full_phone_number = to_s
   end
+  
+  def number_to_phone(number, options = {})
+    return unless number
+    options = options.symbolize_keys
+
+    parse_float(number, true) if options.delete(:raise)
+    ERB::Util.html_escape(ActiveSupport::NumberHelper.number_to_phone(number, options))
+  end
+  
+  def us_formatted_number
+    number_to_phone(full_phone_number, country_code: country_code)
+  end
 
 private
   def filter_non_numeric(str)

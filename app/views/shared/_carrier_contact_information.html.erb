@@ -14,7 +14,7 @@
           <div>
             Call:
             <strong>
-              <a href="tel:+18554443119">1-855-444-3119</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong>
           </div>
           <% elsif plan.carrier_profile.legal_name == "Aetna" %>
@@ -22,7 +22,7 @@
             <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
             Call:
             <strong>
-              <a href="tel:+18555866959">1-855-586-6959</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.where(kind:"individual").first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.where(kind:"individual").first.us_formatted_number %></a>
             </strong><br/>
             from 8am-6pm EST, Monday - Friday
             <br/>
@@ -30,7 +30,7 @@
             <strong>For Brokers and Employers</strong><br/>
             Call:
             <strong>
-              <a href="tel:+18884222128">1-888-422-2128</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.where(kind:"brokers").first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.where(kind:"brokers").first.us_formatted_number %></a>
             </strong><br/>
             from 8am-5pm EST, Monday - Friday
             <br/>
@@ -39,7 +39,7 @@
             <strong>For Small Business Employees</strong><br/>
             Call:
             <strong>
-              <a href="tel:+1-855-885-3289">Call 1-855-885-3289</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.where(kind:"employers").first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.where(kind:"employers").first.us_formatted_number %></a>
             </strong><br/>
             from 8am-6pm EST, Monday - Friday
             <br/>
@@ -48,14 +48,14 @@
           <div>
             Call:
             <strong>
-              <a href="tel:+18007777902">1-800-777-7902</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong>
           </div>
           <% elsif plan.carrier_profile.legal_name == "UnitedHealthcare" %>
           <div>
             Call:
             <strong>
-              <a href="tel:+18778562430">1-877-856-2430</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% end %>
@@ -66,18 +66,18 @@
           <div>
             Call:
             <strong>
-              <a href="tel:+18554443119">1-855-444-3119</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% elsif plan.carrier_profile.legal_name == "Delta Dental" %>
           <div>
             Call:
             <strong>
-              <a href="tel:+18004710236">1-800-471-0236</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.where(kind:"main").first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.where(kind:"main").first.us_formatted_number %></a>
             </strong>
             or
             <strong>
-              <a href="tel:+18004710275">1-800-471-0275</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.where(kind:"main2").first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.where(kind:"main2").first.us_formatted_number %></a>
             </strong>
             <br/>
           </div>
@@ -85,28 +85,28 @@
           <div>
             Call:
             <strong>
-              <a href="tel:+18556382221">1-855-638-2221</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% elsif plan.carrier_profile.legal_name == "Dentegra" %>
           <div>
             Call:
             <strong>
-              <a href="tel:+18004710284">1-800-471-0284</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% elsif plan.carrier_profile.legal_name == "Dominion" %>
           <div>
             Call:
             <strong>
-              <a href="tel:+18552243016">1-855-224-3016</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% elsif plan.carrier_profile.legal_name == "BestLife" %>
           <div><br/>
             Call:
             <strong>
-              <a href="tel:+18004330088">1-800-433-0088</a>
+              <a href="tel:<%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %>"><%=plan.carrier_profile.carrier_contacts.first.us_formatted_number %></a>
             </strong><br/>
           </div>
           <% end %>
