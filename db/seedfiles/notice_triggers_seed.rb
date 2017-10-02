@@ -675,6 +675,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'DIG063',
+    title: "Notice To Initial Employer's No Binder Payment Received",
+    description: 'When an initial employer misses the binder payment deadline, this is sent the day after the binder payment deadline.',
+    resource_name: 'employer',
+    event_name: 'initial_employer_no_binder_payment_received',
+    notice_triggers: [
+      {
+        name: ' Initial Employer No Binding Payment Received',
+        notice_template: 'notices/shop_employer_notices/notice_to_employer_no_binder_payment_received',
+        notice_builder: 'ShopEmployerNotices::NoticeToEmployerNoBinderPaymentReceived',
+        mpi_indicator: 'MPI_DIG063',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 
