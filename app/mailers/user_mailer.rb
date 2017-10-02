@@ -111,7 +111,7 @@ class UserMailer < ApplicationMailer
     files_to_attach.each do |file_name, file_path|
       attachments["#{file_name}"] = File.read(file_path)
     end
-    message = mail({to: email, subject: "You have a new message from DC Health Link", from: 'no-reply@individual.dchealthlink.com'}) do |format|
+    message = mail({to: email, subject: "Important new letter for you from #{Settings.site.short_name}", from: 'no-reply@individual.dchealthlink.com'}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
   end
