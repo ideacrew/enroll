@@ -2,23 +2,19 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SHOP Dashboard</title>
-
-  <!-- <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-theme.min.css" rel="stylesheet"> -->
-    <link rel="stylesheet" type="text/css" href="dashStyle.css">
+  <title>Congress Dashboard</title>
     
 <script type="text/javascript">
     $(function () {
         Highcharts.setOptions({ lang: { thousandsSep: ',' }});
         $('#barYr1').highcharts({
         chart: {
+           chart: {
             borderColor: '#000000',
             borderWidth: 0,
             type: 'column',
             marginLeft: 70,
-            height: 200,
+            height: 190,
             width: 1000
         },
         title: {
@@ -41,14 +37,13 @@
                 'Sep',
                 'Oct',
                 'Nov',
-                'Dec',
+                'Dec'
             ],
             crosshair: true
         },
         yAxis: {
             min: 0,
             title: {
-                offset: 50,
                 text: 'Covered Lives'
             }
         },
@@ -77,11 +72,9 @@
         },
         series: [{
             showInLegend: false,
-            <% @covered_lives_by_month.each do |month| %>
             name: 'Covered Lives',
-            data: [<%= month.jan_start %>, <%= month.feb_start %>, <%= month.mar_start %>, <%= month.apr_start %>, <%= month.may_start %>, <%= month.jul_start %>,<%= month.jul_start %>, <%= month.aug_start %>, <%= month.sep_start %>, <%= month.oct_start %>, <%= month.nov_start %>, <%= month.dec_start %>]
+            data: [4559, 2645, 3049, 2722, 2561, 6811, 4640, 4336, 5143, 4288, 1621, 3]
             }]
-            <% end %>
         });
     });
 </script>
@@ -90,52 +83,48 @@
 <body>
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/heatmap.js"></script>
 
 <div class="module">
 <div class="container-fluid ivl_dashboards" style="margin: 5px;"> 
 
 <ul class="nav nav-pills">
-  <li><a href="https://enroll-dashboard.dchbx.org/ivl/covered" >IVL Covered Lives</a></li>
-  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy" >IVL Policies</a></li>
-  <li class="active"><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/covered">IVL Covered Lives</a></li>
+  <li><a href="https://enroll-dashboard.dchbx.org/ivl/policy">IVL Policies</a></li>
+   <li class="active"><a href="https://enroll-dashboard.dchbx.org/host/shop">SHOP</a></li>
   <li><a href="https://enroll-dashboard.dchbx.org/host/congress">Congress</a></li>
 </ul>
 
 <div class="row row-content">
-<% @total_employers_count.each do |total_count| %>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b><%= total_count.active_empler%> Active Employers</b></div>
+  <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+  <div class="panel panel-default">
+    <div class="panel-body"><b>4,076 Active Employers</b></div>
+  </div>
+  </div>
+  <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+    <div class="panel panel-default">
+  <div class="panel-body"><b>25,979 Total Employees</b></div>
 </div>
+  </div>
+  <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+    <div class="panel panel-default">
+  <div class="panel-body"><b>77% Employees Enrolled</b></div>
 </div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b><%= total_count.covered_empl%>  Total Employees</b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b><%= total_count.percent_empl%>  Employees Enrolled</b></div>
-</div>
-</div>
-<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-<div class="panel panel-default">
-  <div class="panel-body"><b><%= total_count.total_covered%>  Total Covered</b></div>
-</div>
-</div>
-<%end%>
+  </div>
+  <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+    <div class="panel panel-default">
+      <div class="panel-body"><b>42,378 Total Covered</b></div>
+    </div>
+  </div>    
 </div>
 
-    <div class="row row-content">
+  <div class="row row-content">
     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="box-shadow: 0px 0px 5px gray;">
 
     <table class="table table-hover table-condensed" style="margin-top: 10px;">
     
     <thead>
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Employer <a href="/moreinfo">More Information</a></th>
+        <th class="texLef" colspan="4">Employer <a href="shop_next1.htm">More Information</a></th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
       </tr>
@@ -147,37 +136,34 @@
     </thead>
     <tbody>
       <tr>
-        <% @shop_employees.each do |employee| %>
         <td class="texLef">1 - 9</td>
-        <td><%= employee.num_1_9%></td>
-        <td><%= employee.pct_1_9%></td>
+        <td>2,895</td>
+        <td>71%</td>
       </tr>
       <tr>
         <td class="texLef">10 - 24</td>
-        <td><%= employee.num_10_24%></td>
-        <td><%= employee.pct_10_24%></td>
+        <td>878</td>
+        <td>22%</td>
       </tr>
       <tr>
         <td class="texLef">25 - 50</td>
-        <td><%= employee.num_25_50%></td>
-        <td><%= employee.pct_25_50%></td>
-      </tr>
+        <td>298</td>
+        <td>7%</td>
       </tr>
       <tr>
         <td class="texLef">51 - 100</td>
-        <td><%= employee.num_51_100%></td>
-        <td><%= employee.pct_51_100%></td>
+        <td>3</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">100+</td>
-        <td><%= employee.num_100%></td>
-        <td><%= employee.pct_100%></td>
+        <td>2</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -190,21 +176,19 @@
     </thead>
     <tbody>
       <tr>
-        <% @total_brokers_count.each do |broker| %>
         <td class="texLef">Yes</td>
-        <td><%= broker.num_100 %></td>
-        <td><%= broker.broker_yes_pct %></td>
+        <td>3,385</td>
+        <td>90%</td>
       </tr>
       <tr>
         <td class="texLef">No</td>
-        <td><%= broker.broker_no_num %></td>
-        <td><%= broker.broker_no_pct %></td>
+        <td>391</td>
+        <td>2%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -217,26 +201,24 @@
     </thead>
     <tbody>
       <tr>
-        <% @total_carriers_count.each do |carrier| %>
         <td class="texLef">1-Plan</td>
-         <td><%= carrier.plan1_num %></td>
-         <td><%= carrier.plan1_pct %></td>
+        <td>1,852</td>
+        <td>45%</td>
       </tr>
       <tr>
         <td class="texLef">1-Carrier</td>
-        <td><%= carrier.carrier1_num %></td>
-        <td><%= carrier.carrier1_pct %></td>
+        <td>1,942</td>
+        <td>48%</td>
       </tr>
       <tr>
         <td class="texLef">1-Metal</td>
-         <td><%= carrier.metal1_num %></td>
-        <td><%= carrier.metal1_pct %></td>
+        <td>282</td>
+        <td>7%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-         <% end %>
       </tr>
     </tbody>
 
@@ -249,26 +231,24 @@
     </thead>
     <tbody>
       <tr>
-         <% @employer_contribution.each do |contribution| %>
         <td class="texLef">100%</td>
-        <td><%= contribution.broker_yes_num %></td>
-        <td><%= contribution.pct_100 %></td>
+        <td>1,925</td>
+        <td>47%</td>
       </tr>
       <tr>
         <td class="texLef">51-99%</td>
-        <td><%= contribution.carrier1_num %></td>
-        <td><%= contribution.carrier1_pct %></td>
+        <td>1.075</td>
+        <td>26%</td>
       </tr>
       <tr>
         <td class="texLef">50%</td>
-        <td><%= contribution.metal1_num %></td>
-        <td><%= contribution.metal1_pct %></td>
+        <td>1,076</td>
+        <td>26%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -281,31 +261,29 @@
     </thead>
     <tbody>
       <tr>
-        <% @new_hire_benefits.each do |benefits| %>
         <td class="texLef">Date of Hire</td>
-        <td><%= benefits.date_hire_num %></td>
-        <td><%= benefits.date_hire_pct %></td>
+        <td>5</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">1st of Month</td>
-        <td><%= benefits.first_mth_num %></td>
-        <td><%= benefits.first_mth_pct %></td>
+        <td>3,214</td>
+        <td>79%</td>
       </tr>
       <tr>
         <td class="texLef">1st After 30 Days</td>
-        <td><%= benefits.day30_num %></td>
-        <td><%= benefits.day30_pct %></td>
+        <td>352</td>
+        <td>9%</td>
       </tr>
       <tr>
         <td class="texLef">1st After 60 Days</td>
-        <td><%= benefits.day60_num %></td>
-        <td><%= benefits.day60_pct %></td>
+        <td>505</td>
+        <td>12%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -323,21 +301,19 @@
     </thead>
     <tbody>
       <tr>
-        <% @census_employees.each do |census_employees| %>
         <td class="texLef">Enrolled</td>
-        <td><%= census_employees.num_100 %></td>
-        <td><%= census_employees.pct_100 %></td>
+        <td>32,938</td>
+        <td>62%</td>
       </tr>
       <tr>
         <td class="texLef">Not-Enrolled</td>
-        <td><%= census_employees.carrier1_num %></td>
-        <td><%= census_employees.carrier1_pct %></td>
+        <td>10,062</td>
+        <td>38%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -348,56 +324,56 @@
 
 <h6>SHOP Active Covered Lives by Start Month</h6>
 
-<div id="barYr1" style="min-width: 310px; height: 200px; margin: 0 auto"></div>
+<div id="barYr1" style="min-width: 310px; height: 185px; margin: 0 auto"></div>
 
-  <table class="table table-hover table-condensed" style="margin-top: 10px;">   
+  <table class="table table-hover table-condensed">   
     <thead>
       <tr>
         <th class="texLef"></th>
-        <th>Apr16</th>
-        <th>May16</th>
-        <th>Jun16</th>
-        <th>Jul16</th>
-        <th>Aug16</th>
-        <th>Sep16</th>
-        <th>Oct16</th>
-        <th>Nov16</th>
-        <th>Dec16</th>
-        <th>Jan17</th>
-        <th>Feb17</th>
-        <th>Mar17</th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td class="texLef">Covered Lives</td>
-        <td>705</td>
-        <td>368</td>
-        <td>574</td>
-        <td>3,296</td>
-        <td>3,075</td>
-        <td>3,990</td>
-        <td>4,036</td>
-        <td>5,110</td>
-        <td>22,211</td>
-        <td>5,242</td>
-        <td>3,457</td>
-        <td>2,953</td>
+        <td>4,559</td>
+        <td>2,645</td>
+        <td>3,049</td>
+        <td>2,722</td>
+        <td>2,561</td>
+        <td>6,811</td>
+        <td>4,640</td>
+        <td>4,336</td>
+        <td>5,143</td>
+        <td>4,288</td>
+        <td>1,621</td>
+        <td>3</td>
       </tr>
       <tr>
         <td class="texLef">% Covered Lives</td>
-        <td>1%</td>
-        <td>1%</td>
-        <td>1%</td>
-        <td>6%</td>
+        <td>11%</td>
         <td>6%</td>
         <td>7%</td>
-        <td>7%</td>
-        <td>9%</td>
-        <td>40%</td>
+        <td>6%</td>
+        <td>6%</td>
+        <td>16%</td>
+        <td>11%</td>
         <td>10%</td>
-        <td>6%</td>
-        <td>5%</td>
+        <td>12%</td>
+        <td>10%</td>
+        <td>4%</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td class="texLef">Employers</td>
@@ -439,7 +415,7 @@
     <table class="table table-hover table-condensed">
     <thead>
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Employee <a href="ivl_enroll.htm"></a></th>
+        <th class="texLef" colspan="4">Employee <a href="ivl_enroll.htm">More Information</a></th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
       </tr>
@@ -451,21 +427,19 @@
     <thead>
     <tbody>
       <tr>
-        <% @employee_status.each do |status| %>
         <td class="texLef">Employee</td>
-        <td><%= status.status_empl_num %></td>
-        <td><%= (status.status_empl_pct.to_f * 100).to_i %>%</td>
+        <td>25,979</td>
+        <td>61%</td>
       </tr>
       <tr>
         <td class="texLef">Dependent</td>
-        <td><%= status.status_dep_num %></td>
-        <td><%= (status.status_dep_pct.to_f * 100).to_i %>%</td>
+        <td>16,397</td>
+        <td>39%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -478,46 +452,44 @@
     </thead>
     <tbody>
       <tr>
-        <% @family_members.each do |family| %>
         <td class="texLef">1-Member</td>
-        <td><%= family.mem1_num %></td>
-        <td><%= (family.mem1_pct.to_f * 100).to_i %>%</td>
+        <td>18,086</td>
+        <td>70%</td>
       </tr>
       <tr>
         <td class="texLef">2-Members</td>
-        <td><%= family.mem2_num %></td>
-        <td><%= (family.mem2_pct.to_f * 100).to_i %>%</td>
+        <td>3,290</td>
+        <td>13%</td>
       </tr>
       <tr>
         <td class="texLef">3-Members</td>
-        <td><%= family.mem3_num %></td>
-        <td><%= (family.mem3_pct.to_f * 100).to_i %>%</td>
+        <td>1,883</td>
+        <td>7%</td>
       </tr>
       <tr>
         <td class="texLef">4-Members</td>
-        <td><%= family.mem4_num %></td>
-        <td><%= (family.mem4_pct.to_f * 100).to_i %>%</td>
+        <td>1,864</td>
+        <td>7%</td>
       </tr>
       <tr>
         <td class="texLef">5-Members</td>
-        <td><%= family.mem5_num %></td>
-        <td><%= (family.mem5_pct.to_f * 100).to_i %>%</td>
+        <td>623</td>
+        <td>2%</td>
       </tr>
       <tr>
         <td class="texLef">6-Members</td>
-        <td><%= family.mem6_num %></td>
-        <td><%= (family.mem6_pct.to_f * 100).to_i %>%</td>
+        <td>177</td>
+        <td>1%</td>
       </tr>
       <tr>
         <td class="texLef">7+ Members</td>
-       <td><%= family.mem7_num %></td>
-       <td><%= (family.mem7_pct.to_f * 100).to_i %>%</td>
+        <td>56</td>
+        <td>0%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -529,7 +501,7 @@
 
     <thead>
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Covered Lives Demographic <a href="ivl_enroll.htm"></a></th>
+        <th class="texLef" colspan="4">Covered Lives Demographic <a href="ivl_enroll.htm">More Information</a></th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
       </tr>
@@ -541,51 +513,49 @@
     </thead>
     <tbody>
       <tr>
-       <% @age_grps.each do |age| %>
         <td class="texLef">< 1</td>
-       <td><%= age.age1_num %></td>
-       <td><%= age.age1_pct %></td>
+        <td>506</td>
+        <td>1%</td>
       </tr>
       <tr>
         <td class="texLef">1-17</td>
-       <td><%= age.age17_num %></td>
-       <td><%= age.age17_pct %></td>
+        <td>6,773</td>
+        <td>16%</td>
       </tr>
       <tr>
         <td class="texLef">18-25</td>
-       <td><%= age.age25_num %></td>
-       <td><%= age.age25_pct %></td>
+        <td>4,273</td>
+        <td>10%</td>
       </tr>
       <tr>
         <td class="texLef">26-34</td>
-       <td><%= age.age34_num %></td>
-       <td><%= age.age34_pct %></td>
+        <td>10,383</td>
+        <td>25%</td>
       </tr>
       <tr>
         <td class="texLef">35-44</td>
-       <td><%= age.age44_num %></td>
-       <td><%= age.age44_pct %></td>
+        <td>7,863</td>
+        <td>19%</td>
       </tr>
       <tr>
         <td class="texLef">45-54</td>
-       <td><%= age.age54_num %></td>
-       <td><%= age.age54_pct %></td>
+        <td>6,257</td>
+        <td>15%</td>
       </tr>
       <tr>
         <td class="texLef">55-64</td>
-       <td><%= age.age64_num %></td>
-       <td><%= age.age64_pct %></td>
+        <td>4,559</td>
+        <td>11%</td>
       </tr>
       <tr>
         <td class="texLef">65+</td>
-       <td><%= age.age65_num %></td>
-       <td><%= age.age65_pct %></td>
+        <td>1,282</td>
+        <td>3%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
 
@@ -598,17 +568,15 @@
     </thead>
     <tbody>
       <tr>
-        <% @shop_genders.each do |gender| %>
         <td class="texLef">Male</td>
-        <td><%= gender.male_num%></td>
-        <td><%= gender.male_pct%></td>
+        <td>19,542</td>
+        <td>46%</td>
       </tr>
       <tr>
         <td class="texLef">Female</td>
-        <td><%= gender.female_num%></td>
-        <td><%= gender.female_pct%></td>
+        <td>22,834</td>
+        <td>54%</td>
       </tr>
-      <% end %>
     </tbody>
 
     </table>
@@ -620,7 +588,7 @@
     <tbody>
 
       <tr class="tabSpc1">
-        <th class="texLef" colspan="4">Covered Lives Coverage <a href="ivl_enroll.htm"></a></th>
+        <th class="texLef" colspan="4">Covered Lives Coverage <a href="ivl_enroll.htm">More Information</a></th>
         <th>&nbsp;</th>
         <th>&nbsp;</th>
       </tr>
@@ -630,32 +598,30 @@
         <th>%</th>
       </tr>
       <tr>
-        <% @shop_covered_lives_carrier.each do |carrier| %>
-        <td class="texLef">CareFirst</td>
-        <td><%=carrier.aetna_num%></td>
-        <td><%=carrier.aetna_pct%></td>
+        <td class="texLef">Aetna</td>
+        <td>525</td>
+        <td>1%</td>
       </tr>
       <tr>
-        <td class="texLef">United</td>
-        <td><%=carrier.cf_num%></td>
-        <td><%=carrier.cf_pct%></td>
+        <td class="texLef">CareFirst</td>
+        <td>33,376</td>
+        <td>79%</td>
       </tr>
       <tr>
         <td class="texLef">Kaiser</td>
-        <td><%=carrier.kp_num%></td>
-        <td><%=carrier.kp_pct%></td>
+        <td>2,171</td>
+        <td>5%</td>
       </tr>
       <tr>
-        <td class="texLef">Aetna</td>
-        <td><%=carrier.united_num%></td>
-        <td><%=carrier.united_pct%></td>
+        <td class="texLef">United</td>
+        <td>6,306</td>
+        <td>15%</td>
       </tr>
 
       <tr>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
       <tr>
         <th class="texLef">Metal</th>
@@ -663,25 +629,24 @@
         <th>%</th>
       </tr>
       <tr>
-        <% @metal_level.each do |metal| %>
         <td class="texLef">Platinum</td>
-        <td><%= metal.plat_num%></td>
-        <td><%= metal.plat_pct%></td>
+        <td>21,104</td>
+        <td>50%</td>
       </tr>
       <tr>
         <td class="texLef">Gold</td>
-        <td><%= metal.gold_num%></td>
-        <td><%= metal.gold_pct%></td>
+        <td>12,269</td>
+        <td>29%</td>
       </tr>
       <tr>
         <td class="texLef">Silver</td>
-        <td><%= metal.silver_num%></td>
-        <td><%= metal.silver_pct%></td>
+        <td>7,779</td>
+        <td>18%</td>
       </tr>
       <tr>
         <td class="texLef">Bronze</td>
-        <td><%= metal.bronze_num%></td>
-        <td><%= metal.bronze_pct%></td>
+        <td>1,226</td>
+        <td>3%</td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -692,7 +657,6 @@
         <td>&nbsp;</td>
         <td>&nbsp;</td>
         <td>&nbsp;</td>
-        <% end %>
       </tr>
     </tbody>
     </table>
