@@ -372,9 +372,9 @@ class EmployerProfile
 
   def is_transmit_xml_button_disabled?
     if self.renewing_plan_year.present?
-       binder_criteria_satisfied?
+      binder_criteria_satisfied?
     else
-       !self.renewing_plan_year.present? && !self.binder_paid?
+      !self.renewing_plan_year.present? && !self.binder_paid?
     end
   end
 

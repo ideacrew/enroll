@@ -37,7 +37,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   def transmit_group_xml
     HbxProfile.transmit_group_xml(params[:id].split)
     @employer_profile = EmployerProfile.find(params[:id])
-    @fein=@employer_profile.fein
+    @fein = @employer_profile.fein
     start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
     end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
     @xml_submit_time = @employer_profile.xml_transmitted_timestamp
