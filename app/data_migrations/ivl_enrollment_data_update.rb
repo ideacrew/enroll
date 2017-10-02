@@ -12,10 +12,9 @@ class IvlEnrollmentDataUpdate < MongoidMigrationTask
     # Then E1 is Canceled
     #IVL Enrollments should be transitioned from the Canceled state to the Terminated state.
                                                                                                                                                                                                                                                                                require 'csv'
-    families=Family.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
+    families=Family.by_enrollment_individual_market.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
     families.each do |family|
       begin
-        families=Family.by_enrollment_individual_market.where(:"households.hbx_enrollments.aasm_state".in => HbxEnrollment::CANCELED_STATUSES)
         families.each do |family|
           enrollments=family.active_household.hbx_enrollments
           if enrollments.size >= 2
@@ -23,15 +22,13 @@ class IvlEnrollmentDataUpdate < MongoidMigrationTask
             if canceled_enrollments.size > 0
               other_enrollments = enrollments - canceled_enrollments
               other_enrollments = other_enrollments.select{|a| a.subscriber  && a.effective_on  && a.submitted_at  }
-
               if other_enrollments.size>0
                 canceled_enrollments.each do |canceled_enrollment|
-                  if canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
+                  if canceled_enrollment.kind && canceled_enrollment.kind == "individual" && canceled_enrollment.subscriber && canceled_enrollment.effective_on && canceled_enrollment.submitted_at
                     kind = canceled_enrollment.kind
                     person= canceled_enrollment.subscriber.person
                     effective = canceled_enrollment.effective_on
-                    year = canceled_enrollment.effective_on.year
-                    other_enrollments = other_enrollments.select{|a| a.kind == kind && a.subscriber.person == person && effective > a.submitted_at && effective < a.effective_on && a.effective_on.year==year }
+                    other_enrollments = other_enrollments.select{|a| a.kind == kind && a.subscriber.person == person && effective > a.submitted_at && effective < a.effective_on }
                     if other_enrollments.size > 0
                       canceled_enrollment.update_attributes(aasm_state:"coverage_terminated")
                     end
@@ -47,3 +44,6 @@ class IvlEnrollmentDataUpdate < MongoidMigrationTask
     end
   end
 end
+
+
+
