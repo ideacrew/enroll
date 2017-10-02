@@ -713,7 +713,6 @@ shop_notice_triggers = [
       }
     ]
   },
-
 #   {
 #     hbx_id: 'SHOP27',
 #     title: 'Final Reminder to publish Application',
@@ -831,6 +830,27 @@ shop_notice_triggers = [
 #         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
 #         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
 #         mpi_indicator: 'MPI_SHOP32',
+#         notice_trigger_element_group: {
+#           market_places: ['shop'],
+#           primary_recipients: ["employer"],
+#           primary_recipient_delivery_method: ["secure_message"],
+#           secondary_recipients: []
+#         }
+#       }
+#     ]
+#   }
+#   {
+#     hbx_id: 'SHOP33',
+#     title: 'Employer Annual Renewal - Denial of Eligibility',
+#     description: 'denial of eligibility for employer as failed resindency',
+#     resource_name: 'employer',
+#     event_name: 'employer_renewal_eligibility_denial_notice',
+#     notice_triggers: [
+#       {
+#         name: 'Employer Annual Renewal - Denial of Eligibility',
+#         notice_template: 'notices/shop_employer_notices/employer_renewal_eligibility_denial_notice',
+#         notice_builder: 'ShopEmployerNotices::EmployerRenewalEligibilityDenialNotice',
+#         mpi_indicator: 'MPI_SHOP33',
 #         notice_trigger_element_group: {
 #           market_places: ['shop'],
 #           primary_recipients: ["employer"],
