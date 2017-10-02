@@ -25,7 +25,6 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-  documents_index_enabled: false
 
 #
   qle:
