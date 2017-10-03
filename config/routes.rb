@@ -544,7 +544,6 @@ Rails.application.routes.draw do
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
       get :fed_hub_request
       post 'download_documents'

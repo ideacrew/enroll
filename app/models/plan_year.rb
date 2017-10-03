@@ -902,7 +902,7 @@ class PlanYear
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
       transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :renewing_draft, to: :renewing_publish_pending #:after => :employer_renewal_eligibility_denial_notice
+      transitions from: :renewing_draft, to: :renewing_publish_pending #:after => :employer_renewal_eligibility_denial_notice, :notify_employee_of_renewing_employer_ineligibility
     end
 
     # Employer requests review of invalid application determination
@@ -941,7 +941,7 @@ class PlanYear
 
     # Coverage reinstated
     event :reinstate_plan_year, :after => :record_transition do
-      transitions from: :terminated, to: :active
+      transitions from: :terminated, to: :active, after: :reset_termination_and_end_date
     end
 
     event :renew_plan_year, :after => :record_transition do
@@ -1216,6 +1216,16 @@ class PlanYear
     end
   end
 
+  #notice will be sent to employees when a renewing employer has his primary office address outside of DC.
+  def notify_employee_of_renewing_employer_ineligibility
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    if application_eligibility_warnings.include?(:primary_office_location)
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_of_renewing_employer_ineligibility")
+      end
+    end
+  end
+
   def initial_employer_denial_notice
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if (application_eligibility_warnings.include?(:primary_office_location) || application_eligibility_warnings.include?(:fte_count))
@@ -1244,6 +1254,11 @@ class PlanYear
   def initial_employer_ineligibility_notice
     return true if benefit_groups.any? { |bg| bg.is_congress? }
     self.employer_profile.trigger_notices("initial_employer_ineligibility_notice")
+  end
+
+  def renewal_employer_open_enrollment_completed
+    return true if benefit_groups.any?{|bg| bg.is_congress?}
+    self.employer_profile.trigger_notices("renewal_employer_open_enrollment_completed")
   end
 
   def renewal_employer_ineligibility_notice
@@ -1341,5 +1356,9 @@ class PlanYear
         errors.add(:end_on, "plan year period should be: #{duration_in_days(Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day)} days")
       end
     end
+  end
+
+  def reset_termination_and_end_date
+    update_attributes!({terminated_on: nil, end_on: start_on.next_year.prev_day})
   end
 end

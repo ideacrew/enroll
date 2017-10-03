@@ -1,18 +1,20 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
+RSpec.describe ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
+  let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_enrolled' ) }
+  let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Initial Employer SHOP Approval Notice',
-                            :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
-                            :notice_builder => 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
-                            :event_name => 'initial_employer_approval',
-                            :mpi_indicator => 'MPI_SHOP2A',
-                            :title => "Employer Approval Notice"})
+                            :name =>'Renewal Employee Open Employee Completed',
+                            :notice_template => 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
+                            :notice_builder => 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
+                            :event_name => 'renewal_employer_open_enrollment_completed',
+                            :mpi_indicator => 'MPI_SHOP18',
+                            :title => "Group Open Enrollment Successfully Completed"})
                           }
     let(:valid_parmas) {{
         :subject => application_event.title,
@@ -27,7 +29,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::InitialEmployerEligibilityNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -35,7 +37,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployerNotices::InitialEmployerEligibilityNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +46,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerEligibilityNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,16 +59,11 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerEligibilityNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted.new(employer_profile, valid_parmas)
     end
     it "should append necessary" do
-      plan_year = employer_profile.plan_years.first
-      due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
       @employer_notice.append_data
-      expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
-      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq plan_year.open_enrollment_start_on
-      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
-      expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
+      expect(@employer_notice.notice.plan_year.start_on).to eq renewal_plan_year.start_on
     end
   end
 

@@ -650,6 +650,27 @@ shop_notice_triggers = [
       }
      ]
    },
+  # {
+  #   hbx_id: 'SHOP18',
+  #   title: 'Group Open Enrollment Successfully Completed',
+  #   description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
+  #   resource_name: 'employer',
+  #   event_name: 'renewal_employer_open_enrollment_completed',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Renewal Employee Open Employee Completed',
+  #       notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
+  #       notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
+  #       mpi_indicator: 'MPI_SHOP18',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
   {
     hbx_id: 'SHOP19',
     title: 'Group Ineligible to Obtain Coverage',
@@ -1025,11 +1046,54 @@ shop_notice_triggers = [
                   primary_recipients: ["employee"],
                   primary_recipient_delivery_method: ["secure_message"],
                   secondary_recipients: []
-
-                }
             }
+          }
         ]
     },
+
+  # {
+  #   hbx_id: 'SHOP10047',
+  #   title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+  #   description: 'Notification to employees regarding their Employer’s ineligibility.',
+  #   resource_name: 'employee_role',
+  #   event_name: 'notify_employee_of_initial_employer_ineligibility',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Notification to employees regarding their Employer’s ineligibility.',
+  #       notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_initial_employer_ineligibility',
+  #       notice_builder: 'ShopEmployeeNotices::NotifyEmployeeOfInitialEmployerIneligibility',
+  #       mpi_indicator: 'MPI_SHOP10047',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employee"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # }
+  # {
+  #   hbx_id: 'SHOP10066',
+  #   title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+  #   description: 'Notify Employees of their Employer Termination from SHOP due to ineligibility',
+  #   resource_name: 'employee_role',
+  #   event_name: 'notify_employee_of_renewing_employer_ineligibility',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Notify Employees of their employer termination due to ineligibility',
+  #       notice_template: 'notices/shop_employee_notices/notification_to_employee_due_to_renewal_employer_ineligibility',
+  #       notice_builder: 'ShopEmployeeNotices::NotifyEmployeeDueToRenewalEmployerIneligibility',
+  #       mpi_indicator: 'MPI_SHOP10066',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employee"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+
     {
         hbx_id: 'SHOP_M040',
         title: 'CONFIRMATION OF ELECTION TO TERMINATE COVERAGE',
