@@ -37,15 +37,6 @@ class UsersController < ApplicationController
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
-  def edit
-    @user = User.find(params[:id])
-  end
-
-  def update
-    @user = User.find(params[:id])
-    @user.update_attributes(email_update_params)
-  end
-    
   def change_password
     user.password = params[:user][:new_password]
     user.password_confirmation = params[:user][:password_confirmation]
@@ -57,18 +48,36 @@ class UsersController < ApplicationController
     redirect_to personal_insured_families_path
   end
 
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    @user.update_attributes(email_update_params)
+  end
+
   private
+  helper_method :user
 
   def email_update_params
     params.require(:user).permit(:email)
   end
 
-  def user
-    @user ||= User.find(params[:id])
+  def validate_email
+     @error = if params[:user][:email].blank?
+               'Please enter a valid email'
+             elsif params[:user].present? && !@user.update_attributes(email_update_params)
+                @user.errors.full_messages.join.gsub('(optional) ', '')
+              end
   end
 
   def login_history
     @user_login_history = SessionIdHistory.for_user(user_id: user.id).order('created_at DESC').page(params[:page]).per(15)
+  end
+
+  def user
+    @user ||= User.find(params[:id])
   end
 
   def confirm_existing_password

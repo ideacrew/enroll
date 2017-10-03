@@ -30,6 +30,7 @@ describe UsersController do
     end
   end
 
+
   before :each do
     allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
     allow(User).to receive(:find).with(user_id).and_return(user)
@@ -41,7 +42,6 @@ describe UsersController do
       sign_in(admin)
       get :confirm_lock, id: user_id, format: :js
     end
-    it { expect(assigns(:user)).to eq(user) }
     it { expect(response).to render_template('confirm_lock') }
   end
 
@@ -56,7 +56,6 @@ describe UsersController do
       before do
         sign_in(admin)
       end
-
       it "does not toggle the lock status" do
         expect(user).not_to receive(:lock!)
         get :lockable, id: user_id
@@ -74,7 +73,7 @@ describe UsersController do
         allow(user).to receive(:lock!)
       end
 
-      it "toggles the user lock" do 
+      it "toggles the user lock" do
         expect(user).to receive(:lock!)
         get :lockable, id: user_id
       end
@@ -88,16 +87,12 @@ describe UsersController do
       let(:can_lock) { true }
       before do
         sign_in(admin)
-        allow(user).to receive(:update_lockable)
+        allow(user).to receive(:lock!)
       end
 
       it "toggles the user lock" do
-        expect(user).to receive(:update_lockable)
+        expect(user).to receive(:lock!)
         get :lockable, id: user_id
-      end
-      it do
-        get :lockable, id: user_id
-        expect(response).to redirect_to(user_account_index_exchanges_hbx_profiles_url)
       end
     end
   end
@@ -133,6 +128,8 @@ describe UsersController do
   end
 
   describe '.confirm_reset_password' do
+    let(:can_reset_password) { false }
+    
     before do
       allow(user_policy).to receive(:reset_password?).and_return(can_reset_password)
     end
@@ -159,12 +156,20 @@ describe UsersController do
       end
       it do
         put :confirm_reset_password, id: user_id, user: { email: '' }, format: :js
-        expect(assigns(:error)).to eq('Please enter a valid email') 
+        expect(assigns(:error)).to eq('Please enter a valid email')
       end
       it do
         put :confirm_reset_password, id: user_id, user: { email: '' }, format: :js
         expect(response).to render_template('users/reset_password.js.erb')
       end
+    end
+
+  describe '.edit' do
+    let(:user) { FactoryGirl.build(:user, :with_consumer_role) }
+    before do
+      sign_in(admin)
+      allow(User).to receive(:find).with(user.id).and_return(user)
+      get :edit, id: user.id, format: 'js'
     end
     it { expect(assigns(:user)).to eq(user) }
     it { expect(response).to render_template('edit') }
