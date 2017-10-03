@@ -162,7 +162,7 @@ module Insured
       (plan_year.start_on.beginning_of_day..plan_year.end_on.end_of_day).cover? effective_on
     end
 
-    def is_chm_checkbox_disabled?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
+    def is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage)
       if benefit_type.present? && benefit_type != "health"
         is_dental_coverage.nil? ? is_ivl_coverage : is_dental_coverage
       else

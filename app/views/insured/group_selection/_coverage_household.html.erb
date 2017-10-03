@@ -27,14 +27,12 @@
           %>
         <% end %>
 
-        <% is_coverage = !is_health_coverage.nil? ? is_health_coverage : is_ivl_coverage %>
-
-        <% benefit_type_val = is_chm_checkbox_disabled?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
+        <% is_checked = is_member_checked?(benefit_type, is_health_coverage, is_dental_coverage, is_ivl_coverage) %>
 
 
         <tr class='<%= class_for_ineligible_row(family_member, is_ivl_coverage) %>'>
           <td width="20">
-            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, benefit_type_val, disabled: !benefit_type_val ) %>
+            <%= check_box_tag("family_member_ids[#{index}]", family_member.id, is_checked, disabled: !is_checked ) %>
           </td>
           <td><%= label_tag("family_member_ids[#{index}]", "#{family_member.full_name} (Age : #{pluralize(calculate_age_by_dob(family_member.dob), 'year')})") %></td>
 

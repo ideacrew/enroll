@@ -648,7 +648,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
       end
 
       context "when EE clicked on make changes button of enrollment" do
-        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg)}
+        let(:enrollment) { double("HbxEnrollment", benefit_group: renewal_bg, :is_shop? => true)}
         before do
           allow(employee_role).to receive(:can_enroll_as_new_hire?).and_return true
         end
@@ -662,6 +662,64 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
           expect(helper.is_eligible_for_dental?(employee_role, "change_plan", enrollment)).to eq false
         end
       end
+    end
+  end
+
+  describe "#class_for_ineligible_row" do
+    let(:person) { FactoryGirl.create(:person, :with_family)}
+    let(:employee_role) { FactoryGirl.create(:employee_role, person: person)}
+    # let(:employee_role_2) { FactoryGirl.create(:employee_role, person: employee_role_1.person)}
+
+    before do
+      assign(:"person", person)
+      allow(person).to receive(:active_employee_roles).and_return [employee_role]
+      @member = person.primary_family.primary_applicant
+    end
+
+    it "should return a string" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).class).to eq String
+    end
+
+    it "should have 'ineligible_health_employee_role_id' class if not eligible for ER sponsored health benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([false, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq true
+    end
+
+    it "should have 'ineligible_dental_employee_role_id' class if not eligible for ER sponsored dental benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, false])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq true
+    end
+
+    it "should have both 'ineligible_dental' & 'ineligible_health' classes if not eligible for both types of ER sponsored benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([false, false])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq true
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq true
+    end 
+
+    it "should have 'ineligible_ivl_row' class if not eligible for IVL benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, false).include?("ineligible_ivl_row")).to eq true
+    end
+
+    it "should not have 'ineligible_health_employee_role_id' class if eligible for ER sponsored health benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([true, nil])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_health_row_#{employee_role.id}")).to eq false
+    end
+
+    it "should not have 'ineligible_dental_employee_role_id' class if eligible for ER sponsored dental benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, true])
+      expect(helper.class_for_ineligible_row(@member, nil).include?("ineligible_dental_row_#{employee_role.id}")).to eq false
+    end
+
+    it "should not have 'ineligible_ivl_row' class if eligible for IVL benefits" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, true).include?("ineligible_ivl_row")).to eq false
+    end
+
+    it "should have 'is_primary' class for primary person" do
+      allow(helper).to receive(:shop_health_and_dental_attributes).with(@member, employee_role).and_return([nil, nil])
+      expect(helper.class_for_ineligible_row(@member, true).include?("is_primary")).to eq true
     end
   end
 end
