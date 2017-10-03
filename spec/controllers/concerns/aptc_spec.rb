@@ -46,13 +46,13 @@ RSpec.describe FakesController, :type => :controller do
     describe "get_tax_household_from_family_members" do
       context "get_tax_household_from_family_members" do
         it "should return all the tax housholds of the given family members" do
-          family_member_ids = {"0" => primary_member.id.to_s, "1" => family_member1.id.to_s, "2" => family_member2.id.to_s}
+          family_member_ids = [primary_member.id.to_s, family_member1.id.to_s, family_member2.id.to_s]
           expect(subject.get_tax_households_from_family_members(person, family_member_ids, TimeKeeper.date_of_record.year)).to eq [tax_household1, tax_household2, tax_household3]
         end
 
         it "should not return any tax housholds as the effective year is different" do
           allow(person).to receive(:has_active_consumer_role?).and_return true
-          family_member_ids = {"0" => primary_member.id.to_s, "1" => family_member1.id.to_s, "2" => family_member2.id.to_s}
+          family_member_ids = [primary_member.id.to_s, family_member1.id.to_s, family_member2.id.to_s]
           expect(subject.get_tax_households_from_family_members(person, family_member_ids, 2014)).to eq []
         end
 

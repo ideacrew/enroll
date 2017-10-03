@@ -9,7 +9,6 @@ module Aptc
 
   def get_tax_households_from_family_members(person, family_member_ids, year)
     tax_households = []
-    family_member_ids = family_member_ids.collect { |k,v| v}
     if person.present? && person.has_active_consumer_role?
       family = person.primary_family
       application = family.active_approved_application
