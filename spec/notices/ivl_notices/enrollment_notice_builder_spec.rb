@@ -95,8 +95,6 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
   end
 
-
-
   describe "render template and generate pdf" do
     before do
       allow(person).to receive("primary_family").and_return(family)
