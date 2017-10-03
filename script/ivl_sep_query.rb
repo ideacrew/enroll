@@ -20,13 +20,13 @@ class IvlEnrollmentsPublisher
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
-coverage_statuses = %w(coverage_selected auto_renewing)
+active_statuses = %w(coverage_selected auto_renewing)
 
 purchases = Family.collection.aggregate([
   {"$match" => {
     "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
-        "to_state" => {"$in" => coverage_statuses},
+        "to_state" => {"$in" => active_statuses},
         "transition_at" => {
            "$gte" => start_time,
            "$lt" => end_time
@@ -39,7 +39,7 @@ purchases = Family.collection.aggregate([
   {"$match" => {
     "households.hbx_enrollments.workflow_state_transitions" => {
       "$elemMatch" => {
-        "to_state" => {"$in" => coverage_statuses},
+        "to_state" => {"$in" => active_statuses},
         "transition_at" => {
            "$gte" => start_time,
            "$lt" => end_time
@@ -87,12 +87,12 @@ purchase_event = "acapi.info.events.hbx_enrollment.coverage_selected"
 purchases.each do |rec|
   pol_id = rec["_id"]
   Rails.logger.info "-----publishing #{pol_id}"
-  IVLEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
+  IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
 end
 
 term_event = "acapi.info.events.hbx_enrollment.terminated"
 terms.each do |rec|
   pol_id = rec["_id"]
   Rails.logger.info "-----publishing #{pol_id}"
-  ShopEnrollmentsPublisher.publish_action(term_event, pol_id, "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
+  IvlEnrollmentsPublisher.publish_action(term_event, pol_id, "urn:openhbx:terms:v1:enrollment#terminate_enrollment")
 end
