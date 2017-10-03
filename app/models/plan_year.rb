@@ -939,6 +939,11 @@ class PlanYear
       transitions from: :active, to: :termination_pending, :after => [:set_termination_date, :schedule_employee_terminations]
     end
 
+    # Coverage reinstated
+    event :reinstate_plan_year, :after => :record_transition do
+      transitions from: :terminated, to: :active
+    end
+
     event :renew_plan_year, :after => :record_transition do
       transitions from: :draft, to: :renewing_draft
     end
