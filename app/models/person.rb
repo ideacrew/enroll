@@ -930,33 +930,6 @@ class Person
     person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
   end
 
-  def is_a_valid_faa_update?(params)
-    if (params["first_name"] == first_name &&
-        params["middle_name"] == middle_name &&
-        params["last_name"] == last_name &&
-        # params["dob"] == dob &&
-        # params["ssn"] == ssn &&
-        params["no_ssn"] == no_ssn &&
-        params["gender"] == gender &&
-        # params["relationship"] == relationship &&
-        params["is_applying_coverage"] == is_applying_coverage.to_s &&
-        params["us_citizen"] == us_citizen.to_s &&
-        params["naturalized_citizen"] == naturalized_citizen.to_s &&
-        params["eligible_immigration_status"] == eligible_immigration_status.to_s &&
-        params["indian_tribe_member"] == indian_tribe_member.to_s &&
-        params["tribal_id"] == tribal_id &&
-        params["ethnicity"] == ethnicity &&
-        # params["is_consumer_role"] == is_consumer_role &&
-        # params["same_with_primary"] == same_with_primary &&
-        params["no_dc_address"] == no_dc_address.to_s )
-
-     return true
-    else
-     return false
-    end
-  end
-
-
   private
   def is_ssn_composition_correct?
     # Invalid compositions:

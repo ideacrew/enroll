@@ -140,13 +140,8 @@ class FamilyMember
   def create_financial_assistance_applicant
     # If there is an application in progress create an applicant for the added family member.
     if family.applications.present?
-      if family.application_in_progress.present? #Review this condition dummy
-        #TODO Activate applicant if exists.
+      if family.application_in_progress.present?
         family.application_in_progress.applicants.create!({family_member_id: self.id}) unless self.is_primary_applicant?
-      else
-        old_application = family.applications.order_by(:submitted_at => 'desc').first
-        @application = old_application.copy_application
-        @application.applicants.create!({family_member_id: self.id})
       end
     end
   end
