@@ -77,7 +77,8 @@ if missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  puts "Processing Plan Mapping ..."
+  puts "Processing Plan Mapping for plans  ..."
+  system "bundle exec rake xml:plan_cross_walk_old"
   system "bundle exec rake xml:plan_cross_walk"
   puts "Processing Plan Mapping completed"
   puts "*"*80
