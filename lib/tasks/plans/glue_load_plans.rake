@@ -47,7 +47,7 @@ namespace :seed do
       puts JSON.dump(plan_json.merge({:premium_tables => build_premium_tables(premium_tables).uniq}))
     end
     puts "["
-    Plan.where(active_year: 2018, hios_id: "94506DC0390014-01").each do |pln|
+    Plan.where(active_year: 2018).each do |pln|
       dump_plan_for_enroll(pln)
       puts(",")
     end
