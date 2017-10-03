@@ -49,6 +49,7 @@ namespace :xml do
       puts "*"*80
       puts "processing file: #{@file_name} \n"
       puts "*"*80
+      next if current_year == 2018
 
       sheets = ["IVL HIOS Plan Crosswalk", "SHOP HIOS Plan Crosswalk"]
       # sheets = ["SHOP HIOS Plan Crosswalk"]
