@@ -42,7 +42,9 @@ namespace :import do
               if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                 rx_formulary_url = row_info[@headers["rx formulary url"]]
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
-                plan.is_standard_plan = row_info[@headers["standard plan?"]] if sheet_name == "IVL"
+                if sheet_name == "IVL" && year > 2017
+                  plan.is_standard_plan = row_info[@headers["standard plan?"]]
+                end
               end
               plan.save
             end
