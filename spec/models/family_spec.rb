@@ -1320,7 +1320,7 @@ end
 
 describe "#document_due_date", dbclean: :after_each do
   context "when special verifications exists" do
-    let(:special_verification) { FactoryGirl.create(:special_verification)}
+    let(:special_verification) { FactoryGirl.create(:special_verification, type: "admin")}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
     it "should return the due date on the related latest special verification" do

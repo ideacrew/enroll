@@ -127,17 +127,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     outstanding_people = []
     people.each do |person|
       outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
-      person.verification_types.each do |verification_type|
-        unless person.consumer_role.special_verifications.where(:"verification_type" => verification_type).present?
-          special_verification = SpecialVerification.new(due_date: (date + Settings.aca.individual_market.verification_due.days), verification_type: verification_type)
-          person.consumer_role.special_verifications << special_verification
-          person.consumer_role.save!
-        end
-      end
+      update_individual_due_date(person, date)
     end
 
-    family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family) unless family.min_verification_due_date_on_family.present?
-
+    family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family) unless family.min_verification_due_date.present?
     hbx_enrollments = []
     en = enrollments.select{ |en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
     health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:effective_on).last
@@ -156,23 +149,33 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     append_unverified_individuals(outstanding_people)
   end
 
+  def update_individual_due_date(person, date)
+    person.consumer_role.outstanding_verification_types.each do |verification_type|
+      unless person.consumer_role.special_verifications.where(:"verification_type" => verification_type).present?
+        special_verification = SpecialVerification.new(due_date: (date + Settings.aca.individual_market.verification_due.days), verification_type: verification_type, type: "notice")
+        person.consumer_role.special_verifications << special_verification
+        person.consumer_role.save!
+      end
+    end
+  end
+
   def append_unverified_individuals(people)
     people.each do |person|
       person.consumer_role.outstanding_verification_types.each do |verification_type|
         case verification_type
         when "Social Security Number"
-          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         when "Immigration status"
-          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         when "Citizenship"
-          notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+          notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
         end
       end
     end
   end
 
-  def due_date(person, verification_type)
-    special_verification = family_member.person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
+  def document_due_date(person, verification_type)
+    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
     special_verification.present? ? special_verification.due_date : nil
   end
 
