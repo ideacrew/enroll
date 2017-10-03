@@ -341,7 +341,7 @@ class FinancialAssistance::Application
   end
 
   def populate_applicants_for(family)
-    self.applicants = family.family_members.map do |family_member|
+    self.applicants = family.active_family_members.map do |family_member|
       FinancialAssistance::Applicant.new family_member_id: family_member.id
     end
   end
@@ -444,10 +444,6 @@ class FinancialAssistance::Application
     self.aasm_state == "determined" ? true : false
   end
 
-  def active_applicants
-    applicants.where(is_active: true)
-  end
-
   def incomplete_applicants?
     active_applicants.each do |applicant|
       return true if applicant.applicant_validation_complete? == false
@@ -539,7 +535,24 @@ class FinancialAssistance::Application
       new_application.submitted_at = nil
       new_application.created_at = nil
       new_application.save!
+      new_application.sync_family_members_with_applicants
       new_application
+    end
+  end
+
+  def sync_family_members_with_applicants
+    active_member_ids = family.active_family_members.map(&:id)
+    applicants.each do |app| app.update_attributes(:is_active => false) if !active_member_ids.include?(app.family_member_id) end
+    active_applicant_family_member_ids = active_applicants.map(&:family_member_id)
+    family.active_family_members.each do |fm|
+      if !active_applicant_family_member_ids.include?(fm.id)
+        applicant_in_context = applicants.where(family_member_id: fm.id)
+        if applicant_in_context.present?
+          applicant_in_context.first.update_attributes(is_active: true)
+        else
+          applicants.create(family_member_id: fm.id)
+        end
+      end
     end
   end
 

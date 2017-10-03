@@ -78,16 +78,14 @@ module Forms
       return false unless valid?
       existing_inactive_family_member = family.find_matching_inactive_member(self)
       if existing_inactive_family_member
-        puts "IN EXISTING INACTIVE FAMILY"
         self.id = existing_inactive_family_member.id
         existing_inactive_family_member.reactivate!(self.relationship)
         existing_inactive_family_member.save!
         family.save!
-        return create_application_and_return
+        return true
       end
       existing_person = Person.match_existing_person(self)
       if existing_person
-        puts "IN Existing Person"
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
           family_member.family.build_consumer_role(family_member)
@@ -98,7 +96,7 @@ module Forms
         family_member.save!
         family.save!
         self.id = family_member.id
-        return create_application_and_return
+        return true
       end
       person = Person.new(extract_person_params)
       return false unless try_create_person(person)
@@ -113,16 +111,7 @@ module Forms
       family.save!
       family.build_relationship_matrix
       self.id = family_member.id
-      create_application_and_return
-    end
-
-    def create_application_and_return
-      current_applicant = family.family_members.find(self.id).try(:person)
-      if !family.application_in_progress.present? && current_applicant.present?
-        application = family.applications.order_by(:submitted_at => 'desc').first
-        application.copy_application if application.present? && application.applicants.select{ |applicant| applicant.person.id == current_applicant.id }.count == 0
-      end
-     return true
+      true
     end
 
     def try_create_person(person)
@@ -208,17 +197,6 @@ module Forms
     def destroy!
       family.remove_family_member(family_member.person)
       family.save!
-      application = family.application_in_progress
-      if application.present?
-        applicant = application.applicants.where(family_member_id: self.family_member.id).first
-        applicant.update_attributes(is_active: false) if applicant.present?
-      else
-        if family.applications.present?
-          application = family.applications.order_by(:submitted_at => 'desc').first.copy_application
-          dependent_applicant = application.applicants.where(family_member_id: self.family_member.id).first
-          dependent_applicant.update_attribute("is_active", false)
-        end
-      end
     end
 
     def family
@@ -318,11 +296,6 @@ module Forms
       family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
       family.build_relationship_matrix
       family_member.save!
-      if family.applications.present?
-        unless family.application_in_progress || family_member.person.is_a_valid_faa_update?(attr)
-          family.applications.order_by(:submitted_at => 'desc').first.copy_application
-        end
-      end
       true
     end
 
@@ -338,11 +311,15 @@ module Forms
       end
     end
 
-    private
-
-    def copy_financial_application
+    def copy_finanacial_assistances_application
+      if family.applications.present?
+        application_in_draft = family.application_in_progress
+        if application_in_draft.present?
+          application_in_draft.sync_family_members_with_applicants
+        else family.latest_submitted_application.present?
+          family.latest_submitted_application.copy_application
+        end
+      end
     end
-
-
   end
 end
