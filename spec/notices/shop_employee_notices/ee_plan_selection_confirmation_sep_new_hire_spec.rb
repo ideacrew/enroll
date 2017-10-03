@@ -86,7 +86,7 @@ RSpec.describe ShopEmployeeNotices::EePlanConfirmationSepNewHire do
     it "should append data" do
       expect(@employer_notice.notice.enrollment.effective_on.to_s).to eq("07/14/2017")
       expect(@employer_notice.notice.enrollment.plan.plan_name).to eq(plan.name)
-      expect(@employer_notice.notice.enrollment.employee_cost).to eq("0.0")
+      expect(@employer_notice.notice.enrollment.employee_cost).to eq("0.00")
     end
 
     it "should render ee_plan_selection_notice" do
