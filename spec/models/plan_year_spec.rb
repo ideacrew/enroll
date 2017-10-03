@@ -472,9 +472,9 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
     end
   end
-  
+
   context 'should return correct benefit group assignments for an employee' do
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }  
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile) }
     let(:plan_year_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
     let(:plan_year_end_on) { TimeKeeper.date_of_record.end_of_month + 1.year }
     let(:open_enrollment_start_on) { TimeKeeper.date_of_record.beginning_of_month }
@@ -825,7 +825,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
@@ -882,7 +882,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before do
                   TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
@@ -2454,7 +2454,7 @@ describe PlanYear, "plan year schedule changes" do
     end
   end
 
-  context '.carriers_offered' do 
+  context '.carriers_offered' do
 
     let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'active', start_on: TimeKeeper.date_of_record.next_month.beginning_of_month)}
     let(:plan_year) { employer_profile.published_plan_year }
@@ -2488,7 +2488,7 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
     employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
     employee
   }
-  
+
   context 'when plan year begin date changed' do
     let(:modified_start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:modified_end_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
