@@ -25,7 +25,6 @@ class Insured::FamilyMembersController < ApplicationController
     end
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
-    ee_sep_request_accepted_notice(@employee_role)
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
@@ -42,6 +41,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
       @market_kind = qle.market_kind
+      ee_sep_request_accepted_notice(@employee_role)
     end
 
     if request.referer.present?
