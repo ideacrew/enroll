@@ -452,7 +452,7 @@ describe Family do
       end
 
       it "death sep" do
-        allow(family).to receive(:latest_shop_sep).and_return death_sep 
+        allow(family).to receive(:latest_shop_sep).and_return death_sep
         expect(family.terminate_date_for_shop_by_enrollment).to eq date
       end
 
@@ -1320,6 +1320,17 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
     allow(family).to receive(:dependents).and_return([family_member_dependent])
     family.send(:create_dep_consumer_role)
     expect(family.dependents.first.person.consumer_role?).to be_truthy
+  end
+end
+
+describe "min_verification_due_date", dbclean: :after_each do
+  let!(:today) { Date.today }
+  let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
+
+  context "::min_verification_due_date_range" do
+    it "returns a family in the range" do
+      expect(Family.min_verification_due_date_range(10.days.ago, today).to_a).to eq([family])
+    end
   end
 end
 
