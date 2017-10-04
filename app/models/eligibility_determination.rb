@@ -4,7 +4,7 @@ class EligibilityDetermination
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  embedded_in :application, class_name: "FinancialAssistance::Application"
+  embedded_in :tax_household
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0)
 
@@ -24,7 +24,6 @@ class EligibilityDetermination
 
   field :e_pdc_id, type: String
   field :benchmark_plan_id, type: BSON::ObjectId
-  field :tax_household_id, type: BSON::ObjectId
 
   # Premium tax credit assistance eligibility.
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
@@ -75,8 +74,7 @@ class EligibilityDetermination
       message: "%{value} is not a valid cost sharing eligibility kind"
     }
 
-  validates :source,
-    inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" }
+  validate :source_kind
 
   def csr_percent_as_integer=(new_csr_percent)
     super
@@ -93,7 +91,7 @@ class EligibilityDetermination
   end
 
   def family
-    application.family
+    tax_household.family
   end
 
   def benchmark_plan=(benchmark_plan_instance)
@@ -130,12 +128,19 @@ class EligibilityDetermination
     end
   end
 
-  def tax_household
-    return nil unless tax_household_id
-    application.tax_households.where(id: tax_household_id).first
+  def application
+    return nil unless tax_household.application_id.present?
+    tax_household.application
   end
 
 private
+
+  def source_kind
+    unless source.nil?
+      errors.add(:source, " Can't be other than Curam Haven Admin ") unless SOURCE_KINDS.include?source
+    end
+  end
+
   def set_premium_credit_strategy
     self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
   end
@@ -143,6 +148,10 @@ private
   def set_determined_at
     if application && application.submitted_at.present?
       self.determined_at ||= application.submitted_at
+    else
+      if tax_household && tax_household.submitted_at.present?
+        self.determined_at ||= tax_household.submitted_at
+      end
     end
   end
 end

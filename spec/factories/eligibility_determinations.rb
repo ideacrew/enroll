@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :eligibility_determination do
-    application
+    tax_household
     determined_on TimeKeeper.datetime_of_record
     determined_at TimeKeeper.datetime_of_record
     max_aptc  225.13
