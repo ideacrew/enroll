@@ -174,6 +174,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -288,6 +289,7 @@ Rails.application.routes.draw do
         post 'download_documents'
         post 'delete_documents'
         post 'upload_document'
+        post 'generate_checkbook_urls'
       end
 
       collection do

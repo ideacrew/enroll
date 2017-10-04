@@ -2,7 +2,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   include Config::AcaConcern
 
   before_action :find_employer, only: [:show, :show_profile, :destroy, :inbox,
-                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document]
+                                       :bulk_employee_upload, :bulk_employee_upload_form, :download_invoice, :export_census_employees, :link_from_quote, :new_document, :upload_document, :generate_checkbook_urls]
 
   before_action :check_show_permissions, only: [:show, :show_profile, :destroy, :inbox, :bulk_employee_upload, :bulk_employee_upload_form]
   before_action :check_index_permissions, only: [:index]
@@ -30,11 +30,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       else
         flash[:error] = 'There was issue claiming this quote.'
       end
-
     end
 
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'benefits')
-
   end
 
   def index
@@ -278,6 +276,13 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def bulk_employee_upload_form
+  end
+
+
+  def generate_checkbook_urls
+    @employer_profile.generate_checkbook_notices
+    flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
+    redirect_to action: :show, :tab => :employees
   end
 
   def download_invoice

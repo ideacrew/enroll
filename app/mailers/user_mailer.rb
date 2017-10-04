@@ -115,8 +115,12 @@ class UserMailer < ApplicationMailer
     end
   end
 
-  def generic_notice_alert(first_name, notice_subject, email)
-    mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
+
+  def generic_notice_alert(first_name, notice_subject, email, files_to_attach={})
+    files_to_attach.each do |file_name, file_path|
+      attachments["#{file_name}"] = File.read(file_path)
+    end
+    message =  mail({to: email, subject: "You have a new message from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
       format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
     end
   end
