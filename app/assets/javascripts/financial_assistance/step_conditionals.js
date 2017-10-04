@@ -289,6 +289,11 @@ $(document).ready(function() {
  });
 /* Applicant's Tax Info Form Related */
 
+$(document).ready(function(){
+  if( $('.interaction-click-control-tax-info').parent('li').hasClass('active') && ($('#is_required_to_file_taxes_yes, #is_required_to_file_taxes_no').is(':checked') && $('#is_claimed_as_tax_dependent_yes, #is_claimed_as_tax_dependent_no').is(':checked'))){
+   $('.interaction-click-control-continue').prop('disabled', false)
+ }
+})
 
 /* Applicant's Other Questions Form Related */
 
