@@ -52,7 +52,7 @@ RSpec.describe Insured::FamiliesController do
   # let(:coverage_wavied) { double("CoverageWavied") }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind, pre_event_sep_in_days: 30, post_event_sep_in_days: 0) }
   let(:sep) { double("SpecialEnrollmentPeriod") }
-  
+
 
   before :each do
     allow(hbx_enrollments).to receive(:order).and_return(hbx_enrollments)
@@ -610,7 +610,8 @@ RSpec.describe Insured::FamiliesController do
         date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
         expect(controller).to receive(:sep_request_denial_notice)
         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
-      end  
+      end
+
 
       it "future_qualified_date should return nil when qle market kind is indiviual" do
         qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
@@ -624,12 +625,12 @@ RSpec.describe Insured::FamiliesController do
       end
 
       it "should not trigger sep_request_denial_notice unqualified date  when qle market kind is individual" do
-         qle = FactoryGirl.build(:qualifying_life_event_kind)
-         allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
-         date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
-         expect(controller).to receive(:sep_request_denial_notice)
-         xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js   
-      end  
+        qle = FactoryGirl.build(:qualifying_life_event_kind, market_kind: "individual")
+        allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
+        date = TimeKeeper.date_of_record.next_month.strftime("%m/%d/%Y")
+        expect(controller).not_to receive(:sep_request_denial_notice)
+        xhr :get, :check_qle_date, date_val: date, qle_id: qle.id, format: :js
+      end
     end
 
     context "GET check_qle_date" do
