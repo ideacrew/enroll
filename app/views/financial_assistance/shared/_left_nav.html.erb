@@ -84,19 +84,19 @@
 
       <% if @application.incomplete_applicants?%>
         <% if @application.active_applicants.count > 1 %>
-          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-review'>
+          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
             <a class="cna">Family Relationships</a>
           </li>
         <% end %>
       <% else %>
         <% if @application.active_applicants.count > 1 and @application.is_draft? %>
-          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-review'>
+          <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
             <%= link_to 'Family Relationships', insured_family_relationships_path%>
           </li>
         <% end %>
       <% end %>
 
-      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-review">
+      <li class="list-box step-tabs <%= li_nav_classes_for(:review_and_submit) %> global-nav indent-w no-hover-disable">
         <% if @application.ready_for_attestation? and @application.is_draft? %>
           <%= link_to "Review and Submit", review_and_submit_financial_assistance_application_path(@application) %>
         <% else %>
