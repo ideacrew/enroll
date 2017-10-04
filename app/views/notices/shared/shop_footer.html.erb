@@ -1,18 +1,20 @@
 <html>
 <head>
-  <title><%= site_short_name %> Confirmation</title>
+  <title><%= Settings.site.short_name %> Confirmation</title>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <meta content="IE=edge" http-equiv="X-UA-Compatible" />
   <meta content="telephone=no" name="format-detection" />
 
   <style type="text/css">
+
   @font-face {
     font-family: 'NimbusTimesRoman';
     font-style: normal;
     font-weight: 300;
     src: url("<%= Rails.root.join('app', 'assets', 'fonts/nimbus-roman-no9', 'NimbusRomNo9L-Reg.otf') %>") format('opentype')
   }
+
   body {
     width:100%!important;
     -webkit-text-size-adjust:100%;
@@ -25,6 +27,7 @@
     font-family: "NimbusTimesRoman", Times, serif;
     margin-top: 17px;
   }
+
   table td {
     border-collapse:collapse;
     font-size:10px;
@@ -36,29 +39,30 @@
   table td {
     border-collapse: collapse;
   }
-
-  td.left {
-        margin-left: 50%;
-  }
   </style>
 
 
 <script>
    // function subst() {
    //    var vars = {};
+
    //    // explode the URL query string
    //    var x = document.location.search.substring(1).split('&');
+
    //    // loop through each query string segment and get keys/values
    //    for (var i in x)
    //    {
    //       var z = x[i].split('=',2);
    //       vars[z[0]] = unescape(z[1]);
    //    }
+
    //    // an array of all the parameters passed into the footer file
    //    var x = ['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+
    //    // each page will have an element with class 'section' from the body of the footer HTML
    //    var y = document.getElementsByClassName('footer-section');
    //    var m = document.getElementsByClassName('mpi-indicator');
+
    //    for(var j = 0; j < y.length; j++)
    //    {
    //       // hide footer on languages page
@@ -69,23 +73,21 @@
    //          }
    //          y[j].style.display = 'none';
    //       }
+
    //    }
+
    // }
 </script>
 </head>
 
 <body onload="subst()">
-  <table class="footer" style="color: #808080;">
-     <tr>
+  <table class="footer-section" align="center" width="100%" border="0">
     <tr>
-      <td align="center">___________________________________________________________________________________________________________________________________________________</td>
-          </tr><tr>
-          <td class="left-align-footer">Questions? Call <%= site_short_name%> at 1-877-MA-ENROLL, or go to www.mahealthconnector.org/</td>
-     </tr>
-   </table>
+      <td>____________________________________________________________________________________________________</td>
+    </tr>
+    <tr>
+      <td style="padding:3px 10px; font-size:8px;" align="center">Questions? Call DC Health Link at <%= notice.hbe.phone %>, or go to www.dchealthlink.com.</td>
     </tr>
   </table>
-
-<!--   <div class="mpi-indicator" style="display:none;">MPI_IVLR1</div>
- --></body>
+</body>
 </html>

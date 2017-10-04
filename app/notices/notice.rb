@@ -83,7 +83,6 @@ class Notice
         })
       }})
     end
-
     options
   end
 
@@ -101,7 +100,7 @@ class Notice
     begin
       File.open(notice_path, 'wb') do |file|
         file << self.pdf
-      end      
+      end
     rescue Exception => e
       puts "#{e} #{e.backtrace}"
     end
