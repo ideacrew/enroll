@@ -10,7 +10,7 @@
 </div>
 
 <script type="text/javascript" charset="utf-8">
-	    $('.datepicker').datepicker();
+	    $('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
  initializeDataTables();
  <% if @selector == 'assisted' %>
     $('#Tab\\:by_enrollment_individual_market').click();

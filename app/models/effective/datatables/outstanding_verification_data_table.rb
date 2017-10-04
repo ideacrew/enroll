@@ -20,25 +20,15 @@ module Effective
 
       end
 
-
       def collection
         unless  (defined? @families) && @families.present?   #memoize the wrapper class to persist @search_string
-          @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent")
-          @families = Family.by_enrollment_individual_market.where(:'households.hbx_enrollments.aasm_state' => "enrolled_contingent").send(attributes[:documents_uploaded]) if attributes[:documents_uploaded].present?
-          if attributes[:custom_datatable_date_from].present? & attributes[:custom_datatable_date_to].present?
-           @families = @families.min_verification_due_date_range(attributes[:custom_datatable_date_from],attributes[:custom_datatable_date_to])
-          end
+          @families = Queries::OutstandingVerificationDatatableQuery.new(attributes)
         end
         @families
       end
 
       def global_search?
         true
-      end
-
-
-      def search_column(collection, table_column, search_term, sql_column)
-          super
       end
 
       def date_filter_name_definition
