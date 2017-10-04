@@ -24,7 +24,7 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({
-      :template => template,
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -39,7 +39,11 @@ class Notice
   end
 
   def layout
-    'pdf_notice'
+    if market_kind == 'individual'
+      'ivl_pdf_notice'
+    else
+      'pdf_notice'
+    end
   end
 
   def notice_filename
@@ -71,7 +75,7 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-          locals: {notice: notice}
+          locals: {recipient: recipient, notice: notice}
           }),
         }
     }
