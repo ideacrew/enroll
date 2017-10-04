@@ -81,7 +81,8 @@ class CorrectEmployeesWithIncorrectWaivers < MongoidMigrationTask
     factory.renewing_plan_year = renewing_plan_year
     factory.active_plan_year = active_plan_year
     factory.disable_notifications = true
-    factory.process_renewals_for('health')
+    factory.coverage_kind = 'health'
+    factory.generate_renewals
   end
 
   def plan_year_query(i)

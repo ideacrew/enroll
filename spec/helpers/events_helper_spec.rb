@@ -142,7 +142,7 @@ describe EventsHelper, "given an address_kind" do
     context "initial employer" do
       context "day is after 15th of this month" do
         let(:active_start_on) { TimeKeeper.date_of_record.at_beginning_of_month.next_month }
-        let(:current_date_of_record) { 
+        let(:current_date_of_record) {
           TimeKeeper.date_of_record.at_beginning_of_month + 20.days
         }
 
@@ -160,7 +160,7 @@ describe EventsHelper, "given an address_kind" do
 
       context "day is on or before 15th of this month" do
         let(:active_start_on) { TimeKeeper.date_of_record.at_beginning_of_month.next_month }
-        let(:current_date_of_record) { 
+        let(:current_date_of_record) {
           TimeKeeper.date_of_record.at_beginning_of_month
         }
 
@@ -259,7 +259,7 @@ describe EventsHelper, "given an address_kind" do
         it "should not return plan years" do
           employer_profile2.profile_source='conversion'
           employer_profile2.save
-          expect(subject.employer_plan_years(employer_profile2)).to eq [] 
+          expect(subject.employer_plan_years(employer_profile2)).to eq []
         end
       end
     end
