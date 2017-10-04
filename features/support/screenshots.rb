@@ -9,7 +9,10 @@ rescue NameError
 end
 
 Before do |scenario|
-  Capybara.reset_sessions!
+  #page.driver.restart
+  #Capybara.reset_sessions!
+  #page.driver.clear_memory_cache
+  #page.driver.clear_cookies
   DatabaseCleaner.clean
   @count = 0
   case scenario
