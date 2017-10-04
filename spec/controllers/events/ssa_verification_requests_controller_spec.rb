@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe Events::SsaVerificationRequestsController do
   describe "#call with a person" do
-    let(:person) { double(hbx_id: "123") }
+    let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
     let(:outbound_event_name) { "acapi.info.events.lawful_presence.ssa_verification_request" }
     let(:rendered_template) { double }
     let(:mock_end_time) { (mock_now + 24.hours).to_i }
@@ -23,7 +23,7 @@ describe Events::SsaVerificationRequestsController do
       controller.call(LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME, nil, nil, nil, {:person => person} )
       ActiveSupport::Notifications.unsubscribe(event_subscriber)
       expect(@event_name).to eq outbound_event_name
-      expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :retry_deadline => mock_end_time})
+      expect(@body).to eq ({:body => rendered_template, :individual_id => person.hbx_id, :correlation_id=> person.correlation_id, :retry_deadline => mock_end_time})
     end
   end
 end

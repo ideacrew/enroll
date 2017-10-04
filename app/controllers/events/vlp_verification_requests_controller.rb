@@ -9,9 +9,10 @@ module Events
     def call(event_name, e_start, e_end, msg_id, payload)
       individual = payload.stringify_keys["person"]
       coverage_start_date = payload.stringify_keys["coverage_start_date"]
+      individual.update_attributes(correlation_id: SecureRandom.uuid.gsub("-",""))
       event_payload = render_to_string "events/lawful_presence/vlp_verification_request", :formats => ["xml"], :locals => { :individual => individual, :coverage_start_date => coverage_start_date }
 
-      notify("acapi.info.events.lawful_presence.vlp_verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :retry_deadline => (Time.now + 24.hours).to_i})
+      notify("acapi.info.events.lawful_presence.vlp_verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :correlation_id =>individual.correlation_id, :retry_deadline => (Time.now + 24.hours).to_i})
     end
 
     def self.subscribe
