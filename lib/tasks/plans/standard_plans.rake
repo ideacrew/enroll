@@ -21,7 +21,6 @@ namespace :xml do
             hios_id = row_info[@headers["hios/standard component id"]].squish
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
-              binding.pry
               plan.is_standard_plan = row_info[@headers["standard plan?"]] == "Yes" ? true : false
               plan.save
             end
