@@ -12,9 +12,11 @@ class RemoveCoverageHouseHoldMemberForInactiveFamilyMember < MongoidMigrationTas
       family_member_ids = coverage_house_hold_members.map(&:family_member_id).map(&:to_s)
       valid_family_members = coverage_household.family.family_members.map(&:id).map(&:to_s)
       chm_to_be_removed = family_member_ids - valid_family_members
-      puts "Removing the following CHM with Family member id #{chm_to_be_removed.join(", ")}"
       #chm_to_be_added = valid_family_members - family_member_ids
-      unless chm_to_be_removed.empty?
+      if chm_to_be_removed.empty?
+        puts "No Coverage Household to remove"
+      else
+        puts "Removing the following CHM with Family member id #{chm_to_be_removed.join(", ")}"
         coverage_house_hold_members.where(:family_member_id.in => chm_to_be_removed.map{ |e| e.empty? ? nil : e }).map(&:delete)
         coverage_household.save
       end
