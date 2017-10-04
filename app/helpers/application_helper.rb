@@ -548,9 +548,9 @@ module ApplicationHelper
   def notify_employee_confirming_coverage_termination(hbx_enrollment)
     if hbx_enrollment.is_shop? && hbx_enrollment.census_employee.present?
       begin 
-        ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination")
+        ShopNoticesNotifierJob.perform_later(hbx_enrollment.census_employee.id.to_s, "notify_employee_confirming_coverage_termination") 
       rescue Exception => e
-        (Rails.logger.error { "Unable to deliver Notices to #{hbx_enrollment.census_employee.full_name} due to #{e}" }) unless Rails.env.test? 
+        (Rails.logger.error { "Unable to deliver Notices to #{hbx_enrollment.census_employee.full_name} due to #{e}" }) 
       end
     end 
   end
