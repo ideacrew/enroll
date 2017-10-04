@@ -10,10 +10,7 @@ end
 
 Before do |scenario|
   Capybara.reset_sessions!
-  page.driver.clear_memory_cache
-  page.driver.clear_cookies
   DatabaseCleaner.clean
-  page.driver.restart
   @count = 0
   case scenario
   when Cucumber::RunningTestCase::ScenarioOutlineExample
