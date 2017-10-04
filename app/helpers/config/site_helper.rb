@@ -35,6 +35,10 @@ module Config::SiteHelper
     Settings.site.business_resource_center_url
   end
 
+  def link_to_site_business_resource_center
+    link_to "Business Resource Center", site_business_resource_center_url
+  end
+
   def site_nondiscrimination_notice_url
     Settings.site.nondiscrimination_notice_url
   end
@@ -76,7 +80,7 @@ module Config::SiteHelper
   end
 
   def site_main_web_link
-    link_to site_main_web_address, site_main_web_address
+    link_to site_website_name, site_main_web_address_url
   end
 
   def site_make_their_premium_payments_online

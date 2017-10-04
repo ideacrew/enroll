@@ -58,6 +58,13 @@ class Insured::PlanShoppingsController < ApplicationController
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     employee_mid_year_plan_change(@person, @change_plan)
+
+    # send accepted SEP QLE event notice to enrolled employee
+    if @market_kind == "shop" && @enrollment.employee_role_id.present? && @change_plan == "change_by_qle"
+       emp_role_id = @enrollment.employee_role_id.to_s
+       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id }
+       sep_qle_request_accept_notice_ee(@employee_role.census_employee.id.to_s, @enrollment)
+    end
     send_receipt_emails if @person.emails.first
   end
 
@@ -146,6 +153,17 @@ class Insured::PlanShoppingsController < ApplicationController
      rescue Exception => e
        log("#{e.message}; person_id: #{person.id}")
      end
+    end
+     
+  def sep_qle_request_accept_notice_ee(employee_id, enrollment)
+    sep = enrollment.special_enrollment_period
+    options = { :sep_qle_end_on => sep.end_on.to_s, :sep_qle_title => sep.title, :sep_qle_on => sep.qle_on.to_s }
+    begin
+      ShopNoticesNotifierJob.perform_later(employee_id, "notify_employee_of_special_enrollment_period", :sep => options)
+    rescue Exception => e
+      logger.debug("Exception raised in %s" % e.backtrace)
+      raise "Unable to trigger sep_qle_request_accept_notice_ee"
+    end
   end
 
   def terminate
