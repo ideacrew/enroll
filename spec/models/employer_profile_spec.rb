@@ -107,6 +107,18 @@ describe EmployerProfile, dbclean: :after_each do
       let(:new_plan_year){ FactoryGirl.build(:plan_year) }
       let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
 
+      let!(:employer_profile1) { create(:employer_with_planyear, plan_year_state: 'active', aasm_state: "enrolling", start_on: start_on)}
+      let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+      let!(:benefit_group) { employer_profile1.published_plan_year.benefit_groups.first}
+      let!(:organization) {FactoryGirl.create(:organization, employer_profile: employer_profile1)}
+      let!(:census_employee){
+        employee = FactoryGirl.create :census_employee, employer_profile: employer_profile1
+        employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+        employee
+      }
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on)}
+
       it "should return true if its new employer and does not have binder paid status" do
         expect(employer_profile.is_transmit_xml_button_disabled?).to be_truthy
       end
@@ -115,6 +127,18 @@ describe EmployerProfile, dbclean: :after_each do
         employer_profile.aasm_state = "binder_paid"
         employer_profile.save
         expect(employer_profile.is_transmit_xml_button_disabled?).to be_falsey
+      end
+
+      it "should receive binder_paid action" do
+        ActiveJob::Base.queue_adapter = :test
+        ActiveJob::Base.queue_adapter.enqueued_jobs = []
+        census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+        hbx_enrollment.save!
+        employer_profile1.initial_employee_plan_selection_confirmation(organization.id)
+        queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+          job_info[:job] == ShopNoticesNotifierJob
+        end
+        expect(queued_job[:args]).to eq [census_employee.id.to_s, 'initial_employee_plan_selection_confirmation']
       end
     end
 

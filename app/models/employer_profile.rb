@@ -989,7 +989,22 @@ class EmployerProfile
     organization_ids.each do |id|
       if org = Organization.find(id)
         org.employer_profile.update_attribute(:aasm_state, "binder_paid")
+        initial_employee_plan_selection_confirmation(id)
       end
+    end
+  end
+
+  def initial_employee_plan_selection_confirmation(id)
+    begin
+      employer = Organization.find(id).employer_profile
+      census_employees = employer.census_employees.active if employer.is_new_employer?
+      census_employees.each do |ce|
+        if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == Organization.find(id).employer_profile.active_plan_year.start_on
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
+        end
+      end
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver initial_employee_plan_selection_confirmation from organization #{id} due to #{e}"}) unless Rails.env.test?
     end
   end
 

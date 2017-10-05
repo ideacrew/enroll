@@ -26,30 +26,12 @@ class Exchanges::HbxProfilesController < ApplicationController
         EmployerProfile.update_status_to_binder_paid(params[:ids])
         flash["notice"] = "Successfully submitted the selected employer(s) for binder paid."
         render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
-        initial_employee_plan_selection_confirmation(params[:ids])
       rescue => e
         render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
       end
     end
     # Removed redirect because of Datatables. Send Results to Datatable Status
     #redirect_to exchanges_hbx_profiles_root_path
-  end
-
-  def initial_employee_plan_selection_confirmation(organization_ids)
-    begin
-      organization_ids.each do |org_id|
-        if Organization.find(org_id).employer_profile.is_new_employer?
-          census_employees = Organization.find(org_id).employer_profile.census_employees.active
-          census_employees.each do |ce|
-            if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == Organization.find(org_id).employer_profile.active_plan_year.start_on
-              ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
-            end
-          end
-        end
-      end
-    rescue Exception => e
-      Rails.logger.error["Unable to deliver notice to census_employee.id due to #{e}"]
-    end
   end
 
   def transmit_group_xml
