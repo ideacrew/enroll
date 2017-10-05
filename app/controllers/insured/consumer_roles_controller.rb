@@ -88,19 +88,13 @@ class Insured::ConsumerRolesController < ApplicationController
           if @resident_candidate.valid?
             found_person = @resident_candidate.match_person
             if found_person.present? && found_person.resident_role.present?
-              begin
-                @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
-                if @resident_role.present?
-                  @person = @resident_role.person
-                  session[:person_id] = @person.id
-                else
-                # not logging error because error was logged in construct_consumer_role
-                  render file: 'public/500.html', status: 500
-                  return
-                end
-              rescue Exception => e
-                flash[:error] = set_error_message(e.message)
-                redirect_to search_exchanges_residents_path
+              @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+              if @resident_role.present?
+                @person = @resident_role.person
+                session[:person_id] = @person.id
+              else
+              # not logging error because error was logged in construct_consumer_role
+                render file: 'public/500.html', status: 500
                 return
               end
               create_sso_account(current_user, @person, 15, "resident") do
@@ -142,18 +136,12 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
-    begin
-      @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
-      if @consumer_role.present?
-        @person = @consumer_role.person
-      else
-      # not logging error because error was logged in construct_consumer_role
-        render file: 'public/500.html', status: 500
-        return
-      end
-    rescue Exception => e
-      flash[:error] = set_error_message(e.message)
-      redirect_to search_insured_consumer_role_index_path
+    @consumer_role = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+    if @consumer_role.present?
+      @person = @consumer_role.person
+    else
+    # not logging error because error was logged in construct_consumer_role
+      render file: 'public/500.html', status: 500
       return
     end
     @person.primary_family.create_dep_consumer_role if @person
