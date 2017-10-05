@@ -30,14 +30,14 @@ module Enroll
     config.i18n.available_locales = [:en, :es]
     config.i18n.default_locale = :en
 
-    #Queue adapter 
+    #Queue adapter
     config.active_job.queue_adapter = :resque
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     # config.active_record.raise_in_transactional_callbacks = true
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
-    
+
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
     config.i18n.fallbacks = {'es' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
@@ -65,6 +65,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
       config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
       config.acapi.add_async_subscription("TransportProfiles::Subscribers::TransportArtifactSubscriber")
+      config.acapi.add_async_subscription("Subscribers::ShopInitialEmployerQuietPeriodEnded")
     end
   end
 end
