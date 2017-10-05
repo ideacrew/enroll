@@ -143,7 +143,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     end
 
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
-    notice.due_date = min_notice_due_date(family)
+    notice.due_date = (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = outstanding_people.present? ? true : false
     append_unverified_individuals(outstanding_people)
@@ -160,8 +160,6 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
     if due_dates.present? && earliest_future_due_date.present?
       earliest_future_due_date.to_date
-    elsif due_dates.present?
-      due_dates.min.to_date
     else
       nil
     end
