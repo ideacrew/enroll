@@ -29,7 +29,12 @@
                   <td> <%= applicant.person.full_name %> </td>
                   <td> <%= embedded_document.kind.humanize %> </td>
                   <td> <%= embedded_document.frequency_kind.humanize %> </td>
-                  <td> <%= number_to_currency(embedded_document.amount.to_s) %> </td>
+                  <td>
+                    <% if embedded_document.class == FinancialAssistance::Deduction %>
+                      <%= "(#{number_to_currency(embedded_document.amount.to_s)})" %>
+                    <% else %>
+                      <%= "#{number_to_currency(embedded_document.amount.to_s)}" %>
+                    <% end %>
                   <td>
                     <%= start_to_end_dates(embedded_document) %>
                     <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
