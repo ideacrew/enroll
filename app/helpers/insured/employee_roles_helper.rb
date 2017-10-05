@@ -20,7 +20,7 @@ module Insured::EmployeeRolesHelper
     direct_realation_to_primary = family_member.primary_relationship
 
     relationship = CompositeRatedPlanCostDecorator.benefit_relationship(direct_realation_to_primary)
-    if direct_realation_to_primary == "child" && calculate_age_by_dob(family_member.dob) > 26 && new_effective_on >= family_member.dob+26.years
+    if direct_realation_to_primary == "child" && calculate_age_by_dob(family_member.dob) >= 26 && new_effective_on >= family_member.dob+26.years
       relationship = "child_over_26"
     end
 
