@@ -126,15 +126,44 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     end
   end
 
-  describe ".assisted_renewal_plan" do
+  describe ".assisted_renewal_plan", dbclean: :after_each do
+    context "When individual currently enrolled under CSR plan" do
+      let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
+      let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_plan_id: renewal_plan.id) }
+      let!(:csr_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
+      let!(:csr_01_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
 
-    context "When individual eligible for csr" do 
-      it "should return csr variant plan" do 
+      context "and have different CSR amount for renewal plan year" do
+        let(:aptc_values) {{ csr_amt: "87" }}
+
+        it "should be renewed into new CSR variant plan" do
+          expect(subject.assisted_renewal_plan).to eq csr_plan
+        end
+      end
+
+      context "and have CSR amount as 0 for renewal plan year" do
+        let(:aptc_values) {{ csr_amt: "0" }}
+
+        it "should map to csr variant 01 plan" do
+          expect(subject.assisted_renewal_plan).to eq csr_01_plan
+        end
+      end
+
+      context "and have same CSR amount for renewal plan year" do
+        let(:aptc_values) {{ csr_amt: "73" }}
+
+        it "should be renewed into same CSR variant plan" do
+          expect(subject.assisted_renewal_plan).to eq renewal_plan
+        end
       end
     end
 
-    context "When its not a csr" do
-      it "should return renewal plan" do 
+    context "When individual not enrolled under CSR plan" do
+      let!(:renewal_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year + 1, hios_id: "11111111122302-01", csr_variant_id: "01") }
+      let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
+
+      it "should return regular renewal plan" do
+        expect(subject.assisted_renewal_plan).to eq renewal_plan
       end
     end
   end

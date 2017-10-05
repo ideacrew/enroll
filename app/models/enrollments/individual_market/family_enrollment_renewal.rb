@@ -77,14 +77,15 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_renewal_plan
-    if is_csr? 
+    # TODO: Make sure tax households create script treats 0 as 100 
+    if is_csr?
       if @aptc_values[:csr_amt] == '0'
         csr_variant = '01'
       else
         csr_variant = EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP["csr_#{@aptc_values[:csr_amt]}"]
       end
 
-      Plan.where({ 
+      Plan.where({
         :active_year => @renewal_benefit_coverage_period.start_on.year, 
         :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
       }).first

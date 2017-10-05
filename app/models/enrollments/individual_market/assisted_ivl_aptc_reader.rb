@@ -35,6 +35,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
 
   def call
     file_name = "#{Rails.root}/public/Update-Data-Scrub-11-7-16.csv"
+    calender_year = TimeKeeper.date_of_record.year + 1
 
     @assisted_individuals = {}
     count = 0
@@ -69,8 +70,8 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
       else
         @assisted_individuals[person.hbx_id] = {
           applied_percentage: row_hash[:applied_percentage], 
-          applied_aptc: row_hash[:"2017_applied"], 
-          csr_amt: row_hash[:"2017_csr"]
+          applied_aptc: row_hash[:"#{calender_year}_applied"], 
+          csr_amt: row_hash[:"#{calender_year}_csr"]
         }
       end
     end
