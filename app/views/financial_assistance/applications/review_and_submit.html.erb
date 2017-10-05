@@ -2,31 +2,29 @@
   <div class="col-md-9">
     <div id="dependents_info_wrapper">
       <h1 class="darkblue">Review Your Application </h1>
-      <p><strong> You're almost done! </STRONG>Review the application summary below and make sure it's correct. Select the
+      <p><strong> You're almost done! </strong>Review the application summary below and make sure it's correct. Select the
         pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
         <h3 class="darkblue">Income and Adjustments</h3>
         <div class="row white-background">
           <div class="col-md-12 pz">
-            <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11 form-heading">The following is information you entered for everone in this application</div>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-11">The following is information <span class="form-heading">you entered for everone in this application </span></div>
               <div class="col-md-1">
               </div>
             </div>
-            <table class="table mb0" border="1" style="color: silver;" >
+            <table class="table table-border-line mb0" border="1" >
               <thead>
                 <tr class="form-heading">
-                  <th class="form-heading">PERSON</th>
-                  <th class="form-heading">TYPES</th>
-                  <th class="form-heading">FREQUENCY</th>
-                  <th class="form-heading">AMOUNT</th>
-                  <th class="form-heading">DATES</th>
+                  <th> <b>PERSON </b></th>
+                  <th><b>TYPES</b></th>
+                  <th><b>FREQUENCY</b></th>
+                  <th><b>AMOUNT</b></th>
+                  <th><b>DATES </b></th>
                 </tr>
               </thead>
               <tbody>
                 <% @applicants.each do |applicant| %>
-
-                <% income_and_deduction = income_and_deductions_for(applicant) %>
-                <% income_and_deduction.each do |embedded_document| %>
+                <% income_and_deductions_for(applicant).each do |embedded_document| %>
                 <tr class="noBorder">
                   <td> <%= applicant.person.full_name %> </td>
                   <td> <%= embedded_document.kind.humanize %> </td>
@@ -108,9 +106,7 @@
                   </div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
                 </div>
-              </div>
 
-              <div class="form-bottom-border">
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Income</div>
                   <div class="col-md-1">
@@ -144,9 +140,7 @@
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>
-              </div>
 
-              <div class="form-bottom-border">
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Income Adjustments</div>
                   <div class="col-md-1">
@@ -167,9 +161,7 @@
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
                 </div>
-              </div>
 
-              <div class="form-bottom-border">
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">Health Coverage</div>
                   <div class="col-md-1">
