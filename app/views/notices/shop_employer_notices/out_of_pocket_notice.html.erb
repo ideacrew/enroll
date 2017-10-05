@@ -14,37 +14,33 @@
   <table class="total_table" border="0">
     <tbody>
       <tr>
-        <td>Dear <%= notice.primary_fullname %>:  </td>
+        <td>Dear <%= notice.employer_name %>:  </td>
       </tr>
     </tbody>
   </table>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions. Click here to download a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them:", top_margin: '10px'} %>
+    content: "To use Plan Match, your employees will need to provide some basic information about your plan offerings and contributions. On the next page, you’ll find a a custom set of instructions that you can share with your eligible employees to enable them to use Plan Match to find the right health plan for them."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "Employee Plan Match – Instructions for Your Eligible Employees"} %>
+    content: "<strong>What is Plan Match?</strong>"} %>
 
-
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<strong>What is Plan Match?</strong>", top_margin: '10px'} %>
-
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "Plan Match, #{Settings.site.short_name}'s health plan comparison tool powered by Consumers' CHECKBOOK takes your employees through a few simple steps to find the best health plan for them."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "With this anonymous tool, your employees can find every plan that you choose to make available to them through #{Settings.site.short_name}, and then compare plans based on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers CHECKBOOK has over 35 years of experience helping consumers choose the best plans.", top_margin: '10px'} %>
+    content: "With this anonymous tool, your employees can find every plan that you choose to make available to them through #{Settings.site.short_name}, and then compare plans based on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers CHECKBOOK has over 35 years of experience helping consumers choose the best plans."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "</strong>Who can I share my custom Plan Match instructions with?</strong>", top_margin: '10px'} %>
+    content: "</strong>Who can I share my custom Plan Match instructions with?</strong>"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "Plan Match is a tool for your employees who are eligible for the health plan(s) you offer through #{Settings.site.short_name}. Plan Match can be used anonymously by your eligible employees and their family members to compare health plan options and find the right health plan for their needs and budget. Employees can also use Plan Match during the year when they experience a life event, such as marriage, birth, or loss of other coverage, to help determine the right health plan for them under their new circumstances. Because Plan Match is truly anonymous, you could even share it with prospective employees who want to see what health plan options are available as part of your benefits offerings."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "<strong>Can employees enroll directly using Plan Match?</strong>", top_margin: '10px'} %>
+    content: "<strong>Can employees enroll directly using Plan Match?</strong>"} %>
 
-  <%= render partial: 'notices/shared/paragraph', :locals => {
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "Since Plan Match is an anonymous health plan comparison tool, eligible employees will need to log into their <a href=#{Settings.site.home_url}>DCHealthLink.com</a> account to complete their plan selection.", bottom_margin: '10px'} %>
 
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -53,18 +49,20 @@
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
    previous: "Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
-   listings: ["By calling #{notice.hbe.phone}.",
+   listings: ["By calling #{notice.hbe.phone}",
               "TTY: #{Settings.contact_center.tty}",
               "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
   <% if notice.broker.present? %>
     <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
   <% else %>
-    <%= render partial: 'notices/shared/paragraph', :locals => {
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{notice.hbe.phone}."} %>
   <% end %>
 </div>
 
+<%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "<strong>Employee Plan Match</strong>"} %>
 <%notice.benefit_group_assignments.each do |benefit_group_id,benefit_group| %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "For eligible employees of: #{notice.employer_name.titleize}"} %>
@@ -73,18 +71,18 @@
   <%= render partial: 'notices/shared/paragraph', :locals => {
     content: "Benefit Package: #{benefit_group.first.title.titleize}"} %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
-    content: "WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?", top_margin: '10px'} %>
+    content: "WHICH HEALTH PLAN IS RIGHT FOR YOU BASED ON YOUR NEEDS AND BUDGET?"} %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Plan Match, #{Settings.site.short_name}'s health plan comparison tool powered by Consumers' CHECKBOOK takes you through a few simple steps to find the best health plan for you, or you and your family."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "The health information you provide is anonymous and isn't  shared with #{Settings.site.short_name}. With this tool, you can find every plan available to you through #{Settings.site.short_name}, and compare on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans.", top_margin: '10px'} %>
+  content: "The health information you provide is anonymous and isn't  shared with #{Settings.site.short_name}. With this tool, you can find every plan available to you through #{Settings.site.short_name}, and compare on total estimated cost (not just premiums or deductibles), plan features, doctor availability and more. Consumers' CHECKBOOK has over 35 years of experience helping consumers choose the best plans."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings.", top_margin: '10px'} %>
+  content: "To use the Plan Match tool, you'll need to provide some basic information about your employer's plan offerings."} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "Click this link to access the Plan Match Tool and enter your employer’s information using the details below: <br> <a target='_blank' <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>", top_margin: '10px'}%>
+  content: "Click this link to access the Plan Match Tool and enter your employer’s information using the details below: <br> <a target='_blank' <a href= '#{notice.data[:url]}'> #{notice.data[:url]}</a>"}%>
 
   <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "1. Your employer's plan year start date:<strong> #{benefit_group.first.start_on} </strong>"} %>
