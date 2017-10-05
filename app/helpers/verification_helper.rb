@@ -33,6 +33,14 @@ module VerificationHelper
         else
           "outstanding"
         end
+      when 'Residency'
+        if consumer.residency_verified?
+          consumer.local_residency_validation
+        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
+          "in review"
+        else
+          "outstanding"
+        end
       else
         if consumer.lawful_presence_verified?
           "verified"
@@ -54,6 +62,10 @@ module VerificationHelper
         member.consumer_role.processing_hub_24h? ? "info" : "danger"
       when "curam"
         "default"
+      when "attested"
+        "default"
+      when "valid"
+        "success"
     end
   end
 
@@ -168,6 +180,10 @@ module VerificationHelper
         "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "valid"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "attested"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       when "curam"
         admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
@@ -197,6 +213,6 @@ module VerificationHelper
   end
 
   def type_unverified?(v_type, person)
-    verification_type_status(v_type, person) != "verified"
+    !["verified", "valid", "attested"].include?(verification_type_status(v_type, person))
   end
 end
