@@ -19,9 +19,9 @@ describe Subscribers::LawfulPresence do
     let(:individual_id) { "121211" }
     let(:xml) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response.xml")) }
     let(:xml2) { File.read(Rails.root.join("spec", "test_data", "lawful_presence_payloads", "response2.xml")) }
-    let(:xml_hash) { {:case_number => "12121", :lawful_presence_determination => {
-        :response_code => "lawfully_present", :legal_status => "lawful_permanent_resident"}} }
-    let(:xml_hash2) { {:case_number => "12121", :lawful_presence_indeterminate => {:response_code => "invalid_information",
+    let(:xml_hash) { {:case_number => "12121", :is_barred => true, :bar_met => "true",:lawful_presence_determination => {
+        :response_code => "lawfully_present", :is_barred => true, :bar_met => "true", :legal_status => "lawful_permanent_resident"}} }
+    let(:xml_hash2) { {:case_number => "12121", :is_barred => true, :bar_met => "true", :lawful_presence_indeterminate => {:response_code => "invalid_information",
                                                                                    :response_text => "Complete information."}} }
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
@@ -43,6 +43,8 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
           expect(person.consumer_role.aasm_state).to eq('fully_verified')
+          expect(person.consumer_role.is_barred).to be true
+          expect(person.consumer_role.bar_met).to be true
           expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])

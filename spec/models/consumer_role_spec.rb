@@ -390,17 +390,19 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
+    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
-    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
-      before do
-        person.ssn = ssn
-        consumer.citizen_status = citizen
-        consumer.is_state_resident = residency
-      end
-      it "moves from #{from_state} to #{to_state} on #{event}" do
-        expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|    
+      context "import" do
+        before do
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+          consumer.is_state_resident = residency
+        end
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+        end
       end
     end
 
@@ -541,6 +543,14 @@ context "Verification process and notices" do
         consumer.aasm_state = "dhs_pending"
         consumer.fail_dhs! verification_attr
         expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
+      end
+
+      it "stores 5 year bar response" do
+        consumer.aasm_state="dhs_pending"
+        consumer.fail_dhs!(verification_attr)
+        expect(consumer.is_barred).to be true
+        expect(consumer.five_year_bar).to be true
+        expect(consumer.bar_met).to be true
       end
     end
 
