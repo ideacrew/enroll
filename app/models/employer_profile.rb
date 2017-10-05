@@ -572,9 +572,10 @@ class EmployerProfile
       })
     end
 
-    def initial_employers_enrolled_plan_year_state
+    def initial_employers_enrolled_plan_year_state(start_on)
       Organization.where(:"employer_profile.plan_years" => 
         { :$elemMatch => { 
+          :"start_on" => start_on,
           :aasm_state => "enrolled"
           }
         })
@@ -750,9 +751,10 @@ class EmployerProfile
         end
 
         #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
-        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        start_on_for_missing_binder_payments = TimeKeeper.date_of_record.next_month.beginning_of_month
+        binder_next_day = PlanYear.calculate_open_enrollment_date(start_on_for_missing_binder_payments)[:binder_payment_due_date].next_day
         if new_date == binder_next_day
-          initial_employers_enrolled_plan_year_state.each do |org|
+          initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
             if !org.employer_profile.binder_paid?
               notice_to_employee_for_missing_binder_payment(org)
             end
@@ -1101,7 +1103,7 @@ private
       begin
         ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_employee_for_missing_binder_payment")
       rescue Exception => e
-        (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
+        (Rails.logger.error {"Unable to deliver notice_to_employee_for_missing_binder_payment to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
       end
     end
   end

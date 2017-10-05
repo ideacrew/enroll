@@ -1155,10 +1155,13 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
 end
 
 describe EmployerProfile, "initial employers enrolled plan year state", dbclean: :after_each do
-  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
+  let!(:date) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+  let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled", :start_on => date) }
   let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
+
   it "should return employers" do
-    expect(EmployerProfile.initial_employers_enrolled_plan_year_state.size).to eq 1
+    organizations = EmployerProfile.initial_employers_enrolled_plan_year_state(date)
+    expect(organizations.count).to eq 1
   end
 end
 
