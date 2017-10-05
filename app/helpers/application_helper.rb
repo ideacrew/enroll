@@ -648,4 +648,14 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
+  def exchange_icon_path(icon)
+    site_key = Settings.site.key
+    
+    if site_key.blank? || site_key.to_sym == :dchbx
+      "icons/#{icon}"
+    else
+      "icons/#{site_key}-#{icon}"
+    end
+  end
 end
