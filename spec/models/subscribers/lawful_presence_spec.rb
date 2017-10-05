@@ -26,7 +26,7 @@ describe Subscribers::LawfulPresence do
     let(:xml_hash3) { {:case_number => "12121", :lawful_presence_determination => {
         :response_code => "not_lawfully_present", :legal_status => "other"}} }
 
-    let(:person) { person = FactoryGirl.create(:person)
+    let(:person) { person = FactoryGirl.create(:person, :correlation_id => '1234')
     consumer_role = person.build_consumer_role
     consumer_role = FactoryGirl.build(:consumer_role)
     person.consumer_role = consumer_role
@@ -35,12 +35,13 @@ describe Subscribers::LawfulPresence do
     }
 
     context "lawful_presence_determination" do
-      let(:payload) { {:individual_id => individual_id, :body => xml} }
+      let(:payload) { {:individual_id => individual_id, :correlation_id => '1234', :body => xml} }
       context "lawfully_present" do
         it "should approve lawful presence" do
           allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
+          expect(person.correlation_id).to eq(payload[:correlation_id])
           expect(person.consumer_role.aasm_state).to eq('fully_verified')
           expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
@@ -53,6 +54,7 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash3)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
+          expect(person.correlation_id).to eq(payload[:correlation_id])
           expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
           expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
           expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
@@ -62,15 +64,57 @@ describe Subscribers::LawfulPresence do
     end
 
     context "lawful_presence_indeterminate" do
-      let(:payload) { {:individual_id => individual_id, :body => xml2} }
+      let(:payload) { {:individual_id => individual_id, :correlation_id => '1234', :body => xml2} }
       it "should deny lawful presence" do
         allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
+        expect(person.correlation_id).to eq(payload[:correlation_id])
         expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.lawful_presence_determination.vlp_authority).to eq('dhs')
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.count).to eq(1)
         expect(Person.find(person.id).consumer_role.lawful_presence_determination.vlp_responses.first.body).to eq(payload[:body])
+      end
+    end
+
+    context 'do nothing with the response' do
+      let(:payload) { {:individual_id => individual_id, :correlation_id => '123', :body => xml2} }
+
+      it 'should not update lawful presence when person correlation id is not matched' do
+        allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+
+        expect(person.correlation_id).to_not eq(payload[:correlation_id])
+        expect(person.consumer_role.aasm_state).to eq('dhs_pending')
+      end
+    end
+
+    context 'lawful presence update' do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      before :each do
+        person.consumer_role.aasm_state= 'dhs_pending'
+        person.save!
+      end
+
+      it 'should update lawful presence when person correlation id is blank' do
+        payload = {:individual_id => individual_id, :correlation_id => '123', :body => xml2}
+        allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+
+        expect(person.correlation_id).to_not eq(payload[:correlation_id])
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
+      end
+
+      it 'should update consumer role when person correlation id is blank and payload correlation id is blank' do
+        payload = {:individual_id => individual_id, :body => xml2}
+        allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash2)
+        allow(subject).to receive(:find_person).with(individual_id).and_return(person)
+        subject.call(nil, nil, nil, nil, payload)
+
+        expect(person.correlation_id).to eq(payload[:correlation_id])
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
       end
     end
 

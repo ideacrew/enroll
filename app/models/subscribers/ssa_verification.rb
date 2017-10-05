@@ -15,7 +15,7 @@ module Subscribers
       begin
         stringed_key_payload = payload.stringify_keys
         xml = stringed_key_payload['body']
-        person_correlation_id = stringed_key_payload['correlation_id']
+        person_co_id = stringed_key_payload['correlation_id']
         person_hbx_id = stringed_key_payload['individual_id']
         return_status = stringed_key_payload["return_status"].to_s
 
@@ -36,8 +36,10 @@ module Subscribers
         end
 
         xml_hash = xml_to_hash(xml)
+        existing_co_id = person.correlation_id
 
-        update_consumer_role(consumer_role, xml_hash) if person_correlation_id == person.correlation_id
+        #will update if some reason coorelation id is blank in person model
+        update_consumer_role(consumer_role, xml_hash) if (existing_co_id.blank? || person_co_id == existing_co_id)
       rescue => e
         notify("acapi.error.application.enroll.remote_listener.ssa_responses", {
           :body => JSON.dump({
