@@ -1,6 +1,6 @@
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
-  attr_accessor :enrollment, :renewal_benefit_coverage_period, :assisted, :aptc_values
+  attr_accessor :enrollment, :current_benefit_coverage_period, :renewal_benefit_coverage_period, :assisted, :aptc_values
 
   def initialize
     @logger = Logger.new("#{Rails.root}/log/ivl_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
@@ -30,9 +30,17 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
 
-    if @assisted
+    # H & S 
+
+    # 500 
+
+    # 495  EHB Premium (Plan :ehb)
+    # 497.75 Applied APTC 
+
+    
+    if @assisted  # IF applied APTC is great than EHB use EHB
       renewal_enrollment.elected_aptc_pct = (@aptc_values[:applied_percentage].to_f/100.0)
-      renewal_enrollment.applied_aptc_amount = @aptc_values[:applied_aptc].to_f
+      renewal_enrollment.applied_aptc_amount = @aptc_values[:applied_aptc].to_f # 
     end
 
     renewal_enrollment
@@ -69,7 +77,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def assisted_renewal_plan
-
     if is_csr? 
       if @aptc_values[:csr_amt] == '0'
         csr_variant = '01'
@@ -92,19 +99,23 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def is_cat_plan_ineligible?
     @enrollment.hbx_enrollment_members.any? do |member| 
-      member.person.age_on(HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on) > 29
+      member.person.age_on(renewal_benefit_coverage_period.start_on) > 29
     end
   end
 
-  def eligible_to_get_covered?(person)
-    person.age_on(HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.end_on) < 26 || person.is_disabled
+  def eligible_to_get_covered?(member)
+    child_relations = %w(child ward foster_child adopted_child)
+
+    if child_relations.include?(member.family_member.relationship)
+      member.person.age_on(current_benefit_coverage_period.end_on) < 26
+    else
+      true
+    end
   end
 
   def eligible_enrollment_members
-    child_relations = %w(child ward foster_child adopted_child)
-
     @enrollment.hbx_enrollment_members.reject do |member|
-      child_relations.include?(member.family_member.relationship) && !eligible_to_get_covered?(member.person)
+      member.person.is_disabled || !eligible_to_get_covered?(member)
     end
   end
 
