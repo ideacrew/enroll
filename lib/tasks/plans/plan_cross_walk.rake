@@ -1,5 +1,44 @@
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_parser')
+
 namespace :xml do
-  task :plan_cross_walk, [:file] => :environment do |task,args|
+  desc "Import plan crosswalk"
+  task :plan_cross_walk, [:file] => :environment do |task, args|
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "cross_walk", "**", "*.xml"))
+    files.each do |file_path|
+      @file_path = file_path
+      @current_year = file_path.split("/")[-2].to_i # Retrieve the year of the master xml file you are uploading
+      @previous_year = @current_year - 1
+      xml = Nokogiri::XML(File.open(@file_path))
+      result = Parser::PlanCrossWalkListParser.parse(xml.root.canonicalize, :single => true)
+      result.crosswalks.each do |row|
+        hios_id_2017 = row.plan_id_2017_hios.squish
+        hios_id_2018 = row.plan_id_2018_hios.squish
+        is_this_plan_catastrophic_or_child_only_plan = row.is_this_plan_catastrophic_or_child_only_plan.squish.downcase
+        hios_id_cat_age_off_2018 = row.plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan
+        new_plans =  Plan.where(hios_id: /#{hios_id_2018}/, active_year: @current_year)
+        cat_age_off_renewal_plan =  Plan.where(hios_id: /#{hios_id_cat_age_off_2018}/, active_year: @current_year, csr_variant_id: "01").first
+        new_plans.each do |new_plan|
+          if new_plan.present? && new_plan.csr_variant_id != "00"
+            old_plan = Plan.where(hios_id: /#{hios_id_2017}/, active_year: @previous_year, csr_variant_id: /#{new_plan.csr_variant_id}/).first
+            if old_plan.present?
+              old_plan.update(renewal_plan_id: new_plan.id)
+              if cat_age_off_renewal_plan.present? && new_plan.csr_variant_id == "01" && is_this_plan_catastrophic_or_child_only_plan == "yes" && new_plan.coverage_kind == "health"
+                old_plan.update(cat_age_off_renewal_plan_id: cat_age_off_renewal_plan.id)
+                puts "Successfully mapped #{@previous_year} #{old_plan.carrier_profile.legal_name} cat age off plan with hios_id #{old_plan.hios_id} to #{@current_year} #{cat_age_off_renewal_plan.carrier_profile.legal_name} plan_hios_id: #{cat_age_off_renewal_plan.hios_id}"
+              end
+              puts "Old #{@previous_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{@current_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}"
+            else
+              puts "Old #{@previous_year}  plan hios_id #{hios_id_2017}-#{new_plan.csr_variant_id} not present."
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+namespace :xml do
+  task :plan_cross_walk_old, [:file] => :environment do |task,args|
 
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
     files.each do |file_path|
@@ -10,6 +49,7 @@ namespace :xml do
       puts "*"*80
       puts "processing file: #{@file_name} \n"
       puts "*"*80
+      next if current_year == 2018
 
       sheets = ["IVL HIOS Plan Crosswalk", "SHOP HIOS Plan Crosswalk"]
       # sheets = ["SHOP HIOS Plan Crosswalk"]
