@@ -187,4 +187,26 @@ module FinancialAssistanceHelper
       yield f
     end
   end
+
+  def income_and_deductions_for(applicant)
+    applicant.incomes + applicant.deductions
+  end
+
+  def start_to_end_dates(embedded_document)
+    start_date = embedded_document.start_on
+    end_date = embedded_document.end_on
+    end_date.present? ? "#{start_date} - #{end_date}" : "#{start_date} - present"
+  end
+
+  def income_and_deductions_edit(application, applicant, embedded_document)
+    if embedded_document.class == FinancialAssistance::Deduction
+      financial_assistance_application_applicant_deductions_path(application, applicant)
+    else
+      if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
+        financial_assistance_application_applicant_incomes_path(application, applicant)
+      else
+        other_financial_assistance_application_applicant_incomes_path(application, applicant)
+      end
+    end
+  end
 end
