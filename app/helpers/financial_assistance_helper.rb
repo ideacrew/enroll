@@ -195,7 +195,7 @@ module FinancialAssistanceHelper
   def start_to_end_dates(embedded_document)
     start_date = embedded_document.start_on
     end_date = embedded_document.end_on
-    end_date.present? ? "#{start_date} - #{end_date}" : "#{start_date} - present"
+    end_date == TimeKeeper.date_of_record ? "#{start_date} - present" : "#{start_date} - #{end_date}"
   end
 
   def income_and_deductions_edit(application, applicant, embedded_document)
