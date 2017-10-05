@@ -30,10 +30,10 @@
                   <td> <%= embedded_document.kind.humanize %> </td>
                   <td> <%= embedded_document.frequency_kind.humanize %> </td>
                   <td>
-                    <% if embedded_document.class == FinancialAssistance::Deduction %>
-                      <%= "(#{number_to_currency(embedded_document.amount.to_s)})" %>
+                    <% if embedded_document.is_a? FinancialAssistance::Deduction %>
+                      (<%= number_to_currency(embedded_document.amount.to_s) %>)
                     <% else %>
-                      <%= "#{number_to_currency(embedded_document.amount.to_s)}" %>
+                      <%= number_to_currency(embedded_document.amount.to_s) %>
                     <% end %>
                   <td>
                     <%= start_to_end_dates(embedded_document) %>
