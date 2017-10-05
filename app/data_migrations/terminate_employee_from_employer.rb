@@ -11,7 +11,7 @@ class TerminateEmployeeRole < MongoidMigrationTask
       puts "No employee was found with information provided" unless Rails.env.test?
     else
       employee.terminate_employee_role!
-      puts "Employee was successfully terminated."
+      puts "Employee was successfully terminated." unless Rails.env.test?
     end
 	end
 end
