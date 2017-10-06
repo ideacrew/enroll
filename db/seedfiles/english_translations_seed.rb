@@ -20,8 +20,10 @@ translations = [
   DEVISE_TRANSLATIONS
 ].reduce({}, :merge)
 
-puts "TRANSLATIONS"
-p translations
+unless Rails.env.test?
+  puts "TRANSLATIONS"
+  p translations
+end
 
 translations.keys.each do |k|
   Translation.where(key: k).first_or_create.update_attributes!(value: "\"#{translations[k]}\"")

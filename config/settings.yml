@@ -6,6 +6,7 @@ site:
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
+  help_url: "HELP URL GOES HERE"
   website_name: "www.DCHealthLink.com"
 
   social_media:
@@ -25,7 +26,9 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-
+  market_kinds: ["shop",'individual']
+  nationwide_markets: true
+  general_agency_enabled: true
 #
   qle:
     with_in_sixty_days: 60
@@ -111,7 +114,7 @@ aca:
     employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
-checkbook_services: 
+checkbook_services:
     remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
     base_url:  "https://dc.checkbookhealth.org"
     url: "https://dc.checkbookhealth.org/shop/dc/"
