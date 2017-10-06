@@ -22,7 +22,7 @@ Given(/^I should see page for documents verification$/) do
   expect(page).to have_content "Documents FAQ"
   expect(page).to have_content('Social Security Number')
   find('.btn', text: 'Documents FAQ').click
-  expect(page).to have_content('DC Residency')
+  expect(page).to have_content('Residency')
 end
 
 Given(/^a consumer exists$/) do

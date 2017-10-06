@@ -33,7 +33,7 @@ module VerificationHelper
         else
           "outstanding"
         end
-      when 'DC Residency'
+      when 'Residency'
         if consumer.residency_verified?
           consumer.local_residency_validation
         elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
