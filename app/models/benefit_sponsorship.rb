@@ -95,6 +95,11 @@ class BenefitSponsorship
         hbx_sponsor.advance_year    if new_date.day == 1 && new_date.month == 1
       end
 
+      if renewal_benefit_coverage_period.open_enrollment_start_on == new_date
+        oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
+        oe_begin.process_renewals
+      end
+
       # # Find families with events today and trigger their respective workflow states
       # orgs = Organization.or(
       #   {:"employer_profile.plan_years.start_on" => new_date},

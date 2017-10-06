@@ -27,7 +27,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
       next if person.blank?
 
       @all_assisted_individuals[person.hbx_id] = {
-        applied_percentage: row_hash[:applied_percentage], 
+        applied_percentage: row_hash[:applied_pct], 
         applied_aptc: row_hash[:"#{calender_year}_applied"], 
         csr_amt: row_hash[:"#{calender_year}_csr"]
       }
@@ -70,7 +70,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
         @assisted_individuals.delete(person.hbx_id)
       else
         @assisted_individuals[person.hbx_id] = {
-          applied_percentage: row_hash[:applied_percentage], 
+          applied_percentage: row_hash[:applied_pct], 
           applied_aptc: row_hash[:"#{calender_year}_applied"], 
           csr_amt: row_hash[:"#{calender_year}_csr"],
           max_aptc: row_hash[:"#{calender_year}_aptc"]

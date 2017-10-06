@@ -20,9 +20,16 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
 
     def process_renewals
+      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+
+      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
+      aptc_reader.calender_year = renewal_benefit_coverage_period.start_on.year
+      aptc_reader.call
+
       @assisted_individuals = aptc_reader.assisted_individuals
-      process_aqhp_renewals
-      process_uqhp_renewals
+
+      process_aqhp_renewals(renewal_benefit_coverage_period)
+      process_uqhp_renewals(renewal_benefit_coverage_period)
     end
 
     def log_message
@@ -71,19 +78,11 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       enrollments.detect{|e| enrollment.subscriber.hbx_id == e.subscriber.hbx_id }.blank?
     end
 
-    def process_aqhp_renewals
+    def process_aqhp_renewals(renewal_benefit_coverage_period)
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-
-      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
-      aptc_reader.calender_year = renewal_benefit_coverage_period.start_on.year
-      aptc_reader.call
-
-      @assisted_individuals = aptc_reader.assisted_individuals
-
+  
       count  = 0
       @assisted_individuals.each do |hbx_id, aptc_values|
-
         person = Person.by_hbx_id(hbx_id).first
         family = person.primary_family
 
@@ -93,7 +92,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         puts "Processing #{person.full_name}(#{person.hbx_id})"
 
         enrollments = family.active_household.hbx_enrollments.where({
-          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"],
           :kind => 'individual',
           :coverage_kind => 'health'
           }).order(:"effective_on".desc).select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
@@ -124,14 +123,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       puts count
     end
 
-    def process_uqhp_renewals
+    def process_uqhp_renewals(renewal_benefit_coverage_period)
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-
-      aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
-      aptc_reader.all_hbx_ids
-      @all_assisted_individuals = aptc_reader.all_assisted_individuals.keys
-
       count = 0
 
       families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => {
@@ -145,9 +138,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
           enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
           enrollments.each do |enrollment|
+            next if @assisted_individuals.has_key?(enrollment.subscriber.hbx_id) && enrollment.coverage_kind == 'health'
 
-            next if is_individual_assisted?(enrollment)
-       
             if can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
               count += 1
 
