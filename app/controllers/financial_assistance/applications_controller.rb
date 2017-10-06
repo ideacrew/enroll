@@ -10,6 +10,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
 
   def index
     @family = @person.primary_family
+    @family_members = @person.primary_family.active_family_members
     @applications = @family.applications
   end
 
