@@ -24,6 +24,10 @@ module Config::SiteHelper
     site_home_url + "/find-expert"
   end
 
+  def site_home_business_url
+    Settings.site.home_business_url
+  end
+
   def site_home_url
     Settings.site.home_url
   end
