@@ -198,12 +198,23 @@ var PersonValidations = (function(window, undefined) {
         DependentsValidationFields.check_continue_button();
     }
 
+    function validationForPhysicallyDisabled(e) {
+      if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+        return true;
+      }
+      if ($('input[name="person[is_physically_disabled]"]').not(":checked").length == 2) {
+        alert('Please provide an answer for question: Does this person have a disability?');
+        PersonValidations.restoreRequiredAttributes(e);
+      }
+    }
+
     function restoreRequiredAttributes(e) {
         e.preventDefault && e.preventDefault();
         hidden_requireds.each(function(index) {
             $(this).prop('required', true);
         });
     }
+
 
     function checkConsumerInputRequiredFields(e){
       var checking_fields = {
@@ -319,6 +330,7 @@ var PersonValidations = (function(window, undefined) {
         validationForVlpDocuments: validationForVlpDocuments,
         restoreRequiredAttributes: restoreRequiredAttributes,
         checkRequiredFields: checkRequiredFields,
+        validationForPhysicallyDisabled: validationForPhysicallyDisabled,
         checkConsumerInputRequiredFields: checkConsumerInputRequiredFields
     };
 
@@ -331,6 +343,7 @@ $(document).ready(function() {
     $('form.edit_person, form.new_dependent, form.edit_dependent').submit(function(e) {
         PersonValidations.checkConsumerInputRequiredFields(e);
         PersonValidations.validationForVlpDocuments(e);
+        PersonValidations.validationForPhysicallyDisabled(e);
     });
 
   isApplyingCoverage("person");

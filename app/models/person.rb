@@ -41,6 +41,7 @@ class Person
   field :is_incarcerated_in_dc, type: Boolean
   field :incarceration_date, type: Date
   field :expected_release_date, type: Date
+  field :is_physically_disabled, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -1007,5 +1008,9 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
+  end
+
+  def family_member
+    primary_family.family_members.find_by(person_id: id)
   end
 end
