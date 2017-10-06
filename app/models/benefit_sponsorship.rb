@@ -96,7 +96,7 @@ class BenefitSponsorship
       end
 
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-      if renewal_benefit_coverage_period.open_enrollment_start_on == new_date
+      if renewal_benefit_coverage_period.present? && renewal_benefit_coverage_period.open_enrollment_start_on == new_date
         oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
         oe_begin.process_renewals
       end
