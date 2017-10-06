@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       get :check_eligibility_results_received, on: :member
       get :application_publish_error, on: :member
       get :eligibility_response_error, on: :member
+      get 'checklist_pdf',on: :collection, action: 'checklist_pdf', as: 'checklist_pdf'
 
       resources :applicants do
         put :step, on: :member
