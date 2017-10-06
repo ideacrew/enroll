@@ -42,6 +42,7 @@ end
 When(/^the user clicks the “Action” dropdown corresponding to the “determination_response_error” application$/) do
   find_button('Actions').visible?
   click_button('Actions')
+  screenshot_and_post_to_slack('application_index_page_screenshot', channel: 'new_faa_team')
 end
 
 Given(/^that a family has a Financial Assistance application in the “determined” state$/) do

@@ -8,11 +8,13 @@ Given(/^that the user is on the FAA Household Info page$/) do
 end
 
 When(/^the user clicks Add\/Edit Info button for a given household member$/) do
+	screenshot_and_post_to_slack('household_info_page_left_nav_screenshot', channel: 'new_faa_team')
 	find(".btn", text: "ADD INCOME & COVERAGE INFO").click
 end
 
 Then(/^the user will navigate to the Tax Info page for the corresponding applicant\.$/) do
 	expect(page).to have_content('Household Info: Family Members')
+	screenshot_and_post_to_slack('tax_info_page_left_nav_screenshot', channel: 'new_faa_team')
 end
 
 Given(/^that the user is on the Tax Info page for a given applicant$/) do
@@ -41,7 +43,6 @@ end
 
 When(/^the user clicks Job Income section on the left navigation$/) do
 	click_link 'Job Income'
-	screenshot('job_income_page_screenshot', force: true)
 end
 
 Then(/^the user will navigate to the Job Income page for the corresponding applicant$/) do
@@ -78,5 +79,6 @@ end
 
 Then(/^the user will navigate to the Other Questions page for the corresponding applicant$/) do
 	visit other_questions_financial_assistance_application_applicant_path(application, application.primary_applicant)
+	screenshot_and_post_to_slack('other_questions_page_left_nav_screenshot', channel: 'new_faa_team')
 end
 
