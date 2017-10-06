@@ -37,14 +37,38 @@ Given (/a matched Employee exists with multiple employee roles/) do
   employee_role2.update_attributes(census_employee_id: ce2.id, employer_profile_id: org2.employer_profile.id)
 end
 
+Given (/a matched Employee exists with consumer role/) do
+  org = FactoryGirl.create :organization, :with_active_plan_year
+  benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
+  bga = FactoryGirl.build :benefit_group_assignment, benefit_group: benefit_group
+  FactoryGirl.create(:user)
+  @person = FactoryGirl.create(:person, :with_family, :with_consumer_role, first_name: "Employee", last_name: "E", user: user)
+  employee_role = FactoryGirl.create :employee_role, person: @person, employer_profile: org.employer_profile
+  ce =  FactoryGirl.create(:census_employee, 
+          first_name: @person.first_name, 
+          last_name: @person.last_name, 
+          dob: @person.dob, 
+          ssn: @person.ssn, 
+          employee_role_id: employee_role.id,
+          employer_profile: org.employer_profile
+        )
+
+  ce.benefit_group_assignments << bga
+  ce.link_employee_role!
+
+  employee_role.update_attributes!(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
+  ce.employee_role.reload
+  FactoryGirl.create(:hbx_profile)
+end
+
 
 And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role, kind, var|
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
   @family = Family.all.first
-  if role == "consumer"
-    dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
-  else
+  if role == "employee"
     dependent = FactoryGirl.create :person, dob: dob
+  else
+    dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
   end
   fm = FactoryGirl.create :family_member, family: @family, person: dependent
   user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
@@ -180,6 +204,10 @@ And(/(.*) clicked on shop for new plan/) do |role|
   find(".interaction-click-control-shop-for-new-plan").click
 end
 
+And(/user did not apply coverage for child as ivl/) do
+  @family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
+end
+
 And(/employee has a valid "(.*)" qle/) do |qle|
   qle = FactoryGirl.create :qualifying_life_event_kind, title: qle
 end
@@ -220,8 +248,33 @@ When(/employee switched to (.*) employer/) do |employer|
   end
 end
 
+When(/employee clicked on shop for plans/) do
+  find(".interaction-click-control-shop-for-plans").trigger('click')
+  wait_for_ajax
+end
+
+When(/employee switched for (.*) benefits/) do |market_kind|
+  if market_kind == "individual"
+    find(:xpath, '//*[@id="market_kinds"]/div/div[2]/label').click
+  else
+    find(:xpath, '//*[@id="market_kinds"]/div/div[1]/label').click
+  end
+end
+
+Then(/user should (.*) the ivl error message/) do |var|
+  if var == "see"
+    expect(page).to have_content "Did not apply for coverage"
+  else
+    expect(page).not_to have_content "Did not apply for coverage"
+  end
+end
+
 And(/(.*) should not see the dental radio button/) do |role|
   expect(page).not_to have_content "Dental"
+end
+
+And(/employee clicked on continue for plan shopping/) do
+  find(".interaction-click-control-continue").click
 end
 
 When(/employee clicked on make changes of health enrollment from first employer/) do
