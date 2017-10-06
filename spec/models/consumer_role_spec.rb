@@ -641,6 +641,13 @@ context "Verification process and notices" do
         end
       end
     end
+
+    context 'coverage_purchased_no_residency' do
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', true, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', false, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+    end
   end
 
   describe "#check_for_critical_changes" do

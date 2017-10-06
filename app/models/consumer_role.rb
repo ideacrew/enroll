@@ -400,6 +400,13 @@ class ConsumerRole
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
     end
 
+    event :coverage_purchased_no_residency, :after => [:record_transition, :notify_of_eligibility_change]  do
+      transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
+      transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
+      transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
+    end
+
+
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :verification_outstanding
     end
@@ -805,7 +812,7 @@ class ConsumerRole
 
   def redetermine_verification!(verification_attr)
     revert!(verification_attr)
-    coverage_purchased!(verification_attr)
+    coverage_purchased_no_residency!(verification_attr)
   end
 
   def is_type_verified?(type)

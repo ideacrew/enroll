@@ -1043,11 +1043,12 @@ describe Person do
   end
 
   describe "verification types" do
-    let(:person) {FactoryGirl.create(:person)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role) }
 
-    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native|
+    shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
-        allow(person).to receive(:ssn).and_return(ssn) if ssn
+        allow(person).to receive(:ssn).and_return(nil) unless ssn
+        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
         allow(person).to receive(:us_citizen).and_return(citizen)
         allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
