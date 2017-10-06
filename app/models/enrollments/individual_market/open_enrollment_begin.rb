@@ -76,7 +76,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
       aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
-      aptc_reader.calender_year = renewal_benefit_coverage_period.start_on
+      aptc_reader.calender_year = renewal_benefit_coverage_period.start_on.year
       aptc_reader.call
 
       @assisted_individuals = aptc_reader.assisted_individuals

@@ -36,13 +36,13 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
 
   def call
     file_name = "#{Rails.root}/2018_FA_Renewals_20171006_DryRun1_FARenewals.csv"
-    calender_year = TimeKeeper.date_of_record.year + 1
 
     @assisted_individuals = {}
     count = 0
 
     CSV.foreach(file_name, headers: true, header_converters: :symbol) do |row|
       row_hash = row.to_hash
+
 
       next if row_hash[:error_message].to_s.strip == "CURAM, NOT EA"
 
