@@ -1,9 +1,9 @@
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
-  attr_accessor :enrollment, :current_benefit_coverage_period, :renewal_benefit_coverage_period, :assisted, :aptc_values
+  attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   def initialize
-    @logger = Logger.new("#{Rails.root}/log/ivl_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
   end
 
   def renew
@@ -14,7 +14,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
       puts "#{enrollment.hbx_id}---#{e.inspect}"
-      # @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
+      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.to_s}"
     end
   end
 
@@ -22,7 +22,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment = @enrollment.family.active_household.hbx_enrollments.new
 
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
-    renewal_enrollment.effective_on = @renewal_benefit_coverage_period.start_on
+    renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = "individual"
@@ -30,17 +30,17 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
 
-    # H & S 
+    # elected aptc should be the minimun between applied_aptc and EHB premium.
+    if @assisted
+      ehb_premium = (renewal_enrollment.total_premium * renewal_enrollment.plan.ehb)
+      applied_aptc_amt = [@aptc_values[:applied_aptc].to_f, ehb_premium].min
+      renewal_enrollment.applied_aptc_amount = applied_aptc_amt
 
-    # 500 
-
-    # 495  EHB Premium (Plan :ehb)
-    # 497.75 Applied APTC 
-
-    
-    if @assisted  # IF applied APTC is great than EHB use EHB
-      renewal_enrollment.elected_aptc_pct = (@aptc_values[:applied_percentage].to_f/100.0)
-      renewal_enrollment.applied_aptc_amount = @aptc_values[:applied_aptc].to_f # 
+      if applied_aptc_amt == @aptc_values[:applied_aptc].to_f
+        renewal_enrollment.elected_aptc_pct = (@aptc_values[:applied_percentage].to_f/100.0)
+      else
+        renewal_enrollment.elected_aptc_pct = (applied_aptc_amt / @aptc_values[:"max_aptc"].to_f)
+      end
     end
 
     renewal_enrollment
@@ -60,12 +60,20 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     if has_catastrophic_plan? && is_cat_plan_ineligible?
       renewal_plan = @enrollment.plan.cat_age_off_renewal_plan
        if renewal_plan.blank?
-        raise "2017 Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
+        raise "#{renewal_coverage_start.year} Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
       end
     else
-      renewal_plan = @enrollment.plan.renewal_plan
+      if @enrollment.plan.csr_variant_id == '01' || has_catastrophic_plan?
+        renewal_plan = @enrollment.plan.renewal_plan
+      else
+        renewal_plan = Plan.where({
+          :active_year => renewal_coverage_start.year, 
+          :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-01"
+          }).first
+      end
+
       if renewal_plan.blank?
-        raise "2017 renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
+        raise "#{renewal_coverage_start.year} renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
       end
     end
     renewal_plan
@@ -86,7 +94,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       end
 
       Plan.where({
-        :active_year => @renewal_benefit_coverage_period.start_on.year, 
+        :active_year => renewal_coverage_start.year, 
         :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
       }).first
     else
@@ -100,7 +108,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def is_cat_plan_ineligible?
     @enrollment.hbx_enrollment_members.any? do |member| 
-      member.person.age_on(renewal_benefit_coverage_period.start_on) > 29
+      member.person.age_on(renewal_coverage_start) > 29
     end
   end
 
@@ -108,7 +116,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     child_relations = %w(child ward foster_child adopted_child)
 
     if child_relations.include?(member.family_member.relationship)
-      member.person.age_on(current_benefit_coverage_period.end_on) < 26
+      member.person.age_on(renewal_coverage_start.prev_day) < 26
     else
       true
     end
@@ -124,8 +132,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     eligible_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       members << HbxEnrollmentMember.new({
         applicant_id: hbx_enrollment_member.applicant_id,
-        eligibility_date: @renewal_benefit_coverage_period.start_on,
-        coverage_start_on: @renewal_benefit_coverage_period.start_on,
+        eligibility_date: renewal_coverage_start,
+        coverage_start_on: renewal_coverage_start,
         is_subscriber: hbx_enrollment_member.is_subscriber
       })
     end

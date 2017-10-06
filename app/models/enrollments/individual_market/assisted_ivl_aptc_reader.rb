@@ -2,6 +2,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
   require 'csv'
 
   attr_reader :assisted_individuals, :all_assisted_individuals
+  attr_accessor :calender_year
 
   def all_hbx_ids
     file_name = "#{Rails.root}/public/Update-Data-Scrub-11-7-16.csv"
@@ -27,14 +28,14 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
 
       @all_assisted_individuals[person.hbx_id] = {
         applied_percentage: row_hash[:applied_percentage], 
-        applied_aptc: row_hash[:"2017_applied"], 
-        csr_amt: row_hash[:"2017_csr"]
+        applied_aptc: row_hash[:"#{calender_year}_applied"], 
+        csr_amt: row_hash[:"#{calender_year}_csr"]
       }
     end
   end
 
   def call
-    file_name = "#{Rails.root}/public/Update-Data-Scrub-11-7-16.csv"
+    file_name = "#{Rails.root}/2018_FA_Renewals_20171006_DryRun1_FARenewals.csv"
     calender_year = TimeKeeper.date_of_record.year + 1
 
     @assisted_individuals = {}
@@ -46,8 +47,8 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
       next if row_hash[:error_message].to_s.strip == "CURAM, NOT EA"
 
       if ["EA, NOT CURAM", "CURAM ERROR"].include?(row_hash[:error_message].to_s.strip)
-        row_hash[:"2017_applied"] = "0"
-        row_hash[:"2017_csr"] = "0"
+        row_hash[:"#{calender_year}_applied"] = "0"
+        row_hash[:"#{calender_year}_csr"] = "0"
       end
 
       if row_hash[:ssn].present? && row_hash[:ssn] != '#N/A' && row_hash[:ssn] != "0"
@@ -71,7 +72,8 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
         @assisted_individuals[person.hbx_id] = {
           applied_percentage: row_hash[:applied_percentage], 
           applied_aptc: row_hash[:"#{calender_year}_applied"], 
-          csr_amt: row_hash[:"#{calender_year}_csr"]
+          csr_amt: row_hash[:"#{calender_year}_csr"],
+          max_aptc: row_hash[:"#{calender_year}_aptc"]
         }
       end
     end

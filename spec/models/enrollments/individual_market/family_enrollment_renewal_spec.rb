@@ -58,8 +58,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
     enrollment_renewal.enrollment = enrollment
     enrollment_renewal.assisted = assisted
     enrollment_renewal.aptc_values = aptc_values
-    enrollment_renewal.renewal_benefit_coverage_period = renewal_benefit_coverage_period
-    enrollment_renewal.current_benefit_coverage_period = current_benefit_coverage_period
+    enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
     enrollment_renewal
   }
 
