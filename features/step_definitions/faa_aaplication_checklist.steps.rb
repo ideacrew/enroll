@@ -1,5 +1,5 @@
 Then(/^the user has navigated to Application checklist page$/) do
-  expect(page).to have_content('Gather Income and Coverage Info')
+  expect(page).to have_content('For Each Person in Your Household')
 end
 
 Given(/^the user is on the Application checklist page$/) do

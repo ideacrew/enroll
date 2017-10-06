@@ -177,6 +177,10 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     application = @person.primary_family.applications.find(params[:id])
     render :text => "#{application.success_status_codes?(application.determination_http_status_code)}"
   end
+  
+  def checklist_pdf
+    send_file(Rails.root.join("public", "ivl_checklist.pdf").to_s, :disposition => "inline", :type => "application/pdf")
+  end
 
   private
 
