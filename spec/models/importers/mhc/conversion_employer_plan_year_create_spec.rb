@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_each do
 
-  let(:record_attrs) {
+  let!(:record_attrs) {
     {
       :action=>"Add",
       :fein=>"512121312",
@@ -26,11 +26,11 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
     }
   }
 
-  let(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
-  let(:default_plan_year_start) { (registered_on + 3.months).prev_year }
+  let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:default_plan_year_start) { (registered_on + 3.months).prev_year }
 
-  let(:fein) { record_attrs[:fein] }
-  let(:employer) { EmployerProfile.find_by_fein(fein) }
+  let!(:fein) { record_attrs[:fein] }
+  # let!(:employer) { EmployerProfile.find_by_fein(fein) }
 
   let!(:carrier_profile) {FactoryGirl.create(:carrier_profile, with_service_areas: 0, issuer_hios_ids: ['11111'], abbrev: 'BMCHP', offers_sole_source: true)}
   let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '02108', issuer_hios_id: carrier_profile.issuer_hios_ids.first) }
@@ -43,27 +43,33 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
 
   before :each do
     importer = Importers::Mhc::ConversionEmployerSet.new(file_name, out_stream, registered_on.strftime('%Y-%m-%d'))
+    # allow(ConversionEmployerCreate).to receive(:new).with(record_attrs.merge({:registered_on => registered_on.strftime('%Y-%m-%d') }))
     importer.import!
     out_stream.rewind
   end
 
   context "provided with employer date" do
+    before do
+      @employer = EmployerProfile.find_by_fein(fein)
+      # need to understand how service area been being mapped.
+      # allow(CarrierProfile).to receive(:carrier_profile_service_area_pairs_for).with(@employer).and_return([carrier_profile.id, @employer.service_areas.first.service_area_id])
+    end
 
     it "should create plan year" do
-      expect(employer.present?).to be_truthy
-      expect(employer.plan_years.empty?).to be_truthy
+      expect(@employer.present?).to be_truthy
+      expect(@employer.plan_years.empty?).to be_truthy
 
       subject.save
-      employer_profile = employer.reload
+      employer_profile = @employer.reload
       plan_year = employer_profile.plan_years.first
 
       expect(plan_year.present?).to be_truthy
       expect(plan_year.start_on).to eq default_plan_year_start
     end
 
-    it "should create benefit group with sole source plan offerings" do  
+    it "should create benefit group with sole source plan offerings" do
       subject.save
-      employer_profile = employer.reload
+      employer_profile = @employer.reload
       plan_year = employer_profile.plan_years.first
       benefit_group = plan_year.benefit_groups.first
 
@@ -72,10 +78,10 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
       expect(benefit_group.plan_option_kind).to eq 'sole_source'
     end
     
-    it "should create composite tiers" do 
+    it "should create composite tiers" do
       subject.save
 
-      employer_profile = employer.reload
+      employer_profile = @employer.reload
       plan_year = employer_profile.plan_years.first
       benefit_group = plan_year.benefit_groups.first
 

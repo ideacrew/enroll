@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
 
-  let(:record_attrs) {
+  let!(:record_attrs) {
     {:action=>"Update",
      :fein=>"512121312",
      :dba=>"Acme Contractors",
@@ -29,18 +29,21 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
      :carrier=>"bmc healthnet plan"}
   }
 
-  let(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
 
-  let(:fein) { record_attrs[:fein] }
-  let(:employer) { EmployerProfile.find_by_fein(fein) }
-  let(:carrier_profile) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
+  let!(:fein) { record_attrs[:fein] }
+  # let(:employer) { EmployerProfile.find_by_fein(fein) }
+  let!(:carrier_profile) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
   
   subject { Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
 
   context "provided with employer date" do
+    before :each do
+      @employer_profile = EmployerProfile.find_by_fein(fein)
+    end
 
     it "should create employer profile" do
-      expect(employer).to be_blank
+      expect(@employer_profile).to be_blank
       result = subject.save
       employer_profile = EmployerProfile.find_by_fein(fein)
 

@@ -100,11 +100,11 @@ module Importers::Mhc
     def create_model(record_attrs)
       row_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
       if row_action == 'add'
-        ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
+        ::Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
       elsif row_action == 'update'
-        ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
+        ::Importers::Mhc::ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
       else
-        ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
+        ::Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date}))
       end
     end
   end
