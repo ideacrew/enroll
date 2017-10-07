@@ -88,6 +88,7 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
+    return false if verification_type_status(v_type, family_member.person) == "attested"
     !family_member.person.consumer_role.is_type_verified?(v_type)
   end
 
