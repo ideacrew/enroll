@@ -674,7 +674,7 @@ class ConsumerRole
   end
 
   def residency_verified?
-    is_state_resident? || person.no_dc_address
+    is_state_resident? || person.no_dc_address || local_residency_validation == "attested"
   end
 
   def citizenship_verified?
