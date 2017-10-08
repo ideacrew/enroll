@@ -8,39 +8,43 @@
         <div class="row white-background">
           <div class="col-md-12 pz">
             <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-11">The following is information <span class="form-heading">you entered for everone in this application </span></div>
+              <div class="col-md-11">The following is information <span class="form-heading">you entered for everyone in this application. </span></div>
               <div class="col-md-1">
               </div>
             </div>
-            <table class="table table-border-line mb0" border="1" >
+            <table class="table table-border-line mb0 table-grey-border" border="1" >
               <thead>
                 <tr class="form-heading">
-                  <th> <b>PERSON </b></th>
-                  <th><b>TYPES</b></th>
-                  <th><b>FREQUENCY</b></th>
-                  <th><b>AMOUNT</b></th>
-                  <th><b>DATES </b></th>
+                  <th class="no-bottom-border"> <b>PERSON </b></th>
+                  <th class="no-bottom-border"><b>TYPES</b></th>
+                  <th class="no-bottom-border"><b>FREQUENCY</b></th>
+                  <th class="no-bottom-border"><b>AMOUNT</b></th>
+                  <th class="no-bottom-border"><b>DATES </b></th>
                 </tr>
               </thead>
               <tbody>
                 <% @applicants.each do |applicant| %>
                 <% income_and_deductions_for(applicant).each do |embedded_document| %>
-                <tr class="noBorder">
+                <tr>
                   <td> <%= applicant.person.full_name %> </td>
                   <td> <%= embedded_document.kind.humanize %> </td>
                   <td> <%= embedded_document.frequency_kind.humanize %> </td>
                   <td>
+                    <b>
                     <% if embedded_document.is_a? FinancialAssistance::Deduction %>
                       (<%= number_to_currency(embedded_document.amount.to_s) %>)
                     <% else %>
                       <%= number_to_currency(embedded_document.amount.to_s) %>
                     <% end %>
+                    </b>
                   <td>
                     <%= start_to_end_dates(embedded_document) %>
-                    <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
-                      <i class="fa fa-pencil fa-2x"></i>
-                    <% end %>
-                    </td>
+                    <span class= "ml10">
+                      <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
+                        <i class="fa fa-pencil fa-2x"></i>
+                      <% end %>
+                    </span>
+                  </td>
                 </tr>
                 <% end %>
                 <% end %>
