@@ -26,7 +26,7 @@
           <label class="radio-yml" for="has_other_income_yes">Yes</label>
         </div>
         <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_other_income", false, !@applicant.has_other_income, class: "radio-yml", required: true)%>
+          <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "radio-yml", required: true)%>
           <label class="radio-yml" for="has_other_income_no">No</label>
         </div>
         <div class='col-md-6'>
