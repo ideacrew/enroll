@@ -70,13 +70,3 @@ end
 Then(/^the user will navigate to the Job Income page for the same applicant\.$/) do
   click_link 'Job Income'
 end
-
-
-
-
-
-
-
-
-
-
