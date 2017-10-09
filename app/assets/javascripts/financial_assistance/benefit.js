@@ -216,9 +216,9 @@ $(document).ready(function() {
     });
 
     /* Condtional Display Enrolled Benefit Questions */
-    if ($("#has_enrolled_health_coverage_false").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
+    if (!$("#has_enrolled_health_coverage_true").is(':checked')) $("#enrolled-benefit-kinds").addClass('hide');
     /* Condtional Display Eligible Benefit Questions */
-    if ($("#has_eligible_health_coverage_false").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
+    if (!$("#has_eligible_health_coverage_true").is(':checked')) $("#eligible-benefit-kinds").addClass('hide');
 
     $("body").on("change", "#has_enrolled_health_coverage_true", function(){
       if ($('#has_enrolled_health_coverage_true').is(':checked')) {
