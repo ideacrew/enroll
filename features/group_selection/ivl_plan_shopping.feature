@@ -58,7 +58,7 @@ Feature: IVL plan purchase
     When consumer visits home page after successful ridp
     Then consumer should see the enrollment with make changes button
     When consumer clicked on make changes button
-    And consumer should see the ineligible family member disabled and unchecked
+    Then consumer should see the ineligible family member disabled and unchecked
     And consumer should see the eligible family member enabled and checked
     And consumer should also see the reason for ineligibility
     When consumer clicked on shop for new plan

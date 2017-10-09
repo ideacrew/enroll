@@ -16,10 +16,10 @@ Feature: EE with consumer role plan purchase
     And employee should see the eligible family member enabled and checked
     And employee should also see the reason for ineligibility
     When employee switched for individual benefits
-    And employee should see the dental radio button
+    Then employee should see the dental radio button
     Then user should see the ivl error message
     When employee switched for employer-sponsored benefits
-    And employee should not see the reason for ineligibility
+    Then employee should not see the reason for ineligibility
     When employee unchecks the dependent
     And employee clicked on continue for plan shopping
     Then employee should see primary and valid dependent
@@ -46,7 +46,7 @@ Feature: EE with consumer role plan purchase
     Then Employee sign in to portal
     Then employee should see the enrollment with make changes button
     When employee clicked on make changes button
-    And employee should see the ineligible family member disabled and unchecked
+    Then employee should see the ineligible family member disabled and unchecked
     And employee should see the eligible family member enabled and checked
     Then user should not see the ivl error message
     And employee should also see the reason for ineligibility

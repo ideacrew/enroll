@@ -22,7 +22,7 @@ function setGroupSelectionHandlers(){
         $(".dental_errors_" + employer_id ).show();
       }
 
-      $("tr.is_primary").closest("td").attr("readonly", true)
+      // $("tr.is_primary").closest("td").attr("readonly", true)
       setDentalBenefits(checked_er.attr('dental_benefits'));
       errorsForChangeInCoverageKind(employer_id);
       setPrimaryForShop();

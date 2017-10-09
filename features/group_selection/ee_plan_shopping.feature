@@ -56,7 +56,7 @@ Feature: EE plan purchase
     Then Employee sign in to portal
     Then employee should see the enrollment with make changes button
     When employee clicked on make changes button
-    And employee should see the ineligible family member disabled and unchecked
+    Then employee should see the ineligible family member disabled and unchecked
     And employee should see the eligible family member enabled and checked
     And employee should also see the reason for ineligibility
     When employee clicked on shop for new plan

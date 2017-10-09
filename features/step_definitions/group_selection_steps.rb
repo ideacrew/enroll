@@ -67,6 +67,8 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   @family = Family.all.first
   if role == "employee"
     dependent = FactoryGirl.create :person, dob: dob
+  elsif role == "Resident"
+    dependent = FactoryGirl.create :person, :with_resident_role, dob: dob
   else
     dependent = FactoryGirl.create :person, :with_consumer_role, dob: dob
   end
@@ -82,7 +84,7 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
   sep = FactoryGirl.create :special_enrollment_period, family: @family
   enrollment = FactoryGirl.create(:hbx_enrollment, 
                                   household: @family.active_household,
-                                  kind: (@employee_role.present? ? "employer_sponsored" : "individual"),
+                                  kind: (@employee_role.present? ? "employer_sponsored" : (role == "Resident" ? "coverall" : "individual")),
                                   effective_on: TimeKeeper.date_of_record,
                                   enrollment_kind: "special_enrollment",
                                   special_enrollment_period_id: sep.id,
@@ -121,6 +123,7 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
 end
 
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
+  wait_for_ajax
   if type == "ineligible"
     expect(find("#family_member_ids_1")).to be_disabled
     expect(find("#family_member_ids_1")).not_to be_checked
@@ -131,10 +134,10 @@ And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, 
 end
 
 And(/(.*) should also see the reason for ineligibility/) do |role|
-  if role == "consumer"
-    expect(page).to have_content "eligibility failed on family_relationships"
+  if role == "employee"
+    expect(page).to have_content "This dependent is ineligible for employer-sponsored"
   else
-    expect(page).to have_content "This dependent is ineligible for employer-sponsored coverage."
+    expect(page).to have_content "eligibility failed on family_relationships"
   end
 end
 
@@ -192,7 +195,7 @@ Then(/(.*) should see all the family members names/) do |role|
   end
 end
 
-When(/consumer (.*) the primary person/) do |checked|
+When(/(.*) (.*) the primary person/) do |role, checked|
   if checked == "checks"
     find("#family_member_ids_0").set(true)
   else
@@ -237,7 +240,7 @@ And(/first ER not offers dental benefits to spouse/) do
 end
 
 And(/employee should not see the reason for ineligibility/) do
-  expect(page).not_to have_content "This dependent is ineligible for employer-sponsored coverage."
+  expect(page).not_to have_content "This dependent is ineligible for employer-sponsored"
 end
 
 When(/employee switched to (.*) employer/) do |employer|
@@ -279,5 +282,24 @@ end
 
 When(/employee clicked on make changes of health enrollment from first employer/) do
   find(:xpath, '//*[@id="account-detail"]/div[2]/div[1]/div[3]/div[3]/div/div[3]/div/span/a')
+end
+
+Given(/^a Resident exists$/) do
+  user :with_resident_role
+end
+
+Given(/^the Resident is logged in$/) do
+  login_as user
+end
+
+When(/Resident visits home page with qle/) do
+  # we have only shop & ivl as market kinds for qle
+  FactoryGirl.create(:qualifying_life_event_kind, market_kind: "individual")
+  FactoryGirl.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  visit "/families/home"
+end
+
+And(/Resident clicked on "Married" qle/) do
+  click_link "Married"
 end
 
