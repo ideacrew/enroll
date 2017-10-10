@@ -681,14 +681,18 @@ describe HbxEnrollment, dbclean: :after_all do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
     let(:census_employee) { FactoryGirl.create(:census_employee)}
     let(:benefit_group_assignment) { FactoryGirl.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee) }
-    let(:benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
+    let(:plan_year) { FactoryGirl.create(:plan_year, aasm_state: "enrolling") }
     let(:enrollment) { FactoryGirl.create(:hbx_enrollment, :individual_unassisted, household: family.active_household)}
-    let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household)}
+    let(:enrollment_two) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household, effective_on: TimeKeeper.date_of_record.next_month)}
     let(:enrollment_three) { FactoryGirl.create(:hbx_enrollment, :cobra_shop, household: family.active_household)}
+    let(:enrollment_four) { FactoryGirl.create(:hbx_enrollment, :shop, household: family.active_household, benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id, effective_on: TimeKeeper.date_of_record.beginning_of_month)}
+
     before do
       benefit_group_assignment.update_attribute(:hbx_enrollment_id, enrollment_two.id)
       enrollment_two.update_attributes(benefit_group_id: benefit_group_assignment.benefit_group.id, benefit_group_assignment_id: benefit_group_assignment.id)
     end
+
     it "should return false if it is an ivl enrollment" do
       expect(enrollment.propogate_waiver).to eq false
     end
@@ -708,9 +712,18 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(enrollment_two.benefit_group_assignment.aasm_state).not_to eq "coverage_waived"
     end
 
-    it "should cancel the shop enrollment" do
+    it "should cancel the shop enrollment when effective_on is in future" do
+      expect(enrollment_two.effective_on).to be > TimeKeeper.date_of_record
       enrollment_two.propogate_waiver
-      expect(enrollment_two.aasm_state).to eq "coverage_termination_pending"
+      enrollment_two.reload
+      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+    end
+
+    it "should terminate the shop enrollment when effective_on is in past" do
+      expect(enrollment_four.effective_on).to be <= TimeKeeper.date_of_record
+      enrollment_four.propogate_waiver
+      enrollment_four.reload
+      expect(enrollment_four.aasm_state).to eq "coverage_termination_pending"
     end
   end
 end
