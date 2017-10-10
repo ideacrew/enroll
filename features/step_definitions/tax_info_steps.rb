@@ -1,9 +1,3 @@
-Given(/^that the user is on the FAA Household Info page$/) do
-  login_as consumer, scope: :user
-  visit financial_assistance_applications_path
-  create_plan
-  click_button "Start new application"
-end
 
 Given(/^the applicant has no saved data$/) do
   expect(page).to have_content('Info Needed')
@@ -11,10 +5,6 @@ end
 
 When(/^the user clicks the ADD Info Button for a given household member$/) do
   find(".btn", text: "ADD INCOME & COVERAGE INFO").click
-end
-
-Then(/^the user will navigate to the Tax Info page for the corresponding applicant\.$/) do
-  visit go_to_step_financial_assistance_application_applicant_path(application, application.primary_applicant, 1)
 end
 
 Given(/^the user is editing an application for financial assistance$/) do
