@@ -29,7 +29,7 @@
                       class: "required date-picker qle-date-picker form-control", required: true %>
                 </div>
                 <div class="form-group">
-                  <%= link_to l10n('.continue').to_s.downcase, 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
+                  <%= link_to l10n('continue'), 'javascript:;', class: 'btn btn-primary btn-md', id: 'qle_submit' %>
                 </div>
               </div>
             </div>
@@ -50,7 +50,7 @@
               <div class="spec_reasons">
               </div>
               <div class="text-center <%= pundit_class Family,:updateable? %>">
-                <%= submit_tag l10n('.continue'), class: 'btn btn-primary' %>
+                <%= submit_tag l10n('continue'), class: 'btn btn-primary' %>
                 <br/>
                 <br/>
               </div>

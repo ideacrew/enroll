@@ -11,7 +11,7 @@
         <% end %>
 
         <h1><%= l10n("household_info") %>: <%= l10n("family_members") %></h1>
-        <h4><%= l10n("family_members.index_continue_to_get_insurance") %></h4>
+        <h4><%= l10n("family_members.index.continue_to_get_insurance") %></h4>
         <p class='memo'>* = <%= l10n("required_field") %></p>
 
         <div class="row no-buffer">
@@ -58,7 +58,7 @@
 
             <% if @change_plan.present? %>
               <%=
-                link_to "<i class='fa fa-user-plus'></i> #{l10n('.continue')}".html_safe, group_selection_url,
+                link_to "<i class='fa fa-user-plus'></i> #{l10n('continue')}".html_safe, group_selection_url,
                  class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
               %>
             <% end %>

@@ -8,7 +8,8 @@ site:
   home_url: "https://www.dchealthlink.com/"
   help_url: "HELP URL GOES HERE"
   website_name: "www.DCHealthLink.com"
-
+  broker_enabled: true
+  broker_quoting_enabled: true
   social_media:
     facebook_url: ""
 
