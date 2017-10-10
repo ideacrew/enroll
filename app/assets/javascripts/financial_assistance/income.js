@@ -243,8 +243,8 @@ $(document).ready(function() {
 
 
     /* Condtional Display Job Income Question */
-    if ($("#has_job_income_false").is(':checked')) $("#job_income").addClass('hidden');
-    if ($("#has_self_employment_income_false").is(':checked')) $("#self_employed_incomes").addClass('hidden');
+    if (!$("#has_job_income_true").is(':checked')) $("#job_income").addClass('hidden');
+    if (!$("#has_self_employment_income_true").is(':checked')) $("#self_employed_incomes").addClass('hidden');
     if (!$("#has_other_income_true").is(':checked')) $(".other_income_kinds").addClass('hidden');
 
     $("body").on("change", "#has_job_income_true", function(){
