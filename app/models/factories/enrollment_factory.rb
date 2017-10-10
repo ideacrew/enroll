@@ -83,19 +83,6 @@ module Factories
         person_params["is_applying_coverage"]
       )
       if person.blank? && person_new.blank?
-        begin
-          raise
-        rescue => e
-          error_message = {
-            :error => {
-              :message => "unable to construct consumer role",
-              :person_params => person_params.inspect,
-              :user => user.inspect,
-              :backtrace => e.backtrace.join("\n")
-            }
-          }
-          log(JSON.dump(error_message), {:severity => 'error'})
-        end
         return nil
       end
       role = build_consumer_role(person, person_new)
