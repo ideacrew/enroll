@@ -5,7 +5,7 @@
       <div class="col-md-3">
         <%= f.text_field :amount, placeholder: 'AMOUNT *', required: true, class: "floatlabel" %>
       </div>
-      <div class="col-md-3 fa-select">
+      <div class="col-md-3 fa-select select-box">
         <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
         <%= f.label :frequency_kind, 'How Often *', class: "label-color" %>
         <%= f.select(:frequency_kind, options_for_select(FinancialAssistance::Deduction::FREQUENCY_KINDS, selected: deduction.frequency_kind), {include_blank: "Choose"}, {:disabled => false})  %>
