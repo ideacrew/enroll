@@ -999,7 +999,7 @@ class EmployerProfile
       employer = Organization.find(id).employer_profile
       census_employees = employer.census_employees.active if employer.is_new_employer?
       census_employees.each do |ce|
-        if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == Organization.find(id).employer_profile.active_plan_year.start_on
+        if ce.active_benefit_group_assignment.hbx_enrollment.present? && ce.active_benefit_group_assignment.hbx_enrollment.effective_on == employer.active_plan_year.start_on
           ShopNoticesNotifierJob.perform_later(ce.id.to_s, "initial_employee_plan_selection_confirmation")
         end
       end
