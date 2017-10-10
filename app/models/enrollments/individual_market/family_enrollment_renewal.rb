@@ -57,25 +57,30 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # Cat plan ageoff
   # Eligibility determination CSR change
   def renewal_plan
-    if has_catastrophic_plan? && is_cat_plan_ineligible?
-      renewal_plan = @enrollment.plan.cat_age_off_renewal_plan
-       if renewal_plan.blank?
-        raise "#{renewal_coverage_start.year} Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
-      end
+    if @enrollment.coverage_kind == 'dental'
+      renewal_plan = @enrollment.plan.renewal_plan
     else
-      if @enrollment.plan.csr_variant_id == '01' || has_catastrophic_plan?
-        renewal_plan = @enrollment.plan.renewal_plan
+      if has_catastrophic_plan? && is_cat_plan_ineligible?
+        renewal_plan = @enrollment.plan.cat_age_off_renewal_plan
+        if renewal_plan.blank?
+          raise "#{renewal_coverage_start.year} Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
+        end
       else
-        renewal_plan = Plan.where({
-          :active_year => renewal_coverage_start.year, 
-          :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-01"
-          }).first
-      end
-
-      if renewal_plan.blank?
-        raise "#{renewal_coverage_start.year} renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
+        if @enrollment.plan.csr_variant_id == '01' || has_catastrophic_plan?
+          renewal_plan = @enrollment.plan.renewal_plan
+        else
+          renewal_plan = Plan.where({
+            :active_year => renewal_coverage_start.year, 
+            :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-01"
+            }).first
+        end
       end
     end
+
+    if renewal_plan.blank?
+      raise "#{renewal_coverage_start.year} renewal plan missing on HIOS id #{@enrollment.plan.hios_id}"
+    end
+    
     renewal_plan
   end
 

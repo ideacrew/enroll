@@ -20,6 +20,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
 
     def process_renewals
+      @logger.info "Started process at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
+
       renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
 
       aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
@@ -27,9 +29,12 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       aptc_reader.call
 
       @assisted_individuals = aptc_reader.assisted_individuals
+      @logger.info "Found #{@assisted_individuals.keys.count} entries in Assisted sheet."
 
       process_aqhp_renewals(renewal_benefit_coverage_period)
       process_uqhp_renewals(renewal_benefit_coverage_period)
+
+      @logger.info "Process ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
     end
 
     def log_message
