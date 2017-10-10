@@ -995,20 +995,11 @@ class Family
   def document_due_date(family_member, v_type)
     return nil if family_member.person.consumer_role.is_type_verified?(v_type)
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    enrollment = enrolled_policy(family_member)
-    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : nil )
+    sv.present? ? sv.due_date : nil
   end
 
   def enrolled_policy(family_member)
     enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
-  end
-
-  def verification_due_date_from_enrollment(enrollment)
-    if enrollment.special_verification_period
-      enrollment.special_verification_period.to_date
-    else
-      nil
-    end
   end
 
   def review_status

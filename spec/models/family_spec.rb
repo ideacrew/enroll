@@ -1368,7 +1368,7 @@ end
 
 describe "#document_due_date", dbclean: :after_each do
   context "when special verifications exists" do
-    let(:special_verification) { FactoryGirl.create(:special_verification)}
+    let(:special_verification) { FactoryGirl.create(:special_verification, type: "admin")}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: special_verification.consumer_role.person)}
 
     it "should return the due date on the related latest special verification" do
@@ -1389,12 +1389,8 @@ describe "#document_due_date", dbclean: :after_each do
         fm = family.primary_family_member
         enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, eligibility_date: TimeKeeper.date_of_record , coverage_start_on: TimeKeeper.date_of_record)
       end
-      it "should return the special_verification_period on the enrollment if it exists" do
-        enrollment.special_verification_period = TimeKeeper.date_of_record + 45.days
-        enrollment.save!
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq enrollment.special_verification_period.to_date
-      end
 
+      #No longer updating special_verification_period on erollment. Due dates are moved to member level.
       it "should return nil if special_verification_period on the enrollment is nil" do
         enrollment.special_verification_period = nil
         enrollment.save
