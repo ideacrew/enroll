@@ -20,7 +20,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
-  listings: [["Your group meets residency requirements:",["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR ","You offer coverage through the #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the SHOP exchange serving their primary worksite(s)."]],"At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage.","Atleast one non-owner employee enrolls in health coverage."]} %>
+  listings: [["Your group meets residency requirements:",["Your principal business address is in #{aca_state_name} and you offer coverage to all full-time employees through the #{site_short_name}, OR ","You offer coverage through the #{site_short_name} to all full-time employees whose primary worksite is located in #{aca_state_name} and offer coverage to non-#{aca_state_name} based employees through the SHOP exchange serving their primary worksite(s)."]],"At least seventy-five (75) percent of your eligible employees enroll in your group health coverage or waive due to having other coverage.","At least one non-owner employee enrolls in health coverage."]} %>
 
   <table class="total_table notice_spacing_2" border="0">
     <tbody>
@@ -42,20 +42,22 @@
       <td class="mpi_indicator">
         <ul style="list-style: circle solid;">
         <li class="notice_spacing">
-           <strong>Log in to your account at</strong> <%= link_to "#{site_main_web_address}", "#{site_main_web_address_url}" %>
+           <strong>Log in to your account at</strong> <%= site_website_address %>
         </li>
         <li>
-          <strong>Finalize List of Eligible Employees</strong><br>
-          At a minimum, you must offer coverage to all employees working 30 hours or more per week.<br>
-          At the beginning of Open Enrollment, the <%=site_short_name%> will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%=site_short_name%> online account and log in, review their plan options, and enroll into coverage. You will also receive a copy of this open enrollment notice.<br>
+          <strong>Finalize List of Eligible Employees</strong>
+          <p>At a minimum, you must offer coverage to all employees working 30 hours or more per week.</p>
 
-          During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan or waived coverage
+          <p>At the beginning of Open Enrollment, the <%=site_short_name%> will send a notice to your eligible employees to announce the beginning of their Open Enrollment Period and provide them with instructions on how to create a <%=site_short_name%> online account and log in, review their plan options, and enroll into coverage. You will also receive a copy of this open enrollment notice.</p>
+
+          <p>During Open Enrollment, you can monitor your employee elections and send reminder emails to your eligible employees who have not yet enrolled in a plan or waived coverage.</p>
         </li>
         <li>
-          <strong>Finalize Coverage and Pay First Month’s Premium</strong><br>
-          Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received no later than 5:00 p.m. Eastern on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%> in order for your coverage to take effect on <%=notice.plan_year.start_on%>. Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.<br>
+          <strong>Finalize Coverage and Pay First Month’s Premium</strong>
+          <p>
+          Your coverage will only be finalized upon payment of your first month’s premium.  Your first month’s premium payment must be received no later than 5:00 p.m. Eastern on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%> in order for your coverage to take effect on <%=notice.plan_year.start_on%>. Payments over the phone or online are required, as they can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company.</p>
 
-          If your first month’s premium is not received by 5:00 p.m. Eastern on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.
+          <p>If your first month’s premium is not received by 5:00 p.m. Eastern on <%=notice.plan_year.binder_payment_due_date.strftime("%m/%d/%Y")%>, your group’s coverage will be delayed and your employees may experience a gap in coverage. Once enrollments have been processed by the health insurance company, employees will receive information about their health plan directly from the health insurance company, including their ID cards.</p>
         </li>
         </ul>
       </td>
