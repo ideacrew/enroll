@@ -258,7 +258,6 @@ class ConsumerRole
     Person.all_consumer_roles
   end
 
-
   def is_active?
     self.is_active
   end
@@ -390,19 +389,35 @@ class ConsumerRole
     end
 
     event :income_valid, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :unverified, to: :unverified
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => [:is_assistance_verified?]
+      transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :income_outstanding, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
     end
 
     event :mec_valid, :after => [:record_transition, :notify_of_eligibility_change] do
+      transitions from: :unverified, to: :unverified
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_assistance_verified?
+      transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
     event :mec_outstanding, :after => [:record_transition, :notify_of_eligibility_change] do
-      transitions from: [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding], to: :verification_outstanding
+      transitions from: :unverified, to: :verification_outstanding
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :verification_outstanding
     end
 
     event :coverage_purchased do
@@ -796,8 +811,25 @@ class ConsumerRole
   end
 
   def is_assistance_verified?
-    return true if ((!eligible_for_faa?) || (eligible_for_faa? && assisted_income_validation == "valid" && assisted_mec_validation == "valid"))
-    return false
+    if ((!eligible_for_faa?) || is_assistance_required_and_verified? )
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    return true_or_false
+  end
+
+  def is_assistance_required_and_verified?
+    eligible_for_faa? && income_valid? && mec_valid?
+  end
+
+  def income_valid?
+    assisted_income_validation == "valid"
+  end
+
+  def mec_valid?
+    assisted_mec_validation == "valid"
   end
 
   def eligible_for_faa?
@@ -830,11 +862,13 @@ class ConsumerRole
 
   def assisted_doument_pending?(kind)
     if eligible_for_faa? && assisted_verification_documents.select{|assisted_document| assisted_document.kind == kind }.first.status == "pending"
-      return true
+      true_or_false = true
     elsif !eligible_for_faa?
-      return false
+      true_or_false = false
     else
-      return false
+      true_or_false = false
     end
+
+    return true_or_false
   end
 end

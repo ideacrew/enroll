@@ -597,14 +597,14 @@ describe ConsumerRole, "receiving a notification of ivl_coverage_selected" do
   it_behaves_like "a consumer role unchanged by ivl_coverage_selected", :verification_period_ended
 end
 
-
-
-describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
+describe "related to valid and invalid scenarios(INCOME and MEC)" do
 
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    allow_any_instance_of(Family).to receive(:application_applicable_year).and_return(TimeKeeper.date_of_record.year)
     consumer_role.assisted_verification_documents << [
-      FactoryGirl.build(:assisted_verification_document, application_id: application.id, applicant_id: applicant.id, assisted_verification_id: assisted_verification.id) ]
+      FactoryGirl.build(:assisted_verification_document, application_id: application.id, applicant_id: applicant.id, assisted_verification_id: assisted_verification.id),
+      FactoryGirl.build(:assisted_verification_document, application_id: application.id, applicant_id: applicant.id, assisted_verification_id: mec_assisted_verification.id) ]
   end
 
   let(:assisted_person) { FactoryGirl.create(:person, :with_consumer_role) }
@@ -613,6 +613,7 @@ describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
   let(:application) { FactoryGirl.create(:application, family: assisted_family) }
   let(:applicant) { FactoryGirl.create(:applicant, application: application) }
   let(:assisted_verification)  { FactoryGirl.create(:assisted_verification, applicant: applicant) }
+  let(:mec_assisted_verification)  { FactoryGirl.create(:assisted_verification, applicant: applicant, verification_type: "MEC") }
   let(:state) { consumer_role.aasm_state }
 
   context "for Income verifications" do
@@ -620,12 +621,12 @@ describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
     context "for event income_valid" do
       it "changes state from verification_outstanding to fully_verified" do
         consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "valid")
-        expect(consumer_role).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:mec_valid)
+        expect(consumer_role).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:income_valid)
       end
 
-      it "fails to change state on failed call back" do
-        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "na")
-        expect{consumer_role.mec_valid}.to raise_error(AASM::InvalidTransition)
+      it "fails to change state to fully_verified on failed call back" do
+        consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "na", aasm_state: "verification_outstanding")
+        expect(consumer_role).to transition_from(state).to(state).on_event(:income_valid)
       end
     end
 
@@ -645,9 +646,9 @@ describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
         expect(consumer_role).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:mec_valid)
       end
 
-      it "fails to change state on failed call back" do
+      it "fails to change state to fully_verified on failed call back" do
         consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "na")
-        expect{consumer_role.mec_valid}.to raise_error(AASM::InvalidTransition)
+        expect(consumer_role).to transition_from(state).to(state).on_event(:mec_valid)
       end
     end
 
@@ -656,6 +657,126 @@ describe "state transitions for valid and invalid scenarios(INCOME and MEC)" do
         consumer_role.update_attributes(assisted_income_validation: "valid", assisted_mec_validation: "outstanding")
         expect(consumer_role).to transition_from(state).to(:verification_outstanding).on_event(:mec_outstanding)
       end
+    end
+  end
+
+  context "assisted_doument_pending?" do
+
+    it "returns false as the status is unverified" do
+      expect(consumer_role.assisted_doument_pending?("Income")).to eq false
+    end
+
+    it "returns true as the status is pending" do
+      assisted_verification.update_attributes(status: "pending")
+      expect(consumer_role.assisted_doument_pending?("Income")).to eq true
+    end
+  end
+
+  context "income_pending?" do
+
+    it "returns false as the status is unverified" do
+      expect(consumer_role.income_pending?).to eq false
+    end
+
+    it "returns true as the status is pending" do
+      assisted_verification.update_attributes(status: "pending")
+      expect(consumer_role.income_pending?).to eq true
+    end
+  end
+
+  context "mec_pending?" do
+
+    it "returns false as the status is unverified" do
+      expect(consumer_role.mec_pending?).to eq false
+    end
+
+    it "returns true as the status is pending" do
+      mec_assisted_verification.update_attributes(status: "pending")
+      expect(consumer_role.mec_pending?).to eq true
+    end
+  end
+
+  context "invalid_income_response" do
+    it "should update consumer_role" do
+      consumer_role.invalid_income_response
+      expect(consumer_role.assisted_income_validation).to eq "outstanding"
+    end
+  end
+
+  context "valid_income_response" do
+    it "should update consumer_role" do
+      consumer_role.valid_income_response
+      expect(consumer_role.assisted_income_validation).to eq "valid"
+    end
+  end
+
+  context "invalid_mec_response" do
+    it "should update consumer_role" do
+      consumer_role.invalid_mec_response
+      expect(consumer_role.assisted_mec_validation).to eq "outstanding"
+    end
+  end
+
+  context "valid_mec_response" do
+    it "should update consumer_role" do
+      consumer_role.valid_mec_response
+      expect(consumer_role.assisted_mec_validation).to eq "valid"
+    end
+  end
+
+  context "eligible_for_faa?" do
+    it "should return true" do
+      expect(consumer_role.eligible_for_faa?).to eq true
+    end
+
+    it "should return false" do
+      application.update_attributes(assistance_year: 2015)
+      expect(consumer_role.eligible_for_faa?).to eq false
+    end
+  end
+
+  context "income_valid?" do
+    it "should return true" do
+      consumer_role.update_attributes(:assisted_income_validation => "valid")
+      expect(consumer_role.income_valid?).to eq true
+    end
+
+    it "should return false" do
+      expect(consumer_role.income_valid?).to eq false
+    end
+  end
+
+  context "mec_valid?" do
+    it "should return true" do
+      consumer_role.update_attributes(:assisted_mec_validation => "valid")
+      expect(consumer_role.mec_valid?).to eq true
+    end
+
+    it "should return false" do
+      expect(consumer_role.mec_valid?).to eq false
+    end
+  end
+
+  context "is_assistance_verified?" do
+    it "should return true" do
+      consumer_role.update_attributes(:assisted_mec_validation => "valid", :assisted_income_validation => "valid")
+      expect(consumer_role.is_assistance_verified?).to eq true
+    end
+
+    it "should return false as not eligible_for_faa" do
+      consumer_role.update_attributes(:assisted_mec_validation => "pending")
+      expect(consumer_role.is_assistance_verified?).to eq false
+    end
+  end
+
+  context "is_assistance_required_and_verified?" do
+    it "should return true" do
+      consumer_role.update_attributes(:assisted_mec_validation => "valid", :assisted_income_validation => "valid")
+      expect(consumer_role.is_assistance_required_and_verified?).to eq true
+    end
+
+    it "should return false" do
+      expect(consumer_role.is_assistance_required_and_verified?).to eq false
     end
   end
 end
