@@ -17,8 +17,8 @@ class AssistedVerificationDocument < Document
   field :applicant_id, type: BSON::ObjectId
   field :assisted_verification_id, type: BSON::ObjectId
 
-  field :status, type: String, default: "not submitted"
-  field :kind, type: String
+  # field :status, type: String, default: "not submitted"
+  # field :kind, type: String
   field :comment, type: String
 
   validates_presence_of :application_id, :applicant_id, :assisted_verification_id
