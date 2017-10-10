@@ -65,7 +65,7 @@ aca:
     initial_application:
       publish_due_day_of_month: 5
       earliest_start_prior_to_effective_on:
-        months: -3
+        months: -2
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
@@ -75,7 +75,7 @@ aca:
 
     renewal_application:
       earliest_start_prior_to_effective_on:
-        months: -3
+        months: -2
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
       force_publish_day_of_month: 11
