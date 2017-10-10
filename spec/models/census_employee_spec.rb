@@ -1285,7 +1285,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     context 'when none present with given benefit group' do
       let!(:blue_collar_benefit_group_assignment)  { FactoryGirl.create(:benefit_group_assignment, benefit_group: blue_collar_benefit_group, census_employee: census_employee, is_active: true) }
-
       it 'should create new benefit group assignment' do
         expect(census_employee.benefit_group_assignments.size).to eq 1
         expect(census_employee.active_benefit_group_assignment.benefit_group).to eq blue_collar_benefit_group
@@ -1460,21 +1459,21 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
     end
   end
 
-  context "has_only_future_benefit_groups?" do 
+  context "is_employers_first_plan_year?" do 
     let(:census_employee) { FactoryGirl.build(:census_employee) }
     let(:employee_role) { FactoryGirl.build(:employee_role) }
     let(:hbx_enrollment) { HbxEnrollment.new }
-    let(:future_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment , start_on: TimeKeeper.date_of_record + 2.months ) }
-    let(:past_benefit_group_assignment) { FactoryGirl.build(:benefit_group_assignment) }
+    let(:future_plan_year)  { FactoryGirl.build(:plan_year, :aasm_state => "enrolling" , :start_on => TimeKeeper.date_of_record + 1.month) }
+    let(:past_plan_year) { FactoryGirl.build(:plan_year, :aasm_state => "terminated") }
 
-    it "should return true when all benefit_group_assignments start in future date" do
-      allow(census_employee).to receive(:benefit_group_assignments).and_return [future_benefit_group_assignment]
-      expect(census_employee.has_only_future_benefit_groups?).to be_truthy
+    it "should return true when employer has only plan year that starts with future date" do
+      allow(census_employee).to receive_message_chain(:employer_profile,:plan_years).and_return [future_plan_year]
+      expect(census_employee.is_employers_first_plan_year?).to be_truthy
     end
 
     it "should return false when all benefit_group_assignments has future and past start_on dates" do
-      allow(census_employee).to receive(:benefit_group_assignments).and_return [past_benefit_group_assignment,future_benefit_group_assignment]
-      expect(census_employee.has_only_future_benefit_groups?).to be_falsey
+      allow(census_employee).to receive_message_chain(:employer_profile,:plan_years).and_return [future_plan_year,past_plan_year]
+      expect(census_employee.is_employers_first_plan_year?).to be_falsey
     end
   end
 

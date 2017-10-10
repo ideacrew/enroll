@@ -801,13 +801,13 @@ class CensusEmployee < CensusMember
     employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
     (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank? ) ||
     employee_termination_pending? || 
-      has_only_future_benefit_groups?
+      is_employers_first_plan_year?
   end
 
-  def has_only_future_benefit_groups?
-    future_bg = self.benefit_group_assignments.detect{|bg| bg.start_on > TimeKeeper.date_of_record}
-    past_bg = self.benefit_group_assignments.detect{|bg| bg.start_on <= TimeKeeper.date_of_record}
-    future_bg.present? && !past_bg.present?
+  def is_employers_first_plan_year?
+    new_plan_year = self.employer_profile.plan_years.detect{|py| py.start_on > TimeKeeper.date_of_record && "enrolling" == py.aasm_state}
+    past_plan_years = self.employer_profile.plan_years.select{|py| "enrolling" != py.aasm_state }
+    new_plan_year.present? && !past_plan_years.present?
   end
 
   def has_cobra_hbx_enrollment?
