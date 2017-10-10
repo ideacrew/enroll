@@ -32,10 +32,10 @@
   content: "Thank you for applying to offer group health coverage through #{Settings.site.short_name}. However, our records show we did not receive the payment of #{notice.plan_year.binder_payment_total} for the first month of coverage for your employees. The deadline for payment was #{notice.plan_year.binder_payment_due_date}. As a result of this non-payment, your group and all employees cannot obtain employer-sponsored coverage beginning on #{notice.plan_year.start_on} through #{Settings.site.short_name}.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you would like to obtain health coverage through the Small Business Marketplace you may re-apply for coverage starting on later start date. The earliest date you are eligible to apply for at this time is #{notice.plan_year.start_on.next_month}. The deadline for completing an employer application for coverage starting on #{notice.plan_year.start_on.next_month} is #{(notice.plan_year.start_on).strftime("%m/#{Settings.aca.shop_market.initial_application.advertised_deadline_of_month}/%Y")}. You can find all deadlines for initial employer applications <a href = '#{Settings.site.employer_application_deadline_link}' > here </a>.", top_margin: '10px'} %> 
+  content: "If you would like to obtain health coverage through the Small Business Marketplace you may re-apply for coverage starting on later start date. The earliest date you are eligible to apply for at this time is #{notice.plan_year.start_on.next_month}. The deadline for completing an employer application for coverage starting on #{notice.plan_year.start_on.next_month} is #{notice.plan_year.start_on}. You can find all deadlines for initial employer applications <a href = '#{Settings.site.employer_application_deadline_link}' > here </a>.", top_margin: '10px'} %> 
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you believe you have made an initial payment, please call us at #{Settings.contact_center.phone_number}.", top_margin: '10px'} %>      
+  content: "If you believe you have made an initial payment, please call us at #{Settings.contact_center.phone_number}.", top_margin: '10px'} %><br>      
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["Please contact your broker for further assistance.  You can also contact  

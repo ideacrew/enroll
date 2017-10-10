@@ -750,6 +750,20 @@ class EmployerProfile
           end
         end
       end
+      
+      #initial employers misses binder payment due date deadline on next day notice
+      binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        if new_date == binder_next_day
+          initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+                begin
+                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
+                rescue Exception => e
+                  (Rails.logger.error {"Unable to deliver Notice to  when missing binder payment due to #{e}"}) unless Rails.env.test?
+                end
+            end
+          end
+        end 
 
       # Employer activities that take place monthly - on first of month
       if new_date.day == 1
@@ -971,6 +985,13 @@ class EmployerProfile
   # def is_eligible_to_shop?
   #   registered? or published_plan_year.enrolling?
   # end
+  def self.initial_employers_enrolled_plan_year_state
+    Organization.where(:"employer_profile.plan_years" => 
+    { :$elemMatch => { 
+        :aasm_state => "enrolled"
+        }
+    })
+  end
 
   def self.update_status_to_binder_paid(organization_ids)
     organization_ids.each do |id|
