@@ -68,6 +68,7 @@ class EmployerInvoice
       plan_year = @employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
       if (@organization.invoices.size < 1) || (@organization.invoices.sort_by(&:date).last.date.next_month.beginning_of_month < plan_year.start_on)
         @employer_profile.trigger_notices("initial_employer_invoice_available")
+      end
     end
   end
 
