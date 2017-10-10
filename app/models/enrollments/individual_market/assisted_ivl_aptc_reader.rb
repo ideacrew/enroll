@@ -35,8 +35,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
   end
 
   def call
-    file_name = "#{Rails.root}/2018_FA_Renewals_20171006_DryRun1_FARenewals.csv"
-
+    file_name = "#{Rails.root}/pids/2018_FA_Renewals.csv"
     @assisted_individuals = {}
     count = 0
 
