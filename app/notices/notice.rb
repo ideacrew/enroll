@@ -20,7 +20,7 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({ 
-      :template => template,
+      :template => options[:custom_template] || template,
       :layout => layout,
       :locals => { notice: notice }
     })
@@ -35,7 +35,11 @@ class Notice
   end
 
   def layout
-    'pdf_notice'
+    if market_kind == 'individual'
+      'ivl_pdf_notice'
+    else
+      'pdf_notice'
+    end
   end
 
   def notice_filename
@@ -54,7 +58,7 @@ class Notice
     options = {
       margin:  {
         top: 15,
-        bottom: 28,
+        bottom: 20,
         left: 22,
         right: 22 
       },
@@ -67,11 +71,12 @@ class Notice
         content: ApplicationController.new.render_to_string({
           template: header,
           layout: false,
-          locals: {notice: notice, recipient: recipient}
+          locals: { recipient: recipient, notice: notice}
           }),
         }
     }
-    footer = (market_kind == "individual") ? "notices/shared/footer.html.erb" : "notices/shared/shop_footer.html.erb"
+
+    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
         template: footer,
@@ -94,9 +99,14 @@ class Notice
   end
 
   def generate_pdf_notice
-    File.open(notice_path, 'wb') do |file|
-      file << self.pdf
+    begin
+      File.open(notice_path, 'wb') do |file|
+        file << self.pdf
+      end      
+    rescue Exception => e
+      puts "#{e} #{e.backtrace}"
     end
+
     # clear_tmp
   end
 

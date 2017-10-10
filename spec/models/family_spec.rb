@@ -809,6 +809,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
       expect(family.current_shop_eligible_open_enrollments.count).to eq 1
     end
 
+    it "should have no current shop eligible open enrollments if the employee role is not active" do
+      census_employee.update_attributes(aasm_state: "employment_terminated")
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
+    end
+
     it "should not be in ivl open enrollment" do
       expect(family.is_under_ivl_open_enrollment?).to be_falsey
     end
@@ -1347,16 +1352,16 @@ describe "#document_due_date", dbclean: :after_each do
         expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq enrollment.special_verification_period.to_date
       end
 
-      it "should return today date + 95 days if special_verification_period on the enrollment is nil" do
+      it "should return nil if special_verification_period on the enrollment is nil" do
         enrollment.special_verification_period = nil
         enrollment.save
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq TimeKeeper.date_of_record.to_date + 95.days
+        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
       end
     end
 
     context "when the family member had no policy" do
-      it "should return the today date + 95 days" do
-        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq TimeKeeper.date_of_record.to_date + 95.days
+      it "should return nil" do
+        expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
       end
     end
   end
