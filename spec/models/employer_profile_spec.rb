@@ -107,7 +107,7 @@ describe EmployerProfile, dbclean: :after_each do
       let(:new_plan_year){ FactoryGirl.build(:plan_year) }
       let(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
 
-      let!(:employer_profile1) { create(:employer_with_planyear, plan_year_state: 'active', aasm_state: "enrolling", start_on: start_on)}
+      let!(:employer_profile1) { create(:employer_with_planyear, plan_year_state: 'active', start_on: start_on)}
       let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
       let!(:benefit_group) { employer_profile1.published_plan_year.benefit_groups.first}
       let!(:organization) {FactoryGirl.create(:organization, employer_profile: employer_profile1)}
