@@ -1,4 +1,4 @@
-Feature: A dedicated page that gives the user access to household member creation/edit as well as Financial application forms for each household member.
+Feature: Left Nav Uses Checkmarks
 
 Background: Left Nav
   Given that an FAA application is in the draft state

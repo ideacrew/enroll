@@ -20,7 +20,7 @@ module Screenshots
   end
 
   def screenshot_and_post_to_slack(name, options={})
-    page.save_screenshot "tmp/slack/#{options[:channel]}/#{@feature_name}/#{@scenario_name}/#{name}.png", full: true
+    page.save_screenshot "tmp/slack/#{options[:channel]}/#{@feature_name}/#{name}.png", full: true
   end
 end
 
