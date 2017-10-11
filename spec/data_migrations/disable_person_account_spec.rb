@@ -20,7 +20,7 @@ describe DisablePersonAccount do
     it "should disable the person's primary family" do
       subject.migrate
       person.reload
-      expect(person.primary_family.is_active).to eq false
+      expect(person.is_active).to eq false
     end
   end
 end
