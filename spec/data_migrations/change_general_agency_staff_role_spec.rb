@@ -20,7 +20,7 @@ describe ChangeGeneralAgencyStaffRole, dbclean: :after_each do
         incorrect_person.general_agency_staff_roles << general_agency_staff_role
     end
 
-      it "should change the email of the given account" do
+      it "should add general agency staff role to the correct_person account" do
           expect(incorrect_person.general_agency_staff_roles.present?).to be_truthy
           expect(correct_person.general_agency_staff_roles.present?).to eq false
           subject.migrate
