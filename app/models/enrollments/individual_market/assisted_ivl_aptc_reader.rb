@@ -48,31 +48,12 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
         row_hash[:"#{calender_year}_csr"] = "0"
       end
      
-      if row_hash[:ssn].present? && row_hash[:ssn] != '#N/A' && row_hash[:ssn] != "0"
-        person = Person.by_ssn(row_hash[:ssn]).first
-      end
-
-      if person.blank? && row_hash[:subscriber].present?
-        person = Person.by_hbx_id(row_hash[:subscriber]).first
-      end
-
-      if person.blank? && row_hash[:icnumber].present?
-        family = Family.where(:e_case_id => /#{row_hash[:icnumber]}/i).first
-        person = family.primary_applicant.person if family.present?
-      end
-
-      next if person.blank?
-
-      if @assisted_individuals[person.hbx_id].present?
-        @assisted_individuals.delete(person.hbx_id)
-      else
-        @assisted_individuals[person.hbx_id] = {
-          applied_percentage: row_hash[:applied_pct], 
-          applied_aptc: row_hash[:"#{calender_year}_applied"], 
-          csr_amt: row_hash[:"#{calender_year}_csr"],
-          max_aptc: row_hash[:"#{calender_year}_aptc"]
-        }
-      end
+      @assisted_individuals[row_hash[:subscriber]] = {
+        applied_percentage: row_hash[:applied_pct], 
+        applied_aptc: row_hash[:"#{calender_year}_applied"], 
+        csr_amt: row_hash[:"#{calender_year}_csr"],
+        max_aptc: row_hash[:"#{calender_year}_aptc"]
+      }
     end
   end
 end
