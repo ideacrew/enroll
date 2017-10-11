@@ -6,7 +6,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
   include Acapi::Notifiers
   require 'securerandom'
 
-  before_filter :load_support_texts, only: [:help_paying_coverage]
+  before_filter :load_support_texts, only: [:edit, :help_paying_coverage]
 
   def index
     @family = @person.primary_family
