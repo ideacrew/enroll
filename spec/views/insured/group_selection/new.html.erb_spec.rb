@@ -127,6 +127,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(family_member4).to receive(:first_name).and_return('joey')
       allow(family_member4).to receive(:gender).and_return('female')
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
       sign_in current_user
     end
 
@@ -403,7 +406,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should display effective on date" do
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to match(/EFFECTIVE DATE/)
+      expect(rendered).to match(/Effective Date/)
     end
   end
 
@@ -568,7 +571,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should not render dental coverage_household partial to display chm's when ER not offers dental benefits" do
-      allow(view).to receive(:is_eligible_for_dental?).with(employee_role, nil).and_return false
+      allow(view).to receive(:is_eligible_for_dental?).with(employee_role, nil, enrollment).and_return false
       allow(employee_role).to receive(:is_dental_offered?).and_return false
       render file: "insured/group_selection/new.html.erb"
       expect(response).not_to render_template(:partial => 'coverage_household', :locals => { :coverage_kind => "dental", :coverage_household => nil})
@@ -576,7 +579,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     end
 
     it "should render dental coverage_household partial to display chm's when ER offers dental benefits" do
-      allow(view).to receive(:is_eligible_for_dental?).with(employee_role, nil).and_return true
+      allow(view).to receive(:is_eligible_for_dental?).with(employee_role, nil, enrollment).and_return true
       allow(employee_role).to receive(:is_dental_offered?).and_return true
       render file: "insured/group_selection/new.html.erb"
       expect(response).to render_template(:partial => 'coverage_household', :locals => { :coverage_kind => "dental", :coverage_household => nil})

@@ -2,6 +2,8 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
 
   before_action :set_current_person, :set_family
+  before_action :set_dependent, only: [:destroy, :show, :edit, :update]
+
   def index
     set_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
@@ -89,9 +91,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def destroy
-    @dependent = Forms::FamilyMember.find(params.require(:id))
     @dependent.destroy!
-
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
@@ -99,8 +99,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show
-    @dependent = Forms::FamilyMember.find(params.require(:id))
-
     respond_to do |format|
       format.html
       format.js
@@ -108,7 +106,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def edit
-    @dependent = Forms::FamilyMember.find(params.require(:id))
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
 
@@ -119,8 +116,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
-    @dependent = Forms::FamilyMember.find(params.require(:id))
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
@@ -131,6 +126,7 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+    consumer_role.check_for_critical_changes(params[:dependent]) if consumer_role
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
       respond_to do |format|
@@ -157,7 +153,7 @@ class Insured::FamilyMembersController < ApplicationController
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
+      @effective_on_date =  special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
       special_enrollment_period.qualifying_life_event_kind = qle
       special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
@@ -213,5 +209,9 @@ private
       end
       @dependent.addresses = addresses
     end
+  end
+
+  def set_dependent
+    @dependent = Forms::FamilyMember.find(params.require(:id))
   end
 end

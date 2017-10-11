@@ -12,7 +12,7 @@ class ShopEmployeeNotice < Notice
     args[:to] = census_employee.employee_role.person.work_email_or_best
     args[:name] = census_employee.employee_role.person.full_name
     args[:recipient_document_store]= census_employee.employee_role.person
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
 
@@ -25,9 +25,12 @@ class ShopEmployeeNotice < Notice
   end
 
   def build
+    notice.mpi_indicator = self.mpi_indicator
+    notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
     append_hbe
+    append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
   end
 
@@ -57,6 +60,16 @@ class ShopEmployeeNotice < Notice
         zip: "20005"
       })
     })
+  end
+
+  def append_address(primary_address)
+    notice.primary_address = PdfTemplates::NoticeAddress.new({
+      street_1: primary_address.address_1.titleize,
+      street_2: primary_address.address_2.titleize,
+      city: primary_address.city.titleize,
+      state: primary_address.state,
+      zip: primary_address.zip
+      })
   end
 
   def append_broker(broker)
