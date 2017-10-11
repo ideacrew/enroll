@@ -354,26 +354,22 @@ $(document).ready(function(){
   }
 
   if($('#is_post_partum_period_yes').is(':checked')) {
-    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
-  } else {
-    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#medicaid_pregnency_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').removeClass('hide');
   }
 
   $("body").on("change", "#is_post_partum_period_yes", function(){
     if ($('#is_post_partum_period_yes').is(':checked')) {
-      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').removeClass('hide');
+      $('#medicaid_pregnency_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').removeClass('hide');
     };
   });
 
   if($('#is_post_partum_period_no').is(':checked')) {
-    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
-  } else {
-    $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+    $('#medicaid_pregnency_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
   }
 
   $("body").on("change", "#is_post_partum_period_no", function(){
     if ($('#is_post_partum_period_no').is(':checked')) {
-      $('#medicaid_pregnency_yes').parents('.row-form-wrapper').addClass('hide');
+      $('#medicaid_pregnency_yes, #applicant_pregnancy_end_on').parents('.row-form-wrapper').addClass('hide');
     };
   });
 
