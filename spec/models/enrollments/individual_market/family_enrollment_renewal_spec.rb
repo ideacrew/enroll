@@ -111,7 +111,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         let(:child1_dob) { TimeKeeper.date_of_record.next_month - 30.years }
 
         it "should return catastrophic aged off plan" do
-          expect(subject.renewal_plan).to eq cat_age_off_plan
+          expect(subject.renewal_plan).to eq cat_age_off_plan.id
         end
       end
 
@@ -119,7 +119,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         let(:child1_dob) { TimeKeeper.date_of_record.next_month - 25.years }
 
         it "should return renewal plan" do
-          expect(subject.renewal_plan).to eq renewal_plan
+          expect(subject.renewal_plan).to eq renewal_plan.id
         end 
       end
     end
@@ -136,7 +136,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         let(:aptc_values) {{ csr_amt: "87" }}
 
         it "should be renewed into new CSR variant plan" do
-          expect(subject.assisted_renewal_plan).to eq csr_plan
+          expect(subject.assisted_renewal_plan).to eq csr_plan.id
         end
       end
 
@@ -144,7 +144,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         let(:aptc_values) {{ csr_amt: "0" }}
 
         it "should map to csr variant 01 plan" do
-          expect(subject.assisted_renewal_plan).to eq csr_01_plan
+          expect(subject.assisted_renewal_plan).to eq csr_01_plan.id
         end
       end
 
@@ -152,7 +152,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         let(:aptc_values) {{ csr_amt: "73" }}
 
         it "should be renewed into same CSR variant plan" do
-          expect(subject.assisted_renewal_plan).to eq renewal_plan
+          expect(subject.assisted_renewal_plan).to eq renewal_plan.id
         end
       end
     end
@@ -162,7 +162,7 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       let!(:current_plan) { FactoryGirl.create(:plan, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
 
       it "should return regular renewal plan" do
-        expect(subject.assisted_renewal_plan).to eq renewal_plan
+        expect(subject.assisted_renewal_plan).to eq renewal_plan.id
       end
     end
   end

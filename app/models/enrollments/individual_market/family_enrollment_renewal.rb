@@ -3,14 +3,14 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   def initialize
-    @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
   end
 
   def renew
     begin
       renewal_enrollment = clone_enrollment
       renewal_enrollment.renew_enrollment
-      renewal_enrollment.decorated_hbx_enrollment
+      # renewal_enrollment.decorated_hbx_enrollment
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
       puts "#{enrollment.hbx_id}---#{e.inspect}"
@@ -26,7 +26,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
     renewal_enrollment.enrollment_kind = "open_enrollment"
     renewal_enrollment.kind = "individual"
-    renewal_enrollment.plan = (@assisted ? assisted_renewal_plan : renewal_plan)
+    renewal_enrollment.plan_id = (@assisted ? assisted_renewal_plan : renewal_plan)
     renewal_enrollment.elected_aptc_pct = @enrollment.elected_aptc_pct
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
 
@@ -58,21 +58,21 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # Eligibility determination CSR change
   def renewal_plan
     if @enrollment.coverage_kind == 'dental'
-      renewal_plan = @enrollment.plan.renewal_plan
+      renewal_plan = @enrollment.plan.renewal_plan_id
     else
       if has_catastrophic_plan? && is_cat_plan_ineligible?
-        renewal_plan = @enrollment.plan.cat_age_off_renewal_plan
+        renewal_plan = @enrollment.plan.cat_age_off_renewal_plan_id
         if renewal_plan.blank?
           raise "#{renewal_coverage_start.year} Catastrophic age off plan missing on HIOS id #{@enrollment.plan.hios_id}"
         end
       else
         if @enrollment.plan.csr_variant_id == '01' || has_catastrophic_plan?
-          renewal_plan = @enrollment.plan.renewal_plan
+          renewal_plan = @enrollment.plan.renewal_plan_id
         else
           renewal_plan = Plan.where({
             :active_year => renewal_coverage_start.year, 
             :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-01"
-            }).first
+            }).first.id
         end
       end
     end
@@ -101,9 +101,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       Plan.where({
         :active_year => renewal_coverage_start.year, 
         :hios_id => "#{@enrollment.plan.renewal_plan.hios_base_id}-#{csr_variant}"
-      }).first
+      }).first.id
     else
-      @enrollment.plan.renewal_plan
+      @enrollment.plan.renewal_plan_id
     end
   end
 
