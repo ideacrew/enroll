@@ -1398,10 +1398,10 @@ describe Person do
       end
     end
 
-    it_behaves_like "invalid SSN", "999786567", false
+    it_behaves_like "invalid SSN", "999786567", true
     it_behaves_like "invalid SSN", "000786567", false
     it_behaves_like "invalid SSN", "666786567", false
-    it_behaves_like "invalid SSN", "945786567", false
+    it_behaves_like "invalid SSN", "945786567", true
     it_behaves_like "invalid SSN", "123006567", false
     it_behaves_like "invalid SSN", "123000000", false
     it_behaves_like "invalid SSN", "123456000", false

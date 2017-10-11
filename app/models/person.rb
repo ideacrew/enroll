@@ -889,10 +889,10 @@ class Person
 
   def is_ssn_invalid?
     invalid_area_numbers = %w(000 666)
-    invalid_area_range = 900..999
+    # invalid_area_range = 900..999
     invalid_group_numbers = %w(00)
     invalid_serial_numbers = %w(0000)
-    invalid_area_numbers.include?(ssn.to_s[0,3]) || invalid_area_range.include?(ssn.to_s[0,3].to_i) || invalid_group_numbers.include?(ssn.to_s[3,2]) || invalid_serial_numbers.include?(ssn.to_s[5,4])
+    invalid_area_numbers.include?(ssn.to_s[0,3]) || invalid_group_numbers.include?(ssn.to_s[3,2]) || invalid_serial_numbers.include?(ssn.to_s[5,4])
   end
 
   def is_ssn_sequential?
