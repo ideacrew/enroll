@@ -606,6 +606,15 @@ class EmployerProfile
                              })
     end
 
+    def initial_employers_enrolled_plan_year_state(start_on)
+      Organization.where(:"employer_profile.plan_years" => 
+        { :$elemMatch => { 
+          :"start_on" => start_on,
+          :aasm_state => "enrolled"
+          }
+        })
+    end
+
     def initial_employers_reminder_to_publish(start_on)
       Organization.where(:"employer_profile.plan_years" =>
                              {:$elemMatch => {
@@ -780,6 +789,17 @@ class EmployerProfile
               rescue Exception => e
                 Rails.logger.error { "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following error #{e}" }
               end
+            end
+          end
+        end
+
+        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
+        start_on_for_missing_binder_payments = TimeKeeper.date_of_record.next_month.beginning_of_month
+        binder_next_day = PlanYear.calculate_open_enrollment_date(start_on_for_missing_binder_payments)[:binder_payment_due_date].next_day
+        if new_date == binder_next_day
+          initial_employers_enrolled_plan_year_state(start_on_for_missing_binder_payments).each do |org|
+            if !org.employer_profile.binder_paid?
+              notice_to_employee_for_missing_binder_payment(org)
             end
           end
         end
@@ -1148,7 +1168,17 @@ class EmployerProfile
     )
   end
 
-# TODO - fix premium amount
+  def self.notice_to_employee_for_missing_binder_payment(org)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notice_to_employee_for_missing_binder_payment")
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver notice_to_employee_for_missing_binder_payment to #{ce.full_name} due to #{e}"}) unless Rails.env.test?
+      end
+    end
+  end
+
+  # TODO - fix premium amount
   def initialize_account
     if employer_profile_account.blank?
       self.build_employer_profile_account

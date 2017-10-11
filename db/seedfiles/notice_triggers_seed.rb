@@ -823,6 +823,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP_D049',
     title: 'Broker Hired Confirmation Notice',
@@ -866,6 +867,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOPDRE076',
     title: 'Employee Enrollment Confirmation',
@@ -885,6 +887,28 @@ shop_notice_triggers = [
           secondary_recipients: []
         }
       }
+    ]
+  },
+
+  {                
+    hbx_id: 'SHOPDIE064',
+    title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
+    description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
+    resource_name: 'employee_role',
+    event_name: 'notice_to_employee_for_missing_binder_payment', 
+    notice_triggers: [
+      {
+        name: "Notice to EEs that ER’s plan year will not be written",
+        notice_template: 'notices/shop_employee_notices/termination_of_employers_health_coverage',
+        notice_builder: 'ShopEmployeeNotices::TerminationOfEmployersHealthCoverage',
+        mpi_indicator: 'MPI_SHOPDIE064',
+        notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employee"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+            }
+        }
     ]
   },
 
