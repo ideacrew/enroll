@@ -33,7 +33,7 @@
           <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
-            By carrier
+              <%= fetch_plan_title_for_single_carrier %>
           <% end %>
         </li>
       <% end %>
@@ -43,7 +43,7 @@
           <%= f.label :plan_option_kind_metal_level, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
-            By metal level
+            By <%= fetch_plan_title_for_metal_level %>
           <% end %>
         </li>
       <% end %>
@@ -53,7 +53,7 @@
           <%= f.label :plan_option_kind_sole_source, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
             <i class="fa fa-dot-circle-o"></i>
-            Sole Source
+              <%= fetch_plan_title_for_sole_source %>
           <% end %>
         </li>
       <% end %>

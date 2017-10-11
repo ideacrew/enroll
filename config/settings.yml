@@ -74,6 +74,11 @@ contact_center:
     phone_3: "800-537-7697"
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
+plan_option_titles:
+  sole_source: 'One Plan'
+  metal_level: 'One Level'
+  single_carrier: 'One Carrier'
+
 notices:
   mailing_address:
     address_1:
