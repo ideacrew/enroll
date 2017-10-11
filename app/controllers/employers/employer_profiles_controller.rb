@@ -256,7 +256,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
 
   def generate_checkbook_urls
-    @employer_profile.generate_checkbook_notices
+    @employer_profile.trigger_notices("out_of_pocker_url_notifier")
     flash[:notice] = "Custom Plan Match instructions are being generated.  Check your secure Messages inbox shortly."
     redirect_to action: :show, :tab => :employees
   end

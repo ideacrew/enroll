@@ -64,11 +64,15 @@ class EmployerInvoice
   end
 
   def send_first_invoice_available_notice
-    if @employer_profile.is_new_employer? && !@employer_profile.is_converting?
-      plan_year = @employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
-      if (@organization.invoices.size < 1) || (@organization.invoices.sort_by(&:date).last.date.next_month.beginning_of_month < plan_year.start_on)
-        @employer_profile.trigger_notices("initial_employer_invoice_available")
+    begin
+      if @employer_profile.is_new_employer? && !@employer_profile.is_converting?
+        plan_year = @employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+        if (@organization.invoices.size < 1) || (@organization.invoices.sort_by(&:date).last.date.next_month.beginning_of_month < plan_year.start_on)
+          @employer_profile.trigger_notices("initial_employer_invoice_available")
+        end
       end
+    rescue Exception => e
+      Rails.logger.error {"Error delivering first invoice available notice to #{@employer_profile.legal_name} due to #{e}"}
     end
   end
 
