@@ -1158,7 +1158,7 @@ describe EmployerProfile, "initial employers enrolled plan year state", dbclean:
   let!(:new_plan_year){ FactoryGirl.build(:plan_year, :aasm_state => "enrolled") }
   let!(:employer_profile){ FactoryGirl.create(:employer_profile, plan_years: [new_plan_year]) }
   it "should return employers" do
-    expect(EmployerProfile.initial_employers_enrolled_plan_year_state.size).to eq 1
+    expect(EmployerProfile.initial_employers_enrolled_plan_year_state(new_plan_year.start_on).size).to eq 1
   end
 
 end
