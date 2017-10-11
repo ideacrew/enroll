@@ -7,7 +7,6 @@ function stopEditingIncome() {
 };
 
 function startEditingIncome() {
-  debugger
   $('a.new-income').addClass('hide');
   $('a.income-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
