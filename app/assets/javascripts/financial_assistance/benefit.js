@@ -46,7 +46,7 @@ $(document).ready(function() {
       return true;
     });
 
-    $('input[type="checkbox"]').click(function(e){
+    $(document).on('click', 'input[type="checkbox"]', function(e) {
       var value = e.target.checked,
           self = this;
       if (value) {
