@@ -1,5 +1,5 @@
 function stopEditingIncome() {
-  $('a.new-income.btn').removeClass('disabled');
+  $('a.new-income').removeClass('hide');
   $('a.income-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
   $("a.interaction-click-control-add-more").removeClass('hide');
@@ -7,7 +7,8 @@ function stopEditingIncome() {
 };
 
 function startEditingIncome() {
-  $('a.new-income.btn').addClass('disabled');
+  debugger
+  $('a.new-income').addClass('hide');
   $('a.income-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
   $("a.interaction-click-control-add-more").addClass('hide');
@@ -213,7 +214,7 @@ $(document).ready(function() {
     });
 
     /* new job incomes */
-    $('a.new-income.btn').click(function(e) {
+    $('a.new-income').click(function(e) {
         e.preventDefault();
         startEditingIncome();
         var form = $(this).parents();

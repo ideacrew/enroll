@@ -44,13 +44,12 @@
         <% end %>
       </div>
 
-      <a class='new-income btn btn-default' style="
-        margin-top: 10px; margin-bottom: 25px;">Add Another Income</a>
+      <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> Add Another Income</a>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/job_income_form', locals: { income: @applicant.incomes.build } %>
       </div>
-    </div>
+    </div> <br>
 
     <div class="row row-form-wrapper radio-align no-buffer">
       <div class='col-md-6 labelforcoverage'>
@@ -80,7 +79,7 @@
         <% end %>
       </div>
 
-      <a class='new-income btn btn-default'>Add Another Self-Employed Income</a>
+      <a class='new-income'> <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> Add Another Self-Employed Income</a>
 
       <div class='new-income-form hidden'>
         <%= render partial: 'financial_assistance/incomes/self_employed_income_form', locals: { income: @applicant.incomes.build } %>
