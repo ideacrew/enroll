@@ -85,7 +85,13 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
     def process_aqhp_renewals(renewal_benefit_coverage_period)
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-  
+      query = {
+        :kind => 'individual',
+        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
+        :coverage_kind => 'health',
+        :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
+      }
+
       count  = 0
       @assisted_individuals.each do |hbx_id, aptc_values|
         person = Person.by_hbx_id(hbx_id).first
@@ -96,12 +102,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
         puts "Processing #{person.full_name}(#{person.hbx_id})"
 
-        enrollments = family.active_household.hbx_enrollments.where({
-          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"],
-          :kind => 'individual',
-          :coverage_kind => 'health'
-          }).order(:"effective_on".desc).select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
-
+        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
         enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
         if enrollments.size > 1
@@ -128,15 +129,18 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       puts count
     end
 
+
     def process_uqhp_renewals(renewal_benefit_coverage_period)
       current_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
 
-      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => {
+      query = {
         :kind => 'individual',
         :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ["coverage_renewed", "coverage_termination_pending"]),
         :coverage_kind.in => HbxEnrollment::COVERAGE_KINDS,
-        :effective_on.gte => current_benefit_coverage_period.start_on
-      }})
+        :effective_on => { "$gte" => current_benefit_coverage_period.start_on, "$lt" => current_benefit_coverage_period.end_on}
+      }
+
+      families = Family.where(:"households.hbx_enrollments" => {:$elemMatch => query})
 
       @logger.info "Families count #{families.count}"
 
@@ -146,17 +150,11 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       enrollment_renewal.aptc_values = {}
 
       count = 0
-      counter = 0
       families.no_timeout.each do |family|
-        counter += 1
-        if counter % 100
-          puts "processing #{counter}"
-        end
-
         primary_hbx_id = family.primary_applicant.person.hbx_id
 
         begin
-          enrollments = family.active_household.hbx_enrollments.where(query_criteria).order(:"effective_on".desc)
+          enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
           enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
           enrollments.each do |enrollment|
             next if @assisted_individuals.has_key?(primary_hbx_id) && enrollment.coverage_kind == 'health'
