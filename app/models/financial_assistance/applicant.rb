@@ -344,9 +344,7 @@ class FinancialAssistance::Applicant
 
   def other_questions_complete?
     !has_daily_living_help.nil? &&
-      !need_help_paying_bills.nil? &&
-      !is_resident_post_092296.nil? &&
-      !is_vets_spouse_or_child.nil?
+      !need_help_paying_bills.nil?
   end
 
   def tax_info_complete?

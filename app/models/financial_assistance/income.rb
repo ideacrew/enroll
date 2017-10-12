@@ -104,8 +104,8 @@ class FinancialAssistance::Income
   # validates :wage_type,       inclusion: { in: WAGE_TYPE_KINDS, message: "%{value} is not a valid wage type" }
 
   validates :frequency_kind, presence: true,
-                             inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" },
-                             on: [:step_1, :submission]
+                             inclusion: { in: FREQUENCY_KINDS, message: "%{value} is not a valid frequency" }
+
   validates :start_on, presence: true, on: [:step_1, :submission]
 
   # validates :tax_form,        presence: true,

@@ -10,7 +10,7 @@
     </div>
 
     <%= f.fields_for :employer_address do |benefit_fields| %>
-      <%= benefit_fields.hidden_field :kind, value: 'primary' %>
+      <%= benefit_fields.hidden_field :kind, value: 'work' %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
           <%= benefit_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: benefit.employer_address.try(:address_1), required: true, class: "floatlabel ph-width" %>
@@ -34,7 +34,7 @@
     <% end %>
 
     <%= f.fields_for :employer_phone do |phone_fields| %>
-      <%= phone_fields.hidden_field :kind, value: "phone main" %>
+      <%= phone_fields.hidden_field :kind, value: "work" %>
       <div class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-6">
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel" %>
