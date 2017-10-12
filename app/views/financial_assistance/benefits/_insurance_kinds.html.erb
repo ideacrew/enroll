@@ -41,6 +41,5 @@
     <div class="col-md-12 add-more-link-<%=insurance_kind%>" id="add-more-link">
       <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{insurance_kind.titleize}".html_safe, "javascript:void(0);", :id => "add_new_insurance_kind", :class => "#{'hidden' unless @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present? }" %>
     </div>
-    <br /><br />
   </div>
 <% end %>

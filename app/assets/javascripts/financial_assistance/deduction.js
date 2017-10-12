@@ -117,7 +117,7 @@ $(document).ready(function() {
     });
 
     /* edit existing deductions */
-    $('.deduction-kind').on('click', 'a.deduction-edit:not(.disabled)', function(e) {
+    $('.deduction-kinds').on('click', 'a.deduction-edit:not(.disabled)', function(e) {
       e.preventDefault();
       var deductionEl = $(this).parents('.deduction');
       deductionEl.find('.deduction-show').addClass('hidden');
@@ -128,7 +128,7 @@ $(document).ready(function() {
     });
 
     /* destroy existing deducitons */
-    $('.deduction-kind').on('click', 'a.deduction-delete:not(.disabled)', function(e) {
+    $('.deduction-kinds').on('click', 'a.deduction-delete:not(.disabled)', function(e) {
       var self = this;
       e.preventDefault();
       $("#destroyDeduction").modal();

@@ -68,12 +68,10 @@
           <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
             <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
           </div>
-          <br>
 
           <div class='new-other-income-form hidden <%= other_income_kind %>'>
             <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true } %>
           </div>
-          <br />
         </div>
       <% end %>
     </div>
