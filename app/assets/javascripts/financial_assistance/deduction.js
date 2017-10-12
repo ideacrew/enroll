@@ -88,7 +88,9 @@ $(document).ready(function() {
 
         $("#destroyAllDeductions .modal-continue-button").click(function(e) {
           $("#destroyAllDeductions").modal('hide');
+          stopEditingDeduction();
           $(self).prop('checked', false);
+          $(self).parents('.deduction-kind').find('.deductions-list > .new-deduction-form').remove();
 
           $(self).parents('.deduction-kind').find('.deductions-list > .deduction').each(function(i, deduction) {
             var url = $(deduction).attr('id').replace('financial_assistance_deduction_', 'deductions/');
