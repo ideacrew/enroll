@@ -21,7 +21,16 @@
           <% end %>
         </div>
       </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="back-link">
+            <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+            <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="col-md-3">
       <% if @model.class.name == "FinancialAssistance::Application" and @steps.last_step?(@current_step) %>
           <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
@@ -33,7 +42,7 @@
           <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" , disabled: (local_assigns[:disabled].nil? ? 'false' : disable) %>
         <% else %>
           <%= submit_tag 'CONTINUE', :class => "btn btn-lg btn-primary btn-block" %>
-        <% end %>        
+        <% end %>
       <% end %>
       <p class="small-left-margin very-small-margin-top faded">
         <ul class='list-unstyled list-right-section'>
