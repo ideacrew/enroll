@@ -26,7 +26,7 @@
           <%= radio_button_tag("has_enrolled_health_coverage", false, @applicant.has_enrolled_health_coverage == false, class: "radio-yml" ) %>
           <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 left-seprator">
             <a href="#has_enrolled_health_coverage" data-toggle="modal" data-target="#has_enrolled_health_coverage" class="interaction-click-control-not-sure?">Not Sure?</a>
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_enrolled_health_coverage"} %>
         </div>
@@ -52,7 +52,7 @@
           <%= radio_button_tag("has_eligible_health_coverage", false, @applicant.has_eligible_health_coverage == false, class: "radio-yml" ) %>
           <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 left-seprator">
            <a href="#has_eligible_health_coverage" data-toggle="modal" data-target="#has_eligible_health_coverage" class="interaction-click-control-not-sure?">Not Sure?</a>
            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_health_coverage"} %>
         </div>
@@ -66,6 +66,15 @@
 
     <div class="col-md-4 col-sm-4 col-xs-4">
     <%#= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+    </div>
+    
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+          <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
     </div>
   </div>
 
