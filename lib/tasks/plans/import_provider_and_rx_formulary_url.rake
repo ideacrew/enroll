@@ -31,6 +31,11 @@ namespace :import do
               plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
               plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               plan.network_information = row_info[@headers["network notes"]]
+              if year > 2017
+                plan.is_sole_source = row_info[@headers["sole source offering"]].strip == "Yes" ? true : false
+                plan.is_horizontal = row_info[@headers["horizontal offering"]].strip == "Yes" ? true : false
+                plan.is_vertical = row_info[@headers["vertical offerring"]].strip == "Yes" ? true : false
+              end
               plan.save
             end
           end

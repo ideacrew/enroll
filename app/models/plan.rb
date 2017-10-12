@@ -63,6 +63,11 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
+  # offerings
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
+
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
