@@ -7,7 +7,7 @@ class IvlEnrollmentsPublisher
   def self.publish_action(action_name, hbx_id, action)
     puts hbx_id.to_s
 
-    glue_environment = "prod"
+    glue_environment = ENV['AWS_ENV']
     reply_to = "dc0.#{glue_environment}.q.glue.enrollment_event_batch_handler"
 
     notify(
