@@ -15,7 +15,7 @@
     <p>Tell Us about income adjustments for this person. When you're finished, select CONTINUE</p>
     <br>
     <!--income adjustment driver question-->
-    <div class="row row-form-wrapper radio-align no-buffer">
+    <div id="income-adjustment-driver-question" class="row row-form-wrapper radio-align no-buffer">
       <div class="col-md-6 labelforcoverage">
         <span class="fa-text-color">Does this person expect to have income adjustments in <%=@application.assistance_year%> *</span>
       </div>
@@ -38,14 +38,14 @@
 
     <!--Deduction Kinds-->
     <div class='deduction-kinds run-glossary'>
-      <div class="row row-form-wrapper no-buffer row-height">
+      <div id="deduction-kinds-intro" class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-9">
           <h4 class="panel-title">
               <b> Income adjustments you must report </b>
           </h4>
         </div>
       </div>
-      <div class="row row-form-wrapper no-buffer row-height">
+      <div id="deduction-kinds-instruction" class="row row-form-wrapper no-buffer row-height">
         <div class="col-md-12 lightgray fa-text-color">
           <span>  Check any boxes that apply to this person and enter details when requested. </span>
         </div>
@@ -54,7 +54,7 @@
       <br />
 
       <% FinancialAssistance::Deduction::KINDS.each do |deduction_kind| %>
-        <div class="deduction-kind">
+        <div id="<%= deduction_kind %>"class="deduction-kind">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1">
               <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
