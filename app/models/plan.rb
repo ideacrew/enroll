@@ -55,11 +55,6 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :dc_in_network, type: Boolean # DC In-Network or not
 
-  # Fields for checking respective carrier is offering or not
-  field :is_horizontal, type: Boolean, default: true
-  field :is_vertical, type: Boolean, default: true
-  field :is_sole_source, type: Boolean, default: true
-
   # Fields for provider direcotry and rx formulary url
   field :provider_directory_url, type: String
   field :rx_formulary_url, type: String
@@ -67,6 +62,11 @@ class Plan
   # for dental plans only, metal level -> high/low values
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
+
+  # Fields for checking respective carrier is offering or not
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
 
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
