@@ -7,7 +7,7 @@ class ShopEnrollmentsPublisher
   def self.publish_action(action_name, hbx_id, action)
     puts hbx_id.to_s
 
-    amqp_environment_name = "prod"
+    amqp_environment_name = ENV['AWS_ENV'] || "local"
     reply_to = "dc0.#{amqp_environment_name}.q.glue.enrollment_event_batch_handler"
 
     notify(
