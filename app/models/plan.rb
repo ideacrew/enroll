@@ -5,11 +5,11 @@ class Plan
 
   COVERAGE_KINDS = %w[health dental]
   METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental expanded_bronze]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
+  REFERENCE_PLAN_METAL_LEVELS = %w[expanded_bronze bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
-  BRONZE_METAL_LEVEL_KINDS = %w(bronze expanded_bronze)
+
 
   field :hbx_id, type: Integer
   field :active_year, type: Integer
@@ -177,7 +177,6 @@ class Plan
 
   scope :by_active_year,        ->(active_year = TimeKeeper.date_of_record.year) { where(active_year: active_year) }
   scope :by_metal_level,        ->(metal_level) { where(metal_level: metal_level) }
-  scope :by_bronze_metal_level, ->{ where(:metal_level.in => BRONZE_METAL_LEVEL_KINDS ) }
   scope :by_dental_level,       ->(dental_level) { where(dental_level: dental_level) }
   scope :by_plan_type,          ->(plan_type) { where(plan_type: plan_type) }
   scope :by_dental_level_for_bqt,       ->(dental_level) { where(:dental_level.in => dental_level) }

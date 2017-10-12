@@ -397,22 +397,6 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
     end
   end
 
-  describe "GET reference_plans" do
-    let(:employer_profile){ FactoryGirl.create(:employer_profile) }
-    let!(:bronze_plan){ FactoryGirl.create(:plan, metal_level: "bronze") }
-    let!(:expanded_bronze_plan){ FactoryGirl.create(:plan, metal_level: "expanded_bronze", carrier_profile_id: bronze_plan.carrier_profile.id.to_s) }
-
-    before :each do
-      sign_in
-      xhr :get, :reference_plans, employer_profile_id: employer_profile.id, plan_year_id: PlanYear.new.id.to_s, start_on: TimeKeeper.date_of_record.year, plan_option_kind: "metal_level", metal_level: "bronze"
-    end
-
-    it "should be a success" do
-      expect(assigns(:plans).size).to eq 2
-      expect(response).to have_http_status(:success)
-    end
-  end
-
   describe "GET recommend_dates" do
     before :each do
       sign_in
