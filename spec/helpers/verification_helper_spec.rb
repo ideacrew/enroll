@@ -76,8 +76,22 @@ RSpec.describe VerificationHelper, :type => :helper do
       before :each do
         person.dob = Date.new(2010,11,10)
       end
-      it 'returns attested if age < 18 and type is residency' do
+      it 'returns attested if age <= 18 and type is residency' do
         expect(helper.verification_type_status('Residency', person)).to eq('attested')
+      end
+
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('Residency', person)).to eq('attested')
+      end
+
+      it 'does not return attested if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
+        expect(helper.verification_type_status('Residency', person)).not_to eq('attested')
+      end
+
+      it 'does not return attested if age <= 18 and type is social security number ' do
+        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
       end
 
       it 'returns outstanding if age > 18 and type is residency' do
