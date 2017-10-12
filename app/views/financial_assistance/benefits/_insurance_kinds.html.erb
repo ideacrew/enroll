@@ -1,10 +1,10 @@
 
-<div class="row row-form-wrapper no-buffer row-height">
+<div class="instruction-row row row-form-wrapper no-buffer row-height">
 	<div class="col-md-9">
 	  <span> <b> What type of coverage is this person currently enrolled in? * </b></span>
 	</div>
 </div>
-<div class="row row-form-wrapper lightgray no-buffer row-height">
+<div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
   <div class="col-md-12">
     <span>  Check any boxes that apply to this person and enter details when requested. </span>
   </div>
@@ -13,7 +13,7 @@
 <br />
 
 <% insurance_kinds.each do |insurance_kind| %>
-  <div class="benefit-kind">
+  <div id="<%= insurance_kind %>"class="benefit-kind">
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
       <div class="col-md-10 benefits-check">
         <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %> &nbsp

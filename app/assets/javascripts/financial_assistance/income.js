@@ -1,4 +1,5 @@
 function stopEditingIncome() {
+  $('.driver-question, .instruction-row, .income, .other-income-kind').removeClass('disabled');
   $('a.new-income').removeClass('hide');
   $('a.income-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
@@ -6,7 +7,8 @@ function stopEditingIncome() {
   $('input.interaction-choice-control-value-other-income-kind').prop('disabled', false);
 };
 
-function startEditingIncome() {
+function startEditingIncome(income_kind) {
+  $('.driver-question, .instruction-row, .income:not(#' + income_kind + '), .other-income-kind:not(#' + income_kind + ')').addClass('disabled');
   $('a.new-income').addClass('hide');
   $('a.income-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
@@ -138,7 +140,7 @@ $(document).ready(function() {
       incomeEl.find('.income-edit-form').removeClass('hidden');
       $(incomeEl).find('select').selectric();
       $(incomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
-      startEditingIncome();
+      startEditingIncome($(this).parents('.income').attr('id'));
     });
 
 
@@ -215,19 +217,17 @@ $(document).ready(function() {
     /* new job incomes */
     $('a.new-income').click(function(e) {
         e.preventDefault();
-        startEditingIncome();
+        startEditingIncome($(this).parents('.income').attr('id'));
         var form = $(this).parents();
         if ($(this).parents('#job_income').children('.new-income-form').length){
            var  newIncomeForm = $(this).parents('#job_income').children('.new-income-form')
-        }
-        else{
+        } else{
            var  newIncomeForm = $(this).parents('#self_employed_incomes').children('.new-income-form')
         }
 
         if ($(this).parents('#job_income').find('.incomes-list').length){
            var  incomeListEl =  $(this).parents('#job_income').find('.incomes-list');
-        }
-        else{
+        } else{
            var  incomeListEl =  $(this).parents('#self_employed_incomes').find('.incomes-list');
         }
         if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
@@ -343,33 +343,33 @@ $(document).ready(function() {
       var clonedForm = newOtherIncomeFormEl.clone(true, true)
       .removeClass('hidden')
       .appendTo(otherIncomeListEl);
-      startEditingIncome();
+      startEditingIncome($(this).parents('.other-income-kind').attr('id'));
       $(clonedForm).find('select').selectric();
       $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     }
     else {
       e.preventDefault();
-        // prompt to delete all these dedcutions
-        $("#destroyAllOtherIncomes").modal();
-        $("#destroyAllOtherIncomes .modal-cancel-button").click(function(e) {
-          $("#destroyAllOtherIncomes").modal('hide');
-        });
+      // prompt to delete all these dedcutions
+      $("#destroyAllOtherIncomes").modal();
+      $("#destroyAllOtherIncomes .modal-cancel-button").click(function(e) {
+        $("#destroyAllOtherIncomes").modal('hide');
+      });
 
-        $("#destroyAllOtherIncomes .modal-continue-button").click(function(e) {
-          $("#destroyAllOtherIncomes").modal('hide');
-          $(self).prop('checked', false);
-          $(self).parents('.other-income-kind').find('.interaction-click-control-add-more').addClass('hidden');
+      $("#destroyAllOtherIncomes .modal-continue-button").click(function(e) {
+        $("#destroyAllOtherIncomes").modal('hide');
+        $(self).prop('checked', false);
+        $(self).parents('.other-income-kind').find('.interaction-click-control-add-more').addClass('hidden');
 
-          $(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').each(function(i, other_income) {
-            var url = $(other_income).attr('id').replace('financial_assistance_income_', '');
-            $(other_income).remove();
+        $(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').each(function(i, other_income) {
+          var url = $(other_income).attr('id').replace('financial_assistance_income_', '');
+          $(other_income).remove();
 
-            $.ajax({
-              type: 'DELETE',
-              url: url
-            });
+          $.ajax({
+            type: 'DELETE',
+            url: url
           });
         });
+      });
     }
   });
   // add more for other income
@@ -381,7 +381,7 @@ $(document).ready(function() {
        var clonedForm = newOtherIncomeFormEl.clone(true, true)
            .removeClass('hidden')
            .appendTo(otherIncomeListEl);
-       startEditingIncome();
+        startEditingIncome($(this).parents('.other-income-kind').attr('id'));
        $(clonedForm).find('select').selectric();
        $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
        $(this).addClass("hidden");
@@ -393,7 +393,7 @@ $(document).ready(function() {
     var otherIncomeEl = $(this).parents('.other-income');
     otherIncomeEl.find('.other-income-show').addClass('hidden');
     otherIncomeEl.find('.edit-other-income-form').removeClass('hidden');
-    startEditingIncome();
+    startEditingIncome($(this).parents('.other-income-kind').attr('id'));
 
     $(otherIncomeEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
   });
@@ -436,7 +436,7 @@ $(document).ready(function() {
     } else {
       if (!$(this).parents('.other-incomes-list > div.other-income').length) {
         $(this).parents('.other-income-kind').find('input[type="checkbox"]').prop('checked', false);
-        $(this).closest('.other-income-kind').find('a#add_new_other_income_kind').removeClass("hidden");
+        $(this).closest('.other-income-kind').find('a#add_new_other_income_kind').addClass("hidden");
       }
       $(this).parents('.new-other-income-form').remove();
       $(this).parents('.edit-other-income-form').remove();

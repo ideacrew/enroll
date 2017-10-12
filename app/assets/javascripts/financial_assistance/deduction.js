@@ -1,12 +1,12 @@
 function stopEditingDeduction() {
-  $('#income-adjustment-driver-question, #deduction-kinds-intro, #deduction-kinds-instruction, .deduction-kind').removeClass('disabled');
+  $('.driver-question, .instruction-row, .deduction-kind').removeClass('disabled');
   $('input.deduction-checkbox').prop('disabled', false);
   $('a.deduction-edit').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
 function startEditingDeduction(deduction_kind) {
-  $('#income-adjustment-driver-question, #deduction-kinds-intro, #deduction-kinds-instruction, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
+  $('.driver-question, .instruction-row, .deduction-kind:not(#' + deduction_kind + ')').addClass('disabled');
   $('input.deduction-checkbox').prop('disabled', true);
   $('a.deduction-edit').addClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');

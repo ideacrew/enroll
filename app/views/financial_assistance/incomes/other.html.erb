@@ -16,7 +16,7 @@
     <p>Tell us about this person's other income. When you're finished, select CONTINUE.</p>
     <br>
 
-    <div class="row row-form-wrapper radio-align no-buffer">
+    <div class="driver-question row row-form-wrapper radio-align no-buffer">
       <div class='col-md-6 labelforcoverage'>
         <span class="fa-text-color">Does this person expect to have <b> income from other sources </b> in 2017 ?</span>
       </div>
@@ -36,120 +36,121 @@
       </div>
     </div>
     <br>
-    <div class='other_income_kinds'>
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-9">
-         <span> <b> Common types of income you must report. </b></span>
-       </div>
-     </div>
-     <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-12">
-        <span> Check any boxes that apply to this person and enter details when requested. </span>
-      </div>
-    </div>
-    <br>
 
-    <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
-    <div class="other-income-kind run-glossary">
-      <div class="row row-form-wrapper no-buffer row-height">
-        <div class="col-md-1">
-          <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
-        </div>
+    <div class='other_income_kinds'>
+      <div class="instruction-row row row-form-wrapper no-buffer row-height">
         <div class="col-md-9">
-          <%= label %>
+          <span> <b> Common types of income you must report. </b></span>
         </div>
       </div>
-      <div class="other-incomes-list">
-        <% @applicant.incomes.of_kind(other_income_kind).each do |other_income| %>
-        <%= render partial: 'other_income', locals: { other_income: other_income } %>
-        <% end %>
-      </div>
-      <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
-        <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+      <div class="instruction-row row row-form-wrapper no-buffer row-height">
+        <div class="col-md-12">
+          <span> Check any boxes that apply to this person and enter details when requested. </span>
+        </div>
       </div>
       <br>
 
-      <div class='new-other-income-form hidden <%= other_income_kind %>'>
-        <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true } %>
-      </div>
-      <br />
+      <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
+        <div id="<%= other_income_kind %>" class="other-income-kind run-glossary">
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class="col-md-1">
+              <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
+            </div>
+            <div class="col-md-9">
+              <%= label %>
+            </div>
+          </div>
+          <div class="other-incomes-list">
+            <% @applicant.incomes.of_kind(other_income_kind).each do |other_income| %>
+              <%= render partial: 'other_income', locals: { other_income: other_income } %>
+            <% end %>
+          </div>
+          <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
+            <%= link_to "<span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+          </div>
+          <br>
+
+          <div class='new-other-income-form hidden <%= other_income_kind %>'>
+            <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true } %>
+          </div>
+          <br />
+        </div>
+      <% end %>
     </div>
-    <% end %>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+          <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden unsaved other income modal -->
+    <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+          </div>
+          <div class="modal-body">
+            You have made changes to an income that are not yet saved. Are you sure you want to continue?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="back-link">
-        <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-        <a href="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hidden unsaved other income modal -->
-  <div class="modal fade" id="unsavedIncomeChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <!-- Hidden destroy other income modal -->
+  <div class="modal fade" id="destroyOtherIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">Unsaved Income Changes</h4>
+          <h4 class="modal-title" id="myModalLabel">REMOVE THIS INFO?</h4>
         </div>
         <div class="modal-body">
-          You have made changes to an income that are not yet saved. Are you sure you want to continue?
+          Are you sure you want to remove this info? <br> <br>
+          <b> This cannot be undone </b>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger">Continue</button>
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
+          <button type="button" class="btn btn-danger modal-continue-button">CONTINUE AND REMOVE</button>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Hidden destroy other income modal -->
-<div class="modal fade" id="destroyOtherIncome" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">REMOVE THIS INFO?</h4>
-      </div>
-      <div class="modal-body">
-       Are you sure you want to remove this info? <br> <br>
-        <b> This cannot be undone </b>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
-        <button type="button" class="btn btn-danger modal-continue-button">CONTINUE AND REMOVE</button>
+  <!-- Destroy all Exsting Other Incomes  -->
+  <div class="modal fade" id="destroyAllOtherIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Delete all exsting Other Incomes?</h4>
+        </div>
+        <div class="modal-body">
+          You are going to delete all exsting Other Incomes. Are you sure you want to continue?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Destroy all Exsting Other Incomes  -->
-<div class="modal fade" id="destroyAllOtherIncomes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Delete all exsting Other Incomes?</h4>
-      </div>
-      <div class="modal-body">
-        You are going to delete all exsting Other Incomes. Are you sure you want to continue?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger modal-continue-button">Continue</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class='col-md-3'>
-  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-    previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant),
-    next_url: financial_assistance_application_applicant_deductions_path(@application, @applicant)
-  } %>
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant),
+      next_url: financial_assistance_application_applicant_deductions_path(@application, @applicant)
+    } %>
 </div>
 <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
 </div>

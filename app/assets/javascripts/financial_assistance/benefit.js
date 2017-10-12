@@ -1,11 +1,13 @@
 function stopEditingBenefit() {
+  $('.driver-question, .instruction-row, .benefit-kind').removeClass('disabled');
   $('input.benefit-checkbox').prop('disabled', false);
   $('a.benefit-edit').removeClass('disabled');
   // $('a.benefit-delete').removeClass('disabled');
   $('.col-md-3 > .interaction-click-control-continue').removeClass('disabled');
 };
 
-function startEditingBenefit() {
+function startEditingBenefit(benefit_kind) {
+  $('.driver-question, .instruction-row, .benefit-kind:not(#' + benefit_kind + ')').addClass('disabled');
   $('input.benefit-checkbox').prop('disabled', true);
   $('a.benefit-edit').addClass('disabled');
   // $('a.benefit-delete').removeClass('disabled');
@@ -56,7 +58,7 @@ $(document).ready(function() {
         var clonedForm = newBenefitFormEl.clone(true, true)
           .removeClass('hidden')
           .appendTo(benefitListEl);
-        startEditingBenefit();
+        startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
         $(clonedForm).find('select').selectric();
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
       } else {
@@ -95,18 +97,18 @@ $(document).ready(function() {
         var clonedForm = newBenefitFormEl.clone(true, true)
           .removeClass('hidden')
           .appendTo(benefitListEl);
-          startEditingBenefit();
+          startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
         $(clonedForm).find('select').selectric();
         $(clonedForm).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
     });
 
     /* edit existing benefits */
-    $('.benefits-list').on('click', 'a.benefit-edit:not(.disabled)', function(e) {
+    $('.benefit-kinds').on('click', 'a.benefit-edit:not(.disabled)', function(e) {
       e.preventDefault();
       var benefitEl = $(this).parents('.benefit');
       benefitEl.find('.benefit-show').addClass('hidden');
       benefitEl.find('.edit-benefit-form').removeClass('hidden');
-      startEditingBenefit();
+      startEditingBenefit($(this).parents('.benefit-kind').attr('id'));
 
       //$(clonedForm).find('select').selectric();
       $(benefitEl).find(".datepicker-js").datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true, changeYear: true});
@@ -114,7 +116,7 @@ $(document).ready(function() {
 
 
     /* destroy existing benefits */
-    $('.benefits-list').on('click', 'a.benefit-delete:not(.disabled)', function(e) {
+    $('.benefit-kinds').on('click', 'a.benefit-delete:not(.disabled)', function(e) {
       var self = this;
       e.preventDefault();
       $("#destroyBenefit").modal();
@@ -194,7 +196,7 @@ $(document).ready(function() {
       }
     });
     /* cancel benefit edits */
-    $('.benefits-list').on('click', 'a.benefit-cancel', function(e) {
+    $('.benefit-kinds').on('click', 'a.benefit-cancel', function(e) {
       e.preventDefault();
       stopEditingBenefit();
 
