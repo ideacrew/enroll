@@ -1,5 +1,5 @@
 <%= benefit_form_for @application, @applicant, benefit do |f| %>
-  <div class="focus_effect_module">
+  <div class="focus_effect_module row-edit-border">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: insurance_kind %>
 
@@ -131,6 +131,7 @@
         <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), required: true, prompt: 'Choose' %>
       </div>
     </div>
+  </div>
 
     <div class="row">
       <div class="col-md-3 pull-right">
@@ -138,7 +139,6 @@
         <%= f.submit 'Save', class: 'btn btn-danger' %>
       </div>
     </div>
-  </div>
 <% end %>
 
 <script>

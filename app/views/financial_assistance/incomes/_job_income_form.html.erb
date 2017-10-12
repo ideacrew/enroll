@@ -1,6 +1,6 @@
 <%= income_form_for @application, @applicant, income do |f| %>
   <%= f.hidden_field :kind, value: 'wages_and_salaries' %>
-  <div class="focus_effect_module">
+  <div class="focus_effect_module row-edit-border">
     <div class="row row-form-wrapper no-buffer row-height">
       <div class="col-md-12">
         <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
@@ -55,6 +55,7 @@
         </div>
       </div>
     <% end %>
+  </div>
 
     <div class="row">
       <div class="col-md-3 pull-right cancel-save-mt">
@@ -62,5 +63,4 @@
         <%= f.submit 'Save', class: 'btn btn-danger' %>
       </div>
     </div>
-  </div>
 <% end %>
