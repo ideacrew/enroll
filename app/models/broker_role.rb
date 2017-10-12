@@ -125,7 +125,7 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.detect { |phone| phone.kind == "work" } || broker_agency_profile.phone rescue ""
+    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
   end
 
   def email=(new_email)
