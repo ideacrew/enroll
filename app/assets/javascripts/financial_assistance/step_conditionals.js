@@ -40,7 +40,7 @@ $(document).ready(function() {
     $.ajax({
       type: "GET",
       data:{},
-      url: window.location.href.replace(/step(\/2)?/, 'primary_applicant_has_spouse'),
+      url: window.location.href.replace(/step(\/1)?/, 'primary_applicant_has_spouse'),
       success: function (has_spouse) {
         if(has_spouse == 'true'){
           $('#is_joint_tax_filing_no').parents('.row-form-wrapper').removeClass('hide');
