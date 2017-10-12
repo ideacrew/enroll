@@ -1,4 +1,5 @@
 class UserMailer < ApplicationMailer
+  include ApplicationHelper
 
   def welcome(user)
     if user.email.present?
@@ -111,8 +112,9 @@ class UserMailer < ApplicationMailer
     files_to_attach.each do |file_name, file_path|
       attachments["#{file_name}"] = File.read(file_path)
     end
+    phone_number = phone_number_format(Settings.contact_center.phone_number)
     message = mail({to: email, subject: "Important new letter for you from #{Settings.site.short_name}", from: 'no-reply@individual.dchealthlink.com'}) do |format|
-      format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject}}
+      format.html {render "generic_notice_alert", locals: {first_name: first_name, notice_subject: notice_subject, phone_number: phone_number}}
     end
   end
 

@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include ActionView::Helpers::NumberHelper
 
   def deductible_display(hbx_enrollment, plan)
     if hbx_enrollment.hbx_enrollment_members.size > 1
@@ -285,6 +286,10 @@ module ApplicationHelper
       phone = nil
     end
     return phone
+  end
+
+  def phone_number_format(number)
+    number_to_phone(number.gsub(/^./, "").gsub('-',''), area_code: true)
   end
 
 # the following methods are used when we are embedding devise signin and signup pages in views other than devise.

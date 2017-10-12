@@ -269,6 +269,13 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe "phone_number_format" do
+    it "should return phone number with brackets" do
+      number = Settings.contact_center.phone_number
+      expect(phone_number_format(number)).to eq "(855) 532-5465"
+    end
+  end
+
   describe "disable_purchase?" do
     it "should return true when disabled is true" do
       expect(helper.disable_purchase?(true, nil)).to eq true
