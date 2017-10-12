@@ -2,7 +2,7 @@
   <div class="focus_effect_module">
     <%= f.hidden_field :kind, value: kind %>
     <%= f.hidden_field :insurance_kind, value: insurance_kind %>
-      <div class="row row-form-wrapper no-buffer row-height">
+      <div class="row row-form-wrapper no-buffer row-height row-edit-border">
         <div class="col-md-6">
           <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{benefit.id}", class: "datepicker-js floatlabel" %>
         </div>
