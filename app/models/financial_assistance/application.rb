@@ -377,7 +377,6 @@ class FinancialAssistance::Application
   end
 
   def is_schema_valid?(faa_doc)
-    return true #DEMO override.
     return false if faa_doc.blank?
     faa_xsd = Nokogiri::XML::Schema(File.open FAA_SCHEMA_FILE_PATH)
     faa_xsd.valid?(faa_doc)

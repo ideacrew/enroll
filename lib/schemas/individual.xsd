@@ -2386,7 +2386,7 @@
 	</xs:simpleType>
 		<xs:simpleType name="FinancialAssistanceBenefitEsiCoveredType">
 		<xs:restriction base="xs:anyURI">
-			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_benefit_esi_coveredt#self"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered#self"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered#self_and_spouse"/>
 			<xs:enumeration value="urn:openhbx:terms:v1:financial_assistance_benefit_esi_covered#family"/>
 		</xs:restriction>
