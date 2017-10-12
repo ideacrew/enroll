@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="instruction-row row row-form-wrapper no-buffer row-height">
-        <div class="col-md-12">
+        <div class="col-md-12 lightgray">
           <span> Check any boxes that apply to this person and enter details when requested. </span>
         </div>
       </div>
@@ -52,7 +52,7 @@
 
       <% FinancialAssistance::Income::OTHER_INCOME_TYPE_KIND.each do |other_income_kind, label| %>
         <div id="<%= other_income_kind %>" class="other-income-kind run-glossary">
-          <div class="row row-form-wrapper no-buffer row-height">
+          <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1">
               <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
