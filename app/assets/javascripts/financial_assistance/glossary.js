@@ -358,10 +358,6 @@ $(document).ready(function() {
         "description": "The acronym for <a href='\/glossary#federally_qualified_health_center' target='_blank'>Federally Qualified Health Center<\/a>."
       },
       {
-        "term": "FTE",
-        "description": "The acronym for <a href='\/glossary#full-time_equivalent_employee' target='_blank'>Full-time Equivalent Employee<\/a>."
-      },
-      {
         "term": "Full-time Equivalent Employee",
         "description": "Small businesses must have at least 1 full-time equivalent employee to purchase <a href='\/glossary#health_insurance' target='_blank'>health insurance<\/a> through DC Health Link\u2019s Small Business Marketplace. All employees (not including owners, partners or family members) who work on average, at least 30 hours a week are considered full-time employees. Part-time employees can count towards calculating the number of full-time equivalent employees. For example, 2 part-time employees who each work 15 hours a week - half the hours of a full-time employee - equal 1 full-time equivalent employee. (2x.50=1)"
       },
