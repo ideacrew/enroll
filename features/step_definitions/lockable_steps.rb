@@ -5,7 +5,7 @@ Then(/^there are (\d+) preloaded (.*?) user accounts$/) do |num, status|
   end
 end
 
-Then(/^there are (\d+) preloaded user accounts without email$/) do |num|
+Then(/^there are (\d+) preloaded user accounts without the email$/) do |num|
   (0...num.to_i).each do |int|
     FactoryGirl.create(:user, :without_email, :with_family)
   end
@@ -52,7 +52,7 @@ Then(/^the (.*?) user should be in the list$/) do |status|
   end
 end
 
-Then(/^an error (.*?) should be raised$/) do |error|
+Then(/^the error (.*?) should be raised$/) do |error|
   within('.child-row') do
     expect(page).to have_content(error)
   end
