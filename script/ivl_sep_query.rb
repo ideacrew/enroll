@@ -5,10 +5,7 @@ class IvlEnrollmentsPublisher
   extend Acapi::Notifiers
 
   def self.publish_action(action_name, hbx_id, action)
-    puts hbx_id.to_s
-
-    glue_environment = ENV['AWS_ENV']
-    reply_to = "dc0.#{glue_environment}.q.glue.enrollment_event_batch_handler"
+    reply_to = "dc0.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler"
 
     notify(
       action_name, {
