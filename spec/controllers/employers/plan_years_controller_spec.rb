@@ -399,8 +399,8 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
 
   describe "GET reference_plans" do
     let(:employer_profile){ FactoryGirl.create(:employer_profile) }
-    let!(:bronze_plan){ FactoryGirl.create(:plan, metal_level: "bronze", service_area_id: "1") }
-    let!(:expanded_bronze_plan){ FactoryGirl.create(:plan, metal_level: "expanded_bronze", carrier_profile_id: bronze_plan.carrier_profile.id.to_s, service_area_id: "1") }
+    let!(:bronze_plan){ FactoryGirl.create(:plan, metal_level: "bronze") }
+    let!(:expanded_bronze_plan){ FactoryGirl.create(:plan, metal_level: "expanded_bronze", carrier_profile_id: bronze_plan.carrier_profile.id.to_s) }
 
     before :each do
       sign_in
