@@ -792,22 +792,28 @@ class CensusEmployee < CensusMember
     employee_role.present?
   end
 
-  # should disable cobra
-  # 1.waived
-  # 2.do not have an enrollment
-  # 3.census_employee is pending
-  # 4.Employer has only future date enrollments
-  def is_disabled_cobra_action?
-    employee_role.blank? || active_benefit_group_assignment.blank? || active_benefit_group_assignment.coverage_waived? ||
-    (active_benefit_group_assignment.hbx_enrollment.blank? && active_benefit_group_assignment.hbx_enrollments.blank? ) ||
-    employee_termination_pending? || 
-      is_employers_first_plan_year?
+  ##
+  # This method is to verify whether roster employee is cobra eligible or not
+  # = Rules for employee cobra eligibility
+  #   * Employee must be in a terminated status
+  #   * Must be a covered employee on the date of their employment termination
+  def is_cobra_coverage_eligible?
+    return false unless census_employee.employment_terminated?
+
+    Family.where(:"households.hbx_enrollments" => {
+      :benefit_group_assignment_id.in => benefit_group_assignments.pluck(:id),
+      :coverage_kind => 'health',
+      :kind => 'employer_sponsored',
+      :terminated_on => coverage_terminated_on || employment_terminated_on.end_of_month,
+      :aasm_state.in => ['coverage_terminated', 'coverage_termination_pending']
+    }).present?
   end
 
-  def is_employers_first_plan_year?
-    new_plan_year = self.employer_profile.plan_years.detect{|py| py.start_on > TimeKeeper.date_of_record && "enrolling" == py.aasm_state}
-    past_plan_years = self.employer_profile.plan_years.select{|py| "enrolling" != py.aasm_state }
-    new_plan_year.present? && !past_plan_years.present?
+  ##
+  # This is to validate 6 months rule for cobra eligiblity
+  def cobra_eligibility_expired?
+    last_date_of_coverage = (coverage_terminated_on || employment_terminated_on.end_of_month)
+    TimeKeeper.date_of_record > last_date_of_coverage + 6.months
   end
 
   def has_cobra_hbx_enrollment?
