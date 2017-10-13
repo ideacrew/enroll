@@ -393,18 +393,4 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
     end
   end
-
-  describe "#trigger ee_sep_request_accepted_notice" do
-    let(:census_employee){FactoryGirl.build(:census_employee)}
-    let(:employee_role){FactoryGirl.build(:employee_role, :census_employee => census_employee)}
-    it "should trigger ee_sep_request_accepted_notice job in queue" do
-      ActiveJob::Base.queue_adapter = :test
-      ActiveJob::Base.queue_adapter.enqueued_jobs = []
-      helper.ee_sep_request_accepted_notice(employee_role)
-      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-        job_info[:job] == ShopNoticesNotifierJob
-      end
-      expect(queued_job[:args]).to eq [census_employee.id.to_s, 'ee_sep_request_accepted_notice']
-    end
-  end
 end
