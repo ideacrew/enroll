@@ -1,4 +1,16 @@
 $(document).ready(function() {
+  $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+    if($('#unsavedOtherQuestionsWarning').length == 1) {
+      e.preventDefault();
+      var self = this;
+      $('#unsavedOtherQuestionsWarning').modal('show');
+      $('.btn.btn-danger').click(function() {
+        window.location.href = $(self).attr('href');
+      });
+      return false;
+    } else
+    return true;
+  });
 
   /* attestations */
   $('#living_outside_yes, #living_outside_no').change(function(e) {
