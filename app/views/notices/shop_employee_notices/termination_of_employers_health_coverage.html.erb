@@ -38,9 +38,9 @@
   { heading:'For Questions or Assistance:'} %>
 
 <% if notice.broker.present? %>
-  <p class ="notice-font notice-font-padding1">Contact your employer or your broker for further assistance.</p>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer or your broker for further assistance."} %>
 <% else %>
-  <p class ="notice-font notice-font-padding1">Contact your employer further assistance.</p>
+  <%= render partial: 'notices/shared/paragraph', :locals => { content: "Contact your employer further assistance."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{site_short_name} with any questions:"} %>
