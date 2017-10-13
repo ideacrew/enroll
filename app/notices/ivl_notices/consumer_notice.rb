@@ -33,6 +33,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
 
   def build
     family = recipient.primary_family    
+    notice.mpi_indicator = self.mpi_indicator
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.first_name = recipient.first_name
     append_hbe
