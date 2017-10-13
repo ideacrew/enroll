@@ -280,6 +280,7 @@ module Forms
     end
 
     def update_attributes(attr)
+      attributes_matched = self.family_member.is_a_valid_faa_update?(attr) && (attr["same_with_primary"] = same_with_primary)
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
