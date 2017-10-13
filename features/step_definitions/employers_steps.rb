@@ -326,7 +326,7 @@ end
 And(/^Employer can see the sole source plan information on home tab$/) do
   sleep 1
   within('.benefit-group') do
-    expect(page).to have_content('One Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
@@ -340,7 +340,7 @@ end
 And(/^Employer can see the sole source plan information$/) do
   sleep 1
   within('.benefit-package') do
-    expect(page).to have_content('One Plan')
+    expect(page).to have_content('A Single Plan')
   end
 end
 
