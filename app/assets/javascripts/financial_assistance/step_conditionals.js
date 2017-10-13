@@ -12,6 +12,19 @@ $(document).ready(function() {
     return true;
   });
 
+  $(document).on('click', 'a[href]:not(.disabled)', function(e) {
+    if($('#unsavedTaxInfoQuestionsWarning').length == 1) {
+      e.preventDefault();
+      var self = this;
+      $('#unsavedTaxInfoQuestionsWarning').modal('show');
+      $('.btn.btn-danger').click(function() {
+        window.location.href = $(self).attr('href');
+      });
+      return false;
+    } else
+    return true;
+  });
+
   /* attestations */
   $('#living_outside_yes, #living_outside_no').change(function(e) {
     $('#application_attestation_terms').attr('required', e.target.value == 'true');
