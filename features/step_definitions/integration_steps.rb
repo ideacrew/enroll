@@ -897,6 +897,17 @@ When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab
   wait_for_ajax
 end
 
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) dropdown$/) do |tab_name|
+  find(".#{tab_name.downcase}-dropdown").click
+  wait_for_ajax
+end
+
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) option$/) do |tab_name|
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
+  wait_for_ajax
+  find('#myTabContent').trigger('click')
+end
+
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
   @browser.element(class: /interaction-click-control-#{tab_name}/).wait_until_present
   scroll_then_click(@browser.element(class: /interaction-click-control-#{tab_name}/))
