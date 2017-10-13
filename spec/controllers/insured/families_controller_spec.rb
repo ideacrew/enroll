@@ -483,6 +483,14 @@ RSpec.describe Insured::FamiliesController do
       end
     end
 
+    context 'trigger_notice' do
+      it "should receive notice" do
+        special_enrollment_period = @family.special_enrollment_periods.last
+        expect(employee_role2.census_employee).to receive(:trigger_notice).with("ee_sep_request_accepted_notice")
+        post :record_sep, qle_id: @qle.id, qle_date: Date.today, employee_role_id: employee_role2.id
+      end
+    end
+
     context 'when its change of plan' do
 
       before :each do

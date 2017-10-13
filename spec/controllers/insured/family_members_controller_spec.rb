@@ -41,6 +41,23 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    context 'trigger_notice' do
+      let(:date) {TimeKeeper.date_of_record}
+      before(:each) do
+        allow(person).to receive(:broker_role).and_return(nil)
+        allow(person).to receive(:primary_family).and_return(test_family)
+        allow(user).to receive(:person).and_return(person)
+        allow(census_employee).to receive(:earliest_eligible_date).and_return(date.next_month.beginning_of_month)
+        sign_in(user)
+        allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
+      end
+
+      it "employee should receive notice" do
+        expect(employee_role.census_employee).to receive(:trigger_notice).with("ee_sep_request_accepted_notice")
+        get :index, :employee_role_id => employee_role_id, qle_id: qle.id, effective_on_kind: "date_of_event", qle_date: date.yesterday, effective_on_date: date - 10.days
+      end
+    end
+
     context 'with no referer' do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
