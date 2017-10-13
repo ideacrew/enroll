@@ -537,20 +537,11 @@ module ApplicationHelper
     'Confirm'
   end
 
-
   def qualify_qle_notice
     content_tag(:span) do
       concat "In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. "
       concat link_to("Click here", find_sep_insured_families_path)
       concat " to see if you qualify for a Special Enrollment period"
-    end
-  end
-
-  def ee_sep_request_accepted_notice(employee_role)
-    begin
-      ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice")
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver notice to census_employee #{employee_role.census_employee.id} due to #{e}" }
     end
   end
 
