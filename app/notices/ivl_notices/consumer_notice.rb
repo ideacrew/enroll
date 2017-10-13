@@ -15,8 +15,8 @@ class IvlNotices::ConsumerNotice < IvlNotice
     build
     generate_pdf_notice
     attach_envelope
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
     attach_blank_page(notice_path)
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?) 
     upload_and_send_secure_message
     send_generic_notice_alert
   end
@@ -82,7 +82,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     contingent_enrollment = enrollments.detect{ |e | e.enrolled_contingent? }
     notice.enrollments << build_enrollment(contingent_enrollment)
     notice.documents_needed = outstanding_people.present? ? true : false
-    notice.due_date = contingent_enrollment.special_verification_period  rescue ""
+    notice.due_date = family.min_verification_due_date rescue ""
     notice.application_date = contingent_enrollment.created_at  rescue ""
     # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
     append_unverified_individuals(outstanding_people)
