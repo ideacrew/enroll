@@ -1,6 +1,11 @@
 class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNotice
 
-  attr_accessor :census_employee
+  attr_accessor :census_employee, :dep_hbx_ids
+
+  def initialize(census_employee, args = {})
+    self.dep_hbx_ids = args[:options][:dep_hbx_ids]
+    super(census_employee, args)
+  end
 
   def deliver
     build
@@ -18,21 +23,15 @@ class ShopEmployeeNotices::EmployeeDependentAgeOffTermination < ShopEmployeeNoti
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(now.next_year) }
     names = []
     if bc_period.present?
-      if census_employee.active_benefit_group_assignment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.present? && census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.count >= 1
-        census_employee.active_benefit_group_assignment.hbx_enrollment.hbx_enrollment_members.reject(&:is_subscriber).each do |dependent|
-          dep = dependent.person
-          age = now.year - dep.dob.year - ((now.month > dep.dob.month || (now.month == dep.dob.month && now.day >= dep.dob.day)) ? 0 : 1)
-          if (dep.age_on(TimeKeeper.date_of_record.end_of_month) >= 26 && age < 27) && (now.month == 12 || now.month == dep.dob.month)
-            names << dep.full_name
-            notice.enrollment = PdfTemplates::Enrollment.new({
-              :dependents => names,
-              :plan_year => bc_period.start_on.year,
-              :effective_on => bc_period.start_on,
-              :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
-              :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
-              })
-          end
-        end
+      self.dep_hbx_ids.each do |dep_id|
+        names << Person.where(hbx_id: dep_id).first.full_name
+        notice.enrollment = PdfTemplates::Enrollment.new({
+          :dependents => names,
+          :plan_year => bc_period.start_on.year,
+          :effective_on => bc_period.start_on,
+          :ivl_open_enrollment_start_on => bc_period.open_enrollment_start_on,
+          :ivl_open_enrollment_end_on => bc_period.open_enrollment_end_on
+          })
       end
     end
   end

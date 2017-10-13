@@ -7,6 +7,8 @@ site:
   logo_file_name: "logo.png"
   home_url: "https://www.dchealthlink.com/"
   website_name: "www.DCHealthLink.com"
+  healthcare_url: "https://www.healthcare.gov/"
+  healthcare_name: "www.healthcare.gov"
 
   social_media:
     facebook_url: ""
