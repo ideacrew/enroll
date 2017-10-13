@@ -48,6 +48,7 @@ class GeneralAgencyProfile
     inclusion: { in: MARKET_KINDS, message: "%{value} is not a valid market kind" },
     allow_blank: false
 
+  embeds_many :documents, as: :documentable
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
   accepts_nested_attributes_for :inbox
   after_initialize :build_nested_models

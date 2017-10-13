@@ -421,6 +421,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       expect(broker_agency_profile.default_general_agency_profile).to eq general_agency_profile
 
       sign_in user
+      expect(controller).to receive(:broker_fires_default_ga_notice).with(general_agency_profile.id, broker_agency_profile.id)
       xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
       expect(assigns(:broker_agency_profile).default_general_agency_profile).to eq nil
     end

@@ -205,6 +205,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
+        broker_fires_default_ga_notice(old_default_ga_id, @broker_agency_profile.id.to_s)
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
@@ -388,6 +389,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def redirect_to_show(broker_agency_profile_id)
     redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
+  end
+
+  def broker_fires_default_ga_notice(old_default_ga_id, broker_agency_profile_id)
+    begin
+      ShopNoticesNotifierJob.perform_later(old_default_ga_id, "broker_fires_default_ga_notice", broker_agency_profile_id: broker_agency_profile_id)
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver broker_fires_default_ga_notice to General Agency #{old_default_ga_id} due to #{e}"}) unless Rails.env.test?
+    end
   end
 
   private
