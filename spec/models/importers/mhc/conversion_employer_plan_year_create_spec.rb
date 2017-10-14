@@ -42,6 +42,7 @@ describe ::Importers::Mhc::ConversionEmployerPlanYearCreate, dbclean: :after_eac
   let(:file_name) { File.join(Rails.root, "spec", "test_data", "conversion_employers", "mhc_sample_conversion_employers.xlsx") }
 
   before :each do
+    allow(CarrierServiceArea).to receive(:service_areas_for).and_return([carrier_one_service_area])
     importer = Importers::Mhc::ConversionEmployerSet.new(file_name, out_stream, registered_on.strftime('%Y-%m-%d'))
     # allow(ConversionEmployerCreate).to receive(:new).with(record_attrs.merge({:registered_on => registered_on.strftime('%Y-%m-%d') }))
     importer.import!
