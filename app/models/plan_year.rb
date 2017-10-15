@@ -6,6 +6,8 @@ class PlanYear
   include Acapi::Notifiers
   include ScheduledEventService
   include Config::AcaModelConcern
+  include Concerns::Observable
+  include ModelEvents::PlanYear
 
   embedded_in :employer_profile
 
@@ -108,6 +110,8 @@ class PlanYear
   scope :non_canceled, -> { not_in(aasm_state: ['canceled, renewing_canceled']) }
 
   after_update :update_employee_benefit_packages
+
+  after_save :notify_on_save
 
   def update_employee_benefit_packages
     if self.start_on_changed?
