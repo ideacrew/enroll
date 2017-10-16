@@ -2,7 +2,18 @@
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
     <div class="col-md-9">
       <p class="alert alert-error hide"></p>
-      <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %> </h2>
+      <div class="row">
+      <div class="col-md-12">
+        <div class="title-icon">
+          <span class="fa-icon fa-stack fa-lg">
+              <i class="fa fa-circle-thin fa-stack-2x ques-icon"></i>
+              <i class="fa fa-question fa-stack-2x "></i>
+          </span>
+        </div>
+        <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %></h2>
+      </div>
+    </div>
+      <!-- <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %> </h2> -->
       <p>Tell us about this person's other questions. When you're finished select CONTINUE.</p>
       <p class="memo">* = required field</p>
 
