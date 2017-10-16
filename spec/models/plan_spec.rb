@@ -109,6 +109,22 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
 
+    context "check plan offerings scope" do
+      def params;
+        valid_params.merge(is_sole_source: true)
+      end
+
+      def plan;
+        Plan.new(**params);
+      end
+
+      it "should retun scope count for .check_plan_offerings_for_sole_source" do
+        expect(plan.save).to be_truthy
+        expect(plan.is_sole_source).to eq true
+        expect(Plan.check_plan_offerings_for_sole_source.count).to eq 1
+      end
+    end
+
     context "with no metal_level" do
       def params;
         valid_params.except(:metal_level);

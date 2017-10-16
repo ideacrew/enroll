@@ -55,6 +55,11 @@ class Plan
   field :nationwide, type: Boolean # Nationwide
   field :dc_in_network, type: Boolean # DC In-Network or not
 
+  # Fields for checking respective carrier is offering or not
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
+
   # Fields for provider direcotry and rx formulary url
   field :provider_directory_url, type: String
   field :rx_formulary_url, type: String
@@ -142,6 +147,11 @@ class Plan
 
   ## Scopes
   default_scope -> {order("name ASC")}
+
+  #filter based on plan offerings
+  scope :check_plan_offerings_for_metal_level,  ->{ where(is_horizontal: "true") }
+  scope :check_plan_offerings_for_single_carrier,  ->{ where(is_vertical: "true") }
+  scope :check_plan_offerings_for_sole_source,  ->{ where(is_sole_source: "true") }
 
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }

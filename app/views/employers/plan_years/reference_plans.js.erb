@@ -15,14 +15,14 @@ $('#<%= @location_id %> .health .reference-plan .col-xs-2').on('click', function
 
 });
 $('.controls').show();
-var reference_plan_count = $('#<%= @location_id %> .reference-plan').length
+var reference_plan_count = $('#<%= @location_id %> .reference-plan').length;
 var reference_plan_remainder = reference_plan_count % 3;
 if (reference_plan_remainder > 0 ) {
   $('#<%= @location_id %> .reference-plan').slice(-reference_plan_remainder).css({"border-bottom":"none" });
 } else {
 
 }
-var dental_reference_plan_count = $('#<%= @location_id %> .dental-reference-plan').length
+var dental_reference_plan_count = $('#<%= @location_id %> .dental-reference-plan').length;
 var dental_reference_plan_remainder = dental_reference_plan_count % 4;
 if (dental_reference_plan_remainder > 0 ) {
   $('#<%= @location_id %> .dental-reference-plan').slice(-dental_reference_plan_remainder).css({"border-bottom":"none" });
