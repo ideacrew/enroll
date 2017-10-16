@@ -122,7 +122,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
       let!(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
       let!(:application) { FactoryGirl.create(:application, family: family) }
-      let!(:tax_household1) { FactoryGirl.create(:tax_household, application: application) }
+      let!(:tax_household1) { FactoryGirl.create(:tax_household, household: family.households.first) }
       let!(:applicant) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family.primary_applicant.id) }
       let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant) }
       let!(:assisted_verification_documents) { person.consumer_role.assisted_verification_documents.create!(application_id: application.id,applicant_id: applicant.id,assisted_verification_id: assisted_verification.id) }
