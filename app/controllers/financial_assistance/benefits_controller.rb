@@ -84,10 +84,11 @@ class FinancialAssistance::BenefitsController < ApplicationController
   end
 
   private
+
   def format_date params
-   params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
-   params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y")
- end
+    params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
+    params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y")
+  end
 
   def update_employer_contact model, params
     if params[:employer_phone].present?
