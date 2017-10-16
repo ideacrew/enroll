@@ -9,7 +9,9 @@ rescue NameError
 end
 
 Before do |scenario|
-  page.driver.restart
+  page.driver.clear_network_traffic
+  page.driver.server.restart
+  page.driver.client.restart
   Capybara.reset_sessions!
   page.driver.clear_memory_cache
   page.driver.clear_cookies
