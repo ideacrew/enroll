@@ -36,10 +36,23 @@ var Verification = (function(){
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
    }
+   function modalByType(name) {
+     $('#historyModal').modal('show');
+     $('#historyModal').on('shown.bs.modal', function (event) {
+       var element = $(event.relatedTarget) // Button that triggered the modal
+       var title = element.data('typeof'); // Extract info from data-* attributes
+       // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+       // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+       var modal = $(this)
+       modal.find('.modal-title').text(name + ' Verification History')
+       //modal.find('.modal-body input').val(recipient)
+     });
+   }
    function checkAction(event){
      var $selected_id = $(event.target).attr('id');
      var $selected_el = $('#'+$selected_id);
      var $selected_el_val = $selected_el.val();
+     var $selected_typeof = $selected_el.data('typeof');
 
      switch ($selected_el_val) {
          case 'Verify':
@@ -58,8 +71,11 @@ var Verification = (function(){
             hideAllActions($selected_id);
             showExtendAction($selected_id);
             break;
+          case 'View History':
+            modalByType($selected_typeof);
+            break;
          default:
-             hideAllActions($selected_id);
+             hideAllActions($selected_el_val);
      }
    }
 
