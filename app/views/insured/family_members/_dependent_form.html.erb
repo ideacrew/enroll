@@ -122,7 +122,7 @@
           <% end %>
           <div class="col-md-5 mt18">
             <div class="select-positioning ml-label"> <label>is</label> </div>
-            <label class="static_label label-floatlabel mt-label">RELATIONSHIPS</label>
+            <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
             <div class="select-relation rs_selection">
               <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control" %>
             </div>
@@ -197,7 +197,7 @@
       };
       $("#dependent_first_name").change(function() {
         var text = $("#dependent_first_name").val() == '' ? "this person" : $("#dependent_first_name").val()
-        $("#is_applying_coverage_value_dep").text("Is "+ text +" applying for coverage?");
+        $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage?");
         $("#is_applying_coverage_value_dep_1").text(text);
       });
     });
