@@ -3,17 +3,12 @@ module Concerns::Observable
 
   included do
     after_initialize do |instance|
-      # klass_name = "Observers::" + self.class.name + "Observer"
-      # instance.add_observer(Object.const_get(klass_name).new)
       register_observers
     end
+  end
 
-    # aasm do
-    #   after_all_events :notify_state_change
-    #   after_all_events do
-    #     notify_observers(self, aasm: aasm)
-    #   end
-    # end
+  def register_observers
+    add_observer(Observers::NoticeObserver.new, (self.class.model_name.param_key + '_update').to_sym)
   end
 
   def add_observer(observer, func=:update)
@@ -38,14 +33,5 @@ module Concerns::Observable
         k.send v, *arg
       end
     end
-  end
-
-   def register_observers
-    # add_observer(Observers::EdiObserver.new,      :employer_profile_update)
-    add_observer(Observers::NoticeObserver.new,   :employer_profile_update)
-    # add_observer(Observers::AnalyticObserver.new, :employer_profile_update)
-    # add_observer(Observers::LedgerObserver.new,   :employer_profile_update)
-    # add_observer(Observers::AcapiObserver.new,    :employer_profile_update)
-    # add_observer(Observers::LogObserver.new,      :employer_profile_update)
   end
 end
