@@ -551,14 +551,14 @@ class CensusEmployee < CensusMember
             relations = primary_person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
             
             if relations.present?
-              aged_off_dependents =  relations.select{|cm| (new_date.month == (cm.relative.dob.month || 12) ) && (cm.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:person)
+              aged_off_dependents =  relations.select{|dep| (new_date.month == (dep.relative.dob.month || 12)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
               next if aged_off_dependents.empty?
               dep_hbx_ids = aged_off_dependents.map(&:hbx_id)
               census_employee = primary_person.active_employee_roles.first.census_employee
               ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_dependent_age_off_termination", dep_hbx_ids: dep_hbx_ids )
             end
           rescue => e
-            puts "Unable to deliver employee_dependent_age_off_termination notice to: #{family.primary_applicant.person.hbx_id}, #{e}"
+            puts "Unable to deliver employee_dependent_age_off_termination notice to: #{family.primary_applicant.person.hbx_id}, #{e}" unless Rails.env.test?
           end
         end
       end

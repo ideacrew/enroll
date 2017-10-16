@@ -1796,4 +1796,40 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
 
     end
   end
+
+  describe "#trigger employee_dependent_age_off_termination", type: :model, dbclean: :after_all do
+    let!(:person) { FactoryGirl.create(:person, :with_employee_role) }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, aasm_state: "eligible") }
+    let!(:person2) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
+    let!(:person3) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 30.years) }
+    let!(:family) {
+                  family = FactoryGirl.build(:family, :with_primary_family_member, person: person)
+                  FactoryGirl.create(:family_member, family: family, person: person2)
+                  FactoryGirl.create(:family_member, family: family, person: person3)
+                  person.person_relationships.create(relative_id: person2.id, kind: "child")
+                  person.person_relationships.create(relative_id: person3.id, kind: "child")
+                  person.save!
+                  family.save!
+                  family
+                }
+    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "employer_sponsored", aasm_state: "coverage_selected") }
+    let!(:hbx_enrollment_member1){ FactoryGirl.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record - 1.month) }
+    let!(:hbx_enrollment_member2){ FactoryGirl.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.second.id, eligibility_date: TimeKeeper.date_of_record - 1.month, is_subscriber: false) }
+
+    before :each do
+      person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
+    end
+
+    it "should trigger employee_dependent_age_off_termination job in queue" do
+      ActiveJob::Base.queue_adapter = :test
+      ActiveJob::Base.queue_adapter.enqueued_jobs = []
+      CensusEmployee.employee_dependent_age_off_termination(TimeKeeper.date_of_record.beginning_of_month)
+      queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+        job_info[:job] == ShopNoticesNotifierJob
+      end
+
+      expect(queued_job[:args].first).to eq census_employee.id.to_s
+      expect(queued_job[:args].second).to eq "employee_dependent_age_off_termination"
+    end
+  end
 end
