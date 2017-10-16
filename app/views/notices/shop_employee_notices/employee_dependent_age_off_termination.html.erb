@@ -1,6 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date_and_identifier', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -30,8 +31,8 @@ content: "Dependent children with disabilities may be eligible to remain covered
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Individual Market Enrollment</strong><br><br>"} %>
 
-<%= render partial: 'notices/shared/paragraph_without_page_break', :locals => {
-content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period your dependent can enroll in individual market coverage through #{Settings.site.short_name} if they live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance. Your dependent child can create a #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside the #{Settings.aca.state_name}, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}#{Settings.site.healthcare_name}</a>."} %>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period your dependent can enroll in individual market coverage through #{Settings.site.short_name} if they live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance. Your dependent child can create a #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside the #{Settings.aca.state_name}, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}>#{Settings.site.healthcare_name}</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "There are separate eligibility rules for Special Enrollment Periods into individual market coverage. If your dependent is a #{Settings.aca.state_name} resident and thinks they might be eligible for an individual market Special Enrollment Period, they can contact #{Settings.site.short_name} to see if they are eligible to enroll through a Special Enrollment Period."} %>
