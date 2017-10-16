@@ -121,9 +121,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
     save_faa_bookmark(@person, request.original_url)
     @consumer_role = @person.consumer_role
     @application = @person.primary_family.application_in_progress
-    @applicants = @application.active_applicants
-
-    render layout: 'financial_assistance'
+    @applicants = @application.active_applicants if @application.present?
+    if @application.blank?
+      redirect_to financial_assistance_applications_path
+    else
+      render layout: 'financial_assistance'
+    end
   end
 
   def wait_for_eligibility_response

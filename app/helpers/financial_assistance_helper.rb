@@ -192,6 +192,13 @@ module FinancialAssistanceHelper
     applicant.incomes + applicant.deductions
   end
 
+  def income_and_deductions_for_any(application)
+    application.applicants.each do |applicant|
+      return true if income_and_deductions_for(applicant).present?
+    end
+    return false
+  end
+
   def start_to_end_dates(embedded_document)
     start_date = embedded_document.start_on
     end_date = embedded_document.end_on

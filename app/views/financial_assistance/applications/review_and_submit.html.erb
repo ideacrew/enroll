@@ -4,60 +4,63 @@
       <h1 class="darkblue">Review Your Application </h1>
       <p><strong> You're almost done! </strong>Review the application summary below and make sure it's correct. Select the
         pencil icon to go back to any item and make change. When you're finished, select CONTINUE.</p>
-        <h3 class="darkblue">Income and Adjustments</h3>
-        <div class="row white-background">
-          <div class="col-md-12 pz">
-            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-              <div class="col-md-11">The following is information <span class="form-heading">you entered for everyone in this application. </span></div>
-              <div class="col-md-1">
+
+        <% if income_and_deductions_for_any(@application).present? %>
+          <h3 class="darkblue">Income and Adjustments</h3>
+          <div class="row white-background">
+            <div class="col-md-12 pz">
+              <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                <div class="col-md-11">The following is information <span class="form-heading">you entered for everyone in this application. </span></div>
+                <div class="col-md-1">
+                </div>
               </div>
-            </div>
-            <table class="table table-border-line mb0 table-grey-border" border="1" >
-              <thead>
-                <tr class="form-heading">
-                  <th class="no-bottom-border"> <b>PERSON </b></th>
-                  <th class="no-bottom-border"><b>TYPES</b></th>
-                  <th class="no-bottom-border"><b>FREQUENCY</b></th>
-                  <th class="no-bottom-border"><b>AMOUNT</b></th>
-                  <th class="no-bottom-border"><b>DATES </b></th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @applicants.each do |applicant| %>
-                <% income_and_deductions_for(applicant).each do |embedded_document| %>
-                <tr>
-                  <td> <%= applicant.person.full_name %> </td>
-                  <td> <%= embedded_document.kind.humanize %> </td>
-                  <td> <%= embedded_document.frequency_kind.humanize %> </td>
-                  <td>
-                    <b>
-                    <% if embedded_document.is_a? FinancialAssistance::Deduction %>
-                      (<%= number_to_currency(embedded_document.amount.to_s) %>)
-                    <% else %>
-                      <%= number_to_currency(embedded_document.amount.to_s) %>
-                    <% end %>
-                    </b>
-                  <td>
-                    <%= start_to_end_dates(embedded_document) %>
-                    <span class= "ml10">
-                      <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
-                        <i class="fa fa-pencil fa-2x"></i>
+              <table class="table table-border-line mb0 table-grey-border" border="1" >
+                <thead>
+                  <tr class="form-heading">
+                    <th class="no-bottom-border"> <b>PERSON </b></th>
+                    <th class="no-bottom-border"><b>TYPES</b></th>
+                    <th class="no-bottom-border"><b>FREQUENCY</b></th>
+                    <th class="no-bottom-border"><b>AMOUNT</b></th>
+                    <th class="no-bottom-border"><b>DATES </b></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @applicants.each do |applicant| %>
+                  <% income_and_deductions_for(applicant).each do |embedded_document| %>
+                  <tr>
+                    <td> <%= applicant.person.full_name %> </td>
+                    <td> <%= embedded_document.kind.humanize %> </td>
+                    <td> <%= embedded_document.frequency_kind.humanize %> </td>
+                    <td>
+                      <b>
+                      <% if embedded_document.is_a? FinancialAssistance::Deduction %>
+                        (<%= number_to_currency(embedded_document.amount.to_s) %>)
+                      <% else %>
+                        <%= number_to_currency(embedded_document.amount.to_s) %>
                       <% end %>
-                    </span>
-                  </td>
-                </tr>
-                <% end %>
-                <% end %>
-              </tbody>
-            </table>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
-              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-              </div>
-              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                      </b>
+                    <td>
+                      <%= start_to_end_dates(embedded_document) %>
+                      <span class= "ml10">
+                        <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
+                          <i class="fa fa-pencil fa-2x"></i>
+                        <% end %>
+                      </span>
+                    </td>
+                  </tr>
+                  <% end %>
+                  <% end %>
+                </tbody>
+              </table>
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bg-primary" style="padding: 0px; height: 20px">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        <% end %>
         <br><br>
 
         <% @applicants.each do |applicant| %>
