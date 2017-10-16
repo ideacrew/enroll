@@ -15,6 +15,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
     assign(:consumer_role, person.consumer_role)
     assign(:person, person)
+    assign(:support_texts, {support_key: "support-description-sample"})
     render partial: "insured/consumer_roles/form", locals: {f: mock_form}
   end
 
@@ -31,7 +32,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
   end
 
   it "should display the is_applying_coverage field option" do
-    expect(rendered).to match /Is this person applying for coverage?/
+    expect(rendered).to match /Does this person need coverage?/
   end
 
   it "should display the affirmative message" do
