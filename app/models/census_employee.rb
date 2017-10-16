@@ -431,14 +431,22 @@ class CensusEmployee < CensusMember
     false
   end
 
-  def construct_employee_role_for_match_person
+  def employee_existence
     employee_relationship = Forms::EmployeeCandidate.new({first_name: first_name,
                                                           last_name: last_name,
                                                           ssn: ssn,
                                                           dob: dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
-    return false if person.blank? || (person.present? &&
-                                      person.has_active_employee_role_for_census_employee?(self))
+    if person.blank? || (person.present? && person.has_active_employee_role_for_census_employee?(self))
+      return false
+    else
+      return person
+    end
+  end
+
+  def construct_employee_role_for_match_person
+    return false if employee_existence == false
+    person = employee_existence
     Factories::EnrollmentFactory.build_employee_role(person, nil, employer_profile, self, hired_on)
     return true
   end

@@ -16,7 +16,6 @@ class Employers::CensusEmployeesController < ApplicationController
   def create
     @census_employee = CensusEmployee.new
     @census_employee.build_from_params(census_employee_params, benefit_group_id)
-
     if renewal_benefit_group_id.present?
       benefit_group = BenefitGroup.find(BSON::ObjectId.from_string(renewal_benefit_group_id))
       if @census_employee.renewal_benefit_group_assignment.try(:benefit_group_id) != benefit_group.id
@@ -31,6 +30,7 @@ class Employers::CensusEmployeesController < ApplicationController
         @census_employee.construct_employee_role_for_match_person
         flash[:notice] = "Census Employee is successfully created."
       else
+        @census_employee.update_attribute("aasm_state","employee_role_linked") if @census_employee.employee_existence.present?
         flash[:notice] = "Your employee was successfully added to your roster."
         #flash[:notice] += "Note: an employee must be assigned to a benefit group before they can enroll for benefits"
       end
