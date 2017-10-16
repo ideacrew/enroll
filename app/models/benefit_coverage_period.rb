@@ -143,15 +143,9 @@ class BenefitCoveragePeriod
           date.next_month.end_of_month
         end
       end
-    else
-      dateOfTermMin = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
-      if (date < dateOfTermMin)
-        # If selected date is less than 14 days from today, add 14 days to today's date and that is the termination date.
-        effective_date = TimeKeeper.date_of_record + HbxProfile::IndividualEnrollmentTerminationMinimum
-      else
-        # If selected date is greater than or equal to 14 days from today, the selected date itself is the termination date.
+    else 
+     #  new rule
         effective_date = date
-      end
 
       # Add guard to prevent the temination date exceeding end date in the Individual Market
       [effective_date, end_on].min
