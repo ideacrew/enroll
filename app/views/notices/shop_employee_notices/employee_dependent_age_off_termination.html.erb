@@ -19,8 +19,13 @@
   </tbody>
 </table>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turning 26 and their coverage as a dependent on your employer-sponsored insurance with #{notice.employer_name} will terminate automatically on December 31<sup>st</sup> of this year. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on December 31<sup>st</sup> of that year."} %>
+<% if notice.enrollment.is_congress %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turning 26 and their coverage as a dependent on your employer-sponsored insurance through #{notice.employer_name} will terminate automatically on #{notice.enrollment.dependent_dob}. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on the last day of that month."} %>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "This notice is to inform you that your dependent, #{notice.enrollment.dependents.join(', ')}, recently turning 26 and their coverage as a dependent on your employer-sponsored insurance with #{notice.employer_name} will terminate automatically on December 31<sup>st</sup> of this year. Dependent children are eligible to remain enrolled on their parents’ plan up to age 26. Their coverage extends through the end of the calendar year during which they turn 26 and automatically terminates on December 31<sup>st</sup> of that year."} %>
+<% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "This means that, although your dependent child may be eligible to participate in #{Settings.site.short_name},they are not eligible to remain active on your policy as a dependent. This is because they are no longer eligible to enroll as a dependent child due to their age."} %>
@@ -31,7 +36,7 @@ content: "Dependent children with disabilities may be eligible to remain covered
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>Individual Market Enrollment</strong><br><br>"} %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => {
+<%= render partial: 'notices/shared/paragraph_without_page_break', :locals => {
 content: "If your dependent child does not qualify to enroll in employer-sponsored coverage or other coverage at this time, the annual individual market open enrollment period for #{notice.enrollment.plan_year} begins #{notice.enrollment.ivl_open_enrollment_start_on}. During this period your dependent can enroll in individual market coverage through #{Settings.site.short_name} if they live in the #{Settings.aca.state_name}. Plan selections made by #{notice.enrollment.ivl_open_enrollment_end_on} will become effective on #{notice.enrollment.effective_on}. Your dependent child may also be eligible for premium subsidies and other forms of financial assistance if they are unable to afford the full cost of health insurance. Your dependent child can create a #{Settings.site.short_name} account and complete an eligibility application for individual marketplace coverage to review health plan options and learn whether they might be eligible for financial assistance. If your dependent lives outside the #{Settings.aca.state_name}, they can apply during open enrollment through the health insurance exchange operating in their state. To find the Health Insurance Marketplace in your state, go to <a href=#{Settings.site.healthcare_url}>#{Settings.site.healthcare_name}</a>."} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -49,11 +54,13 @@ content: "There are separate eligibility rules for Special Enrollment Periods in
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 
-<% if notice.broker.present? %>
-  <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
-<% else %>
-  <%= render partial: 'notices/shared/paragraph', :locals => {
- content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+<% if !notice.enrollment.is_congress %>
+  <% if notice.broker.present? %>
+    <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>
+  <% else %>
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+   content: "If you do not currently have a broker, you can reach out to one of our many trained experts by clicking on the “Find a Broker” link in your employer account or calling #{Settings.contact_center.phone_number}."} %>
+  <% end %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
