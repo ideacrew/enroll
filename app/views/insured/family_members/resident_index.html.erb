@@ -11,7 +11,7 @@
         <% end %>
 
         <h1><%= l10n("household_info") %>: <%= l10n("family_members") %></h1>
-        <h4><%= l10n("family_members.index.continue_to_get_insurance") %></h4>
+        <h4><%= l10n(".continue_to_get_insurance") %></h4>
         <p class='memo'>* = <%= l10n("required_field") %></p>
 
         <div class="row no-buffer">
@@ -21,7 +21,7 @@
               <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
             </div>
             <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
-              <label class="static_label label-floatlabel" for="relation"><%= l10n(".relation").to_s.upcase %></label>
+              <label class="static_label label-floatlabel" for="relation"><%= l10n("relation").to_s.upcase %></label>
               <span class="field_value floatlabel form-control active-floatlabel" id="relation">Self</span>
             </div>
           </div>
@@ -30,7 +30,7 @@
         <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-              <p class="fail"><%= l10n("family_members.index.add_member_info_html") %></p>
+              <p class="fail"><%= l10n(".add_member_info_html") %></p>
               <br>
               <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
                 <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>

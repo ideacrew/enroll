@@ -116,7 +116,7 @@ Then(/(.*) should see \"my account\" page with enrollment/) do |named_person|
   enrollment = all('.hbx-enrollment-panel')
   qle  = sep_enr ? true : false
 
-  expect(all('.hbx-enrollment-panel').select{|panel| 
+  expect(all('.hbx-enrollment-panel').select{|panel|
     panel.has_selector?('.enrollment-effective', text: expected_effective_on(qle: qle).strftime("%m/%d/%Y"))
   }.present?).to be_truthy
 
@@ -230,7 +230,7 @@ When(/Employee enters Qualifying Life Event/) do
   wait_for_ajax
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   click_link "CONTINUE"
-  click_button "Continue"
+  click_button "CONTINUE"
   screenshot("completing SEP")
 end
 

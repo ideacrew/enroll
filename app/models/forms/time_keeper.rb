@@ -4,7 +4,7 @@ module Forms
     include ActiveModel::Validations
     include Acapi::Notifiers
 
-    delegate :date_of_record, :save, :valid?, to: :'::TimeKeeper'
+    delegate :date_of_record, :valid?, to: :'::TimeKeeper'
 
     attr_reader :forms_date_of_record
 
@@ -16,6 +16,10 @@ module Forms
 
     def set_date_of_record(date)
       notify(DATE_EVENT, {"current_date" => date})
+    end
+
+    def save
+      ::TimeKeeper.set_date_of_record forms_date_of_record
     end
 
     def instance

@@ -649,7 +649,7 @@ end
 
 Then(/^.+ should see the new dependent form$/) do
 
-  expect(page).to have_content('Confirm Member')
+  expect(page).to have_content('CONFIRM MEMBER')
 end
 
 When(/^.+ enters? the dependent info of Sorens daughter$/) do
@@ -866,12 +866,16 @@ When(/^I select a past qle date$/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
   find(".navbar-brand").click #to stop datepicker blocking shit
+
   within '#qle-date-chose' do
-    click_link "CONTINUE"
+    find("#qle_submit").click
   end
+  screenshot("clicked_continue")
+
 end
 
 Then(/^I should see confirmation and continue$/) do
+  wait_for_ajax
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   screenshot("valid_qle")
   click_button "Continue"
@@ -939,9 +943,9 @@ end
 And(/Employee should have a ER sponsored enrollment/) do
   person = Person.all.first
   bg = Organization.all.first.employer_profile.plan_years[0].benefit_groups[0]
-  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected", 
+  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected",
                                     plan: Plan.all.first, benefit_group_id: bg.id
-  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id, 
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id,
                                         eligibility_date: TimeKeeper.date_of_record - 1.month, coverage_start_on: TimeKeeper.date_of_record)
   enrollment.save
 end
@@ -972,4 +976,3 @@ Given(/^a Hbx admin with read and write permissions and employers$/) do
   org2 = FactoryGirl.create(:organization, legal_name: 'Chase & Assoc', hbx_id: "67890")
   employer_profile = FactoryGirl.create :employer_profile, organization: org2
 end
-

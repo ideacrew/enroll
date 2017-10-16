@@ -101,4 +101,5 @@ class TimeKeeper
   def thread_local_date_of_record
     Thread.current[:time_keeper_local_cached_date]
   end
+
 end

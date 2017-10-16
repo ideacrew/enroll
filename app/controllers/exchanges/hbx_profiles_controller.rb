@@ -521,6 +521,7 @@ def employer_poc
     forms_time_keeper = Forms::TimeKeeper.new(params[:forms_time_keeper])
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
+      forms_time_keeper.save
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
     rescue Exception=>e
       flash[:error] = "Failed to set date of record, " + e.message
