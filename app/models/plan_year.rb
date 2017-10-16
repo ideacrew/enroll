@@ -6,8 +6,8 @@ class PlanYear
   include Acapi::Notifiers
   include ScheduledEventService
   include Config::AcaModelConcern
-  include Concerns::Observable
-  include ModelEvents::PlanYear
+  # include Concerns::Observable
+  # include ModelEvents::PlanYear
 
   embedded_in :employer_profile
 
