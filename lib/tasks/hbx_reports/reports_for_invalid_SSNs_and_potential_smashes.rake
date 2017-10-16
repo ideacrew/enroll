@@ -11,6 +11,7 @@ namespace :reports do
       FirstName
       LastName
       DOB
+      SSN
       Is_Primary
       Has_Employee_Role
       Has_IVL_Role
@@ -49,6 +50,7 @@ namespace :reports do
               person.first_name,
               person.last_name,
               person.dob,
+              person.ssn,
               is_primary?(person),
               has_employee_role?(person),
               has_ivl_role?(person),
@@ -73,6 +75,7 @@ namespace :reports do
               person.first_name,
               person.last_name,
               person.dob,
+              person.ssn,
               is_primary?(person),
               has_employee_role?(person),
               has_ivl_role?(person),
