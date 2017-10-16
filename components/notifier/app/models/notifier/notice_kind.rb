@@ -4,6 +4,7 @@ module Notifier
   class NoticeKind
     include Mongoid::Document
     include Mongoid::Timestamps
+    include AASM
 
     RECEIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
@@ -16,13 +17,26 @@ module Notifier
     field :identifier, type: String
     field :notice_number, type: String
     field :receipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
+    field :aasm_state, type: String, default: :draft
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
     embeds_one :merge_data_model
+    embeds_many :workflow_state_transitions, as: :transitional
 
     validates_presence_of :title, :notice_number, :receipient
     validates_uniqueness_of :notice_number
+
+    before_save :set_data_elements
+
+    scope :published,         ->{ any_in(aasm_state: ['published']) }
+    scope :archived,          ->{ any_in(aasm_state: ['archived']) }
+
+    def set_data_elements
+      if template.present?
+        template.data_elements = template.raw_body.scan(/\#\{([\w|\.]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}
+      end
+    end
 
     def receipient_class_name
       # receipient.constantize.class_name.underscore
@@ -130,6 +144,32 @@ module Notifier
           csv << [notice.notice_number, notice.title, notice.description, notice.receipient, notice.template.try(:raw_body)]
         end
       end
+    end
+
+    aasm do
+      state :draft, initial: true
+
+      state :published
+      state :archived
+
+      event :publish, :after => :record_transition do
+        transitions from: :draft,  to: :published,  :guard  => :can_be_published?
+      end
+
+      event :archive, :after => :record_transition do
+        transitions from: [:published],  to: :archived
+      end  
+    end
+
+    # Check if notice with same MPI indictor exists
+    def can_be_published?
+    end
+
+    def record_transition
+      self.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: aasm.from_state,
+        to_state: aasm.to_state
+        )
     end
   end
 end

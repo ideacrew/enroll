@@ -10,6 +10,7 @@ module Notifier
     field :raw_header, type: String
     field :raw_footer, type: String
     field :template_key, type: String
+    field :data_elements, type: Array, default: []
 
     validates_presence_of :raw_body
 
