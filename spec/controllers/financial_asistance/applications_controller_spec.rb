@@ -266,7 +266,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, type: :controller do
 
   context "GET eligibility_results" do
     it 'should get eligibility results' do
-      get :eligibility_results, id: application.id
+      get :eligibility_results, {:id => application.id, :cur=>1}
       expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
       expect(response).to render_template(:financial_assistance)
