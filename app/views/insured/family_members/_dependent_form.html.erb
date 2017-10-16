@@ -124,7 +124,7 @@
             <div class="select-positioning ml-label"> <label>is</label> </div>
             <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
             <div class="select-relation rs_selection">
-              <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control" %>
+              <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
             </div>
             <label class="position-left"> of</label>
             <div class="icon-rel">
