@@ -9,10 +9,10 @@ module Effective
         end
 
         table_column :mpi_indicator, :proc => Proc.new { |row|
-          link_to row.notice_number, preview_notice_kind_path(row), target: '_blank'
+          link_to row.notice_number, notifier.preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
         table_column :title, :proc => Proc.new { |row|
-          link_to row.title, preview_notice_kind_path(row), target: '_blank'
+          link_to row.title, notifier.preview_notice_kind_path(row), target: '_blank'
         }, :filter => false, :sortable => false
         table_column :description, :proc => Proc.new { |row|
           row.description
