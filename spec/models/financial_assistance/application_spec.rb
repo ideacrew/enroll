@@ -4,13 +4,17 @@ require 'aasm/rspec'
 RSpec.describe FinancialAssistance::Application, type: :model do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
   end
 
-  let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
-  let!(:primary_member) { family.primary_applicant.person}
-  let!(:family_member1) { FactoryGirl.create(:family_member, family: family) }
-  let!(:family_member2) { FactoryGirl.create(:family_member, family: family) }
-  let!(:family_member3) { FactoryGirl.create(:family_member, family: family) }
+  let!(:primary_member) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: primary_member) }
+  let!(:person2) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:person3) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:person4) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:family_member1) { FactoryGirl.create(:family_member, family: family, person: person2) }
+  let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person3) }
+  let!(:family_member3) { FactoryGirl.create(:family_member, family: family, person: person4) }
   let!(:year) { TimeKeeper.date_of_record.year }
   let!(:application) { FactoryGirl.create(:application, family: family) }
   let!(:household) { family.households.first }

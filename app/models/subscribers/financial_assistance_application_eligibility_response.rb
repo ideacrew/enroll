@@ -44,7 +44,7 @@ module Subscribers
       verified_family.parse(xml)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
-      application_in_context = family.applications.find(verified_family.fin_app_id)
+      application_in_context = FinancialAssistance::Application.where(:id => verified_family.fin_app_id).first
       primary_person = search_person(verified_primary_family_member)
       if primary_person.blank?
         application_in_context.set_determination_response_error!

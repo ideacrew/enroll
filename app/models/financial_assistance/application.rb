@@ -569,6 +569,14 @@ private
     end
   end
 
+  def trigger_eligibilility_notice
+    if is_family_totally_ineligibile
+      IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "ineligibility_notice")
+    else
+      IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "eligibility_notice")
+    end
+  end
+
   def set_hbx_id
     #TODO: Use hbx_id generator for Application
     write_attribute(:hbx_id, HbxIdGenerator.generate_application_id) if hbx_id.blank?
