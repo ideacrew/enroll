@@ -5,24 +5,31 @@ module Notifier
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
 
-    attribute :notice_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
-    attribute :first_name, String, default: 'John'
-    attribute :last_name, String, default: 'Whitmore'
+    attribute :notice_date, Date
+    attribute :first_name, String
+    attribute :last_name, String
     attribute :mailing_address, MergeDataModels::Address
 
-    attribute :borker_agency_name, String, default: 'Best Brokers LLC'
-    attribute :assignment_date, Date, default: TimeKeeper.date_of_record.strftime('%m/%d/%Y') 
-    attribute :employer_name, String, default: 'North America Football Federation'
-    attribute :employer_poc_firstname, String, default: 'David'
-    attribute :employer_poc_lastname, String, default: 'Samules'
-
+    attribute :borker_agency_name, String
+    attribute :assignment_date, Date
+    attribute :employer_name, String
+    attribute :employer_poc_firstname, String
+    attribute :employer_poc_lastname, String
 
     def self.stubbed_object
-      notice = Notifier::MergeDataModels::BrokerProfile.new
+      notice = Notifier::MergeDataModels::BrokerProfile.new({
+        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+        first_name: 'John',
+        last_name: 'Whitmore',
+        borker_agency_name: 'Best Brokers LLC',
+        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
+        employer_name: 'North America Football Federation',
+        employer_poc_firstname: 'David',
+        employer_poc_lastname: 'Samules'
+        })
       notice.mailing_address = Notifier::MergeDataModels::Address.new
       notice
     end
-
 
     def collections
       []

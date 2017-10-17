@@ -43,7 +43,7 @@ module Notifier
       end
     end
 
-    def receipient_klass_instance
+    def receipient_klass_name
       receipient.to_s.split('::').last.underscore.to_sym
     end
 

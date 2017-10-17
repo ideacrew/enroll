@@ -3,7 +3,7 @@ module Notifier
 
     def to_html(options = {})
       data_object = (resource_id.present? ? data_builder : receipient.constantize.stubbed_object)
-      render_envelope({receipient: data_object}) + render_notice_body({receipient_klass_instance => data_object}) 
+      render_envelope({receipient: data_object}) + render_notice_body({receipient_klass_name => data_object}) 
     end
 
     def data_builder
@@ -13,7 +13,7 @@ module Notifier
       builder.append_contact_details
 
       template.data_elements.each do |element|
-        element_retriver = element.split('.').reject{|ele| ele == receipient_klass_instance.to_s}.join('_')
+        element_retriver = element.split('.').reject{|ele| ele == receipient_klass_name.to_s}.join('_')
         builder.instance_eval(element_retriver)
       end
 
