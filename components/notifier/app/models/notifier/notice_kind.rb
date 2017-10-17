@@ -5,6 +5,7 @@ module Notifier
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
+    include Notifier::NoticeBuilder
 
     RECEIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
@@ -32,109 +33,19 @@ module Notifier
     scope :published,         ->{ any_in(aasm_state: ['published']) }
     scope :archived,          ->{ any_in(aasm_state: ['archived']) }
 
+    attr_accessor :resource_id
+
     def set_data_elements
       if template.present?
-        template.data_elements = template.raw_body.scan(/\#\{([\w|\.]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}
+        tokens = template.raw_body.scan(/\#\{([\w|\.]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq
+        conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
+        template.data_elements = tokens + conditional_tokens
       end
     end
 
-    def receipient_class_name
-      # receipient.constantize.class_name.underscore
+    def receipient_klass_instance
       receipient.to_s.split('::').last.underscore.to_sym
     end
-
-    def to_html(options = {})
-      params = { receipient_class_name.to_sym => receipient.constantize.stubbed_object }
-
-      if receipient_class_name.to_sym != :employer_profile
-        params.merge!({employer_profile: receipient.constantize.stubbed_object})
-      end
-
-      Notifier::NoticeKindsController.new.render_to_string({
-        :template => 'notifier/notice_kinds/template.html.erb', 
-        :layout => false,
-        :locals => { receipient: receipient.constantize.stubbed_object, notice_number: self.notice_number}
-      }) + Notifier::NoticeKindsController.new.render_to_string({ 
-        :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        :layout => 'notifier/pdf_layout',
-        :locals => params
-      })
-    end
-
-    def save_html
-      File.open(Rails.root.join("tmp", "notice.html"), 'wb') do |file|
-        file << self.to_html({kind: 'pdf'})
-      end
-    end 
-  
-    def to_pdf
-      WickedPdf.new.pdf_from_string(self.to_html({kind: 'pdf'}), pdf_options)
-    end
-
-    def generate_pdf_notice
-      File.open(notice_path, 'wb') do |file|
-        file << self.to_pdf
-      end
-
-      attach_envelope
-      non_discrimination_attachment
-      # clear_tmp
-    end
-
-    def pdf_options
-      {
-        margin:  {
-          top: 15,
-          bottom: 28,
-          left: 22,
-          right: 22 
-        },
-        disable_smart_shrinking: true,
-        dpi: 96,
-        page_size: 'Letter',
-        formats: :html,
-        encoding: 'utf8',
-        header: {
-          content: ApplicationController.new.render_to_string({
-            template: "notifier/notice_kinds/header_with_page_numbers.html.erb",
-            layout: false,
-            locals: {notice: self}
-            }),
-          }
-      }
-    end
-
-    def notice_path
-      Rails.root.join("public", "NoticeTemplate.pdf")
-    end
-
-    def non_discrimination_attachment
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_shop_non_discrimination_attachment.pdf')]
-    end
-
-    def attach_envelope
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ma_envelope_without_address.pdf')]
-    end
-
-    def join_pdfs(pdfs)
-      pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
-      pdf << CombinePDF.load(pdfs[1])
-      pdf.save notice_path
-    end
-
-    # def self.markdown
-    #   Redcarpet::Markdown.new(ReplaceTokenRenderer,
-    #       no_links: true,
-    #       hard_wrap: true,
-    #       disable_indented_code_blocks: true,
-    #       fenced_code_blocks: false,        
-    #     )
-    # end
-
-    # # Markdown API: http://www.rubydoc.info/gems/redcarpet/3.3.4
-    # def to_html
-    #   self.markdown.render(template.body)
-    # end
 
     def self.to_csv
       CSV.generate(headers: true) do |csv|
@@ -171,5 +82,19 @@ module Notifier
         to_state: aasm.to_state
         )
     end
+
+    # def self.markdown
+    #   Redcarpet::Markdown.new(ReplaceTokenRenderer,
+    #       no_links: true,
+    #       hard_wrap: true,
+    #       disable_indented_code_blocks: true,
+    #       fenced_code_blocks: false,        
+    #     )
+    # end
+
+    # # Markdown API: http://www.rubydoc.info/gems/redcarpet/3.3.4
+    # def to_html
+    #   self.markdown.render(template.body)
+    # end
   end
 end
