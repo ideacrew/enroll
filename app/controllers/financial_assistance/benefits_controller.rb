@@ -80,7 +80,7 @@ class FinancialAssistance::BenefitsController < ApplicationController
     @benefit_insurance_kind = @benefit.insurance_kind
     @benefit.destroy!
 
-    render head: 'ok'
+    head :ok
   end
 
   private

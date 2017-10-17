@@ -105,13 +105,11 @@ RSpec.describe FinancialAssistance::BenefitsController, type: :controller do
   end
 
   context "destroy" do
-    it "should create new benefit" do
+    it "should delete a benefit instance" do
       expect(applicant.benefits.count).to eq 1
       delete :destroy, application_id: application.id , applicant_id: applicant.id, id: benefit.id
       applicant.reload
       expect(applicant.benefits.count).to eq 0
-      expect(flash[:success]).to eq "Benefit deleted - (#{benefit.kind}, #{benefit.insurance_kind})"
-      expect(response).to redirect_to(financial_assistance_application_applicant_benefits_path(application, applicant))
     end
   end
 end
