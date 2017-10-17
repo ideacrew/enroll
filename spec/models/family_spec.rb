@@ -809,6 +809,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
       expect(family.current_shop_eligible_open_enrollments.count).to eq 1
     end
 
+    it "should have no current shop eligible open enrollments if the employee role is not active" do
+      census_employee.update_attributes(aasm_state: "employment_terminated")
+      expect(family.current_shop_eligible_open_enrollments.count).to eq 0
+    end
+
     it "should not be in ivl open enrollment" do
       expect(family.is_under_ivl_open_enrollment?).to be_falsey
     end
