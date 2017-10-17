@@ -36,15 +36,21 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
   context "POST step" do
     before do
       controller.instance_variable_set(:@modal, application)
+      controller.instance_variable_set(:@applicant, applicant)
     end
 
     it "should show flash error message nil" do
       expect(flash[:error]).to match(nil)
     end
 
-    it "should render step if no key present in params with modal_name" do
+    it "should render create if no key present in params with modal_name" do
       post :step, application_id: application.id , applicant_id: applicant.id
-      expect(response).to render_template 'workflow/step'
+      expect(response).to render_template 'financial_assistance/deductions/create'
+    end
+
+    it "should render create if no key present in params with modal_name" do
+      post :step, application_id: application.id , applicant_id: applicant.id, :financial_assistance_deduction => {:start_on=> "09/09/2017", :end_on=> "09/20/2017"}
+      expect(response).to render_template 'financial_assistance/deductions/create'
     end
 
     context "when params has application key" do

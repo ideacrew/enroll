@@ -75,12 +75,13 @@ class FinancialAssistance::DeductionsController < ApplicationController
     @deduction_kind = @deduction.kind
     @deduction.destroy!
 
-    render head: 'ok'
+    head :ok
   end
 
   private
 
   def format_date params
+    return if params[:financial_assistance_deduction].blank?
     params[:financial_assistance_deduction][:start_on] = Date.strptime(params[:financial_assistance_deduction][:start_on].to_s, "%m/%d/%Y")
     params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y")
   end
@@ -106,6 +107,7 @@ class FinancialAssistance::DeductionsController < ApplicationController
   end
 
   def permit_params(attributes)
+    return if attributes.blank?
     attributes.permit!
   end
 
