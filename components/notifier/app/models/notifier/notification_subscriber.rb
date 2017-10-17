@@ -15,6 +15,17 @@ module Notifier
         rescue Exception => e
           # ADD LOGGING AND HANDLING
           puts "#{e.inspect} #{e.backtrace}"
+          error_payload = JSON.dump({
+            :error => e.inspect,
+            :message => e.message,
+            :backtrace => e.backtrace
+            })
+          notify("acapi.error.application.enroll.remote_listener.notice_automation_responses", {
+            :resource_id => payload.first[1],
+            :event_name => event_name,
+            :return_status => "500",
+            :body => error_payload
+          })
         end
       end
     end
