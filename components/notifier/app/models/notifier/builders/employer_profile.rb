@@ -6,9 +6,8 @@ module Notifier
       @merge_model = Notifier::MergeDataModels::EmployerProfile.new
     end
 
-    def resource_id=(resource_id)
-      @employer_profile = EmployerProfile.by_hbx_id(resource_id)
-      raise ArgumentError.new("Unable to find Employer profile with given Hbx ID: #{resource_id}") if employer_profile.blank?
+    def resource=(resource)
+      @employer_profile = resource
     end
 
     def append_contact_details
