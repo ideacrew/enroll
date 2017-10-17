@@ -39,13 +39,50 @@ var Verification = (function(){
    function modalByType(name) {
      $('#historyModal').modal('show');
      $('#historyModal').on('shown.bs.modal', function (event) {
-       var element = $(event.relatedTarget) // Button that triggered the modal
-       var title = element.data('typeof'); // Extract info from data-* attributes
-       // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-       // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-       var modal = $(this)
-       modal.find('.modal-title').text(name + ' Verification History')
-       //modal.find('.modal-body input').val(recipient)
+       var element = $(event.relatedTarget)
+       var modal = $(this);
+       switch (name) {
+         case 'Social Security Number':
+           $('.ssn-table').show();
+           $('.citizenship-table').hide();
+           $('.ssa-request').hide();
+           $('.ssa-response').hide();
+           modal.find('.modal-title').text(name + ' Verification History');
+           $('#ssa-request').click(function() {
+             modal.find('.modal-title').text(name + ' Hub Request');
+             $('.ssn-overview').hide();
+             $('.ssa-request').show();
+           });
+           $('#ssa-response').click(function() {
+             modal.find('.modal-title').text(name + ' Hub Request');
+             $('.ssn-overview').hide();
+             $('.ssa-response').show();
+           });
+           $('.ssn-back').click(function() {
+             $('.ssn-table').show();
+             $('.ssn-overview').show();
+             $('.citizenship-table').hide();
+             $('.ssa-request').hide();
+             $('.ssa-response').hide();
+             modal.find('.modal-title').text(name + ' Verification History');
+           });
+           break;
+         case 'Immigration status':
+           $('.ssn-table').hide();
+           $('.citizenship-table').hide();
+           modal.find('.modal-title').text(name + ' Verification History');
+           break;
+         case 'Citizenship':
+           $('.citizenship-table').show();
+           $('.ssn-table').hide();
+           modal.find('.modal-title').text(name + ' Verification History');
+           break;
+         case 'Residency':
+           modal.find('.modal-title').text(name + ' Verification History');
+           break;
+       }
+       // Resets selectric options on modal load
+       $('select').selectric().prop('selectedIndex', 0).selectric('refresh');
      });
    }
    function checkAction(event){
@@ -89,4 +126,6 @@ var Verification = (function(){
 $(document).ready(function(){
    $('.v-type-actions').on('change', Verification.check_selected_action);
    $('.verification-update-reason').delegate('a', "click", Verification.confirm_v_type );
+   $('.ssn-table').hide();
+   $('.immigration').hide();
 });

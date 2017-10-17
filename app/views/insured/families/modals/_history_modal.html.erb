@@ -4,14 +4,23 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel"></h4>
+                <h4 class="modal-title"></h4>
       </div>
       <div class="modal-body">
-        SSN History
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <div class="ssn-table">
+          <div class="ssn-overview">
+            <%= render partial: 'insured/families/modals/tables/ssn' %>
+          </div>
+          <div class="ssa-request">
+            <%= render partial: 'insured/families/modals/tables/ssa_request' %>
+          </div>
+          <div class="ssa-response">
+            <%= render partial: 'insured/families/modals/tables/ssa_response' %>
+          </div>
+        </div>
+        <div class="citizenship-table">
+          <%= render partial: 'insured/families/modals/tables/citizenship' %>
+        </div>
       </div>
     </div>
   </div>
