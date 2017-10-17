@@ -31,15 +31,14 @@ RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
   }
   let(:financial_assistance_applicant_invalid){
     {
-      "student_kind"=>"",
-      "student_status_end_on"=>"",
-      "student_school_kind"=>"",
-      "is_self_attested_blind"=>"false",
-      "has_daily_living_help"=>"false"
+      "is_required_to_file_taxes" => nil,
+      "is_claimed_as_tax_dependent" => nil
     }
   }
   let(:applicant_params){
     {
+      "is_required_to_file_taxes" => true,
+      "is_claimed_as_tax_dependent" => false,
       "has_job_income"=>"false",
       "has_self_employment_income"=>"false",
       "has_other_income"=>"false",
@@ -93,11 +92,11 @@ RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
         expect(applicant.save).to eq true
       end
 
-      it "should redirect to find_applicant_path when passing params last step" do
+      it "should redirect to income index when in last step (tax_info)" do
         post :step, application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: applicant_params, last_step: true
-        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response.headers['Location']).to have_content 'incomes'
         expect(response.status).to eq 302
-        expect(response).to redirect_to(other_questions_financial_assistance_application_applicant_path(application, applicant))
+        expect(response).to redirect_to(financial_assistance_application_applicant_incomes_path(application, applicant))
       end
 
       it "should not redirect to find_applicant_path when not passing params last step" do
@@ -106,7 +105,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, type: :controller do
         expect(response).to render_template 'workflow/step'
       end
 
-      it "should render workflow/step when we are not params last step" do
+      it "should render_template 'workflow/step' when params are invalid" do
         post :step, application_id: application.id, id: applicant.id, commit: "CONTINUE", applicant: financial_assistance_applicant_invalid, last_step: true
         expect(response).to render_template 'workflow/step'
       end

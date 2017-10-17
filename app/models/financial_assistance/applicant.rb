@@ -434,6 +434,14 @@ private
     if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
       errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank")
     end
+
+    if is_required_to_file_taxes.nil?
+      errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank")
+    end
+
+    if is_claimed_as_tax_dependent.nil?
+      errors.add(:is_claimed_as_tax_dependent, "' is_claimed_as_tax_dependent can't be blank")
+    end
   end
 
   def presence_of_attr_other_qns
