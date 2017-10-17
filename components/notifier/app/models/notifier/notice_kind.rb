@@ -52,6 +52,8 @@ module Notifier
 
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
       generate_pdf_notice
+      upload_and_send_secure_message
+      send_generic_notice_alert
     end
 
     def receipient_klass_name

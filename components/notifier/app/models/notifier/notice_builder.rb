@@ -1,5 +1,6 @@
 module Notifier
   module NoticeBuilder
+    include Config::SiteConcern
 
     def to_html(options = {})
       data_object = (resource.present? ? data_builder : receipient.constantize.stubbed_object)
@@ -80,7 +81,15 @@ module Notifier
     end
 
     def notice_path
-      Rails.root.join("public", "NoticeTemplate.pdf")
+      Rails.root.join("tmp", "#{notice_filename}.pdf")
+    end
+
+    def subject
+      title
+    end
+
+    def notice_filename
+      "#{subject.titleize.gsub(/\s*/, '_')}"
     end
 
     def non_discrimination_attachment
@@ -95,6 +104,67 @@ module Notifier
       pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
       pdf << CombinePDF.load(pdfs[1])
       pdf.save notice_path
+    end
+
+    def upload_and_send_secure_message
+      doc_uri = upload_to_amazonS3
+      notice  = create_recipient_document(doc_uri)
+      create_secure_inbox_message(notice)
+    end
+
+    def upload_to_amazonS3
+      Aws::S3Storage.save(notice_path, 'notices')
+    rescue => e
+      raise "unable to upload to amazon #{e}"
+    end
+
+    # @param recipient is a Person object
+    def send_generic_notice_alert
+      UserMailer.generic_notice_alert(name,subject,to).deliver_now
+    end
+
+    def store_paper_notice
+      bucket_name= Settings.paper_notice
+      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '_')}"
+      notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
+      begin
+        FileUtils.cp(notice_path, notice_path_for_paper_notice)
+        doc_uri = Aws::S3Storage.save(notice_path_for_paper_notice,bucket_name,"#{notice_filename_for_paper_notice}.pdf")
+        File.delete(notice_path_for_paper_notice)
+      rescue Exception => e
+        puts "Unable to upload paper notices to Amazon"
+      end
+      # paper_notices_folder = "#{Rails.root.to_s}/public/paper_notices/"
+      # FileUtils.cp(notice_path, "#{Rails.root.to_s}/public/paper_notices/")
+      # File.rename(paper_notices_folder + , paper_notices_folder + "#{recipient.hbx_id}_" + notice_filename + File.extname(notice_path))
+    end
+
+    def create_recipient_document(doc_uri)
+      notice = resource.documents.build({
+        title: notice_filename, 
+        creator: "hbx_staff",
+        subject: "notice",
+        identifier: doc_uri,
+        format: "application/pdf"
+        })
+
+      if notice.save
+        notice
+      else
+        # LOG ERROR
+      end
+    end
+
+    def create_secure_inbox_message(notice)
+      body = "<br>You can download the notice by clicking this link " +
+             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
+      recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+      message = resource.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
+      message.save!
+    end
+
+    def clear_tmp
+      File.delete(notice_path)
     end
   end
 end
