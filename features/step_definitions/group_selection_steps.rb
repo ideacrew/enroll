@@ -122,6 +122,34 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
   enrollment.save!
 end
 
+Given (/a matched Employee exists with active and renwal plan years/) do
+  FactoryGirl.create(:user)
+  person = FactoryGirl.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
+  org = FactoryGirl.create :organization, :with_active_and_renewal_plan_years
+  @active_benefit_group = org.employer_profile.active_plan_year.benefit_groups[0]
+  active_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @active_benefit_group
+
+  @renewal_benefit_group = org.employer_profile.show_plan_year.benefit_groups[0]
+  renewal_bga = FactoryGirl.build :benefit_group_assignment, benefit_group: @renewal_benefit_group
+
+  @employee_role = person.employee_roles[0]
+  ce =  FactoryGirl.create(:census_employee, 
+          first_name: person.first_name, 
+          last_name: person.last_name, 
+          dob: person.dob, 
+          ssn: person.ssn, 
+          employee_role_id: @employee_role.id,
+          employer_profile: org.employer_profile
+        )
+  [renewal_bga, active_bga].each do |bga|
+    ce.benefit_group_assignments << bga
+  end
+
+  ce.link_employee_role!
+
+  @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
+end
+
 And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
   wait_for_ajax
   if type == "ineligible"
@@ -131,6 +159,16 @@ And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, 
     expect(find("#family_member_ids_0")).not_to be_disabled
     expect(find("#family_member_ids_0")).to be_checked
   end
+end
+
+And(/Employer not offers dental benefits for spouse in renewal plan year/) do
+  benefits = @renewal_benefit_group.dental_relationship_benefits
+  until benefits.blank?
+    benefits.each { |rb| rb.delete }
+  end
+  rbs = [FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :employee, premium_pct: 49, employer_max_amt: 1000.00),
+         FactoryGirl.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :spouse, premium_pct: 40, employer_max_amt:  200.00, offered: false)]
+  @renewal_benefit_group.save
 end
 
 And(/(.*) should also see the reason for ineligibility/) do |role|
@@ -282,6 +320,10 @@ end
 
 When(/employee clicked on make changes of health enrollment from first employer/) do
   find(:xpath, '//*[@id="account-detail"]/div[2]/div[1]/div[3]/div[3]/div/div[3]/div/span/a')
+end
+
+When(/employee clicked on back to my account/) do
+  find(".interaction-click-control-back-to-my-account").click
 end
 
 Given(/^a Resident exists$/) do

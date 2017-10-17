@@ -16,15 +16,13 @@ module Insured
       person.try(:has_active_resident_role?)
     end
 
-    def health_relationship_benefits(employee_role)
-      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+    def health_relationship_benefits(employee_role, benefit_group)
       if benefit_group.present?
         benefit_group.relationship_benefits.select(&:offered).map(&:relationship)
       end
     end
 
-    def dental_relationship_benefits(employee_role)
-      benefit_group = employee_role.census_employee.renewal_published_benefit_group || employee_role.census_employee.active_benefit_group
+    def dental_relationship_benefits(employee_role, benefit_group)
       if benefit_group.present?
         benefit_group.dental_relationship_benefits.select(&:offered).map(&:relationship)
       end
@@ -57,9 +55,17 @@ module Insured
       end
     end
 
-    def select_benefit_group(qle)
+    def get_benefit_group(benefit_group, employee_role, qle)
+      if benefit_group.present? && (employee_role.employer_profile == benefit_group.employer_profile )
+        benefit_group
+      else
+        select_benefit_group(qle, employee_role)
+      end
+    end
+
+    def select_benefit_group(qle, employee_role)
       if @market_kind == "shop"
-        @employee_role.present? ? @employee_role.benefit_group(qle: qle) : nil
+        employee_role.present? ? employee_role.benefit_group(qle: qle) : nil
       else
         nil
       end
@@ -206,8 +212,9 @@ module Insured
     end
 
     def shop_health_and_dental_attributes(family_member, employee_role)
+      benefit_group = get_benefit_group(@benefit_group, employee_role, @qle)
 
-      health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benfits(employee_role)
+      health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
 
       is_health_coverage = health_offered_relationship_benefits.present? ? coverage_relationship_check(
       health_offered_relationship_benefits, family_member, @new_effective_on) : true
@@ -219,11 +226,11 @@ module Insured
       return is_health_coverage, is_dental_coverage
     end
 
-    def shop_health_and_dental_relationship_benfits(employee_role)
-      health_offered_relationship_benefits = health_relationship_benefits(employee_role) 
+    def shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
+      health_offered_relationship_benefits = health_relationship_benefits(employee_role, benefit_group) 
 
       if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment) 
-        dental_offered_relationship_benefits = dental_relationship_benefits(employee_role) 
+        dental_offered_relationship_benefits = dental_relationship_benefits(employee_role, benefit_group) 
       end
 
       return health_offered_relationship_benefits, dental_offered_relationship_benefits

@@ -76,14 +76,15 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
   end
 
-  describe "#health_relationship_benefits" do
+  context "relationship_benefits" do
 
-    context "active/renewal health benefit group offered relationships" do
-      let(:employee_role){FactoryGirl.build(:employee_role)}
-      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
+    let(:employee_role){FactoryGirl.build(:employee_role)}
+    let(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
+    let(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
 
-      let(:relationship_benefits) do
+    context "#health_relationship_benefits" do
+
+      let(:initial_health__relationship_benefits) do
         [
             RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
             RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
@@ -91,45 +92,53 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
         ]
       end
 
-      it "should return offered relationships of active health benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
-        allow(active_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
-        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      let(:renewal_health_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75)
+        ]
       end
 
-      it "should return offered relationships of renewal health benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
-        allow(renewal_benefit_group).to receive_message_chain(:relationship_benefits).and_return(relationship_benefits)
-        expect(subject.health_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      context "active/renewal health benefit group offered relationships" do
+
+        it "should return offered relationships of active health benefit group" do
+          allow(active_benefit_group).to receive_message_chain(:relationship_benefits).and_return(initial_health__relationship_benefits)
+          expect(helper.health_relationship_benefits(employee_role, active_benefit_group)).to eq ["employee", "spouse", "child_under_26"]
+        end
+
+        it "should return offered relationships of renewal health benefit group" do
+          allow(renewal_benefit_group).to receive_message_chain(:relationship_benefits).and_return(renewal_health_relationship_benefits)
+          expect(helper.health_relationship_benefits(employee_role, renewal_benefit_group)).to eq ["employee", "spouse"]
+        end
       end
     end
-  end
 
-  describe "#dental_relationship_benefits" do
+    context "#dental_relationship_benefits" do
 
-    context "active/renewal dental benefit group offered relationships" do
-      let(:employee_role){FactoryGirl.build(:employee_role)}
-      let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group) }
-      let!(:active_benefit_group) { FactoryGirl.create(:benefit_group)}
-
-      let(:dental_relationship_benefits) do
+      let(:initial_dental_relationship_benefits) do
         [
             RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
-            RelationshipBenefit.new(offered: true, relationship: :spouse, premium_pct: 75),
             RelationshipBenefit.new(offered: true, relationship: :child_under_26, premium_pct: 50)
         ]
       end
 
-      it "should return offered relationships of active dental benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(active_benefit_group)
-        allow(active_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
-        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      let(:renewal_dental_relationship_benefits) do
+        [
+            RelationshipBenefit.new(offered: true, relationship: :employee, premium_pct: 100),
+        ]
       end
 
-      it "should return offered relationships of renewal dental benefit group" do
-        allow(employee_role).to receive_message_chain(:census_employee, :renewal_published_benefit_group).and_return(renewal_benefit_group)
-        allow(renewal_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(dental_relationship_benefits)
-        expect(subject.dental_relationship_benefits(employee_role)).to eq ["employee", "spouse", "child_under_26"]
+      context "active/renewal dental benefit group offered relationships" do
+
+        it "should return offered relationships of active dental benefit group" do
+          allow(active_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(initial_dental_relationship_benefits)
+          expect(helper.dental_relationship_benefits(employee_role, active_benefit_group)).to eq ["employee", "child_under_26"]
+        end
+
+        it "should return offered relationships of renewal dental benefit group" do
+          allow(renewal_benefit_group).to receive_message_chain(:dental_relationship_benefits).and_return(renewal_dental_relationship_benefits)
+          expect(helper.dental_relationship_benefits(employee_role, renewal_benefit_group)).to eq ["employee"]
+        end
       end
     end
   end
@@ -140,14 +149,14 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper do
 
     it "should return nil if market kind is not shop" do
       helper.instance_variable_set("@market_kind", "individual")
-      expect(helper.select_benefit_group(false)).to eq nil
+      expect(helper.select_benefit_group(false, employee_role)).to eq nil
     end
 
     it "should return benefit group on employee role if shop" do
       helper.instance_variable_set("@market_kind", "shop")
       helper.instance_variable_set("@employee_role", employee_role)
       allow(employee_role).to receive(:benefit_group).with(qle: false).and_return benefit_group
-      expect(helper.select_benefit_group(false)).to eq benefit_group
+      expect(helper.select_benefit_group(false, employee_role)).to eq benefit_group
     end
   end
 
