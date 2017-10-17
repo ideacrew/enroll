@@ -1,0 +1,2 @@
+$('#payments-table').empty();
+$('#payments-table').append("<%= escape_javascript(render 'employers/employer_profiles/my_account/accounts/payment_history', employer_profile: @employer_profile, tab: "accounts") %>");
