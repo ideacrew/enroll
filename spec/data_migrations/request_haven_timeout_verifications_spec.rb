@@ -19,7 +19,7 @@ describe RequestHavenTimeoutVerifications, dbclean: :after_each do
   describe "respond to Haven on TimeOut" do
     let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
     let!(:application) { FactoryGirl.create(:application, family: family) }
-    let!(:applicant) { FactoryGirl.create(:applicant, application: application, has_verification_response: false, is_ia_eligible: true) }
+    let!(:applicant) { FactoryGirl.create(:applicant, application: application, is_ia_eligible: true) }
 
     it "should update date of termination" do
       expect(application.timeout_response_last_submitted_at).to eq nil
