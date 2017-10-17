@@ -19,21 +19,21 @@ module Notifier
     field :notice_number, type: String
     field :receipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
     field :aasm_state, type: String, default: :draft
+    field :event_name, type: String
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
-    embeds_one :merge_data_model
     embeds_many :workflow_state_transitions, as: :transitional
 
     validates_presence_of :title, :notice_number, :receipient
-    validates_uniqueness_of :notice_number
+    validates_uniqueness_of :notice_number, :event_name
 
     before_save :set_data_elements
 
     scope :published,         ->{ any_in(aasm_state: ['published']) }
     scope :archived,          ->{ any_in(aasm_state: ['archived']) }
 
-    attr_accessor :resource_id
+    attr_accessor :resource
 
     def set_data_elements
       if template.present?
@@ -41,6 +41,17 @@ module Notifier
         conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
         template.data_elements = tokens + conditional_tokens
       end
+    end
+
+    def execute_notice(event_name, payload)
+      finder_mapping = Notifier::ApplicationEventMapper.lookup_resource_mapping(event_name)
+      if finder_mapping.nil?
+        # LOG AN ERROR ABOUT A BOGUS EVENT WHERE YOU CAN'T FIND THINGS
+        return
+      end
+
+      @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
+      generate_pdf_notice
     end
 
     def receipient_klass_name
