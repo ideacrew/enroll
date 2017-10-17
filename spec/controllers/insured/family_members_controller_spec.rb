@@ -89,11 +89,13 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "GET show" do
     let(:dependent) { double("Dependent") }
-    let(:family_member) {double("FamilyMember", id: double("id"))}
+    let(:app) { double("App") }
+    let(:family_member) {double("FamilyMember", id: double("id"), family: double("Family", application_in_progress: double("App")))}
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
       allow(dependent).to receive(:family).and_return(test_family)
+      allow(dependent).to receive(:family_member).and_return(family_member)
       allow(test_family).to receive(:build_relationship_matrix).and_return([])
       allow(test_family).to receive(:find_missing_relationships).and_return([])
       sign_in(user)
@@ -141,6 +143,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(dependent).to receive(:address=)
       allow(dependent).to receive(:family_id).and_return(dependent_properties)
       allow(dependent).to receive(:family).and_return(test_family)
+      allow(dependent).to receive(:copy_finanacial_assistances_application)
       allow(test_family).to receive(:build_relationship_matrix).and_return([])
       allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
@@ -205,6 +208,7 @@ RSpec.describe Insured::FamilyMembersController do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(dependent).to receive(:family_member).and_return(family_member)
+      allow(dependent).to receive(:copy_finanacial_assistances_application)
     end
 
     it "should destroy the dependent" do
@@ -242,7 +246,7 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: 'true') }
+    let(:dependent) { double(addresses: [address], family_member: double("FamilyMember", family: double("Family", application_in_progress: double("App"))), same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
