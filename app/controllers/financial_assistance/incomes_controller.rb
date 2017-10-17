@@ -69,7 +69,7 @@
     if @income.save
       render :create
     else
-      render head: 'ok'
+      head :ok
     end
   end
 
@@ -88,13 +88,14 @@
     @income = @applicant.incomes.find(params[:id])
     @income.destroy!
 
-    render head: 'ok'
+    head :ok
   end
 
   private
   def format_date params
-   params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
-   params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
+    return if params[:financial_assistance_income].blank?
+    params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
+    params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
  end
 
   def job_income_type
@@ -129,6 +130,7 @@
   end
 
   def permit_params(attributes)
+    return if attributes.blank?
     attributes.permit!
   end
 

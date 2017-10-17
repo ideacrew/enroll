@@ -39,15 +39,11 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
   context "POST step" do
     before do
       controller.instance_variable_set(:@modal, application)
+      controller.instance_variable_set(:@applicant, applicant)
     end
 
     it "should show flash error message nil" do
       expect(flash[:error]).to match(nil)
-    end
-
-    it "should render step if no key present in params with modal_name" do
-      post :step, application_id: application.id , applicant_id: applicant.id
-      expect(response).to render_template 'workflow/step'
     end
 
     context "when params has application key" do
@@ -78,7 +74,6 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
 
     it "should render step if model is not saved" do
       post :step, application_id: application.id , applicant_id: applicant.id, id: income.id, income: invalid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params
-      expect(flash[:error]).to match("Ppp Is Not A Valid Income Type")
       expect(response).to render_template 'workflow/step'
     end
   end
@@ -89,8 +84,6 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
       delete :destroy, application_id: application.id , applicant_id: applicant.id, id: income.id
       applicant.reload
       expect(applicant.incomes.count).to eq 0
-      expect(flash[:success]).to eq "Income deleted - (#{income.kind})"
-      expect(response).to redirect_to(financial_assistance_application_applicant_incomes_path(application, applicant))
     end
   end
 end
