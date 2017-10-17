@@ -60,6 +60,8 @@ PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
+      aasm (~> 4.8.0)
+      acapi
       ckeditor
       combine_pdf
       curl
@@ -801,4 +803,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.14.6
+   1.15.4
