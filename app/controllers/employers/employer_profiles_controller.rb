@@ -126,6 +126,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         else
           retrieve_payments_for_page(1)
         end
+        respond_to do |format|
+          format.js {render 'employers/employer_profiles/my_account/accounts/payment_history'}
+          format.html
+        end
       when 'employees'
         @current_plan_year = @employer_profile.show_plan_year
         paginate_employees
