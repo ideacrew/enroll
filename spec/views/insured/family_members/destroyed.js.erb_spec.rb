@@ -15,6 +15,7 @@ describe "insured/family_members/destroyed.js.erb" do
       allow(family_member).to receive(:person).and_return person
       allow(person).to receive(:has_mailing_address?).and_return false
       assign(:dependent, Forms::FamilyMember.find(family_member.id))
+      assign(:family, family)
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
 
       render file: "insured/family_members/destroyed.js.erb"

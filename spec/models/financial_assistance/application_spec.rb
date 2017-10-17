@@ -5,6 +5,7 @@ RSpec.describe FinancialAssistance::Application, type: :model do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
     allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:create_verification_documents).and_return(true)
   end
 
   let!(:primary_member) { FactoryGirl.create(:person, :with_consumer_role) }

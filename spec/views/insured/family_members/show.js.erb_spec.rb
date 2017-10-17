@@ -13,6 +13,7 @@ describe "insured/family_members/show.js.erb" do
       assign(:person, person)
       assign(:created, true)
       assign(:dependent, dependent)
+      assign(:family, family)
       allow(FamilyMember).to receive(:find).with(family_member.id).and_return(family_member)
       allow(family_member).to receive(:primary_relationship).and_return("self")
       allow(family_member).to receive(:person).and_return person
