@@ -24,7 +24,7 @@ namespace :reports do
 
               #for health case
               enrollment = enrollments.detect{|enrollment| enrollment.coverage_kind == 'health' && enrollment.aasm_state == "coverage_terminated"}
-              unless enrollment.nil?
+              unless enrollment.nil? || ce.employee_role.nil? || ce.employee_role.person.nil?
                 csv <<[  ce.employee_role.person.full_name,
                          ce.employee_role.person.hbx_id,
                          enrollment.employer_profile.legal_name,
@@ -37,7 +37,7 @@ namespace :reports do
               end
               # for dental case
               enrollment = enrollments.detect{|enrollment| enrollment.coverage_kind == 'dental' && enrollment.aasm_state == "coverage_terminated"}
-              unless enrollment.nil?
+              unless enrollment.nil? || ce.employee_role.nil? || ce.employee_role.person.nil?
                 csv <<[  ce.employee_role.person.full_name,
                          ce.employee_role.person.hbx_id,
                          enrollment.employer_profile.legal_name,
