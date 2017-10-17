@@ -25,9 +25,9 @@ module Observers
         if new_model_event.event_key == :ineligible_initial_application_submitted
           eligibility_warnings = plan_year.application_eligibility_warnings
 
-          if (eligibility_warnings.include?(:primary_office_location) || eligibility_warnings.include?(:fte_count))
+          # if (eligibility_warnings.include?(:primary_office_location) || eligibility_warnings.include?(:fte_count))
             trigger_notice(plan_year.employer_profile, "initial_employer_denial")
-          end
+          # end
         end
       end
     end

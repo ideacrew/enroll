@@ -89,7 +89,7 @@ module Notifier
     end
 
     def notice_filename
-      "#{subject.titleize.gsub(/\s*/, '_')}"
+      "#{subject.titleize.gsub(/\s+/, '_')}"
     end
 
     def non_discrimination_attachment
@@ -118,14 +118,26 @@ module Notifier
       raise "unable to upload to amazon #{e}"
     end
 
+    def recipient_name
+      if resource.is_a?(EmployerProfile)
+        resource.staff_roles.first.full_name.titleize
+      end
+    end
+
+    def recipient_to
+      if resource.is_a?(EmployerProfile)
+        resource.staff_roles.first.work_email_or_best
+      end
+    end
+
     # @param recipient is a Person object
     def send_generic_notice_alert
-      UserMailer.generic_notice_alert(name,subject,to).deliver_now
+      UserMailer.generic_notice_alert(recipient_name,subject,recipient_to).deliver_now
     end
 
     def store_paper_notice
       bucket_name= Settings.paper_notice
-      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '_')}"
+      notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s+/, '_')}"
       notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
       begin
         FileUtils.cp(notice_path, notice_path_for_paper_notice)
@@ -157,8 +169,8 @@ module Notifier
 
     def create_secure_inbox_message(notice)
       body = "<br>You can download the notice by clicking this link " +
-             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
-      recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+             "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(resource.class.to_s, 
+      resource.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
       message = resource.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end

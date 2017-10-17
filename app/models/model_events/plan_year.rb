@@ -20,7 +20,7 @@ module ModelEvents
           is_renewal_application_created = true
         end
 
-        if is_transition_matching?(to: :publish_pending, from: :draft, event: :publish)
+        if is_transition_matching?(to: :publish_pending, from: :draft, event: [:publish, :force_publish])
           is_ineligible_initial_application_submitted = true
         end
 
