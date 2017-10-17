@@ -18,6 +18,7 @@ contact_center:
   alt_name: "DC Health Link Customer Service"
   phone_number: "1-855-532-5465"
   tty_number: "1-855-532-5465"
+  tty: "771"
   alt_phone_number: "1-855-532-LINK"
   email_address: "info@dchealthlink.com"
 
@@ -70,6 +71,7 @@ aca:
       # After submitting an ineligible plan year application, time period an Employer must wait
       ineligible_period_after_application_denial:
         days: 90
+      quiet_period_end_on: 28
 
     renewal_application:
       earliest_start_prior_to_effective_on:
@@ -80,6 +82,7 @@ aca:
       open_enrollment:
         minimum_length:
           days: 3
+      quiet_period_end_on: 15
 
     benefit_period:
       length_minimum:
@@ -103,8 +106,15 @@ aca:
       new_enrollment_transmit_on: 16
       update_transmit_day_of_week: "friday"
 
+    transmit_employers_immediately: false
+    transmit_scheduled_employers: true
+    employer_transmission_day_of_month: 16
 
 paper_notice: 'paper-notices'
+checkbook_services: 
+    remote_access_key: 'B48E5D58B6A64B3E93A6BF719647E568'
+    base_url:  "https://dc.checkbookhealth.org"
+    url: "https://dc.checkbookhealth.org/shop/dc/"
 
 aptc_errors:
   effective_date_overflow: "Updates not allowed at this time. Effective Date happens to be after the Policy's life (next year) when following the 15th day rule."
