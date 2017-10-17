@@ -798,7 +798,7 @@ class CensusEmployee < CensusMember
   #   * Employee must be in a terminated status
   #   * Must be a covered employee on the date of their employment termination
   def is_cobra_coverage_eligible?
-    return false unless census_employee.employment_terminated?
+    return false unless self.employment_terminated?
 
     Family.where(:"households.hbx_enrollments" => {
       :benefit_group_assignment_id.in => benefit_group_assignments.pluck(:id),
