@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency "non-stupid-digest-assets"
   s.add_dependency "roo", "~> 2.1.0"
   s.add_dependency 'aasm', '~> 4.8.0'
+  s.add_dependency 'acapi'
 
   s.add_development_dependency 'rspec-rails' 
   s.add_development_dependency 'shoulda-matchers'
