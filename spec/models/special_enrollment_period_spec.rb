@@ -462,13 +462,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     let(:employee_role) { FactoryGirl.create(:employee_role, person: person, census_employee: census_employee, employer_profile: organization.employer_profile)}
     let(:person) { FactoryGirl.create(:person)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-    let(:sep){
-      sep = family.special_enrollment_periods.new
-      sep.effective_on_kind = 'date_of_event'
-      sep.qualifying_life_event_kind= qle_effective_date
-      sep.qle_on= Date.new(2016,8,26)
-      sep
-    }
+    let(:sep) { FactoryGirl.create(:special_enrollment_period, family: family)}
 
     before do
       census_employee.update_attributes(:employee_role =>  employee_role, :employee_role_id =>  employee_role.id)
@@ -476,12 +470,14 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     it "should return a sep with an effective date that equals to sep date" do
-       expect(sep.effective_on).to eq sep.qle_on
+      sep.update_attributes(:qle_on => organization.employer_profile.plan_years[0].end_on - 14.days )
+      expect(sep.effective_on).to eq sep.qle_on
     end
 
     it "should return a sep with an effective date that equals to first of month" do
-      sep.update_attribute(:effective_on_kind, "first_of_month")
-      expect(sep.effective_on).to eq Date.new(2016,10,1)
+      sep.update_attributes(effective_on_kind: "first_of_month",
+        qle_on: organization.employer_profile.plan_years[0].end_on - 14.days)
+      expect(sep.effective_on).to eq organization.employer_profile.plan_years[1].start_on
     end
 
   end
