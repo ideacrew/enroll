@@ -36,53 +36,94 @@ var Verification = (function(){
    function confirmVerificationType(){
        $(this).closest('div').parent().hide();
    }
-   function modalByType(name) {
+   function modalProperties(name) {
+     // Formats name for css
+     if (name == "Social Security Number") {
+       var modalType = 'ssn';
+     }
+     if (name == "Immigration status") {
+       var modalType = 'immigration';
+     }
+     if (name == "Citizenship") {
+       var modalType = 'citizenship';
+     }
+     if (name == "American Indian Status") {
+       var modalType = 'ai';
+     }
+     // Shows model on View History Select
+     $('.'+modalType+'-table').show();
+     // Shows request view
+     $('#'+modalType+'-request').click(function() {
+       $('.'+modalType+'-overview').hide();
+       $('.'+modalType+'-request').show();
+       $('#historyModal').find('.modal-title').text(name + ' Hub Response');
+     });
+     // Shows response view
+     $('#'+modalType+'-response').click(function() {
+       $('.'+modalType+'-overview').hide();
+       $('.'+modalType+'-response').show();
+       $('#historyModal').find('.modal-title').text(name + ' Hub Response');
+     });
+     // Allows view to return to previous
+     $('.'+modalType+'-back').click(function() {
+       $('.'+modalType+'-table').show();
+       $('.'+modalType+'-overview').show();
+       $('.'+modalType+'-request').hide();
+       $('.'+modalType+'-response').hide();
+       $('#historyModal').find('.modal-title').text(name + ' Verification History');
+     });
+     // Populates modal titles
+     $('#historyModal').find('.modal-title').text(name + ' Verification History');
+   }
+   
+   function hideAllModals() {
+     $('.ssn-table').hide();
+     $('.citizenship-table').hide();
+     $('.immigration-table').hide();
+     $('.ai-table').hide();
+   }
+
+   function modalByType(name, modalType) {
      $('#historyModal').modal('show');
      $('#historyModal').on('shown.bs.modal', function (event) {
        var element = $(event.relatedTarget)
        var modal = $(this);
        switch (name) {
          case 'Social Security Number':
-           $('.ssn-table').show();
+           modalProperties(name);
            $('.citizenship-table').hide();
-           $('.ssa-request').hide();
-           $('.ssa-response').hide();
-           modal.find('.modal-title').text(name + ' Verification History');
-           $('#ssa-request').click(function() {
-             modal.find('.modal-title').text(name + ' Hub Request');
-             $('.ssn-overview').hide();
-             $('.ssa-request').show();
-           });
-           $('#ssa-response').click(function() {
-             modal.find('.modal-title').text(name + ' Hub Request');
-             $('.ssn-overview').hide();
-             $('.ssa-response').show();
-           });
-           $('.ssn-back').click(function() {
-             $('.ssn-table').show();
-             $('.ssn-overview').show();
-             $('.citizenship-table').hide();
-             $('.ssa-request').hide();
-             $('.ssa-response').hide();
-             modal.find('.modal-title').text(name + ' Verification History');
-           });
+           $('.immigration-table').hide();
+           $('.ssn-request').hide();
+           $('.ssn-response').hide();
            break;
          case 'Immigration status':
+           modalProperties(name);
            $('.ssn-table').hide();
            $('.citizenship-table').hide();
-           modal.find('.modal-title').text(name + ' Verification History');
+           $('.immigration-request').hide();
+           $('.immigration-response').hide();
            break;
          case 'Citizenship':
-           $('.citizenship-table').show();
+           modalProperties(name);
            $('.ssn-table').hide();
-           modal.find('.modal-title').text(name + ' Verification History');
+           $('.immigration-table').hide();
+           $('.citizenship-request').hide();
+           $('.citizenship-response').hide();
            break;
-         case 'Residency':
-           modal.find('.modal-title').text(name + ' Verification History');
+         case 'American Indian Status':
+           modalProperties(name);
+           $('.citizenship-table').hide();
+           $('.ssn-table').hide();
+           $('.immigration-table').hide();
+           $('.ai-request').hide();
+           $('.ai-response').hide();
            break;
        }
        // Resets selectric options on modal load
        $('select').selectric().prop('selectedIndex', 0).selectric('refresh');
+     });
+     $('#historyModal').on('hide.bs.modal', function (event) {
+       hideAllModals();
      });
    }
    function checkAction(event){
@@ -127,5 +168,7 @@ $(document).ready(function(){
    $('.v-type-actions').on('change', Verification.check_selected_action);
    $('.verification-update-reason').delegate('a', "click", Verification.confirm_v_type );
    $('.ssn-table').hide();
-   $('.immigration').hide();
+   $('.citizenship-table').hide();
+   $('.immigration-table').hide();
+   $('.ai-table').hide();
 });
