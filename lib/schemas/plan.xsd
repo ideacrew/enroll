@@ -187,7 +187,6 @@
 			<xs:element name="default_coinsurance" type="xs:integer"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="Deductables"/>
 	<xs:simpleType name="EnrolleeRelationshipNameType">
 		<xs:annotation>
 			<xs:documentation>Interpersonal relationship names between individuals in a plan enrollment</xs:documentation>

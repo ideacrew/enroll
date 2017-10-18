@@ -76,7 +76,7 @@
 			</xs:element>
 			<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
 			<xs:element name="tpa" type="TpaType" minOccurs="0"/>
-			<xs:element name="is_active" type="xs:boolean">
+			<xs:element name="is_active" type="xs:boolean" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
 				</xs:annotation>
@@ -124,7 +124,11 @@
 	</xs:complexType>
 	<xs:complexType name="EnrolleeBenefitType">
 		<xs:sequence>
-			<xs:element name="premium_amount" type="CurrencyType"/>
+			<xs:element name="premium_amount" type="CurrencyType">
+				<xs:annotation>
+					<xs:documentation>Represents the amount of the total premium allocated to a member.  In the case of a composite rated enrollment, this value should be ignored and not encoded in interchange formats such as EDI X12.  In those cases this will carry a default value of 0.00.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="eligibility_begin_date" type="SimpleDateType" minOccurs="0"/>
 			<xs:element name="begin_date" type="SimpleDateType"/>
 			<xs:element name="end_date" type="SimpleDateType" minOccurs="0"/>

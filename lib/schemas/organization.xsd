@@ -117,6 +117,25 @@
 			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+
+	<xs:complexType name="BrokerPaymentAccountType">
+		<xs:annotation>
+			<xs:documentation>Describes account payment information for brokers.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="routing_number" type="xs:string"/>
+			<xs:element name="account_number" type="xs:string"/>
+			<xs:element name="account_active_on" type="xs:date"/>
+			<xs:element name="account_inactive_on" type="xs:date" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BrokerPaymentAccountsType">
+		<xs:sequence>
+			<xs:element name="broker_payment_account" type="BrokerPaymentAccountType" minOccurs="1" maxOccurs="unbounded"/>
+	        </xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="BrokerRoleType">
 		<xs:annotation>
 			<xs:documentation>An individual playing the role of a broker.</xs:documentation>
@@ -125,6 +144,7 @@
 			<xs:element name="id" type="IdentifierType"/>
 			<xs:element name="npn" type="NpnIdType"/>
 			<xs:element name="broker_agency" type="BrokerAgencyLinkType"/>
+			<xs:element name="broker_payment_accounts" type="BrokerPaymentAccountsType" minOccurs="0"/> 
 			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -776,10 +796,12 @@
 	<xs:complexType name="OrganizationServiceEventBodyType">
 		<xs:complexContent>
 			<xs:restriction base="ServiceBodyType">
+				<xs:sequence>
 				<xs:choice>
 					<xs:element name="organization" type="OrganizationWithRolesType"/>
 					<xs:element name="organization_identifiers_assigned" type="EmployerInformationAssignmentResponseType" />
 				</xs:choice>
+			        </xs:sequence>
 			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>
@@ -843,24 +865,24 @@
 			<xs:enumeration value="urn:openhbx:events:v1:employer#digest_period_ended"/>
 		</xs:restriction>
 	</xs:simpleType>
+	<xs:complexType name="EmployerEventsType">
+		<xs:sequence>
+			<xs:element name="coverage_period" type="DateTimeRangeType">
+				<xs:annotation>
+					<xs:documentation>The start and end timestamps for events listed in this digest instance</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="employer_event" type="EmployerEventType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
 	<xs:complexType name="EmployerDigestServiceEventBodyType">
 		<xs:complexContent>
 			<xs:restriction base="ServiceBodyType">
 				<xs:sequence>
-					<xs:element name="employer_events">
+					<xs:element name="employer_events" type="EmployerEventsType">
 						<xs:annotation>
 							<xs:documentation>Collection of employer profile event messages</xs:documentation>
 						</xs:annotation>
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="coverage_period" type="DateTimeRangeType">
-									<xs:annotation>
-										<xs:documentation>The start and end timestamps for events listed in this digest instance</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="employer_event" type="EmployerEventType" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
 			</xs:restriction>

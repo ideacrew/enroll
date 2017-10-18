@@ -361,6 +361,24 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:complexType name="LawfulPresenceFiveYearBarResultsType">
+		<xs:annotation>
+			<xs:documentation>Specifies status of the individual under the 5-year bar.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="is_barred" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Is the individual barred from the usage of services for 5 years?  If pending or n/a, mark false.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bar_met" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Has this individual met the timeline requirement to have the bar lifted?  Supply this value ONLY IF is_barred is marked true.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="LawfulPresenceResponseType">
 		<xs:sequence>
 			<xs:element name="case_number" type="xs:string"/>
@@ -381,10 +399,16 @@
 							<xs:element name="legal_status" type="LawfulPresencePresenceCodeType"/>
 							<xs:element name="employment_authorized" type="LawfulPresenceEmploymentAuthorizedCodeType"/>
 							<xs:element name="document_results" type="LawfulPresenceDocumentResultsType"/>
+							<xs:element name="five_year_bar_results" type="LawfulPresenceFiveYearBarResultsType"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 			</xs:choice>
+			<xs:element name="raw_response" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Raw response payload from federal hub.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -417,6 +441,11 @@
 					<xs:element name="response_text" type="xs:string" minOccurs="0"/>
 				</xs:sequence>
 			</xs:choice>
+			<xs:element name="raw_response" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Raw response payload from federal hub.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
