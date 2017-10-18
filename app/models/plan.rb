@@ -63,7 +63,10 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
-  # offerings
+  #field can be used for filtering
+  field :frozen_plan_year, type: Boolean
+
+  # Fields for checking respective carrier is offering or not
   field :is_horizontal, type: Boolean, default: true
   field :is_vertical, type: Boolean, default: true
   field :is_sole_source, type: Boolean, default: true
