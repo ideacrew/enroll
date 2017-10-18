@@ -5,7 +5,7 @@
 
 namespace :import do
   task :common_data_from_master_xml => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
     files.each do |file|
       year = file.split("/")[-2].to_i
       puts "*"*80
