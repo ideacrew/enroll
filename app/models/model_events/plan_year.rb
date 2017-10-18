@@ -3,7 +3,6 @@ module ModelEvents
 
     EMPLOYER_APPLICATION_EVENTS = [
       :renewal_application_created,
-      :renewal_group_notice,
       :initial_application_submitted,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
@@ -18,7 +17,7 @@ module ModelEvents
     def notify_on_save
       if aasm_state_changed?
 
-        if is_transition_matching?(to: :renewing_draft, from: :draft)
+        if is_transition_matching?(to: :renewing_draft, from: :draft, event: :renew_plan_year)
           is_renewal_application_created = true
         end
 
@@ -40,10 +39,6 @@ module ModelEvents
 
         if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :force_publish)
           is_renewal_application_autosubmitted = true
-        end
-
-        if is_transition_matching?(to: :renewing_draft, from: [:draft, :renewing_draft], event: [:force_publish, :renew_plan_year])
-          is_renewal_group_notice = true
         end
 
         if enrolling? || renewing_enrolling?
