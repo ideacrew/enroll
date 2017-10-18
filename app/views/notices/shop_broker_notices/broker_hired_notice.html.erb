@@ -20,7 +20,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
-  { content: "Congratulations! You have been selected as the broker for <strong>#{notice.employer_name }</strong> as of #{notice.broker.assignment_date}, with #{notice.broker_agency} as the assigned agency. The primary contact at <strong>#{notice.employer_name}</strong> is <string>#{notice.employer.employer_first_name} #{notice.employer.employer_last_name}</strong>.", top_margin: '10px'} %>
+  { content: "Congratulations! You have been selected as the broker for <strong>#{notice.employer_name }</strong> as of <strong>#{notice.broker.assignment_date}</strong>, with <strong>#{notice.broker_agency}</strong> as the assigned agency. The primary contact at <strong>#{notice.employer_name}</strong> is <string>#{notice.employer.employer_first_name} #{notice.employer.employer_last_name}</strong>.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals =>
   { content: "Please remember that as a registered broker with #{Settings.site.short_name}, you are agreeing to the #{Settings.site.short_name} Statement of Producer Attestations when logging into <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>.",  top_margin: '10px'} %>

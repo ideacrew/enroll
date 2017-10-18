@@ -127,7 +127,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP3B',
+    hbx_id: 'DRG007',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
@@ -137,7 +137,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOPRB',
+        mpi_indicator: 'MPI_DRG007',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
@@ -851,15 +851,15 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_PRE_2',
-    title: '2017 Health Insurance Coverage and Preliminary Renewal Information',
-    description: 'Notice to be sent out to individuals with UQHP(Unassisted)',
+    title: 'Update your information at DC Health Link by October 15',
+    description: 'Notice to be sent out to individuals with AQHP(Assisted)',
     resource_name: 'consumer_role',
     event_name: 'projected_eligibility_notice_2',
     notice_triggers: [
       {
         name: 'September Projected Renewal Notice',
         notice_template: 'notices/ivl/projected_eligibility_notice',
-        notice_builder: 'IvlNotices::IvlRenewalNotice',
+        notice_builder: 'IvlNotices::SecondIvlRenewalNotice',
         mpi_indicator: 'IVL_PRE',
         notice_trigger_element_group: {
           market_places: ['individual'],
