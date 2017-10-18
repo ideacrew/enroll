@@ -278,7 +278,7 @@ Given(/^a Hbx admin with read only permissions exists$/) do
   FactoryGirl.create :hbx_enrollment, household:user.primary_family.active_household
 end
 
-Given(/^Employer for (.*) exists with a published health plan year$/) do |named_person|
+Given(/^(.*)Employer for (.*) exists with a published health plan year$/) do |kind, named_person|
   person = people[named_person]
   FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
@@ -483,7 +483,8 @@ When(/^(.+) creates? a new employer profile with (.+)$/) do |named_person, prima
   fill_in 'organization[area_code]', :with => '202'
   fill_in 'organization[number]', :with => '5551212'
   fill_in 'organization[extension]', :with => '22332'
-
+  find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Only Electronic communications')]]").click
+  find(:xpath, "//select[@name='organization[contact_method]']/option[@value='Paper and Electronic communications']")
   find('.interaction-click-control-confirm').click
 end
 
@@ -1006,6 +1007,25 @@ end
 
 Then (/HBX admin start new employee enrollment/) do
   expect(page).to have_content("Personal Information")
+end
+
+Then(/Employee should see the correct employee contribution on plan tile/) do
+  enrollment = Person.all.first.primary_family.active_household.hbx_enrollments.where(:"aasm_state".ne => "shopping").first
+  expect(page).to have_content "$#{enrollment.total_employee_cost.round(2)}"
+end
+
+Then(/Employee should see their current plan/) do
+  expect(page).to have_content "YOUR CURRENT #{TimeKeeper.date_of_record.year} PLAN"
+end
+
+And(/Employee should have a ER sponsored enrollment/) do
+  person = Person.all.first
+  bg = Organization.all.first.employer_profile.plan_years[0].benefit_groups[0]
+  enrollment = FactoryGirl.create :hbx_enrollment, household: person.primary_family.active_household, aasm_state: "coverage_selected",
+                                    plan: Plan.all.first, benefit_group_id: bg.id
+  enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(is_subscriber: true, applicant_id: person.primary_family.family_members[0].id,
+                                        eligibility_date: TimeKeeper.date_of_record - 1.month, coverage_start_on: TimeKeeper.date_of_record)
+  enrollment.save
 end
 
 Then(/Devops can verify session logs/) do

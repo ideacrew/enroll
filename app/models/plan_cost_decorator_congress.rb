@@ -33,7 +33,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
   end
 
   def total_max_employer_contribution
-    case members.count
+    case members.size
     when 0
       0.to_money
     when 1
