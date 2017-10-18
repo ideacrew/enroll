@@ -147,6 +147,7 @@ aca:
         months: -2
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
+      application_submission_soft_deadline: 10
       force_publish_day_of_month: 16
       open_enrollment:
         minimum_length:
