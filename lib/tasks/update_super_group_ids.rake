@@ -1,7 +1,7 @@
 namespace :supergroup do
   desc "Migrating super group ID with macthing HIOS_Isuuer_Id"
   task :update_plan_id => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/xls_templates/super_groups", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/super_groups", "**", "*.xlsx"))
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
       result = Roo::Spreadsheet.open(file)

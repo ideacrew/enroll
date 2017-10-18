@@ -1,7 +1,7 @@
 namespace :load_sic_code do
   desc "Load sic codes data"
   task :update_sic_codes => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "xls_templates", "si_codes.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "xls_templates", "si_codes.xlsx"))
     puts "Creating SicCodes" unless Rails.env.test?
     if files.present?
       sheet_data = Roo::Spreadsheet.open(files.first)

@@ -1,7 +1,7 @@
 namespace :load_service_reference do
 
   task :run_all_service_areas do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/xls_templates/service_areas", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/service_areas", "**", "*.xlsx"))
     puts "*"*80 unless Rails.env.test?
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?

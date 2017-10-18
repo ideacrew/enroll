@@ -1,7 +1,7 @@
 namespace :load_rating_factors do
 
   task :run_all_rating_factors do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/xls_templates/rating_factors", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/xls_templates/rating_factors", "**", "*.xlsx"))
     puts "*"*80 unless Rails.env.test?
     files.each do |file|
       puts "processing file #{file}" unless Rails.env.test?
