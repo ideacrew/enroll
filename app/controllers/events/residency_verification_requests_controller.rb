@@ -10,6 +10,7 @@ module Events
       individual = payload.stringify_keys["person"]
       event_payload = render_to_string "events/residency/verification_request", :formats => ["xml"], :locals => { :individual => individual }
 
+      individual.consumer_role.local_residency_requests << EventRequest.new({requested_at: Time.now, body: event_payload})
       notify("acapi.info.events.residency.verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :retry_deadline => (Time.now + 24.hours).to_i})
     end
 
