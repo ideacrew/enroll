@@ -30,7 +30,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should display the is_applying_coverage field option" do
-      expect(rendered).to match /Is this person applying for coverage?/
+      expect(rendered).to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do
@@ -63,10 +63,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should have required indicator for fields" do
+
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
   end
 
@@ -99,11 +100,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
 
     it "should not display the is_applying_coverage field option" do
-      expect(rendered).not_to match /Is this person applying for coverage?/
+      expect(rendered).not_to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do
