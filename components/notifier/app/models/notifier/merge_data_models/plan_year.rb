@@ -16,6 +16,7 @@ module Notifier
     attribute :renewal_carrier_name, String
 
     attribute :warnings, Array[String]
+    attribute :errors, Array[String]
 
     attribute :binder_due_date, Date
     attribute :renewal_binder_due_data, Date
