@@ -77,6 +77,7 @@ class Person
   embeds_one :resident_role, cascade_callbacks: true, validate: true
   embeds_one :broker_role, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
+  embeds_one :super_admin_role, cascade_callbacks: true, validate:true
   #embeds_one :responsible_party, cascade_callbacks: true, validate: true # This model does not exist.
 
   embeds_one :csr_role, cascade_callbacks: true, validate: true
@@ -175,6 +176,7 @@ class Person
   #index({"hbx_responsible_party_role._id" => 1})
 
   index({"hbx_csr_role._id" => 1})
+  index({"super_admin_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }

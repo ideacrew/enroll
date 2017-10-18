@@ -361,6 +361,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
     let(:person) { double("person")}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
+    let(:super_admin_role) { double("super_admin_role")}
 
     before :each do
       expect(controller).to receive(:find_hbx_profile)
@@ -368,6 +369,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :after_each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(person).to receive(:super_admin_role).and_return(super_admin_role)
+      allow(super_admin_role).to receive(:permission).and_return(double('Permission', view_config_tab_as_admin: true))
       allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
       sign_in(user)
       get :configuration

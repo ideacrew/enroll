@@ -5,6 +5,11 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.view_admin_tabs
   end
 
+  def view_config_tabs?
+    return false unless role = user.person.super_admin_role
+    role.permission.view_config_tab_as_admin
+  end
+
   def modify_admin_tabs?
     return true unless role = user.person.hbx_staff_role
     role.permission.modify_admin_tabs

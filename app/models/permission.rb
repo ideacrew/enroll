@@ -18,25 +18,35 @@ class Permission
   field :can_complete_resident_application, type: Boolean, default: false
   field :can_add_sep, default: false
   field :can_view_username_and_email, type: Boolean, default: false
-  
+  field :view_config_tab_as_admin, type: Boolean, default: false
+
   class << self
     def hbx_staff
       Permission.where(name: 'hbx_staff').first
     end
+
     def hbx_read_only
       Permission.where(name: 'hbx_read_only').first
     end
+
     def hbx_csr_supervisor
       Permission.where(name: 'hbx_csr_supervisor').first
     end
+
     def hbx_csr_tier1
       Permission.where(name: 'hbx_csr_tier1').first
     end
+
     def hbx_csr_tier2
       Permission.where(name: 'hbx_csr_tier2').first
     end
+
     def developer
       Permission.where(name: 'developer').first
+    end
+
+    def super_admin
+      Permission.where(name: 'super_admin').first
     end
   end
 end

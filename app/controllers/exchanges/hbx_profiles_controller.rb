@@ -8,6 +8,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
+  before_action :view_config_tabs?, only:[:configuration]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
@@ -573,6 +574,10 @@ private
    def view_admin_tabs?
      authorize HbxProfile, :view_admin_tabs?
    end
+
+  def view_config_tabs?
+    authorize HbxProfile, :view_config_tabs?
+  end
 
   def setting_params
     params.require(:setting).permit(:name, :value)

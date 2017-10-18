@@ -79,5 +79,18 @@ FactoryGirl.define do
       modify_admin_tabs false
       view_admin_tabs  false
     end
+
+    trait :super_admin do
+      modify_family true
+      modify_employer true
+      revert_application true
+      list_enrollments true
+      send_broker_agency_message true
+      approve_broker true
+      approve_ga true
+      modify_admin_tabs true
+      view_admin_tabs  true
+      view_config_tab_as_admin true
+    end
   end
 end

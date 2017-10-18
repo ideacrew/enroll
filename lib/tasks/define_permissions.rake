@@ -30,7 +30,18 @@ namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
+
+namespace :permissions do
+  desc 'super admin can manage configuration tabs'
+  DefinePermissions.define_task :super_admin_can_view_configuration_tabs => :environment
+end
+
+namespace :permissions do
+  desc 'super admin can manage configuration tabs'
+  DefinePermissions.define_task :grant_super_admin_access => :environment
+end
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_complete_resident_application
+#rake permissions:grant_super_admin_access

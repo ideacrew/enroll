@@ -170,6 +170,7 @@ class User
     general_agency_staff: "general_agency_staff",
     assister: 'assister',
     csr: 'csr',
+    super_admin: 'super_admin'
   }
 
   # Enable polymorphic associations
@@ -275,6 +276,10 @@ class User
 
   def has_hbx_staff_role?
     has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
+  end
+
+  def has_super_admin_role?
+    has_role?(:super_admin)
   end
 
   def has_csr_role?
