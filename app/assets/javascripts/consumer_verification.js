@@ -50,21 +50,23 @@ var Verification = (function(){
      if (name == "American Indian Status") {
        var modalType = 'ai';
      }
-     // Shows model on View History Select
+     // Displays the table view in the modal
      $('.'+modalType+'-table').show();
-     // Shows request view
+     $('.'+modalType+'-request').hide();
+     $('.'+modalType+'-response').hide();
+     // Shows request view in the modal
      $('#'+modalType+'-request').click(function() {
        $('.'+modalType+'-overview').hide();
        $('.'+modalType+'-request').show();
-       $('#historyModal').find('.modal-title').text(name + ' Hub Response');
+       $('#historyModal').find('.modal-title').text(name + ' Hub Request');
      });
-     // Shows response view
+     // Shows response view in the modal
      $('#'+modalType+'-response').click(function() {
        $('.'+modalType+'-overview').hide();
        $('.'+modalType+'-response').show();
        $('#historyModal').find('.modal-title').text(name + ' Hub Response');
      });
-     // Allows view to return to previous
+     // Allows view to return to previous in the modal
      $('.'+modalType+'-back').click(function() {
        $('.'+modalType+'-table').show();
        $('.'+modalType+'-overview').show();
@@ -75,55 +77,29 @@ var Verification = (function(){
      // Populates modal titles
      $('#historyModal').find('.modal-title').text(name + ' Verification History');
    }
-   
+   // Hides all modals
    function hideAllModals() {
      $('.ssn-table').hide();
      $('.citizenship-table').hide();
      $('.immigration-table').hide();
      $('.ai-table').hide();
    }
-
+   // Opens modal when View History is selected
    function modalByType(name, modalType) {
-     $('#historyModal').modal('show');
+     $('#historyModal').modal({backdrop: 'static', keyboard: false}, 'show');
      $('#historyModal').on('shown.bs.modal', function (event) {
        var element = $(event.relatedTarget)
        var modal = $(this);
        switch (name) {
-         case 'Social Security Number':
+         default:
+           hideAllModals();
            modalProperties(name);
-           $('.citizenship-table').hide();
-           $('.immigration-table').hide();
-           $('.ssn-request').hide();
-           $('.ssn-response').hide();
-           break;
-         case 'Immigration status':
-           modalProperties(name);
-           $('.ssn-table').hide();
-           $('.citizenship-table').hide();
-           $('.immigration-request').hide();
-           $('.immigration-response').hide();
-           break;
-         case 'Citizenship':
-           modalProperties(name);
-           $('.ssn-table').hide();
-           $('.immigration-table').hide();
-           $('.citizenship-request').hide();
-           $('.citizenship-response').hide();
-           break;
-         case 'American Indian Status':
-           modalProperties(name);
-           $('.citizenship-table').hide();
-           $('.ssn-table').hide();
-           $('.immigration-table').hide();
-           $('.ai-request').hide();
-           $('.ai-response').hide();
-           break;
        }
-       // Resets selectric options on modal load
-       $('select').selectric().prop('selectedIndex', 0).selectric('refresh');
      });
      $('#historyModal').on('hide.bs.modal', function (event) {
        hideAllModals();
+       // Resets selectric options to default on modal close
+       $('select').selectric().prop('selectedIndex', 0).selectric('refresh');
      });
    }
    function checkAction(event){
