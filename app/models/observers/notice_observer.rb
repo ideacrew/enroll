@@ -35,7 +35,7 @@ module Observers
           eligibility_warnings = plan_year.application_eligibility_warnings
 
           # if (eligibility_warnings.include?(:primary_office_location) || eligibility_warnings.include?(:fte_count))
-            trigger_notice(plan_year.employer_profile, "initial_employer_denial")
+            trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "initial_employer_denial")
           # end
         end
       end

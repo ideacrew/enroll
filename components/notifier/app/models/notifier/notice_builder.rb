@@ -3,14 +3,15 @@ module Notifier
     include Config::SiteConcern
 
     def to_html(options = {})
-      data_object = (resource.present? ? data_builder : recipient.constantize.stubbed_object)
+      data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
       render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object}) 
     end
 
-    def data_builder
+    def construct_notice_object
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
       builder.resource = resource
+      builder.payload = payload
       builder.append_contact_details
 
       template.data_elements.each do |element|
