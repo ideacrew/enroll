@@ -94,7 +94,22 @@
               <n1:is_coverage_applicant>true</n1:is_coverage_applicant>
             </n1:tax_household_member>
           </n1:tax_household_members>
-          <n1:start_date>20170822</n1:start_date>
+          <n1:eligibility_determinations>
+            <n1:eligibility_determination>
+              <n1:id>
+                <n1:id>206317</n1:id>
+              </n1:id>
+              <n1:maximum_aptc>00.0</n1:maximum_aptc>
+              <n1:csr_percent>0</n1:csr_percent>
+              <n1:aptc_csr_annual_household_income>71094.00</n1:aptc_csr_annual_household_income>
+              <n1:effective_on>20170122</n1:effective_on>
+              <n1:determination_date>20170122</n1:determination_date>
+              <n1:aptc_annual_income_limit>81640.00</n1:aptc_annual_income_limit>
+              <n1:csr_annual_income_limit>52400.00</n1:csr_annual_income_limit>
+              <n1:created_at>2017-08-22T11:28:23Z</n1:created_at>
+            </n1:eligibility_determination>
+          </n1:eligibility_determinations>
+          <n1:start_date>20170122</n1:start_date>
         </n1:tax_household>
       </n1:tax_households>
     </n1:household>
