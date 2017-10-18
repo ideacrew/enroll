@@ -34,7 +34,7 @@ module Notifier
     scope :published,         ->{ any_in(aasm_state: ['published']) }
     scope :archived,          ->{ any_in(aasm_state: ['archived']) }
 
-    attr_accessor :resource
+    attr_accessor :resource, :payload
 
     def set_data_elements
       if template.present?
@@ -50,6 +50,7 @@ module Notifier
         raise ArgumentError.new("BOGUS EVENT...could n't find resoure mapping for event #{event_name}.")
       end
 
+      @payload = payload
       @resource = finder_mapping.mapped_class.send(finder_mapping.search_method, payload[finder_mapping.identifier_key.to_s])
       if @resource.blank?
         raise ArgumentError.new("Bad Payload...could n't find resoure with #{payload[finder_mapping.identifier_key.to_s]}.")
