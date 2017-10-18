@@ -3,7 +3,6 @@ module Observers
 
     PLANYEAR_NOTICE_EVENTS = [
       :renewal_application_created,
-      :renewal_group_notice,
       :initial_application_submitted,
       :renewal_application_submitted,
       :renewal_application_autosubmitted,
