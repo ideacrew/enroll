@@ -56,7 +56,6 @@ class Employers::PlanYearsController < ApplicationController
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:start_on])
     end
-    puts @plans
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     respond_to do |format|
       format.js
