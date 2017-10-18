@@ -4,7 +4,7 @@ CKEDITOR.editorConfig = function( config )
     type:"GET",
     url:"notice_kinds/get_tokens",
     dataType:"json",
-    data: {builder: $('#notice_kind_receipient').val()},
+    data: {builder: $('#notice_kind_recipient').val()},
     success:function(result){
 
       config.tokenStart = '#{';

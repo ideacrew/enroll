@@ -17,8 +17,8 @@ module Effective
         table_column :description, :proc => Proc.new { |row|
           row.description
         }, :filter => false, :sortable => false
-        table_column :receipient, :proc => Proc.new { |row|
-         row.receipient_klass_name.to_s.titleize
+        table_column :recipient, :proc => Proc.new { |row|
+         row.recipient_klass_name.to_s.titleize
         }, :filter => false, :sortable => false
         table_column :last_updated_at, :proc => Proc.new { |row|
          row.updated_at.in_time_zone('Eastern Time (US & Canada)').strftime('%m/%d/%Y %H:%M')

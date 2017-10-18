@@ -20,8 +20,8 @@
   </div>
   
   <div class="form-group col-xs-8">
-    <label for="noticeDescription">Receipient *</label>
-    <%= f.select(:receipient, options_for_select(Notifier::NoticeKind::RECEIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.receipient), { :class => 'form-control'}, required: true ) %>
+    <label for="noticeDescription">Recipient *</label>
+    <%= f.select(:recipient, options_for_select(Notifier::NoticeKind::RECIPIENTS.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
   </div>
  
   <div class="form-group col-xs-12">
@@ -55,7 +55,7 @@
 
 <script>
 
-$('#notice_kind_receipient').change(function() {
+$('#notice_kind_recipient').change(function() {
 
 for (instance in CKEDITOR.instances){CKEDITOR.instances[instance].destroy();}
 

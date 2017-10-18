@@ -4,18 +4,18 @@
   <tbody>
   <tr><td><br><br><br></td></tr>
     <tr>
-      <td class="fssize health-connector-address" align="left"><%= receipient.first_name %> <%= receipient.last_name %></td>
+      <td class="fssize health-connector-address" align="left"><%= recipient.first_name %> <%= recipient.last_name %></td>
     </tr>
     <tr>
-       <td class="fssize1 health-connector-address" align="left"><%= receipient.mailing_address.street_1 %></td>
+       <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_1 %></td>
     </tr>
-    <% if receipient.mailing_address.street_2.present? %>
+    <% if recipient.mailing_address.street_2.present? %>
     <tr>
-      <td class="fssize1 health-connector-address" align="left"><%= receipient.mailing_address.street_2 %></td>
+      <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.street_2 %></td>
     </tr>
     <% end %>
     <tr>
-    <td class="fssize1 health-connector-address" align="left"><%= receipient.mailing_address.city %> <%= receipient.mailing_address.state %> <%= receipient.mailing_address.zip %></td>
+    <td class="fssize1 health-connector-address" align="left"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
     </tr>
   </tbody>
 </table>
