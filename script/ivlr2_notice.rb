@@ -27,7 +27,7 @@
           ic_ref
           hbx_id
         )
-  file_name = "#{Rails.root}/public/ivl_renewal_notice_2_report.csv"
+  file_name = "#{Rails.root}/public/#{NOTICE_GENERATOR}_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
   CSV.open(file_name, "w", force_quotes: true) do |csv|
     csv << field_names
@@ -44,25 +44,17 @@
     notice_trigger = event_kind.notice_triggers.first
     @data_hash.each do |ic_ref, members|
       begin
-        primary_member = members.detect{|m| m["subscriber"] == "Y"}
+        primary_member = members.detect{|m| m["subscriber"] == "Yes"}
         person = Person.where(:hbx_id => primary_member["hbx_id"]).first
-        address = {
-          :address_1 => primary_member["glue_address_1"],
-          :address_2 => primary_member["glue_address_2"],
-          :city => primary_member["glue_city"],
-          :state => primary_member["glue_state"],
-          :zip => primary_member["glue_zip"]
-
-        }
         consumer_role =person.consumer_role
         if consumer_role.present?
             builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
                   template: notice_trigger.notice_template,
                   subject: event_kind.title,
                   mpi_indicator: notice_trigger.mpi_indicator,
+                  event_name: event_kind.event_name,
                   data: members,
                   person: person,
-                  address: address,
                   primary_identifier: ic_ref
                   }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
                   )
@@ -75,7 +67,7 @@
           puts "Unable to send notice to family_id : #{ic_ref}"
         end
       rescue Exception => e
-        puts "Unable to deliver to #{ic_ref} for the following error #{e.backtrace}"
+        puts "Unable to deliver to #{ic_ref} for the following error ----- #{e.backtrace}"
         next
       end
     end
