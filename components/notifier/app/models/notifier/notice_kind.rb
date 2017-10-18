@@ -7,7 +7,7 @@ module Notifier
     include AASM
     include Notifier::NoticeBuilder
 
-    RECEIPIENTS = {
+    RECIPIENTS = {
       "Employer" => "Notifier::MergeDataModels::EmployerProfile",
       "Employee" => "Notifier::MergeDataModels::EmployeeProfile",
       "Broker" => "Notifier::MergeDataModels::BrokerProfile"
@@ -17,16 +17,17 @@ module Notifier
     field :description, type: String
     field :identifier, type: String
     field :notice_number, type: String
-    field :receipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
+    field :recipient, type: String, default: "Notifier::MergeDataModels::EmployerProfile"
     field :aasm_state, type: String, default: :draft
-    field :event_name, type: String
+    field :event_name, type: String, default: nil
 
     embeds_one :cover_page
     embeds_one :template, class_name: "Notifier::Template"
     embeds_many :workflow_state_transitions, as: :transitional
 
-    validates_presence_of :title, :notice_number, :receipient
-    validates_uniqueness_of :notice_number, :event_name
+    validates_presence_of :title, :notice_number, :recipient
+    validates_uniqueness_of :notice_number
+    validates_uniqueness_of :event_name, :allow_blank => true
 
     before_save :set_data_elements
 
@@ -59,16 +60,16 @@ module Notifier
       send_generic_notice_alert
     end
 
-    def receipient_klass_name
-      receipient.to_s.split('::').last.underscore.to_sym
+    def recipient_klass_name
+      recipient.to_s.split('::').last.underscore.to_sym
     end
 
     def self.to_csv
       CSV.generate(headers: true) do |csv|
-        csv << ['Notice Number', 'Title', 'Description', 'Receipient', 'Notice Template']
+        csv << ['Notice Number', 'Title', 'Description', 'Recipient', 'Notice Template']
 
         all.each do |notice|
-          csv << [notice.notice_number, notice.title, notice.description, notice.receipient, notice.template.try(:raw_body)]
+          csv << [notice.notice_number, notice.title, notice.description, notice.recipient, notice.template.try(:raw_body)]
         end
       end
     end
