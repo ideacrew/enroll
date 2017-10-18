@@ -1,4 +1,16 @@
 namespace :load_rating_factors do
+
+  task :run_all_rating_factors do
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/xls_templates/rating_factors", "**", "*.xlsx"))
+    puts "*"*80 unless Rails.env.test?
+    files.each do |file|
+      puts "processing file #{file}" unless Rails.env.test?
+      Rake::Task['load_rating_factors:update_factor_sets'].invoke(file)
+      Rake::Task['load_rating_factors:update_factor_sets'].reenable
+    end
+    puts "*"*80 unless Rails.env.test?
+  end
+
   desc "load rating factors from xlsx file"
   task :update_factor_sets, [:file_name] => :environment do |t,args|
     CURRENT_ACTIVE_YEAR = 2017

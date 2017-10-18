@@ -1,4 +1,17 @@
 namespace :load_service_reference do
+
+  task :run_all_service_areas do
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/xls_templates/service_areas", "**", "*.xlsx"))
+    puts "*"*80 unless Rails.env.test?
+    files.each do |file|
+      puts "processing file #{file}" unless Rails.env.test?
+      Rake::Task['load_service_reference:update_service_areas'].invoke(file)
+      Rake::Task['load_service_reference:update_service_areas'].reenable
+    end
+    puts "created #{CarrierServiceArea.all.size} service areas" unless Rails.env.test?
+    puts "*"*80 unless Rails.env.test?
+  end
+
   desc "load service regions from xlsx file"
   task :update_service_areas, [:file_name] => :environment do |t,args|
     row_data_begin = 13
