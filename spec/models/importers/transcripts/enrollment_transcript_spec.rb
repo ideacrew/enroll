@@ -50,13 +50,17 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       family.family_members.build(is_primary_applicant: false, person: child1)
       family.family_members.build(is_primary_applicant: false, person: child2)
 
-      person.person_relationships.build(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      spouse.person_relationships.create(predecessor_id: spouse.id , successor_id: person.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+      child1.person_relationships.create(predecessor_id: child1.id , successor_id: person.id, kind: "child", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+      child2.person_relationships.create(predecessor_id: child2.id , successor_id: person.id, kind: "child", family_id: family.id)
 
-      person.save
-      # person.person_relationships.update_all(family_id: family.id)
-      family.save
+      person.save!
+      child1.save!
+      child2.save!
+      family.save!
       family.reload
     }
 
