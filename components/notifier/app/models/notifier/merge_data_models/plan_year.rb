@@ -50,7 +50,11 @@ module Notifier
         renewal_py_start_on: renewal_py_start,
         renewal_py_end_on: renewal_py_start.next_year.prev_day,
         carrier_name: 'Kaiser',
-        renewal_carrier_name: 'Kaiser'
+        renewal_carrier_name: 'Kaiser',
+        binder_due_date: '09/25/2017',
+        renewal_binder_due_data: '09/25/2017',
+        ivl_open_enrollment_end_on: '01/31/2018',
+        ivl_open_enrollment_start_on: '11/01/2017'
       })
     end
   end
