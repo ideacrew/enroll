@@ -10,7 +10,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:family_member2) { double("family member 2", id: "family_member", primary_relationship: "parent", dob: Date.new(1990,10,10), full_name: "member") }
     let(:family_member3) { double("family member 3", id: "family_member", primary_relationship: "spouse", dob: Date.new(1990,10,10), full_name: "member") }
     let(:coverage_household) { double("coverage household", coverage_household_members: coverage_household_members) }
-    let(:coverage_household_members) {[double("coverage household member 1", family_member: family_member1), double("coverage household member 2", family_member: family_member2), double("coverage household member 3", family_member: family_member3)]}
+    let(:coverage_household_members) {[double("coverage household member 2", family_member: family_member2), double("coverage household member 1", family_member: family_member1), double("coverage household member 3", family_member: family_member3)]}
     # let(:coverage_household) { double(family_members: [family_member1, family_member2, family_member3]) }
     let(:hbx_enrollment) {double("hbx enrollment", id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, is_shop?: false)}
     let(:current_user) {FactoryGirl.create(:user)}
@@ -35,6 +35,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:employee_role_id] = employee_role.id
 
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
       render :template => "insured/group_selection/new.html.erb"
     end
 
@@ -106,6 +107,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(benefit_package).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_year)
       controller.request.path_parameters[:person_id] = jail_person.id
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
+      allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
       allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
@@ -535,8 +537,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
   context "#can_shop_shop?", dbclean: :after_each do
     let(:census_employee) { double("CensusEmployee", id: 'ce_id', employer_profile: double("EmployerProfile", legal_name: "acme, Inc"))}
     let(:person) { double("Person", id: 'person_id')}
-    let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: nil)}
+    let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: benefit_group)}
     let(:employee_role) { double("EmployeeRole", id: 'er_id', person: person, census_employee: census_employee)}
+    let(:benefit_group) { double("BenefitGroup")}
 
     before do
       assign(:person, person)
@@ -544,8 +547,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:employee_role, employee_role)
       assign(:coverage_household, double("CoverageHousehold", coverage_household_members: []))
       allow(view).to receive(:can_shop_shop?).with(person).and_return true
-      allow(view).to receive(:health_relationship_benefits).with(employee_role).and_return ["employee"]
-      allow(view).to receive(:dental_relationship_benefits).with(employee_role).and_return ["employee"]
+      allow(view).to receive(:health_relationship_benefits).with(employee_role, benefit_group).and_return ["employee"]
+      allow(view).to receive(:dental_relationship_benefits).with(employee_role, benefit_group).and_return ["employee"]
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
