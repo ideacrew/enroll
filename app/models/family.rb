@@ -85,6 +85,7 @@ class Family
          },
          {name: "kind_and_state_and_created_and_terminated"})
 
+  index({"households.hbx_enrollments._id" => 1})
   index({"households.hbx_enrollments.kind" => 1,
          "households.hbx_enrollments.aasm_state" => 1,
          "households.hbx_enrollments.coverage_kind" => 1,
@@ -384,15 +385,14 @@ class Family
   def current_shop_eligible_open_enrollments(options = {})
     eligible_open_enrollments = []
 
-    if employee_roles = primary_applicant.try(:person).try(:employee_roles) # TODO only active employee roles
-      employee_roles.each do |employee_role|
-        if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
-          (employer_profile = employee_role.try(:employer_profile))
-          employer_profile.try(:published_plan_year).try(:enrolling?) &&
-          benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
+    active_employee_roles = primary_applicant.person.active_employee_roles if primary_applicant.present?
+    active_employee_roles.each do |employee_role|
+      if (benefit_group = employee_role.benefit_group(qle: options[:qle])) &&
+        (employer_profile = employee_role.try(:employer_profile))
+        employer_profile.try(:published_plan_year).try(:enrolling?) &&
+        benefit_group.effective_on_for(employee_role.hired_on) > benefit_group.start_on
 
-          eligible_open_enrollments << EnrollmentEligibilityReason.new(employer_profile)
-        end
+        eligible_open_enrollments << EnrollmentEligibilityReason.new(employer_profile)
       end
     end
 
