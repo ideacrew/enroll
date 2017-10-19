@@ -306,7 +306,8 @@ describe BrokerRole, dbclean: :after_each do
         expect(b1.email.kind).to eq('work')
       end
     end
-    context '#phone returns broker work phone or agency office phone' do
+    context '#phone returns broker office phone or agency office phone or work phone' do
+      # broker will not be able to add any work phone.
       person0= FactoryGirl.create(:person)
       provider_kind = 'broker'
 
@@ -314,11 +315,19 @@ describe BrokerRole, dbclean: :after_each do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
         expect(b1.phone.to_s).to eq b1.broker_agency_profile.phone
       end
-      it 'should return broker person work phone' do
+      it 'should return main office phone' do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+        person0.phones[1].update_attributes!(kind: 'phone main')
+        expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "phone main").first.to_s
+      end
+
+      it 'should return work phone if office phone & broker agency profile phone not present' do
+        b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
+        allow(b1.broker_agency_profile).to receive(:phone).and_return nil
         person0.phones[1].update_attributes!(kind: 'work')
         expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
-        expect(b1.phone.to_s).to eq person0.phones[1].to_s
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "work").first.to_s
       end
     end
   end
