@@ -2,7 +2,7 @@ module Notifier
   class MergeDataModels::Plan
     include Virtus.model
 
-    attribute :coverage_start_on, Date
+    attribute :coverage_start_on, String
     # attribute :coverage_end_on, Date
     attribute :plan_name, String
     # attribute :metal_level, String

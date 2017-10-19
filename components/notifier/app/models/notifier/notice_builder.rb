@@ -13,12 +13,10 @@ module Notifier
       builder.resource = resource
       builder.payload = payload
       builder.append_contact_details
-
       template.data_elements.each do |element|
         element_retriver = element.split('.').reject{|ele| ele == recipient_klass_name.to_s}.join('_')
         builder.instance_eval(element_retriver)
       end
-
       builder.merge_model
     end
 
@@ -153,7 +151,10 @@ module Notifier
     end
 
     def create_recipient_document(doc_uri)
-      notice = resource.documents.build({
+      receiver = resource
+      receiver = resource.person if resource.is_a?(EmployeeRole)
+
+      notice = receiver.documents.build({
         title: notice_filename, 
         creator: "hbx_staff",
         subject: "notice",
@@ -169,10 +170,14 @@ module Notifier
     end
 
     def create_secure_inbox_message(notice)
+      receiver = resource
+      receiver = resource.person if resource.is_a?(EmployeeRole)
+
       body = "<br>You can download the notice by clicking this link " +
              "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(resource.class.to_s, 
       resource.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-      message = resource.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
+    
+      message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
       message.save!
     end
 

@@ -4,16 +4,17 @@ module Notifier
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
 
-    attribute :notice_date, Date
+    attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :employer_name, String
     # attribute :coverage_begin_date, Date
     attribute :broker, MergeDataModels::Broker
-    attribute :date_of_hire, Date
-    attribute :earliest_coverage_begin_date, Date
-    attribute :new_hire_oe_end_date, Date
+    attribute :date_of_hire, String
+    attribute :earliest_coverage_begin_date, String
+    attribute :new_hire_oe_start_date, String
+    attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Plan
 
@@ -27,7 +28,8 @@ module Notifier
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
         earliest_coverage_begin_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
-        new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y')
+        new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
+        new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%,/%d/%Y')
       })
       notice.mailing_address = Notifier::MergeDataModels::Address.new
       notice.broker = Notifier::MergeDataModels::Broker.new
