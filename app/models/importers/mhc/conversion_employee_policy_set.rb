@@ -162,7 +162,6 @@ module Importers::Mhc
         :ignore,
         :ignore,
         :ignore,
-        :ignore,
         :subscriber_ssn,
         :subscriber_dob,
         :subscriber_gender,
