@@ -62,6 +62,10 @@ def people
       email: 'admin@dc.gov',
       password: 'aA1!aA1!aA1!'
     },
+    "Super Admin" => {
+        email: 'themanda.super_admin@dc.gov',
+        password: 'P@55word'
+    },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
       password: 'aA1!aA1!aA1!'
@@ -211,6 +215,22 @@ Given(/^Hbx Admin exists$/) do
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
+  year = (Date.today + 2.months).year
+  year = (Date.today + 2.months).year
+  plan = FactoryGirl.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000
+  plan2 = FactoryGirl.create :plan, :with_premium_tables, active_year: (year - 1), market: 'shop', coverage_kind: 'health', deductible: 4000, carrier_profile_id: plan.carrier_profile_id
+end
+
+Given(/^Super Admin exists$/) do
+  p_staff=Permission.create(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                            send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, view_config_tab_as_admin: true)
+  person = people['Super Admin']
+  hbx_profile = FactoryGirl.create :hbx_profile
+  user = FactoryGirl.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryGirl.create :super_admin_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryGirl.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   #Hackity Hack need both years reference plans b/c of Plan.valid_shop_dental_plans and Plan.by_active_year(params[:start_on]).shop_market.health_coverage.by_carrier_profile(@carrier_profile).and(hios_id: /-01/)
   year = (Date.today + 2.months).year
@@ -437,7 +457,6 @@ end
 
 When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   person = people[named_person]
-
   visit "/"
   portal_class = "interaction-click-control-#{portal.downcase.gsub(/ /, '-')}"
   portal_uri = find("a.#{portal_class}")["href"]
@@ -448,6 +467,7 @@ When(/^(.*) logs on to the (.*)?/) do |named_person, portal|
   fill_in "user[password]", :with => person[:password]
   #TODO this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person[:email] unless find(:xpath, '//*[@id="user_login"]').value == person[:email]
+  wait_for_ajax
   find('.interaction-click-control-sign-in').click
   visit portal_uri
 end

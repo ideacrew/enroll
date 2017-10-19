@@ -1,19 +1,19 @@
-Feature: Hbx staff create announcements for consumer role
+Feature: Super Admin staff create announcements for consumer role
 
   Scenario: Hbx staff create announcements for consumer role
-    Given Hbx Admin exists
-    When Hbx Admin logs on to the Hbx Portal
-    And Hbx admin should see the link of announcements and click
-    Then Hbx admin should see the page of announcements
-    When Hbx admin enter announcement info
-    Then Hbx admin should see the current announcement
-    When Hbx admin enter announcement info with future date
-    Then Hbx admin should not see the future announcement
-    When Hbx admin click the link of all
-    Then Hbx admin should see the future announcement
-    When Hbx admin enter announcement info with invalid params
-    Then Hbx admin should see the alert msg
-    Then Hbx admin logs out
+    Given Super Admin exists
+    When Super Admin logs on to the Hbx Portal
+    And Super Admin should see the link of announcements and click
+    Then Super Admin should see the page of announcements
+    When Super Admin enter announcement info
+    Then Super Admin should see the current announcement
+    When Super Admin enter announcement info with future date
+    Then Super Admin should not see the future announcement
+    When Super Admin click the link of all
+    Then Super Admin should see the future announcement
+    When Super Admin enter announcement info with invalid params
+    Then Super Admin should see the alert msg
+    Then Super Admin logs out
 
   Scenario: Consumer see announcement for consumer role
     Given Announcement prepared for Consumer role
@@ -30,3 +30,9 @@ Feature: Hbx staff create announcements for consumer role
     Given Employer role exists
     When Employer login 
     Then Employer should not see announcement
+
+  Scenario: Hbx staff cannot create announcements for consumer role
+    Given Hbx Admin exists
+    When Hbx Admin logs on to the Hbx Portal
+    And Hbx admin should not see the link of announcements
+    Then Hbx admin logs out

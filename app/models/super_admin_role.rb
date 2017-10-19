@@ -27,5 +27,21 @@ class SuperAdminRole
     people.any? ? people[0].sub_admin_role : nil
   end
 
+  # belongs_to Hbx
+  def hbx_profile=(new_hbx_profile)
+    raise ArgumentError.new("expected HbxProfile") unless new_hbx_profile.is_a? HbxProfile
+    self.hbx_profile_id = new_hbx_profile._id
+    @hbx_profile = new_hbx_profile
+  end
+
+  def hbx_profile
+    return @hbx_profile if defined? @hbx_profile
+    @hbx_profile = HbxProfile.find(self.hbx_profile_id)
+  end
+
+  def parent
+    person
+  end
+
 
 end

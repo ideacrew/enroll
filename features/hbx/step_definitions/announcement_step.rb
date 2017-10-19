@@ -1,16 +1,20 @@
-And /^Hbx admin should see the link of announcements and click$/ do
+And /^Super Admin should see the link of announcements and click$/ do
   click_link 'Config'
   wait_for_ajax
   expect(page).to have_content("Announcements")
   click_link 'Announcements'
 end
 
-Then /^Hbx admin should see the page of announcements$/ do
+And /^Hbx admin should not see the link of announcements$/ do
+  expect(page).not_to have_content('Config')
+end
+
+Then /^Super Admin should see the page of announcements$/ do
   expect(page).to have_content("Current Announcements")
   expect(page).to have_content("Msg Start Date")
 end
 
-When(/Hbx admin enter announcement info$/) do
+When(/Super Admin enter announcement info$/) do
   fill_in 'announcement[content]', with: 'announcement for current'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record - 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
@@ -19,7 +23,7 @@ When(/Hbx admin enter announcement info$/) do
   find('.interaction-click-control-create-announcement').click
 end
 
-When(/^Hbx admin enter announcement info with future date$/) do
+When(/^Super Admin enter announcement info with future date$/) do
   fill_in 'announcement[content]', with: 'announcement for future'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record + 15.days).to_s
@@ -28,18 +32,18 @@ When(/^Hbx admin enter announcement info with future date$/) do
   find('.interaction-click-control-create-announcement').click
 end
 
-Then(/Hbx admin should see the current announcement/) do
+Then(/Super Admin should see the current announcement/) do
   # Deal with this step later
   # wait_for_ajax(5,1)
   # expect(page).to have_content('announcement for current')
   # expect(page).to have_content('IVL')
 end
 
-Then(/^Hbx admin should not see the future announcement$/) do
+Then(/^Super Admin should not see the future announcement$/) do
   expect(page).not_to have_content('announcement for future')
 end
 
-When(/^Hbx admin enter announcement info with invalid params$/) do
+When(/^Super Admin enter announcement info with invalid params$/) do
   fill_in 'announcement[content]', with: 'invalid announcement'
   fill_in 'jq_datepicker_ignore_announcement[start_date]', with: (TimeKeeper.date_of_record + 5.days).to_s
   fill_in 'jq_datepicker_ignore_announcement[end_date]', with: (TimeKeeper.date_of_record).to_s
@@ -47,16 +51,16 @@ When(/^Hbx admin enter announcement info with invalid params$/) do
   find('.interaction-click-control-create-announcement').click
 end
 
-Then(/^Hbx admin should see the alert msg$/) do
+Then(/^Super Admin should see the alert msg$/) do
   expect(page).to have_content('prohibited this announcement from being saved')
   expect(page).to have_content('End Date should be later than Start date')
 end
 
-When(/^Hbx admin click the link of all$/) do
+When(/^Super Admin click the link of all$/) do
   click_link "All"
 end
 
-Then(/^Hbx admin should see the future announcement$/) do
+Then(/^Super Admin should see the future announcement$/) do
   expect(page).to have_content('announcement for future')
 end
 
