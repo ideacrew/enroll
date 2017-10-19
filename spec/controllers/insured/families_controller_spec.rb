@@ -819,12 +819,21 @@ RSpec.describe Insured::FamiliesController do
   end
 
   describe "GET family_member_matrix" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:person1) {FactoryGirl.create(:person)}
+    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family_members) {FactoryGirl.build(:family_member, family: family1, is_primary_applicant: false, is_active: true, person: person1)}
 
     before :each do
-      allow(family).to receive(:active_family_members).and_return(family_members)
-      allow(family).to receive(:build_relationship_matrix).and_return([])
-      allow(family).to receive(:find_missing_relationships).and_return([])
-      get :family_relationships_matrix
+      controller.instance_variable_set(:@family, family1)
+      allow(family).to receive(:active_family_members).and_return([family_members])
+      allow(family).to receive(:build_relationship_matrix).and_return(family1.build_relationship_matrix)
+      allow(family).to receive(:family_members).and_return(family1.family_members)
+      matrix = family1.build_relationship_matrix
+      allow(family).to receive(:find_missing_relationships).and_return({:rspec => "mock"})
+      allow(family).to receive(:find_all_relationships).and_return({:rspec => "parent"})
+      get :family_relationships_matrix, tab: "123"
     end
 
     it "should be a success" do
