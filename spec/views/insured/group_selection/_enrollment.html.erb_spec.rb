@@ -15,6 +15,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return false
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:is_shop?).and_return true
+      allow(hbx_enrollment).to receive(:benefit_group).and_return benefit_group
       assign :change_plan, 'change_plan'
       assign :employee_role, employee_role
       assign :person, person

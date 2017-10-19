@@ -3,7 +3,6 @@ require "rails_helper"
 RSpec.describe "insured/plan_shoppings/_coverage_information.html.erb" do
 
   let(:plan){FactoryGirl.create(:plan)}
-
   let(:employer_profile) {
     FactoryGirl.create(:employer_with_planyear, plan_year_state: 'active', reference_plan_id: plan.id)
   }
