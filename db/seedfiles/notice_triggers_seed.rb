@@ -777,8 +777,7 @@ shop_notice_triggers = [
             }
         ]
     },
-    {                
-        HEAD
+    {
         hbx_id: 'SHOP59',
         title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
         description: 'When an initial group misses the binder payment deadline this notice is sent to employees to let them know the group will not be offering coverage',
