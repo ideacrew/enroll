@@ -24,6 +24,7 @@ module Importers::Mhc
         "Contact Last Name",
         "Contact Email",
         "Contact Phone",
+        "Contact Phone Extension",
         "Enrolled Employee Count",
         "New Hire Coverage Policy",
         "Contact Address 1",
