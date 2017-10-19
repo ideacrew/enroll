@@ -10,7 +10,7 @@ module Importers::Mhc
       "boston medical center health plan" => "BMCHP"
     }
 
-    validate :validate_plan_selection
+    validate :validate_plan_selection, :validate_reference_plan
 
     attr_accessor :employee_only_rt_contribution,
       :employee_only_rt_premium,
@@ -30,6 +30,12 @@ module Importers::Mhc
 
     def plan_selection=(val)
       @plan_selection = val.to_s.parameterize('_')
+    end
+
+    def validate_reference_plan
+      found_carrier = find_carrier
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
+      select_reference_plan(available_plans)
     end
 
     def validate_plan_selection
