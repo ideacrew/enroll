@@ -80,8 +80,11 @@ module Importers::Mhc
       :ignore,
       :ignore,
       :ignore,
+      :ignore,
       :enrolled_employee_count,
       :new_coverage_policy,
+      :ignore,
+      :ignore,
       :ignore,
       :ignore,
       :ignore,
@@ -121,9 +124,9 @@ module Importers::Mhc
       the_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
       case the_action
       when "update"
-        ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+        ::Importers::Mhc::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       else
-        ConversionEmployerPlanYearCreate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+        ::Importers::Mhc::ConversionEmployerPlanYearCreate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       end
     end
   end

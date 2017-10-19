@@ -74,6 +74,7 @@ module Importers::Mhc
         :contact_last_name,
         :contact_email,
         :contact_phone,
+        :contact_phone_extension,
         :enrolled_employee_count,
         :new_hire_count,
         :ignore,
@@ -83,6 +84,8 @@ module Importers::Mhc
         :ignore,
         :broker_name,
         :broker_npn,
+        :ignore,
+        :ignore,
         :ignore,
         :carrier
       ]

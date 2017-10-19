@@ -3,8 +3,11 @@ module Importers::Mhc
 
     CARRIER_MAPPING = {
       "bmc healthnet plan"=>"BMCHP", 
-      "fallon health"=>"FCHP", 
-      "health new england"=>"HNE"
+      "fallon community health plan"=>"FCHP",
+      "health new england"=>"HNE",
+      "neighborhood health plan" => "NHP",
+      "harvard pilgrim health care" => "HPHC",
+      "boston medical center health plan" => "BMCHP",
     }
 
     attr_accessor :fein,
@@ -13,6 +16,18 @@ module Importers::Mhc
       :primary_location_county_fips,
       :primary_location_zip,
       :mailing_location_zip
+
+    def primary_location_zip=(val)
+      @primary_location_zip= prepend_zeros(Integer(val).to_s,5)
+    end
+
+    def mailing_location_zip=(val)
+      @mailing_location_zip= prepend_zeros(Integer(val).to_s,5)
+    end
+
+    def fein=(val)
+      @fein = prepend_zeros(val.to_s.gsub('-', '').strip, 9)
+    end
 
     def build_primary_address
       Address.new(

@@ -2,9 +2,12 @@ module Importers::Mhc
   class ConversionEmployerPlanYear < Importers::ConversionEmployerPlanYear
 
     CARRIER_MAPPING = {
-      "bmc healthnet plan"=>"BMCHP", 
-      "fallon health"=>"FCHP", 
-      "health new england"=>"HNE"
+      "bmc healthnet plan"=>"BMCHP",
+      "fallon community health plan"=>"FCHP",
+      "health new england"=>"HNE",
+      "neighborhood health plan" => "NHP",
+      "harvard pilgrim health care" => "HPHC",
+      "boston medical center health plan" => "BMCHP"
     }
 
     validate :validate_plan_selection
@@ -20,6 +23,10 @@ module Importers::Mhc
       :family_rt_offered,
       :family_rt_contribution,
       :family_rt_premium
+
+    def initialize(opts = {})
+      super(opts)
+    end
 
     def plan_selection=(val)
       @plan_selection = val.to_s.parameterize('_')
