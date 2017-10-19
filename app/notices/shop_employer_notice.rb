@@ -100,4 +100,12 @@ class ShopEmployerNotice < Notice
     })
   end
 
+  def send_generic_notice_alert_to_broker
+    if employer_profile.broker_agency_profile.present?
+      broker_name = employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_email = employer_profile.broker_agency_profile.primary_broker_role.email_address
+      UserMailer.generic_notice_alert_to_ba(broker_name, broker_email, employer_profile.legal_name.titleize).deliver_now
+    end
+  end
+
 end
