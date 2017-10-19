@@ -586,6 +586,28 @@ shop_notice_triggers = [
         ]
     },
 
+    {                
+        hbx_id: 'SHOP42',
+        title: 'Termination of Employer’s Health Coverage Offered Through The Health Connector',
+        description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
+        resource_name: 'employee_role',
+        event_name: 'notify_employee_when_employer_requests_advance_termination', 
+        notice_triggers: [
+          {
+            name: " Notice to EEs that active ER is terminated from SHOP",
+            notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
+            notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
+            mpi_indicator: 'SHOP_M042',
+            notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["employee"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+                }
+            }
+        ]
+    },
+
    {
    hbx_id: 'SHOP46',
    title: 'Broker Hired Confirmation Notice',
