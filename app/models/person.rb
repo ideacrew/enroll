@@ -37,6 +37,7 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :is_physically_disabled, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -968,5 +969,9 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
+  end
+
+  def family_member
+    primary_family.family_members.find_by(person_id: id)
   end
 end
