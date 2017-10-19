@@ -3,10 +3,11 @@ module Notifier
     attr_accessor :employer_profile, :merge_model, :payload
 
     def initialize
-      @merge_model = Notifier::MergeDataModels::EmployerProfile.new
-      @merge_model.mailing_address = Notifier::MergeDataModels::Address.new
-      @merge_model.plan_year = Notifier::MergeDataModels::PlanYear.new
-      @merge_model.broker = Notifier::MergeDataModels::Broker.new
+      data_object = Notifier::MergeDataModels::EmployerProfile.new
+      data_object.mailing_address = Notifier::MergeDataModels::Address.new
+      data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
+      data_object.broker = Notifier::MergeDataModels::Broker.new
+      @merge_model = data_object
     end
 
     def resource=(resource)
