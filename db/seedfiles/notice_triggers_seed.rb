@@ -411,6 +411,28 @@ shop_notice_triggers = [
     },
 
     {
+      hbx_id: 'SHOP_M049',
+      title: 'You Removed Your Broker In The Health Connector',
+      description: ' Broker gets terminated after employer selects change broker',
+      resource_name: 'employer',
+      event_name: 'employer_broker_fired',
+      notice_triggers: [
+          {
+              name: 'YOU REMOVED YOUR BROKER IN THE HEALTH CONNECTOR',
+              notice_template: 'notices/shop_employer_notices/employer_broker_fired_notice',
+              notice_builder: 'ShopEmployerNotices::EmployerBrokerFiredNotice',
+              mpi_indicator: 'SHOP_M049',
+              notice_trigger_element_group: {
+                  market_places: ['shop'],
+                  primary_recipients: ["employer"],
+                  primary_recipient_delivery_method: ["secure_message"],
+                  secondary_recipients: []
+              }
+          }
+      ]
+    },
+
+    {
         hbx_id: 'SHOP_M022',
         title: 'Your Invoice for Employer Sponsored Coverage is Now Available',
         description: 'When initial groups first invoice is available in their account, this notice is sent to them to instruct them on how to pay their binder payment.',
