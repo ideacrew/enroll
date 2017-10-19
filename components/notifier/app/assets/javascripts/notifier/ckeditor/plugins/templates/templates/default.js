@@ -63,7 +63,7 @@ CKEDITOR.addTemplates( 'default', {
 "<p>Dear ​#{employee_profile.first_name} ​#{employee_profile.last_name}:</p>" +
 "<p>&lt;Paste Your Notice Body Here&gt;</p>" +
 "<h3>For Questions or Assistance:</h3>"+
-"<p>[[ if employer_profile.broker_present? ]]</p>" +
+"<p>[[ if employee_profile.broker_present? ]]</p>" +
 "<p>Contact your employer or your broker for further assistance.</p>" +
 "<p>[[ else ]]</p>" +
 "<p>Contact your employer for further assistance.<br />" +
@@ -74,24 +74,24 @@ CKEDITOR.addTemplates( 'default', {
 	"<li>By email: <a href='mailto:​#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
 "</ul>" +
 "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
-"[[ if employer_profile.broker_present? ]]" +
+"[[ if employee_profile.broker_present? ]]" +
 "<table border='0'cellpadding='0' cellspacing='0' style='height:auto; width:auto'>" +
 	"<tbody>" +
 		"<tr>" +
 			"<td><strong>Broker: &nbsp;&nbsp;</strong></td>" +
-			"<td>#{employer_profile.broker.primary_fullname}</td>" +
+			"<td>#{employee_profile.broker.primary_fullname}</td>" +
 		"</tr>" +
 		"<tr>" +
 			"<td>&nbsp;</td>" +
-			"<td>#{employer_profile.broker.organization}</td>" +
+			"<td>#{employee_profile.broker.organization}</td>" +
 		"</tr>" +
 		"<tr>" +
 			"<td>&nbsp;</td>" +
-			"<td>#{employer_profile.broker.phone}</td>" +
+			"<td>#{employee_profile.broker.phone}</td>" +
 		"</tr>" +
 		"<tr>" +
 			"<td>&nbsp;</td>" +
-			"<td>#{employer_profile.broker.email}</td>" +
+			"<td>#{employee_profile.broker.email}</td>" +
 		"</tr>" +
 	"</tbody>" +
 "</table>" +
