@@ -1453,7 +1453,6 @@ class HbxEnrollment
     end
   end
 
-
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
