@@ -12,7 +12,7 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
-
+  
   social_media:
     facebook_url: ""
 
@@ -72,6 +72,7 @@ aca:
 
     retroactive_coverage_termination_maximum:
       days: -60
+    employer_application_deadline_link: "https://www.dchealthlink.com/smallbusiness/employer-coverage-deadlines"  
 
     initial_application:
       publish_due_day_of_month: 5
