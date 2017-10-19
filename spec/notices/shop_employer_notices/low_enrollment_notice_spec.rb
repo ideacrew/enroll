@@ -8,10 +8,10 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
                             :notice_template => 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
                             :notice_builder => 'ShopEmployerNotices::LowEnrollmentNotice',
                             :event_name => 'low_enrollment_notice_for_employer',
-                            :mpi_indicator => 'MPI_SHOP15',
+                            :mpi_indicator => 'MPI_DAG015',
                             :title => "Notice of Low Enrollment - Action Needed"})
                           }
-    let(:valid_parmas) {{
+    let(:valid_params) {{
         :subject => application_event.title,
         :mpi_indicator => application_event.mpi_indicator,
         :event_name => application_event.event_name,
@@ -24,15 +24,15 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_params)}.not_to raise_error
       end
     end
 
     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
-          valid_parmas.delete(key)
-          expect{ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          valid_params.delete(key)
+          expect{ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -41,7 +41,7 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_params)
     end
     it "should build notice with all necessory info" do
       @employer_notice.build
@@ -54,7 +54,7 @@ RSpec.describe ShopEmployerNotices::LowEnrollmentNotice do
   describe "append data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::LowEnrollmentNotice.new(employer_profile, valid_params)
     end
     context "initial employer" do
       let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
