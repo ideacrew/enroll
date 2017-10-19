@@ -27,8 +27,7 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
       end
 
       date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
-
-      latest_active_household = active_household.latest_active_tax_household
+      latest_active_household = active_household.latest_active_tax_household_with_year(date.year)
       latest_eligibility_determination = latest_active_household.latest_eligibility_determination
       latest_active_household.eligibility_determinations.build({"determined_at"                 => date,
                                                                 "determined_on"                 => date,
