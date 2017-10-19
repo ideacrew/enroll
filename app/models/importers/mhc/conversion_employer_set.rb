@@ -42,10 +42,16 @@ module Importers::Mhc
         "Plan Name",
         "Plan HIOS Id",
         "Employee Only Rating Tier Contribution",
-        "Employee Only Rating Tier Cost",  
+        "Employee Rating Tier Premium",
+        "Employee And Spouse Rating Tier Offered",
+        "Employee And Spouse Rating Tier Contribution",
+        "Employee And Spouse Rating Tier Premium",
+        "Employee And Dependents Rating Tier Offered",
+        "Employee And Dependents Rating Tier Contribution",
+        "Employee And Dependents Rating Tier Premium",
         "Family Rating Tier",
         "Family Rating Tier Contribution",
-        "Family Rating Tier Cost",
+        "Family Rating Tier Premium",
         "Import Status",
         "Import Details"
       ]
