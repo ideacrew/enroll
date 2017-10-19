@@ -6,7 +6,7 @@
   <% end %>
 <% end %>
 
-<% if !@family.relationships_complete? %>
+<% if @family.application_in_progress.present? and !@family.relationships_complete? %>
   <%= content_for :submit_button do %>
     <%= link_to 'Continue', insured_family_relationships_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: @family.application_in_progress.incomplete_applicants? %>
   <% end %>
