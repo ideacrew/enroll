@@ -19,7 +19,7 @@ module Subscribers
           heiu.split("#").last
         end
         enrollments = hbx_enrollment_ids.map do |hei|
-          HbxEnrollment.find(hei)
+          HbxEnrollment.by_hbx_id(hei).first
         end.compact
         enrollments.each do |en|
           if is_cancel

@@ -7,7 +7,7 @@ describe Subscribers::PolicyTerminationsSubscriber do
   let(:cancelation_event_name) { "acapi.info.events.policy.canceled" }
 
   before :each do
-    allow(HbxEnrollment).to receive(:find).with("123456").and_return(existing_enrollment)
+    allow(HbxEnrollment).to receive(:by_hbx_id).with("123456").and_return([existing_enrollment])
   end
 
   describe "given a termination event" do
