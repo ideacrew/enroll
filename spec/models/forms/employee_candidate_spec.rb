@@ -65,6 +65,16 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
     end
   end
   
+  context "should not return undefined method benefit_groups error if employer hasn't selected a plan_year" do
+    before do
+      allow(fake_employer).to receive(:plan_years).and_return(nil)
+    end
+    it "should return nil if employer plan years are nil" do
+      expect(subject.match_census_employees).to eq []
+      expect(subject.valid?).to be_truthy
+    end
+  end
+
   context "and the plan year is allowing matching" do
     before do
       allow(CensusEmployee).to receive(:matchable).and_return([census_employee])
