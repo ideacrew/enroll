@@ -4,7 +4,6 @@ require 'aasm/rspec'
 RSpec.describe FinancialAssistance::Application, type: :model do
   before :each do
     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-    allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
     allow_any_instance_of(FinancialAssistance::Application).to receive(:create_verification_documents).and_return(true)
   end
 
@@ -137,12 +136,14 @@ RSpec.describe FinancialAssistance::Application, type: :model do
       let(:family_member) { FactoryGirl.create(:family_member, family: family, is_primary_applicant: true) }
 
       it "should allow a sucessful state transition if the application is valid" do
+        allow(valid_application).to receive(:is_application_valid?).and_return(true)
         expect(valid_application.submit).to eq true
         expect(valid_application.determine).to eq true
         expect(valid_application.aasm_state).to eq "determined"
       end
 
       it "should invoke submit_application on a sucessful state transition on submit" do
+        allow(valid_application).to receive(:is_application_valid?).and_return(true)
         expect(valid_application).to receive(:set_submit)
         valid_application.submit!
       end
