@@ -832,7 +832,7 @@ class PlanYear
     state :canceled,          :after_enter => :cancel_application             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
-    state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
+    state :renewing_draft
     state :renewing_published
     state :renewing_publish_pending
     state :renewing_enrolling, :after_enter => [:trigger_passive_renewals, :send_employee_invites]
@@ -883,8 +883,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -904,8 +904,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :record_sic_and_rating_area]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:record_sic_and_rating_area]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -1171,16 +1171,6 @@ class PlanYear
     end
   end
 
-  def trigger_renewal_notice
-    return true if benefit_groups.any?{|bg| bg.is_congress?}
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    if event_name == "publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3a")
-    elsif event_name == "force_publish"
-      self.employer_profile.trigger_notices("planyear_renewal_3b")
-    end
-  end
-
   def zero_employees_on_roster
     return true if benefit_groups.any?{|bg| bg.is_congress?}
     if self.employer_profile.census_employees.active.count < 1
@@ -1203,16 +1193,6 @@ class PlanYear
   def initial_employer_open_enrollment_begins
     return true if (benefit_groups.any?{|bg| bg.is_congress?})
     self.employer_profile.trigger_notices("initial_eligibile_employer_open_enrollment_begins")
-  end
-
-  def renewal_group_notice
-    event_name = aasm.current_event.to_s.gsub(/!/, '')
-    return true if (benefit_groups.any?{|bg| bg.is_congress?} || ["publish","withdraw_pending","revert_renewal"].include?(event_name))
-    if self.employer_profile.is_converting?
-      self.employer_profile.trigger_notices("conversion_group_renewal")
-    else
-      self.employer_profile.trigger_notices("group_renewal_5")
-    end
   end
 
   def initial_employer_denial_notice
