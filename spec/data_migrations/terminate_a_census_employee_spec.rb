@@ -20,10 +20,10 @@ describe TerminateACensusEmployee, dbclean: :after_each do
       expect(census_employee.aasm_state).to eq "employee_role_linked"
     end
     
-    it "should have employment_terminated state" do
+    it "should have eligible state" do
       subject.migrate
       census_employee.reload
-      expect(census_employee.aasm_state).to eq "employment_terminated"
+      expect(census_employee.aasm_state).to eq "eligible"
     end
   end
 end
