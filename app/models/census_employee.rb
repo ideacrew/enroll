@@ -120,6 +120,7 @@ class CensusEmployee < CensusMember
   scope :search_with_ssn_dob,              ->(ssn, dob) { unscoped.where(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob) }
   scope :search_dependent_with_ssn_dob,    ->(ssn, dob) { unscoped.where(:"census_dependents.encrypted_ssn" => CensusMember.encrypt_ssn(ssn), :"census_dependents.dob" => dob) }
 
+
   scope :matchable, ->(ssn, dob) {
     matched = unscoped.and(encrypted_ssn: CensusMember.encrypt_ssn(ssn), dob: dob, aasm_state: {"$in": ELIGIBLE_STATES })
     benefit_group_assignment_ids = matched.flat_map() do |ee|

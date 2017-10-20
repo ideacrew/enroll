@@ -64,7 +64,7 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
       expect(subject.valid?).to be_truthy
     end
   end
-  
+
   context "and the plan year is allowing matching" do
     before do
       allow(CensusEmployee).to receive(:matchable).and_return([census_employee])
