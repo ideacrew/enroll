@@ -207,7 +207,11 @@ describe EventsHelper, "selecting plan years to be exported" do
 
   describe "plan_years_for_manual_export" do
     let (:employer_profile) { FactoryGirl.create(:employer_with_planyear) }
+    let (:ren_employer_profile) { FactoryGirl.create(:employer_with_renewing_planyear) }
     let (:plan_year) { employer_profile.plan_years.first }
+    let (:act_plan_year) { ren_employer_profile.plan_years.first }
+    let (:ren_plan_year) { ren_employer_profile.plan_years.last }
+
 
     context "draft plan year" do
       it "should return []" do
@@ -241,18 +245,18 @@ describe EventsHelper, "selecting plan years to be exported" do
         plan_year.update_attributes({:aasm_state => "expired"})
       end
 
-      it "should not return the plan year" do
+      it "should return the expired plan year" do
         expect(subject.plan_years_for_manual_export(employer_profile)).to eq [plan_year]
       end
     end
 
-    context "canceled plan year" do
+    context "active and canceled plan year" do
       before do
-        plan_year.update_attributes({:aasm_state => "renewing_canceled"})
+        ren_plan_year.update_attributes({:aasm_state => "renewing_canceled"})
       end
 
       it "should not return the plan year" do
-        expect(subject.plan_years_for_manual_export(employer_profile)).to eq []
+        expect(subject.plan_years_for_manual_export(ren_employer_profile)).to eq [act_plan_year]
       end
     end
   end
