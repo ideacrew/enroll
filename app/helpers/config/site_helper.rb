@@ -123,6 +123,10 @@ module Config::SiteHelper
     mail_to non_discrimination_email, non_discrimination_email
   end
 
+  def site_employer_application_deadline_link
+    Settings.site.employer_application_deadline_link
+  end
+
   def site_non_discrimination_complaint_url
     link_to non_discrimination_complaint_url, non_discrimination_complaint_url
   end

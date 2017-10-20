@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'rake'
+require 'stringio'
 
 describe 'terminating employer active plan year & enrollments', :dbclean => :around_each do
   describe 'migrations:terminate_employer_account' do
@@ -12,6 +13,7 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
     let(:enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household)}
 
     before do
+      $stdout = StringIO.new
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/terminate_employer_accounts.rake", __FILE__)
       Rake::Task.define_task(:environment)
       fein = organization.fein
@@ -19,6 +21,10 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
       enrollment.update_attributes(benefit_group_id: benefit_group.id, aasm_state:'coverage_selected')
       Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date)
+    end
+
+    after(:all) do
+      $stdout = STDOUT
     end
 
     it 'should terminate plan year & enrollment and update plan year & enrollment end_on and terminated date' do
@@ -40,5 +46,25 @@ describe 'terminating employer active plan year & enrollments', :dbclean => :aro
       expect(active_plan_year.terminated_on).to eq nil
       expect(active_plan_year.aasm_state).to eq "published"
     end
+
+    it 'should send notification when we pass true in generate_termination_notice attribute' do
+      fein = organization.fein
+      end_on = TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')
+      termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      Rake::Task["migrations:terminate_employer_account"].reenable
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"true")
+      expect($stdout.string).to match("Notification generated for employer\n")
+      expect($stdout.string).to match("Notification generated for employee\n")
+    end
+
+    it 'should not send notification when we pass false in generate_termination_notice attribute' do
+      fein = organization.fein
+      end_on = TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y')
+      termination_date = TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      Rake::Task["migrations:terminate_employer_account"].reenable
+      Rake::Task["migrations:terminate_employer_account"].invoke(fein,end_on,termination_date,"false")
+      expect($stdout.string).not_to match("Notification generated for\n")
+    end
+
   end
 end
