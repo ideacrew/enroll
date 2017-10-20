@@ -16,11 +16,12 @@ describe Forms::FamilyMember do
 
   it "should require tribal_id when citizen_status=indian_tribe_member" do
     if individual_market_is_enabled?
-      subject.is_consumer_role = "true"
-      subject.citizen_status = "indian_tribe_member"
+      subject.is_consumer_role = true
+      subject.is_applying_coverage = true
+      subject.indian_tribe_member = true
       subject.valid?
       expect(subject).to have_errors_on(:tribal_id)
-      expect(subject.errors[:tribal_id]).not_to eq ["is required when native american / alaskan native is selected"]
+      expect(subject.errors[:tribal_id]).to eq ["is required when native american / alaskan native is selected"]
     end
   end
 
