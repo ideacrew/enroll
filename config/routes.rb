@@ -183,6 +183,11 @@ Rails.application.routes.draw do
     get 'paper_applications/upload', to: 'paper_applications#upload'
     post 'paper_applications/upload', to: 'paper_applications#upload'
     get 'paper_applications/download/:key', to: 'paper_applications#download'
+    get 'ridp_documents/upload', to: 'ridp_documents#upload'
+    post 'ridp_documents/upload', to: 'ridp_documents#upload'
+    get 'ridp_documents/download/:key', to: 'ridp_documents#download'
+    resources :ridp_documents, only: [:destroy]
+
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -197,7 +202,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -242,6 +252,7 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
@@ -588,6 +599,7 @@ Rails.application.routes.draw do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
+      put :update_ridp_verification_type
       get :enrollment_verification
       put :extend_due_date
       get :fed_hub_request
