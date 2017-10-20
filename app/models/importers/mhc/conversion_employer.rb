@@ -18,11 +18,11 @@ module Importers::Mhc
       :mailing_location_zip
 
     def primary_location_zip=(val)
-      @primary_location_zip= prepend_zeros(Integer(val).to_s,5)
+      @primary_location_zip= prepend_zeros(Integer(val).to_s,5) if val.present?
     end
 
     def mailing_location_zip=(val)
-      @mailing_location_zip= prepend_zeros(Integer(val).to_s,5)
+      @mailing_location_zip= prepend_zeros(Integer(val).to_s,5) if val.present?
     end
 
     def fein=(val)

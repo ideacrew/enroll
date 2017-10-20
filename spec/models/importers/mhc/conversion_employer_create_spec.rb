@@ -15,11 +15,11 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
      :primary_location_county=>"Bristol",
      :primary_location_county_fips=>"025",
      :primary_location_state=>"MA",
-     :primary_location_zip=>"02743",
+     :primary_location_zip=>"2743",
      :mailing_location_address_1=>"P. O. Box 223344",
      :mailing_location_city=>"Dartmouth",
      :mailing_location_state=>"MA",
-     :mailing_location_zip=>"02108",
+     :mailing_location_zip=>"2108",
      :contact_first_name=>"Roger",
      :contact_last_name=>"Moore",
      :contact_email=>"roger@liveandletdie.com",
@@ -32,7 +32,6 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
   let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
 
   let!(:fein) { record_attrs[:fein] }
-  # let(:employer) { EmployerProfile.find_by_fein(fein) }
   let!(:carrier_profile) { FactoryGirl.create(:carrier_profile, issuer_hios_ids: ['11111'], abbrev: 'BMCHP') }
   
   subject { Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => registered_on})) }
@@ -66,7 +65,8 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
       expect(primary_location.county).to eq record_attrs[:primary_location_county]
       expect(primary_location.location_state_code).to eq record_attrs[:primary_location_county_fips]
       expect(primary_location.state).to eq record_attrs[:primary_location_state]
-      expect(primary_location.zip).to eq record_attrs[:primary_location_zip]
+      # we are pre-pending zeros to zip we are taking input from excel.
+      expect(primary_location.zip).to eq ("0" << record_attrs[:primary_location_zip])
     end
 
     it "should create mailing location" do 
@@ -76,7 +76,8 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
       expect(mailing_location.address_1).to eq record_attrs[:mailing_location_address_1]
       expect(mailing_location.city).to eq record_attrs[:mailing_location_city]
       expect(mailing_location.state).to eq record_attrs[:mailing_location_state]
-      expect(mailing_location.zip).to eq record_attrs[:mailing_location_zip]
+      # we are pre-pending zeros to zip we are taking input from excel.
+      expect(mailing_location.zip).to eq("0" << record_attrs[:mailing_location_zip])
     end
   end
 end
