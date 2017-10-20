@@ -87,10 +87,8 @@ module Subscribers
             response_text: data.lawful_presence_indeterminate.response_text
             )
       elsif data.lawful_presence_determination.present?
-    
         consumer_role.lawful_presence_determination.dhs_verification_responses << 
-        DhsVerificationResponse.new(
-
+          DhsVerificationResponse.new(
           case_number:  data.case_number,
           document_DS2019: data.lawful_presence_determination.document_results.document_DS2019,
           document_I20: data.lawful_presence_determination.document_results.document_I20,
@@ -101,7 +99,6 @@ module Subscribers
           document_I94: data.lawful_presence_determination.document_results.document_I94,
           document_cert_of_citizenship: data.lawful_presence_determination.document_results.document_cert_of_citizenship,
 
-          # document_cert_of_naturalization: data.lawful_presence_determination.document_results.document_cert_of_naturalization,
           cert_of_naturalization_admitted_to_date: data.lawful_presence_determination.document_results.document_cert_of_naturalization.admitted_to_date,
           cert_of_naturalization_admitted_to_text: data.lawful_presence_determination.document_results.document_cert_of_naturalization.admitted_to_text,
           cert_of_naturalization_case_number: data.lawful_presence_determination.document_results.document_cert_of_naturalization.case_number,
@@ -119,7 +116,6 @@ module Subscribers
           cert_of_naturalization_response_code: data.lawful_presence_determination.document_results.document_cert_of_naturalization.response_code,
           cert_of_naturalization_response_description_text: data.lawful_presence_determination.document_results.document_cert_of_naturalization.response_description_text,
           cert_of_naturalization_tds_response_description_text: data.lawful_presence_determination.document_results.document_cert_of_naturalization.tds_response_description_text,
-
 
           passport_admitted_to_date: data.lawful_presence_determination.document_results.document_foreign_passport.admitted_to_date,
           passport_admitted_to_text: data.lawful_presence_determination.document_results.document_foreign_passport.admitted_to_text,

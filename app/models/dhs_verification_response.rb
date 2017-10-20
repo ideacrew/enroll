@@ -5,7 +5,6 @@ class DhsVerificationResponse
     field :response_code,  type: String
     field :response_text, type: String 
     field :case_number,  type: String 
-
     
     field :case_number,  type: String 
     field :response_code,  type: String
@@ -16,7 +15,6 @@ class DhsVerificationResponse
     field :document_I327, type: String
     field :document_I551, type: String
     field :document_I571, type: String
-    
     field :document_I766,type: String
     field :document_I94,type: String
     field :document_cert_of_citizenship,type: String
@@ -38,9 +36,7 @@ class DhsVerificationResponse
     field :cert_of_naturalization_response_code,type: String
     field :cert_of_naturalization_response_description_text,type: String
     field :cert_of_naturalization_tds_response_description_text,type: String
-
-
-    #passport
+    #passport fields
     field :passport_admitted_to_date,type: String
     field :passport_admitted_to_text,type: String
     field :passport_case_number,type: String
@@ -68,7 +64,6 @@ class DhsVerificationResponse
     field :employment_authorized, type: String
     field :legal_status,type: String
     field :response_code,type: String
-
     field :lawful_presence_indeterminate, type: String 
 
     

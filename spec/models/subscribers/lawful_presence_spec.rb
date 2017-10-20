@@ -72,7 +72,6 @@ describe Subscribers::LawfulPresence do
           allow(subject).to receive(:xml_to_hash).with(xml2).and_return(xml_hash)
           allow(subject).to receive(:find_person).with(individual_id).and_return(person)
           subject.call(nil, nil, nil, nil, payload)
-
           expect(person.consumer_role.lawful_presence_determination.dhs_verification_responses.length).to eq(1)
           expect(person.consumer_role.lawful_presence_determination.dhs_verification_responses.last.case_number).to eq(response_data.case_number)
 
@@ -129,10 +128,8 @@ describe Subscribers::LawfulPresence do
           expect(person.consumer_role.lawful_presence_determination.dhs_verification_responses.last.employment_authorized).to eq(response_data.lawful_presence_determination.employment_authorized)
           expect(person.consumer_role.lawful_presence_determination.dhs_verification_responses.last.response_code).to eq(response_data.lawful_presence_determination.response_code)
           expect(person.consumer_role.lawful_presence_determination.dhs_verification_responses.last.lawful_presence_indeterminate).to eq(response_data.lawful_presence_indeterminate)
-
         end
       end
-
 
       context "unlawfully_present" do
         it "should approve lawful presence" do
