@@ -236,10 +236,19 @@ describe EventsHelper, "selecting plan years to be exported" do
       end
     end
 
-    context "terminated plan year with past date of termination" do
+    context "expired plan year" do
       before do
-        plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record - 1.month,
-                                     :aasm_state => "terminated"})
+        plan_year.update_attributes({:aasm_state => "expired"})
+      end
+
+      it "should not return the plan year" do
+        expect(subject.plan_years_for_manual_export(employer_profile)).to eq [plan_year]
+      end
+    end
+
+    context "canceled plan year" do
+      before do
+        plan_year.update_attributes({:aasm_state => "renewing_canceled"})
       end
 
       it "should not return the plan year" do
