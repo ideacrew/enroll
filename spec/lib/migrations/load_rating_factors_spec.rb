@@ -111,7 +111,7 @@ RSpec.describe 'Load Rate Factors Task', :type => :task do
     private
 
     def invoke_task
-      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "#{Rails.root}/spec/test_data/rate_factors/2017/SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
+      Rake::Task["load_rating_factors:update_factor_sets"].execute({:file_name => "#{Rails.root}/spec/test_data/plan_data/rate_factors/2017/SHOP_RateFactors_CY2017_SOFT_DRAFT.xlsx"})
     end
   end
 end
