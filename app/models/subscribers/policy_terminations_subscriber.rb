@@ -36,6 +36,7 @@ module Subscribers
           end
         end
       rescue Exception => e
+        Rails.logger.error { e.to_s } unless Rails.env.test?
       end
     end
   end
