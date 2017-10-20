@@ -62,15 +62,13 @@ module Importers::Mhc
 
       rating_tier_names = CompositeRatingTier::NAMES.reject{|rating_tier| rating_tier == 'employee_only'}
 
-      family_offered = tier_offered?(family_rt_offered.to_s)
-
       rating_tier_names.each do |rating_tier|
         composite_tiers << benefit_group.composite_tier_contributions.build({
           composite_rating_tier: rating_tier, 
-          offered: (family_offered ? true : tier_offered?(eval("#{rating_tier}_rt_offered").to_s)),
-          employer_contribution_percent: (family_offered ? family_rt_contribution : eval("#{rating_tier}_rt_contribution")),
-          estimated_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium")),
-          final_tier_premium: (family_offered ? family_rt_premium : eval("#{rating_tier}_rt_premium"))
+          offered: tier_offered?(eval("#{rating_tier}_rt_offered").to_s),
+          employer_contribution_percent: eval("#{rating_tier}_rt_contribution"),
+          estimated_tier_premium: eval("#{rating_tier}_rt_premium"),
+          final_tier_premium: eval("#{rating_tier}_rt_premium")
         })
       end
 
