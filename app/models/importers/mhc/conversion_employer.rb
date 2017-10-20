@@ -17,12 +17,12 @@ module Importers::Mhc
       :primary_location_zip,
       :mailing_location_zip
 
-    def primary_location_zip=(val)
-      @primary_location_zip= prepend_zeros(Integer(val).to_s,5) if val.present?
+    def primary_location_zip=(val='')
+      @primary_location_zip= prepend_zeros(val.to_i.to_s,5)
     end
 
-    def mailing_location_zip=(val)
-      @mailing_location_zip= prepend_zeros(Integer(val).to_s,5) if val.present?
+    def mailing_location_zip=(val='')
+      @mailing_location_zip= prepend_zeros(val.to_i.to_s,5)
     end
 
     def fein=(val)
