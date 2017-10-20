@@ -10,6 +10,7 @@ class LawfulPresenceDetermination
   embedded_in :ivl_role, polymorphic: true
   embeds_many :ssa_responses, class_name:"EventResponse"
   embeds_many :vlp_responses, class_name:"EventResponse"
+  embeds_many :dhs_verification_responses, class_name:"DhsVerificationResponse"
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
