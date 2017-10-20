@@ -1,6 +1,15 @@
+unless ARGV[0].present? && ARGV[1].present?
+  puts "Please include mandatory arguments: File name and Event name. Example: rails runner script/ivl_renewal_notices.rb <file_name> <event_name>" unless Rails.env.test?
+  puts "Event Names: ivl_renewal_notice_2, ivl_renewal_notice_3, ivl_renewal_notice_4" unless Rails.env.test?
+  exit
+end
+
+
 begin
+  file_name = ARGV[0]
+  event = ARGV[1]
   @data_hash = {}
-  CSV.foreach('proj_elig_report_aqhp.csv',:headers =>true).each do |d|
+  CSV.foreach(file_name,:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
       hbx_ids = @data_hash[d["ic_number"]].collect{|r| r['member_id']}
       next if hbx_ids.include?(d["member_id"])
@@ -13,21 +22,27 @@ rescue Exception => e
   puts "Unable to open file #{e}"
 end
 
-field_names  = %w(
+field_names = %w(
         ic_number
         hbx_id
-        full_name
+        first_name
+        last_name
       )
-file_name = "#{Rails.root}/projected_eligibility_notice_aqhp_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
 #open enrollment information
 hbx = HbxProfile.current_hbx
 bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == TimeKeeper.date_of_record.next_year.year.to_s }
 
-CSV.open(file_name, "w", force_quotes: true) do |csv|
+event_kind = ApplicationEventKind.where(:event_name => event).first
+notice_trigger = event_kind.notice_triggers.first
+
+unless event_kind.present?
+  puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
+end
+
+CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
-  event_kind = ApplicationEventKind.where(:event_name => 'projected_eligibility_notice_2').first
-  notice_trigger = event_kind.notice_triggers.first
   @data_hash.each do |ic_number , members|
     begin
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
@@ -50,13 +65,14 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << [
           ic_number,
           person.hbx_id,
-          person.full_name
+          person.first_name,
+          person.last_name
         ]
       else
-        puts "No consumer role for #{person.hbx_id} -- #{e}"
+        puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}"
+      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}" unless Rails.env.test?
     end
 
   end

@@ -36,15 +36,15 @@
         </tr>
       <% end %>
 
-      <% if ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible) || !ivl.is_medicaid_chip_eligible %>
+      <% if ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || ivl.is_ia_eligible || ivl.is_without_assistance %>
         <tr valign="top">
           <td style="width: 25%;">
             <b>Private Health Insurance</b>
           </td>
           <td style="width: 75%;">
-            <% if (ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible)) %>
+            <% if ivl.is_medicaid_chip_eligible %>
               <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>. People who likely qualify for Medicaid also have the option to purchase private health insurance at full price, even though Medicaid offers free, comprehensive health coverage.</p>
-            <% elsif (!ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible || !(ivl.is_totally_ineligible)) %>
+            <% else %>
               <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>.</p>
             <% end %>
           </td>

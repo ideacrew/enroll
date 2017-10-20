@@ -31,12 +31,12 @@
       listings: ["What’s new this year", "Your final eligibility results for <coverage year>", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["While there’s been a lot of news about the repeal and replace of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, DC Health Link continues to be the health insurance marketplace for District residents.  We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses.". "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for 2018. Free expert enrollment assistance, and online support tools are available to help you and your family to make informed decisions. You may also be eligible for reduced monthly premiums."],
-   heading: 'What’s New This Year', top_margin: '10px', bottom_margin: '5px'} %>
+ contents: ["While there’s been a lot of news about the repeal and replace of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, DC Health Link continues to be the health insurance marketplace for District residents.  We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses.", "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for 2018. Free expert enrollment assistance, and online support tools are available to help you and your family to make informed decisions. You may also be eligible for reduced monthly premiums."],
+   heading: 'What’s New This Year', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Based on our records, and any updates you gave us, your results are as follows:"],
-   heading: 'Your Final Eligibility Results', top_margin: '10px', bottom_margin: '5px'} %>
+   heading: 'Your Final Eligibility Results', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <% if notice.magi_medicaid_eligible.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
@@ -109,9 +109,9 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["DC Health Link registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."],
-   heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px'} %>
+   heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
-<% notice.enrollments.size > 1 %>
+<% if notice.enrollments.size > 1 %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
      contents: ["The people listed will be enrolled in the plan(s) shown below for coverage beginning January 1, <coverage year> unless you enroll in a new plan. The plan you have now will not be offered in <coverage year>, but the plan shown is similar to it.", "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different. "],
        heading: 'Your Plan', sub_heading: ''} %>
