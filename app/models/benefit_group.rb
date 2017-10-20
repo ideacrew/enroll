@@ -430,7 +430,7 @@ class BenefitGroup
   end
 
   def elected_plans_by_option_kind
-    @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile)
+    @profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, self.start_on.year)
 
     case plan_option_kind
     when "sole_source"
