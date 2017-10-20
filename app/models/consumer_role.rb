@@ -33,7 +33,6 @@ class ConsumerRole
       naturalized_citizen
       alien_lawfully_present
       lawful_permanent_resident
-      indian_tribe_member
       undocumented_immigrant
       not_lawfully_present_in_us
       non_native_not_lawfully_present_in_us
@@ -65,7 +64,7 @@ class ConsumerRole
 
   field :raw_event_responses, type: Array, default: [] #e.g. [{:lawful_presence_response => payload}]
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
   field :ssn_validation, type: String, default: "pending"
@@ -94,6 +93,7 @@ class ConsumerRole
   delegate :race,               :race=,              to: :person, allow_nil: true
   delegate :ethnicity,          :ethnicity=,         to: :person, allow_nil: true
   delegate :is_disabled,        :is_disabled=,       to: :person, allow_nil: true
+  delegate :is_physically_disabled,    :is_physically_disabled=,   to: :person, allow_nil: true
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
@@ -762,10 +762,10 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
-      self.native_validation = "outstanding" if native_validation == "na"
-    else
+    if (tribal_id.nil? || tribal_id.empty?)
       self.native_validation = "na"
+    else
+      self.native_validation = "outstanding" if native_validation == "na"
     end
   end
 

@@ -47,16 +47,21 @@ module Forms
         elsif @us_citizen == true && @naturalized_citizen.nil?
           self.errors.add(:base, "Naturalized citizen is required")
         end
-        if !tribal_id.present? && @citizen_status.present? && @citizen_status == "indian_tribe_member"
-          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
-        end
 
         if @indian_tribe_member.nil?
           self.errors.add(:base, "native american / alaskan native status is required")
         end
 
+        if !tribal_id.present? && @indian_tribe_member
+          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+        end
+
         if @is_incarcerated.nil?
           self.errors.add(:base, "Incarceration status is required")
+        end
+
+        if @is_physically_disabled.nil?
+          self.errors.add(:base, "Physically disabled status is required")
         end
       end
     end
@@ -177,6 +182,7 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
+        :is_physically_disabled => is_physically_disabled,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
@@ -223,6 +229,7 @@ module Forms
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
+        :is_physically_disabled => found_family_member.is_physically_disabled,
         :citizen_status => found_family_member.citizen_status,
         :naturalized_citizen => found_family_member.naturalized_citizen,
         :eligible_immigration_status => found_family_member.eligible_immigration_status,

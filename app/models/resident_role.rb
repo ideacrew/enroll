@@ -19,7 +19,7 @@ class ResidentRole
   field :is_state_resident, type: Boolean, default:true
   field :residency_determined_at, type: DateTime
 
-  field :contact_method, type: String, default: "Only Paper communication"
+  field :contact_method, type: String, default: "Paper and Electronic communications"
   field :language_preference, type: String, default: "English"
 
   delegate :hbx_id,           to: :person, allow_nil: true
@@ -27,7 +27,9 @@ class ResidentRole
   delegate :dob, :dob=,       to: :person, allow_nil: true
   delegate :gender, :gender=, to: :person, allow_nil: true
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
+  delegate :is_physically_disabled,          :is_physically_disabled=,         to: :person, allow_nil: true
   delegate :is_incarcerated,    :is_incarcerated=,   to: :person, allow_nil: true
+
 
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
