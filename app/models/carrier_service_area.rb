@@ -46,6 +46,8 @@ class CarrierServiceArea
       areas_valid_for_zip_code(zip_code: address.zip)
     end
 
+    private
+
     def service_areas_for_carrier(carrier_profile)
       where(issuer_hios_id: carrier_profile.issuer_hios_ids)
     end
