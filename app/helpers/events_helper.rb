@@ -93,10 +93,7 @@ module EventsHelper
   end
 
   def plan_years_for_manual_export(employer)
-    plan_years = employer.plan_years.select(&:eligible_for_export?)
-    plan_years << employer.plan_years.detect do |py|
-      py.terminated? && py.terminated_on >= TimeKeeper.date_of_record
-    end
-    plan_years.compact
+    plan_year_states = PlanYear::INELIGIBLE_FOR_EXPORT_STATES.delete_if{|i| ["renewing_enrolling","enrolling"].include?(i)}
+    employer.plan_years.select {|plan_year| !plan_year_states.include?(plan_year.aasm_state)}
   end
 end
