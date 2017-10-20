@@ -104,7 +104,7 @@ RSpec.describe Employers::CensusEmployeesController do
     end
   end
 
-  describe "PUT update", :dbclean => :after_each do
+  describe "PUT update" do
     let(:benefit_group) { double(id: "5453a544791e4bcd33000121") }
     let(:plan_year) { FactoryGirl.create(:plan_year, :aasm_state => "active") }
     let(:user) { FactoryGirl.create(:user, :employer_staff) }
@@ -209,16 +209,6 @@ RSpec.describe Employers::CensusEmployeesController do
       allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
       expect(census_employee.aasm_state).to eq "eligible"
-      person.dob = "11/11/1990"
-      person.save
-      post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
-      expect(census_employee.aasm_state).to eq "employee_role_linked"
-    end
-
-    it "should have aasm state as employee_role_linked when there is matching record found and eligible in reverse case" do
-      allow(employee_role).to receive(:person).and_return(person)
-      allow(census_employee).to receive(:save).and_return(true)
-      allow(controller).to receive(:census_employee_params).and_return(census_employee_params)
       person.dob = "11/11/1990"
       person.save
       post :update, :id => census_employee.id, :employer_profile_id => employer_profile_id, census_employee: {}
