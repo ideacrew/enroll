@@ -43,13 +43,13 @@
     CONTINUE
 - elsif ridp == true && step == 2
   - if next_link.present?
-    = link_to "Continue", next_link, :method => :put, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => (current_user.has_hbx_staff_role? ? false : (!identity_verified && !application_verified))
+    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !(identity_verified  && application_verified)
   - else
     = link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue'
 
 - elsif step == 2
   - if next_link.present?
-    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => (current_user.has_hbx_staff_role? ? false : (!identity_verified  && !application_verified))
+    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !(identity_verified  && application_verified)
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4
