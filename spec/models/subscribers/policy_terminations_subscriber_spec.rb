@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe Subscribers::PolicyTerminationsSubscriber do
-  let(:existing_enrollment) { instance_double(HbxEnrollment) }
+  let(:existing_enrollment) { instance_double(HbxEnrollment, :hbx_id => 1) }
   let(:enrollment_id) { "urn:some:id#123456" }
   let(:termination_event_name) { "acapi.info.events.policy.terminated" }
   let(:cancelation_event_name) { "acapi.info.events.policy.canceled" }
