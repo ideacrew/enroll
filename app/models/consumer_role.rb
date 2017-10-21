@@ -825,9 +825,9 @@ class ConsumerRole
   def mark_ridp_doc_uploaded(ridp_type)
     case ridp_type
       when 'Identity'
-        update_attributes(:identity_rejected => false)
+        update_attributes(:identity_rejected => false, :identity_validation => 'pending')
       when 'Application'
-        update_attributes(:application_rejected => false)
+        update_attributes(:application_rejected => false, :application_validation => 'pending')
     end
   end
 
