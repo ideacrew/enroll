@@ -8,6 +8,8 @@ module Subscribers
 
     def call(event_name, e_start, e_end, msg_id, payload)
       begin
+        Rails.logger.error("PolicyTerminationsSubscriber") { "Began Processing" }
+        Rails.logger.error("PolicyTerminationsSubscriber") { payload.inspect }
         stringed_payload = payload.stringify_keys
         qr_uri = stringed_payload["qualifying_reason"]
         policy_instance_uri = stringed_payload["resource_instance_uri"]
@@ -19,14 +21,18 @@ module Subscribers
           heiu.split("#").last
         end
         enrollments = hbx_enrollment_ids.map do |hei|
+          Rails.logger.error("PolicyTerminationsSubscriber") { "Searching for enrollment with ID #{hei}" }
           HbxEnrollment.by_hbx_id(hei).first
         end.compact
+        Rails.logger.error("PolicyTerminationsSubscriber") { "Found #{enrollments.count} enrollments" }
         enrollments.each do |en|
           if is_cancel
+            Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as cancel" }
             if en.may_cancel_coverage?
               en.cancel_coverage!
             end
           else
+            Rails.logger.error("PolicyTerminationsSubscriber") { "Found and attempting to process #{en.hbx_id} as termination" }
             if en.may_terminate_coverage?
               end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
               if end_effective_date
@@ -36,7 +42,7 @@ module Subscribers
           end
         end
       rescue Exception => e
-        Rails.logger.error { e.to_s } unless Rails.env.test?
+        Rails.logger.error("PolicyTerminationsSubscriber") { e.to_s } unless Rails.env.test?
       end
     end
   end
