@@ -101,7 +101,11 @@
       <br><br>
       <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.</p>
       <br/>
-      <% Plan::REFERENCE_PLAN_METAL_LEVELS.each do |kind| %>
+      <% reference_plans = Plan::REFERENCE_PLAN_METAL_LEVELS %>
+      <% if check_plan_options_title %>
+          <% reference_plans = reference_plans_for_metal_level %>
+      <% end %>
+      <% reference_plans.each do |kind| %>
       <div class="col-xs-3 metals">
         <div class="col-xs-12 row">
           <%= link_to employers_employer_profile_plan_year_reference_plans_path(@employer_profile, plan_year_id: @plan_year.id, plan_option_kind: "metal_level", metal_level: kind, benefit_group:f.object.id ), remote: true do %>
