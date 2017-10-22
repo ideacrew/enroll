@@ -34,6 +34,11 @@ module Importers::Mhc
 
     def validate_reference_plan
       found_carrier = find_carrier
+      if found_carrier.blank?
+        errors.add(:carrer, "carrier not found")
+        return
+      end
+
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
       select_reference_plan(available_plans)
     end
