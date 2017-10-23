@@ -7,7 +7,7 @@ module Insured
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
         format.html do
-          if service_response.failed?
+          if service_response.blank?
             redirect_to :action => "service_unavailable"
           else
             if service_response.failed?

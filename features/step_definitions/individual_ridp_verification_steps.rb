@@ -14,5 +14,5 @@ end
 Then(/^Admin sees page with RIDP documents$/) do
 	expect(page).to have_content('Identity')
 	expect(page).to have_content('Application')
-	find(:xpath, "//HTML[1]/BODY[1]/DIV[2]/DIV[2]/DIV[1]/DIV[1]/DIV[2]/SPAN[1]/A[1]").click
+	find('.interaction-click-control-continue')['disabled'].should == "disabled"
 end

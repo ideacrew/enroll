@@ -80,6 +80,19 @@
         </div>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button">
+      Documents FAQ
+    </a>
+  </div>
+</div>
+
+<div class="collapse" id="docs-verification-faq">
+  <%= render partial: "insured/interactive_identity_verifications/ridp_document_list" %>
+</div>
+
 <script>
     $(document).ready(function() {
         Insured.custom_upload_init();

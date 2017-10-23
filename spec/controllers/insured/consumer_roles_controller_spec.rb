@@ -225,7 +225,22 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
   end
 
-  context "PUT update", dbclean: :after_each do
+
+  context "GET upload_ridp_document" do
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+    end
+    it "should render new template" do
+      sign_in user
+      get :upload_ridp_document
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_ridp_document)
+    end
+  end
+
+  context "PUT update" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryBot.create(:person) }
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},

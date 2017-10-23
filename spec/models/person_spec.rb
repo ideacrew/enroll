@@ -1057,7 +1057,7 @@ describe Person, :dbclean => :after_each do
 
     shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
       before do
-        allow(person).to receive(:completed_identity_verification?).and_return(true)
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
         person.consumer_role.update_attributes!(is_applicant: is_applicant)
       end
       it 'returns array of verification types' do

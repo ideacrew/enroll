@@ -201,11 +201,13 @@ RSpec.describe VerificationHelper, :type => :helper do
 
     context 'ridp type status outstanding' do
       it 'returns danger outstanding IDENTITY' do
+        person.consumer_role.ridp_documents = []
         person.consumer_role.identity_validation = 'outstanding'
         expect(helper.ridp_type_class('Identity', person)).to eq('danger')
       end
 
       it 'returns danger outstanding APPLICATION' do
+        person.consumer_role.ridp_documents = []
         person.consumer_role.application_validation = 'outstanding'
         expect(helper.ridp_type_class('Application', person)).to eq('danger')
       end
@@ -454,6 +456,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       end
 
       it 'returns outstanding if identity_validation is outstanding' do
+        person.consumer_role.ridp_documents = []
         person.consumer_role.identity_validation = 'outstanding'
         expect(helper.show_ridp_type('Identity', person)).to eq("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
       end
@@ -504,6 +507,33 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "documents uploaded for one verification type", "Citizenship", 1, 1
     it_behaves_like "documents uploaded for one verification type", "Immigration status", 1, 1
     it_behaves_like "documents uploaded for one verification type", "American Indian Status", 1, 1
+  end
+
+  describe "#ridp_documents_list" do
+    shared_examples_for "ridp documents uploaded for one verification type" do |v_type, docs, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.ridp_documents=[]
+          docs.to_i.times { person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => v_type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    shared_examples_for "ridp documents uploaded for multiple verification types" do |v_type, result|
+      context "#{v_type}" do
+        before do
+          person.consumer_role.ridp_documents=[]
+          ['Identity', 'Application'].each {|type| person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :ridp_verification_type => type)}
+        end
+        it "returns array with #{result} documents" do
+          expect(helper.ridp_documents_list(person, v_type).size).to eq result.to_i
+        end
+      end
+    end
+    it_behaves_like "ridp documents uploaded for one verification type", "Identity", 1, 1
+    it_behaves_like "ridp documents uploaded for one verification type", "Application", 1, 1
   end
 
   describe "#build_admin_actions_list" do
@@ -630,4 +660,19 @@ RSpec.describe VerificationHelper, :type => :helper do
     it_behaves_like "reject reason dropdown list", "American Indian Status", "Wrong Person", "Expired"
   end
 end
+
+  describe "#build_ridp_admin_actions_list" do
+    shared_examples_for "ridp admin actions dropdown list" do |type, status, actions|
+      before do
+        allow(helper).to receive(:ridp_type_status).and_return status
+      end
+      it "returns ridp admin actions array" do
+        expect(helper.build_ridp_admin_actions_list(type, person)).to eq actions
+      end
+    end
+
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "outstanding", ["Verify"]
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "verified", ["Verify", "Reject"]
+    it_behaves_like "ridp admin actions dropdown list", "Identity", "in review", ["Verify", "Reject"]
+  end
 end

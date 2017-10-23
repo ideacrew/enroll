@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :ridp_document do
     identifier "identifier"
     ridp_verification_type 'Identity'

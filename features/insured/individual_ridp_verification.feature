@@ -28,15 +28,4 @@ Feature: Consumer RIDP verification process
     And Admin logs in the Hbx Portal
     When Admin click on families link
     Then Admin sees page with RIDP documents
-    Then Admin should see the dependents form
-    And I click on continue button on household info form
-    When I click the "Married" in qle carousel
-    And I select a past qle date
-    Then I should see confirmation and continue
-    When I click on continue button on group selection page during a sep
-    And I select three plans to compare
-    And I should not see any plan which premium is 0
-    And I select a plan on plan shopping page
-    And I click on purchase button on confirmation page
-    And I click on continue button to go to the individual home page
-    And I should see the individual home page
+
