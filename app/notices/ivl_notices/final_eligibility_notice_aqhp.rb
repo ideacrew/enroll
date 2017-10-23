@@ -19,10 +19,10 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def deliver
     build
     generate_pdf_notice
-    attach_blank_page
+    attach_blank_page(notice_path)
+    attach_required_documents if notice.documents_needed
     attach_non_discrimination
     attach_taglines
-    attach_voter_application
     upload_and_send_secure_message
 
     if recipient.consumer_role.can_receive_electronic_communication?
@@ -53,10 +53,12 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
 
   def append_data
     primary_member = data.detect{|m| m["subscriber"] == "Yes"}
+    append_enrollment_information
     append_member_information(primary_member)
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
     end
+    notice.documents_needed = check(primary_member("documents_needed"))
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
     notice.irs_consent_needed = check(primary_member["irs_consent"])
     notice.primary_firstname = primary_member["first_name"]
@@ -85,6 +87,10 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :tax_household => append_tax_household_information(primary_member)
       })
     end
+  end
+
+  def append_enrollment_information
+
   end
 
   def append_tax_household_information(primary_member)
