@@ -25,6 +25,70 @@ shop_notice_triggers = [
         ]
     },
 
+  # {
+  #   hbx_id: 'SHOP2',
+  #   title: 'Employer Approval Notice',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link',
+  #   resource_name: 'employer',
+  #   event_name: 'initial_employer_approval',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Initial Employer SHOP Approval Notice',
+  #       notice_template: 'notices/shop_employer_notices/2_initial_employer_approval_notice',
+  #       notice_builder: 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
+  #       mpi_indicator: 'MPI_SHOP2A',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'SHOP2B',
+  #   title: 'Employer Denial Notice',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link',
+  #   resource_name: 'employer',
+  #   event_name: 'initial_employer_denial',
+  #   notice_triggers: [
+  #     {
+  #       name: 'Denial of Initial Employer Application/Request for Clarifying Documentation',
+  #       notice_template: 'notices/shop_employer_notices/2_initial_employer_denial_notice',
+  #       notice_builder: 'ShopEmployerNotices::InitialEmployerDenialNotice',
+  #       mpi_indicator: 'MPI_SHOP2B',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+  # {
+  #   hbx_id: 'DRG007',
+  #   title: 'Plan Offerings Finalized',
+  #   description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
+  #   resource_name: 'employer',
+  #   event_name: 'planyear_renewal_3b',
+  #   notice_triggers: [
+  #     {
+  #       name: 'PlanYear Renewal Auto-Published',
+  #       notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
+  #       notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
+  #       mpi_indicator: 'MPI_DRG007',
+  #       notice_trigger_element_group: {
+  #         market_places: ['shop'],
+  #         primary_recipients: ["employer"],
+  #         primary_recipient_delivery_method: ["secure_message"],
+  #         secondary_recipients: []
+  #       }
+  #     }
+  #   ]
+  # },
+
     # {
     #   hbx_id: 'SHOP1A',
     #   title: 'Initial Employer SHOP Application Approval',
