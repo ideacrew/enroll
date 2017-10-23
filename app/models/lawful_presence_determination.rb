@@ -14,6 +14,7 @@ class LawfulPresenceDetermination
   embeds_many :vlp_requests,  class_name:"EventRequest"
   embeds_many :ssa_verification_responses 
   embeds_many :workflow_state_transitions, as: :transitional
+  embeds_many :dhs_verification_responses, class_name:"DhsVerificationResponse"
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
