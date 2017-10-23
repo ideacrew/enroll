@@ -67,6 +67,7 @@ module Notifier
       end
     end
 
+<<<<<<< HEAD
     def plan_year_renewal_py_start_date
       if renewal_plan_year.present?
         merge_model.plan_year.renewal_py_start_date = format_date(renewal_plan_year.start_on) 
@@ -122,7 +123,6 @@ module Notifier
         merge_model.plan_year.renewal_py_submit_due_date = format_date(PlanYear.map_binder_payment_due_date_by_start_on(current_plan_year.start_on))
       end
     end
-
 
     def format_date(date)
       return if date.blank?
