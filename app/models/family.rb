@@ -17,6 +17,7 @@ class Family
   # include Mongoid::Versioning
   include Sortable
   include Mongoid::Autoinc
+  include DocumentsVerificationStatus
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -1005,9 +1006,9 @@ class Family
     documents_list = []
     document_status_outstanding = []
     self.active_family_members.each do |member|
-      member.person.verification_types.all? do |type|
-      if member.person.consumer_role
-        documents_list <<  member.person.consumer_role.has_docs_for_type?(type)
+      member.person.verification_types.each do |type|
+      if member.person.consumer_role && verification_type_status(type, member.person) != "verified"
+        documents_list <<  member.person.consumer_role.has_docs_for_type?(type) 
         document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
       end
       end
