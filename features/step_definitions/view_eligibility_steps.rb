@@ -22,6 +22,7 @@ Given(/^that a family has a Financial Assistance application in the “submitted
   login_as consumer, scope: :user
   visit financial_assistance_applications_path
   create_plan
+  create_hbx_profile
   application
   application.update_attributes(:aasm_state => 'submitted')
 end

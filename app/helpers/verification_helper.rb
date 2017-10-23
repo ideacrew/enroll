@@ -37,7 +37,7 @@ module VerificationHelper
           "verified"
         elsif member.consumer_role.has_faa_docs_for_type?(type)
           "in review"
-        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "Income"}.first.status)
+        elsif assistance_applicant_documents.present? && ["outstanding"].include?(assistance_applicant_documents.select{|document| document.kind == "Income"}.first.status)
           "outstanding"
         end
       when 'Minimal Essential Coverage'
@@ -45,7 +45,7 @@ module VerificationHelper
           "verified"
         elsif member.consumer_role.has_faa_docs_for_type?("MEC")
           "in review"
-        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "MEC"}.first.status)
+        elsif assistance_applicant_documents.present? && ["outstanding"].include?(assistance_applicant_documents.select{|document| document.kind == "MEC"}.first.status)
           "outstanding"
         end
       else

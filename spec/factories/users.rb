@@ -130,5 +130,15 @@ FactoryGirl.define do
     end
   end
 
+  trait :with_nuclear_family_valid_auth do
+    after :create do |user|
+      user.idp_verified = true
+      user.idp_uuid = "7976867567"
+      user.identity_final_decision_code = 'acc'
+      user.save
+      FactoryGirl.create :person, :with_nuclear_family, :user => user
+    end
+  end
+
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]
 end

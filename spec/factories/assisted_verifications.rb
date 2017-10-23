@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory(:assisted_verification, :class => FinancialAssistance::AssistedVerification) do
     association :applicant
-    status "unverified"
+    status "outstanding"
     verification_type "Income"
   end
 end

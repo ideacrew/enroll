@@ -556,6 +556,17 @@ class FinancialAssistance::Application
     end
   end
 
+  #TODO
+  # def has_any_verification_unverified_applicant?
+  #   all_aptc_applicants.each do |applicant|
+  #     return false if !(applicant.has_income_verification_response && applicant.has_mec_verification_response)
+  #   end
+  # end
+
+  def all_aptc_applicants
+    active_applicants.find_all(&:is_ia_eligible?)
+  end
+
 private
 
   def clean_params(model_params)
