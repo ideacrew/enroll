@@ -50,7 +50,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
-            # dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           else
             @application.unsubmit!

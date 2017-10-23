@@ -27,7 +27,7 @@ module Subscribers
           #Rejection message to Haven on failed Schema Validation
           message = "Invalid schema eligibility determination response provided"
           notify("acapi.info.events.verification.rejected",
-                    #Same correlation_id is sent back so that Haven can track the correct response.
+                    #Same correlation_id is sent back so that Haven can match the response sent to Enroll.
                     {:correlation_id => stringed_key_payload["correlation_id"],
                       :body => JSON.dump({error: message}),
                       :assistance_application_id => stringed_key_payload["assistance_application_id"],
@@ -45,7 +45,7 @@ module Subscribers
       end
     end
 
-    private
+    # private
 
     def haven_verifications_import_from_xml(xml)
       if xml.include?('income_verification_result')
@@ -64,7 +64,6 @@ module Subscribers
     def import_assisted_verification(kind, verified_person, verified_verification)
       person_in_context = search_person(verified_person)
       throw(:processing_issue, "ERROR: Failed to find primary person in xml") unless person_in_context.present?
-
       application_in_context = FinancialAssistance::Application.find(verified_verification.fin_app_id)
       applicant_in_context = application_in_context.applicants.select { |applicant| applicant.person.hbx_id == person_in_context.hbx_id}.first
       throw(:processing_issue, "ERROR: Failed to find applicant in xml") unless applicant_in_context.present?
@@ -85,37 +84,35 @@ module Subscribers
           assisted_verification.update_attributes(status: status, verification_failed: verification_failed)
         else
           new_assisted_verification = applicant_in_context.assisted_verifications.create!(verification_type: kind, status: status, verification_failed: verification_failed)
-          applicant_in_context.person.consumer_role.assisted_verification_documents.create(application_id: verified_verification.fin_app_id, applicant_id: applicant_in_context.id, assisted_verification_id: new_assisted_verification.id, status: new_assisted_verification.status, kind: new_assisted_verification.verification_type)
         end
 
-        update_consumer_role(kind, applicant_in_context, status)
+        update_applicant(kind, applicant_in_context, status)
       else
         throw(:processing_issue, "ERROR: Failed to find #{kind} verification for the applicant") unless assisted_verification.present?
       end
-      person_in_context.save
-      application_in_context.save
+
+      application_in_context.save!
     end
 
-    def update_consumer_role(kind, applicant, status)
-      consumer_role = applicant.person.consumer_role
+    def update_applicant(kind, applicant, status)
       if kind == "Income"
         if status == "outstanding"
-          consumer_role.invalid_income_response
-          consumer_role.income_outstanding
+          applicant.invalid_income_response
+          applicant.income_outstanding
         elsif status == "verified"
-          consumer_role.invalid_income_response
-          consumer_role.income_valid
+          applicant.invalid_income_response
+          applicant.income_valid
         end
       elsif kind == "MEC"
         if status == "outstanding"
-          consumer_role.invalid_mec_response
-          consumer_role.mec_outstanding
+          applicant.invalid_mec_response
+          applicant.mec_outstanding
         elsif status == "verified"
-          consumer_role.invalid_mec_response
-          consumer_role.mec_valid
+          applicant.invalid_mec_response
+          applicant.mec_valid
         end
       end
-      consumer_role.save
+      applicant.save!
     end
 
     def search_person(verified_person)

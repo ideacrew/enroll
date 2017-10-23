@@ -134,7 +134,6 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
       context "for import Income Verification" do
         let!(:parser) { Parsers::Xml::Cv::OutstandingMecVerificationParser.new.parse(xml) }
         let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
-        let!(:consumer_role) { person.consumer_role }
         let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
         let!(:application) {
           FactoryGirl.create(:application, id: "#{parser.fin_app_id}", family: family, aasm_state: "determined")
@@ -162,12 +161,12 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
             allow(Person).to receive(:where).and_return([person])
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
-            consumer_role.reload
+            applicant.reload
             income_assisted_verification.reload
             expect(income_assisted_verification.status).to eq "outstanding"
             expect(applicant.assisted_verifications.income.count).to eq 1
-            expect(consumer_role.assisted_income_validation).to eq "outstanding"
-            expect(applicant.person.consumer_role.aasm_state).to eq "verification_outstanding"
+            expect(applicant.assisted_income_validation).to eq "outstanding"
+            expect(applicant.aasm_state).to eq "verification_outstanding"
           end
 
           it "should not log any errors and creates new assisted_verifications for applicant" do
@@ -176,11 +175,10 @@ describe Subscribers::FinancialAssistanceApplicationOutstandingVerification do
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, message)
             expect(income_assisted_verification.status).to eq "unverified"
-            consumer_role.reload
             applicant.reload
             expect(applicant.assisted_verifications.income.count).to eq 2
-            expect(applicant.person.consumer_role.assisted_income_validation).to eq "outstanding"
-            expect(consumer_role.aasm_state).to eq "verification_outstanding"
+            expect(applicant.assisted_income_validation).to eq "outstanding"
+            expect(applicant.aasm_state).to eq "verification_outstanding"
           end
         end
       end

@@ -2,6 +2,7 @@ class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_current_person, onlu: [:update_verification_type]
   respond_to :html, :js
 
   def download
@@ -31,11 +32,22 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
+    primary_person = @person
+    family = @person.primary_family
+    @person = Person.find(params["person_id"])
+    family_member = family.family_members.where(:person_id => params["person_id"]).first
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     respond_to do |format|
-      if (VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS).uniq.include? (update_reason)
-        verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
+      if ( VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS ).uniq.include?(update_reason)
+
+        if FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(params["verification_type"])
+          applicant = family.latest_applicable_submitted_application.applicants.where(family_member_id: family_member.id).first
+          verification_result = applicant.update_verification_type(v_type, update_reason)
+        else
+          verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
+        end
+
         message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
         format.html { redirect_to :back, :flash => { :success => message} }
       else

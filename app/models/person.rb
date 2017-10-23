@@ -420,8 +420,24 @@ class Person
     else
       verification_types << 'Immigration status'
     end
-    verification_types << "Income" << "Minimal Essential Coverage"  if families.any?{ |family| family.has_financial_assistance_verification? }
+
     verification_types
+  end
+
+  def all_verification_types(family_id)
+    family = Family.where(id: family_id).first
+    if family.present? && family.has_financial_assistance_verification? && has_faa_application?(family)
+      verifications = verification_types + ["Income", "MEC"]
+    else
+      verifications = verification_types
+    end
+
+    return verifications
+  end
+
+  def has_faa_application?(family)
+    member = family.family_members.where(person_id: id).first
+    family.latest_applicable_submitted_application.applicants.where(family_member_id: member.id).first.present?
   end
 
   def relatives(family_id)
