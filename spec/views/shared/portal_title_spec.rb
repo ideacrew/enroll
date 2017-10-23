@@ -10,7 +10,7 @@ RSpec.describe "layouts/_header.html.erb" do
   let(:signed_in?){ true }
   #let!(:byline) { create(:translation, key: "en.layouts.header.byline", value: Settings.site.header_message) }
   before do
-    Translation.create(key: "en.layouts.header.html.erb.byline", value: "\"#{Settings.site.header_message}\"")
+    Translation.create(key: "en.welcome.index.byline", value: "\"#{Settings.site.header_message}\"")
   end
   before(:each) do
   	sign_in current_user
