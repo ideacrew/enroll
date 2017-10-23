@@ -38,7 +38,7 @@ module Notifier
 
     def set_data_elements
       if template.present?
-        tokens = template.raw_body.scan(/\#\{([\w|\.]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq
+        tokens = template.raw_body.scan(/\#\{([\w|\.|\s|\+|\-]*)\}/).flatten.reject{|element| element.scan(/Settings/).any?}.uniq.map(&:strip)
         conditional_tokens = template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
         template.data_elements = tokens + conditional_tokens
       end

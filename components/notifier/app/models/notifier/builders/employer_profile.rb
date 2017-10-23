@@ -1,7 +1,10 @@
 module Notifier
   class Builders::EmployerProfile
-    attr_accessor :employer_profile, :merge_model, :payload
+    include Notifier::Builders::PlanYear
+    include Notifier::Builders::Broker
 
+    attr_accessor :employer_profile, :merge_model, :payload
+    
     def initialize
       data_object = Notifier::MergeDataModels::EmployerProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
@@ -40,49 +43,6 @@ module Notifier
       merge_model.employer_name = employer_profile.legal_name
     end
 
-    def broker_agency_account
-      employer_profile.active_broker_agency_account
-    end
-
-    def broker
-      broker_agency_account.writing_agent.parent if broker_agency_account.present?
-    end
-
-    def broker_present?
-      if broker.present?
-        if merge_model.broker.blank?
-          merge_model.broker = Notifier::MergeDataModels::Broker.new
-        end
-        true
-      else
-        false
-      end
-    end
-
-    def broker_primary_fullname
-      if broker_present?
-        merge_model.broker.primary_fullname = broker.full_name
-      end
-    end
-
-    def broker_organization
-      if broker_agency_account.present?
-        merge_model.broker.organization = broker_agency_account.legal_name
-      end
-    end
-
-    def broker_phone
-      if broker_present?
-        merge_model.broker.phone = broker.work_phone_or_best
-      end
-    end
-
-    def broker_email
-      if broker_present?
-        merge_model.broker.email = broker.work_email_or_best
-      end
-    end
-
     def current_plan_year
       return @current_plan_year if defined? @current_plan_year
       if payload['event_object_kind'].constantize == PlanYear
@@ -104,18 +64,6 @@ module Notifier
         else
           @renewal_plan_year = employer_profile.plan_years.detect{|py| py.is_renewing? && py.start_on == plan_year.start_on.next_year}
         end
-      end
-    end
-
-    def plan_year_current_py_start_date
-      if current_plan_year.present?
-        merge_model.plan_year.current_py_start_date = format_date(current_plan_year.start_on)
-      end
-    end
-
-    def plan_year_current_py_end_date
-      if current_plan_year.present?
-        merge_model.plan_year.current_py_end_date = format_date(current_plan_year.end_on)
       end
     end
 
@@ -174,6 +122,7 @@ module Notifier
         merge_model.plan_year.renewal_py_submit_due_date = format_date(PlanYear.map_binder_payment_due_date_by_start_on(current_plan_year.start_on))
       end
     end
+
 
     def format_date(date)
       return if date.blank?

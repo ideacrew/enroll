@@ -3,7 +3,9 @@ module Notifier
     include Virtus.model
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
-    
+
+    DATE_ELEMENTS = %w(current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on)
+
     attribute :notice_date, Date
     attribute :first_name, String
     attribute :last_name, String

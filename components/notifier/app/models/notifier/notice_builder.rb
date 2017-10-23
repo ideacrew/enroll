@@ -14,7 +14,16 @@ module Notifier
       builder.payload = payload
       builder.append_contact_details
       template.data_elements.each do |element|
-        element_retriver = element.split('.').reject{|ele| ele == recipient_klass_name.to_s}.join('_')
+        elements = element.split('.')
+        date_element = elements.detect{|ele| Notifier::MergeDataModels::EmployerProfile::DATE_ELEMENTS.any?{|date| ele.match(/#{date}/i).present?}}
+
+        if date_element.present?
+          date_ele_index = elements.index(date_element)
+          elements = elements[0..date_ele_index]
+          elements[date_ele_index] = date_element.scan(/[a-zA-Z_]+/).first
+        end
+      
+        element_retriver = elements.reject{|ele| ele == recipient_klass_name.to_s}.join('_')
         builder.instance_eval(element_retriver)
       end
       builder.merge_model

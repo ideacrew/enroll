@@ -1,6 +1,8 @@
 module Notifier
   class Builders::EmployeeProfile
     include ActionView::Helpers::NumberHelper
+    include Notifier::Builders::PlanYear
+    include Notifier::Builders::Broker
 
     attr_accessor :employee_role, :merge_model, :payload
 
@@ -9,6 +11,7 @@ module Notifier
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
       data_object.enrollment = Notifier::MergeDataModels::Plan.new
+      data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       @merge_model = data_object
     end
 
@@ -105,8 +108,12 @@ module Notifier
         end
       end
 
-      if plan_year.present? && !plan_year.is_renewing?
-        @current_plan_year = plan_year
+      if plan_year.present?
+        if plan_year.is_renewing?
+          @current_plan_year = employer_profile.plan_years.published_plan_years_by_date(plan_year.start_on.prev_year).first
+        else
+          @current_plan_year = plan_year
+        end
       end
     end
 
@@ -122,108 +129,17 @@ module Notifier
         end
       end
 
-      if plan_year.present? && plan_year.is_renewing?
-        @renewal_plan_year = plan_year
+      if plan_year.present?
+        if plan_year.is_renewing?
+          @renewal_plan_year = plan_year
+        else
+          @renewal_plan_year = employer_profile.plan_years.renewing.where(:start_on => plan_year.start_on.next_year).last
+        end
       end
-    end
-
-    def renewal_plan_year_start_date
-      start_date = renewal_plan_year.start_on if renewal_plan_year.present?
-      if start_date.blank? && current_plan_year.present?
-        start_date = current_plan_year.start_on.next_year
-      end
-
-      merge_model.renewal_plan_year_start_date = format_date(start_date)
-    end
-
-    def renewal_plan_year_end_date
-      end_date = renewal_plan_year.end_on if renewal_plan_year.present?
-      if end_date.blank? && current_plan_year.present?
-        end_date = current_plan_year.end_on.next_year
-      end
-
-      merge_model.renewal_plan_year_end_date = format_date(end_date)
-    end
-
-    def current_plan_year_start_date
-      start_date = current_plan_year.start_on if current_plan_year.present?
-      if start_date.blank? && renewal_plan_year.present?
-        start_date = renewal_plan_year.start_on.prev_year
-      end
-
-      merge_model.current_plan_year_start_date = format_date(start_date)
-    end
-
-    def current_plan_year_end_date
-      end_date = current_plan_year.end_on if current_plan_year.present?
-      if end_date.blank? && renewal_plan_year.present?
-        end_date = renewal_plan_year.end_on.prev_year
-      end
-
-      merge_model.current_plan_year_end_date = format_date(end_date)
-    end
-
-    def current_coverage_year
-      year = current_plan_year.year if current_plan_year.present?
-      if renewal_plan_year.present?
-        year = renewal_plan_year.year - 1
-      end
-      merge_model.current_coverage_year = year
-    end
-
-    def renewal_coverage_year
-      year = renewal_plan_year.year if renewal_plan_year.present?
-      if current_plan_year.present?
-        year = current_plan_year.year + 1
-      end
-      merge_model.renewal_coverage_year = year
     end
 
     def employer_profile
       employee_role.employer_profile
-    end
-
-    def broker_agency_account
-      employer_profile.active_broker_agency_account
-    end
-
-    def broker
-      broker_agency_account.writing_agent.parent if broker_agency_account.present?
-    end
-
-    def broker_present?
-      if broker.present?
-        if merge_model.broker.blank?
-          merge_model.broker = Notifier::MergeDataModels::Broker.new
-        end
-        true
-      else
-        false
-      end
-    end
-
-    def broker_primary_fullname
-      if broker_present?
-        merge_model.broker.primary_fullname = broker.full_name
-      end
-    end
-
-    def broker_organization
-      if broker_agency_account.present?
-        merge_model.broker.organization = broker_agency_account.legal_name
-      end
-    end
-
-    def broker_phone
-      if broker_present?
-        merge_model.broker.phone = broker.work_phone_or_best
-      end
-    end
-
-    def broker_email
-      if broker_present?
-        merge_model.broker.email = broker.work_email_or_best
-      end
     end
 
     def format_date(date)
