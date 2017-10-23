@@ -5,8 +5,8 @@
 #           So including http at the start of each rx formulary urls that does not have http.
 
 namespace :import do
-  task :provider_and_rx_formulary_url => :environment do
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "**", "*.xlsx"))
+  task :common_data_from_master_xml => :environment do
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
     files.each do |file|
       year = file.split("/")[-2].to_i
       puts "*"*80
@@ -42,6 +42,9 @@ namespace :import do
               if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                 rx_formulary_url = row_info[@headers["rx formulary url"]]
                 plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+                if sheet_name == "IVL" && year > 2017
+                  plan.is_standard_plan = row_info[@headers["standard plan?"]]
+                end
               end
               plan.save
             end
