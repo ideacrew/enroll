@@ -1,13 +1,13 @@
 require "rails_helper"
 
 describe Subscribers::PolicyTerminationsSubscriber do
-  let(:existing_enrollment) { instance_double(HbxEnrollment) }
+  let(:existing_enrollment) { instance_double(HbxEnrollment, :hbx_id => 1) }
   let(:enrollment_id) { "urn:some:id#123456" }
   let(:termination_event_name) { "acapi.info.events.policy.terminated" }
   let(:cancelation_event_name) { "acapi.info.events.policy.canceled" }
 
   before :each do
-    allow(HbxEnrollment).to receive(:find).with("123456").and_return(existing_enrollment)
+    allow(HbxEnrollment).to receive(:by_hbx_id).with("123456").and_return([existing_enrollment])
   end
 
   describe "given a termination event" do
