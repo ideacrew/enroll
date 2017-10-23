@@ -17,7 +17,7 @@ module Notifier
     attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]
     attribute :enrollment, MergeDataModels::Plan
-
+    attribute :plan_year, MergeDataModels::PlanYear
   
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployeeProfile.new({
@@ -35,6 +35,7 @@ module Notifier
       notice.broker = Notifier::MergeDataModels::Broker.new
       notice.addresses = [ notice.mailing_address ]
       notice.enrollment = Notifier::MergeDataModels::Plan.new
+      notice.plan_year = Notifier::MergeDataModels::PlanYear.new
       notice
     end
 
