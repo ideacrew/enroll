@@ -12,6 +12,8 @@ class LawfulPresenceDetermination
   embeds_many :vlp_responses, class_name:"EventResponse"
   embeds_many :ssa_requests,  class_name:"EventRequest"
   embeds_many :vlp_requests,  class_name:"EventRequest"
+  embeds_many :ssa_verification_responses 
+  embeds_many :workflow_state_transitions, as: :transitional
 
   field :vlp_verified_at, type: DateTime
   field :vlp_authority, type: String
@@ -19,7 +21,6 @@ class LawfulPresenceDetermination
   field :citizen_status, type: String
   field :citizenship_result, type: String
   field :aasm_state, type: String
-  embeds_many :workflow_state_transitions, as: :transitional
 
   aasm do
     state :verification_pending, initial: true
