@@ -322,7 +322,15 @@ var EmployerProfile = ( function( window, undefined ) {
     var cobra_date = target.find('input.date-picker').val();
     var cobra_link = target.find('a.cobra_confirm_submit').data('link');
     var cobra_options = {};
+    if($('input[name="cobra_options_is_cobra"]:checked').size() == 0 ){
+      alert('Please select users to convert to cobra.');
+      return;
+    }
     $('input[name="cobra_options_is_cobra"]:checked').map(function(){
+       if (Object.values(cobra_options).includes("primary")){
+          alert("Can't have more than one Pirmay member in a household.");
+          return;
+       }
        cobra_type = $(this).parent().parent().find("select[name='cobra_options_type']").val();
        cobra_options[$(this).parent().find("[name='cobra_options_id']").val()] = cobra_type;
     })
