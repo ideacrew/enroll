@@ -9,7 +9,7 @@ def check_duplicated
   not_found = []
   stranges = []
 
-  CSV.foreach("spec/test_data/cne.csv") do |row_with_ssn|
+  CSV.foreach("pids/2018_THHEligibility.csv") do |row_with_ssn|
     ssn, hbx_id, aptc, csr = row_with_ssn
     if ssn && ssn =~ /^\d+$/ && ssn.to_s != '0'
       ssn = '0'*(9-ssn.length) + ssn if ssn.length < 9
