@@ -47,10 +47,12 @@
       <% end %>
     <% end %>
 
-    <!-- Adjustments -->
+    <!-- Adjustments/Enrollment Changes -->
     <tr>
       <td class="adjustments-icon"><span class="pull-right glyphicon glyphicon-plus"></span></td>
-      <td>Enrollment changes since <%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %> invoice</td>
+      <td>Enrollment changes since <%= @employer_profile.try(:employer_profile_account).try(:current_statement_date) %> invoice
+        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Enrollment Changes are any type of enrollment change, including new enrollments, changes to existing enrollments, or terminations of coverage. Enrollment changes may occur due to a variety of reasons, including newly-eligible for coverage, special enrollment periods, or terminations of eligibility."></i>
+      </td>
       <td></td>
     </tr>
 
