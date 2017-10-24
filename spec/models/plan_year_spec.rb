@@ -785,7 +785,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
           context "and the employer doesn't request eligibility review" do
             context "and more than 90 days have elapsed since the ineligible application was submitted" do
-              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+              let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
               before do
                 TimeKeeper.set_date_of_record(submit_date + 90.days)
               end
@@ -842,7 +842,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
               end
 
               context "and 90 days have elapsed since the ineligible application was submitted" do
-                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+                let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
                 before do
                   TimeKeeper.set_date_of_record(submit_date + Settings.aca.shop_market.initial_application.ineligible_period_after_application_denial.days)
                 end
