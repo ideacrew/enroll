@@ -40,7 +40,6 @@ class DocumentsController < ApplicationController
     update_reason = params[:verification_reason]
     respond_to do |format|
       if ( VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS ).uniq.include?(update_reason)
-
         if FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(params["verification_type"])
           applicant = family.latest_applicable_submitted_application.applicants.where(family_member_id: family_member.id).first
           verification_result = applicant.update_verification_type(v_type, update_reason)
@@ -57,26 +56,26 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-     family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
-       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-         enrollment.evaluate_individual_market_eligiblity
-       end
-       family.save!
-       respond_to do |format|
-         format.html {
-           flash[:success] = "Enrollment group was completely verified."
-           redirect_to :back
-         }
-       end
-     else
-       respond_to do |format|
-         format.html {
-           flash[:danger] = "Family does not have any active Enrollment to verify."
-           redirect_to :back
-         }
-       end
-     end
+    family = @person.primary_family
+    if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+      family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+        enrollment.evaluate_individual_market_eligiblity
+      end
+      family.save!
+      respond_to do |format|
+        format.html {
+          flash[:success] = "Enrollment group was completely verified."
+          redirect_to :back
+        }
+      end
+    else
+      respond_to do |format|
+        format.html {
+          flash[:danger] = "Family does not have any active Enrollment to verify."
+          redirect_to :back
+        }
+      end
+    end
   end
 
   def fed_hub_request

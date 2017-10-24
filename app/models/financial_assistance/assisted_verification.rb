@@ -23,32 +23,7 @@ class FinancialAssistance::AssistedVerification
   scope :income, ->{ where(:"verification_type" => "Income") }
   scope :mec, ->{ where(:"verification_type" => "MEC") }
 
-  def assisted_income_verified?
-    assisted_income_validation == "valid"
-  end
-
-  def assisted_mec_verified?
-    assisted_mec_validation == "valid"
-  end
-
-  def assisted_verification_doument
-    applicant.person.consumer_role.assisted_verification_documents.where(assisted_verification_id: self.id).first
-  end
-
   def family
     applicant.family
   end
-
-    # elsif v_type == "Minimal Essential Coverage"
-    #   update_attributes(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
-    # elsif v_type == "Income"
-    #   update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
-
-
-    #   when "Income"
-    #     assisted_income_verified?
-    #   when "Minimal Essential Coverage"
-    #     assisted_mec_verified?
-
-
 end

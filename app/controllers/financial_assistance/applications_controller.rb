@@ -50,7 +50,7 @@ class FinancialAssistance::ApplicationsController < ApplicationController
           @application.submit! if @application.complete?
           payload = generate_payload(@application)
           if @application.publish(payload)
-            dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
+            # dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
             redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
           else
             @application.unsubmit!
@@ -197,6 +197,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
                                               e_pdc_id: "3110344",
                                               source: "Haven").save!
       @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.applicants.count > 1
+      
+      #Update the Income and MEC verifications to Outstanding
+      @model.applicants.each do |applicant|
+        applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
+        applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: "outstanding", verification_failed: true) }
+      end
     end
   end
 

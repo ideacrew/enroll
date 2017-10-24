@@ -15,7 +15,4 @@ class AssistedVerificationDocument < Document
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
 
-  def family
-    assisted_verification.family
-  end
 end

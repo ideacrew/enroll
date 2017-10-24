@@ -209,7 +209,6 @@ class FinancialAssistance::Applicant
     self.tax_household.blank?
   end
 
-  # States and transitions Verifications for Assisted Applicant
   aasm do
     state :unverified, initial: true
     state :verification_outstanding
@@ -497,12 +496,14 @@ class FinancialAssistance::Applicant
 
   def update_verification_type(v_type, update_reason)
     if v_type == "MEC"
-      update_attributes(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
+      update_attributes!(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
+      assisted_verifications.mec.first.update_attributes!(status: "verified")
+      self.mec_valid!
     else v_type == "Income"
       update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
+      assisted_verifications.income.first.update_attributes!(status: "verified")
+      self.income_valid!
     end
-
-    "#{v_type} successfully verified."
   end
 
   private
