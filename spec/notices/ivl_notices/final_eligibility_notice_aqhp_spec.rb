@@ -8,7 +8,8 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
   data = csv.to_a
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :hbx_id => "383883742")}
   let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
-  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual")}
+  let(:plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', csr_variant_id: '01', active_year: 2018, hios_id: "11111111122302-01") }
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", plan: plan, aasm_state: "auto_renewing", effective_on: Date.new(2018,1,1))}
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Eligibility Notice for AQHP individuals',
                             :notice_template => 'notices/ivl/final_eligibility_notice_aqhp',
@@ -74,6 +75,26 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
       expect(@final_eligibility_notice.notice.mpi_indicator).to eq application_event.mpi_indicator
     end
   end
+
+  describe "#pick_enrollments" do
+    before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
+    end
+
+    it "returns all auto_renewing enrollments" do
+      @final_eligibility_notice.pick_enrollments
+      expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
+    end
+
+    it "returns nil when there are no auto_renewing enrollments" do
+      hbx_enrollment.update_attributes!(:aasm_state => "coverage_expired")
+      @final_eligibility_notice.pick_enrollments
+      expect(@final_eligibility_notice.notice.enrollments.size).to eq 0
+    end
+  end
+
 
   describe "#append_open_enrollment_data" do
     before do
