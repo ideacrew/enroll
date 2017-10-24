@@ -65,8 +65,9 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   end
 
   def append_member_information(primary_member)
-    notice.individuals = data.collect do |datum|
-      PdfTemplates::Individual.new({
+    due_dates = []
+    data.collect do |datum|
+      notice.individuals << PdfTemplates::Individual.new({
         :first_name => datum["first_name"],
         :last_name => datum["last_name"],
         :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
@@ -86,7 +87,20 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :has_access_to_affordable_coverage => check(datum ["mec"]),
         :tax_household => append_tax_household_information(primary_member)
       })
+
+      due_dates << Date.strptime(datum["document_deadline"], '%m/%d/%Y')
+
+      if datum["outstanding_verification_types"].include?("Social Security Number")
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+      if datum["outstanding_verification_types"].include?("Immigration status")
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+      if datum["outstanding_verification_types"].include?("Citizenship")
+        notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
     end
+    notice.due_date = due_dates.min
   end
 
   def pick_enrollments
