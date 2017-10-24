@@ -5,7 +5,7 @@ class Enrollments::IndividualMarket::AssistedIvlAptcReader
   attr_accessor :calender_year
 
   def all_hbx_ids
-    file_name = "#{Rails.root}/public/Update-Data-Scrub-11-7-16.csv"
+    file_name = "#{Rails.root}/public/#{TimeKeeper.date_of_record.year + 1}_FA_Renewals.csv"
     @all_assisted_individuals = {}
 
     CSV.foreach(file_name, headers: true, header_converters: :symbol) do |row|
