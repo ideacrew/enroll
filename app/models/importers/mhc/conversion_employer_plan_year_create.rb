@@ -18,7 +18,7 @@ module Importers::Mhc
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
 
       begin
-        reference_plan = select_reference_plan(available_plans)
+        reference_plan = select_reference_plan(available_plans, (calculated_coverage_start).year)
 
         benefit_group_properties = {
           :title => "Standard",
