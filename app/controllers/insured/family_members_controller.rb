@@ -27,6 +27,9 @@ class Insured::FamilyMembersController < ApplicationController
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
+      if @sep.submitted_at.to_date != TimeKeeper.date_of_record
+        @sep = duplicate_sep(@sep)
+      end
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
@@ -209,6 +212,14 @@ private
       end
       @dependent.addresses = addresses
     end
+  end
+
+  def duplicate_sep(sep)
+    sp = SpecialEnrollmentPeriod.new(sep.attributes.except("effective_on", "submitted_at", "_id"))
+    sp.qualifying_life_event_kind = sep.qualifying_life_event_kind    # initiate sep dates
+    @family.special_enrollment_periods << sp
+    sp.save
+    sp
   end
 
   def set_dependent
