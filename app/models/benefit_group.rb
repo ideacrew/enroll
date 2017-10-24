@@ -359,7 +359,7 @@ class BenefitGroup
       build_composite_tier_contributions
       estimate_composite_rates
     end
-    targeted_census_employees.active.collect do |ce|
+    targeted_census_employees.active.expected_to_enroll.collect do |ce|
       pcd = if self.sole_source? && (!plan.dental?)
         CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
       else
