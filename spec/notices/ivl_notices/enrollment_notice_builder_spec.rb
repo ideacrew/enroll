@@ -157,6 +157,27 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     end
   end
 
+  describe "#attach_required_documents" do
+    before do
+      allow(person).to receive("primary_family").and_return(family)
+      allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)
+      @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
+    end
+
+    it "should render documents section when outstanding people are present" do
+      @eligibility_notice.append_hbe
+      @eligibility_notice.build
+      expect(@eligibility_notice).to receive :attach_required_documents
+      @eligibility_notice.attach_docs
+    end
+
+    it "should not render documents when no outstanding people" do
+      allow(person.consumer_role).to receive_message_chain("outstanding_verification_types").and_return(nil)
+      expect(@eligibility_notice).not_to receive :attach_required_documents
+      @eligibility_notice.attach_docs
+    end
+  end
+
   describe "render template and generate pdf" do
     before do
       allow(person).to receive("primary_family").and_return(family)

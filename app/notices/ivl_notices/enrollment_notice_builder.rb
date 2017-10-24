@@ -71,7 +71,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_docs
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
@@ -83,6 +83,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     if recipient.consumer_role.can_receive_paper_communication?
       store_paper_notice
     end
+  end
+
+  def attach_docs
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
   end
 
   def build
@@ -126,8 +130,10 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
-      update_individual_due_date(person, date)
+      if person.consumer_role.outstanding_verification_types.present?
+        outstanding_people << person
+        update_individual_due_date(person, date)
+      end
     end
 
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family) unless family.min_verification_due_date.present?
