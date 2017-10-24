@@ -7,12 +7,14 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_for_address_info, only: [:find_sep, :home]
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
+  before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
 
   def home
+    authorize @family, :show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_admin_sep = @family.active_admin_seps.last
+    @active_sep = @family.active_seps.last
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -74,7 +76,6 @@ class Insured::FamiliesController < FamiliesController
     if ((params[:resident_role_id].present? && params[:resident_role_id]) || @resident_role_id)
       @market_kind = "coverall"
     end
-
     render :layout => 'application'
   end
 
@@ -88,11 +89,10 @@ class Insured::FamiliesController < FamiliesController
       special_enrollment_period.save
     end
 
-    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep'}
+    action_params = {person_id: @person.id, consumer_role_id: @person.consumer_role.try(:id), employee_role_id: params[:employee_role_id], enrollment_kind: 'sep', effective_on_date: special_enrollment_period.effective_on, qle_id: qle.id}
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
-
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -139,44 +139,37 @@ class Insured::FamiliesController < FamiliesController
 
     @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
-    @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
+      @future_qualified_date = (@qle_date > TimeKeeper.date_of_record) ? true : false
     end
 
     if @person.resident_role?
       @resident_role_id = @person.resident_role.id
     end
 
+    if ((@qle.present? && @qle.shop?) && !@qualified_date)
+      sep_request_denial_notice
+    end
   end
 
   def check_move_reason
-    calculate_dates
   end
 
   def check_insurance_reason
-    calculate_dates
+  end
+
+  def check_marriage_reason
   end
 
   def purchase
     if params[:hbx_enrollment_id].present?
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
-    @enrollment = @family.try(:latest_household).try(:hbx_enrollments).active.last
+      @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
 
     if @enrollment.present?
-      plan = @enrollment.try(:plan)
-      if @enrollment.is_shop?
-        @benefit_group = @enrollment.benefit_group
-        @reference_plan = @enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
-
-        if @benefit_group.is_congress
-          @plan = PlanCostDecoratorCongress.new(plan, @enrollment, @benefit_group)
-        else
-          @plan = PlanCostDecorator.new(plan, @enrollment, @benefit_group, @reference_plan)
-        end
-      else
-        @plan = UnassistedPlanCostDecorator.new(plan, @enrollment)
-      end
+      @enrollment.reset_dates_on_previously_covered_members
+      @plan = @enrollment.build_plan_premium
 
       begin
         @plan.name
@@ -239,6 +232,14 @@ class Insured::FamiliesController < FamiliesController
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    end
+  end
+
+  def sep_request_denial_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
     end
   end
 

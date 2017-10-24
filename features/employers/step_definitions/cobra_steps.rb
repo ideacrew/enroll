@@ -67,7 +67,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/b').click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"
@@ -176,7 +176,7 @@ And(/^.+ should see the status of Cobra Linked$/) do
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee Role Linked')
+  expect(page).to have_content('Account Linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
@@ -235,7 +235,8 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  find('tr.even i.fa-trash-o').click
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
   click_link 'Terminate Employee'
@@ -256,8 +257,11 @@ Then(/^.+ should see the status of Employment terminated$/) do
 end
 
 When(/^.+ cobra one employee$/) do
-  find('a.show_cobra_confirm').click
-  find('a.cobra_confirm_submit').click
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
+  element.find('a.show_cobra_confirm').click
+
+  employee_id = element.find('a', :text => 'Employee Jr.')[:href].match(/^.*\/census_employees\/(\w+).*/i)[1]
+  find("tr.cobra_confirm_#{employee_id}").find('a.cobra_confirm_submit').click
 end
 
 Then(/^.+ should see cobra successful msg/) do
@@ -271,11 +275,12 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Terminated')
   unless TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Selected')
+    expect(page).to have_content('Coverage Termination Pending')
   else
     expect(page).to have_content('Coverage Enrolled')
+    expect(page).to have_content('Terminated')
   end
 end
 
