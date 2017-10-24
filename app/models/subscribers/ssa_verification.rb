@@ -78,7 +78,7 @@ module Subscribers
 
     def save_ssa_verification_responses(consumer_role)
       data = Parsers::Xml::Cv::SsaVerificationResultParser.parse(consumer_role.lawful_presence_determination.ssa_responses.last.body)
-      consumer_role.lawful_presence_determination.ssa_verification_responses << 
+      consumer_role.lawful_presence_determination.ssa_verification_responses <<
       SsaVerificationResponse.new(
         response_code: data.response_code,
         response_text: data.response_text,
@@ -95,7 +95,6 @@ module Subscribers
         marital_status: data.individual.person_demographics.marital_status,
         death_date: data.individual.person_demographics.death_date,
         race: data.individual.person_demographics.race,
-        is_state_resident: data.individual.person_demographics.is_state_resident,
         ethnicity: data.individual.person_demographics.ethnicity,
         person_id: data.individual.person.id,
         first_name: data.individual.person.name_first,
@@ -115,10 +114,10 @@ module Subscribers
          consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_email << Email.new(kind: email.type, address:  email.email_address)
         end
         data.individual.person.phones.each do |phone|
-         consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_phone << Phone.new(kind: phone.type,country_code: phone.country_code,area_code: phone.area_code, 
+         consumer_role.lawful_presence_determination.ssa_verification_responses.last.individual_phone << Phone.new(kind: phone.type,country_code: phone.country_code,area_code: phone.area_code,
                             number: phone.phone_number,extension: phone.extension,primary: phone.is_preferred,full_phone_number: phone.full_phone_number)
         end
-        
-    end  
+
+    end
   end
 end
