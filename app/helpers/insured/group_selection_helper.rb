@@ -64,8 +64,8 @@ module Insured
     end
 
     def select_benefit_group(qle, employee_role)
-      if @market_kind == "shop"
-        employee_role.present? ? employee_role.benefit_group(qle: qle) : nil
+      if @market_kind == "shop" && employee_role.present?
+        employee_role.benefit_group(qle: qle)
       else
         nil
       end

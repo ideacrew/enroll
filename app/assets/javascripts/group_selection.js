@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
  setGroupSelectionHandlers();
 });
@@ -22,7 +21,6 @@ function setGroupSelectionHandlers(){
         $(".dental_errors_" + employer_id ).show();
       }
 
-      // $("tr.is_primary").closest("td").attr("readonly", true)
       setDentalBenefits(checked_er.attr('dental_benefits'));
       errorsForChangeInCoverageKind(employer_id);
       setPrimaryForShop();
@@ -96,9 +94,8 @@ function setPrimaryForShop() {
 
 
 function hideAllErrors(){
-  $("[class^=dental_errors_]").hide();
-  $("[class^=health_errors_]").hide();
-  $('#coverage-household tr td.ivl_errors').hide();
+  hideShopErrors();
+  hideIvlErrors();
 }
 
 function hideShopErrors() {
