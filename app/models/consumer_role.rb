@@ -195,7 +195,7 @@ class ConsumerRole
   #check verification type status
   def is_type_outstanding?(type)
     case type
-      when "Residency"
+      when "DC Residency"
         residency_denied? && !has_docs_for_type?(type)
       when 'Social Security Number'
         !ssn_verified? && !has_docs_for_type?(type)
@@ -791,7 +791,7 @@ class ConsumerRole
 
   def return_doc_for_deficiency(v_type, update_reason, *authority)
     case v_type
-      when "Residency"
+      when "DC Residency"
         update_attributes(:residency_update_reason => update_reason, :residency_rejected => true)
         mark_residency_denied
       when "Social Security Number"
@@ -808,8 +808,8 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     case v_type
-      when "Residency"
-        update_attributes(:residency_update_reason => update_reason)
+      when "DC Residency"
+        update_attributes(:is_state_resident => true, :residency_update_reason => update_reason, :residency_determined_at => TimeKeeper.datetime_of_record)
         mark_residency_authorized
       when "Social Security Number"
         update_attributes(:ssn_validation => "valid", :ssn_update_reason => update_reason)

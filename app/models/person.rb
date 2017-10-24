@@ -415,7 +415,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
-    verification_types << 'Residency' if consumer_role
+    verification_types << 'DC Residency' if consumer_role
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
@@ -879,7 +879,7 @@ class Person
   def make_primary(role)
     self.active_employer_staff_roles.update(primary_poc: role)
   end
-  
+
   def is_primary_poc
     if active_employer_staff_roles.present?
       active_employer_staff_roles.first.primary_poc
@@ -952,7 +952,7 @@ class Person
       end
     end
   end
-  
+
   # Verify basic date rules
   def date_functional_validations
     date_of_birth_is_past

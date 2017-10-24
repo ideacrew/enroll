@@ -212,7 +212,6 @@ context "Verification process and notices" do
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
-
         person.update_attributes!(:tribal_id=>"444444444") if tribe
         person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
         expect(person.consumer_role.native_validation).to eq(state)
@@ -375,8 +374,8 @@ context "Verification process and notices" do
     context "verify" do
       it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
       it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
-      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "local_residency_validation", "valid"
-      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "local_residency_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
 
     end
 
@@ -384,7 +383,7 @@ context "Verification process and notices" do
       it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
       it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
       it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
-      it_behaves_like "admin verification actions", "return_for_deficiency", "Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "DC Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
     end
   end
 
@@ -393,7 +392,7 @@ context "Verification process and notices" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
-    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|    
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
       context "import" do
         before do
           person.ssn = ssn
