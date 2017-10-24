@@ -8,7 +8,7 @@ module Observers
       notify(event_name, {
         resource_mapping.identifier_key => recipient.send(resource_mapping.identifier_method).to_s,
         :event_object_kind => event_object.class.to_s,
-        :event_object_id => event_object.id
+        :event_object_id => event_object.id.to_s
       })
     end
   end
