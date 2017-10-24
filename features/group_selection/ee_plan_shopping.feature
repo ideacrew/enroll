@@ -70,7 +70,8 @@ Feature: EE plan purchase
     When Employee click the "Married" in qle carousel
     And I select a past qle date
     Then I should see confirmation and continue
-    When employee clicked continue on household info page
+    When employee coverage effective on date is under active plan year
+    And employee clicked continue on household info page
     Then employee should see all the family members names
     And employee should not see the reason for ineligibility
     And employee should see the dental radio button

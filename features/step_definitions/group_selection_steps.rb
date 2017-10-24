@@ -326,6 +326,10 @@ When(/employee clicked on back to my account/) do
   find(".interaction-click-control-back-to-my-account").click
 end
 
+And(/employee coverage effective on date is under active plan year/) do
+  @employee_role.person.primary_family.current_sep.update_attributes(effective_on: TimeKeeper.date_of_record.beginning_of_day)
+end
+
 Given(/^a Resident exists$/) do
   user :with_resident_role
 end
