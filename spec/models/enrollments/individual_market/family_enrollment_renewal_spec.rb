@@ -51,7 +51,8 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
 
   let(:calender_year) { TimeKeeper.date_of_record.year }
   let(:coverage_kind) { 'health' }
-  let(:current_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
+  let(:current_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id) }
+  let(:renewal_plan) { FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.next_year.year, hios_id: "11111111122302-01", csr_variant_id: "01") }
 
   subject { 
     enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -82,6 +83,11 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
         expect(applicant_ids).not_to include(child1.id)
         expect(applicant_ids).to include(child2.id)
       end
+
+      it "should generate passive renewal in coverage_selected state" do
+        renewal = subject.renew
+        expect(renewal.coverage_selected?).to be_truthy
+      end
     end
 
     # Don't we need this for all the dependents
@@ -97,6 +103,25 @@ RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :mo
       end
     end
   end
+
+  describe ".renew" do
+
+    before do
+      allow(child1).to receive(:relationship).and_return('child')
+      allow(child2).to receive(:relationship).and_return('child')
+    end
+
+    context "when all the covered housedhold eligible for renewal" do
+      let(:child1_dob) { TimeKeeper.date_of_record.next_month - 24.years }
+
+
+      it "should generate passive renewal in auto_renewing state" do
+        renewal = subject.renew
+        expect(renewal.auto_renewing?).to be_truthy
+      end
+    end
+  end
+
 
   describe ".renewal_plan" do
     context "When consumer covered under catastrophic plan" do

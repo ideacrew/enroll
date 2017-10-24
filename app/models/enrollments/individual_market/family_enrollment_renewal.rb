@@ -7,10 +7,19 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def renew
+    @dependent_age_off = false
+
     begin
       renewal_enrollment = clone_enrollment
-      renewal_enrollment.renew_enrollment
+      if is_dependent_dropped?
+        renewal_enrollment.aasm_state = 'coverage_selected'
+        renewal_enrollment.workflow_state_transitions.build(from_state: 'shopping', to_state: 'coverage_selected')
+      else
+        renewal_enrollment.renew_enrollment
+      end
+
       # renewal_enrollment.decorated_hbx_enrollment
+      @dependent_age_off = nil
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
       puts "#{enrollment.hbx_id}---#{e.inspect}"
@@ -20,7 +29,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def clone_enrollment
     renewal_enrollment = @enrollment.family.active_household.hbx_enrollments.new
-
     renewal_enrollment.consumer_role_id = @enrollment.consumer_role_id
     renewal_enrollment.effective_on = renewal_coverage_start
     renewal_enrollment.coverage_kind = @enrollment.coverage_kind
@@ -44,6 +52,10 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     end
 
     renewal_enrollment
+  end
+
+  def is_dependent_dropped?
+    @dependent_age_off
   end
 
   # Assisted
@@ -121,7 +133,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     child_relations = %w(child ward foster_child adopted_child)
 
     if child_relations.include?(member.family_member.relationship)
-      member.person.age_on(renewal_coverage_start.prev_day) < 26
+      return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
+      @dependent_age_off = true unless @dependent_age_off
+      return false
     else
       true
     end
