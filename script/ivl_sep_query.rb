@@ -48,7 +48,14 @@ purchases = Family.collection.aggregate([
     },
     "households.hbx_enrollments.kind" => {"$nin" => enrollment_kinds}
   }},
-  {"$group" => {"_id" => "$households.hbx_enrollments.hbx_id"}}
+  {"$group" => {
+    "_id" => "$households.hbx_enrollments.hbx_id",
+    "enrollment_state" => {"$last" => "$households.hbx_enrollments.aasm_state"}
+  }},
+  {"$project" => {
+    "_id" => 1,
+    "enrollment_state" => "$enrollment_state"
+  }}
 ])
 
 terms = Family.collection.aggregate([
@@ -87,7 +94,12 @@ purchase_event = "acapi.info.events.hbx_enrollment.coverage_selected"
 purchases.each do |rec|
   pol_id = rec["_id"]
   Rails.logger.info "-----publishing #{pol_id}"
-  IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
+
+  if rec["enrollment_state"] == 'auto_renewing'
+    IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#auto_renew")
+  else
+    IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
+  end
 end
 
 term_event = "acapi.info.events.hbx_enrollment.terminated"
