@@ -110,4 +110,10 @@ class BenefitGroupCongress < BenefitGroup
     "employee_plus_many"  => 1094.64
   }
 
+  employer_contribution_max_2018 = {
+    "employee_only"       => 496.71,
+    "employee_plus_one"   => 1063.83,
+    "employee_plus_many"  => 1130.09
+  }
+
 end
