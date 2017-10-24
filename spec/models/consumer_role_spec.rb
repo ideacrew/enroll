@@ -374,8 +374,8 @@ context "Verification process and notices" do
     context "verify" do
       it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
       it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
-      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "local_residency_validation", "valid"
-      it_behaves_like "admin verification actions", "verify", "Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "local_residency_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
 
     end
 
@@ -383,7 +383,7 @@ context "Verification process and notices" do
       it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
       it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
       it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
-      it_behaves_like "admin verification actions", "return_for_deficiency", "Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "DC Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
     end
   end
 

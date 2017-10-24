@@ -33,7 +33,7 @@ module VerificationHelper
         else
           "outstanding"
         end
-      when 'Residency'
+      when 'DC Residency'
         if consumer.residency_verified?
           consumer.local_residency_validation
         elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
@@ -199,7 +199,7 @@ module VerificationHelper
   def documents_list(person, v_type)
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
-  
+
   def admin_actions(v_type, f_member)
     options_for_select(build_admin_actions_list(v_type, f_member))
   end
