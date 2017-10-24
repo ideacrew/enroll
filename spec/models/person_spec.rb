@@ -1048,9 +1048,10 @@ describe Person do
     shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
         allow(person).to receive(:ssn).and_return(nil) unless ssn
-        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
         allow(person).to receive(:us_citizen).and_return(citizen)
+        allow(person).to receive(:dob).and_return(TimeKeeper.date_of_record - age.to_i.years)
         allow(person).to receive(:tribal_id).and_return("444444444") if native
+        allow(person).to receive(:citizen_status).and_return("indian_tribe_member") if native
       end
       it "returns array of verification types" do
         expect(person.verification_types).to be_a Array
