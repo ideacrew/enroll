@@ -8,6 +8,8 @@ class CensusEmployee < CensusMember
   include Config::AcaModelConcern
   include ::Eligibility::CensusEmployee
   include ::Eligibility::EmployeeBenefitPackages
+  include Concerns::Observable
+  include ModelEvents::CensusEmployee
 
   require 'roo'
 
