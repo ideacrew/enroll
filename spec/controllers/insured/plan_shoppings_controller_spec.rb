@@ -297,6 +297,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       sign_in(user)
+      expect(controller).to receive(:waiver_confirmation_notice).with(enrollment)
       get :print_waiver, id: "id"
       expect(response).to have_http_status(:success)
     end

@@ -675,6 +675,27 @@ shop_notice_triggers = [
       }
     ]
   },
+  {
+    hbx_id: 'SHOPDAE031',
+    title: 'Confirmation of Election to Waive Coverage',
+    description: 'Notice to employee confirming their election to waive coverage. If employee is enrolled, notice must include coverage termination details',
+    resource_name: 'employee_role',
+    event_name: 'waiver_confirmation_notice',
+    notice_triggers: [
+      {
+        name: 'Waiver Confirmation',
+        notice_template: 'notices/shop_employee_notices/waiver_confirmation_notice',
+        notice_builder: 'ShopEmployeeNotices::WaiverConfirmationNotice',
+        mpi_indicator: 'MPI_SHOPDAE031',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employee"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
 ]
 
 

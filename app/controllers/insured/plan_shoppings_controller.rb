@@ -129,6 +129,15 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def print_waiver
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))
+    waiver_confirmation_notice(@hbx_enrollment)
+  end
+
+  def waiver_confirmation_notice(enrollment)
+    begin
+      ShopNoticesNotifierJob.perform_later(enrollment.census_employee.id.to_s, "waiver_confirmation_notice")
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver waiver_confirmation_notice to employee #{enrollment.census_employee.full_name} due to #{e}"}) unless Rails.env.test?
+    end
   end
 
   def terminate
