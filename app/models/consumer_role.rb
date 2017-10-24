@@ -393,7 +393,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :fully_verified
     end
 
-    event :coverage_purchased, :after => [:record_transition, :notify_of_eligibility_change]  do
+    event :coverage_purchased, :after => [:record_transition, :notify_of_eligibility_change, :invoke_residency_verification!]  do
       transitions from: :unverified, to: :verification_outstanding, :guard => :native_no_ssn?, :after => [:fail_ssa_for_no_ssn]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?], :after => [:invoke_verification!]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:invoke_verification!]
@@ -443,6 +443,14 @@ class ConsumerRole
       transitions from: :fully_verified, to: :verification_outstanding
     end
 
+    event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process] do
+      transitions from: :ssa_pending, to: :ssa_pending
+      transitions from: :dhs_pending, to: :dhs_pending
+      transitions from: :sci_verified, to: :sci_verified
+      transitions from: :verification_outstanding, to: :verification_outstanding
+      transitions from: :fully_verified, to: :sci_verified
+    end
+
     #this event rejecting the status if admin rejects any verification type but it DOESN'T work backwards - we don't move all the types to unverified by triggering this event
     event :reject, :after => [:record_transition, :notify_of_eligibility_change] do
       transitions from: :unverified, to: :verification_outstanding
@@ -485,7 +493,6 @@ class ConsumerRole
   end
 
   def invoke_verification!(*args)
-    start_residency_verification_process unless person.no_dc_address
     if person.ssn || is_native?
       invoke_ssa
     else
@@ -592,10 +599,27 @@ class ConsumerRole
     is_native? && no_ssn?
   end
 
-  def check_for_critical_changes(person_params)
+  def check_for_critical_changes(person_params, family)
     if person_params.select{|k,v| VERIFICATION_SENSITIVE_ATTR.include?(k) }.any?{|field,v| sensitive_information_changed(field, person_params)}
-      redetermine_verification!(verification_attr) if Person.person_has_an_active_enrollment?(person)
+      redetermine_verification!(verification_attr) if family.person_has_an_active_enrollment?(person)
     end
+
+    trigger_residency! if can_trigger_residency?(person_params["no_dc_address"], family)
+  end
+
+  def can_trigger_residency?(no_dc_address, family) # trigger for change in address
+    person.age_on(TimeKeeper.date_of_record) > 18 &&
+    person.no_dc_address &&
+    no_dc_address == "false" &&
+    family.person_has_an_active_enrollment?(person)
+  end
+
+  def can_start_residency_verification? # initial trigger check for coverage purchase
+    !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
+  end
+
+  def invoke_residency_verification!
+    start_residency_verification_process if can_start_residency_verification?
   end
 
   #class methods
