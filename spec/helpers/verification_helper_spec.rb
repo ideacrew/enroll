@@ -71,6 +71,36 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
     end
+
+    context 'verification type status attested' do
+      before :each do
+        person.dob = Date.new(2010,11,10)
+      end
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'does not return attested if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
+        expect(helper.verification_type_status('DC Residency', person)).not_to eq('attested')
+      end
+
+      it 'does not return attested if age <= 18 and type is social security number ' do
+        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
+      end
+
+      it 'returns outstanding if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.native_validation = "outstanding"
+        person.consumer_role.mark_residency_denied
+        expect(helper.verification_type_status('DC Residency', person)).to eq('outstanding')
+      end
+    end
   end
 
   describe "#verification_type_class" do
