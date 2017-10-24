@@ -17,9 +17,9 @@ module ModelEvents
       aasm_matcher.call(from, aasm.from_state) && aasm_matcher.call(to, aasm.to_state) && aasm_matcher.call(event, current_event_name)
     end
 
-    def trigger_model_event(event_name)
+    def trigger_model_event(event_name, event_options = {})
       if REGISTERED_EVENTS.include?(event_name)
-        notify_observers(ModelEvent.new(event_name, self, {}))
+        notify_observers(ModelEvent.new(event_name, self, event_options))
       end
     end
   end
