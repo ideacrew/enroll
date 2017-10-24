@@ -228,12 +228,14 @@ class FinancialAssistance::Applicant
       transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+      transitions from: :fully_verified, to: :fully_verified
     end
 
     event :mec_valid do
       transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+      transitions from: :fully_verified, to: :fully_verified
     end
   end
 
