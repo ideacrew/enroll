@@ -41,5 +41,12 @@ describe RemoveOneCeFromEr, dbclean: :after_each do
       organization.reload
       expect(organization.employer_profile.census_employees.where(id:ce2_id).size).to eq 1
     end
+    it "remove employee_role if present" do
+      ce2_id = census_employee2.id
+      expect(organization.employer_profile.census_employees.where(id:ce2_id).first.employer_profile.employee_roles.first).to eq employee_role
+      subject.migrate
+      organization.reload
+      expect(organization.employer_profile.census_employees.where(id:ce2_id).first.employer_profile.employee_roles.first).to eq nil
+    end
   end
 end
