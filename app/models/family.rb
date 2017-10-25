@@ -724,12 +724,19 @@ class Family
     enrollments.verification_needed.any?
   end
 
-  def has_financial_assistance_verification?
-    return false if applications.blank?
+  def application_applicable_year
     current_year = TimeKeeper.date_of_record.year
     applicable_year = HbxProfile.current_hbx.under_open_enrollment? ? current_year + 1 : current_year
-    current_submitted_app = applications.where(assistance_year: applicable_year, aasm_state: "submitted").order_by(:submitted_at => 'desc').first
-    current_submitted_app.present? ? true : false
+  end
+
+  def latest_applicable_submitted_application
+    retrn nil unless applications.present?
+    applications.where(:assistance_year => application_applicable_year, :aasm_state.in => ["submitted", "determined"]).order_by(:submitted_at => 'desc').first
+  end
+
+  def has_financial_assistance_verification?
+    return false if applications.blank?
+    latest_applicable_submitted_application.present? ? true : false
   end
 
   def application_in_progress

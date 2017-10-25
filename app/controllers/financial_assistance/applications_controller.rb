@@ -189,6 +189,12 @@ class FinancialAssistance::ApplicationsController < ApplicationController
                                               e_pdc_id: "3110344",
                                               source: "Haven").save!
       @model.applicants.second.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false) if txh.applicants.count > 1
+      
+      #Update the Income and MEC verifications to Outstanding
+      @model.applicants.each do |applicant|
+        applicant.update_attributes!(:assisted_income_validation => "outstanding", :assisted_mec_validation => "outstanding", aasm_state: "verification_outstanding")
+        applicant.assisted_verifications.each { |verification| verification.update_attributes!(status: "outstanding", verification_failed: true) }
+      end
     end
   end
 
