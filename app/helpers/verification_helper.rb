@@ -231,7 +231,7 @@ module VerificationHelper
     person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
   end
 
-  # returns ridp_documents array for verification type
+  # returns ridp_documents array for ridp verification type
   def ridp_documents_list(person, ridp_type)
     person.consumer_role.ridp_documents.select{|doc| doc.identifier && doc.ridp_verification_type == ridp_type } if person.consumer_role
   end

@@ -26,8 +26,8 @@ class ConsumerRole
   LOCAL_RESIDENCY_VALIDATION_STATES = %w(attested valid outstanding pending) #attested state is used for people with active enrollments before locale residency verification was turned on
 
   #ridp
-  IDENTITY_VALIDATION_STATES = %w(na valid outstanding pending)
-  APPLICATION_VALIDATION_STATES = %w(na valid outstanding pending)
+  IDENTITY_VALIDATION_STATES = %w(valid outstanding pending)
+  APPLICATION_VALIDATION_STATES = %w(valid outstanding pending)
 
   VERIFICATION_SENSITIVE_ATTR = %w(first_name last_name ssn us_citizen naturalized_citizen eligible_immigration_status dob indian_tribe_member)
 
@@ -85,14 +85,14 @@ class ConsumerRole
   field :local_residency_validation, type: String, default: nil
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
-  
+
   # Identity
   field :identity_validation, type: String, default: "outstanding"
-  validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => true
+  validates_inclusion_of :identity_validation, :in => IDENTITY_VALIDATION_STATES, :allow_blank => false
 
   # Application
   field :application_validation, type: String, default: "outstanding"
-  validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => true
+  validates_inclusion_of :identity_validation, :in => APPLICATION_VALIDATION_STATES, :allow_blank => false
 
   #ridp update reason fields
   field :identity_update_reason, type: String
@@ -294,11 +294,11 @@ class ConsumerRole
   end
 
   def identity_verified?
-    ['na', 'valid'].include?(self.identity_validation)
+    ['valid'].include?(self.identity_validation)
   end
 
   def application_verified?
-    ['na', 'valid'].include?(self.application_validation)
+    ['valid'].include?(self.application_validation)
   end
 
   def is_hbx_enrollment_eligible?
