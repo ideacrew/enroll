@@ -92,7 +92,21 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
                           scrollTop: position
                       }, 500);
       $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
+      var selected_carrier_level = $('.health .nav li:visible input').val()
+
+      loadCarrierNames();
+      $('.tab-container').hide();
+      if (selected_carrier_level == 'sole_source') {
+        $('.sole-source-plan-tab').show();
+      } else if (selected_carrier_level == 'single_plan') {
+        $('.single-plan-tab').show();
+      } else if (selected_carrier_level == 'metal_level') {
+        $('.metal-level-tab').show();
+      } else if (selected_carrier_level == 'single_carrier') {
+        $('.single-carrier-tab').show();
+      }
       $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
+
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
 
@@ -106,9 +120,27 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
       $(this).closest('.select-dental-plan').find('.edit-offering').show();
       $(this).closest('.select-dental-plan').find('.nav-tabs').show();
     } else {
-      $(".nav-tabs li label").first().trigger('click')
       $('#<%= @location_id %>').find('.reference-steps:first').show();
       $('#<%= @location_id %> <%= @coverage_type %>').find('.health').find('.nav-tabs').show();
+      var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
+      $('html, body').animate({
+                          scrollTop: position
+                      }, 500);
+      $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
+      var selected_carrier_level = $('.health .nav li:visible input').val()
+
+      loadCarrierNames();
+      $('.tab-container').hide();
+      if (selected_carrier_level == 'sole_source') {
+        $('.sole-source-plan-tab').show();
+      } else if (selected_carrier_level == 'single_plan') {
+        $('.single-plan-tab').show();
+      } else if (selected_carrier_level == 'metal_level') {
+        $('.metal-level-tab').show();
+      } else if (selected_carrier_level == 'single_carrier') {
+        $('.single-carrier-tab').show();
+      }
+      $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
     }
   });
 

@@ -300,6 +300,7 @@ Rails.application.routes.draw do
         get 'reference_plans'
         get 'dental_reference_plans'
         get 'generate_dental_carriers_and_plans'
+        get 'generate_health_carriers_and_plans', on: :collection
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection

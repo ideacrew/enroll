@@ -44,12 +44,24 @@ module Config::AcaHelper
     @offer_sole_source ||= Settings.aca.plan_options_available.include?("sole_source")
   end
 
+  def enabled_sole_source_years
+    @enabled_sole_source_years ||= Settings.aca.plan_option_years.sole_source_carriers_available
+  end
+
   def offers_metal_level?
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
+  def enabled_metal_level_years
+    @enabled_metal_level_years ||= Settings.aca.plan_option_years.metal_level_carriers_available
+  end
+
   def offers_single_carrier?
     @offer_single_carrier ||= Settings.aca.plan_options_available.include?("single_carrier")
+  end
+
+  def enabled_single_carrier_years
+    @enabled_single_carrier_years ||= Settings.aca.plan_option_years.single_carriers_available
   end
 
   def offers_single_plan?

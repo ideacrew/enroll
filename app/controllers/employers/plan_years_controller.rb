@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
   before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
+  before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
@@ -414,6 +414,22 @@ class Employers::PlanYearsController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def generate_health_carriers_and_plans
+    @plan_year = build_plan_year
+    @benefit_group = params[:benefit_group]
+    @location_id = params[:location_id]
+    @start_on = params[:start_on]
+    @carrier_search_level = params[:selected_carrier_level]
+
+    ## TODO: different if we dont have service areas enabled
+    ## TODO: awfully slow
+    @carrier_names = Organization.valid_carrier_names(
+                        primary_office_location: @employer_profile.organization.primary_office_location,
+                        selected_carrier_level: params[:selected_carrier_level],
+                        active_year: @start_on
+                        )
   end
 
   private
