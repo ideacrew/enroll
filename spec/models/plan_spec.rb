@@ -510,10 +510,12 @@ RSpec.describe Plan, dbclean: :after_each do
       let(:plan2) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'silver', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122303", csr_variant_id: "06")}
       let(:plan3) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', metal_level: 'gold', active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122304-01", csr_variant_id: "01")}
       let(:plan4) {FactoryGirl.create(:plan, :with_premium_tables, market: 'individual', coverage_kind: 'dental', dental_level: "high", active_year: TimeKeeper.date_of_record.year, hios_id: "11111111122305-02")}
-      let(:tax_household) {double(preferred_eligibility_determination: double(csr_eligibility_kind: "csr_94"))}
       let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
       let(:primary_family_member) {family.primary_applicant}
       let(:application) {FactoryGirl.create(:application, family: family)}
+      let(:tax_household) {FactoryGirl.create(:tax_household, application_id: application.id, household: family.households.first, is_eligibility_determined: true)}
+      let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_94", tax_household: tax_household)}
+      let(:applicant) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household.id, family_member_id: primary_family_member.id, is_active: true)}
 
       before :each do
         Plan.delete_all
@@ -532,8 +534,11 @@ RSpec.describe Plan, dbclean: :after_each do
       it "should return health plans" do
         plans = [plan2]
         allow(tax_household).to receive(:family).and_return family
-        allow(application).to receive(:active_applicants).and_return nil
-        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids:nil).to_a).to eq plans
+        allow(tax_household).to receive(:application).and_return application
+        allow(applicant).to receive(:application).and_return application
+        allow(application).to receive(:active_applicants).and_return [applicant]
+        allow(tax_household).to receive(:preferred_eligibility_determination).and_return eligibility_determination1
+        expect(Plan.individual_plans(coverage_kind:'health', active_year:TimeKeeper.date_of_record.year, tax_households: [tax_household], family_member_ids: [primary_family_member.id.to_s]).to_a).to eq plans
       end
 
       context "individual_plans" do
@@ -542,9 +547,9 @@ RSpec.describe Plan, dbclean: :after_each do
         let(:family_member4) {FactoryGirl.create(:family_member, family: family)}
         let(:household) {FactoryGirl.create(:household, family: family)}
         let(:tax_household1) {FactoryGirl.create(:tax_household, application_id: application.id, household: household)}
-        let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, application_id: application.id, csr_eligibility_kind: "csr_87", tax_household_id: tax_household2.id)}
+        let(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_87", tax_household: tax_household2)}
         let(:tax_household2) {FactoryGirl.create(:tax_household, application_id: application.id, household: household)}
-        let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, application: application, csr_eligibility_kind: "csr_94", tax_household_id: tax_household2.id)}
+        let(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, csr_eligibility_kind: "csr_94", tax_household: tax_household2)}
         let(:applicant1) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: primary_family_member.id)}
         let(:applicant2) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: family_member2.id, is_totally_ineligible: true)}
         let(:applicant3) {FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household2.id, family_member_id: family_member3.id)}
