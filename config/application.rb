@@ -66,6 +66,7 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
       config.acapi.add_async_subscription("TransportProfiles::Subscribers::TransportArtifactSubscriber")
       config.acapi.add_async_subscription("Subscribers::ShopInitialEmployerQuietPeriodEnded")
+      config.acapi.add_async_subscription("Subscribers::PolicyTerminationsSubscriber")
     end
   end
 end
