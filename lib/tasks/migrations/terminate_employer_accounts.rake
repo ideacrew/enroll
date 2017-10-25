@@ -1,14 +1,14 @@
 # This rake task used to terminate employer active plan year && active enrollments.
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date', 'generate_termination_notice']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017',true/false]
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
-  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
+  task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
 
     fein = args[:fein]
+    generate_termination_notice = args[:generate_termination_notice] == "true"
     organizations = Organization.where(fein: fein)
-
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
       raise 'more than 1 employer found with given fein'
@@ -19,7 +19,6 @@ namespace :migrations do
     end_on = Date.strptime(args[:end_on], "%m/%d/%Y")
 
     organizations.each do |organization|
-
       # Expire previous year plan years
       organization.employer_profile.plan_years.published.where(:"end_on".lte => TimeKeeper.date_of_record).each do |plan_year|
         enrollments = enrollments_for_plan_year(plan_year)
@@ -33,10 +32,8 @@ namespace :migrations do
 
         plan_year.expire! if plan_year.may_expire?
       end
-
       # Terminate current active plan years
       organization.employer_profile.plan_years.published_plan_years_by_date(TimeKeeper.date_of_record).each do |plan_year|
-
         enrollments = enrollments_for_plan_year(plan_year)
         if enrollments.any?
           puts "Terminating employees coverage for employer #{organization.legal_name}" unless Rails.env.test?
@@ -53,8 +50,13 @@ namespace :migrations do
         if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
+          if generate_termination_notice
+            send_notice_to_employer(organization)
+            send_notice_to_employees(organization)
+          end
+
         end
-      end
+    end
 
       # organization.employer_profile.census_employees.non_terminated.each do |census_employee|
       #   if census_employee.employee_role_linked?
@@ -119,5 +121,25 @@ def enrollments_for_plan_year(plan_year)
   families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
   enrollments = families.inject([]) do |enrollments, family|
     enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+  end
+end
+
+def send_notice_to_employer(org)
+  puts "group_advance_termination_confirmation:Notification generated for employer"
+  begin
+    ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "group_advance_termination_confirmation")
+  rescue Exception => e
+    (Rails.logger.error { "Unable to deliver Notices to #{org.employer_profile.legal_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+  end
+end
+
+def send_notice_to_employees(org)
+  puts "Notification generated for employee"
+  org.employer_profile.census_employees.active.each do |ce|
+    begin
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+    end
   end
 end

@@ -44,6 +44,7 @@ Rails.application.configure do
   config.acapi.app_id = "enroll"
   HbxIdGenerator.slug!
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
+  config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
   config.action_mailer.default_url_options = {
     :host => "127.0.0.1",

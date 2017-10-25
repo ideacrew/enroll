@@ -151,9 +151,18 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
     broker_fired_confirmation_to_broker
     broker_agency_fired_confirmation
+  end
+
+  def employer_broker_fired
+    begin
+      trigger_notices('employer_broker_fired')
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
+    end
   end
 
   def broker_agency_fired_confirmation
@@ -692,15 +701,18 @@ class EmployerProfile
               end
             end
           end
-        end    
+        end     
 
-        #initial Employer's missing binder payment due date notices to Employer's and active Employee's.
+        #initial employers misses binder payment due date deadline on next day notice
         binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
         if new_date == binder_next_day
           initial_employers_enrolled_plan_year_state.each do |org|
             if !org.employer_profile.binder_paid?
-              notice_to_employer_for_missing_binder_payment(org)
-              notice_to_employee_for_missing_binder_payment(org)
+                begin
+                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
+                rescue Exception => e
+                  (Rails.logger.error {"Unable to deliver Notice to  when missing binder payment due to #{e}"}) unless Rails.env.test?
+                end
             end
           end
         end
