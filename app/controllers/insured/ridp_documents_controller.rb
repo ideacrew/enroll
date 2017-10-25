@@ -10,7 +10,7 @@ class Insured::RidpDocumentsController < ApplicationController
     @docs_owner = @person
     if params[:file]
       params[:file].each do |file|
-        doc_uri =  "https://stackoverflow.com/questions/" #Aws::S3Storage.save(file_path(file), 'id-verification')
+        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
           if update_ridp_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
@@ -101,10 +101,10 @@ class Insured::RidpDocumentsController < ApplicationController
 
   def ridp_docs_clean(person)
     existing_documents = person.consumer_role.ridp_documents
-    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.ridp_documents =[]
     person_consumer_role.save
-    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.ridp_documents = existing_documents.uniq
     person_consumer_role.save
   end

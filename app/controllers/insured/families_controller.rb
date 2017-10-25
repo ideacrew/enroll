@@ -325,7 +325,7 @@ class Insured::FamiliesController < FamiliesController
 
   def ridp_redirection
     consumer = @person.consumer_role
-    @person.user && (!@person.user.identity_verified? && !consumer.identity_verified? && !consumer.application_verified?)
+    @person.user && (!@person.user.identity_verified? && !consumer.identity_verified? && !consumer.application_verified?)  && !current_user.has_hbx_staff_role?
   end
 
   def update_changing_hbxs(hbxs)

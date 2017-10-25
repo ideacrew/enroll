@@ -145,11 +145,11 @@ describe "#find_ridp_document_by_key" do
   let(:person) {Person.new}
   let(:consumer_role) {ConsumerRole.new({person:person})}
   let(:key) {"sample-key"}
-  let(:ridp_document) {RidpDocument.new({subject: "Certificate of Citizenship", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+  let(:ridp_document) {RidpDocument.new({subject: "Driver License", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
 
   context "has a ridp_document without a file uploaded" do
     before do
-      consumer_role.ridp_documents.build({subject: "Certificate of Citizenship"})
+      consumer_role.ridp_documents.build({subject: "Driver License"})
     end
 
     it "return no document" do
