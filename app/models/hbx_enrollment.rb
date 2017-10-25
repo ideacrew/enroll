@@ -1456,6 +1456,10 @@ class HbxEnrollment
     submitted_at.blank? ? Time.now : submitted_at
   end
 
+  def is_reinstated_enrollment?
+    self.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}
+  end
+
   private
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
