@@ -131,26 +131,35 @@ RSpec.describe Organization, dbclean: :after_each do
     let(:office_location) { double(address: address)}
     let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
 
+
     before :each do
-      allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
       Rails.cache.clear
     end
 
     context "carrier_names" do
-
-      it "valid_carrier_names" do
-        carrier_names = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
-        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
-        expect(Organization.valid_carrier_names).to match_array carrier_names
+      before :each do
+        allow(Plan).to receive(:valid_shop_health_plans).and_return([carrier_plan])
       end
 
-      it "valid_carrier_names_for_options" do
-        carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options).to match_array carriers
-      end
+      context "base case" do
+        it "valid_carrier_names" do
+          carrier_names = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          carrier_names[carrier_profile_2.id.to_s] = carrier_profile_2.legal_name
+          carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          expect(Organization.valid_carrier_names).to match_array carrier_names
+        end
 
+        it "valid_carrier_names_for_options" do
+          carriers = [[carrier_profile_1.legal_name, carrier_profile_1.id.to_s], [carrier_profile_2.legal_name, carrier_profile_2.id.to_s],[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
+          expect(Organization.valid_carrier_names_for_options).to match_array carriers
+        end
+
+        it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
+          carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
+          expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
+        end
+      end
 
       context "when limiting carriers to service area and coverage selection level and active year" do
         before do

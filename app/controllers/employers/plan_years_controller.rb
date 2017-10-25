@@ -325,8 +325,6 @@ class Employers::PlanYearsController < ApplicationController
                             selected_carrier_level: 'sole_source',
                             active_year: @start_on
                             )
-                            pp "***"
-                            pp @sole_source_carriers
         @open_enrollment_dates = PlanYear.calculate_open_enrollment_date(start_on)
         @schedule= PlanYear.shop_enrollment_timetable(start_on)
       end
