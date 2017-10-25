@@ -75,6 +75,7 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "PUT update_verification_type" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      allow(family).to receive(:update_family_document_status!).and_return(true)
     end
 
     shared_examples_for "update verification type" do |type, reason, admin_action, updated_attr, result|

@@ -34,10 +34,12 @@ class DocumentsController < ApplicationController
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
+    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     if (VlpDocument::VERIFICATION_REASONS + VlpDocument::RETURNING_FOR_DEF_REASONS).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
+      update_doc_status(family_member) if family_member
     else
       flash_message = { :error => "Please provide a verification reason."}
     end
@@ -159,6 +161,11 @@ class DocumentsController < ApplicationController
   def authorized_to_download?(owner, documents, document_id)
     return true
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
+  end
+
+  def update_doc_status(family_member)
+    family = family_member.family
+    family.update_family_document_status!
   end
 
   def set_document
