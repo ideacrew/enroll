@@ -221,6 +221,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     let(:mock_person) { double }
     let(:mock_user) { double(:person => mock_person) }
     before :each do
+      allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(mock_user)
     end
 
@@ -236,6 +237,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     let(:mock_transaction_id) { double }
     let(:mock_user) { double(:person => mock_person) }
     before :each do
+      allow(mock_user).to receive(:has_hbx_staff_role?).and_return(false)
       sign_in(mock_user)
     end
 
