@@ -4,7 +4,6 @@ unless ARGV[0].present? && ARGV[1].present?
   exit
 end
 
-
 begin
   file_name = ARGV[0]
   event = ARGV[1]
@@ -72,7 +71,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver to projected_eligibility_notice_2 to #{ic_number} - ic number due to the following error #{e.backtrace}" unless Rails.env.test?
+      puts "Unable to deliver #{event} notice to #{person.hbx_id} - ic number due to the following error #{e.backtrace}" unless Rails.env.test?
     end
 
   end

@@ -9,8 +9,12 @@
   <tbody>
     <tr>
       <td><h3>
-        YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018 <br>
-        ACTION REQUIRED - SEND BY DOCUMENTS BY < document_due_date >
+        <% if notice.documents_needed %>
+          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018 <br>
+          ACTION REQUIRED - SEND BY DOCUMENTS BY <%= notice.due_date.strftime("%B %d, %Y") %>
+        <% else %>
+          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018
+        <% end %>
       </h3></td>
     </tr>
   </tbody>
@@ -25,23 +29,28 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "Welcome to the <coverage year> open enrollment season!  We value you as a customer, and are pleased to once again be of service to you and your family as you select quality, affordable health insurance coverage for the coming year. Open enrollment for health and dental insurance plans begins on <OE Start Date> and ends on <OE End Date>. This letter will tell you:", bottom_margin: '8px'} %>
+   content: "Welcome to the #{notice.coverage_year} open enrollment season!  We value you as a customer, and are pleased to once again be of service to you and your family as you select quality, affordable health insurance coverage for the coming year. Open enrollment for health and dental insurance plans begins on #{notice.ivl_open_enrollment_start_on.strftime("%B %d, %Y")} and ends on #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}. This letter will tell you:", bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-      listings: ["What’s new this year", "Your final eligibility results for <coverage year>", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
+      listings: ["What’s new this year", "Your final eligibility results for #{notice.coverage_year}", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["While there’s been a lot of news about the repeal and replace of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, DC Health Link continues to be the health insurance marketplace for District residents.  We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses.", "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for 2018. Free expert enrollment assistance, and online support tools are available to help you and your family to make informed decisions. You may also be eligible for reduced monthly premiums."],
-   heading: 'What’s New This Year', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+ contents: ["While there’s been a lot of news about the repeal and replace of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents.  We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
+   heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+   content: "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for 2018. Free expert enrollment assistance, and online support tools are available to help you and your family to make informed decisions. You may also be eligible for reduced monthly premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through DC Health Link. Based on our records, and any updates you gave us, your results are as follows:"],
+ contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
    heading: 'Your Final Eligibility Results', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <% if notice.magi_medicaid_eligible.present? %>
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
       previous: "<strong>Likely Qualify for Medicaid:</strong>",
       listings: notice.magi_medicaid_eligible} %>
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+  listing: "<strong>What you need to do next:</strong> If you already have Medicaid, you don’t need to do anything right now. If you don’t, the DC Department of Human Services (DHS) will make a final decision on whether those listed qualify for Medicaid. They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS by #{TimeKeeper.date_of_record+14.days}, you may want to ask for an update by calling us at #{notice.hbe.phone}."} %>
 <% end %>
 
 <% if notice.aqhp_or_non_magi_medicaid_eligible.present? %>
@@ -85,7 +94,7 @@
     <% end %>
   <% end %>
   <%= render partial: 'notices/shared/custom_listing', locals: {
-  listing: "What you need to do next: Review your plan, and decide if you want to keep it. If you want to keep your plan, you don’t need to do anything. You’ll automatically be enrolled in the plan shown for coverage beginning January 1, <coverage year>. If you want to change plans, shop for a new plan during open enrollment."} %>
+  listing: "<strong>What you need to do next:</strong> Review your plan, and decide if you want to keep it. If you want to keep your plan, you don’t need to do anything. You’ll automatically be enrolled in the plan shown for coverage beginning January 1, #{notice.coverage_year}. If you want to change plans, shop for a new plan during open enrollment."} %>
 <% end %>
 
 <% if notice.ineligible_applicants.present? %>
@@ -94,30 +103,33 @@
     listings: notice.ineligible_applicants} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-     content: "<strong>Send Us Documents</strong>", top_margin: '-5px', bottom_margin: '5px'} %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["You need to send us documents to verify that you still qualify to get coverage through #{Settings.site.short_name}."],
+   heading: 'Send Us Documents', sub_heading: ''} %>
 
-    <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "You need to send us documents to verify that you still qualify to get coverage through DC Health Link. The deadline to return them is <Document Due Date>. You could lose your insurance or cost savings if you don’t submit them by this deadline. Your final eligibility results may also change based on the documents you submit.",
-      listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+      content: "<strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline. Your final eligibility results may also change based on the documents you submit</strong>.", bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', locals: {
+  listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If you want to change plans for <coverage year>, or add someone to a plan, shop for a new plan during open enrollment. After <OE End Date>, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
-   heading: 'Open Enrollment', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+ contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
+   heading: 'Open Enrollment', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/oe_dates' %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["DC Health Link registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com."],
+ contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='https://www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
    heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <% if notice.enrollments.size > 1 %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-     contents: ["The people listed will be enrolled in the plan(s) shown below for coverage beginning January 1, <coverage year> unless you enroll in a new plan. The plan you have now will not be offered in <coverage year>, but the plan shown is similar to it.", "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different. "],
-       heading: 'Your Plan', sub_heading: ''} %>
+     contents: ["The people listed will be enrolled in the plan(s) shown below for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan. The plan you have now will not be offered in #{notice.coverage_year}, but the plan shown is similar to it.", "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different. "],
+       heading: 'Your Plan', sub_heading: '', bottom_margin: '5px'} %>
 
-    <%= render partial: 'notices/shared/custom_listing', locals: {
-        listing: "Your insurance company will send you a letter about changes to your benefits. This plan may have different services than the plan you have now. Copayments, coinsurance, and deductibles may also be different."} %>
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
@@ -127,11 +139,12 @@
 
 <% else %>
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-   contents: ["The people listed will be enrolled in the same plan you have now for coverage beginning January 1, <coverage year> unless you enroll in a new plan.", "Copayments, coinsurance, and deductibles for <coverage year> may be different. Your insurance company will send you a letter about any changes."],
-     heading: 'Your Plan', sub_heading: ''} %>
+   contents: ["The people listed will be enrolled in the same plan you have now for coverage beginning January 1, #{notice.coverage_year} unless you enroll in a new plan.", "Copayments, coinsurance, and deductibles for #{notice.coverage_year} may be different. Your insurance company will send you a letter about any changes."],
+     heading: 'Your Plan', sub_heading: '', bottom_margin: '3px'} %>
 
   <%= render partial: 'notices/shared/custom_listing', locals: {
       listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
+
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
                                    rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
@@ -140,7 +153,7 @@
 
 <% end%>
 
-<% notice.current_health_enrollments.each do |enrollment|%>
+<% notice.renewal_health_enrollments.each do |enrollment|%>
   <% if enrollment.aptc_amount > 0 %>
     <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
       contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],
@@ -154,7 +167,7 @@
           Full price monthly premium:
         </td>
         <td align="right">
-          $<%= enrollment.premium %>
+          <%= number_to_currency(enrollment.premium, precision: 2) %>
         </td>
       </tr>
       <tr>
@@ -162,7 +175,7 @@
           Your tax credit savings:
         </td>
         <td align="right">
-          - $<%= enrollment.aptc_amount.to_f %>
+          - $<%= number_to_currency(enrollment.aptc_amount.to_f, precision: 2) %>
           <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
         </td>
       </tr>
@@ -171,20 +184,21 @@
           Your monthly premium payment:
         </td>
         <td align="right">
-          $<%= enrollment.responsible_amount %>
+          $<%= number_to_currency(enrollment.responsible_amount, precision: 2) %>
         </td>
       </tr>
     </table>
-  <% end %>
-  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-     content: "If you told us to apply less than the full amount of your tax credit last year, we’ve applied the same percentage this year. If you’d like to change the amount of your tax credit, login to your account at dchealthlink.com or call us at (855) 532-5465.", top_margin: '-5px', bottom_margin: '5px'} %>
 
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for <coverage year> to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+     content: "If you told us to apply less than the full amount of your tax credit last year, we’ve applied the same percentage this year. If you’d like to change the amount of your tax credit, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}.", top_margin: '-5px', bottom_margin: '5px'} %>
+
+    <%= render partial: 'notices/shared/custom_listing', locals: {
+        listing: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
+  <% end %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You must continue to pay your premium for your <current year> plan to automatically be enrolled in the plan shown for <coverage year>. If you miss a payment or do not pay the full amount each month, your coverage will not be renewed. If your <current year> plan is no longer active, and you want to enroll in plan for <coverage year>, login to your account at dchealthlink.com or call us at (855) 532-5465.", "Your monthly premium amount will be different in <coverage year>. If you have auto-pay set up through your health and/or dental insurance plan(s), you must contact your insurance company to update your autopay. The same is true if you set-up auto-pay through another method, such as through your bank. If you do not make an update, your plan may be terminated."],
+ contents: ["You must continue to pay your premium for your #{notice.current_year} plan to automatically be enrolled in the plan shown for #{notice.coverage_year}. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed</strong>. If your #{notice.current_year} plan is no longer active, and you want to enroll in plan for #{notice.coverage_year}, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}.", "Your monthly premium amount will be different in #{notice.coverage_year}. <strong>If you have auto-pay set up through your health and/or dental insurance plan(s), you must contact your insurance company to update your autopay. The same is true if you set-up auto-pay through another method, such as through your bank</strong>. If you do not make an update, your plan may be terminated."],
    heading: 'Pay Your Premiums', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
@@ -207,7 +221,7 @@ listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_rec
    heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is <Document Due Date></strong>. If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page. "} %>
+listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page. "} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>

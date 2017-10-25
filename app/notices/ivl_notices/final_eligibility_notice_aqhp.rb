@@ -37,7 +37,9 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def build
     notice.notification_type = self.event_name
     notice.mpi_indicator = self.mpi_indicator
+    notice.primary_identifier = recipient.hbx_id
     notice.coverage_year = TimeKeeper.date_of_record.next_year.year
+    notice.current_year = TimeKeeper.date_of_record.year
     notice.ivl_open_enrollment_start_on = open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = open_enrollment_end_on
     append_data
@@ -68,9 +70,9 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     due_dates = []
     data.collect do |datum|
       notice.individuals << PdfTemplates::Individual.new({
-        :first_name => datum["first_name"],
-        :last_name => datum["last_name"],
-        :full_name => datum["full_name"],
+        :first_name => datum["first_name"].titleize,
+        :last_name => datum["last_name"].titleize,
+        :full_name => datum["full_name"].titleize,
         :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
         :incarcerated => datum["incarcerated"].upcase == "N" ? "No" : "Yes",
         :citizen_status => citizen_status(datum["citizen_status"]),

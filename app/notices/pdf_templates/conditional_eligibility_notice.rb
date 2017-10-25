@@ -32,6 +32,7 @@ module PdfTemplates
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
+    attribute :current_year, String
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
@@ -89,12 +90,12 @@ module PdfTemplates
       enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
     end
 
-    def renewal_health_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+    def renewal_health_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
-    def renewal_dental_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+    def renewal_dental_enrollments
+      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def magi_medicaid_eligible
