@@ -748,7 +748,7 @@ class Family
 
   def active_approved_application
     # Returns the most recent application that is approved (has eligibility determination) for the current year.
-    applications.where(aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year).order_by(:submitted_at => 'desc').first
+    applications.where(aasm_state: "determined", assistance_year: application_applicable_year).order_by(:submitted_at => 'desc').first
   end
 
   def approved_applications_for_year(year)
