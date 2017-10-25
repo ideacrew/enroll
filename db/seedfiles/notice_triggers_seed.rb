@@ -702,7 +702,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLNotice20A',
-    title: 'Request for Additional Information - First Reminder',
+    title: 'REMINDER - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'first_verifications_reminder',
@@ -723,7 +723,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLNotice20B',
-    title: 'Request for Additional Information - Second Reminder',
+    title: 'DON’T FORGET - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'second_verifications_reminder',
@@ -744,7 +744,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLNotice21',
-    title: 'Request for Additional Information - Third Reminder',
+    title: 'TIME SENSITIVE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'third_verifications_reminder',
@@ -765,7 +765,7 @@ ivl_notice_triggers = [
   },
   {
     hbx_id: 'IVLNotice22',
-    title: 'Request for Additional Information - Fourth Reminder',
+    title: 'FINAL NOTICE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
     event_name: 'fourth_verifications_reminder',

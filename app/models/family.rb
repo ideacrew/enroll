@@ -930,6 +930,24 @@ class Family
     end
   end
 
+  def contingent_enrolled_family_members_due_dates
+    due_dates = []
+    contingent_enrolled_active_family_members.each do |family_member|
+      family_member.person.verification_types.each do |v_type|
+        due_dates << document_due_date(family_member, v_type)
+      end
+    end
+    due_dates.compact.uniq.sort
+  end
+
+  def best_verification_due_date
+    due_date= contingent_enrolled_family_members_due_dates.detect do |date| 
+      date > TimeKeeper.date_of_record && (date - TimeKeeper.date_of_record).to_int >= 30
+    end
+    due_date || contingent_enrolled_family_members_due_dates.last
+    #TimeKeeper.date_of_record + 45 # for testing
+  end
+
   def min_verification_due_date_on_family
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|

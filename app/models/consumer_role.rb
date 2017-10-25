@@ -806,7 +806,8 @@ class ConsumerRole
   #check if consumer notification job exists
   def send_consumer_notification(*args)
     event_name = aasm.current_event
-    IvlNoticesNotifierJob.perform_later(self.person.id.to_s , event_name.to_s)
+    event_name = event_name.to_s.gsub("!","")
+    IvlNoticesNotifierJob.perform_later(self.person.id.to_s , event_name)
   end
 
   def verification_attr(*authority)
