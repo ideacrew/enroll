@@ -2,6 +2,8 @@ module Concerns::Observable
   extend ActiveSupport::Concern
 
   included do
+    attr_reader :observer_peers
+
     after_initialize do |instance|
       register_observers
     end
