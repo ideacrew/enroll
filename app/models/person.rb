@@ -37,7 +37,6 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
-  field :is_physically_disabled, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
@@ -411,6 +410,7 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
+    verification_types << 'DC Residency' if consumer_role
     verification_types << 'Social Security Number' if ssn
     verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
@@ -977,9 +977,5 @@ class Person
 
   def incarceration_validation
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
-  end
-
-  def family_member
-    primary_family.family_members.find_by(person_id: id)
   end
 end
