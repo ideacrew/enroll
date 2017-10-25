@@ -1,6 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
-  before_action :set_document,  only: [:destroy, :update]
+  before_action :set_document, only: [:destroy, :update]
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :update_ridp_verification_type]
   respond_to :html, :js
 

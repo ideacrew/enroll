@@ -74,7 +74,7 @@ module Insured
                 process_successful_interactive_verification(service_response)
               else
                 @verification_response = service_response
-                redirect_to :action =>  "failed_validation", :step => @step || nil, :verification_transaction_id => @verification_response.transaction_id
+                redirect_to :action =>  "failed_validation", :verification_transaction_id => @verification_response.transaction_id
               end
             end
         end

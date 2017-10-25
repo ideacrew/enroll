@@ -1,10 +1,8 @@
 class RidpDocument < Document
 
-
   RIDP_DOCUMENTS_VERIF_STATUS = ['not submitted', 'downloaded', 'verified', 'rejected']
 
-
-  # admin action list for verification process, dropdown for each verification type
+  # admin action list for verification process, dropdown for each ridp verification type
   ADMIN_VERIFICATION_ACTIONS = ["Verify", "Reject"]
 
   # reasons admin can provide when verifying type
@@ -17,7 +15,7 @@ class RidpDocument < Document
 
   field :status, type: String, default: "not submitted"
 
-  # verification type this document can support: Social Security Number, Driver's License
+  # ridp verification type this document can support: Driver's License
   field :ridp_verification_type, default: "Identity"
 
   field :comment, type: String
@@ -25,7 +23,4 @@ class RidpDocument < Document
   field :uploaded_at, type: Date
 
   scope :uploaded, ->{ where(identifier: {:$exists => true}) }
-
-
 end
-
