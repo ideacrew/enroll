@@ -7,11 +7,13 @@ class Insured::VerificationDocumentsController < ApplicationController
   def upload
     @doc_errors = []
     @docs_owner = find_docs_owner(params[:family_member])
+    @applicant = @family.latest_applicable_submitted_application.applicants.where(family_member_id: params[:family_member]).first
     if params[:file]
       params[:file].each do |file|
-        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
+        doc_uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:id-verification##{file_name(file)}"
+        # doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
-          if update_vlp_documents(file_name(file), doc_uri)
+          if update_verification_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"
           else
             flash[:error] = "Could not save file. " + @doc_errors.join(". ")
@@ -42,6 +44,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -67,10 +70,17 @@ class Insured::VerificationDocumentsController < ApplicationController
     @person.primary_family.family_members.find(id).person
   end
 
-  def update_vlp_documents(title, file_uri)
-    document = @docs_owner.consumer_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
-    @doc_errors = document.errors.full_messages unless success
+  def update_verification_documents(title, file_uri)
+    if FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(params[:verification_type])
+      @document = @applicant.assisted_verifications.where(verification_type: params[:verification_type] ).first.assisted_verification_documents.build
+      success = @document.update_attributes({:identifier=>file_uri, :title=>title, :status=>"downloaded"})
+    else
+      @document = @docs_owner.consumer_role.vlp_documents.build
+      success = @document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    end
+
+    @doc_errors = @document.errors.full_messages unless success
+    @applicant.save!
     @docs_owner.save
   end
 

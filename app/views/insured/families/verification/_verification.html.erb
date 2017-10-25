@@ -16,18 +16,20 @@
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
     <% @family_members.each do |f_member| %>
+      <% @f_member = f_member %>
         <% person = f_member.person %>
+        <% @family = f_member.family %>
         <div class="row">
           <div class="family-member col-md-12">
             <div class="person">
               <%= f_member.person.full_name %>
             </div>
             <div class="verification-types col-md-12">
-              <% person.verification_types.each do |v_type| %>
+              <% person.all_verification_types(@family.id).each do |v_type| %>
                   <div class="row">
                     <div class="v-type col-md-12">
                       <div class="v-type-name col-md-3">
-                        <%= v_type %>
+                        <%= v_type == "MEC" ? "Minimal Essential Coverage" : v_type %>
                       </div>
                       <div class="v-type-status col-md-3">
                       <span class="label lb-md label-<%=verification_type_class(v_type, person)%>">
@@ -36,7 +38,7 @@
                         <%= pundit_span Family, :updateable? %>
                       </div>
                       <div class="v-type-upload col-md-3">
-                        <% if unverified?(person) %>
+                        <% if unverified?(person) && applicant_unverified? %>
                             <%= form_tag insured_verification_documents_upload_path, multipart: true, method: :post do %>
                           <span class="btn btn-default btn-file">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
@@ -48,18 +50,10 @@
                             <% end %>
                         <% end %>
                       </div>
-                      <% v_type_has_income_mec = v_type == "Minimal Essential Coverage" || v_type == "Income" %>
                       <% if current_user.has_hbx_staff_role? %>
-                          <% if v_type_has_income_mec %>
-                              <div class="v-type-actions col-md-3">
-                                <%= select_tag :verification_actions, options_for_select(::AssistedVerificationDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
-                              </div>
-                              <!--:disabled => ["Clear Status", "View History", "Call HUB"]-->
-                          <% else %>
-                              <div class="v-type-actions col-md-3">
-                                <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
-                              </div>
-                          <% end %>
+                          <div class="v-type-actions col-md-3">
+                            <%= select_tag :verification_actions, options_for_select(::VlpDocument::ADMIN_VERIFICATION_ACTIONS), {id: "v-action-#{person.id}-#{v_type.split.join('-')}", prompt: 'Action'} %>
+                          </div>
                       <% end %>
                     </div>
                   </div>
@@ -72,15 +66,9 @@
                           <%= form_tag update_verification_type_documents_path, method: :put do %>
                               <%= hidden_field_tag 'person_id', person.id  %>
                               <%= hidden_field_tag 'verification_type', v_type%>
-                              <% if v_type_has_income_mec %>
-                                  <div class="v-type-actions col-md-3">
-                                    <%= select_tag :verification_reason, options_for_select(::AssistedVerificationDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true} %>
-                                  </div>
-                              <% else %>
-                                  <div class="form-group col-md-3">
-                                    <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true} %>
-                                  </div>
-                              <% end %>
+                                <div class="form-group col-md-3">
+                                  <%= select_tag :verification_reason, options_for_select(::VlpDocument::VERIFICATION_REASONS), {prompt: ' Select Reason', required: true}%>
+                                </div>
                               <div class="col-md-3">
                                 <%= submit_tag "Confirm", class: "btn btn-default v-type-confirm-button" %>
                               </div>

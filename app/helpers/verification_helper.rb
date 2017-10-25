@@ -1,5 +1,4 @@
 module VerificationHelper
-
   def doc_status_label(doc)
     case doc.status
       when "not submitted"
@@ -13,8 +12,13 @@ module VerificationHelper
     end
   end
 
+  # def faa_verified_document(applicant, kind)
+  #   assistance_applicant_document = applicant.assisted_verifications.where(verfication_status: kind).first.assistance_applicant_documents.first
+  #   assistance_applicant_document.present? && assistance_applicant_document.status == "unverified"
+  # end
+
   def verification_type_status(type, member)
-    assistance_applicant_documents = member.consumer_role.assisted_verification_documents
+    applicant_in_context = @f_member.applicant_for_verification
     case type
       when 'Social Security Number'
         if member.consumer_role.ssn_verified?
@@ -33,20 +37,24 @@ module VerificationHelper
           "outstanding"
         end
       when 'Income'
-        if member.consumer_role.assisted_income_verified?
-          "verified"
-        elsif member.consumer_role.has_faa_docs_for_type?(type)
-          "in review"
-        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "Income"}.first.status)
-          "outstanding"
+        if applicant_in_context.present?
+          if applicant_in_context.assisted_income_verified?
+            "verified"
+          elsif applicant_in_context.has_faa_docs_for_type?(type)
+            "in review"
+          else
+            "outstanding"
+          end
         end
-      when 'Minimal Essential Coverage'
-        if member.consumer_role.assisted_mec_verified?
-          "verified"
-        elsif member.consumer_role.has_faa_docs_for_type?("MEC")
-          "in review"
-        elsif assistance_applicant_documents.present? && ["unverified"].include?(assistance_applicant_documents.select{|document| document.kind == "MEC"}.first.status)
-          "outstanding"
+      when 'MEC'
+        if applicant_in_context.present?
+          if applicant_in_context.assisted_mec_verified?
+            "verified"
+          elsif applicant_in_context.has_faa_docs_for_type?(type)
+            "in review"
+          else
+            "outstanding"
+          end
         end
       else
         if member.consumer_role.lawful_presence_verified?
@@ -66,12 +74,21 @@ module VerificationHelper
       when "in review"
         "warning"
       when "outstanding"
-        member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        if !FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(type)
+          member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        else
+          "danger"
+        end
     end
   end
 
   def unverified?(person)
     person.consumer_role.aasm_state != "fully_verified"
+  end
+
+  def applicant_unverified?
+    applicant = @f_member.applicant_for_verification
+    applicant.aasm_state != "fully_verified" if applicant.present?
   end
 
   def enrollment_group_unverified?(person)
@@ -177,7 +194,11 @@ module VerificationHelper
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
-        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        if !FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(v_type)
+          person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        else
+          "Outstanding"
+        end
     end
   end
 

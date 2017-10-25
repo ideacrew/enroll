@@ -150,6 +150,10 @@ class FamilyMember
     application.active_applicants.where(family_member_id: self.id).first
   end
 
+  def applicant_for_verification
+    applicant_of_application(family.latest_applicable_submitted_application)
+  end
+
   private
 
   def no_duplicate_family_members
