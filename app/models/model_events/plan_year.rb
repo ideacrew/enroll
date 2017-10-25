@@ -14,6 +14,10 @@ module ModelEvents
       :renewal_application_denied
     ]
 
+    DATA_CHANGE_EVENTS = [
+
+    ]
+
     def notify_on_save
       return if self.is_conversion
 
@@ -68,6 +72,10 @@ module ModelEvents
           end
         end
       end
+    end
+
+    def self.date_change_event(new_date)
+
     end
 
     def is_transition_matching?(from: nil, to: nil, event: nil)
