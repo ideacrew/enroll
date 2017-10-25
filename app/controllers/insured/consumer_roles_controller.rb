@@ -275,6 +275,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :gender,
       :language_code,
       :is_incarcerated,
+      :is_physically_disabled,
       :is_disabled,
       :race,
       :is_consumer_role,

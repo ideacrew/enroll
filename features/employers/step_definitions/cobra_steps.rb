@@ -188,11 +188,11 @@ And(/^.+ should see the status of Cobra Linked$/) do
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee role linked')
+  expect(page).to have_content('Account Linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
-  expect(page).to have_content('Eligible')
+  expect(page).to have_content('eligible')
 end
 
 Then(/^Jack Cobra should see the receipt page and verify employer contribution for cobra employee$/) do

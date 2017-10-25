@@ -165,6 +165,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller do
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(HbxEnrollment).to receive(:find).with("123").and_return(hbx_enrollment)
+      allow(BenefitGroup).to receive(:find).with(factory_benefit_group.id).and_return(factory_benefit_group)
       allow(enrollment).to receive(:is_shop?).and_return(false)
       allow(enrollment).to receive(:plan).and_return(plan)
       allow(enrollment).to receive(:benefit_group).and_return(benefit_group)

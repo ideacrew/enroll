@@ -972,10 +972,10 @@ class PlanYear
     # Admin ability to reset plan year application
     event :revert_application, :after => :revert_employer_profile_application do
       transitions from: [
-        :enrolled, :enrolling, :active, :application_ineligible,
-        :renewing_application_ineligible, :published_invalid,
-        :eligibility_review, :published, :publish_pending
-      ], to: :draft
+                            :enrolled, :enrolling, :active, :application_ineligible,
+                            :renewing_application_ineligible, :published_invalid,
+                            :eligibility_review, :published, :publish_pending
+                          ], to: :draft, :after => [:cancel_enrollments]
     end
 
     # Admin ability to accept application and successfully complete enrollment
@@ -986,7 +986,7 @@ class PlanYear
     # Admin ability to reset renewing plan year application
     event :revert_renewal, :after => :record_transition do
       transitions from: [:active, :renewing_published, :renewing_enrolling,
-                         :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft
+        :renewing_application_ineligible, :renewing_enrolled], to: :renewing_draft, :after => [:cancel_enrollments]
     end
 
     event :cancel_renewal, :after => :record_transition do
@@ -998,6 +998,11 @@ class PlanYear
     end
   end
 
+  def cancel_enrollments
+    self.hbx_enrollments.each do |enrollment|
+      enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
+    end
+  end
 
   def trigger_passive_renewals
     open_enrollment_factory = Factories::EmployerOpenEnrollmentFactory.new
