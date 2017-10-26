@@ -137,6 +137,7 @@ class EmployerProfile
     if active_broker_agency_account.present?
       terminate_on = (start_on - 1.day).end_of_day
       fire_broker_agency(terminate_on)
+      fire_general_agency!(terminate_on)
     end
     broker_agency_accounts.build(broker_agency_profile: new_broker_agency, writing_agent_id: broker_role_id, start_on: start_on)
     @broker_agency_profile = new_broker_agency
@@ -231,6 +232,7 @@ class EmployerProfile
   end
 
   def notify_general_agent_terminated
+    ShopNoticesNotifierJob.perform_later(id.to_s, "broker_terminated")
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
