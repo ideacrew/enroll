@@ -26,6 +26,7 @@ module Importers::Mhc
         save_result = new_organization.save
         if save_result
           emp = new_organization.employer_profile
+          approve_attestation(emp) if emp.employer_attestation.blank?
           map_poc(emp)
         end
 
@@ -34,13 +35,19 @@ module Importers::Mhc
       end
     end
 
+    def approve_attestation(employer)
+      attestation = employer.build_employer_attestation
+      attestation.submit
+      attestation.approve
+      attestation.save
+    end
+
     # TODO: Issuer Assigned Employer ID (should be assigned)
 
     def employer_attributes
       {
         :broker_agency_accounts => assign_brokers,
         :general_agency_accounts => assign_general_agencies,
-        :employer_attestation => employer_attestation_attributes,
         :entity_kind => "c_corporation",
         :profile_source => "conversion",
         :sic_code => sic_code,
