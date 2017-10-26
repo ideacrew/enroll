@@ -23,7 +23,7 @@ And(/^the Admin clicks the Application Type drop down$/) do
 end
 
 And(/^the Admin selects the Phone application option$/) do
-  find(:xpath, '/html/body/div[2]/form/div[1]/div/div/div/div/div[2]/div/div/div[3]/div/ul/li[2]').click
+  find(:xpath, "//select[@name='person[application_type]']/option[@value='Phone']")
 end
 
 Given(/^all other mandatory fields on the page have been populated$/) do
