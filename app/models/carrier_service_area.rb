@@ -40,6 +40,18 @@ class CarrierServiceArea
       return issuers.service_areas_for(office_location: office_location).any?
     end
 
+    def valid_for_carrier_on(address:, carrier_profile:, year:)
+      return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
+      where({
+        :active_year => year,
+        issuer_hios_id: { "$in" => carrier_profile.issuer_hios_ids },
+        "$or" => [
+          {:serves_entire_state => true},
+          {:service_area_zipcode => address.zip, county_name: Regexp.compile(Regexp.escape(address.county).downcase, true)}
+        ]
+      })
+    end
+
     def service_areas_for(office_location:)
       address = office_location.address
       return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase

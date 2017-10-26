@@ -129,7 +129,7 @@ RSpec.describe Organization, dbclean: :after_each do
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
-    let(:carrier_plan) { instance_double(Plan, active_year: '2017') }
+    let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
 
     before :each do
       Rails.cache.clear
@@ -170,16 +170,15 @@ RSpec.describe Organization, dbclean: :after_each do
 
       context "when limiting carriers to service area and coverage selection level and active year" do
         before do
-          ##mock things
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).and_return([])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2017).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2018).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: sole_source_participater, year: 2018).and_return([carrier_one_service_area])
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_2.id, 2017).and_return([])
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2017).and_return([])
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2018).and_return([carrier_plan])
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2017).and_return([carrier_plan])
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2018).and_return([carrier_plan])
-
-          allow(Plan).to receive(:check_plan_offerings_for_sole_source).and_return([carrier_plan])
-          allow(Plan).to receive(:check_plan_offerings_for_metal_level).and_return([])
-          allow(Plan).to receive(:check_plan_offerings_for_single_carrier).and_return([])
         end
 
         it "returns carriers if they are available in the service area and offer plans for that coverage level" do
