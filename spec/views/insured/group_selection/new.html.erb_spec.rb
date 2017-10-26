@@ -547,8 +547,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign(:employee_role, employee_role)
       assign(:coverage_household, double("CoverageHousehold", coverage_household_members: []))
       allow(view).to receive(:can_shop_shop?).with(person).and_return true
-      allow(view).to receive(:health_relationship_benefits).with(employee_role, benefit_group).and_return ["employee"]
-      allow(view).to receive(:dental_relationship_benefits).with(employee_role, benefit_group).and_return ["employee"]
+      allow(view).to receive(:health_relationship_benefits).with(benefit_group).and_return ["employee"]
+      allow(view).to receive(:dental_relationship_benefits).with(benefit_group).and_return ["employee"]
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
     end
