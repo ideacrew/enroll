@@ -22,6 +22,6 @@ module PdfTemplates
 
     def shop?
       false
-    end
   end
+end
 end

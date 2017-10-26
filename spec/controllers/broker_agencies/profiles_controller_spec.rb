@@ -471,7 +471,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       
       expect(enqueued_jobs.size).to eq(1)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
-      job_info[:job] == ShopNoticesNotifierJob
+        job_info[:job] == ShopNoticesNotifierJob
       end
       expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_terminated']
     end

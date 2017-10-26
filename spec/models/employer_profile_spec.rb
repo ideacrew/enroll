@@ -949,7 +949,6 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(employer_profile.general_agency_profile).to eq general_agency_profile
       expect(employer_profile.active_general_agency_account.present?).to eq true
       expect(employer_profile.active_general_agency_account.broker_role).to eq broker_role
-
     end
   end
 
@@ -987,7 +986,6 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_terminated']
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
-
   end
 
   describe "notify_broker_update" do

@@ -487,27 +487,27 @@ shop_notice_triggers = [
     ]
   },
 
-{
-         hbx_id: 'SHOP86',
-         title: 'Genaral agency fired',
-         description: "When a Broker is fired by an employer, the general agency's receives this notification letting them know they are no longer the broker for the client.",
-         resource_name: 'broker_role',
-         event_name: 'broker_terminated',
-         notice_triggers: [
-            {
-               name: 'Broker Fired',
-               notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
-               notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
-               mpi_indicator: 'SHOP_D086',
-               notice_trigger_element_group: {
-                 market_places: ['shop'],
-                 primary_recipients: ["general_agency"],
-                 primary_recipient_delivery_method: ["secure_message"],
-                 secondary_recipients: []
-               }
-             }
-         ]
-     },
+  {
+   hbx_id: 'SHOP86',
+   title: 'Genaral agency fired',
+   description: "When a Broker is fired by an employer, the general agency's receives this notification letting them know they are no longer the broker for the client.",
+   resource_name: 'broker_role',
+   event_name: 'broker_terminated',
+   notice_triggers: [
+     {
+       name: 'Broker Fired',
+       notice_template: 'notices/general_agency_notices/general_agency_fired_notice',
+       notice_builder: 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
+       mpi_indicator: 'SHOP_D086',
+       notice_trigger_element_group: {
+         market_places: ['shop'],
+         primary_recipients: ["general_agency"],
+         primary_recipient_delivery_method: ["secure_message"],
+         secondary_recipients: []
+       }
+     }
+   ]
+ },
 
   {
     hbx_id: 'SHOP28',

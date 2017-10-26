@@ -7,15 +7,10 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
   attr_accessor :broker_agency_profile
 
   def initialize(employer_profile, args = {})
-
     self.employer_profile = employer_profile
     self.general_agency = self.employer_profile.general_agency_accounts.inactive.last
-    
-    
     broker_role = self.employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.primary_broker_role.person
     self.broker = broker_role
-    
-    
     args[:recipient] = general_agency.general_agency_profile
     args[:market_kind]= 'shop'
     args[:notice] = PdfTemplates::GeneralAgencyNotice.new
@@ -36,7 +31,7 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
     send_generic_notice_alert
   end
 
-   def build
+  def build
     notice.primary_fullname = general_agency.ga_name.titleize
     notice.hbx_id = broker.hbx_id
     notice.mpi_indicator = self.mpi_indicator
@@ -49,7 +44,7 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
     append_address(general_agency.general_agency_profile.organization.primary_office_location.address)
   end
 
- def attach_envelope
+  def attach_envelope
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
   end
 
@@ -59,12 +54,11 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-                                 street_1: primary_address.address_1.titleize,
-                                 street_2: primary_address.address_2.titleize,
-                                 city: primary_address.city.titleize,
-                                 state: primary_address.state,
-                                 zip: primary_address.zip
-                             })
+     street_1: primary_address.address_1.titleize,
+     street_2: primary_address.address_2.titleize,
+     city: primary_address.city.titleize,
+     state: primary_address.state,
+     zip: primary_address.zip
+     })
   end
-
 end
