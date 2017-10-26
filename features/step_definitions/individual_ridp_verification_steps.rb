@@ -50,7 +50,8 @@ And(/^an uploaded application in REVIEW status is present$/) do
   find('#upload_application').click
 	within '#upload_application' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
-	end
+  end
+  wait_for_ajax(2)
 	expect(page).to have_content('File Saved')
 	expect(page).to have_content('In Review')
 	person = Person.all.first
@@ -62,7 +63,9 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
 	find('#select_upload_identity').click
 	within '#select_upload_identity' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
-	end
+
+  end
+  wait_for_ajax(2)
 	expect(page).to have_content('File Saved')
 	expect(page).to have_content('In Review')
 	person = Person.all.first
@@ -83,8 +86,6 @@ And(/^an uploaded application in VERIFIED status is present$/) do
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
-  person = Person.all.first
-  expect(person.consumer_role.application_validation).to eq('valid')
 end
 
 And(/^an uploaded Identity verification in VERIFIED status is present$/) do
@@ -101,8 +102,6 @@ And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
-  person = Person.all.first
-  expect(person.consumer_role.identity_validation).to eq('valid')
 end
 
 Then(/^the CONTINUE button is functionally ENABLED$/) do
@@ -171,8 +170,6 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
-  person = Person.all.first
-  expect(person.consumer_role.identity_validation).to eq('valid')
 end
 
 When(/^an uploaded application in VERIFIED status is present on failed experian screen$/) do
@@ -189,6 +186,4 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
-  person = Person.all.first
-  expect(person.consumer_role.application_validation).to eq('valid')
 end
