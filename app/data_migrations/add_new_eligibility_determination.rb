@@ -4,7 +4,7 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
     def migrate
       people=get_people
       people.each do |person|
-        if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_household.nil?
+        if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_tax_household.nil?
           puts "No primary_family or active househod or latest_active_household exists for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
           return
         end
