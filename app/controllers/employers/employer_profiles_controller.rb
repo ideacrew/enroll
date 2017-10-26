@@ -113,7 +113,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @tab = params['tab'] || 'home'
 
     # Conditional based columns has to display so we are passing arguments
-    @datatable = Effective::Datatables::EmployeeDatatable.new({id: params[:id], scopes: params[:scopes]})
+    data_table_params = {id: params[:id], scopes: params[:scopes]}
+    if @employer_profile.renewing_plan_year.present?
+      data_table_params.merge!({renewal: true, renewal_status: true})
+    end
+    @datatable = Effective::Datatables::EmployeeDatatable.new(data_table_params)
 
     if params[:q] || params[:page] || params[:commit] || params[:status]
       paginate_employees
@@ -155,7 +159,11 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       @current_plan_year = @employer_profile.active_plan_year
       @plan_years = @employer_profile.plan_years.order(id: :desc)
     elsif @tab == 'employees'
-      @datatable ||= Effective::Datatables::EmployeeDatatable.new({id: @employer_profile.id, scopes: params[:scopes]})
+      data_table_params = {id: @employer_profile.id, scopes: params[:scopes]}
+      if @employer_profile.renewing_plan_year.present?
+        data_table_params.merge!({renewal: true, renewal_status: true})
+      end
+      @datatable ||= Effective::Datatables::EmployeeDatatable.new(data_table_params)
       paginate_employees
     elsif @tab == 'families'
       #families defined as employee_roles.each { |ee| ee.person.primary_family }
