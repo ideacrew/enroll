@@ -3,17 +3,6 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddNewEligibilityDetermination < MongoidMigrationTask
     def migrate
       people=get_people
-      
-      def get_people
-        hbx_ids = "#{ENV['hbx_id']}".split(',').uniq
-        hbx_ids.inject([]) do |people, hbx_id|
-          if Person.where(hbx_id:hbx_id).size != 1
-            puts "No person was found with the given hbx_id #{hbx_id}" #unless Rails.env.test?
-          else
-            people << Person.where(hbx_id:hbx_id).first
-          end
-        end
-      end
       people.each do |person|
         if person.primary_family.nil? || person.primary_family.active_household.nil? || person.primary_family.active_household.latest_active_household.nil?
           puts "No primary_family or active househod or latest_active_household exists for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
@@ -38,6 +27,16 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
                                                                 "source"                        => "Admin"
                                                                 }).save!
         puts "Create eligibility_determinations for person with the given hbx_id #{person.hbx_id}" unless Rails.env.test?
+      end
+    end
+    def get_people
+      hbx_ids = "#{ENV['hbx_id']}".split(',').uniq
+      hbx_ids.inject([]) do |people, hbx_id|
+        if Person.where(hbx_id:hbx_id).size != 1
+          puts "No person was found with the given hbx_id #{hbx_id}" #unless Rails.env.test?
+        else
+          people << Person.where(hbx_id:hbx_id).first
+        end
       end
     end
 end
