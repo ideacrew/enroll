@@ -86,7 +86,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     end
 
     it "should display application type phone in selectric dropdown" do
-      expect(rendered).to have_select("person[family][application_type]")
+      expect(rendered).to have_select("person[application_type]")
       expect(rendered).to match /Phone/
     end
   end
