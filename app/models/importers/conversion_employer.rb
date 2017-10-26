@@ -200,6 +200,10 @@ module Importers
       broker_agency_accounts
     end
 
+    def employer_attestation_attributes
+      EmployerAttestation.new(aasm_state: "submitted")
+    end
+
     def map_poc(emp)
       person_attrs = {
         :first_name => contact_first_name,

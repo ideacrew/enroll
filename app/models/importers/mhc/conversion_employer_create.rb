@@ -40,6 +40,7 @@ module Importers::Mhc
       {
         :broker_agency_accounts => assign_brokers,
         :general_agency_accounts => assign_general_agencies,
+        :employer_attestation => employer_attestation_attributes,
         :entity_kind => "c_corporation",
         :profile_source => "conversion",
         :sic_code => sic_code,
