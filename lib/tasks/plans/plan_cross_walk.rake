@@ -50,7 +50,7 @@ end
 namespace :xml do
   task :plan_cross_walk_old, [:file] => :environment do |task,args|
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
     files.each do |file_path|
       @file_path = file_path
 
