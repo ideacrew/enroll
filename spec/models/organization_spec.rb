@@ -129,6 +129,10 @@ RSpec.describe Organization, dbclean: :after_each do
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
+<<<<<<< HEAD
+=======
+    let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
+>>>>>>> 8443e2c64... properly restrict service areas that are not offered while checking carriers, use select to iterate over returned plans rather than running a second query
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
@@ -150,10 +154,19 @@ RSpec.describe Organization, dbclean: :after_each do
         expect(Organization.valid_carrier_names_for_options).to match_array carriers
       end
 
-      it "valid_carrier_names_for_options passes arguments and filters to sole source only" do
-        carriers = [[sole_source_participater.legal_name, sole_source_participater.id.to_s]]
-        expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
-      end
+
+      context "when limiting carriers to service area and coverage selection level and active year" do
+        before do
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).and_return([])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2017).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: carrier_profile_1, year: 2018).and_return([carrier_one_service_area])
+          allow(CarrierServiceArea).to receive(:valid_for_carrier_on).with(address: address, carrier_profile: sole_source_participater, year: 2018).and_return([carrier_one_service_area])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_2.id, 2017).and_return([])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2017).and_return([])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", sole_source_participater.id, 2018).and_return([carrier_plan])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2017).and_return([carrier_plan])
+          allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2018).and_return([carrier_plan])
+        end
 
       it "returns carriers if they are available in the service area and offer plans for that coverage level" do
         carrier_names = {}
