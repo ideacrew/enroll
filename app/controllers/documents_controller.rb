@@ -39,7 +39,7 @@ class DocumentsController < ApplicationController
       verification_result = @person.consumer_role.admin_verification_action(admin_action, v_type, update_reason)
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
-      update_doc_status(family_member) if family_member
+      update_documents_status(family_member) if family_member
     else
       flash_message = { :error => "Please provide a verification reason."}
     end
@@ -163,7 +163,7 @@ class DocumentsController < ApplicationController
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
   end
 
-  def update_doc_status(family_member)
+  def update_documents_status(family_member)
     family = family_member.family
     family.update_family_document_status!
   end
