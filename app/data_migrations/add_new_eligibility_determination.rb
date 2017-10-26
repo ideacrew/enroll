@@ -11,12 +11,12 @@ class AddNewEligibilityDetermination < MongoidMigrationTask
         active_household= person.primary_family.active_household
         date = Date.strptime(ENV['effective_date'].to_s, "%m/%d/%Y")
         if active_household.latest_active_tax_household_with_year(date.year).nil?
-          latest_active_household = active_household.latest_active_tax_household
+          latest_active_tax_household = active_household.latest_active_tax_household
         else
-          latest_active_household = active_household.latest_active_tax_household_with_year(date.year)
+          latest_active_tax_household = active_household.latest_active_tax_household_with_year(date.year)
         end
-        latest_eligibility_determination = latest_active_household.latest_eligibility_determination
-        latest_active_household.eligibility_determinations.build({"determined_at"                 => date,
+        latest_eligibility_determination = latest_active_tax_household.latest_eligibility_determination
+        latest_active_tax_household.eligibility_determinations.build({"determined_at"                 => date,
                                                                 "determined_on"                 => date,
                                                                 "csr_eligibility_kind"          => latest_eligibility_determination.csr_eligibility_kind,
                                                                 "premium_credit_strategy_kind"  => latest_eligibility_determination.premium_credit_strategy_kind,
