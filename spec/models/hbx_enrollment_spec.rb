@@ -2693,6 +2693,23 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(@enrollment1.aasm_state).to eq "coverage_canceled"
     end
   end
+  
+  describe "#is_reinstated_enrollment?" do 
+    let(:hbx_enrollment) { HbxEnrollment.new(kind: 'employer_sponsored') }
+    let(:workflow_state_transition) {FactoryGirl.create(:workflow_state_transition,:from_state => "coverage_reinstated", :to_state => "coverage_selected")}
+    context 'when enrollment has been reinstated' do 
+      it "should have reinstated enrollmentt" do
+        allow(hbx_enrollment).to receive(workflow_state_transitions).and_return([workflow_state_transition])
+        expect(hbx_enrollment.is_reinstated_enrollment?).to be_truthy
+      end
+    end
+    context 'when enrollment has not been reinstated' do 
+      it "should have reinstated enrollmentt" do
+        allow(hbx_enrollment).to receive(workflow_state_transitions).and_return([])
+        expect(hbx_enrollment.is_reinstated_enrollment?).to be_falsey
+      end
+    end
+  end
 
   context "Cancel / Terminate Previous Enrollments for IVL" do
     attr_reader :enrollment, :household, :coverage_household
