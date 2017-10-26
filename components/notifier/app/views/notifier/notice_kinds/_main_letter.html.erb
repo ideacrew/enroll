@@ -14,7 +14,7 @@
     <% end %>
     <tr>
       <td class="fssize1 health-connector-address"><%= recipient.mailing_address.city %> <%= recipient.mailing_address.state %> <%= recipient.mailing_address.zip %></td>
-       <td align="right" style="padding-right: 15px">Notice No. <%= notice_number || "SHOP_M001" %></td>
+       <td align="right" style="padding-right: 15px"><%= notice_number || "SHOP_M001" %></td>
     </tr>
   </tbody>
 </table>
