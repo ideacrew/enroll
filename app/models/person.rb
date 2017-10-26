@@ -91,6 +91,8 @@ class Person
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
 
+  field :application_type, type: String
+
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
   # Login account
