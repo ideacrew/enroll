@@ -599,7 +599,7 @@ module ApplicationHelper
   end
 
   def has_new_hire_enrollment_period?(census_employee)
-    census_employee.new_hire_enrollment_period.present?
+    census_employee.new_hire_enrollment_period.cover?(TimeKeeper.date_of_record)
   end
 
   def eligibility_criteria(employer)
