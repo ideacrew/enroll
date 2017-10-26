@@ -66,7 +66,20 @@ module Observers
     def census_employee_update
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent) 
 
-      if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)
+      if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)  
+        census_employee = new_model_event.klass_instance
+
+        if new_model_event.event_key == :renewal_oe_employee_not_enrolled
+          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_open_enrollment_employee_unenrolled")
+        end
+
+        if new_model_event.event_key == :renewal_oe_employee_no_auto_renewal
+          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_open_enrollment_employee_no_auto_renewal")
+        end
+
+        if new_model_event.event_key == :renewal_oe_employee_auto_renewal
+          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_open_enrollment_employee_auto_renewal")
+        end
 
       end
     end

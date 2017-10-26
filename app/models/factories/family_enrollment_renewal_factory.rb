@@ -53,9 +53,9 @@ module Factories
               renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
               renewal_enrollment.decorated_hbx_enrollment
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_auto_renewal") unless renewal_enrollment.coverage_kind == "dental" || disable_notifications
+              census_employee.trigger_model_event(:renewal_oe_employee_auto_renewal, {event_object: renewing_plan_year}) renewal_enrollment.coverage_kind == "dental" || disable_notifications
             else
-              ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_open_enrollment_no_auto_renewal") unless disable_notifications
+              census_employee.trigger_model_event(:renewal_oe_employee_no_auto_renewal, {event_object: renewing_plan_year}) unless disable_notifications
             end
           end
         elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
@@ -264,5 +264,3 @@ module Factories
 
   class FamilyEnrollmentRenewalFactoryError < StandardError; end
 end
-
-
