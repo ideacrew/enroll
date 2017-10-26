@@ -945,7 +945,6 @@ class Family
       date > TimeKeeper.date_of_record && (date - TimeKeeper.date_of_record).to_int >= 30
     end
     due_date || contingent_enrolled_family_members_due_dates.last
-    #TimeKeeper.date_of_record + 45 # for testing
   end
 
   def min_verification_due_date_on_family

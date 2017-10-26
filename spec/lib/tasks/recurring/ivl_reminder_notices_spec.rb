@@ -18,25 +18,15 @@ describe 'recurring:ivl_reminder_notices', :dbclean => :around_each do
       allow(person).to receive_message_chain(:documents,:detect).and_return(false)
     end
 
-    it "should send reminder notice" do
-      expect(consumer_role).to receive(:first_verifications_reminder).at_least(1).times
-      expect(consumer_role).to receive(:second_verifications_reminder).at_least(1).times
-      expect(consumer_role).to receive(:third_verifications_reminder).at_least(1).times
-      expect(consumer_role).to receive(:fourth_verifications_reminder).at_least(1).times
+    it "should send reminder notice when due date is great than or eq to 30 days" do
+      allow(family).to receive(:best_verification_due_date).and_return(TimeKeeper.date_of_record+30)
+      expect(IvlNoticesNotifierJob).to receive(:perform_later).at_least(1).times
       Rake::Task["recurring:ivl_reminder_notices"].invoke
     end
-  end
 
-  context "when reminder already sent" do
-    before do
-      allow(person).to receive_message_chain(:documents,:detect).and_return(true)
-    end
-
-    it "should NOT send reminder notice" do
-      expect(consumer_role).not_to receive(:first_verifications_reminder)
-      expect(consumer_role).not_to receive(:second_verifications_reminder)
-      expect(consumer_role).not_to receive(:third_verifications_reminder)
-      expect(consumer_role).not_to receive(:fourth_verifications_reminder)
+    it "should NOT send reminder notice when due date is less than or eq to 30 days" do
+      allow(family).to receive(:best_verification_due_date).and_return(TimeKeeper.date_of_record+20)
+      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
       Rake::Task["recurring:ivl_reminder_notices"].invoke
     end
   end

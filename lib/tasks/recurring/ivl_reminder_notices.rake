@@ -19,22 +19,21 @@ namespace :recurring do
             if enrollment
               consumer_role = family.primary_applicant.person.consumer_role
               person = family.primary_applicant.person
-              #byebug
               if (family.best_verification_due_date > TimeKeeper.date_of_record)
                 begin
                   case (family.best_verification_due_date - TimeKeeper.date_of_record).to_int
                     when 85 
                       puts "sending first_verifications_reminder to #{consumer_role.id}" unless  Rails.env.test?
-                      consumer_role.first_verifications_reminder!
+                      IvlNoticesNotifierJob.perform_later(person.id.to_s, "first_verifications_reminder")
                     when 70
                       puts "sending second_verifications_reminder to #{consumer_role.id}" unless  Rails.env.test?
-                      consumer_role.second_verifications_reminder!
+                      IvlNoticesNotifierJob.perform_later(person.id.to_s, "second_verifications_reminder")
                     when 45
                       puts "sending third_verifications_reminder to #{consumer_role.id}" unless  Rails.env.test?
-                      consumer_role.third_verifications_reminder!
+                      IvlNoticesNotifierJob.perform_later(person.id.to_s, "third_verifications_reminder")
                     when 30
                       puts "sending fourth_verifications_reminder to #{consumer_role.id}" unless  Rails.env.test?
-                      consumer_role.fourth_verifications_reminder! 
+                      IvlNoticesNotifierJob.perform_later(person.id.to_s, "fourth_verifications_reminder")
                     end
               rescue Exception => e
                 Rails.logger.error e.to_s
