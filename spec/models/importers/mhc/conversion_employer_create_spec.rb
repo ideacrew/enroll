@@ -53,7 +53,7 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
       expect(employer_profile.registered_on).to eq registered_on
       expect(employer_profile.issuer_assigned_id). to eq record_attrs[:assigned_employer_id]
       expect(employer_profile.profile_source).to eq "conversion"
-      expect(employer_profile.employer_attestation.aasm_state).to eq "submitted"
+      expect(employer_profile.employer_attestation.aasm_state).to eq "approved"
     end
 
     it "should create primary office location" do
