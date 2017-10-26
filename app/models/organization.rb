@@ -251,7 +251,7 @@ class Organization
           if filters[:active_year]
             if filters[:active_year] == '2017'
               # only include HNE, BMCHP, Fallon
-              next unless ['043373331','237442369','042864973'].include? org.fein
+              next carrier_names unless ['043373331','237442369','042864973'].include? org.fein
             end
             next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
           end
