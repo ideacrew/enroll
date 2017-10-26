@@ -51,10 +51,10 @@
                   <% end %>
                   <div class="row">
                     <% if ridp_documents_list(@person, ridp_type).any? %>
-                        <div class="v-doc-list col-md-12">
+                        <div class="ridp-doc-list col-md-12">
                           <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
                               <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
-                                <div class="v-doc-elem col-md-12">
+                                <div class="ridp-doc-elem col-md-12">
                                   <div class="v-doc col-md-11">
                                     <% if ridp_doc.identifier.present? %>
                                         <% key = ridp_doc.identifier.split('#').last %>
