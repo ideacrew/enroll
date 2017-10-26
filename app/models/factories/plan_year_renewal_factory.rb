@@ -105,26 +105,27 @@ module Factories
     end
 
     def service_area_plan_hios_ids(carrier_id)
-      employer_profile = find_employer
-      profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile, @renewal_plan_year.start_on.year)
+      profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(@employer_profile, @renewal_plan_year.start_on.year)
       Plan.valid_shop_health_plans_for_service_area("carrier", carrier_id, @renewal_plan_year.start_on.year, profile_and_service_area_pairs.select { |pair| pair.first == carrier_id }).pluck(:hios_id)
     end
 
     def clone_benefit_group(active_group)
       index = @active_plan_year.benefit_groups.index(active_group) + 1
       new_year = @active_plan_year.start_on.year + 1
-      reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
+      renewal_plan = Plan.find(active_group.reference_plan_id).renewal_plan
 
+      if renewal_plan.blank?
+        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{active_group.reference_plan.id} Year #{active_group.reference_plan.active_year} Hios #{active_group.reference_plan.hios_id}"
+      end
+
+      reference_plan_id = renewal_plan.id
+ 
       if active_group.sole_source?
         service_area_hios = service_area_plan_hios_ids(active_group.reference_plan.carrier_profile_id)
 
-        if !service_area_hios.include?(reference_plan_id)
+        if !service_area_hios.include?(renewal_plan.hios_id)
           raise PlanYearRenewalFactoryError, "Unable to renew. renewal plan for referenence plan: #{active_group.reference_plan.id} not offered in employer service areas"
         end
-      end
-
-      if reference_plan_id.blank?
-        raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{active_group.reference_plan.id} Year #{active_group.reference_plan.active_year} Hios #{active_group.reference_plan.hios_id}"
       end
 
       elected_plan_ids = renewal_elected_plan_ids(active_group)
