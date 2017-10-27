@@ -1354,13 +1354,16 @@ describe "#all_persons_vlp_documents_status" do
 
     it "returns all_persons_vlp_documents_status is fully uploaded when all documents are uploaded" do
       family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "Social Security Number")
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency")
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
       family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
     end
 
     it "returns all_persons_vlp_documents_status is Fully Uploaded when documents status is verified" do
+      family_person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency" )
       family_person.consumer_role.update_attributes(ssn_validation: "valid")
+      family_person.save!
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
     end
 
@@ -1384,6 +1387,7 @@ describe "#all_persons_vlp_documents_status" do
     let(:family_member2) { FactoryGirl.create(:family_member, person: person2, family: family)}
     let(:doc1) { FactoryGirl.build(:vlp_document, verification_type: "Social Security Number") }
     let(:doc2) { FactoryGirl.build(:vlp_document) }
+    let(:doc3) { FactoryGirl.build(:vlp_document, verification_type: "DC Residency") }
 
 
     it "returns all_persons_vlp_documents_status is None when there is no document uploaded" do
@@ -1401,8 +1405,10 @@ describe "#all_persons_vlp_documents_status" do
     it "returns all_persons_vlp_documents_status is Fully uploaded when all document are uploaded on both" do
       person1.consumer_role.vlp_documents << doc1
       person1.consumer_role.vlp_documents << doc2
+      person1.consumer_role.vlp_documents << doc3
       person2.consumer_role.vlp_documents << doc1
       person2.consumer_role.vlp_documents << doc2
+      person2.consumer_role.vlp_documents << doc3
       expect(family.all_persons_vlp_documents_status).to eq("Fully Uploaded")
     end 
   end

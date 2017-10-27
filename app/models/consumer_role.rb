@@ -714,6 +714,8 @@ class ConsumerRole
         update_attributes(:lawful_presence_rejected => false)
       when "American Indian Status"
         update_attributes(:native_rejected => false)
+      when "DC Residency"
+        update_attributes(:residency_rejected => false)
     end
   end
 
