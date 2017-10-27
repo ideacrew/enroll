@@ -20,6 +20,7 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
+    attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
     attribute :income_unverified, Array[PdfTemplates::Individual]
     attribute :indian_inconsistency, Array[PdfTemplates::Individual]
@@ -79,7 +80,7 @@ module PdfTemplates
     end
 
     def current_health_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def assisted_enrollments
@@ -91,15 +92,15 @@ module PdfTemplates
     end
 
     def current_dental_enrollments
-      enrollments.select{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.year}
+      enrollments.select{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year.to_s == coverage_year}
     end
 
     def renewal_health_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "health" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def renewal_dental_enrollment
-      enrollments.detect{|enrollment| enrollment.plan.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
+      enrollments.detect{|enrollment| enrollment.coverage_kind == "dental" && enrollment.effective_on.year == TimeKeeper.date_of_record.next_year.year}
     end
 
     def magi_medicaid_eligible
@@ -146,7 +147,7 @@ module PdfTemplates
         else
           subject = "Your Health Plan and Cost Savings"
         end
-      elsif current_health_enrollments.present? && assisted_enrollments.nil?
+      elsif current_health_enrollments.present? && assisted_enrollments.empty?
         if current_dental_enrollments.present?
           subject = "Your Health and Dental Plan"
         else

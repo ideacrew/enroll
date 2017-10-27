@@ -758,6 +758,28 @@ class Family
     def advance_day(new_date)
       expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments
+      send_enrollment_notice_for_ivl(new_date)
+    end
+
+    def send_enrollment_notice_for_ivl(new_date)
+      start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
+      end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
+      families = Family.where({
+        "households.hbx_enrollments" => {
+          "$elemMatch" => {
+            "kind" => "individual",
+            "aasm_state" => { "$in" => HbxEnrollment::ENROLLED_STATUSES },
+            "created_at" => { "$gte" => start_time, "$lte" => end_time},
+        } }
+      })
+      families.each do |family|
+        begin
+          person = family.primary_applicant.person
+          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
+        end
+      end
     end
 
     def find_by_employee_role(employee_role)
@@ -971,20 +993,11 @@ class Family
   def document_due_date(family_member, v_type)
     return nil if family_member.person.consumer_role.is_type_verified?(v_type)
     sv = family_member.person.consumer_role.special_verifications.where(verification_type: v_type).order_by(:"created_at".desc).first
-    enrollment = enrolled_policy(family_member)
-    sv.present? ? sv.due_date : (enrollment.present? ? verification_due_date_from_enrollment(enrollment) : nil )
+    sv.present? ? sv.due_date : nil
   end
 
   def enrolled_policy(family_member)
     enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => family_member.id).first
-  end
-
-  def verification_due_date_from_enrollment(enrollment)
-    if enrollment.special_verification_period
-      enrollment.special_verification_period.to_date
-    else
-      nil
-    end
   end
 
   def review_status
