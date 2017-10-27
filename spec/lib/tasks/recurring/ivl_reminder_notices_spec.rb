@@ -1,31 +1,54 @@
 require 'rails_helper'
 require 'rake'
 
-describe 'recurring:ivl_reminder_notices', :dbclean => :around_each do
-  let(:family) { FactoryGirl.create(:individual_market_family)}
-  let(:hbx_enrollment) { double("HbxEnrollment") }
-  let(:person) {family.primary_applicant.person}
-  let(:consumer_role) {person.consumer_role}
+describe 'recurring:ivl_reminder_notices', :dbclean => :after_each do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let!(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person, e_case_id: nil)}
+  let!(:hbx_enrollment) {FactoryGirl.create(:hbx_enrollment, household: family.households.first, kind: "individual", aasm_state: "enrolled_contingent", applied_aptc_amount: 0.0)}
+  let!(:hbx_enrollment_member) {FactoryGirl.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+
   before do
-  allow(Family).to receive(:where).and_return([family])
-    allow(family).to receive_message_chain(:enrollments,:order,:select,:first).and_return(hbx_enrollment)
-    allow(hbx_enrollment).to receive(:special_verification_period).and_return(DateTime.now + 84.days)
     load File.expand_path("#{Rails.root}/lib/tasks/recurring/ivl_reminder_notices.rake", __FILE__)
     Rake::Task.define_task(:environment)
   end
-  context "when reminder not sent" do
-    before do
-      allow(person).to receive_message_chain(:documents,:detect).and_return(false)
-    end
+
+  context "for unassisted individuals", :dbclean => :after_each do
 
     it "should send reminder notice when due date is great than or eq to 30 days" do
-      allow(family).to receive(:best_verification_due_date).and_return(TimeKeeper.date_of_record+30)
-      expect(IvlNoticesNotifierJob).to receive(:perform_later).at_least(1).times
+      special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+30.days, verification_type: "Social Security Number", type: "notice")
+      person.consumer_role.special_verifications << special_verification
+      person.consumer_role.save!
+      expect(IvlNoticesNotifierJob).to receive(:perform_later)
       Rake::Task["recurring:ivl_reminder_notices"].invoke
     end
 
-    it "should NOT send reminder notice when due date is less than or eq to 30 days" do
-      allow(family).to receive(:best_verification_due_date).and_return(TimeKeeper.date_of_record+20)
+    it "should NOT send reminder notice when due date is less than 30 days" do
+      special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+1.days, verification_type: "Citizenship", type: "notice")
+      person.consumer_role.special_verifications << special_verification
+      person.consumer_role.save!
+      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
+      Rake::Task["recurring:ivl_reminder_notices"].invoke
+    end
+  end
+
+  context "for individuals who have filled in application through curam", :dbclean => :after_each do
+
+    it "should NOT send reminder notice" do
+      family.update_attributes!(:e_case_id => "someecaseid")
+      special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+30.days, verification_type: "Citizenship", type: "notice")
+      person.consumer_role.special_verifications << special_verification
+      person.consumer_role.save!
+      expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
+      Rake::Task["recurring:ivl_reminder_notices"].invoke
+    end
+  end
+  context "for assisted individuals", :dbclean => :after_each do
+
+    it "should NOT send reminder notice" do
+      hbx_enrollment.update_attributes!(:applied_aptc_amount => 354)
+      special_verification = SpecialVerification.new(due_date: TimeKeeper.date_of_record+30.days, verification_type: "Citizenship", type: "notice")
+      person.consumer_role.special_verifications << special_verification
+      person.consumer_role.save!
       expect(IvlNoticesNotifierJob).not_to receive(:perform_later)
       Rake::Task["recurring:ivl_reminder_notices"].invoke
     end

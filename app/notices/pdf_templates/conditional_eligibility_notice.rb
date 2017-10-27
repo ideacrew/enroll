@@ -27,6 +27,7 @@ module PdfTemplates
     attribute :mec_conflict, Array[PdfTemplates::Individual]
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
+    attribute :notice_subject, String
     attribute :due_date, Date
     attribute :application_date, Date
     attribute :last_name, String

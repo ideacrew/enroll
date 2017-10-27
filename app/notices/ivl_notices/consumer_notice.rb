@@ -14,14 +14,20 @@ class IvlNotices::ConsumerNotice < IvlNotice
   def deliver
     build
     generate_pdf_notice
-    attach_envelope
     attach_blank_page(notice_path)
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?) 
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_appeals
+    attach_non_discrimination
+    attach_taglines
     upload_and_send_secure_message
-    send_generic_notice_alert
-  end
 
-  def attach_envelope
+    if recipient.consumer_role.can_receive_electronic_communication?
+      send_generic_notice_alert
+    end
+
+    if recipient.consumer_role.can_receive_paper_communication?
+      store_paper_notice
+    end
   end
 
   def attach_required_documents
@@ -32,17 +38,32 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def build
-    family = recipient.primary_family    
     notice.mpi_indicator = self.mpi_indicator
+    notice.notification_type = self.event_name
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.first_name = recipient.first_name
+    notice.primary_identifier = recipient.hbx_id
     append_hbe
+    append_unverified_family_members
+
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
       raise 'mailing address not present'
     end
-    append_unverified_family_members
+  end
+
+  def notice_subject
+    notice.notice_subject =  case notice.notification_type
+    when "first_verifications_reminder"
+      "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")}"
+    when "second_verifications_reminder"
+      "DON’T FORGET – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    when "third_verifications_reminder"
+      "DON’T MISS THE DEADLINE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    when "fourth_verifications_reminder"
+      "FINAL NOTICE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    end
   end
 
   def append_unverified_family_members
@@ -79,15 +100,23 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if outstanding_people.empty?
       raise 'no family member found without uploaded documents'
     end
-    # enrollments.each {|e| e.update_attributes(special_verification_period: Date.today + 95.days)}
-    contingent_enrollment = enrollments.detect{ |e | e.enrolled_contingent? }
-    notice.enrollments << build_enrollment(contingent_enrollment)
+
+    hbx_enrollments = []
+    en = enrollments.select{ |en| en.enrolled_contingent?}
+    health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at).last
+    dental_enrollment = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at).last
+    hbx_enrollments << health_enrollment
+    hbx_enrollments << dental_enrollment
+    hbx_enrollments.compact!
+
+    hbx_enrollments.each do |enrollment|
+      notice.enrollments << build_enrollment(enrollment)
+    end
+
     notice.documents_needed = outstanding_people.present? ? true : false
-    notice.due_date = family.min_verification_due_date rescue ""
-    notice.application_date = contingent_enrollment.created_at  rescue ""
-    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+    notice.due_date = family.min_verification_due_date
+    notice.application_date = hbx_enrollments.sort_by(&:created_at).last.created_at.to_date
     append_unverified_individuals(outstanding_people)
-    notice.primary_identifier = contingent_enrollment.id
   end
 
    def build_enrollment(hbx_enrollment)
@@ -95,12 +124,10 @@ class IvlNotices::ConsumerNotice < IvlNotice
       plan_name: hbx_enrollment.plan.name ,
       premium: hbx_enrollment.total_premium,
       phone: hbx_enrollment.phone_number,
+      coverage_kind: hbx_enrollment.coverage_kind,
       effective_on: hbx_enrollment.effective_on,
       selected_on: hbx_enrollment.created_at,
-      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.plan.is_csr?) ? true : false,
-      # enrollees: hbx_enrollment.hbx_enrollment_members.inject([]) do |names, member|
-      #   names << member.person.full_name.titleize
-      # end
+      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.plan.is_csr?) ? true : false
     })
   end
 

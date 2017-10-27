@@ -482,19 +482,19 @@ class ConsumerRole
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :first_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
+    event :first_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :second_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
+    event :second_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :third_verifications_reminder, :after => [:record_transition,:send_consumer_notifications] do
+    event :third_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
 
-    event :fourth_verifications_reminder, :after => [:record_transition,:send_consumer_notification] do
+    event :fourth_verifications_reminder, :after => [:record_transition] do
       transitions from: :verification_outstanding, to: :verification_outstanding
     end
   end
@@ -872,13 +872,6 @@ class ConsumerRole
       event: aasm.current_event,
       user_id: SAVEUSER[:current_user_id]
     )
-  end
-
-  #check if consumer notification job exists
-  def send_consumer_notification(*args)
-    event_name = aasm.current_event
-    event_name = event_name.to_s.gsub("!","")
-    IvlNoticesNotifierJob.perform_later(self.person.id.to_s , event_name)
   end
 
   def verification_attr(*authority)

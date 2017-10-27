@@ -709,7 +709,7 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'First Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder1',
+        notice_template: 'notices/ivl/documents_verification_reminder',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLNotice20A',
         notice_trigger_element_group: {
@@ -730,7 +730,7 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'Second Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder2',
+        notice_template: 'notices/ivl/documents_verification_reminder',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLNotice20B',
         notice_trigger_element_group: {
@@ -751,7 +751,7 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'Third Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder3',
+        notice_template: 'notices/ivl/documents_verification_reminder',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLNotice21',
         notice_trigger_element_group: {
@@ -772,7 +772,7 @@ ivl_notice_triggers = [
     notice_triggers: [
       {
         name: 'Fourth Outstanding Verification Notification',
-        notice_template: 'notices/ivl/documents_verification_reminder4',
+        notice_template: 'notices/ivl/documents_verification_reminder',
         notice_builder: 'IvlNotices::ConsumerNotice',
         mpi_indicator: 'MPI_IVLNotice22',
         notice_trigger_element_group: {
