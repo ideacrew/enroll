@@ -67,10 +67,10 @@ module Notifier
 
     def self.to_csv
       CSV.generate(headers: true) do |csv|
-        csv << ['Notice Number', 'Title', 'Description', 'Recipient', 'Notice Template']
+        csv << ['Notice Number', 'Title', 'Description', 'Recipient', 'Event Name', 'Notice Template']
 
         all.each do |notice|
-          csv << [notice.notice_number, notice.title, notice.description, notice.recipient, notice.template.try(:raw_body)]
+          csv << [notice.notice_number, notice.title, notice.description, notice.recipient, notice.event_name, notice.template.try(:raw_body)]
         end
       end
     end

@@ -70,7 +70,7 @@ module Notifier
     end
 
     def download_notices
-      notices = Notifier::NoticeKind.where(:id.in => params['ids'])
+      # notices = Notifier::NoticeKind.where(:id.in => params['ids'])
 
       send_data Notifier::NoticeKind.to_csv, 
         :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
@@ -86,8 +86,8 @@ module Notifier
         next if notice_row[0] == 'Notice Number'
 
         if Notifier::NoticeKind.where(notice_number: notice_row[0]).blank?
-          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], recipient: notice_row[3])
-          notice.template = Template.new(raw_body: notice_row[4])
+          notice = Notifier::NoticeKind.new(notice_number: notice_row[0], title: notice_row[1], description: notice_row[2], recipient: notice_row[3], event_name: notice_row[4])
+          notice.template = Template.new(raw_body: notice_row[5])
           unless notice.save
             @errors << "Notice #{notice_row[0]} got errors: #{notice.errors.to_s}"
           end
