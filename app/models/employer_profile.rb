@@ -1015,7 +1015,7 @@ class EmployerProfile
 
   def service_areas_available_on(date)
     if use_simple_employer_calculation_model?
-      return nil
+      return []
     end
     primary_office_location = organization.primary_office_location
     CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
