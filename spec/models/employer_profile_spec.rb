@@ -110,7 +110,7 @@ describe EmployerProfile, dbclean: :after_each do
       let!(:employer_profile1) { create(:employer_with_planyear, plan_year_state: 'active', aasm_state: "enrolling", start_on: start_on)}
       let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
       let!(:benefit_group) { employer_profile1.published_plan_year.benefit_groups.first}
-      let!(:organization) {FactoryGirl.create(:organization, employer_profile: employer_profile1)}
+      let!(:organization) { employer_profile1.organization }
       let!(:census_employee){
         employee = FactoryGirl.create :census_employee, employer_profile: employer_profile1
         employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
@@ -1115,7 +1115,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
     FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_date, renewal_plan_year_state: plan_year_status, profile_source: source, registered_on: start_date - 3.months, is_conversion: true)
   }
 
-  describe "conversion employer" do  
+  describe "conversion employer" do
 
     context "when under converting period" do
       it "should return true" do
@@ -1127,7 +1127,7 @@ describe EmployerProfile, ".is_converting?", dbclean: :after_each do
       let(:start_date) { TimeKeeper.date_of_record.next_month.beginning_of_month.prev_year }
       let(:plan_year_status) { 'active' }
 
-      before do 
+      before do
         plan_year_renewal_factory = Factories::PlanYearRenewalFactory.new
         plan_year_renewal_factory.employer_profile = renewing_employer
         plan_year_renewal_factory.is_congress = false
@@ -1185,9 +1185,9 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
   let(:benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 1", plan_year: plan_year, reference_plan_id: health_plan.id, plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier', dental_reference_plan_id: dental_plan.id)}
   let(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 2", plan_year: renewal_plan_year, reference_plan_id: new_health_plan.id, plan_option_kind: 'single_carrier', dental_plan_option_kind: 'single_carrier', dental_reference_plan_id: new_dental_plan.id)}
 
-  describe '.is_renewal_transmission_eligible?' do 
+  describe '.is_renewal_transmission_eligible?' do
     context 'renewing_employer exists in enrolled state' do
-    
+
       it 'should return true' do
         expect(renewing_employer.is_renewal_transmission_eligible?).to be_truthy
       end
@@ -1198,7 +1198,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
 
       it 'should return false' do
         expect(renewing_employer.is_renewal_transmission_eligible?).to be_falsey
-      end 
+      end
     end
   end
 
@@ -1210,7 +1210,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
 
     context 'renewing_employer exists with enrolled renewal plan year' do
 
-      context 'when health carrier switched' do 
+      context 'when health carrier switched' do
         let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_2.id) }
         let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_1.id) }
 
@@ -1219,7 +1219,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
         end
       end
 
-      context 'when dental no longer offered' do 
+      context 'when dental no longer offered' do
         let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
         let(:renewal_benefit_group) { FactoryGirl.build(:benefit_group, title: "silver offerings 2", plan_year: renewal_plan_year, reference_plan_id: new_health_plan.id, plan_option_kind: 'single_carrier')}
 
@@ -1228,7 +1228,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
         end
       end
 
-      context 'when dental carrier switched' do 
+      context 'when dental carrier switched' do
         let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
         let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_2.id) }
 
@@ -1237,7 +1237,7 @@ describe EmployerProfile, "group transmissions", dbclean: :after_each do
         end
       end
 
-      context 'when both health and dental carriers remains same' do 
+      context 'when both health and dental carriers remains same' do
         let(:new_health_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: carrier_1.id) }
         let(:new_dental_plan) { FactoryGirl.create(:plan, active_year: start_date.year, carrier_profile_id: dental_carrier_1.id) }
 
