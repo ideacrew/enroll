@@ -20,11 +20,11 @@ namespace :reports do
       file_path = "#{Rails.root}/hbx_report/ee_with_waiver_enrollment.csv"
 
       def enrollment_transition_date(enrollment, aasm_state)
-        enrollment.workflow_state_transitions.select{|state| state.to_state == aasm_state }.first.transition_at
+        enrollment.workflow_state_transitions.detect{|state| state.to_state == aasm_state }.transition_at.to_date
       end
 
       def plan_year_matched?(cancelled_enr, waived_enr)
-        cancelled_enr.benefit_group.plan_year.id.to_s == waived_enr.benefit_group.plan_year.id.to_s
+        cancelled_enr.benefit_group.plan_year == waived_enr.benefit_group.plan_year
       end
 
       def transition_matched?(cancelled_enr, waived_enr)
@@ -71,9 +71,9 @@ namespace :reports do
 
   			Person.all_employee_roles.each do |person|
           begin
-            if person.primary_family.present? && person.primary_family.households.first.hbx_enrollments.count > 1
+            if person.primary_family.present?
               hbx_enrollments = person.primary_family.active_household.hbx_enrollments
-              next if !hbx_enrollments.present?
+              next if hbx_enrollments.size < 2
               canceled_waived_pairs = canceled_waived_enrollments(hbx_enrollments)
 
               if canceled_waived_pairs.present?
@@ -81,15 +81,15 @@ namespace :reports do
                   csv << [
                     person.hbx_id,
                     person.full_name,
-                    cancelled_waived_pair.first.id,
-                    cancelled_waived_pair.second.id,
+                    cancelled_waived_pair[0].hbx_id,
+                    cancelled_waived_pair[1].hbx_id,
                   ]
                 end
                 processed_count = processed_count + 1
               end
             end
-          rescue
-            puts "Bad Person record #{person.hbx_id}"
+          rescue Exception => e
+            Rails.logger.error {"Bad Person record #{person.hbx_id} due to #{e}"} unless Rails.env.test?
           end
         end
         puts "File path: %s, No. of EE's with waived enrollment tiles %d." %[file_path, processed_count]
