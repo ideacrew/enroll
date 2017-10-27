@@ -127,7 +127,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP3B',
+    hbx_id: 'DRG007',
     title: 'Plan Offerings Finalized',
     description: 'Application to Offer Group Health Coverage in DC Health Link when an Employer PlanYear is force published',
     resource_name: 'employer',
@@ -137,7 +137,7 @@ shop_notice_triggers = [
         name: 'PlanYear Renewal Auto-Published',
         notice_template: 'notices/shop_employer_notices/3b_employer_plan_year_renewal',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerEligibilityNotice',
-        mpi_indicator: 'MPI_SHOPRB',
+        mpi_indicator: 'MPI_DRG007',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
