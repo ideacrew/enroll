@@ -62,7 +62,7 @@ module Importers::Mhc
         if !single_plan_hios_id.blank?
           sp_hios = single_plan_hios_id.strip
           service_area_plan_hios_ids_list = service_area_plan_hios_ids(start_on_year)
-          if service_area_plan_hios_ids_list.include?(sp_hios) || service_area_plan_hios_ids.include?("#{sp_hios}-01")
+          if service_area_plan_hios_ids_list.include?(sp_hios) || service_area_plan_hios_ids_list.include?("#{sp_hios}-01")
             found_sole_source_plan = available_plans.detect { |pl| (pl.hios_id == sp_hios) || (pl.hios_id == "#{sp_hios}-01") }
             return found_sole_source_plan if found_sole_source_plan
             errors.add(:single_plan_hios_id, "hios id #{single_plan_hios_id.strip} not found for single plan benefit group")
