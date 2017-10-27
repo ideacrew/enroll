@@ -72,6 +72,8 @@ class CarrierProfile
 
     def carrier_profile_service_area_pairs_for(employer_profile)
      hios_carrier_id_mapping = Organization.where("carrier_profile" => {"$exists" => true}).inject({}) do |acc, org|
+       next acc if org.fein == '800721489'
+
        cp = org.carrier_profile
        cp.issuer_hios_ids.each do |ihid|
          acc[ihid] = cp.id
