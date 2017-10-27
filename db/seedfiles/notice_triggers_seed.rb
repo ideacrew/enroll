@@ -295,6 +295,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP13',
     title: 'Open Enrollment Reminder',
@@ -316,6 +317,29 @@ shop_notice_triggers = [
       }
     ]
   },
+
+  {
+    hbx_id: 'SHOPDAG015',
+    title: 'Notice of Low Enrollment - Action Needed',
+    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
+    resource_name: 'employer',
+    event_name: 'low_enrollment_notice_for_employer',
+    notice_triggers: [
+      {
+        name: 'Low Enrollment Notice',
+        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
+        mpi_indicator: 'MPI_SHOPDAG015',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
   {
     hbx_id: 'SHOP14',
     title: 'Open Enrollment Completed',
@@ -337,27 +361,7 @@ shop_notice_triggers = [
       }
     ]
   },
-  {
-    hbx_id: 'SHOP15',
-    title: 'Notice of Low Enrollment - Action Needed',
-    description: 'Notifies all the employers who doesnt meet minimum participation requirement',
-    resource_name: 'employer',
-    event_name: 'low_enrollment_notice_for_employer',
-    notice_triggers: [
-      {
-        name: 'Low Enrollment Notice',
-        notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
-        notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOP15',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
+  
   {
     hbx_id: 'SHOP17',
     title: 'Open Enrollment Completed',
