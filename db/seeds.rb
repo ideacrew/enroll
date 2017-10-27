@@ -113,7 +113,7 @@ if missing_plan_dumps
   puts "*"*80
 
   puts "Processing Plan Mapping ..."
-  system "bundle exec rake plan:crosswalk_2017_2018"
+  system "bundle exec rake xml:plan_cross_walk"
   puts "Processing Plan Mapping completed"
   puts "*"*80
 
