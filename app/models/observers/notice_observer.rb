@@ -59,7 +59,7 @@ module Observers
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted && plan_year.application_eligibility_warnings.include?(:primary_office_location)
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
-          self.employer_profile.census_employees.non_terminated.each do |ce|
+           plan_year.employer_profile.census_employees.non_terminated.each do |ce|
             trigger_notice(ce.id.to_s, "termination_of_employers_health_coverage")
           end
         end
