@@ -31,14 +31,12 @@ module Observers
             trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_ineligibility_notice")
 
             plan_year.employer_profile.census_employees.non_terminated.each do |ce|
-                if ce.employee_role.present?
-                  trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
-                end
+              if ce.employee_role.present?
+                trigger_notice(recipient: ce.employee_role, event_object: plan_year, notice_event: "employee_renewal_employer_ineligibility_notice")
               end
-
+            end
           end
         end
-
         
         if new_model_event.event_key == :renewal_application_submitted
           trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_application_published")
@@ -49,6 +47,7 @@ module Observers
         end
 
         if new_model_event.event_key == :ineligible_renewal_application_submitted
+          
           if plan_year.application_eligibility_warnings.include?(:primary_office_location)
             trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "employer_renewal_eligibility_denial_notice")
 
