@@ -427,7 +427,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
     let(:user) { FactoryGirl.create(:user, person: person, roles: ['broker']) }
-    let!(:employer_profile) { FactoryGirl.create(:employer_profile, general_agency_profile: general_agency_profile) }
+    let!(:employer_profile) { FactoryGirl.create(:employer_profile, broker_agency_profile: broker_agency_profile) }
     before :each do
       allow(BrokerAgencyProfile).to receive(:find).and_return(broker_agency_profile)
     end

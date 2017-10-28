@@ -190,12 +190,12 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def set_default_ga
     authorize HbxProfile, :modify_admin_tabs?
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
-    employer_profile = EmployerProfile.find_by_general_agency_profile(@broker_agency_profile.default_general_agency_profile).first if @broker_agency_profile.default_general_agency_profile.present?
     if @broker_agency_profile.present?
+      employer_profile = EmployerProfile.find_by_broker_agency_profile(@broker_agency_profile).first
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
-        ShopNoticesNotifierJob.perform_later(employer_profile.try(:id).to_s, "broker_terminated")
+        ShopNoticesNotifierJob.perform_later(employer_profile.id.to_s, "broker_terminated")
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
