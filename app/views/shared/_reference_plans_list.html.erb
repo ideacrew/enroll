@@ -80,7 +80,7 @@
   <div class="col-xs-12 plan-options" style="display: none;">
     <div class="col-xs-12 carriers-tab" style="display: none;">
       <br><br>
-      <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
+      <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
       <br/><br/>
       <% @carrier_names.each_pair do |ck, cv| %>
       <div class="col-xs-3 carriers">
@@ -107,7 +107,7 @@
     </div>
     <div class="col-xs-12 metals-tab" style="display: none;">
       <br><br>
-      <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. Bronze means the plan is expected to pay 60% of expenses for an average population of consumers, Silver 70%, Gold 80% and Platinum 90%.</p>
+      <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explaned %></p>
       <br/>
       <% reference_plans = Plan::REFERENCE_PLAN_METAL_LEVELS %>
       <% if check_plan_options_title %>
