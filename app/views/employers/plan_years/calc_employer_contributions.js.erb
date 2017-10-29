@@ -100,7 +100,6 @@ if ( '<%= @coverage_type %>' == '.dental' ) {
       $('html, body').animate({
                           scrollTop: position
                       }, 500);
-      $(this).closest('.benefit-group-fields').find('.health .carriers-tab').show();
       $(this).closest('.benefit-group-fields').find('.health .plan-options').slideDown();
       $('#<%= @location_id %> .reference-steps:first .currently-offered').html('You currently offer <%= @plan.name %>.');
       $('#<%= @location_id %> .reference-steps:first .currently-offering').html('You currently offer <%= @plan.name %>.');
