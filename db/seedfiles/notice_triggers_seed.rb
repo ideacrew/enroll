@@ -861,7 +861,7 @@ ivl_notice_triggers = [
       {
         name: 'Final Eligibility Notice for UQHP individuals',
         notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
-        notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
+        notice_builder: 'IvlNotices::FinalEligibilityNotice',
         mpi_indicator: 'IVL_FEL',
         notice_trigger_element_group: {
           market_places: ['individual'],
