@@ -1,5 +1,4 @@
 class Employers::PlanYearsController < ApplicationController
-
   before_action :find_employer
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
