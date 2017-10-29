@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'csv'
 
-RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each do
+RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
 
   file = "#{Rails.root}/spec/test_data/notices/final_eligibility_notice_aqhp_test_data.csv"
   csv = CSV.open(file,"r",:headers =>true)
@@ -13,7 +13,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Eligibility Notice for AQHP individuals',
                             :notice_template => 'notices/ivl/final_eligibility_notice_aqhp',
-                            :notice_builder => 'IvlNotices::FinalEligibilityNoticeAqhp',
+                            :notice_builder => 'IvlNotices::FinalEligibilityNotice',
                             :event_name => 'final_eligibility_notice_aqhp',
                             :mpi_indicator => 'IVL_FEL',
                             :data => data,
@@ -40,7 +40,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     end
     context "valid params" do
       it "should initialze" do
-        expect{IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)}.not_to raise_error
+        expect{IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -48,7 +48,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
       @final_eligibility_notice.build
     end
 
@@ -80,7 +80,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
     end
 
     it "returns all auto_renewing enrollments" do
@@ -100,7 +100,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
       @final_eligibility_notice.build
     end
     it "return ivl open enrollment start on" do
@@ -117,7 +117,7 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
     end
 
     it "should render the final eligibility notice template" do

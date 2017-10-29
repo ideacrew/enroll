@@ -1,4 +1,4 @@
-class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
+class IvlNotices::FinalEligibilityNotice < IvlNotice
   include ApplicationHelper
   attr_accessor :family, :data, :person, :open_enrollment_start_on, :open_enrollment_end_on
 
@@ -18,6 +18,8 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
 
   def deliver
     build
+    notice.notification_type == "final_eligibility_notice_aqhp" ? append_aqhp_data : append_uqhp_data
+    append_hbe
     generate_pdf_notice
     attach_blank_page(notice_path)
     attach_required_documents if notice.documents_needed
@@ -42,8 +44,6 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     notice.current_year = TimeKeeper.date_of_record.year
     notice.ivl_open_enrollment_start_on = open_enrollment_start_on
     notice.ivl_open_enrollment_end_on = open_enrollment_end_on
-    append_data
-    append_hbe
     notice.primary_fullname = person.full_name.titleize || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
@@ -53,9 +53,58 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     end
   end
 
-  def append_data
+  def append_uqhp_data
+    append_unverified_uqhp_family_members
+    primary_member = data.detect{|m| m["is_dependent"].upcase == "FALSE"}
+    append_member_information_for_uqhp(primary_member)
+  end
+
+  def append_unverified_uqhp_family_members
+    family = recipient.primary_family
+    enrollments = family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
+      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
+        (
+          hbx_en.terminated_on.blank? ||
+          hbx_en.terminated_on >= TimeKeeper.date_of_record
+        )
+    end
+    enrollments.reject!{|e| e.coverage_terminated? }
+
+    if enrollments.empty?
+      raise 'enrollments not found!'
+    end
+
+    family_members = enrollments.inject([]) do |family_members, enrollment|
+      family_members += enrollment.hbx_enrollment_members.map(&:family_member)
+    end.uniq
+
+    people = family_members.map(&:person).uniq
+    people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
+    people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
+    if people.empty?
+      raise 'no family member found with outstanding verification'
+    end
+
+    outstanding_people = []
+    people.each do |person|
+      if person.consumer_role.outstanding_verification_types.present?
+        outstanding_people << person
+      end
+    end
+
+    outstanding_people.uniq!
+    if outstanding_people.empty?
+      raise 'no family member found without uploaded documents'
+    end
+
+    append_unverified_individuals(outstanding_people)
+    notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
+    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
+  end
+
+  def append_aqhp_data
     primary_member = data.detect{|m| m["subscriber"].upcase == "YES"}
-    append_member_information(primary_member)
+    append_member_information_for_aqhp(primary_member)
     pick_enrollments
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
@@ -66,7 +115,59 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     notice.primary_firstname = primary_member["first_name"]
   end
 
-  def append_member_information(primary_member)
+  def append_member_information_for_aqhp(primary_member)
+    due_dates = []
+    data.collect do |datum|
+      notice.individuals << PdfTemplates::Individual.new({
+        :first_name => datum["first_name"].titleize,
+        :last_name => datum["last_name"].titleize,
+        :full_name => datum["full_name"].titleize,
+        :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
+        :incarcerated => datum["incarcerated"].upcase == "N" ? "No" : "Yes",
+        :citizen_status => citizen_status(datum["citizen_status"]),
+        :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
+        :actual_income => datum["actual_income"],
+        :taxhh_count => datum["tax_hh_count"],
+        :tax_status => filer_type(datum["filer_type"]),
+        :mec => datum["mec"].try(:upcase) == "YES" ? "Yes" : "No",
+        :is_ia_eligible => check(datum["aqhp_eligible"]),
+        :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
+        :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
+        :is_without_assistance => check(datum["uqhp_eligible"]),
+        :is_totally_ineligible => check(datum["totally_inelig"]),
+        :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
+        :has_access_to_affordable_coverage => check(datum ["mec"]),
+        :tax_household => append_tax_household_information(primary_member)
+      })
+
+      due_dates << Date.strptime(datum["document_deadline"], '%m/%d/%Y')
+
+      if datum["outstanding_verification_types"].include?("Social Security Number")
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+      if datum["outstanding_verification_types"].include?("Immigration status")
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+      if datum["outstanding_verification_types"].include?("Citizenship")
+        notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
+      end
+    end
+    notice.due_date = due_dates.min
+  end
+
+  def append_unverified_individuals(people)
+    people.each do |person|
+      if ssn_outstanding?(person)
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
+      end
+
+      if lawful_presence_outstanding?(person)
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
+      end
+    end
+  end
+
+  def append_member_information_for_aqhp(primary_member)
     due_dates = []
     data.collect do |datum|
       notice.individuals << PdfTemplates::Individual.new({
