@@ -8,6 +8,7 @@ module Importers::Mhc
       "neighborhood health plan" => "NHP",
       "harvard pilgrim health care" => "HPHC",
       "boston medical center health plan" => "BMCHP",
+      "blue cross blue shield ma" => "BCBS"
     }
 
     attr_accessor :fein,

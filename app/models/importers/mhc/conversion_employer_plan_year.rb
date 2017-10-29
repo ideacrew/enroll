@@ -2,12 +2,13 @@ module Importers::Mhc
   class ConversionEmployerPlanYear < Importers::ConversionEmployerPlanYear
 
     CARRIER_MAPPING = {
-      "bmc healthnet plan"=>"BMCHP",
+      "bmc healthnet plan"=>"BMCHP", 
       "fallon community health plan"=>"FCHP",
       "health new england"=>"HNE",
       "neighborhood health plan" => "NHP",
       "harvard pilgrim health care" => "HPHC",
-      "boston medical center health plan" => "BMCHP"
+      "boston medical center health plan" => "BMCHP",
+      "blue cross blue shield ma" => "BCBS"
     }
 
     validate :validate_plan_selection, :validate_reference_plan
