@@ -987,12 +987,6 @@ class Family
       "no enrollment"
     end
   end
-  
-  def self.update_vlp_documents_status
-    Family.each do |f|
-      f.update_attributes(vlp_documents_status: f.primary_applicant.person.vlp_documents_status) if f.primary_applicant.person.consumer_role
-   end
-  end 
 
   def person_has_an_active_enrollment?(person)
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
