@@ -22,7 +22,7 @@ class CuramFinancialApplicationLookup
       request_result = nil
       retry_attempt = 0
       while (retry_attempt < 3) && request_result.nil?
-        request_result = Acapi::Requestor.request("curam_financial_application.search", person_demographics, 2)
+        request_result = Acapi::Requestor.request("account_management.check_existing_account", person_demographics, 2)
         retry_attempt = retry_attempt + 1
       end
       request_result.stringify_keys["body"]
