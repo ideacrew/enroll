@@ -4,7 +4,9 @@ Then (/^Hbx Admin sees Families index$/) do
 end
 
 When(/^Hbx Admin clicks on Families tab$/) do
-  click_link "Families"
+  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
+  wait_for_ajax 
 end
 
 Then(/^Hbx Admin should see an Actions link$/) do
@@ -12,7 +14,7 @@ Then(/^Hbx Admin should see an Actions link$/) do
 end
 
 When(/^Hbx Admin clicks on the Actions button$/) do
-  click_button "Actions"
+  find(:xpath,'//*[@id="dropdownMenu1"]').trigger('click')
 end
 
 Then(/^Hbx Admin should see an Enable \/ Disable link$/) do
