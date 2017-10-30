@@ -164,7 +164,15 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
-    it "should render documents section when outstanding people are present" do
+    it "should render not documents section when the family came in through curam(Assisted)" do
+      @eligibility_notice.append_hbe
+      @eligibility_notice.build
+      expect(@eligibility_notice).not_to receive :attach_required_documents
+      @eligibility_notice.attach_docs
+    end
+
+    it "should render documents section when the family is unassisted and outstanding people are present" do
+      family.update_attributes!(:e_case_id => nil)
       @eligibility_notice.append_hbe
       @eligibility_notice.build
       expect(@eligibility_notice).to receive :attach_required_documents
