@@ -4,7 +4,7 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
 
   context 'Family under renewing employer' do
 
-    let(:renewal_year) { (TimeKeeper.date_of_record.end_of_month + 1.day + 2.months).year }
+    let(:renewal_year) { (TimeKeeper.date_of_record.end_of_month + 1.day - Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.months).year }
 
     let!(:renewal_plan) {
       FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: renewal_year, hios_id: "11111111122302-01", csr_variant_id: "01")
@@ -33,9 +33,10 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
       employee.add_renew_benefit_group_assignment renewal_benefit_group
     }
 
-    let(:open_enrollment_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
-    let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 12.days }
-    let(:start_on) { open_enrollment_start_on + 2.months }
+    let(:start_on) { (TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
+
+    let(:open_enrollment_start_on) { start_on - 1.month }
+    let(:open_enrollment_end_on) { start_on - 1.day }
     let(:end_on) { start_on + 1.year - 1.day }
 
     let(:active_plan_year) {

@@ -140,7 +140,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
     context "and effective date is specified and effective date does provide enough time for enrollment" do
       let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}
-      let(:valid_effective_date)   { (prior_month_open_enrollment_start + 3.months).beginning_of_month }
+      let(:valid_effective_date)   { (prior_month_open_enrollment_start - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month }
       before do
         plan_year.effective_date = valid_effective_date
         plan_year.end_on = valid_effective_date + Settings.aca.shop_market.benefit_period.length_minimum.year.years - 1.day
@@ -1633,20 +1633,25 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   context "calculate_start_on_options" do
     it "should return two options" do
       date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
-      date2 = date1.next_month
-      dates = [date1, date2].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+      dates = [date1]
+      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 1).times do
+        dates << dates.last.next_month
+      end
+      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 15))
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month)
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
     it "should return three options" do
       date1 = TimeKeeper.date_of_record.beginning_of_month.next_month
-      date2 = date1.next_month
-      date3 = date2.next_month
-      dates = [date1, date2, date3].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+      dates = [date1]
+      (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 1).times do
+        dates << dates.last.next_month
+      end
+      dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 2))
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 1))
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
   end
