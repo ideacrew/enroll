@@ -337,7 +337,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     let(:calendar_year) { TimeKeeper.date_of_record.year }
     let(:plan_year_start_on) { Date.new(calendar_year, 6, 1) }
     let(:open_enrollment_start_on) { Date.new(calendar_year, 4, 1) }
-    let(:open_enrollment_end_on) { Date.new(calendar_year, 5, 13) }
+    let(:open_enrollment_end_on) { Date.new(calendar_year, 5, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on) }
     let(:plan_year) {
       py = FactoryGirl.create(:plan_year,
         start_on: plan_year_start_on,
@@ -912,6 +912,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                                           employer_profile_id: workflow_plan_year_with_benefit_group.employer_profile.id
                                         )}
               let(:family)            { Family.create }
+              let(:required_employee_count) { (employee_count * Settings.aca.shop_market.employee_participation_ratio_minimum.to_f).ceil }
 
               def benefit_group_assignment
                 BenefitGroupAssignment.new(
@@ -988,11 +989,11 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
                   end
 
                   it "should have the right minimum enrolled count" do
-                    expect(workflow_plan_year_with_benefit_group.minimum_enrolled_count).to eq 4.0
+                    expect(workflow_plan_year_with_benefit_group.minimum_enrolled_count).to eq required_employee_count
                   end
 
                   it "should have the right additional required participants count" do
-                    expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq 1.0
+                    expect(workflow_plan_year_with_benefit_group.additional_required_participants_count).to eq (required_employee_count - 3)
                   end
 
                   context "greater than 100 employees " do
@@ -1615,8 +1616,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context "map binder_payment_due_date" do
     it "in interval of map using shop_enrollment_timetable" do
-      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(2015,9,1))
-      expect(binder_payment_due_date).to eq Date.new(2015,8,12)
+      binder_payment_due_date = PlanYear.map_binder_payment_due_date_by_start_on(Date.new(TimeKeeper.date_of_record.year,9,1))
+      expect(binder_payment_due_date).to eq Date.new(TimeKeeper.date_of_record.year,8,Settings.aca.shop_market.binder_payment_due_on)
     end
 
     it "interval map using existing specified key values" do
