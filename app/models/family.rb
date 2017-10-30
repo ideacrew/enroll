@@ -1001,7 +1001,7 @@ class Family
     document_status_outstanding = []
     self.active_family_members.each do |member|
       member.person.verification_types.each do |type|
-      if member.person.consumer_role && document_verified_status(type, member.person)
+      if member.person.consumer_role && is_document_not_verified(type, member.person)
         documents_list <<  (member.person.consumer_role.has_docs_for_type?(type) && verification_type_status(type, member.person) != "outstanding") 
         document_status_outstanding << member.person.consumer_role.has_outstanding_documents?
       end
@@ -1025,7 +1025,7 @@ class Family
     update_attributes(vlp_documents_status: self.all_persons_vlp_documents_status)
   end
 
-  def document_verified_status(type, person)
+  def is_document_not_verified(type, person)
     verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified"
   end
 
