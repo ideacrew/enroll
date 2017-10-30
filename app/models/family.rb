@@ -726,11 +726,16 @@ class Family
 
   def application_applicable_year
     current_year = TimeKeeper.date_of_record.year
-    applicable_year = HbxProfile.current_hbx.under_open_enrollment? ? current_year + 1 : current_year
+    current_hbx = HbxProfile.current_hbx
+    if current_hbx && current_hbx.under_open_enrollment?
+      current_year + 1
+    else
+      current_year
+    end
   end
 
   def latest_applicable_submitted_application
-    retrn nil unless applications.present?
+    return nil unless applications.present?
     applications.where(:assistance_year => application_applicable_year, :aasm_state.in => ["submitted", "determined"]).order_by(:submitted_at => 'desc').first
   end
 

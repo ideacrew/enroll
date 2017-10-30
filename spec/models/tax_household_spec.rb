@@ -140,6 +140,7 @@ RSpec.describe TaxHousehold, type: :model do
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+        allow(current_hbx).to receive(:under_open_enrollment?).and_return(false)
         allow(plan).to receive(:premium_for).and_return(110)
       end
 

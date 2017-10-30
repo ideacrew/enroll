@@ -150,7 +150,7 @@ class CoverageHousehold
     end
   end
 
-  def update_eligibility_for_family(family)
+  def self.update_eligibility_for_family(family)
     family.households.each do |hh|
       hh.coverage_households.each do |ch|
         ch.evaluate_individual_market_eligiblity
