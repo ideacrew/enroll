@@ -155,12 +155,20 @@ RSpec.describe Organization, dbclean: :after_each do
         expect(Organization.valid_carrier_names_for_options(sole_source_only: true)).to match_array carriers
       end
 
-      it "can filter out by service area" do
-        carrier_names = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        carrier_names[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+        it "returns carriers if they are available in the service area and offer plans for that coverage level" do
+          carrier_names = {}
+          multiple_carriers = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
+        end
 
-        expect(Organization.valid_carrier_names(primary_office_location: office_location)).to match_array carrier_names
+        it "returns no carriers if there are no matches" do
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+        end
       end
     end
 
