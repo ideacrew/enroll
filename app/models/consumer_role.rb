@@ -8,6 +8,7 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
+  include DocumentsVerificationStatus
 
   embedded_in :person
 
@@ -180,6 +181,10 @@ class ConsumerRole
   def has_docs_for_type?(type)
     self.vlp_documents.any?{ |doc| doc.verification_type == type && doc.identifier }
   end
+
+  def has_outstanding_documents?
+    self.vlp_documents.any? {|doc| verification_type_status(doc.verification_type, self.person) == "outstanding" }
+  end  
 
   #use this method to check what verification types needs to be included to the notices
   def outstanding_verification_types
@@ -713,7 +718,7 @@ class ConsumerRole
         update_attributes(:lawful_presence_rejected => false)
       when "American Indian Status"
         update_attributes(:native_rejected => false)
-      when "Residency"
+      when "DC Residency"
         update_attributes(:residency_rejected => false)
     end
   end

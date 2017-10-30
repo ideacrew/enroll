@@ -40,8 +40,14 @@ RSpec.describe DocumentsController, :type => :controller do
 
       it "updates document status" do
         put :update, person_id: person.id, id: document.id, :person=>{ :vlp_document=>{:comment=>"hghghg"}}, :comment => true, :status => "ready"
+        allow(family).to receive(:update_family_document_status!).and_return(true)
         document.reload
         expect(document.status).to eq("ready")
+      end
+
+      it "updates family vlp_documents_status" do
+        put :update, person_id: person.id, id: document.id
+        allow(family).to receive(:update_family_document_status!).and_return(true)
       end
     end
 
@@ -57,6 +63,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
       it "updates document status" do
         put :update, person_id: person.id, id: document.id, :status => "accept"
+        allow(family).to receive(:update_family_document_status!).and_return(true)
         document.reload
         expect(document.status).to eq("accept")
       end

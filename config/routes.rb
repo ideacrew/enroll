@@ -49,6 +49,7 @@ Rails.application.routes.draw do
         post :reinstate_enrollment
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -70,8 +71,6 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
-        get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
