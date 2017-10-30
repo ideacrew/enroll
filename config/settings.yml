@@ -97,7 +97,6 @@ aca:
   qle:
     with_in_sixty_days: 60
 #
-
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
