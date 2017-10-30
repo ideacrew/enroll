@@ -1433,14 +1433,14 @@ describe Person, :dbclean => :after_each do
 
   describe "save application type in person model" do
     context "person saves application type as Phone" do
-      let(:new_person) { FactoryGirl.create(:person) }
+      let(:new_person) { FactoryGirl.create(:person, :with_family) }
       let(:person) { FactoryGirl.create(:person) }
       let(:current_user) {FactoryGirl.create(:user, :hbx_staff, person: person)}
       before do
-        new_person.update_attributes(application_type: "Phone")
+        new_person.primary_family.update_attributes(application_type: "Phone")
       end
       it "should save and disaply the person's application type as Phone" do
-        expect(new_person.application_type).to eq "Phone"
+        expect(new_person.primary_family.application_type).to eq "Phone"
       end
     end
   end

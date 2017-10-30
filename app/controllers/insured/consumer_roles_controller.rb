@@ -293,7 +293,6 @@ class Insured::ConsumerRolesController < ApplicationController
       :tribal_id,
       :no_dc_address,
       :no_dc_address_reason,
-      :application_type,
       :is_applying_coverage
     ]
   end
