@@ -3,10 +3,10 @@ require 'rails_helper'
 RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_each do
 
   let(:calendar_year) { TimeKeeper.date_of_record.year }
-  let(:date_of_record_to_use) { Date.new(calendar_year, 2, 1) }
-  let(:start_on) { (date_of_record_to_use - Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.months).beginning_of_month - 1.year }
+  let(:date_of_record_to_use) { Date.new(calendar_year, 2, Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month + 1) }
+  let(:start_on) { (date_of_record_to_use + 2.month).beginning_of_month - 1.year }
   let(:end_on) { start_on + 1.year - 1.day }
-  let(:open_enrollment_start_on) { start_on - 1.month }
+  let(:open_enrollment_start_on) { start_on - 1.month + Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days }
   let(:open_enrollment_end_on) { start_on - 1.day }
 
   let(:organization) {
