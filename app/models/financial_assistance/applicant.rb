@@ -210,22 +210,27 @@ class FinancialAssistance::Applicant
   end
 
   aasm do
-    state :unverified, initial: true
-    state :verification_outstanding
-    state :fully_verified
+    state :unverified, initial: true #Both Income and MEC are Pending.
+    state :verification_outstanding #Atleast one of the Verifications is Outstanding.
+    state :verification_pending #One of the Verifications is Pending and the other Verification is Verified.
+    state :fully_verified #Both Income and MEC are Verified.
 
     event :income_outstanding do
+      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
     end
 
     event :mec_outstanding do
+      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
     end
 
     event :income_valid do
       transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
       transitions from: :fully_verified, to: :fully_verified
@@ -233,6 +238,8 @@ class FinancialAssistance::Applicant
 
     event :mec_valid do
       transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
       transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
       transitions from: :fully_verified, to: :fully_verified
@@ -613,11 +620,7 @@ class FinancialAssistance::Applicant
 
   #Income/MEC Verifications
   def notify_of_eligibility_change
-    coverage_household.update_eligibility_for_family(family)
-  end
-
-  def coverage_household
-    family.active_household.coverage_households.select{ |ch| ch.coverage_household_members.map(&:family_member_id).include?(family_member.id) }.first
+    CoverageHousehold.update_eligibility_for_family(family)
   end
 
   def is_assistance_verified?
@@ -667,10 +670,24 @@ class FinancialAssistance::Applicant
   end
 
   def is_income_verified?
-    assisted_verifications.select{|verification| verification.verification_type == "Income" }.first.status == "verified"
+    assisted_income_verification = assisted_verifications.select{|verification| verification.verification_type == "Income" }.first
+    if assisted_income_verification.present? && assisted_income_verification.status == "verified"
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    true_or_false
   end
 
   def is_mec_verified?
-    assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first.status == "verified"
+    assisted_mec_verification = assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first
+    if assisted_mec_verification.present? && assisted_mec_verification.status == "verified"
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    true_or_false
   end
 end

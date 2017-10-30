@@ -12,13 +12,8 @@ module VerificationHelper
     end
   end
 
-  # def faa_verified_document(applicant, kind)
-  #   assistance_applicant_document = applicant.assisted_verifications.where(verfication_status: kind).first.assistance_applicant_documents.first
-  #   assistance_applicant_document.present? && assistance_applicant_document.status == "unverified"
-  # end
-
   def verification_type_status(type, member)
-    applicant_in_context = @f_member.applicant_for_verification
+    applicant_in_context = @f_member.applicant_for_verification if @f_member
     case type
       when 'Social Security Number'
         if member.consumer_role.ssn_verified?
