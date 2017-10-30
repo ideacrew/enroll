@@ -3,7 +3,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_pars
 namespace :xml do
   desc "Import plan crosswalk"
   task :plan_cross_walk, [:file] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "cross_walk", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk", "**", "*.xml"))
     files.each do |file_path|
       @file_path = file_path
       @current_year = file_path.split("/")[-2].to_i # Retrieve the year of the master xml file you are uploading
@@ -34,13 +34,23 @@ namespace :xml do
         end
       end
     end
+
+    plans_2017 = Plan.where(active_year: 2017)
+    plans_2017.each do |old_plan|
+      new_plan = Plan.where(active_year: 2018, hios_base_id: old_plan.hios_base_id, csr_variant_id: old_plan.csr_variant_id).first
+      if new_plan.present? && old_plan.renewal_plan_id.nil?
+        old_plan.renewal_plan_id = new_plan.id
+        old_plan.save
+        puts "Old #{old_plan.active_year} #{old_plan.carrier_profile.legal_name} plan hios_id #{old_plan.hios_id} renewed with New #{new_plan.active_year} #{new_plan.carrier_profile.legal_name} plan hios_id: #{new_plan.hios_id}"
+      end
+    end
   end
 end
 
 namespace :xml do
   task :plan_cross_walk_old, [:file] => :environment do |task,args|
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/master_xml", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
     files.each do |file_path|
       @file_path = file_path
 

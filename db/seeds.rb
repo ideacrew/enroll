@@ -94,7 +94,7 @@ if missing_plan_dumps
 
   puts "*"*80
   puts "importing provider_directory_urls and rx_formulary_urls for plans"
-  system "bundle exec rake import:provider_and_rx_formulary_url"
+  system "bundle exec rake import:common_data_from_master_xml"
   puts "importing provider_directory_urls and rx_formulary_urls for plans complete"
   puts "*"*80
 
