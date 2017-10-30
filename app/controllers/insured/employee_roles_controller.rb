@@ -65,7 +65,7 @@ class Insured::EmployeeRolesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to :back, alert: "You can not enroll as another employee. Please reach out to customer serive for assistance"}
+        format.html { redirect_to :back, alert: "You can not enroll as another employee. Please reach out to customer service for assistance"}
       end
     end
   end
