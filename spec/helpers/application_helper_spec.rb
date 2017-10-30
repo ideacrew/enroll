@@ -209,7 +209,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
 
     it "should calculate eligible_to_enroll_count when not zero" do
-      expect(helper.calculate_participation_minimum).to eq 3
+      expect(helper.calculate_participation_minimum).to eq 4
     end
   end
 
