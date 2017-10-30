@@ -45,7 +45,7 @@ FactoryGirl.define do
     employer_profile
     start_on { (TimeKeeper.date_of_record).next_month.beginning_of_month }
     end_on { start_on + 1.year - 1.day }
-    open_enrollment_start_on { (start_on - 32).beginning_of_month }
+    open_enrollment_start_on { (start_on - 32).beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days}
     open_enrollment_end_on { open_enrollment_start_on + 2.weeks }
     aasm_state "renewing_enrolling"
     fte_count { 5 }
@@ -71,7 +71,7 @@ FactoryGirl.define do
     employer_profile
     start_on TimeKeeper.date_of_record.beginning_of_month
     end_on { start_on + 1.year - 1.day }
-    open_enrollment_start_on { start_on - 1.month }
+    open_enrollment_start_on { start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days }
     imported_plan_year true
     fte_count { 5 }
 
