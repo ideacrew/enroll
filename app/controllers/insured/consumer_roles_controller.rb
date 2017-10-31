@@ -238,6 +238,11 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def upload_ridp_document
+    set_consumer_bookmark_url
+    set_current_person
+  end
+
   private
 
   def user_not_authorized(exception)

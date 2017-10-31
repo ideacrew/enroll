@@ -124,7 +124,7 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   screenshot("identify_verification")
   click_button "Submit"
   screenshot("override")
-  click_link "CONTINUE APPLICATION"
+  click_link "Continue Application"
 end
 
 Then(/\w+ should see the dependents form/) do
