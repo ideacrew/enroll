@@ -27,6 +27,7 @@ module Notifier
 
     attribute :warnings, Array[String]
     attribute :errors, Array[String]
+    attribute :enrollment_errors, Hash[Symbol => String]
 
     def self.stubbed_object
       reference_date = TimeKeeper.date_of_record.next_month.beginning_of_month
@@ -54,7 +55,8 @@ module Notifier
         binder_due_date: '09/25/2017',
         renewal_binder_due_data: '09/25/2017',
         ivl_open_enrollment_end_on: '01/31/2018',
-        ivl_open_enrollment_start_on: '11/01/2017'
+        ivl_open_enrollment_start_on: '11/01/2017',
+        enrollment_errors: {non_business_owner_enrollment_count: "at least 3 non-owner employee must enroll"}
       })
     end
   end
