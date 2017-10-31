@@ -82,10 +82,11 @@ end
 And(/^an uploaded application in VERIFIED status is present$/) do
 	login_as hbx_admin, scope: :user
 	visit exchanges_hbx_profiles_root_path
-	click_link 'Families'
+	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
 	family_member = find('a', :text => /First/)
-	family_member.click
+	family_member.trigger("click")
 	expect(page).to have_content('Application')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
@@ -98,10 +99,11 @@ end
 And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   login_as hbx_admin, scope: :user
   visit exchanges_hbx_profiles_root_path
-  click_link 'Families'
+  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.click
+  family_member.trigger("click")
   expect(page).to have_content('Identity')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
@@ -122,10 +124,11 @@ end
 When(/^the Admin clicks “Continue” on the doc upload page$/) do
   login_as hbx_admin, scope: :user
   visit exchanges_hbx_profiles_root_path
-  click_link 'Families'
+  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.click
+  family_member.trigger("click")
 end
 
 Then(/^the Admin is able to complete the application for the consumer$/) do
@@ -166,10 +169,11 @@ end
 When(/^an uploaded Identity verification in VERIFIED status is present on failed experian screen$/) do
   login_as hbx_admin, scope: :user
   visit exchanges_hbx_profiles_root_path
-  click_link 'Families'
+  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.click
+  family_member.trigger("click")
   expect(page).to have_content('Identity')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[1]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
@@ -182,10 +186,11 @@ end
 When(/^an uploaded application in VERIFIED status is present on failed experian screen$/) do
   login_as hbx_admin, scope: :user
   visit exchanges_hbx_profiles_root_path
-  click_link 'Families'
+  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
   family_member = find('a', :text => /First/)
-  family_member.click
+  family_member.trigger("click")
   expect(page).to have_content('Application')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[5]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
