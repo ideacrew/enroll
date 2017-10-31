@@ -232,7 +232,7 @@ class EmployerProfile
   end
 
   def notify_general_agent_terminated
-    ShopNoticesNotifierJob.perform_later(id.to_s, "broker_terminated")
+    ShopNoticesNotifierJob.perform_later(id.to_s, "general_agency_terminated")
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 

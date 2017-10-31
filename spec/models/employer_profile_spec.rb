@@ -535,7 +535,7 @@ describe EmployerProfile, "Class methods", dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer.id.to_s, 'broker_terminated']
+      expect(queued_job[:args]).to eq [employer.id.to_s, 'general_agency_terminated']
     end
 
     it 'works with multiple broker_agency_contacts'  do
@@ -983,7 +983,7 @@ describe EmployerProfile, "For General Agency", dbclean: :after_each do
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
-      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'broker_terminated']
+      expect(queued_job[:args]).to eq [employer_profile.id.to_s, 'general_agency_terminated']
       expect(employer_profile.active_general_agency_account.blank?).to eq true
     end
   end

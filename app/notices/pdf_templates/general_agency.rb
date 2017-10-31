@@ -21,7 +21,7 @@ module PdfTemplates
     attribute :hbx_id, String
 
     def shop?
-      false
+      true
   end
 end
 end

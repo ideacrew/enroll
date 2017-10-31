@@ -16,10 +16,10 @@ RSpec.describe GeneralAgencyNotices::GeneralAgencyTerminatedNotice do
   let!(:renewal_plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on + 1.year, :aasm_state => 'renewing_draft' ) }
   let!(:renewal_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: renewal_plan_year, title: "Benefits #{renewal_plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                             :name =>'Broker_Fired',
+                             :name =>'GA Fired',
                              :notice_template => 'notices/general_agency_notices/general_agency_fired_notice',
                              :notice_builder => 'GeneralAgencyNotices::GeneralAgencyTerminatedNotice',
-                             :event_name => 'broker_terminated',
+                             :event_name => 'general_agency_terminated',
                              :mpi_indicator => 'SHOP_D086)',
                              :title => "Genaral agency fired"})
                           }

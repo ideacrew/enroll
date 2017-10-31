@@ -195,7 +195,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
-        ShopNoticesNotifierJob.perform_later(employer_profile.id.to_s, "broker_terminated")
+        ShopNoticesNotifierJob.perform_later(employer_profile.id.to_s, "general_agency_terminated")
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
       end
