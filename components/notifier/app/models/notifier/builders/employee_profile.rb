@@ -10,7 +10,7 @@ module Notifier
       data_object = Notifier::MergeDataModels::EmployeeProfile.new
       data_object.mailing_address = Notifier::MergeDataModels::Address.new
       data_object.broker = Notifier::MergeDataModels::Broker.new
-      data_object.enrollment = Notifier::MergeDataModels::Plan.new
+      data_object.enrollment = Notifier::MergeDataModels::Enrollment.new
       data_object.plan_year = Notifier::MergeDataModels::PlanYear.new
       @merge_model = data_object
     end
