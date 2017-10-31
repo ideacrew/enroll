@@ -63,6 +63,14 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
+  #field can be used for filtering
+  field :frozen_plan_year, type: Boolean
+
+  # Fields for checking respective carrier is offering or not
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
+
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
@@ -142,6 +150,11 @@ class Plan
 
   ## Scopes
   default_scope -> {order("name ASC")}
+
+  #filter based on plan offerings
+  scope :check_plan_offerings_for_metal_level,  ->{ where(is_horizontal: "true") }
+  scope :check_plan_offerings_for_single_carrier,  ->{ where(is_vertical: "true") }
+  scope :check_plan_offerings_for_sole_source,  ->{ where(is_sole_source: "true") }
 
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }

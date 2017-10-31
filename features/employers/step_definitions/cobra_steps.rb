@@ -365,7 +365,9 @@ And(/^.+ should be able to enter sole source plan year, benefits, relationship b
   wait_for_ajax
   find('.sole-source-plan-tab a').click
   wait_for_ajax
+
   find('.reference-plans label').click
+  
   wait_for_ajax
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][0][employer_contribution_percent]", :with => 50
   fill_in "plan_year[benefit_groups_attributes][0][composite_tier_contributions_attributes][3][employer_contribution_percent]", :with => 50

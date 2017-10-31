@@ -129,10 +129,7 @@ RSpec.describe Organization, dbclean: :after_each do
     let!(:carrier_one_service_area) { create(:carrier_service_area, service_area_zipcode: '10001', issuer_hios_id: carrier_profile_1.issuer_hios_ids.first) }
     let(:address) { double(zip: '10001', county: 'County', state: Settings.aca.state_abbreviation) }
     let(:office_location) { double(address: address)}
-<<<<<<< HEAD
-=======
     let(:carrier_plan) { instance_double(Plan, active_year: '2017', is_sole_source: true, is_vertical: false, is_horizontal: false) }
->>>>>>> 8443e2c64... properly restrict service areas that are not offered while checking carriers, use select to iterate over returned plans rather than running a second query
 
     before :each do
       allow(Plan).to receive(:valid_shop_health_plans).and_return(true)
@@ -168,19 +165,20 @@ RSpec.describe Organization, dbclean: :after_each do
           allow(Plan).to receive(:valid_shop_health_plans).with("carrier", carrier_profile_1.id, 2018).and_return([carrier_plan])
         end
 
-      it "returns carriers if they are available in the service area and offer plans for that coverage level" do
-        carrier_names = {}
-        multiple_carriers = {}
-        carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        multiple_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
-        multiple_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
-        expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
-        expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
-      end
+        it "returns carriers if they are available in the service area and offer plans for that coverage level" do
+          carrier_names = {}
+          multiple_carriers = {}
+          carrier_names[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[carrier_profile_1.id.to_s] = carrier_profile_1.legal_name
+          multiple_carriers[sole_source_participater.id.to_s] = sole_source_participater.legal_name
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'sole_source')).to match_array carrier_names
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2018, selected_carrier_level: 'sole_source')).to match_array multiple_carriers
+        end
 
-      it "returns no carriers if there are no matches" do
-        expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
-        expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+        it "returns no carriers if there are no matches" do
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'metal_level')).to match_array []
+          expect(Organization.load_carriers(primary_office_location: office_location, active_year: 2017, selected_carrier_level: 'single_plan')).to match_array []
+        end
       end
     end
 
