@@ -5,7 +5,7 @@ module Notifier
     include ActiveModel::Model
     include Notifier::MergeDataModels::TokenBuilder
 
-    attribute :notice_date, Date
+    attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
     attribute :mailing_address, MergeDataModels::Address

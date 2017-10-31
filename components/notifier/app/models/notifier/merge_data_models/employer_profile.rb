@@ -6,12 +6,12 @@ module Notifier
 
     DATE_ELEMENTS = %w(current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on)
 
-    attribute :notice_date, Date
+    attribute :notice_date, String
     attribute :first_name, String
     attribute :last_name, String
     # attribute :primary_identifier, String
     # attribute :mpi_indicator, String
-    attribute :application_date, Date
+    attribute :application_date, String
     attribute :employer_name, String
     attribute :mailing_address, MergeDataModels::Address
     attribute :broker, MergeDataModels::Broker
