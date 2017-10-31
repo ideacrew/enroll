@@ -929,8 +929,8 @@ describe EmployerProfile, "Renewal Queries" do
     let(:date) { TimeKeeper.date_of_record }
     let!(:low_organization)  {FactoryGirl.create(:organization, fein: "097936010")}
     let!(:low_employer_profile) { FactoryGirl.create(:employer_profile, organization: low_organization) }
-    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: date.next_month.beginning_of_month)}
-    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: date.next_month.beginning_of_month)}
+    let!(:low_plan_year1) { FactoryGirl.create(:plan_year, aasm_state: "enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
+    let!(:low_plan_year2) { FactoryGirl.create(:plan_year, aasm_state: "renewing_enrolling", employer_profile: low_employer_profile, :open_enrollment_end_on => date+2.days, start_on: (date+2.days).next_month.beginning_of_month)}
 
     it 'should return organizations elgible low enrollment notice' do
       expect(EmployerProfile.organizations_for_low_enrollment_notice(date).to_a).to eq [low_organization]
