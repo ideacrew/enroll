@@ -23,7 +23,7 @@ CKEDITOR.addTemplates( 'default', {
 "<p>Please contact your broker for further assistance. You can also contact the Health Connector with any questions:</p>" +
 "<ul>" +
 	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:​#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
 "</ul>" +
 "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
 "<p>[[ if employer_profile.broker_present? ]]</p>" +
@@ -71,7 +71,7 @@ CKEDITOR.addTemplates( 'default', {
 "<p>You can also contact the Health Connector with any questions:</p>" +
 "<ul>" +
 	"<li>By calling #{Settings.contact_center.phone_number}. TTY: #{Settings.contact_center.tty_number}</li>" +
-	"<li>By email: <a href='mailto:​#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
+	"<li>By email: <a href='mailto:#{Settings.contact_center.small_business_email}'>#{Settings.contact_center.small_business_email}</a></li>" +
 "</ul>" +
 "<p>You can also find more information on our website at <a href='http://​#{Settings.site.main_web_address}'>#{Settings.site.main_web_address}</a></p>" +
 "[[ if employee_profile.broker_present? ]]" +
