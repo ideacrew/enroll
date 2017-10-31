@@ -29,7 +29,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       aptc_reader.call
 
       @assisted_individuals = aptc_reader.assisted_individuals
-      puts "Found #{@assisted_individuals.keys.count} entries in Assisted sheet."
+      puts "Found #{@assisted_individuals.keys.count} entries in Assisted sheet." unless Rails.env.test?
 
       process_aqhp_renewals(renewal_benefit_coverage_period)
       process_uqhp_renewals(renewal_benefit_coverage_period)
@@ -100,7 +100,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         next if family.blank?
         next if family.active_household.blank?
 
-        puts "Processing #{person.full_name}(#{person.hbx_id})"
+        puts "Processing #{person.full_name}(#{person.hbx_id})" unless Rails.env.test?
 
         enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
         enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
