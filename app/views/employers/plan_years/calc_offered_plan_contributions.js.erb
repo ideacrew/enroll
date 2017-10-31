@@ -10,6 +10,8 @@ $("#<%= @location_id %> <%= @coverage_type %>.selected-plan .row:first").hide();
 $("#<%= @location_id %> .dental .reference-steps div:first").hide()
 $("#<%= @location_id %> <%= @coverage_type %> .col-md-12.top-pd").hide();
 $('.benefits-fields').css('pointer-events','');
+$('.composite-offerings').css('opacity','1');
+
 
 $(document).ready(function(){
   $("input#jq_datepicker_ignore_plan_year_open_enrollment_end_on").datepicker( "option", "maxDate", "<%= @plan_year.start_on.prev_day %>");
@@ -87,6 +89,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
       $('.benefits-fields').css('pointer-events','none');
+      $('.composite-offerings').css('opacity','0.5');
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
       var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
@@ -134,6 +137,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
   }
   $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
     $('.benefits-fields').css('pointer-events','none');
+    $('.composite-offerings').css('opacity','0.5');
     $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').hide();
     if ( '<%= @coverage_type %>' == '.dental' ) {
       $(this).closest('.select-dental-plan').find('.edit-offering').show();
