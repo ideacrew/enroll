@@ -5,14 +5,14 @@
   <div class="row">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
       <div class="col-xs-8">
-        <h1 class="darkblue">Choose Coverage for your Household</h1>
+        <h1 class="darkblue">l10n("insured.group_selection.new.choose_coverage_for_your_household")</h1>
         <h4>Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</h4>
         <div style="font-size :18px" font-weight:normal>
         <%if @effective_on_date.present? || @new_effective_on %>
-          Effective Date: <span style="color: red;"><%= @optional_effective_on || @effective_on_date || @new_effective_on %></span>
+          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= @optional_effective_on || @effective_on_date || @new_effective_on %></span>
         <%end%>
         </div>
-        <h3>Who Needs Coverage?</h3>
+        <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
           <%= hidden_field_tag(:person_id, @person.id) %>
           <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
           <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
@@ -49,7 +49,7 @@
 
           <% if can_shop_both_markets?(@person) %>
             <div id="market_kinds" class='row no-buffer'>
-                <h3>Marketplace</h3>
+                <h3><%= l10n("insured.group_selection.new.marketplace") %></h3>
               <span class="clear" style="display: il"></span>
 
               <div class="n-radio-group">
@@ -60,9 +60,9 @@
                       <span class="n-radio">
                       </span>
                       <% if kind=="shop" %>
-                      Employer-Sponsored Benefits
+                        <%= l10n("insured.group_selection.new.employee_sponsored_benifits") %>
                       <% else %>
-                      Individual Benefits
+                        <%= l10n("insured.group_selection.new.individual_benifits") %>
                       <% end %>
                     </label>
                   </div>
@@ -98,7 +98,7 @@
           <% end %>
 
           <div id="coverage_kinds" class='row no-buffer'>
-              <h3>Benefit Type</h3>
+              <h3><%= l10n("benefit_type") %></h3>
 
               <div class="n-radio-group">
                 <div class="n-radio-row">
@@ -106,7 +106,7 @@
                     <%= radio_button_tag 'coverage_kind', 'health', is_coverage_kind_checked?("health"), disabled: is_coverage_kind_disabled?("health"),id: 'coverage_kind_health', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
-                    Health
+                    <%= l10n(".health") %>
                   </label>
                 </div>
 
@@ -115,7 +115,7 @@
                     <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                     <span class="n-radio">
                     </span>
-                    Dental
+                    <%= l10n("dental") %>
                   </label>
                 </div>
               </div>
@@ -125,15 +125,15 @@
           <% if @change_plan.blank? && @enrollment_kind.blank?%>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </p>
-              <p>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></p>
+              <p><%= l10n(".coverage_begin_ivl_enrollment_effective_date", ivl_enrollment_effective_date: format_date(ivl_enrollment_effective_date)) %></p>
+              <p><%= l10n(".need_coverage_earlier_html") %></p>
             </div>
           </div>
           <% end %>
           <% if @show_residency_alert && !CuramUser.name_in_curam_list(@person.first_name, @person.last_name) %>
           <div class='row top-pd'>
             <div class="col-sm-12">
-              <p>Since <%= @person.full_name %> is not a resident of the <%= Settings.aca.state_name %> she/he is not eligible to purchase a plan through <%= Settings.site.short_name %>. Other members may still be eligible to enroll. Please call us at <%= Settings.contact_center.phone_number %> to learn about other health insurance options for <%= @person.full_name %>.</p>
+              <p><%= l10n(".show_residency_alert_msg", full_name: @person.full_name, aca_state_name: aca_state_name, site_short_name: site_short_name, contact_center_phone_number: contact_center_phone_number) %></p>
             </div>
           </div>
           <% end %>
@@ -143,13 +143,13 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
             <br/>
-            <h3>What would you like to do?</h3>
-            <%= submit_tag 'Shop for new plan', class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
+            <h3><%= l10n("insured.group_selection.new.what_would_you_like_to_do") %></h3>
+            <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg'+ pundit_class(Family, :updateable?) %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
-              <%= submit_tag 'Keep existing plan', class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
+              <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
 
-              <%= link_to 'Select Plan to Terminate', terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
-              class: ('btn btn-primary ' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
+              <%= link_to l10n('select_plan_to_terminate'), terminate_selection_insured_group_selections_path(person_id: @person.id, change_plan: @change_plan),
+              class: ('btn btn-primary' + pundit_class(Family, :updateable?)) if @hbx_enrollment.may_terminate_coverage? and @hbx_enrollment.effective_on <= TimeKeeper.date_of_record %>
             <% end %>
           <% else %>
             <!--<h3>Select a plan</h3>-->
@@ -157,7 +157,7 @@
           <% end %>
           <br/>
         <br/>
-          <%= link_to "Back to my account", family_account_path, class: 'btn btn-default btn btn-lg' %>
+          <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
         </div>
       <div class="col-xs-3 right-section pull-right">
           <% if @change_plan.blank?  && @market_kind == "individual" %>
