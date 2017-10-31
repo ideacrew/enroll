@@ -39,7 +39,7 @@
               <span class="my-portal-links">
                 <%= render partial: "shared/my_portal_links"%>
                 <span>
-                  <a href="https://dchealthlink.com/help" target="_blank" class="header-text"><%= l10n(".help") %></a>
+                  <%= link_to l10n(".help"), site_help_url, target: '_blank', class: 'header-text' %>
                 </span>
                 <span> | </span>
                 <span>

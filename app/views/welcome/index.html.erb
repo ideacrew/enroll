@@ -8,8 +8,8 @@
       <%= l10n('.welcome_to_site_name', short_name: Settings.site.short_name) %>
     </strong>
   </h1>
-  <h3 class="darkblue no-buffer">
-    <%= l10n('.byline') %>
+  <h3 class="no-buffer">
+    <%= "#{site_byline}" %>
   </h3>
   <br/>
   <% if user_signed_in? %>
