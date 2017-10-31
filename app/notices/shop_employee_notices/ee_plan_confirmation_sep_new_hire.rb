@@ -21,8 +21,8 @@ ShopEmployeeNotices::EePlanConfirmationSepNewHire < ShopEmployeeNotice
     notice.enrollment = PdfTemplates::Enrollment.new({
                                                          :effective_on => effective_on,
                                                          :plan => {:plan_name => new_hire.plan.name},
-                                                         :employee_cost => build_plan.total_employee_cost,
-                                                         :employer_cost => build_plan.total_employer_contribution
+                                                         :employee_cost => ('%.2f' % build_plan.total_employee_cost),
+                                                         :employer_cost => ('%.2f' % build_plan.total_employer_contribution)
                                                      })
     notice.employer_name = census_employee.employer_profile.legal_name
   end
