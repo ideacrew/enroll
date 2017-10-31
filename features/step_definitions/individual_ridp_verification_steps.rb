@@ -47,6 +47,10 @@ Then(/^visibly DISABLED$/) do
 end
 
 And(/^an uploaded application in REVIEW status is present$/) do
+  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  file_path = File.dirname(__FILE__)
+  allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
+  allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
   find('#upload_application').click
 	within '#upload_application' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
@@ -59,11 +63,14 @@ And(/^an uploaded application in REVIEW status is present$/) do
 end
 
 And(/^an uploaded identity verification in REVIEW status is present$/) do
+  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  file_path = File.dirname(__FILE__)
+  allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
+  allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
 	find('#upload_identity').click
 	find('#select_upload_identity').click
 	within '#select_upload_identity' do
 		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
-
   end
   wait_for_ajax(2)
 	expect(page).to have_content('File Saved')
