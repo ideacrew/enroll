@@ -227,7 +227,6 @@ module VerificationHelper
     end
   end
 
-<<<<<<< HEAD
   def build_reject_reason_list(v_type)
     case v_type
       when "Citizenship"
@@ -238,13 +237,14 @@ module VerificationHelper
         ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
       else
         ::VlpDocument::ALL_TYPES_REJECT_REASONS
-=======
+    end
+  end
+
   def build_ridp_admin_actions_list(ridp_type, person)
     if ridp_type_status(ridp_type, person) == 'outstanding'
       ::RidpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == 'Reject'}
     else
       ::RidpDocument::ADMIN_VERIFICATION_ACTIONS
->>>>>>> origin/app-dev-feature-18843
     end
   end
 
