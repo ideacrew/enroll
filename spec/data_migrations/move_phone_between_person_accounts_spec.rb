@@ -16,7 +16,7 @@ describe MovePhoneBetweenPersonAccounts do
     before(:each) do
       allow(ENV).to receive(:[]).with("from_hbx_id").and_return(person1.hbx_id)
       allow(ENV).to receive(:[]).with("to_hbx_id").and_return(person2.hbx_id)
-      allow(ENV).to receive(:[]).with("phone_id").and_return(phone.id)
+      allow(ENV).to receive(:[]).with("phone_id").and_return(phone.id.to_s)
     end
     it "should move user from person1 to person2" do
       phone_1=person1.phones.size
