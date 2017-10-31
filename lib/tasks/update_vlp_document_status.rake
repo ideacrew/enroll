@@ -18,7 +18,7 @@ namespace :families do
           	processed_count += 1
           end	
         rescue => e
-          puts "Failed to update vlp document status for family #{fam.inspect}"
+          puts "Failed to update vlp document status for family #{fam.inspect}" + e.message
         end
       end
       offset_count += limit_count
