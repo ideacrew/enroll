@@ -849,7 +849,6 @@ shop_notice_triggers = [
       }
     ]
   },
-]
 
   {
     hbx_id: 'DIG063',
