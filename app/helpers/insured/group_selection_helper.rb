@@ -28,15 +28,15 @@ module Insured
       end
     end
 
-    def calculate_effective_on(market_kind:, employee_role:, benefit_group:, effective_on_option_selected:)
+    def calculate_effective_on(market_kind:, employee_role:, benefit_group:)
       HbxEnrollment.calculate_effective_on_from(
         market_kind: market_kind,
         qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
         family: @family,
         employee_role: employee_role,
         benefit_group: benefit_group,
-        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship),
-        effective_on_option_selected: effective_on_option_selected)
+        benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+        )
     end
 
     def select_market(person, params)
@@ -219,7 +219,7 @@ module Insured
       health_offered_relationship_benefits, dental_offered_relationship_benefits = shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
 
       is_health_coverage = coverage_relationship_check(health_offered_relationship_benefits, family_member, @new_effective_on)
-      is_health_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_health_coverage && @coverage_family_members_for_cobra.present?      
+      is_health_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_health_coverage && @coverage_family_members_for_cobra.present?
 
       is_dental_coverage = coverage_relationship_check(dental_offered_relationship_benefits, family_member, @new_effective_on)
       is_dental_coverage = @coverage_family_members_for_cobra.include?(family_member) if is_dental_coverage && @coverage_family_members_for_cobra.present?
@@ -228,10 +228,10 @@ module Insured
     end
 
     def shop_health_and_dental_relationship_benfits(employee_role, benefit_group)
-      health_offered_relationship_benefits = health_relationship_benefits(benefit_group) 
+      health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
 
-      if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment) 
-        dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group) 
+      if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
+        dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
       end
 
       return health_offered_relationship_benefits, dental_offered_relationship_benefits

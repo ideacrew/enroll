@@ -243,7 +243,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
-    effective_on_option_selected = session[:effective_on_option_selected].present? ? session[:effective_on_option_selected] : nil
 
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
@@ -256,9 +255,9 @@ class Insured::PlanShoppingsController < ApplicationController
         @benefit_group = @hbx_enrollment.benefit_group
         @plans = @benefit_group.decorated_elected_plans(@hbx_enrollment, @coverage_kind)
       elsif @hbx_enrollment.is_coverall?
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected, @market_kind)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, @market_kind)
       else
-        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind, effective_on_option_selected)
+        @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       end
 
       build_same_plan_premiums
