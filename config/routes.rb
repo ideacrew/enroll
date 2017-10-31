@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
 
-  mount TransportGateway::Engine, at: "/transport_gateway"
-  mount TransportProfiles::Engine, at: "/transport_profiles"
+  mount TransportGateway::Engine,       at: "/transport_gateway"
+  mount TransportProfiles::Engine,      at: "/transport_profiles"
+  mount SponsoredApplications::Engine,  at: "/sponsored_applications"
 
   require 'resque/server'
   # mount Resque::Server, at: '/jobs'
