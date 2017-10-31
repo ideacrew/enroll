@@ -43,7 +43,7 @@
         </div>
         <% else %>
         <div class="enrollment-effective info vertical-align-top">
-          <strong><%= l10n("effective_date") %>:
+          <strong><%= l10n("plan_start") %>:
           </strong>
           <%= hbx_enrollment.effective_on %>
           <% if read_only == true %>
@@ -88,17 +88,6 @@
           <%= @census_employee.employee_role.try(:hired_on) %></p>
       </div>
       <% end %>
-    </div>
-    <div class="col-xs-12 vertically-aligned-row">
-      <div class="plan-end info vertical-align-top">
-        <strong class="text-danger"><%= l10n("plan_end") %>:
-        </strong>
-        <% if @census_employee.show_plan_end_date? %>
-          <span class="text-danger">
-            <%= @census_employee.coverage_terminated_on.end_of_month %>
-          </span>
-        <% end %>
-      </div>
     </div>
     <% if hbx_enrollment.is_coverage_waived? %>
     <div class="col-xs-12 vertically-aligned-row">
@@ -188,7 +177,7 @@
     <div>
       <a class="vertically-aligned-row" data-target="#<%= plan.coverage_kind %>-<%= plan.id %>" data-toggle="modal">
         <i class="fa fa-phone fa-2x pull-right"></i>
-        <span><%= l10n(".plan_contact_info") %></span>
+        <span><%= l10n(".carrier_contact_info") %></span>
       </a>
       <%= render partial: "shared/carrier_contact_information", locals: { plan: plan } unless plan.carrier_profile.blank? %>
     </div>
@@ -212,4 +201,3 @@
 </div>
 </div>
 <% end %>
-
