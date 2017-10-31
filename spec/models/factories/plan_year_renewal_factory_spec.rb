@@ -3,13 +3,17 @@ require 'rails_helper'
 RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_each do
 
   let(:calendar_year) { TimeKeeper.date_of_record.year }
-  let(:date_of_record_to_use) { Date.new(calendar_year, 2, 1)}
+  let(:date_of_record_to_use) { Date.new(calendar_year, 2, Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month + 1) }
+  let(:start_on) { (date_of_record_to_use + 2.month).beginning_of_month - 1.year }
+  let(:end_on) { start_on + 1.year - 1.day }
+  let(:open_enrollment_start_on) { start_on - 1.month + Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days }
+  let(:open_enrollment_end_on) { start_on - 1.day }
 
   let(:organization) {
     org = FactoryGirl.create :organization, legal_name: "Corp 1"
     employer_profile = FactoryGirl.create :employer_profile, organization: org
-    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => Date.new(calendar_year - 1, 5, 1), :end_on => Date.new(calendar_year, 4, 30),
-    :open_enrollment_start_on => Date.new(calendar_year - 1, 4, 1), :open_enrollment_end_on => Date.new(calendar_year - 1, 4, 10), fte_count: 5
+    active_plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, aasm_state: :active, :start_on => start_on, :end_on => end_on,
+    :open_enrollment_start_on => open_enrollment_start_on, :open_enrollment_end_on => open_enrollment_end_on, fte_count: 5
     benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: active_plan_year
     owner = FactoryGirl.create :census_employee, :owner, employer_profile: employer_profile
     2.times{|i| FactoryGirl.create :census_employee, employer_profile: employer_profile, dob: TimeKeeper.date_of_record - 30.years + i.days }
