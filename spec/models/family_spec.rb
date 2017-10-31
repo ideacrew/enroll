@@ -443,6 +443,45 @@ describe Family do
     end
   end
 
+  context "contingent_enrolled_family_members_due_dates" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family_member) { FactoryGirl.build_stubbed(:family_member) }
+    before do 
+      allow(family).to receive(:contingent_enrolled_active_family_members).and_return([family.primary_family_member,family_member])
+    end
+    it "should return uniq family members duedate" do
+      allow(family).to receive(:document_due_date).and_return(TimeKeeper.date_of_record)
+      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
+    end
+    it "should return sorted due dates" do 
+      allow(family).to receive(:document_due_date).with(family.primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
+      allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
+      expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
+    end
+  end
+
+  context "best_verification_due_date" do 
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    
+    it "should earliest duedate when family had two or more due dates" do
+      family_due_dates = [TimeKeeper.date_of_record+40 , TimeKeeper.date_of_record+ 80]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 40
+    end
+
+    it "should return only possible due date when we only have one due date even if it passed or less than 30days" do
+      family_due_dates = [TimeKeeper.date_of_record+20]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 20
+    end
+
+    it "should return next possible due date when the first due date is passed or less than 30days" do
+      family_due_dates = [TimeKeeper.date_of_record+20 , TimeKeeper.date_of_record+ 80]
+      allow(family).to receive(:contingent_enrolled_family_members_due_dates).and_return(family_due_dates)
+      expect(family.best_verification_due_date).to eq TimeKeeper.date_of_record + 80
+    end
+  end
+
   context "terminate_date_for_shop_by_enrollment" do
     it "without latest_shop_sep" do
       expect(family.terminate_date_for_shop_by_enrollment).to eq TimeKeeper.date_of_record.end_of_month

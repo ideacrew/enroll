@@ -7,21 +7,63 @@ class IvlNotices::ConsumerNotice < IvlNotice
     args[:market_kind] = 'individual'
     args[:recipient_document_store]= consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
-    self.header = "notices/shared/header_with_page_numbers.html.erb"
+    self.header = "notices/shared/header_ivl.html.erb"
     super(args)
   end
 
+  def deliver
+    build
+    generate_pdf_notice
+    attach_blank_page(notice_path)
+    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_appeals
+    attach_non_discrimination
+    attach_taglines
+    upload_and_send_secure_message
+
+    if recipient.consumer_role.can_receive_electronic_communication?
+      send_generic_notice_alert
+    end
+
+    if recipient.consumer_role.can_receive_paper_communication?
+      store_paper_notice
+    end
+  end
+
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
+  end
+
   def build
-    family = recipient.primary_family    
+    notice.mpi_indicator = self.mpi_indicator
+    notice.notification_type = self.event_name
     notice.primary_fullname = recipient.full_name.titleize || ""
+    notice.first_name = recipient.first_name
+    notice.primary_identifier = recipient.hbx_id
+    append_hbe
+    append_unverified_family_members
+
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else  
-      # @notice.primary_address = nil
-      raise 'mailing address not present' 
+      raise 'mailing address not present'
     end
+  end
 
-    append_unverified_family_members
+  def notice_subject
+    notice.notice_subject =  case notice.notification_type
+    when "first_verifications_reminder"
+      "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")}"
+    when "second_verifications_reminder"
+      "DON’T FORGET – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    when "third_verifications_reminder"
+      "DON’T MISS THE DEADLINE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    when "fourth_verifications_reminder"
+      "FINAL NOTICE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    end
   end
 
   def append_unverified_family_members
@@ -33,25 +75,20 @@ class IvlNotices::ConsumerNotice < IvlNotice
           hbx_en.terminated_on >= TimeKeeper.date_of_record
         )
     end
-
     enrollments.reject!{|e| e.coverage_terminated? }
-    # enrollments.reject!{|e| e.effective_on.year != TimeKeeper.date_of_record.year }
-
     if enrollments.empty?
       raise 'enrollments not found!'
     end
-  
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
-
     people = family_members.map(&:person).uniq
     people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
     people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
     if people.empty?
       raise 'no family member found with outstanding verification'
     end
-
+    
     outstanding_people = []
     people.each do |person|
       if person.consumer_role.outstanding_verification_types.present?
@@ -64,12 +101,34 @@ class IvlNotices::ConsumerNotice < IvlNotice
       raise 'no family member found without uploaded documents'
     end
 
-    # enrollments.each {|e| e.update_attributes(special_verification_period: Date.today + 95.days)}
-    # family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+    hbx_enrollments = []
+    en = enrollments.select{ |en| en.enrolled_contingent?}
+    health_enrollment = en.select{ |e| e.coverage_kind == "health"}.sort_by(&:created_at).last
+    dental_enrollment = en.select{ |e| e.coverage_kind == "dental"}.sort_by(&:created_at).last
+    hbx_enrollments << health_enrollment
+    hbx_enrollments << dental_enrollment
+    hbx_enrollments.compact!
 
+    hbx_enrollments.each do |enrollment|
+      notice.enrollments << build_enrollment(enrollment)
+    end
+
+    notice.documents_needed = outstanding_people.present? ? true : false
+    notice.due_date = family.min_verification_due_date
+    notice.application_date = hbx_enrollments.sort_by(&:created_at).last.created_at.to_date
     append_unverified_individuals(outstanding_people)
-    notice.enrollments << (enrollments.detect{|e| e.enrolled_contingent?} || enrollments.first)
-    notice.due_date = enrollments.first.special_verification_period.strftime("%m/%d/%Y")
+  end
+
+   def build_enrollment(hbx_enrollment)
+    PdfTemplates::Enrollment.new({
+      plan_name: hbx_enrollment.plan.name ,
+      premium: hbx_enrollment.total_premium,
+      phone: hbx_enrollment.phone_number,
+      coverage_kind: hbx_enrollment.coverage_kind,
+      effective_on: hbx_enrollment.effective_on,
+      selected_on: hbx_enrollment.created_at,
+      is_receiving_assistance: (hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.plan.is_csr?) ? true : false
+    })
   end
 
   def ssn_outstanding?(person)
@@ -83,11 +142,11 @@ class IvlNotices::ConsumerNotice < IvlNotice
   def append_unverified_individuals(people)
     people.each do |person|
       if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
+        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
 
       if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize })
+        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
       end
     end
   end
@@ -100,6 +159,15 @@ class IvlNotices::ConsumerNotice < IvlNotice
       state: primary_address.state,
       zip: primary_address.zip
       })
+  end
+
+  def append_hbe
+    notice.hbe = PdfTemplates::Hbe.new({
+      url: Settings.site.home_url,
+      phone: phone_number_format(Settings.contact_center.phone_number),
+      email: Settings.contact_center.email_address,
+      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
+    })
   end
 
   def capitalize_quadrant(address_line)

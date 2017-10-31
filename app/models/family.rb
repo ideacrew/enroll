@@ -976,7 +976,14 @@ class Family
     end
   end
 
-  def min_verification_due_date_on_family
+  def best_verification_due_date
+    due_date = contingent_enrolled_family_members_due_dates.detect do |date|
+      date > TimeKeeper.date_of_record && (date.to_date.mjd - TimeKeeper.date_of_record.mjd) >= 30
+    end
+    due_date || contingent_enrolled_family_members_due_dates.last
+  end
+
+  def contingent_enrolled_family_members_due_dates
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.each do |v_type|
@@ -984,7 +991,11 @@ class Family
       end
     end
     due_dates.compact!
-    due_dates.min.to_date if due_dates.present?
+    due_dates.uniq.sort
+  end
+
+  def min_verification_due_date_on_family
+    contingent_enrolled_family_members_due_dates.min.to_date if contingent_enrolled_family_members_due_dates.present?
   end
 
   def contingent_enrolled_active_family_members

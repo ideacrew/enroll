@@ -17,7 +17,7 @@ module PdfTemplates
     attribute :ivl_open_enrollment_end_on, Date
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :enrollments, Array[PdfTemplates::Enrollment]
-    attribute :individuals, Array[PdfTemplates::Individual]
+    attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
     attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
@@ -27,11 +27,14 @@ module PdfTemplates
     attribute :mec_conflict, Array[PdfTemplates::Individual]
     attribute :tax_households, Array[PdfTemplates::TaxHousehold]
     attribute :first_name, String
-    attribute :last_name, String
+    attribute :notice_subject, String
     attribute :due_date, Date
+    attribute :application_date, Date
+    attribute :last_name, String
     attribute :documents_needed, Boolean
     attribute :eligibility_determinations, Array[PdfTemplates::EligibilityDetermination]
     attribute :coverage_year, String
+
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }
