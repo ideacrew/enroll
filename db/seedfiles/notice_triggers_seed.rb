@@ -581,7 +581,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP_D020',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
