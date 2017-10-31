@@ -24,8 +24,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
             expect(model_event).to have_attributes(:event_key => :ineligible_renewal_application_submitted, :klass_instance => model_instance, :options => {})
           end
         end
-        model_instance.publish
-        model_instance.save
+        model_instance.publish!
       end
     end
   end
