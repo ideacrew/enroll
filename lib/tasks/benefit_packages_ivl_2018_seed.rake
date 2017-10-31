@@ -33,7 +33,6 @@ namespace :import do
       bs.save
     end
 
-
     # bc_period_2018 = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == 2018 }.first
     # bc_period_2018.second_lowest_cost_silver_plan = slcsp_2018
 
