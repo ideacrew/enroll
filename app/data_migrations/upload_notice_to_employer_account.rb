@@ -7,14 +7,14 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     raise "Please enter the notice title" if ENV['notice_name'].blank?
     raise "Please specify file path" if ENV['file_path'].blank?
 
-    notice_path = "#{Rails.root}/#{ENV['file_path']}"
+    notice_path = "#{ENV['file_path']}"
     notice_subject = ENV['notice_name'].titleize
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
-    organization = Organization.where(fein: ENV['fein']).first
+    employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
 
-    if organization && organization.employer_profile.present?
-      upload_and_send_secure_message(organization.employer_profile, notice_path, notice_title, notice_subject)
+    if employer_profile.present?
+      upload_and_send_secure_message(employer_profile, notice_path, notice_title, notice_subject)
     else
       puts "No employer account found with the given FEIN - #{ENV['fein']}" unless Rails.env.test?
     end
