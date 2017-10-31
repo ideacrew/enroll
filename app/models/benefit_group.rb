@@ -359,7 +359,7 @@ class BenefitGroup
       build_composite_tier_contributions
       estimate_composite_rates
     end
-    targeted_census_employees.active.collect do |ce|
+    targeted_census_employees_participation.collect do |ce|
       if plan_option_kind == 'sole_source'
         pcd = CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce))
       else
@@ -375,7 +375,7 @@ class BenefitGroup
 
   def monthly_min_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
-    targeted_census_employees.active.collect do |ce|
+    targeted_census_employees_participation.collect do |ce|
       if plan_option_kind == 'sole_source'
         pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
       else
@@ -391,7 +391,7 @@ class BenefitGroup
 
   def monthly_max_employee_cost(coverage_kind = nil)
     return 0 if targeted_census_employees.count > 100
-    targeted_census_employees.active.collect do |ce|
+    targeted_census_employees_participation.collect do |ce|
       if plan_option_kind == 'sole_source'
         pcd = CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce))
       else
@@ -540,14 +540,18 @@ class BenefitGroup
     EmployerParticipationRateRatingFactorSet.value_for(carrier_id, year, participation_rate * 100.0)
   end
 
+  def targeted_census_employees_participation
+    targeted_census_employees.select{|ce| ce.is_included_in_participation_rate?}
+  end
+
   def participation_rate
-    total_employees = targeted_census_employees.count
+    total_employees = targeted_census_employees_participation.count
     return(0.0) if total_employees < 1
     waived_and_active_count = if plan_year.estimate_group_size?
-                                targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
-                              else
-                                all_active_and_waived_health_enrollments.length
-                              end
+                          targeted_census_employees_participation.select{|ce| ce.expected_to_enroll_or_valid_waive?}.length
+                        else
+                          all_active_and_waived_health_enrollments.length
+                        end
     waived_and_active_count/(total_employees * 1.0)
   end
 
@@ -602,7 +606,7 @@ class BenefitGroup
   # year status
   def group_size_count
     if plan_year.estimate_group_size?
-      targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
+      targeted_census_employees_participation.select { |ce| ce.expected_to_enroll? }.length
     else
       all_active_health_enrollments.length
     end
@@ -610,7 +614,7 @@ class BenefitGroup
 
   def composite_rating_enrollment_objects
     if plan_year.estimate_group_size?
-      targeted_census_employees.select { |ce| ce.expected_to_enroll? }
+      targeted_census_employees_participation.select { |ce| ce.expected_to_enroll? }
     else
       all_active_health_enrollments
     end

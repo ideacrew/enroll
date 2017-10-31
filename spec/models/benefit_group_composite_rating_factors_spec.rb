@@ -55,9 +55,9 @@ describe BenefitGroup, "for a plan year which should estimate the group size" do
 
   let(:census_employees) do
     [
-      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile),
-      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile),
-      instance_double(CensusEmployee, :expected_to_enroll? => false, employer_profile: employer_profile)
+      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile, :is_included_in_participation_rate? => true),
+      instance_double(CensusEmployee, :expected_to_enroll? => true, employer_profile: employer_profile, :is_included_in_participation_rate? => true),
+      instance_double(CensusEmployee, :expected_to_enroll? => false, employer_profile: employer_profile, :is_included_in_participation_rate? => false)
     ]
   end
 
@@ -106,6 +106,7 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
   let(:enrollment_2) { instance_double(HbxEnrollment, :dental? => true) }
   let(:enrollment_3) { instance_double(HbxEnrollment, :dental? => false) }
   let(:employer_profile) { build(:employer_profile) }
+  let(:ces){ double("CensusEmployees") }
 
   let(:census_employees) do
     [
@@ -119,7 +120,8 @@ describe BenefitGroup, "being asked for a composite rating participation rate fa
 
   before :each do
     allow(plan_year).to receive(:estimate_group_size?).and_return(plan_year_should_estimate)
-    allow(employer_profile).to receive(:census_employees).and_return(census_employees)
+    allow(employer_profile).to receive(:census_employees).and_return(ces)
+    allow(ces).to receive(:select).and_return(census_employees)
   end
 
   describe "for a plan year which should estimate the group size" do
