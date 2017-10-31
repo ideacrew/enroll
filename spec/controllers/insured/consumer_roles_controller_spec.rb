@@ -241,7 +241,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryBot.create(:person) }
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
     "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
