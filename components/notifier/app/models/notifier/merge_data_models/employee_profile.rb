@@ -16,7 +16,7 @@ module Notifier
     attribute :new_hire_oe_start_date, String
     attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]
-    attribute :enrollment, MergeDataModels::Plan
+    attribute :enrollment, MergeDataModels::Enrollment
     attribute :plan_year, MergeDataModels::PlanYear
   
     def self.stubbed_object

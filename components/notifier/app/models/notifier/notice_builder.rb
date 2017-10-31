@@ -8,9 +8,9 @@ module Notifier
     end
 
     def notice_recipient
+      return OpenStruct.new(hbx_id: "100009") if resource.blank?
       resource.is_a?(EmployeeRole) ? resource.person : resource
     end
-
 
     def construct_notice_object
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
