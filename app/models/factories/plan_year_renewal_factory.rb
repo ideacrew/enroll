@@ -147,8 +147,17 @@ module Factories
         is_congress: active_group.is_congress
       }
 
-      benefit_group_attrs.merge!({composite_tier_contributions: active_group.composite_tier_contributions}) if active_group.sole_source?
-      @renewal_plan_year.benefit_groups.build(benefit_group_attrs)
+      benefit_group = @renewal_plan_year.benefit_groups.build(benefit_group_attrs)
+      if active_group.sole_source?
+
+        active_group.composite_tier_contributions.each do |composite_tier|
+          tier_attrs = composite_tier.attributes.symbolize_keys.except(:_id, :final_tier_premium)
+          benefit_group.composite_tier_contributions.build(tier_attrs)
+        end
+
+        benefit_group.build_estimated_composite_rates
+      end
+      benefit_group
     end
 
     def renew_census_employees(active_group, new_group)
