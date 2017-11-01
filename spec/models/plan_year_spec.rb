@@ -1136,7 +1136,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and today is the day following close of open enrollment" do
-          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile) }
+          let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
           before do
             TimeKeeper.set_date_of_record(workflow_plan_year_with_benefit_group.open_enrollment_end_on + 1.day)
           end
