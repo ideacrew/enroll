@@ -336,8 +336,7 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     ssn: person[:ssn],
     dob: person[:dob_date]
 
-  earliest_enrollment_available = TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days
-  TimeKeeper.set_date_of_record_unprotected!(earliest_enrollment_available)
+  earliest_enrollment_available = TimeKeeper.date_of_record.next_month.beginning_of_month
 
   open_enrollment_start_on = earliest_enrollment_available + 1.day
   open_enrollment_end_on = open_enrollment_start_on + 12.days
