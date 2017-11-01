@@ -32,7 +32,6 @@ module Factories
       @plan_year_start_on  = renewing_plan_year.start_on
       prev_plan_year_start = @plan_year_start_on - 1.year
       prev_plan_year_end   = @plan_year_start_on - 1.day
-
       shop_enrollments.reject!{|enrollment| !(prev_plan_year_start..prev_plan_year_end).cover?(enrollment.effective_on) }
       shop_enrollments.reject!{|enrollment| enrollment.coverage_termination_pending? }
       begin
@@ -53,7 +52,7 @@ module Factories
               renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
               renewal_enrollment.decorated_hbx_enrollment
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
-              census_employee.trigger_model_event(:renewal_oe_employee_auto_renewal, {event_object: renewing_plan_year}) renewal_enrollment.coverage_kind == "dental" || disable_notifications
+              census_employee.trigger_model_event(:renewal_oe_employee_auto_renewal, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
             else
               census_employee.trigger_model_event(:renewal_oe_employee_no_auto_renewal, {event_object: renewing_plan_year}) unless disable_notifications
             end

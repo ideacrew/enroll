@@ -63,7 +63,7 @@ module Observers
       end
     end
 
-    def census_employee_update
+    def census_employee_update(new_model_event)
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent) 
 
       if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)  
