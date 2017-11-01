@@ -1,18 +1,18 @@
 namespace :load_rating_factors do
   desc "load rating factors from xlsx file"
   task :update_factor_sets, [:file_name] => :environment do |t,args|
-    CURRENT_ACTIVE_YEAR = 2017
-    NUMBER_OF_CARRIERS = 4
-    ROW_DATA_BEGINS_ON = 3
-    RATING_FACTOR_PAGES = {
+    CURRENT_ACTIVE_YEAR ||= TimeKeeper.date_of_record.year
+    NUMBER_OF_CARRIERS ||= 4
+    ROW_DATA_BEGINS_ON ||= 3
+    RATING_FACTOR_PAGES ||= {
       'SicCodeRatingFactorSet': { page: 0, max_integer_factor_key: nil },
       'EmployerGroupSizeRatingFactorSet': { page: 1, max_integer_factor_key: 50 },
       'EmployerParticipationRateRatingFactorSet': { page: 2, max_integer_factor_key: nil },
       'CompositeRatingTierFactorSet': { page: 3, max_integer_factor_key: nil }
     }
-    RATING_FACTOR_DEFAULT = 1.0
+    RATING_FACTOR_DEFAULT ||= 1.0
 
-    COMPOSITE_TIER_TRANSLATIONS = {
+    COMPOSITE_TIER_TRANSLATIONS ||= {
       'Employee': 'employee_only',
       'Employee + Spouse': 'employee_and_spouse',
       'Employee + Dependent(s)': 'employee_and_one_or_more_dependents',
