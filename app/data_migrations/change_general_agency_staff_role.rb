@@ -17,7 +17,7 @@ class ChangeGeneralAgencyStaffRole < MongoidMigrationTask
             general_agency_profile_id: gen_staff_role.general_agency_profile_id,
             aasm_state: gen_staff_role.aasm_state)
           correct_person.save!
-          Invitation.invite_general_agency_staff!(correct_person.general_agency_staff_roles)
+          Invitation.invite_general_agency_staff!(correct_person.general_agency_staff_roles.first)
           puts "Correct Person is Assigned the GA Staff Role" unless Rails.env.test?
           incorrect_person.general_agency_staff_roles.first.destroy!
           incorrect_person.save!
