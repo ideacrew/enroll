@@ -10,7 +10,12 @@ RSpec.shared_examples "a rate factor" do |attributes|
 end
 
 RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each  do
-
+  before do
+    SicCodeRatingFactorSet.destroy_all
+    EmployerGroupSizeRatingFactorSet.destroy_all
+    EmployerParticipationRateRatingFactorSet.destroy_all
+    CompositeRatingTierFactorSet.destroy_all
+  end
   context "rate_reference:load_rating_factors" do
     before :each do
       ['82569','88806','34484','73331'].each do |hios_id|
