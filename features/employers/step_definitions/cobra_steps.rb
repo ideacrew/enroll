@@ -249,9 +249,10 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
-  element.find('i.fa-trash-o').click
+  element = all('tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  element.find(".dropdown-toggle", :text => "Actions").click
+  wait_for_ajax
+  element.find('a', :text => "Terminate").click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
   # Once employee termination is complete, this actually refreshes the page (!)
