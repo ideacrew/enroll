@@ -77,10 +77,22 @@ if missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  # puts "Processing Plan Mapping ..."
-  # system "bundle exec rake xml:plan_cross_walk"
-  # puts "Processing Plan Mapping completed"
-  # puts "*"*80
+  puts "Loading super group ids ..."
+  system "bundle exec rake supergroup:update_plan_id"
+  puts "Loading super group ids complete"
+  puts "*"*80
+
+  puts "Processing Plan Mapping ..."
+  system "bundle exec rake xml:plan_cross_walk"
+  puts "Processing Plan Mapping completed"
+  puts "*"*80
+
+  puts "Marking plans as standard, updating provider and rx formulary url, updating network information... "
+  system "bundle exec rake import:common_data_from_master_xml"
+  puts "completed"
+  puts "*"*80
+
+
   # puts "Marking plans as standard ..."
   # system "bundle exec rake xml:standard_plans"
   # puts "Marking plans as standard completed"
