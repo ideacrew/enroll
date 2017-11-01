@@ -124,7 +124,6 @@
           <% if @market_kind == 'individual' && is_under_open_enrollment? %>
             <div class='row top-pd'>
               <div class="col-sm-12">
-                <h4>If you enroll today, coverage will begin <%= format_date ivl_enrollment_effective_date %>. </h4>
                 <h4>Do you need coverage earlier? See if you qualify for a <%= link_to "Special Enrollment Period", "#", :id => 'find_sep_link' %></h4>
               </div>
             </div>
