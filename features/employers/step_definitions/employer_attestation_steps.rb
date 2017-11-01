@@ -135,7 +135,7 @@ end
 def enter_plan_year_info
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 5).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.months).year}')]", :wait => 5).click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click
