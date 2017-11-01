@@ -85,6 +85,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
 
   } else {
     $("#<%= @location_id %> .health .health .change-dental-reference-plan").on('click', function() {
+      $('.benefits-fields').css('pointer-events','none');
       $(this).closest('.selected-plan').hide();
       $(this).closest('#<%= @location_id %>').find('.reference-steps:first').show();
       var position = $(this).closest('#<%= @location_id %>').find('.reference-steps:first').offset().top;
@@ -101,6 +102,7 @@ if (window.location.href.indexOf("edit") > -1 && window.location.href.indexOf("p
 
   }
   $('#<%= @location_id %> <%= @coverage_type %> .dental-config-reference-selection').on('click', function() {
+    $('.benefits-fields').css('pointer-events','none');
     $('#<%= @location_id %> <%= @coverage_type %>.selected-plan').hide();
     if ( '<%= @coverage_type %>' == '.dental' ) {
       $(this).closest('.select-dental-plan').find('.edit-offering').show();

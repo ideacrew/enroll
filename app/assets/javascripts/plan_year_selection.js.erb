@@ -195,11 +195,14 @@ ready = function() {
         if (plan_option_kind === 'sole_source') {
           premium_pcts.push(premium_pcts[premium_pcts.length - 1]);
           premium_pcts.push(premium_pcts[premium_pcts.length - 1]);
+          is_offered.push(is_offered[is_offered.length - 1]);
+          is_offered.push(is_offered[is_offered.length - 1]);
 
           composite_rating_tier_types.forEach(function(compositeTierType, index, composite_tier_types) {
             relation_benefits[index] = {
               "composite_rating_tier": compositeTierType,
-              "employer_contribution_percent": premium_pcts[index]
+              "employer_contribution_percent": premium_pcts[index],
+              "offered": is_offered[index]
             }
           });
         } else {
@@ -623,7 +626,6 @@ function calcEmployerContributions(url, location, coverage_type) {
 
   var composite_rating_tier_types = [ 'employee_only', 'family', 'employee_and_spouse', 'employee_and_one_or_more_dependents']
   var relationship_benefit_types = [ 'employee', 'spouse', 'domestic_partner', 'child_under_26', 'child_26_and_over']
-
   relation_benefits = {};
 
   if (plan_option_kind === 'sole_source') {
