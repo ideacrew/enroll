@@ -70,9 +70,11 @@ RSpec.describe ShopEmployerNotices::InitialEmployerIneligibilityNotice do
      expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_ineligibility_notice"
     end
  
-     it "should generate pdf" do
-       @employer_notice.build
-       expect(File.exist?(@employer_notice.notice_path)).to be true
+    it "should generate pdf" do
+      @employer_notice.build
+      @employer_notice.append_data
+      @employer_notice.generate_pdf_notice
+      expect(File.exist?(@employer_notice.notice_path)).to be true
     end
   end
 
