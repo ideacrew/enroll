@@ -44,7 +44,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     if notice.save
       notice
     else
-      Rails.logger.info {"Unable to save #{notice_title} notice to #{employer_profile.legal_name}'s account"}
+      raise "Unable to save #{notice_title} notice to #{employer_profile.legal_name}'s account"
     end
   end
 
