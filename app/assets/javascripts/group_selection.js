@@ -191,7 +191,7 @@ function setDentalBenefits(dental_benefits){
 $(function(){
   if ( $("#find_sep_link").length ) {
     $("#find_sep_link").click(function() {
-      $(this).closest('form').attr('action', '<%= find_sep_insured_families_path %>');
+      $(this).closest('form').attr('action', '/insured/families/find_sep');
       $(this).closest('form').attr('method', 'get');
       $(this).closest('form').submit();
     });
