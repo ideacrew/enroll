@@ -4,11 +4,27 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
 
   let(:model_event)  { "ineligible_renewal_application_submitted" }
   let(:notice_event) { "ineligible_renewal_application_submitted" }
-  let(:start_on) { (TimeKeeper.date_of_record + 3.months).beginning_of_month }
 
-  let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
-  let(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_draft', benefit_groups: [benefit_group]) }
-  let(:benefit_group) { FactoryGirl.create(:benefit_group) }
+  let(:start_on) { (TimeKeeper.date_of_record + 1.months).beginning_of_month }
+
+  let!(:employer) {
+    FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_on, renewal_plan_year_state: 'renewing_draft')
+  }
+
+  let(:model_instance) { employer.renewing_plan_year }
+
+  let!(:renewing_employees) {
+    employees = FactoryGirl.create_list(:census_employee_with_active_and_renewal_assignment, 5, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: employer,
+      benefit_group: employer.active_plan_year.benefit_groups.first,
+      renewal_benefit_group: model_instance.benefit_groups.first,
+      created_at: TimeKeeper.date_of_record.prev_year)
+
+    employees.each do |ce|
+      person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+      employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer)
+      ce.update_attributes({employee_role: employee_role})
+    end    
+  }
 
   describe "ModelEvent" do
     before :each do
@@ -24,6 +40,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
             expect(model_event).to have_attributes(:event_key => :ineligible_renewal_application_submitted, :klass_instance => model_instance, :options => {})
           end
         end
+
         model_instance.publish!
       end
     end
@@ -45,6 +62,15 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
           expect(payload[:employer_id]).to eq employer.hbx_id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
+        end
+
+        employer.census_employees.non_terminated.each do |ce|
+          expect(subject).to receive(:notify) do |event_name, payload|
+            expect(event_name).to eq "acapi.info.events.employee.termination_of_employers_health_coverage"
+            expect(payload[:employee_role_id]).to eq ce.employee_role_id.to_s
+            expect(payload[:event_object_kind]).to eq 'PlanYear'
+            expect(payload[:event_object_id]).to eq model_instance.id.to_s
+          end
         end
 
         subject.plan_year_update(model_event)
