@@ -44,12 +44,6 @@ RSpec.configure do |config|
   #
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
-  config.before(:each) do
-    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
-  end
-  config.after(:each) do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
-  end
 
   config.after(:example, :dbclean => :after_each) do
     DatabaseCleaner.clean

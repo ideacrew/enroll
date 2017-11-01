@@ -9,9 +9,9 @@ RSpec.shared_examples "a rate factor" do |attributes|
   end
 end
 
-RSpec.describe 'Load Rate Factors Task', :type => :task do
+RSpec.describe 'Load Rate Factors Task', :type => :task, :dbclean => :after_each  do
 
-  context "rate_reference:load_rating_factors", :dbclean => :after_each do
+  context "rate_reference:load_rating_factors" do
     before :each do
       ['82569','88806','34484','73331'].each do |hios_id|
         carrier_profile = FactoryGirl.create(:carrier_profile, issuer_hios_ids: [hios_id])
