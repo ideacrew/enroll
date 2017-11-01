@@ -280,11 +280,11 @@ Given(/^Employer for (.*) exists with a published health plan year$/) do |named_
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, plan_year: plan_year
   carrier_profile = benefit_group.reference_plan.carrier_profile
-  sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+  sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
     factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
   end
   sic_factors.save!
-  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
     [0..5].each do |size|
       factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
     end
@@ -310,11 +310,11 @@ Given(/^Employer for (.*) exists with a published plan year offering health and 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, fte_count: 2, aasm_state: :published
   benefit_group = FactoryGirl.create :benefit_group, :with_valid_dental, plan_year: plan_year
   carrier_profile = benefit_group.reference_plan.carrier_profile
-  sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
+  sic_factors = SicCodeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, carrier_profile: carrier_profile).tap do |factor_set|
     factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
   end
   sic_factors.save!
-  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
+  group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2018, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: carrier_profile).tap do |factor_set|
     [0..5].each do |size|
       factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
     end
@@ -336,28 +336,16 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     ssn: person[:ssn],
     dob: person[:dob_date]
 
-  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month.next_day
+  earliest_enrollment_available = TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days
+  TimeKeeper.set_date_of_record_unprotected!(earliest_enrollment_available)
+
+  open_enrollment_start_on = earliest_enrollment_available + 1.day
   open_enrollment_end_on = open_enrollment_start_on + 12.days
-  start_on = open_enrollment_start_on.next_month
+  start_on = open_enrollment_start_on.next_month.beginning_of_month
   end_on = start_on.next_year.prev_day
 
-  renewal_plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
-  plan = FactoryGirl.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.prev_year.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
-
-  [renewal_plan, plan].each do |plan|
-    sic_factors = SicCodeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, carrier_profile: plan.carrier_profile).tap do |factor_set|
-      factor_set.rating_factor_entries.new(factor_key: employer_profile.sic_code, factor_value: 1.0)
-    end
-    sic_factors.save!
-
-    group_size_factors = EmployerGroupSizeRatingFactorSet.new(active_year: 2017, default_factor_value: 1.0, max_integer_factor_key: 5, carrier_profile: plan.carrier_profile).tap do |factor_set|
-      [0..5].each do |size|
-        factor_set.rating_factor_entries.new(factor_key: size, factor_value: 1.0)
-      end
-    end
-    group_size_factors.save!
-  end
-
+  renewal_plan = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01")
+  plan = FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.prev_year.year, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id)
 
   plan_year = FactoryGirl.create :plan_year, employer_profile: employer_profile, start_on: start_on - 1.year, end_on: end_on - 1.year,
     open_enrollment_start_on: open_enrollment_start_on - 1.year, open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
@@ -401,6 +389,7 @@ Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kin
 end
 
 Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
+  TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
   person = people[named_person]
   FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
