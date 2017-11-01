@@ -1,4 +1,4 @@
-module Importers
+module Importers::Mhc
   class ConversionEmployerPlanYearUpdate < ConversionEmployerPlanYear
 
     def calculated_coverage_start
@@ -26,11 +26,7 @@ module Importers
         errors.add(:base, 'Unable to find a Reference plan with given Hios ID')
       end
 
-      if single_plan_hios_id.blank? && most_common_hios_id.blank? && reference_plan_hios_id.blank?
-        errors.add(:base, 'Reference Plan Hios Id missing')
-      end
-
-      if plan_selection == 'single_plan' && single_plan_hios_id.blank?
+      if plan_selection == 'sole_source' && single_plan_hios_id.blank?
         errors.add(:base, 'Single Plan Hios Id missing')
       end
 
@@ -82,6 +78,15 @@ module Importers
     def save 
       return false unless valid?
       find_and_update_plan_year
+    end
+
+    def propagate_errors(plan_year)
+      plan_year.errors.each do |attr, err|
+        errors.add("plan_year_" + attr.to_s, err)
+      end
+      plan_year.benefit_groups.first.errors.each do |attr, err|
+        errors.add("plan_year_benefit_group_" + attr.to_s, err)
+      end
     end
   end
 end
