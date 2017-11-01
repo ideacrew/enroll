@@ -60,7 +60,11 @@ module VerificationHelper
       when "in review"
         "warning"
       when "outstanding"
-        member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        if type == 'DC Residency'
+          member.consumer_role.processing_residency_24h? ? "info" : "danger"
+        else
+          member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        end
       when "curam"
         "default"
       when "attested"
@@ -188,7 +192,11 @@ module VerificationHelper
       when "curam"
         admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
-        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        if v_type == 'DC Residency'
+          person.consumer_role.processing_residency_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        else
+          person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        end
     end
   end
 

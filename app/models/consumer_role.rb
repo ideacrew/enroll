@@ -649,8 +649,8 @@ class ConsumerRole
   end
 
   def mark_residency_pending(*args)
-    self.residency_determined_at = Time.now
-    self.is_state_resident = nil
+    update_attributes(:residency_determined_at => Time.now,
+                      :is_state_resident => nil)
   end
 
   def mark_residency_authorized(*args)
@@ -849,6 +849,10 @@ class ConsumerRole
   #check if consumer purchased a coverage and no response from hub in 24 hours
   def processing_hub_24h?
     (dhs_pending? || ssa_pending?) && no_changes_24_h?
+  end
+
+  def processing_residency_24h?
+    residency_pending? &&  no_changes_24_h?
   end
 
   def no_changes_24_h?
