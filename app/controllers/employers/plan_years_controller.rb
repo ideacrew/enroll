@@ -341,15 +341,15 @@ class Employers::PlanYearsController < ApplicationController
 
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
-    @plan_year.publish! if @plan_year.may_publish?
-    if @plan_year.publish_pending? || @plan_year.renewing_publish_pending?
-      @plan_year.withdraw_pending!
+
+    if @plan_year.application_eligibility_warnings.present?
       respond_to do |format|
         format.js
       end
     else
-      if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
+      @plan_year.publish! if @plan_year.may_publish?
 
+      if (@plan_year.published? || @plan_year.enrolling? || @plan_year.renewing_published? || @plan_year.renewing_enrolling?)
         if @plan_year.assigned_census_employees_without_owner.present?
           flash[:notice] = "Plan Year successfully published."
         else
@@ -359,6 +359,7 @@ class Employers::PlanYearsController < ApplicationController
         errors = @plan_year.application_errors.values + @plan_year.open_enrollment_date_errors.values
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
+      
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
     end
   end
