@@ -288,7 +288,7 @@ end
 
 When(/^Employer enters plan year start date$/) do
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1months).year}')]").click
 end
 
 Then(/^Employer should see disabled button with text continue$/) do
