@@ -25,7 +25,7 @@ FactoryGirl.define do
     employer_max_amt_in_cents 1000_00
 
     trait :premiums_for_2015 do
-      reference_plan_id {FactoryGirl.create(:plan, :premiums_for_2015 )._id}
+      reference_plan_id {FactoryGirl.create(:plan, :with_rating_factors, :premiums_for_2015 )._id}
     end
   end
 
