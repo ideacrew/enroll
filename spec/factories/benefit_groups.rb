@@ -20,12 +20,12 @@ FactoryGirl.define do
     description "my first benefit group"
     effective_on_offset 0
     default false
-    reference_plan_id {FactoryGirl.create(:plan, :with_premium_tables)._id}
+    reference_plan_id {FactoryGirl.create(:plan, :with_rating_factors, :with_premium_tables)._id}
     elected_plan_ids { [ self.reference_plan_id ]}
     employer_max_amt_in_cents 1000_00
 
     trait :premiums_for_2015 do
-      reference_plan_id {FactoryGirl.create(:plan, :premiums_for_2015 )._id}
+      reference_plan_id {FactoryGirl.create(:plan, :with_rating_factors, :premiums_for_2015 )._id}
     end
   end
 
