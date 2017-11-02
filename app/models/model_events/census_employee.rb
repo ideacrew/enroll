@@ -3,7 +3,7 @@ module ModelEvents
 
     REGISTERED_EVENTS = [
       :renewal_oe_employee_not_enrolled,
-      :renewal_oe_employee_no_auto_renewal,
+      :passive_renewals_failed,
       :renewal_oe_employee_auto_renewal
     ]
 

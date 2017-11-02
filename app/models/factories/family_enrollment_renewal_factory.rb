@@ -54,7 +54,7 @@ module Factories
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
               census_employee.trigger_model_event(:renewal_oe_employee_auto_renewal, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
             else
-              census_employee.trigger_model_event(:renewal_oe_employee_no_auto_renewal, {event_object: renewing_plan_year}) unless disable_notifications
+              census_employee.trigger_model_event(:passive_renewals_failed, {event_object: renewing_plan_year}) unless disable_notifications
             end
           end
         elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
