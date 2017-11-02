@@ -1,6 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class MovePhoneBetweenPersonAccounts< MongoidMigrationTask
   def migrate
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     from_hbx_id = ENV['from_hbx_id']
     to_hbx_id = ENV['to_hbx_id']
     phone_id = ENV['phone_id']
