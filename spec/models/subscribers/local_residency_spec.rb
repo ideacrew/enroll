@@ -15,29 +15,30 @@ describe Subscribers::LocalResidency do
     consumer_role = person.build_consumer_role;
     consumer_role = FactoryGirl.build(:consumer_role);
     person.consumer_role = consumer_role;
-    person.consumer_role.aasm_state=:verifications_pending;
     person
     }
 
     let(:payload) { {:individual_id => individual_id, :body => xml} }
 
     context "ADDRESS_NOT_IN_AREA" do
-      xit "should deny local residency" do
+      it "should deny local residency" do
+        person.consumer_role.aasm_state = "sci_verified"
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_pending')
+        expect(person.consumer_role.aasm_state).to eq('verification_outstanding')
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
         expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
     end
 
     context "ADDRESS_IN_AREA" do
-      xit "should approve local residency" do
+      it "should approve local residency" do
+        person.consumer_role.aasm_state = "sci_verified"
         allow(subject).to receive(:xml_to_hash).with(xml).and_return(xml_hash2)
         allow(subject).to receive(:find_person).with(individual_id).and_return(person)
         subject.call(nil, nil, nil, nil, payload)
-        expect(person.consumer_role.aasm_state).to eq('verifications_pending') #since lawful_presence_verified? is false
+        expect(person.consumer_role.aasm_state).to eq('fully_verified')
         expect(person.consumer_role.local_residency_responses.count).to eq(1)
         expect(person.consumer_role.local_residency_responses.first.body).to eq(payload[:body])
       end
