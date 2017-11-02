@@ -53,7 +53,7 @@ namespace :migrations do
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
           if generate_termination_notice
-            send_notice_to_employees(organization)
+            employer_terminated_from_shop(organization)
           end
           bg_ids = plan_year.benefit_groups.map(&:id)
           census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
@@ -131,13 +131,13 @@ def enrollments_for_plan_year(plan_year)
   end
 end
 
-def send_notice_to_employees(org)
+def employer_terminated_from_shop(org)
   org.employer_profile.census_employees.active.each do |ce|
     begin
       ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
       puts "Notification generated for employee"
     rescue Exception => e
-      (Rails.logger.error { "Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}" }) unless Rails.env.test?
+      (Rails.logger.error { "Unable to deliver employer terminated from shop notice to #{ce.full_name} " }) unless Rails.env.test?
     end
   end
 end
