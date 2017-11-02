@@ -513,6 +513,74 @@ class FinancialAssistance::Applicant
     end
   end
 
+  def is_assistance_verified?
+    if ((!eligible_for_faa?) || is_assistance_required_and_verified? )
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    return true_or_false
+  end
+
+  def is_assistance_required_and_verified?
+    eligible_for_faa? && income_valid? && mec_valid?
+  end
+
+  def income_valid?
+    assisted_income_validation == "valid"
+  end
+
+  def mec_valid?
+    assisted_mec_validation == "valid"
+  end
+
+  def eligible_for_faa?
+    family.active_approved_application.present?
+  end
+
+  def income_pending?
+    assisted_doument_pending?("Income")
+  end
+
+  def mec_pending?
+    assisted_doument_pending?("MEC")
+  end
+
+  def assisted_doument_pending?(kind)
+    if eligible_for_faa? && assisted_verifications.where(verification_type: kind).present? && assisted_verifications.select{|assisted_verification| assisted_verification.verification_type == kind }.first.status == "pending"
+      true_or_false = true
+    elsif !eligible_for_faa?
+      true_or_false = false
+    else
+      true_or_false = false
+    end
+
+    return true_or_false
+  end
+
+  def is_income_verified?
+    assisted_income_verification = assisted_verifications.select{|verification| verification.verification_type == "Income" }.first
+    if assisted_income_verification.present? && assisted_income_verification.status == "verified"
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    true_or_false
+  end
+
+  def is_mec_verified?
+    assisted_mec_verification = assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first
+    if assisted_mec_verification.present? && assisted_mec_verification.status == "verified"
+      true_or_false = true
+    else
+      true_or_false = false
+    end
+
+    true_or_false
+  end
+
   private
 
   def validate_applicant_information
@@ -621,73 +689,5 @@ class FinancialAssistance::Applicant
   #Income/MEC Verifications
   def notify_of_eligibility_change
     CoverageHousehold.update_eligibility_for_family(family)
-  end
-
-  def is_assistance_verified?
-    if ((!eligible_for_faa?) || is_assistance_required_and_verified? )
-      true_or_false = true
-    else
-      true_or_false = false
-    end
-
-    return true_or_false
-  end
-
-  def is_assistance_required_and_verified?
-    eligible_for_faa? && income_valid? && mec_valid?
-  end
-
-  def income_valid?
-    assisted_income_validation == "valid"
-  end
-
-  def mec_valid?
-    assisted_mec_validation == "valid"
-  end
-
-  def eligible_for_faa?
-    family.active_approved_application.present?
-  end
-
-  def income_pending?
-    assisted_doument_pending?("Income")
-  end
-
-  def mec_pending?
-    assisted_doument_pending?("MEC")
-  end
-
-  def assisted_doument_pending?(kind)
-    if eligible_for_faa? && assisted_verification_documents.select{|assisted_document| assisted_document.kind == kind }.first.status == "pending"
-      true_or_false = true
-    elsif !eligible_for_faa?
-      true_or_false = false
-    else
-      true_or_false = false
-    end
-
-    return true_or_false
-  end
-
-  def is_income_verified?
-    assisted_income_verification = assisted_verifications.select{|verification| verification.verification_type == "Income" }.first
-    if assisted_income_verification.present? && assisted_income_verification.status == "verified"
-      true_or_false = true
-    else
-      true_or_false = false
-    end
-
-    true_or_false
-  end
-
-  def is_mec_verified?
-    assisted_mec_verification = assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first
-    if assisted_mec_verification.present? && assisted_mec_verification.status == "verified"
-      true_or_false = true
-    else
-      true_or_false = false
-    end
-
-    true_or_false
   end
 end
