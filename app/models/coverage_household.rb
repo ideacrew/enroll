@@ -158,7 +158,9 @@ class CoverageHousehold
       hh.hbx_enrollments.each do |he|
         he.evaluate_individual_market_eligiblity
       end
-    end    
+    end
+
+    family.save!
   end
 
   def evaluate_individual_market_eligiblity

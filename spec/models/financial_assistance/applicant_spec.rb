@@ -32,18 +32,34 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
     end
   end
 
-  describe "applicants for an application" do
-    let!(:family)  { FactoryGirl.create(:family, :with_primary_family_member) }
+  describe "applicants for an application", dbclean: :after_each do
+    let!(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
+    let!(:person2) { FactoryGirl.create(:person, :with_consumer_role, dob: "1972-04-04".to_date) }
+    let!(:family)  {  family = FactoryGirl.create(:family, :with_primary_family_member, person: person1)
+                      FactoryGirl.create(:family_member, family: family, person: person2)
+                      person1.person_relationships.create!(successor_id: person2.id, predecessor_id: person1.id, kind: "spouse", family_id: family.id)
+                      person2.person_relationships.create!(successor_id: person1.id, predecessor_id: person2.id, kind: "spouse", family_id: family.id)
+                      family.save!
+                      family }
     let!(:family_member1) { family.primary_applicant }
-    let!(:person2) { FactoryGirl.create(:person, dob: "1972-04-04".to_date) }
-    let!(:family_member2) { FactoryGirl.create(:family_member, family: family, person: person2) }
+    let!(:family_member2) { family.family_members.second }
     let!(:application) { FactoryGirl.create(:application, family: family) }
-    let!(:household) {family.households.first}
-    let!(:tax_household1) {FactoryGirl.create(:tax_household,  application_id: application.id, household: household, effective_ending_on: nil)}
-    let!(:eligibility_determination1) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Curam", csr_eligibility_kind: "csr_87")}
-    let!(:eligibility_determination2) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Haven")}
+    let!(:household) { family.households.first }
+    let(:coverage_household1) { household.coverage_households.first }
+    let(:coverage_household2) { household.coverage_households.second }
+    let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, household: household, aasm_state: "coverage_selected", coverage_household_id: household.coverage_households.first.id) }
+    let!(:hbx_enrollment_member) { FactoryGirl.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family_member1.id, eligibility_date: TimeKeeper.date_of_record) }
+    let!(:tax_household1) { FactoryGirl.create(:tax_household,  application_id: application.id, household: household, effective_ending_on: nil) }
+    let!(:eligibility_determination1) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Curam", csr_eligibility_kind: "csr_87") }
+    let!(:eligibility_determination2) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household1, source: "Haven") }
     let!(:applicant1) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member1.id) }
-    let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id) }
+    let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id, aasm_state: "verification_outstanding") }
+    let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant1, status: "pending") }
+
+    before :each do
+      coverage_household1.update_attributes!(aasm_state: "enrolled")
+      coverage_household2.update_attributes!(aasm_state: "enrolled")
+    end
 
     context "applicants with tax household and multiple eligibility_determinations" do
 
@@ -86,6 +102,138 @@ RSpec.describe FinancialAssistance::Applicant, type: :model do
       it "should return true if the family_member associated to the applicant is the primary of the family" do
         expect(applicant1.is_primary_applicant?).to eq true
         expect(applicant1.is_primary_applicant?).not_to eq false
+      end
+    end
+
+    context "state transitions and eligibility notification for hbx_enrollment and coverage_household" do
+
+      context "from state unverified" do
+        it "should return unverified state as a default state" do
+          expect(applicant1.aasm_state).to eq "unverified"
+        end
+
+        context "for notify_of_eligibility_change and aasm_state changes on_event: income_outstanding, verification_outstanding" do
+          before :each do
+            applicant1.income_outstanding!
+          end
+
+          it "should transition from unverified to verification_outstanding" do
+            expect(applicant1.aasm_state).to eq "verification_outstanding"
+          end
+
+          it "should also transition from enrolled to unverified for CoverageHousehold" do
+            coverage_household1.reload
+            expect(coverage_household1.aasm_state).to eq "unverified"
+          end
+
+          it "should also transition from coverage_selected to enrolled_contingent for HbxEnrollment" do
+            hbx_enrollment.reload
+            expect(hbx_enrollment.aasm_state).to eq "enrolled_contingent"
+          end
+
+          it "should also add the transition to workflow_state_transitions of the applicant" do
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq "unverified"
+            expect(applicant1.workflow_state_transitions.last.to_state).to eq "verification_outstanding"
+          end
+        end
+
+        context "for notify_of_eligibility_change and aasm_state changes on_event: income_valid, verification_pending" do
+          before :each do
+            applicant1.income_valid!
+          end
+
+          it "should transition from unverified to verification_outstanding" do
+            expect(applicant1.aasm_state).to eq "verification_pending"
+          end
+
+          it "should also transition from enrolled to unverified for CoverageHousehold" do
+            coverage_household1.reload
+            expect(coverage_household1.aasm_state).to eq "unverified"
+          end
+
+          it "should also transition from coverage_selected to enrolled_contingent for HbxEnrollment" do
+            hbx_enrollment.reload
+            expect(hbx_enrollment.aasm_state).to eq "enrolled_contingent"
+          end
+
+          it "should also add the transition to workflow_state_transitions of the applicant" do
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq "unverified"
+            expect(applicant1.workflow_state_transitions.last.to_state).to eq "verification_pending"
+          end
+        end
+
+
+        context "for notify_of_eligibility_change and aasm_state changes on_event: income_valid, fully_verified" do
+          let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant1, verification_type: "MEC", status: "verified" ) }
+
+          before :each do
+            applicant1.income_valid!
+          end
+
+          it "should transition from unverified to verification_outstanding" do
+            expect(applicant1.aasm_state).to eq "fully_verified"
+          end
+
+          it "should also transition from enrolled to enrolled_contingent for CoverageHousehold" do
+            coverage_household1.reload
+            expect(coverage_household1.aasm_state).to eq "enrolled_contingent"
+          end
+
+          it "should also transition from coverage_selected to enrolled_contingent for HbxEnrollment" do
+            hbx_enrollment.reload
+            expect(hbx_enrollment.aasm_state).to eq "enrolled_contingent"
+          end
+
+          it "should also add the transition to workflow_state_transitions of the applicant" do
+            expect(applicant1.workflow_state_transitions.last.from_state).to eq "unverified"
+            expect(applicant1.workflow_state_transitions.last.to_state).to eq "fully_verified"
+          end
+        end
+      end
+
+      context "from state verification_outstanding" do
+        it "should transition to verification_outstanding" do
+          expect(applicant2.aasm_state).to eq "verification_outstanding"
+          applicant2.income_outstanding!
+          expect(applicant2.aasm_state).to eq "verification_outstanding"
+        end
+
+        it "should transition to fully_verified" do
+          applicant2.assisted_verifications.create!(applicant: applicant2, verification_type: "MEC", status: "verified")
+          expect(applicant2.aasm_state).to eq "verification_outstanding"
+          applicant2.income_valid!
+          expect(applicant2.aasm_state).to eq "fully_verified"
+        end
+      end
+
+      context "from state verification_pending" do
+
+        before :each do
+          applicant2.update_attributes!(aasm_state: "verification_pending")
+        end
+
+        it "should transition to verification_outstanding" do
+          expect(applicant2.aasm_state).to eq "verification_pending"
+          applicant2.income_outstanding!
+          expect(applicant2.aasm_state).to eq "verification_outstanding"
+        end
+
+        it "should transition to fully_verified" do
+          applicant2.assisted_verifications.create!(applicant: applicant2, verification_type: "MEC", status: "verified")
+          expect(applicant2.aasm_state).to eq "verification_pending"
+          applicant2.income_valid!
+          expect(applicant2.aasm_state).to eq "fully_verified"
+        end
+      end
+
+      context "from fully_verified" do
+
+        it "should transition to fully_verified" do
+          applicant2.update_attributes!(aasm_state: "fully_verified")
+          expect(applicant2.aasm_state).to eq "fully_verified"
+          applicant2.income_valid!
+          expect(applicant2.aasm_state).to eq "fully_verified"
+        end
       end
     end
   end
