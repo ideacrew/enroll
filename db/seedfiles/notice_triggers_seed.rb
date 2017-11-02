@@ -594,7 +594,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP32',
+    hbx_id: 'SHOP_D020',
     title: 'Group Ineligible to Obtain Coverage',
     description: 'Initial employee Open Enrollment Completed (Did Not Meet Minimum Participation Requirement or non-owner enrollee requirement)',
     resource_name: 'employer',
@@ -604,7 +604,7 @@ shop_notice_triggers = [
         name: 'Initial Employer ineligible to obtain coverage.',
         notice_template: 'notices/shop_employer_notices/initial_employer_ineligibility_notice',
         notice_builder: 'ShopEmployerNotices::InitialEmployerIneligibilityNotice',
-        mpi_indicator: 'MPI_SHOP32',
+        mpi_indicator: 'SHOP_D020',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

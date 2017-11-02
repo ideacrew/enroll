@@ -32,7 +32,7 @@ class ShopEmployerNotice < Notice
     notice.notification_type = self.event_name
     notice.primary_fullname = employer_profile.staff_roles.first.full_name.titleize
     notice.employer_name = recipient.organization.legal_name.titleize
-    notice.employer_email = employer_profile.staff_roles.first.work_email_or_best
+    notice.employer_email = recipient.staff_roles.first.work_email_or_best
     notice.primary_identifier = employer_profile.hbx_id
     append_address(employer_profile.organization.primary_office_location.address)
     append_hbe
