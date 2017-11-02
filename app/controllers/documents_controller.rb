@@ -72,19 +72,15 @@ class DocumentsController < ApplicationController
 
   def fed_hub_request
     if params[:verification_type] == 'DC Residency'
-      @person.consumer_role.trigger_residency!
+      @person.consumer_role.trigger_residency!(verification_attr)
     else
       @person.consumer_role.redetermine_verification!(verification_attr)
     end
     respond_to do |format|
       format.html {
-        if params[:verification_type] == 'DC Residency'
-          flash[:success] = 'Request was sent to DMV.'
-          redirect_to :back
-        else
-          flash[:success] = 'Request was sent to FedHub.'
-          redirect_to :back
-        end
+        hub =  params[:verification_type] == 'DC Residency' ? 'Verify Residency' : 'FedHub'
+        flash[:success] = "Request was sent to #{hub}."
+        redirect_to :back
       }
       format.js
     end

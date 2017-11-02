@@ -79,7 +79,7 @@ RSpec.describe DocumentsController, :type => :controller do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
         post :fed_hub_request, verification_type: 'DC Residency',person_id: person.id, id: document.id
         expect(response).to redirect_to :back
-        expect(flash[:success]).to eq('Request was sent to DMV.')
+        expect(flash[:success]).to eq('Request was sent to Verify Residency.')
       end
     end
   end
