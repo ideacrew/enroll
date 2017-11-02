@@ -74,4 +74,14 @@ module ConsumerRolesHelper
     end
     return first_checked, second_checked
   end
+
+  def show_application_type_dropdown(person, current_user)
+    application_type = []
+    if person.primary_family.e_case_id.present?
+      application_type = ["Curam"]
+    else
+      application_type = [ "Phone", "In Person", "Paper", "Curam", "Mobile" ]
+    end
+    application_type
+  end
 end
