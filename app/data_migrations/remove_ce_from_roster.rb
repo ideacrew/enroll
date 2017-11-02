@@ -9,7 +9,7 @@ class RemoveCeFromRoster < MongoidMigrationTask
       return
     else
       unless ce.employee_role.nil?
-        ce.employee_role.update_attribtues(:census_employee_id)
+        ce.employee_role.update_attributes(:census_employee_id)
       end
       ce.delete
       puts 'the census employee with id #{ce_id} has been removed from the roster ' unless Rails.env.test?
