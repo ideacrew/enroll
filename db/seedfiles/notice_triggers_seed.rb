@@ -676,7 +676,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOPDAE044',
+    hbx_id: 'SHOP_D044',
     title: 'Termination of Employer’s Health Coverage Offered through DC Health Link',
     description: 'When an employer request termination at least 30 days in advance, all employees active on their roster will receive this notice to provide confirmation of the request and the coverage end date for their groups termination of coverage.',
     resource_name: 'employee_role',
@@ -686,7 +686,7 @@ shop_notice_triggers = [
         name: 'Notice to EEs that active ER is terminated from SHOP',
         notice_template: 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
         notice_builder: 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
-        mpi_indicator: 'MPI_SHOPDAE044',
+        mpi_indicator: 'SHOP_D044',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employee"],
