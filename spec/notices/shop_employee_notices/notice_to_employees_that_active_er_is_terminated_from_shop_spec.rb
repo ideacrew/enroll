@@ -20,12 +20,12 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
       :notice_template => 'notices/shop_employee_notices/notice_to_employees_that_active_er_is_terminated_from_shop',
       :notice_builder => 'ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop',
       :event_name => 'notify_employee_when_employer_requests_advance_termination',
-      :mpi_indicator => 'MPI_SHOPDAE044',
+      :mpi_indicator => 'SHOP_D044',
       :title => "Termination of Employer’s Health Coverage Offered Through The DC Health Link"})
   }
 
 
-  let(:valid_parmas) {{
+  let(:valid_params) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
@@ -34,19 +34,19 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
 
   describe "New" do
     before do
-      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)}.not_to raise_error
+        expect{ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)}.not_to raise_error
       end
     end
 
     context "invalid params" do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
-          valid_parmas.delete(key)
-          expect{ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          valid_params.delete(key)
+          expect{ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -54,7 +54,7 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
 
   describe "Build" do
     before do
-      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)
     end
     it "should build notice with all necessory info" do
 
@@ -66,7 +66,7 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
 
   describe "append_data" do
     before do
-      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)
     end
     it "should append data" do
       allow(HbxProfile).to receive_message_chain("current_hbx").and_return(hbx_profile)
@@ -79,7 +79,7 @@ RSpec.describe ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFro
   describe "Rendering intitial shop application approval notice template and generate pdf" do
     before do
       allow(census_employee.employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_parmas)
+      @employee_notice = ShopEmployeeNotices::NoticeToEmployeesThatActiveErIsTerminatedFromShop.new(census_employee, valid_params)
       allow(census_employee).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
     end
     it "should render termination_of_employers_health_coverage" do
