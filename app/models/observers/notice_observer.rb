@@ -78,7 +78,7 @@ module Observers
         end
 
         if new_model_event.event_key == :renewal_oe_employee_auto_renewal
-          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_open_enrollment_employee_auto_renewal")
+          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_oe_employee_auto_renewal")
         end
 
       end
