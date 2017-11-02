@@ -241,10 +241,10 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   context "PUT update" do
-    let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryBot.create(:person) }
     let(:addresses_attributes) { {"0"=>{"kind"=>"home", "address_1"=>"address1_a", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[0].id.to_s},
     "1"=>{"kind"=>"mailing", "address_1"=>"address1_b", "address_2"=>"", "city"=>"city1", "state"=>"DC", "zip"=>"22211", "id"=> person.addresses[1].id.to_s} } }
+    let(:person_params){{"family"=>{"application_type"=>"Phone"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryBot.create(:person, :with_family) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -327,7 +327,40 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
   end
 
-  context "GET immigration_document_options", dbclean: :after_each do
+  context "PUT update as HBX Admin" do
+    let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryGirl.create(:person, :with_family, :with_hbx_staff_role) }
+
+    before(:each) do
+      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(user).to receive(:person).and_return person
+      allow(person).to receive(:consumer_role).and_return consumer_role
+      sign_in user
+    end
+
+    it "should redirect to family members path when current user has application type as Curam" do
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
+    it "should redirect to family members path when current user has application type as Mobile" do
+      person_params["family"]["application_type"] = "Mobile"
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+  end
+
+  context "GET immigration_document_options" do
     let(:person) {FactoryBot.create(:person, :with_consumer_role)}
     let(:params) {{target_type: 'Person', target_id: "person_id", vlp_doc_target: "vlp doc", vlp_doc_subject: "I-327 (Reentry Permit)"}}
     let(:family_member) {FactoryBot.create(:person, :with_consumer_role)}
