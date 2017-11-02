@@ -382,7 +382,7 @@ shop_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'SHOP18',
+    hbx_id: 'SHOP_D018',
     title: 'Group Open Enrollment Successfully Completed',
     description: 'Renewal Employee Open Enrollment Completed with minimum participation & non-owner enrollee',
     resource_name: 'employer',
@@ -392,7 +392,7 @@ shop_notice_triggers = [
         name: 'Renewal Employee Open Employee Completed',
         notice_template: 'notices/shop_employer_notices/renewal_employer_open_enrollment_completed',
         notice_builder: 'ShopEmployerNotices::RenewalEmployerOpenEnrollmentCompleted',
-        mpi_indicator: 'MPI_SHOP18',
+        mpi_indicator: 'SHOP_D018',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],
