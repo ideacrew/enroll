@@ -24,6 +24,9 @@ namespace :permissions do
 
   desc 'hbx admin can lock and unlock a user'
   DefinePermissions.define_task :hbx_admin_can_lock_unlock => :environment
+
+  desc 'hbx admin can reset password a user'
+  DefinePermissions.define_task :hbx_admin_can_reset_password => :environment
 end
 
 #rake permissions:initial_hbx
@@ -31,3 +34,4 @@ end
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_complete_resident_application
 #rake permissions:hbx_admin_can_update_ssn
+#rake permissions:hbx_admin_can_reset_password

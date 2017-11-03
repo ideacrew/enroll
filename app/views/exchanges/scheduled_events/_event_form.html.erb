@@ -3,13 +3,11 @@
     <% types = ScheduledEvent::EVENT_TYPES; types = types.rotate %>
     <%= f.select :type, options_for_select(types.map {|a| [a.to_s.humanize, a.to_s]}, f.object.type), {include_blank: "SELECT EVENT TYPE"}, required: true, id: 'selected_scheduled_event_type' %>
   </div>
-
   <div id="scheduled_event" class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-    <% if params[:action].to_s.downcase == 'edit' && f.object.type == 'holiday' %> 
-      <%= text_field(:scheduled_event, :event_name, size: 20) %>
+    <% if f.object.try(:type) == 'holiday' %>
+      <%= f.text_field :event_name, size: 20, placeholder: 'Event Name', class: "event_text_field" %>
     <% else %>
-      <% events = ScheduledEvent::SYSTEM_EVENTS  %>
-      <%= f.select :event_name, options_for_select(events.map { |s| [s.humanize, s] }, f.object.event_name), include_blank: "SELECT EVENT", required: true %>
+      <%= f.select :event_name, options_for_select(ScheduledEvent::SYSTEM_EVENTS.map { |s| [s.humanize, s] }, f.object.event_name), include_blank: "SELECT EVENT", required: true %>
     <% end %>
    </div>
 </div>
@@ -26,13 +24,13 @@
 
 <div class="container content-bottom">
   <%= f.label :offset_rule %>
-  <%= f.number_field :offset_rule, placeholder: 0%>
+  <%= f.number_field :offset_rule, placeholder: 0 %>
 </div>
 
 <div class="container content-bottom">
   <%= f.submit %>
-  <%= link_to 'Cancel', exchanges_scheduled_events_path, class: "btn btn-default" %>
+  <%= link_to 'Cancel', exchanges_scheduled_events_path, class: "btn btn-default", remote: true %>
   <% if params[:action].to_s.downcase == 'edit' %>
-    <%= link_to "Delete Event", exchanges_scheduled_event_path(scheduled_event), data: {:confirm => 'Are you sure?'}, class: "btn btn-danger", method: :delete %>
+    <%= link_to "Delete Event", exchanges_scheduled_event_path(scheduled_event), data: {:confirm => 'Are you sure?'}, class: "btn btn-danger", remote: true, method: :delete %>
   <% end %>
 </div>

@@ -213,9 +213,10 @@ Given(/^User has existing security questions/) do
 end
 
 Given(/^Hbx Admin exists$/) do
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true)
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
+                            list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
+                            can_reset_password: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, with_security_questions: false, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -334,7 +335,8 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     first_name: person[:first_name],
     last_name: person[:last_name],
     ssn: person[:ssn],
-    dob: person[:dob_date]
+    dob: person[:dob_date],
+    email: FactoryGirl.build(:email, address: person[:email])
 
   earliest_enrollment_available = TimeKeeper.date_of_record.next_month.beginning_of_month
 
@@ -641,6 +643,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # TODO: fix this bombing issue
   wait_for_ajax
   page.evaluate_script("window.location.reload()")
+  wait_for_ajax
   person = people[named_person]
   screenshot("before modal")
   # find('.interaction-click-control-click-here').click
@@ -880,6 +883,17 @@ end
 When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) tab$/) do |tab_name|
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
   wait_for_ajax
+end
+
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) dropdown$/) do |tab_name|
+  find(".#{tab_name.downcase}-dropdown").click
+  wait_for_ajax
+end
+
+When(/^(?:(?!General).)+ clicks? on the ((?:(?!General|Staff).)+) option$/) do |tab_name|
+  find(".interaction-click-control-#{tab_name.downcase.gsub(' ','-')}").click
+  wait_for_ajax
+  find('#myTabContent').trigger('click')
 end
 
 When(/^.+ clicks? on the tab for (.+)$/) do |tab_name|
