@@ -18,7 +18,7 @@ require File.expand_path("../dummy/config/environment", __FILE__)
 require 'shoulda/matchers'
 require 'database_cleaner'
 require 'factory_girl_rails'
-require 'pry'
+# require 'pry'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
