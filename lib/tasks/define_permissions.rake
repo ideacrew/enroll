@@ -30,6 +30,11 @@ namespace :permissions do
   desc 'hbx admin can view username and email'
   DefinePermissions.define_task :hbx_admin_can_view_username_and_email => :environment
 end
+
+namespace :permissions do
+  desc 'hbx admin can view application types of consumer'
+  DefinePermissions.define_task :hbx_admin_can_view_application_types => :environment
+end
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
