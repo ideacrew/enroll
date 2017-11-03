@@ -1,6 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class MovePhoneBetweenPersonAccounts< MongoidMigrationTask
   def migrate
+    trigger_single_table_inheritance_auto_load_of_child = VlpDocument
     from_hbx_id = ENV['from_hbx_id']
     to_hbx_id = ENV['to_hbx_id']
     phone_id = ENV['phone_id']
@@ -14,7 +15,7 @@ class MovePhoneBetweenPersonAccounts< MongoidMigrationTask
         puts "person with hbx_id  #{from_hbx_id} has no phone number to transfer" unless Rails.env.test?
     else
         from_person.phones.each do |i|
-          if i.id == phone_id
+          if i.id.to_s == phone_id
             to_person.phones << i
             to_person.save
             puts "add phone number #{phone_id} to person with hbx_id  #{to_hbx_id}" unless Rails.env.test?

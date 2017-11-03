@@ -14,7 +14,7 @@ class RemoveEmployerStaffRoleFromPerson< MongoidMigrationTask
         puts  "No employer staff roles found for person with given hbx_id: #{hbx_id}" unless Rails.env.test?
       else
         (0..person.employer_staff_roles.size-1).each do |i|
-          if person.employer_staff_roles[i].id == employer_staff_role_id
+          if person.employer_staff_roles[i].id.to_s == employer_staff_role_id
             person.employer_staff_roles[i].close_role
             person.employer_staff_roles[i].update_attributes(is_active:false)
             puts  "The target employer staff role of person with given hbx_id: #{hbx_id} has been closed" unless Rails.env.test?

@@ -16,7 +16,7 @@ describe RemoveEmployerStaffRoleFromPerson do
     let(:employer_staff_role) {FactoryGirl.create(:employer_staff_role)}
     before(:each) do
       allow(ENV).to receive(:[]).with("person_hbx_id").and_return(employer_staff_role.person.hbx_id)
-      allow(ENV).to receive(:[]).with("employer_staff_role_id").and_return(employer_staff_role.id)
+      allow(ENV).to receive(:[]).with("employer_staff_role_id").and_return(employer_staff_role.id.to_s)
     end
 
     it "should remove employer staff role from the person" do
