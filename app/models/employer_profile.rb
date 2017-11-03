@@ -46,6 +46,7 @@ class EmployerProfile
   field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
+  delegate :issuer_assigned_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
@@ -585,16 +586,15 @@ class EmployerProfile
     end
 
     def initial_employers_enrolled_plan_year_state
-      Organization.where(:"employer_profile.plan_years" => 
-        { :$elemMatch => { 
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
           :aasm_state => "enrolled"
           }
         })
     end
 
     def organizations_eligible_for_renewal(new_date)
-      months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
-
+      months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
@@ -682,7 +682,7 @@ class EmployerProfile
               puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error {e}"
             end
           end
-        elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month 
+        elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
           initial_employers_reminder_to_publish(start_on_1).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
@@ -690,7 +690,7 @@ class EmployerProfile
               puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
             end
           end
-        else 
+        else
           plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
           if (new_date + 2.days == plan_year_due_date)
             initial_employers_reminder_to_publish(start_on_1).each do |organization|
@@ -701,7 +701,7 @@ class EmployerProfile
               end
             end
           end
-        end     
+        end
 
         #initial employers misses binder payment due date deadline on next day notice
         binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
@@ -1014,7 +1014,7 @@ class EmployerProfile
 
   def service_areas_available_on(date)
     if use_simple_employer_calculation_model?
-      return nil
+      return []
     end
     primary_office_location = organization.primary_office_location
     CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)

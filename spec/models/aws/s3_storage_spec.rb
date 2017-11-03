@@ -51,10 +51,10 @@ describe Aws::S3Storage do
 
     context "failure (invalid uri)" do
       it "returns nil" do
-        allow_any_instance_of(Aws::S3Storage).to receive(:get_object).and_raise(Exception)
+        allow_any_instance_of(Aws::S3Storage).to receive(:get_object).with('local', nil).and_raise(StandardError)
         expect do
           subject.find(invalid_url)
-        end.to raise_exception
+        end.to raise_error(StandardError)
       end
     end
   end

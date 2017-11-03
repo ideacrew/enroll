@@ -482,7 +482,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
 
     it "should return a sep with an effective date that equals to first of month" do
       sep.update_attribute(:effective_on_kind, "first_of_month")
-      expect(sep.effective_on).to eq Date.new(2016,10,1)
+      expect(sep.effective_on.day).to eq 1
     end
 
   end
