@@ -987,12 +987,11 @@ class Family
     active_household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).flat_map(&:hbx_enrollment_members).flat_map(&:family_member).flat_map(&:person).include?(person)
   end
 
-private
-
-  def has_curam_or_mobile_application_type?
+  def _curam_or_mobile_application_type?
     ['Curam', 'Mobile'].include?application_type
   end
 
+private
   def build_household
     if households.size == 0
       irs_group = initialize_irs_group
