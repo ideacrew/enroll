@@ -111,7 +111,7 @@ module Importers
       when "update"
         ::Importers::ConversionEmployerPlanYearUpdate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       else
-        ::Importers::ConversionEmployerPlanYear.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
+        ::Importers::ConversionEmployerPlanYearCreate.new(record_attrs.merge({:default_plan_year_start => @default_plan_year_start}))
       end
     end
   end
