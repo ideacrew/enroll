@@ -18,6 +18,7 @@ class Person
 
   PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
+  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -409,8 +410,9 @@ class Person
   # collect all verification types user can have based on information he provided
   def verification_types
     verification_types = []
+    verification_types << 'DC Residency' if (consumer_role && age_on(TimeKeeper.date_of_record) > 19)
     verification_types << 'Social Security Number' if ssn
-    verification_types << 'American Indian Status' if citizen_status && ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS.include?(citizen_status)
+    verification_types << 'American Indian Status' if !(tribal_id.nil? || tribal_id.empty?)
     if self.us_citizen
       verification_types << 'Citizenship'
     else
@@ -493,7 +495,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "main" }
+    phones.detect { |phone| phone.kind == "phone main" }
   end
 
   def home_phone
@@ -534,13 +536,7 @@ class Person
   end
 
   def has_multiple_active_employers?
-    active_census_employees.count > 1
-  end
-
-  def active_census_employees
-    census_employees = CensusEmployee.matchable(ssn, dob).to_a + CensusEmployee.unclaimed_matchable(ssn, dob).to_a
-    ces = census_employees.select { |ce| ce.is_active? }
-    (ces + active_employee_roles.map(&:census_employee)).uniq
+    active_employee_roles.count > 1
   end
 
   def has_active_employer_staff_role?
@@ -788,6 +784,7 @@ class Person
   end
 
   def indian_tribe_member=(val)
+    self.tribal_id = nil if val.to_s == false
     @indian_tribe_member = (val.to_s == "true")
   end
 
@@ -810,7 +807,7 @@ class Person
   def indian_tribe_member
     return @indian_tribe_member if !@indian_tribe_member.nil?
     return nil if citizen_status.blank?
-    @indian_tribe_member ||= (::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS == citizen_status)
+    @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
   end
 
   def eligible_immigration_status
@@ -822,9 +819,7 @@ class Person
   end
 
   def assign_citizen_status
-    if indian_tribe_member
-      self.citizen_status = ::ConsumerRole::INDIAN_TRIBE_MEMBER_STATUS
-    elsif naturalized_citizen
+    if naturalized_citizen
       self.citizen_status = ::ConsumerRole::NATURALIZED_CITIZEN_STATUS
     elsif us_citizen
       self.citizen_status = ::ConsumerRole::US_CITIZEN_STATUS
@@ -946,7 +941,7 @@ class Person
   end
 
   def consumer_fields_validations
-    if @is_consumer_role.to_s == "true" #only check this for consumer flow.
+    if @is_consumer_role.to_s == "true" && consumer_role.is_applying_coverage.to_s == "true" #only check this for consumer flow.
       citizenship_validation
       native_american_validation
       incarceration_validation
