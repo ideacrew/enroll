@@ -1067,6 +1067,10 @@ class Family
     verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified"
   end
 
+  def has_curam_or_mobile_application_type?
+    ['Curam', 'Mobile'].include? application_type
+  end
+
 private
   def build_household
     if households.size == 0
