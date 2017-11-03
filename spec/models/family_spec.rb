@@ -1533,6 +1533,20 @@ describe "#document_due_date", dbclean: :after_each do
         expect(family.document_due_date(family.primary_family_member, "Citizenship")).to eq nil
       end
     end
-  end  
+  end
+
+  describe "save application type in family model" do
+    context "person saves application type as Phone" do
+      let(:new_person) { FactoryGirl.create(:person, :with_family) }
+      let(:person) { FactoryGirl.create(:person) }
+      let(:current_user) {FactoryGirl.create(:user, :hbx_staff, person: person)}
+      before do
+        new_person.primary_family.update_attributes(application_type: "Phone")
+      end
+      it "should save and disaply the person's application type as Phone" do
+        expect(new_person.primary_family.application_type).to eq "Phone"
+      end
+    end
+  end
 end
 
