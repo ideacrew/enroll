@@ -1,15 +1,15 @@
 module Importers::Mhc
   class ConversionEmployer < Importers::ConversionEmployer
 
-    CARRIER_MAPPING = {
-      "bmc healthnet plan"=>"BMCHP", 
-      "fallon community health plan"=>"FCHP",
-      "health new england"=>"HNE",
-      "neighborhood health plan" => "NHP",
-      "harvard pilgrim health care" => "HPHC",
-      "boston medical center health plan" => "BMCHP",
-      "blue cross blue shield ma" => "BCBS"
-    }
+    # CARRIER_MAPPING = {
+    #   "bmc healthnet plan"=>"BMCHP", 
+    #   "fallon community health plan"=>"FCHP",
+    #   "health new england"=>"HNE",
+    #   "neighborhood health plan" => "NHP",
+    #   "harvard pilgrim health care" => "HPHC",
+    #   "boston medical center health plan" => "BMCHP",
+    #   "blue cross blue shield ma" => "BCBS"
+    # }
 
     attr_accessor :fein,
       :assigned_employer_id,

@@ -4,14 +4,14 @@ module Importers
     include ActiveModel::Model
     include ::Etl::ValueParsers
 
-    CARRIER_MAPPING = {
-      "aetna" => "AHI",
-      "carefirst bluecross blueshield" => "GHMSI",
-      "kaiser permanente" => "KFMASI",
-      "united healthcare" => "UHIC",
-      "united health care" => "UHIC",
-      "unitedhealthcare" => "UHIC"
-    }
+    # CARRIER_MAPPING = {
+    #   "aetna" => "AHI",
+    #   "carefirst bluecross blueshield" => "GHMSI",
+    #   "kaiser permanente" => "KFMASI",
+    #   "united healthcare" => "UHIC",
+    #   "united health care" => "UHIC",
+    #   "unitedhealthcare" => "UHIC"
+    # }
 
     attr_converter :fein, :as => :optimistic_ssn
     attr_converter :tpa_fein, :as => :optimistic_ssn
@@ -53,7 +53,7 @@ module Importers
 
     attr_reader :warnings
 
-    include ::Importers::ConversionEmployerCarrierValue
+    # include ::Importers::ConversionEmployerCarrierValue
 
     def initialize(opts = {})
       super(opts)

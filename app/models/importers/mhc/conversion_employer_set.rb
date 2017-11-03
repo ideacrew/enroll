@@ -94,7 +94,7 @@ module Importers::Mhc
         :ignore,
         :ignore,
         :ignore,
-        :carrier
+        :ignore
       ]
     end
 

@@ -106,7 +106,7 @@ module Factories
 
     def service_area_plan_hios_ids(carrier_id)
       profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(@employer_profile, @renewal_plan_year.start_on.year)
-      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_id, @renewal_plan_year.start_on.year, profile_and_service_area_pairs.select { |pair| pair.first == carrier_id }).pluck(:hios_id)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_id, @renewal_plan_year.start_on.year, profile_and_service_area_pairs).pluck(:hios_id)
     end
 
     def clone_benefit_group(active_group)
