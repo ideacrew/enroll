@@ -25,8 +25,8 @@ describe ::Importers::Mhc::ConversionEmployerCreate, dbclean: :after_each do
      :contact_email=>"roger@liveandletdie.com",
      :contact_phone=>"2025551212",
      :enrolled_employee_count=>"1",
-     :new_hire_count=>"First of the month following 30 days",
-     :carrier=>"bmc healthnet plan"}
+     :new_hire_count=>"First of the month following 30 days"
+    }
   }
 
   let!(:registered_on) { TimeKeeper.date_of_record.beginning_of_month }
