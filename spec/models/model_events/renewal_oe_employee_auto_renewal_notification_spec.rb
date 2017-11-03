@@ -33,9 +33,9 @@ describe 'ModelEvents::RenewalOeEmployeeAutoRenewalNotification' do
     employee.add_renew_benefit_group_assignment renewal_benefit_group
   }
 
-  let(:open_enrollment_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day }
-  let(:open_enrollment_end_on) { open_enrollment_start_on.next_month + 12.days }
-  let(:start_on) { open_enrollment_start_on + 2.months }
+  let(:open_enrollment_start_on) { TimeKeeper.date_of_record }
+  let(:open_enrollment_end_on) { open_enrollment_start_on + 12.days }
+  let(:start_on) { (open_enrollment_start_on + 2.months).beginning_of_month }
   let(:end_on) { start_on + 1.year - 1.day }
 
   let(:active_plan_year) {
@@ -136,7 +136,7 @@ describe 'ModelEvents::RenewalOeEmployeeAutoRenewalNotification' do
 
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
-    let!(:payload)   { { 
+    let!(:payload)   { {
       "event_object_kind" => "PlanYear",
       "event_object_id" => renewing_plan_year.id
     } }
@@ -171,7 +171,7 @@ describe 'ModelEvents::RenewalOeEmployeeAutoRenewalNotification' do
         expect(merge_model.broker_present?).to be_falsey
         expect(merge_model.plan_year.current_py_start_on).to eq employer_profile2.plan_years.first.start_on
         expect(merge_model.plan_year.renewal_py_start_on).to eq employer_profile2.plan_years.renewing.first.start_on
-      end 
+      end
     end
   end
 end
