@@ -75,6 +75,10 @@ namespace :permissions do
   DefinePermissions.define_task :grant_hbx_tier3_access => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can view application types of consumer'
+  DefinePermissions.define_task :hbx_admin_can_view_application_types => :environment
+end
 #rake permissions:initial_hbx
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn

@@ -162,4 +162,10 @@ class DefinePermissions < MigrationTask
       HbxStaffRole.create!( person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
   end
+
+  def hbx_admin_can_view_application_types
+    Permission.hbx_csr_supervisor.update_attributes!(can_view_application_types: true)
+    Permission.hbx_csr_tier2.update_attributes!(can_view_application_types: true)
+    Permission.hbx_csr_tier1.update_attributes!(can_view_application_types: true)
+  end
 end

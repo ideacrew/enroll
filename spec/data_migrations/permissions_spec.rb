@@ -465,6 +465,34 @@ describe DefinePermissions, dbclean: :after_each do
       end
     end
 
+    describe 'update permissions for hbx staff role to be able to view  application types' do
+      let(:given_task_name) {':hbx_admin_can_view_application_types'}
+      before do
+        User.all.delete
+        Person.all.delete
+        @hbx_staff_person = FactoryBot.create(:person)
+        @hbx_csr_supervisor_person = FactoryBot.create(:person)
+        @hbx_csr_tier1_person = FactoryBot.create(:person)
+        @hbx_csr_tier2_person = FactoryBot.create(:person)
+        hbx_staff_role = FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        hbx_csr_supervisor_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
+        hbx_csr_tier1_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
+        hbx_csr_tier2_role = FactoryBot.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
+        subject.hbx_admin_can_view_application_types
+      end
+
+      it "updates can_view_application_types to true" do
+        expect(Person.all.count).to eq(3)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_application_types).to be true
+        #verifying that the rake task updated only the correct subroles
+        expect(Permission.developer.can_view_application_types).to be false
+      end
+    end
+
+
     describe 'update permissions for hbx staff role to add sep' do
       let(:given_task_name) {':hbx_admin_can_add_sep'}
 

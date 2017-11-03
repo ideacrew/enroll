@@ -28,6 +28,7 @@ class Permission
   field :can_force_publish, type: Boolean, default: false
   field :view_the_configuration_tab, type: Boolean, default: false
   field :can_submit_time_travel_request, type: Boolean, default: false
+  field :can_view_application_types, type: Boolean, default: false
 
   class << self
     def hbx_staff
