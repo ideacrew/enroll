@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     sponsored_applications (0.0.1)
+      aasm (~> 4.8.0)
       mongoid (~> 5.0.1)
       rails (~> 4.2.3)
       slim (= 3.0.8)
@@ -9,6 +10,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (4.8.0)
     actionmailer (4.2.10)
       actionpack (= 4.2.10)
       actionview (= 4.2.10)
