@@ -79,6 +79,8 @@ module ConsumerRolesHelper
     application_type = []
     if person.primary_family.e_case_id.present?
       application_type = ["Curam"]
+    elsif pundit_allow(ConsumerRole, :view_all_application_types?)
+      application_type = ["Paper", "Phone"]
     else
       application_type = [ "Phone", "In Person", "Paper", "Curam", "Mobile" ]
     end
