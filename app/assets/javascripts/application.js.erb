@@ -630,6 +630,11 @@ $(document).on('change', "#plan_year_start_on", function() {
   // assign fake location_id that will be overridden by js
   var location_id = $('.benefit-group-fields:last').attr('id');
   var active_year = $(this).val().substr(0,4);
+  if($.inArray(active_year, <%= Settings.aca.dental_plan_years_available %>) !== -1){
+    $(".show-dental-plans").show();
+  }else{
+    $(".show-dental-plans").hide();
+  }
   $.ajax({
     type: "GET",
     data:{

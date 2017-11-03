@@ -102,7 +102,7 @@
 	  <span class="dent plan-count" style="display: none;"><% if i < 50 %><% if @plan_year.benefit_groups[i].elected_dental_plan_ids.count == 13 %>All<% else %><%= @plan_year.benefit_groups[i].elected_dental_plan_ids.count %><% end %><% end %></span>
 	  <br/>
 	  <br/>
-    <% if dental_market_enabled? %>
+    <div class="show-dental-plans" style="display: none;">
   	  <div class="row">
   		  <div class="col-xs-12 edit-add-dental b bt-n vertically-aligned-row" style="<% if (@plan_year.new_record? == false && @plan_year.benefit_groups[i].try(:dental_reference_plan_id).present?) || @plan_year.new_record == true %>display: none;<% else %>display: block;<% end %>">
   			  <div class="col-xs-9 text-center">
@@ -113,7 +113,7 @@
   			  </div>
   		  </div>
   	  </div>
-    <% end %>
+    </div>
 	  <div class="select-dental-plan dental row" style="display: none;">
 		  <br/>
 		  <br/>

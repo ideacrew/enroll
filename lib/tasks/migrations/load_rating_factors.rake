@@ -16,6 +16,8 @@ namespace :load_rating_factors do
 
   desc "load rating factors from xlsx file"
   task :update_factor_sets, [:file_name] => :environment do |t,args|
+    CURRENT_ACTIVE_YEAR ||= TimeKeeper.date_of_record.year
+    NUMBER_OF_CARRIERS ||= 4
     ROW_DATA_BEGINS_ON ||= 3
     RATING_FACTOR_PAGES ||= {
       'SicCodeRatingFactorSet': { page: 0, max_integer_factor_key: nil },

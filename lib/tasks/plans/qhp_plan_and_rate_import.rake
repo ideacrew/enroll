@@ -1,6 +1,7 @@
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_benefit_template_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_builder.rb')
 require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_parser')
+require Rails.root.join('lib', 'tasks', 'hbx_import', 'qhp', 'parsers', 'plan_rate_group_list_parser')
 require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
 
 namespace :xml do
@@ -33,8 +34,13 @@ namespace :xml do
       action = args[:action] == "update" ? "update" : "new"
       puts file
       xml = Nokogiri::XML(File.open(file))
-      rates = Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
-      rate_hash.add(rates.to_hash, action)
+      year = file.split("/")[-3].to_i
+      rates = if year < 2018
+        Parser::PlanRateGroupParser.parse(xml.root.canonicalize, :single => true)
+      else
+        Parser::PlanRateGroupListParser.parse(xml.root.canonicalize, :single => true)
+      end
+      rate_hash.add(rates.to_hash, action, year)
       rate_hash
     end
     rate_import_hash.run

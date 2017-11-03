@@ -57,9 +57,9 @@
             <tr>
               <td><%= plan.plan_type ? plan.plan_type.upcase : "" %></td>
               <td>
-                <% plan_level = plan.metal_level.humanize %>
+                <% plan_level = plan.metal_level.titleize %>
                 <span class="<%= plan_level.downcase %>-icon">
-                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).humanize %>
+                  <%= plan_level != 'Dental' ? plan_level : display_dental_metal_level(plan).titleize %>
                 </span>
               </td>
               <td>
