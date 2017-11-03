@@ -69,19 +69,7 @@ module Observers
 
       if  CensusEmployee::REGISTERED_EVENTS.include?(new_model_event.event_key)  
         census_employee = new_model_event.klass_instance
-
-        if new_model_event.event_key == :renewal_oe_employee_not_enrolled
-          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_open_enrollment_employee_unenrolled")
-        end
-
-        if new_model_event.event_key == :passive_renewals_failed
-          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "passive_renewals_failed")
-        end
-
-        if new_model_event.event_key == :renewal_oe_employee_auto_renewal
-          trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: "renewal_oe_employee_auto_renewal")
-        end
-
+        trigger_notice(recipient: census_employee.employee_role, event_object: new_model_event.options[:event_object], notice_event: new_model_event.event_key.to_s)
       end
     end
   end

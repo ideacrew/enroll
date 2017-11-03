@@ -2,8 +2,9 @@ require 'rails_helper'
 
 describe 'ModelEvents::RenewalOpenEnrollmentEmployeeUnenrolledNotification' do
 
-  let(:model_event)  { "renewal_oe_employee_not_enrolled" }
-  let(:notice_event) { "renewal_open_enrollment_employee_unenrolled" }
+  let(:model_event)  { "employee_coverage_passively_waived" }
+  let(:notice_event) { "employee_coverage_passively_waived" }
+
   let(:renewal_year) { (TimeKeeper.date_of_record.end_of_month + 1.day + 2.months).year }
 
   let!(:renewal_plan) {
@@ -90,9 +91,9 @@ describe 'ModelEvents::RenewalOpenEnrollmentEmployeeUnenrolledNotification' do
         factory.employer = employer_profile
         factory.renewing_plan_year = renewing_plan_year
         model_instance.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:census_employee_update) do |model_event|
-            expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :renewal_oe_employee_not_enrolled, :klass_instance => model_instance, :options => {:event_object => renewing_plan_year})
+          expect(observer).to receive(:census_employee_update) do |model_event_instance|
+            expect(model_event_instance).to be_an_instance_of(ModelEvents::ModelEvent)
+            expect(model_event_instance).to have_attributes(:event_key => model_event.to_sym, :klass_instance => model_instance, :options => {:event_object => renewing_plan_year})
           end
         end
         factory.renew
@@ -104,16 +105,16 @@ describe 'ModelEvents::RenewalOpenEnrollmentEmployeeUnenrolledNotification' do
     context "when renewal open enrollment employee unenrolled" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:renewal_oe_employee_not_enrolled, model_instance, {event_object:renewing_plan_year}) }
+      let(:model_event_instance) { ModelEvents::ModelEvent.new(model_event.to_sym, model_instance, {event_object:renewing_plan_year}) }
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.renewal_open_enrollment_employee_unenrolled"
+          expect(event_name).to eq "acapi.info.events.employee.#{notice_event}"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq renewing_plan_year.id.to_s
         end
-        subject.census_employee_update(model_event)
+        subject.census_employee_update(model_event_instance)
       end
     end
   end

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe 'ModelEvents::PassiveRenewalsFailedNotification' do
 
-  let(:model_event)  { "passive_renewals_failed" }
-  let(:notice_event) { "passive_renewals_failed" }
+  let(:model_event)  { "employee_coverage_passive_renewal_failed" }
+  let(:notice_event) { "employee_coverage_passive_renewal_failed" }
   let(:renewal_year) { (TimeKeeper.date_of_record.end_of_month + 1.day + 2.months).year }
 
   let!(:renewal_plan) {
@@ -90,9 +90,9 @@ describe 'ModelEvents::PassiveRenewalsFailedNotification' do
         factory.renewing_plan_year = renewing_plan_year
         allow(factory).to receive(:renewal_plan_offered_by_er?).and_return false
         model_instance.observer_peers.keys.each do |observer|
-          expect(observer).to receive(:census_employee_update) do |model_event|
-            expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
-            expect(model_event).to have_attributes(:event_key => :passive_renewals_failed, :klass_instance => model_instance, :options => {:event_object => renewing_plan_year})
+          expect(observer).to receive(:census_employee_update) do |model_event_instance|
+            expect(model_event_instance).to be_an_instance_of(ModelEvents::ModelEvent)
+            expect(model_event_instance).to have_attributes(:event_key => model_event.to_sym, :klass_instance => model_instance, :options => {:event_object => renewing_plan_year})
           end
         end
         factory.renew
@@ -104,7 +104,7 @@ describe 'ModelEvents::PassiveRenewalsFailedNotification' do
     context "when passive renewals failed" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:passive_renewals_failed, model_instance, {event_object:renewing_plan_year}) }
+      let(:model_event_instance) { ModelEvents::ModelEvent.new(model_event.to_sym, model_instance, {event_object:renewing_plan_year}) }
 
       it "should trigger notice event" do
         factory = Factories::FamilyEnrollmentRenewalFactory.new
@@ -114,12 +114,12 @@ describe 'ModelEvents::PassiveRenewalsFailedNotification' do
         factory.renewing_plan_year = renewing_plan_year
         allow(factory).to receive(:renewal_plan_offered_by_er?).and_return false
         expect(subject).to receive(:notify) do |event_name, payload|
-          expect(event_name).to eq "acapi.info.events.employee.passive_renewals_failed"
+          expect(event_name).to eq "acapi.info.events.employee.#{notice_event}"
           expect(payload[:employee_role_id]).to eq model_instance.employee_role.id.to_s
           expect(payload[:event_object_kind]).to eq 'PlanYear'
           expect(payload[:event_object_id]).to eq renewing_plan_year.id.to_s
         end
-        subject.census_employee_update(model_event)
+        subject.census_employee_update(model_event_instance)
       end
     end
   end

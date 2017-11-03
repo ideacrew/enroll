@@ -2,9 +2,9 @@ module ModelEvents
   module CensusEmployee
 
     REGISTERED_EVENTS = [
-      :renewal_oe_employee_not_enrolled,
-      :passive_renewals_failed,
-      :renewal_oe_employee_auto_renewal
+      :employee_coverage_passively_waived,
+      :employee_coverage_passively_renewed,
+      :employee_coverage_passive_renewal_failed
     ]
 
     def notify_on_save

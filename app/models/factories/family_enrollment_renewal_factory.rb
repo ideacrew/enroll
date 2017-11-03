@@ -46,20 +46,20 @@ module Factories
             active_enrollment = shop_enrollments.compact.sort_by{|e| e.submitted_at || e.created_at }.last
             if active_enrollment.present? && active_enrollment.inactive?
               renew_waived_enrollment(active_enrollment)
-              census_employee.trigger_model_event(:renewal_oe_employee_not_enrolled, {event_object: renewing_plan_year}) unless disable_notifications
+              census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
             elsif renewal_plan_offered_by_er?(active_enrollment)
               renewal_enrollment = renewal_builder(active_enrollment)
               renewal_enrollment = clone_shop_enrollment(active_enrollment, renewal_enrollment)
               renewal_enrollment.decorated_hbx_enrollment
               save_renewal_enrollment(renewal_enrollment, active_enrollment)
-              census_employee.trigger_model_event(:renewal_oe_employee_auto_renewal, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
+              census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewing_plan_year}) unless (renewal_enrollment.coverage_kind == "dental" || disable_notifications)
             else
-              census_employee.trigger_model_event(:passive_renewals_failed, {event_object: renewing_plan_year}) unless disable_notifications
+              census_employee.trigger_model_event(:employee_coverage_passive_renewal_failed, {event_object: renewing_plan_year}) unless disable_notifications
             end
           end
         elsif family.active_household.hbx_enrollments.where(:aasm_state => 'renewing_waived').blank?
           renew_waived_enrollment
-          census_employee.trigger_model_event(:renewal_oe_employee_not_enrolled, {event_object: renewing_plan_year}) unless disable_notifications
+          census_employee.trigger_model_event(:employee_coverage_passively_waived, {event_object: renewing_plan_year}) unless disable_notifications
         end
       rescue Exception => e
         puts "Error found for #{census_employee.full_name} while creating renewals -- #{e.inspect}" unless Rails.env.test?
