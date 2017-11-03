@@ -135,6 +135,7 @@ def employer_terminated_from_shop(org)
   org.employer_profile.census_employees.active.each do |ce|
     begin
       ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+      puts "Notification generated for #{ce.full_name}"
     rescue Exception => e
       (Rails.logger.error { "Unable to deliver employer terminated from shop notice to #{ce.full_name} " }) unless Rails.env.test?
     end
