@@ -177,6 +177,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @organization = Organization.find(params[:id])
     @employer_profile = @organization.employer_profile
     @staff = Person.staff_for_employer_including_pending(@employer_profile)
+    @staff = @staff.sort_by{|x| x.is_primary_poc ? 0 : 1 } if @staff.present?
     @add_staff = params[:add_staff]
     @plan_year = @employer_profile.plan_years.where(id: params[:plan_year_id]).first
   end
