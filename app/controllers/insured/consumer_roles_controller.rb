@@ -210,7 +210,7 @@ class Insured::ConsumerRolesController < ApplicationController
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.application_type == 'Curam' ||  @person.primary_family.application_type == 'Mobile'
+        if is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path

@@ -1108,6 +1108,11 @@ class Family
   end
 
 private
+
+  def has_curam_or_mobile_application_type?
+    ['Curam', 'Mobile'].include?application_type
+  end
+
   def build_household
     if households.size == 0
       irs_group = initialize_irs_group
