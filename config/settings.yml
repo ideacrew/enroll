@@ -12,7 +12,8 @@ site:
   home_forms_url: "https://dchealthlink.com/forms"
   forms_name: "DCHealthLink.com/forms"
   website_name: "www.DCHealthLink.com"
-  
+  website_url: "www.healthcare.gov"
+
   social_media:
     facebook_url: ""
 
