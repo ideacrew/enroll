@@ -1109,7 +1109,7 @@ class Family
   end
 
   def has_curam_or_mobile_application_type?
-    ['Curam', 'Mobile'].include?application_type
+    ['Curam', 'Mobile'].include? application_type
   end
 
 private
