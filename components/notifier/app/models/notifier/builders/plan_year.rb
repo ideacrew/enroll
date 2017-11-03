@@ -91,5 +91,13 @@ module Notifier
         merge_model.plan_year.renewal_py_end_on = renewal_plan_year.end_on
       end
     end
+
+    def plan_year_enrollment_errors
+      if renewal_plan_year.present?
+        merge_model.plan_year.enrollment_errors = renewal_plan_year.enrollment_errors
+      elsif current_plan_year.present?
+        merge_model.plan_year.enrollment_errors = current_plan_year.enrollment_errors
+      end
+    end
   end
 end

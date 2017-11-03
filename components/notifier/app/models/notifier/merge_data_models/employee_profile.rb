@@ -16,7 +16,7 @@ module Notifier
     attribute :new_hire_oe_start_date, String
     attribute :new_hire_oe_end_date, String
     attribute :addresses, Array[MergeDataModels::Address]
-    attribute :enrollment, MergeDataModels::Plan
+    attribute :enrollment, MergeDataModels::Enrollment
     attribute :plan_year, MergeDataModels::PlanYear
   
     def self.stubbed_object
@@ -31,11 +31,11 @@ module Notifier
         new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
         new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%,/%d/%Y')
       })
-      notice.mailing_address = Notifier::MergeDataModels::Address.new
-      notice.broker = Notifier::MergeDataModels::Broker.new
+      notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
+      notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
       notice.addresses = [ notice.mailing_address ]
-      notice.enrollment = Notifier::MergeDataModels::Plan.new
-      notice.plan_year = Notifier::MergeDataModels::PlanYear.new
+      notice.enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object
+      notice.plan_year = Notifier::MergeDataModels::PlanYear.stubbed_object
       notice
     end
 

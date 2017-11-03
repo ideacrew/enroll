@@ -7,6 +7,11 @@ module Notifier
       render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object}) 
     end
 
+    def notice_recipient
+      return OpenStruct.new(hbx_id: "100009") if resource.blank?
+      resource.is_a?(EmployeeRole) ? resource.person : resource
+    end
+
     def construct_notice_object
       builder_klass = ['Notifier', 'Builders', recipient.split('::').last].join('::')
       builder = builder_klass.constantize.new
@@ -82,7 +87,7 @@ module Notifier
           content: ApplicationController.new.render_to_string({
             template: "notifier/notice_kinds/header_with_page_numbers.html.erb",
             layout: false,
-            locals: {notice: self}
+            locals: {notice: self, recipient: notice_recipient}
             }),
           }
       }
