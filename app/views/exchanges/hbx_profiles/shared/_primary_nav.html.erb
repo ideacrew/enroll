@@ -11,7 +11,7 @@
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'families',
-                    link_path: family_index_dt_exchanges_hbx_profiles_path,
+                    link_path: main_app.family_index_dt_exchanges_hbx_profiles_path,
                     display_name: 'Families',
                     active_tab: active_tab,
                     glyphicon_class: 'glyphicon-heart'
@@ -21,7 +21,7 @@
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'employers-invoice',
-                    link_path: employer_invoice_exchanges_hbx_profiles_path,
+                    link_path: main_app.employer_invoice_exchanges_hbx_profiles_path,
                     display_name: 'Employers',
                     active_tab: active_tab,
                     glyphicon_class: 'glyphicon-briefcase'
@@ -31,7 +31,7 @@
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'user-account',
-                    link_path: user_account_index_exchanges_hbx_profiles_path,
+                    link_path: main_app.user_account_index_exchanges_hbx_profiles_path,
                     display_name: 'User Accounts',
                     active_tab: active_tab,
                     glyphicon_class: 'glyphicon-user'
@@ -40,7 +40,7 @@
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                     tab_name: 'issuers',
-                    link_path: issuer_index_exchanges_hbx_profiles_path,
+                    link_path: main_app.issuer_index_exchanges_hbx_profiles_path,
                     display_name: 'Issuers',
                     active_tab: active_tab,
                     glyphicon_class: 'glyphicon-italic'
@@ -50,7 +50,7 @@
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
                           tab_name: 'products',
-                          link_path: product_index_exchanges_hbx_profiles_path,
+                          link_path: main_app.product_index_exchanges_hbx_profiles_path,
                           display_name: 'Products',
                           active_tab: active_tab,
                           glyphicon_class: 'glyphicon-usd'
@@ -62,14 +62,14 @@
             <ul class="dropdown-menu">
             <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                             tab_name: 'brokers',
-                                                                            link_path: exchanges_broker_applicants_path,
+                                                                            link_path: main_app.exchanges_broker_applicants_path,
                                                                             display_name: 'Broker Applications',
                                                                             active_tab: active_tab,
                                                                             glyphicon_class: 'glyphicon-pencil'
                                                                           } %>
               <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'broker-agencies',
-                                                                              link_path: broker_agency_index_exchanges_hbx_profiles_path,
+                                                                              link_path: main_app.broker_agency_index_exchanges_hbx_profiles_path,
                                                                               display_name: 'Broker Agencies',
                                                                               active_tab: active_tab,
                                                                               glyphicon_class: 'glyphicon-phone'
@@ -77,7 +77,7 @@
               <% if general_agency_enabled? %>
                 <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                               tab_name: 'general-agencies',
-                                                                              link_path: general_agency_index_exchanges_hbx_profiles_path,
+                                                                              link_path: main_app.general_agency_index_exchanges_hbx_profiles_path,
                                                                               display_name: 'General Agencies',
                                                                               active_tab: active_tab,
                                                                               glyphicon_class: 'glyphicon-phone'
@@ -90,14 +90,14 @@
         <ul class="dropdown-menu">
           <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                           tab_name: 'calendar',
-                                                                          link_path: exchanges_scheduled_events_path,
+                                                                          link_path: main_app.exchanges_scheduled_events_path,
                                                                           display_name: 'Calendar',
                                                                           active_tab: active_tab,
                                                                           glyphicon_class:'glyphicon-calendar'
                                                                         } %>
           <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                           tab_name: 'configuration',
-                                                                          link_path: configuration_exchanges_hbx_profiles_path,
+                                                                          link_path: main_app.configuration_exchanges_hbx_profiles_path,
                                                                           display_name: 'Config',
                                                                           active_tab: active_tab,
                                                                           glyphicon_class: 'glyphicon-cog'
@@ -105,7 +105,7 @@
                                                                         %>
         <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                         tab_name: 'staff',
-                                                                        link_path: staff_index_exchanges_hbx_profiles_path,
+                                                                        link_path: main_app.staff_index_exchanges_hbx_profiles_path,
                                                                         display_name: 'Staff',
                                                                         active_tab: active_tab,
                                                                         glyphicon_class: 'glyphicon-sunglasses'
@@ -114,7 +114,7 @@
 
         <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                         tab_name: 'users-orphans',
-                                                                        link_path: users_orphans_path,
+                                                                        link_path: main_app.users_orphans_path,
                                                                         display_name: 'Orphan Accounts',
                                                                         active_tab: active_tab,
                                                                         glyphicon_class: 'glyphicon-search'
