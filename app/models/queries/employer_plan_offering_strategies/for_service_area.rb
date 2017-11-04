@@ -16,7 +16,7 @@ module Queries
 
       def metal_level_offered_health_plans(metal_level, start_on)
         profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(employer_profile)
-        Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on).shop_market.health_coverage.by_metal_level(metal_level).and(hios_id: /-01/)
+        Plan.for_service_areas_and_carriers(profile_and_service_area_pairs, start_on, metal_level).shop_market.check_plan_offerings_for_metal_level.health_coverage.by_metal_level(metal_level).and(hios_id: /-01/)
       end
 
       def single_option_offered_health_plans(carrier_id, start_on)
