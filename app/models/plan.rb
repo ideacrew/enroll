@@ -4,8 +4,8 @@ class Plan
 #  include Mongoid::Versioning
 
   COVERAGE_KINDS = %w[health dental]
-  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
+  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental expanded_bronze]
+  REFERENCE_PLAN_METAL_LEVELS = %w[expanded_bronze bronze silver gold platinum dental]
   MARKET_KINDS = %w(shop individual)
   PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
   DENTAL_METAL_LEVEL_KINDS = %w[high low]
@@ -149,6 +149,7 @@ class Plan
   scope :silver_level,        ->{ where(metal_level: "silver") }
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
+  scope :expanded_bronze_level,  ->{ where(metal_level: "expanded_bronze") }
 
 
   scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
@@ -457,13 +458,17 @@ class Plan
       result
     end
 
-    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+    def open_enrollment_year
+      Organization.open_enrollment_year
+    end
+
+    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
       Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
         Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
       end
     end
 
-    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, carrier_service_area_pairs=[])
+    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year, carrier_service_area_pairs=[])
       Plan.for_service_areas_and_carriers(carrier_service_area_pairs, year_of_plans)
     end
 
@@ -473,7 +478,7 @@ class Plan
       Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile).uniq
     end
 
-    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
       Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
         Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
       end

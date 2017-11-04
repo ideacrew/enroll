@@ -76,7 +76,7 @@ module Aws
     end
 
     def aws_env
-      ENV['AWS_ENV'] || "local"
+      ENV['AWS_ENV'] || "qa"
     end
 
     def env_bucket_name(bucket_name)

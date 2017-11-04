@@ -12,7 +12,11 @@ namespace :import do
       puts "Importing provider and formulary url's, marking plans as standard and updating network information from #{file}..."
       if file.present?
         result = Roo::Spreadsheet.open(file)
-        sheets = ["MA SHOP QHP"]
+        sheets = if year == 2017
+          ["MA SHOP QHP"]
+        elsif year == 2018
+          ["2018_QHP", "2018_QDP"]
+        end
         sheets.each do |sheet_name|
           sheet_data = result.sheet(sheet_name)
 
@@ -27,8 +31,10 @@ namespace :import do
             plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
             plans.each do |plan|
               plan.provider_directory_url = provider_directory_url
-              rx_formulary_url = row_info[@headers["rx formulary url"]].strip
-              plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+              if @headers["rx formulary url"].present?
+                rx_formulary_url = row_info[@headers["rx formulary url"]].strip
+                plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
+              end
               plan.is_standard_plan = row_info[@headers["standard plan?"]].strip == "Yes" ? true : false
               plan.network_information = row_info[@headers["network notes"]]
               plan.save

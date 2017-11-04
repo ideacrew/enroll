@@ -237,11 +237,19 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
+  def self.open_enrollment_year
+    if ("#{TimeKeeper.date_of_record.year}-11-01".to_date.."#{TimeKeeper.date_of_record.year}-12-31".to_date).cover?(TimeKeeper.date_of_record)
+      TimeKeeper.date_of_record.year + 1
+    else
+      TimeKeeper.date_of_record.year
+    end
+  end
+
   def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
-    cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    cache_string = "carrier-names-at-#{self.open_enrollment_year}"
     if (filters[:primary_office_location].present?)
       office_location = filters[:primary_office_location]
-      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{self.open_enrollment_year}"
     end
 
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
