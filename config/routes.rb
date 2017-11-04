@@ -1,19 +1,25 @@
 Rails.application.routes.draw do
 
   mount TransportGateway::Engine, at: "/transport_gateway"
+  mount Notifier::Engine, at: "/notifier"
+  # mount RocketJobMissionControl::Engine => 'rocketjob'
   mount TransportProfiles::Engine, at: "/transport_profiles"
 
   require 'resque/server'
-  # mount Resque::Server, at: '/jobs'
+  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
+
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -344,7 +350,7 @@ Rails.application.routes.draw do
 
   match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
   match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
-  
+
   namespace :carriers do
     resources :carrier_profiles do
     end
@@ -556,6 +562,7 @@ Rails.application.routes.draw do
       get :download_employer_document
     end
   end
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

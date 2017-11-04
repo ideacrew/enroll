@@ -469,6 +469,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       allow(plan_year_proxy).to receive(:publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:renewing_publish_pending?).and_return(false)
       allow(plan_year_proxy).to receive(:application_errors)
+      allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({})
     end
 
     context "plan year published sucessfully" do
@@ -500,7 +501,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       before :each do
         allow(plan_year_proxy).to receive(:publish_pending?).and_return(true)
         allow(plan_year_proxy).to receive(:withdraw_pending!).and_return(true)
-        allow(plan_year_proxy).to receive(:application_eligibility_warnings)
+        allow(plan_year_proxy).to receive(:application_eligibility_warnings).and_return({primary_office_location: "address located outside the state"})
       end
 
       it "should be a render modal box with warnings" do

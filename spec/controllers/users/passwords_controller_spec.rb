@@ -17,5 +17,5 @@ require 'rails_helper'
       post :create, { user: { email: email} }
       expect(response).to have_http_status(302)
     end
-  end  
+  end
  end
