@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
-  before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
+  before_action :find_employer
+  before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
@@ -307,6 +307,23 @@ class Employers::PlanYearsController < ApplicationController
       start_on = params[:start_on].to_date
       @result = PlanYear.check_start_on(start_on)
       if @result[:result] == "ok"
+        @plan_year = build_plan_year
+        @benefit_group = params[:benefit_group]
+        @location_id = params[:location_id]
+        @start_on = params[:start_on].to_date.year
+
+        ## TODO: different if we dont have service areas enabled
+        ## TODO: awfully slow
+        @single_carriers = Organization.load_carriers(
+                            primary_office_location: @employer_profile.organization.primary_office_location,
+                            selected_carrier_level: 'single_carrier',
+                            active_year: @start_on
+                            )
+        @sole_source_carriers = Organization.load_carriers(
+                            primary_office_location: @employer_profile.organization.primary_office_location,
+                            selected_carrier_level: 'sole_source',
+                            active_year: @start_on
+                            )
         @open_enrollment_dates = PlanYear.calculate_open_enrollment_date(start_on)
         @schedule= PlanYear.shop_enrollment_timetable(start_on)
       end
@@ -420,6 +437,22 @@ class Employers::PlanYearsController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def generate_health_carriers_and_plans
+    @plan_year = build_plan_year
+    @benefit_group = params[:benefit_group]
+    @location_id = params[:location_id]
+    @start_on = params[:start_on]
+    @carrier_search_level = params[:selected_carrier_level]
+
+    ## TODO: different if we dont have service areas enabled
+    ## TODO: awfully slow
+    @carrier_names = Organization.load_carriers(
+                        primary_office_location: @employer_profile.organization.primary_office_location,
+                        selected_carrier_level: params[:selected_carrier_level],
+                        active_year: @start_on
+                        )
   end
 
   private

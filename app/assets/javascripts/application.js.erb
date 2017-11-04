@@ -617,9 +617,17 @@ $(document).on('change', "#plan_year_start_on", function() {
   if(start_on_date != "") {
     $('.recommend #notice').html("<h4>Loading Suggested Dates...<h4>");
     var target_url = $("a#generate_recommend_dates").data("href");
+    var employer_profile_id = $('#employerProfileId').data('value');
+    var benefit_group_id = $('#benefitGroupId').data('value');
+    var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
     $.ajax({
       type: "GET",
-      data:{start_on: start_on_date},
+      data:{
+        start_on: start_on_date,
+        benefit_group_id: benefit_group_id,
+        location_id: location_id,
+        employer_profile_id: employer_profile_id
+      },
       url: target_url
     });
   };
