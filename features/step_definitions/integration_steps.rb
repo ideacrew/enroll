@@ -784,7 +784,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  click_link 'Select Plan'
+  first(:link, 'Select Plan').click
 end
 
 Then(/^.+ should see the coverage summary page$/) do

@@ -37,18 +37,24 @@ class Employers::PlanYearsController < ApplicationController
     @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
 
     offering_query = Queries::EmployerPlanOfferings.new(@employer_profile)
-    @plans = if params[:plan_option_kind] == "single_carrier"
+    @plans = case params[:plan_option_kind]
+    when "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       offering_query.single_carrier_offered_health_plans(params[:carrier_id], params[:start_on])
-    elsif params[:plan_option_kind] == "metal_level"
+    when "metal_level"
       @metal_level = params[:metal_level]
       offering_query.metal_level_offered_health_plans(params[:metal_level], params[:start_on])
-    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
+    when "single_plan"
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       offering_query.single_option_offered_health_plans(params[:carrier_id], params[:start_on])
+    when "sole_source"
+      @single_plan = params[:single_plan]
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:start_on])
     end
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     respond_to do |format|

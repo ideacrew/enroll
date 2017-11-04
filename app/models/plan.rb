@@ -148,6 +148,11 @@ class Plan
   ## Scopes
   default_scope -> {order("name ASC")}
 
+  #filter based on plan offerings
+  scope :check_plan_offerings_for_metal_level,  ->{ where(is_horizontal: "true") }
+  scope :check_plan_offerings_for_single_carrier,  ->{ where(is_vertical: "true") }
+  scope :check_plan_offerings_for_sole_source,  ->{ where(is_sole_source: "true") }
+
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }
   scope :gold_level,          ->{ where(metal_level: "gold") }
