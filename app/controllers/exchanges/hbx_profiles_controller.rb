@@ -201,6 +201,10 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
+  
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
 
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
