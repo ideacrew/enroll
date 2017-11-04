@@ -87,7 +87,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     person.update_attributes(person_profile_params)
     person.save!
 
-    @broker_agency_profile.update_attributes(languages_spoken_params)
+    @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
 
 
     if @organization.update_attributes(broker_profile_params)
