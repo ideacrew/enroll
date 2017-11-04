@@ -296,6 +296,10 @@ def employer_poc
     @datatable = Effective::Datatables::FamilyDataTable.new(params[:scopes])
     #render '/exchanges/hbx_profiles/family_index_datatable'
   end
+  
+  def identity_verification
+    @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
+  end
 
   def user_account_index
     @datatable = Effective::Datatables::UserAccountDatatable.new
