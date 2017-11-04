@@ -58,6 +58,7 @@ RSpec.describe Employers::PlanYearsController, :dbclean => :after_each do
       expect(response).to render_template("new")
     end
 
+    ## Don't generate carriers on page load anymore
     it "should generate benefit_group with nil plan_option_kind" do
       benefit_group = assigns(:plan_year).benefit_groups.first
       expect(benefit_group.plan_option_kind).to eq nil
