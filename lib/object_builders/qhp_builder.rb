@@ -197,30 +197,33 @@ class QhpBuilder
           plan = Plan.where(active_year: @plan_year,
             hios_id: /#{@qhp.standard_component_id.strip}/,
             hios_base_id: /#{cost_share_variance.hios_plan_and_variant_id.split('-').first}/,
-            csr_variant_id: csr_variant_id).to_a
-          next if plan.present?
-          issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
-          carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
-          carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
-          new_plan = Plan.new(
-            name: cost_share_variance.plan_marketing_name.squish!,
-            hios_id: cost_share_variance.hios_plan_and_variant_id,
-            hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
-            csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
-            active_year: @plan_year,
-            metal_level: parse_metal_level,
-            market: parse_market,
-            ehb: @qhp.ehb_percent_premium,
-            # carrier_profile_id: "53e67210eb899a460300000d",
-            carrier_profile_id: carrier_profile_id,
-            coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
-            dental_level: @dental_metal_level,
-            service_area_id: @qhp.service_area_id
-            )
-          if new_plan.valid?
-            new_plan.save!
+            csr_variant_id: csr_variant_id).to_a.first
+          if plan.present?
+            plan.update_attributes(name: cost_share_variance.plan_marketing_name.squish!)
           else
-            @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
+            issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
+            carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
+            carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
+            new_plan = Plan.new(
+              name: cost_share_variance.plan_marketing_name.squish!,
+              hios_id: cost_share_variance.hios_plan_and_variant_id,
+              hios_base_id: cost_share_variance.hios_plan_and_variant_id.split("-").first,
+              csr_variant_id: cost_share_variance.hios_plan_and_variant_id.split("-").last,
+              active_year: @plan_year,
+              metal_level: parse_metal_level,
+              market: parse_market,
+              ehb: @qhp.ehb_percent_premium,
+              # carrier_profile_id: "53e67210eb899a460300000d",
+              carrier_profile_id: carrier_profile_id,
+              coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+              dental_level: @dental_metal_level,
+              service_area_id: @qhp.service_area_id
+              )
+            if new_plan.valid?
+              new_plan.save!
+            else
+              @logger.error "\n Failed to create plan: #{new_plan.name}, \n hios product id: #{new_plan.hios_id}\n Errors: #{new_plan.errors.full_messages}\n ******************** \n"
+            end
           end
         end
       end

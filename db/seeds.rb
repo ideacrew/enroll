@@ -200,4 +200,10 @@ puts "::: complete :::"
 puts "*"*80
 system "bundle exec rake permissions:initial_hbx"
 puts "*"*80
+
+require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
+puts "importing security questions complete"
+puts "*"*80
+
+
 puts "End of Seed Data"

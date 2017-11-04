@@ -63,6 +63,11 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
+  # offerings
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
+
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
@@ -298,12 +303,12 @@ class Plan
 
   def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year, metal_level = nil, coverage_kind = 'health')
     plan_criteria_set = service_area_carrier_pairs.map do |sap|
-    	criteria = {
-    		:carrier_profile_id => sap.first,
-    		:service_area_id => sap.last,
-    		:active_year => active_year,
+      criteria = {
+        :carrier_profile_id => sap.first,
+        :service_area_id => sap.last,
+        :active_year => active_year,
         :coverage_kind => coverage_kind
-    	}
+      }
       if metal_level.present?
         criteria.merge(metal_level: metal_level)
       end
