@@ -523,12 +523,12 @@ describe BenefitGroup, type: :model do
       let(:organization)            { employer_profile.organization }
       let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
       let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile, metal_level: "gold") }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
-      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile_1) }
+      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
       let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
+          FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
         end
         plans.concat([reference_plan_choice, elected_plan_choice, bronze_plan_choice])
         plans
