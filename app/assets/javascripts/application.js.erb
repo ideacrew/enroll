@@ -619,7 +619,8 @@ $(document).on('change', "#plan_year_start_on", function() {
     var target_url = $("a#generate_recommend_dates").data("href");
     var employer_profile_id = $('#employerProfileId').data('value');
     var benefit_group_id = $('#benefitGroupId').data('value');
-    var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
+    var location_id = $('.health .nav li').closest('fieldset').attr('id');
+
     $.ajax({
       type: "GET",
       data:{
