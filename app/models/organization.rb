@@ -256,7 +256,13 @@ class Organization
 
     if (filters[:primary_office_location].present?)
       office_location = filters[:primary_office_location]
-      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+      cache_string << "-#{office_location.address.zip}-#{office_location.address.county}"
+    end
+
+    if filters[:active_year].present?
+      cache_string << "-carrier-names-at-#{filters[:active_year]}"
+    else
+      cache_string << "-carrier-names-at-#{TimeKeeper.date_of_record.year}"
     end
 
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
