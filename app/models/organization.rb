@@ -23,6 +23,7 @@ class Organization
   FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
 
   field :hbx_id, type: String
+  field :issuer_assigned_id, type: String
 
   # Registered legal name
   field :legal_name, type: String
@@ -237,22 +238,107 @@ class Organization
     all_employers_by_plan_year_start_on_and_valid_plan_year_statuses(date)
   end
 
-  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
-    cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
+  def self.open_enrollment_year
+    if ("#{TimeKeeper.date_of_record.year}-11-01".to_date.."#{TimeKeeper.date_of_record.year}-12-31".to_date).cover?(TimeKeeper.date_of_record)
+      TimeKeeper.date_of_record.year + 1
+    else
+      TimeKeeper.date_of_record.year
+    end
+  end
+
+  def self.load_carriers(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+    cache_string = "load-carriers"
+    if (filters[:selected_carrier_level].present?)
+      cache_string << "-for-#{filters[:selected_carrier_level]}"
+    else
+      cache_string << ""
+    end
+
     if (filters[:primary_office_location].present?)
       office_location = filters[:primary_office_location]
-      cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+      cache_string << "-#{office_location.address.zip}-#{office_location.address.county}"
+    end
+
+    if filters[:active_year].present?
+      cache_string << "-carrier-names-at-#{filters[:active_year]}"
+    else
+      cache_string << "-carrier-names-at-#{TimeKeeper.date_of_record.year}"
     end
 
     Rails.cache.fetch(cache_string, expires_in: 2.hour) do
       Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        ## don't enable Tufts for now
+        next carrier_names if org.fein == '800721489'
+
         unless (filters[:primary_office_location].nil?)
           next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+          if filters[:active_year]
+            if filters[:active_year].to_s == '2017'
+              # only include HNE, BMCHP, Fallon
+              next carrier_names if ['041045815','042452600','234547586'].include? org.fein
+            end
+            next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
+          end
         end
         if (filters[:sole_source_only]) ## Only sole source carriers requested
           next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
         end
         carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
+        carrier_names
+      end
+    end
+  end
+
+  def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil, selected_carrier_level: nil, active_year: nil })
+
+    if (filters[:selected_carrier_level].present?)
+      cache_string = "for-#{filters[:selected_carrier_level]}"
+    else
+      cache_string = ""
+    end
+
+    if (filters[:primary_office_location].present?)
+      office_location = filters[:primary_office_location]
+      cache_string << "-#{office_location.address.zip}-#{office_location.address.county}"
+    end
+
+    if filters[:active_year].present?
+      cache_string << "-carrier-names-at-#{filters[:active_year]}"
+    else
+      cache_string << "-carrier-names-at-#{TimeKeeper.date_of_record.year}"
+    end
+
+    Rails.cache.fetch(cache_string, expires_in: 2.hour) do
+      Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
+        ## don't enable Tufts for now
+        next carrier_names if org.fein == '800721489'
+        unless (filters[:primary_office_location].nil?)
+          next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
+          if filters[:active_year]
+            next carrier_names if CarrierServiceArea.valid_for_carrier_on(address: office_location.address, carrier_profile: org.carrier_profile, year: filters[:active_year]).empty?
+          end
+        end
+        if (filters[:sole_source_only]) ## Only sole source carriers requested
+          next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
+        end
+
+        if (filters[:active_year])
+          carrier_plans = Plan.valid_shop_health_plans("carrier", org.carrier_profile.id, filters[:active_year])
+        else
+          carrier_plans = Plan.valid_shop_health_plans("carrier", org.carrier_profile.id)
+        end
+
+        if (filters[:selected_carrier_level])
+          case filters[:selected_carrier_level]
+          when 'single_carrier'
+            carrier_plans.select! { |plan| plan.is_vertical }
+          when 'metal_level'
+            carrier_plans.select! { |plan| plan.is_horizontal }
+          when 'sole_source'
+            carrier_plans.select! { |plan| plan.is_sole_source }
+          end
+        end
+        carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if carrier_plans.any?
         carrier_names
       end
     end

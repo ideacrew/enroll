@@ -217,8 +217,24 @@ end
 
 describe BenefitGroup, type: :model do
 
+  let!(:employer_profile)               { FactoryGirl.create(:employer_profile) }
+  let(:valid_plan_year_start_on)        { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+  let(:valid_plan_year_end_on)          { valid_plan_year_start_on + 1.year - 1.day }
+  let(:valid_open_enrollment_start_on)  { valid_plan_year_start_on.prev_month }
+  let(:valid_open_enrollment_end_on)    { valid_open_enrollment_start_on + 9.days }
+
+  let(:plan_year_valid_params) do
+    {
+      employer_profile: employer_profile,
+      start_on: valid_plan_year_start_on,
+      end_on: valid_plan_year_end_on,
+      open_enrollment_start_on: valid_open_enrollment_start_on,
+      open_enrollment_end_on: valid_open_enrollment_end_on,
+    }
+  end
+
   let(:title)                   { "Employee Perks" }
-  let(:plan_year)               { FactoryGirl.build(:plan_year) }
+  let(:plan_year)               { PlanYear.new(plan_year_valid_params) }
   let(:reference_plan)          { FactoryGirl.build(:plan) }
   let(:plan_option_kind)        { "single_plan" }
   let(:effective_on_kind)       { "first_of_month" }
@@ -504,17 +520,31 @@ describe BenefitGroup, type: :model do
     end
 
     context "and the 'carrier plans' option is offered" do
-      let(:organization)            { FactoryGirl.create(:organization) }
-      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile) }
-      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile, organization: organization) }
-      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile) }
-      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile_1) }
+      let(:organization)            { employer_profile.organization }
+      let(:carrier_profile)         { FactoryGirl.create(:carrier_profile, organization: organization) }
+      let(:carrier_profile_1)       { FactoryGirl.create(:carrier_profile) }
+      let(:reference_plan_choice)   { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "gold") }
+      let(:elected_plan_choice)     { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile_1) }
+      let(:bronze_plan_choice)      { FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile, metal_level: "bronze", is_vertical: false) }
       let(:elected_plan_set) do
         plans = [1, 2, 3].collect do
-          FactoryGirl.create(:plan, :with_premium_tables, carrier_profile: carrier_profile)
+          FactoryGirl.create(:plan, :with_premium_tables, active_year: benefit_group.start_on.year, carrier_profile: carrier_profile)
         end
-        plans.concat([reference_plan_choice, elected_plan_choice])
+        plans.concat([reference_plan_choice, elected_plan_choice, bronze_plan_choice])
         plans
+      end
+
+      context "when one carrier is selected" do
+        before do
+          benefit_group.plan_option_kind = :single_carrier
+          benefit_group.reference_plan = reference_plan_choice
+          benefit_group.elected_plans = elected_plan_set
+        end
+
+        it "should contain 4 plans which are gold and silver." do
+          expect(benefit_group.elected_plans_by_option_kind.size).to eq 4
+          expect(benefit_group.elected_plans_by_option_kind.map(&:metal_level).uniq).to eq ["gold", "silver"]
+        end
       end
 
       context "and the reference plan is not in the elected plan set" do

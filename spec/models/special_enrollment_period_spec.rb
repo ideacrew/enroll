@@ -476,7 +476,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model do
     end
 
     it "should return a sep with an effective date that equals to sep date" do
-       sep.update_attributes(:qle_on => organization.employer_profile.plan_years[0].end_on - 14.days )
+      sep.update_attributes(:qle_on => organization.employer_profile.plan_years[0].end_on - 14.days )
        expect(sep.effective_on).to eq sep.qle_on
     end
 

@@ -1,12 +1,17 @@
 namespace :load_sic_code do
   desc "Load sic codes data"
   task :update_sic_codes => :environment do
-  	files = Dir.glob(File.join(Rails.root, "lib", "xls_templates", "si_codes.xlsx"))
+    files = if Rails.env.test?
+      Dir.glob(File.join(Rails.root, "spec/test_data/plan_data/sic_code/", "si_codes.xlsx"))
+    else
+      Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "xls_templates", "si_codes.xlsx"))
+    end
+    puts "Creating SicCodes" unless Rails.env.test?
     if files.present?
       sheet_data = Roo::Spreadsheet.open(files.first)
       2.upto(sheet_data.last_row) do |row_number|
-      	begin
-  	      row_data = sheet_data.row(row_number)
+        begin
+          row_data = sheet_data.row(row_number)
           sic_hash = {
             :division_code => row_data[1].sub('Division ', ''),
             :division_label => row_data[2],
@@ -23,5 +28,6 @@ namespace :load_sic_code do
         end
       end
     end
+    puts "Successfully created #{SicCode.all.count} SicCode records." unless Rails.env.test?
   end
 end

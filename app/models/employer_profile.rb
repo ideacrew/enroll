@@ -46,6 +46,7 @@ class EmployerProfile
   field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
+  delegate :issuer_assigned_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
@@ -1013,7 +1014,7 @@ class EmployerProfile
 
   def service_areas_available_on(date)
     if use_simple_employer_calculation_model?
-      return nil
+      return []
     end
     primary_office_location = organization.primary_office_location
     CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
