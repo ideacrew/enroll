@@ -89,12 +89,10 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
               end
             end
 
-            it 'should generate passive waiver' do
+            it 'should not generate passive waiver' do
               generate_renewal
               passive_waiver = current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').first
-              expect(passive_waiver.present?).to be_truthy
-              expect(passive_waiver.coverage_kind).to eq coverage_kind
-              expect(current_family.active_household.hbx_enrollments.renewing.empty?).to be_truthy
+              expect(passive_waiver.present?).to be_falsey
             end
           end
         end
@@ -163,9 +161,9 @@ RSpec.describe Factories::FamilyEnrollmentRenewalFactory, :type => :model do
             employee_D
           }
 
-          it 'should generate passive waiver' do
+          it 'should generate not passive waiver' do
             generate_renewal
-            expect(current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').present?).to be_truthy            
+            expect(current_family.active_household.hbx_enrollments.by_coverage_kind(coverage_kind).where(:aasm_state => 'renewing_waived').empty?).to be_truthy            
           end 
         end
       end
