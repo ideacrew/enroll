@@ -244,6 +244,10 @@ class Person
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
   scope :general_agency_staff_decertified,   -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :decertified })}
   scope :general_agency_staff_denied,        -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :denied })}
+
+  scope :outstanding_identity_validation, -> { where(:'consumer_role.identity_validation' => { "$eq" => "outstanding" })}
+  scope :outstanding_application_validation, -> { where(:'consumer_role.application_validation' => { "$eq" => "outstanding" })}
+
 #  ViewFunctions::Person.install_queries
 
   validate :consumer_fields_validations
@@ -553,6 +557,10 @@ class Person
   end
 
   class << self
+    def for_admin_approval
+      all_consumer_roles.outstanding_identity_validation.outstanding_application_validation
+    end
+
     def default_search_order
       [[:last_name, 1],[:first_name, 1]]
     end

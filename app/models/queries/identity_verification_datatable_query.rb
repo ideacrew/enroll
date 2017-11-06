@@ -22,7 +22,7 @@ module Queries
       #return Family if @search_string.blank?
       #person_id = Person.search(@search_string).limit(5000).pluck(:_id)
       #family_scope = Family.where('family_members.person_id' => {"$in" => person_id})
-      family = Person.unverified_persons
+      family = Person.for_admin_approval
       person = Person
       
       #add other scopes here
