@@ -137,7 +137,7 @@ module Factories
       renewal_benefit_group
     end
 
-    def clone_benefit_group(active_group)
+    def clone_benefit_group(active_group)      
       renewal_benefit_group = @renewal_plan_year.benefit_groups.build({
         title: "#{active_group.title} (#{@renewal_plan_year.start_on.year})",
         effective_on_kind: "first_of_month",

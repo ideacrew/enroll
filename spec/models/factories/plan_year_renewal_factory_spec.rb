@@ -75,7 +75,7 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.blank?).to be_truthy }
       end
 
-      context 'when renewal plan year have mapping on health but not for dental' do
+      context 'when renewal plan year have mapping for health but not for dental' do
 
         let(:dental_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302", renewal_plan_id: nil, coverage_kind: 'dental', dental_level: 'high')}
 
