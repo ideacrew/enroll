@@ -96,18 +96,6 @@ module Factories
         if elected_plan_ids.blank?
           raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_plan_ids}"
         end
-
-        if benefit_group.is_offering_dental?
-          reference_plan_id = benefit_group.dental_reference_plan.renewal_plan_id
-          if reference_plan_id.blank?
-            raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.dental_reference_plan.id} Year #{benefit_group.dental_reference_plan.active_year} Hios #{benefit_group.dental_reference_plan.hios_id}"
-          end
-
-          elected_plan_ids = benefit_group.renewal_elected_dental_plan_ids
-          if elected_plan_ids.blank?
-            raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_dental_plan_ids}"
-          end
-        end
       end
     end
 
@@ -134,6 +122,10 @@ module Factories
       renewal_benefit_group
     end
 
+    def is_renewal_dental_offered?(active_group)
+      active_group.is_offering_dental? && active_group.dental_reference_plan.renewal_plan_id.present? && active_group.renewal_elected_dental_plan_ids.any?
+    end
+
     def assign_dental_plan_offerings(renewal_benefit_group, active_group)
       renewal_benefit_group.assign_attributes({
         dental_plan_option_kind: active_group.dental_plan_option_kind,
@@ -145,7 +137,7 @@ module Factories
       renewal_benefit_group
     end
 
-    def clone_benefit_group(active_group)      
+    def clone_benefit_group(active_group)
       renewal_benefit_group = @renewal_plan_year.benefit_groups.build({
         title: "#{active_group.title} (#{@renewal_plan_year.start_on.year})",
         effective_on_kind: "first_of_month",
@@ -157,7 +149,7 @@ module Factories
       })
      
       renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
-      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if active_group.is_offering_dental?
+      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if is_renewal_dental_offered?(active_group)
       renewal_benefit_group
     end
 
