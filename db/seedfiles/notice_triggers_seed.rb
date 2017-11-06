@@ -491,7 +491,7 @@ shop_notice_triggers = [
    hbx_id: 'SHOP86',
    title: 'Genaral agency fired',
    description: "When a Broker is fired by an employer, the general agency's receives this notification letting them know they are no longer the broker for the client.",
-   resource_name: 'general_agency_profile',
+   resource_name: 'general_agent_profile',
    event_name: 'general_agency_terminated',
    notice_triggers: [
      {

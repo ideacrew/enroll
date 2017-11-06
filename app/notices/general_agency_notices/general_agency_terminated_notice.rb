@@ -8,7 +8,7 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
 
   def initialize(employer_profile, args = {})
     self.employer_profile = employer_profile
-    self.general_agency = self.employer_profile.general_agency_accounts.inactive.last
+    self.general_agency = self.employer_profile.general_agency_accounts.inactive.last 
     broker_role = self.employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.primary_broker_role.person
     self.broker = broker_role
     args[:recipient] = general_agency.general_agency_profile
@@ -20,7 +20,6 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
     self.header = "notices/shared/shop_header.html.erb"
     super(args)
   end
-
 
   def deliver
     build
@@ -40,25 +39,8 @@ class GeneralAgencyNotices::GeneralAgencyTerminatedNotice < GeneralAgencyNotice
     notice.employer_last_name = employer_profile.staff_roles.first.last_name.titleize
     notice.employer_email = employer_profile.staff_roles.first.emails.first.address
     notice.broker_agency = employer_profile.broker_agency_accounts.unscoped.last.broker_agency_profile.legal_name.titleize
+    notice.ga_terminated_on = general_agency.end_on
     append_hbe
     append_address(general_agency.general_agency_profile.organization.primary_office_location.address)
-  end
-
-  def attach_envelope
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
-  end
-
-  def non_discrimination_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
-  end
-
-  def append_address(primary_address)
-    notice.primary_address = PdfTemplates::NoticeAddress.new({
-     street_1: primary_address.address_1.titleize,
-     street_2: primary_address.address_2.titleize,
-     city: primary_address.city.titleize,
-     state: primary_address.state,
-     zip: primary_address.zip
-     })
   end
 end

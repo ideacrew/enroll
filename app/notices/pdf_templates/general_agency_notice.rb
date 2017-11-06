@@ -19,6 +19,7 @@ module PdfTemplates
     attribute :employer_first_name, String
     attribute :employer_last_name, String
     attribute :employer_email, String
+    attribute :ga_terminated_on, Date
 
     def shop?
       return true
