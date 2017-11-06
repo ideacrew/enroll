@@ -5,7 +5,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include SepAll
 
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
-  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification, :identity_verification_pending_admin_approval]
+  before_action :check_hbx_staff_role, except: [:request_help, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
   before_action :find_hbx_profile, only: [:employer_index, :broker_agency_index, :inbox, :configuration, :show, :binder_index]
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
@@ -204,11 +204,6 @@ def employer_poc
   
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
-  end
-  
-  def identity_verification_pending_admin_approval
-    @person = Person.find(params[:person_id])
-    render '/exchanges/hbx_profiles/verification_documents_for_admin.html.erb'
   end
 
   def hide_form
