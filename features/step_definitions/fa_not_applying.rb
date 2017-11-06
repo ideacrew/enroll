@@ -111,5 +111,5 @@ When(/^the user clicks on CONTINUE button/) do
 end
 
 Then(/^the user will navigate to FAA Household Info: Family Members page/) do
-  page.should have_css('.interaction-click-control-add-info')
+  expect(page).to have_content('Household Info: Family Members')
 end

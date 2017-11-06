@@ -72,7 +72,6 @@ Given(/^the user is on the Help Paying For Coverage page$/) do
 end
 
 When(/^the user clicks CONTINUE$/) do
-  expect(page).to have_content('Help Paying for Coverage')
   find('.btn', text: 'CONTINUE').click
 end
 

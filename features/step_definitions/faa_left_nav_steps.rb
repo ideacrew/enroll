@@ -23,7 +23,7 @@ When(/^the user clicks the View My Applications link in left nav$/) do
 end
 
 Then(/^the user will navigate to the household's Application Index page$/) do
-expect(page).to have_content('Your Financial Asistance Applications')
+  expect(page).to have_content('My Financial Asistance Applications')
 end
 
 When(/^the user clicks the Household Info link in left nav$/) do
