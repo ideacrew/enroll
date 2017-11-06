@@ -205,6 +205,11 @@ def employer_poc
   def identity_verification
     @datatable = Effective::Datatables::IdentityVerificationDataTable.new(params[:scopes])
   end
+  
+  def identity_verification_pending_admin_approval
+    @person = Person.find(params[:person_id])
+    render '/exchanges/hbx_profiles/verification_documents_for_admin.html.erb'
+  end
 
   def hide_form
     @element_to_replace_id = params[:family_actions_id]
