@@ -7,9 +7,9 @@ module Effective
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new {  }, :filter => false, :sortable => false
-        table_column :document_type, :label => 'Dcument Type', :proc => Proc.new { }, :filter => false, :sortable => false
-        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc.new { } , :filter => false, :sortable => false
+        table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
+        table_column :document_type, :label => 'Document Type', :proc => Proc.new { |row| document_type(row) }, :filter => false, :sortable => false
+        table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => Proc.new { |row| document_uploaded_date(row) } , :filter => false, :sortable => false
       end
 
       scopes do
@@ -25,6 +25,24 @@ module Effective
 
       def global_search?
         true
+      end
+      
+      def document_type(row)
+        if row.consumer_role.identity_validation == "pending" && row.consumer_role.application_validation != "pending"
+          return "Identity"
+        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation != "pending"
+          return "Application"
+        elsif row.consumer_role.application_validation == "pending" && row.consumer_role.identity_validation == "pending"
+          return "Identity/Application"
+        end
+      end
+      
+      def document_uploaded_date(row)
+        if row.consumer_role.identity_validation == "pending"
+          return row.consumer_role.ridp_documents.where(ridp_verification_type:"Identity").last.uploaded_at
+        elsif row.consumer_role.application_validation == "pending"
+          return row.consumer_role.ridp_documents.where(ridp_verification_type:"Application").last.uploaded_at
+        end
       end
 
     end
