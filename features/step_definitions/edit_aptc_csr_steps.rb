@@ -13,7 +13,3 @@ end
 Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
   find_link('Edit APTC / CSR').visible?
 end
-
-Then(/^Hbx Admin should not see an Edit APTC \/ CSR link$/) do
-  expect(page).to_not have_text("Edit APTC / CSR")
-end
