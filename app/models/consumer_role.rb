@@ -75,7 +75,7 @@ class ConsumerRole
   # DC residency
   field :is_state_resident, type: Boolean, default: nil
   field :residency_determined_at, type: DateTime
-  field :local_residency_validation, type: String, default: "attested"
+  field :local_residency_validation, type: String, default: nil
   validates_inclusion_of :local_residency_validation, :in => LOCAL_RESIDENCY_VALIDATION_STATES, :allow_blank => true
 
   field :ssn_update_reason, type: String
@@ -680,7 +680,11 @@ class ConsumerRole
   end
 
   def residency_verified?
-    is_state_resident? || person.no_dc_address || local_residency_validation == "attested"
+    is_state_resident? || residency_attested?
+  end
+
+  def residency_attested?
+    local_residency_validation == "attested" || person.residency_eligible? || person.age_on(TimeKeeper.date_of_record) <= 18
   end
 
   def citizenship_verified?
