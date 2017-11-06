@@ -13,28 +13,39 @@ module VerificationHelper
     end
   end
 
-  def verification_type_status(type, member)
+  def verification_type_status(type, member, admin=false)
+    consumer = member.consumer_role
+    return "curam" if (consumer.vlp_authority == "curam" && consumer.fully_verified? && admin)
+    return 'attested' if (type == 'DC Residency' && member.age_on(TimeKeeper.date_of_record) <= 18)
     case type
       when 'Social Security Number'
-        if member.consumer_role.ssn_verified?
+        if consumer.ssn_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
           "in review"
         else
           "outstanding"
         end
       when 'American Indian Status'
-        if member.consumer_role.native_verified?
+        if consumer.native_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
+          "in review"
+        else
+          "outstanding"
+        end
+      when 'DC Residency'
+        if consumer.residency_verified?
+          consumer.local_residency_validation
+        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
           "in review"
         else
           "outstanding"
         end
       else
-        if member.consumer_role.lawful_presence_verified?
+        if consumer.lawful_presence_verified?
           "verified"
-        elsif member.consumer_role.has_docs_for_type?(type)
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
           "in review"
         else
           "outstanding"
@@ -42,14 +53,20 @@ module VerificationHelper
     end
   end
 
-  def verification_type_class(type, member)
-    case verification_type_status(type, member)
+  def verification_type_class(type, member, admin=false)
+    case verification_type_status(type, member, admin)
       when "verified"
         "success"
       when "in review"
         "warning"
       when "outstanding"
         member.consumer_role.processing_hub_24h? ? "info" : "danger"
+      when "curam"
+        "default"
+      when "attested"
+        "default"
+      when "valid"
+        "success"
     end
   end
 
@@ -58,11 +75,25 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
+    person.primary_family.contingent_enrolled_active_family_members.any? {|member| member.person.consumer_role.aasm_state == "verification_outstanding"}
   end
 
   def verification_needed?(person)
     person.primary_family.active_household.hbx_enrollments.verification_needed.any? if person.try(:primary_family).try(:active_household).try(:hbx_enrollments)
+  end
+
+  def has_enrolled_policy?(family_member)
+    return true if family_member.blank?
+    family_member.family.enrolled_policy(family_member).present?
+  end
+
+  def is_not_verified?(family_member, v_type)
+    return true if family_member.blank?
+    !family_member.person.consumer_role.is_type_verified?(v_type)
+  end
+
+  def can_show_due_date?(person, options ={})
+    enrollment_group_unverified?(person) && verification_needed?(person) && (has_enrolled_policy?(options[:f_member]) && is_not_verified?(options[:f_member], options[:v_type]))
   end
 
   def documents_uploaded
@@ -83,21 +114,32 @@ module VerificationHelper
     end
   end
 
-  def documents_count(person)
-    return 0 unless person.consumer_role
-    person.consumer_role.vlp_documents.select{|doc| doc.identifier}.count
+  def documents_count(family)
+    family.family_members.map(&:person).flat_map(&:consumer_role).flat_map(&:vlp_documents).select{|doc| doc.identifier}.count
   end
 
   def review_button_class(family)
     if family.active_household.hbx_enrollments.verification_needed.any?
-      if family.active_household.hbx_enrollments.verification_needed.first.review_status == "ready"
-        "success"
-      elsif family.active_household.hbx_enrollments.verification_needed.first.review_status == "in review"
-        "info"
+      people = family.family_members.map(&:person)
+      v_types_list = get_person_v_type_status(people)
+      if !v_types_list.include?('outstanding')
+        'success'
+      elsif v_types_list.include?('in review') && v_types_list.include?('outstanding')
+        'info'
       else
-        "default"
+        'default'
       end
     end
+  end
+
+  def get_person_v_type_status(people)
+    v_type_status_list = []
+    people.each do |person|
+      person.verification_types.each do |v_type|
+        v_type_status_list << verification_type_status(v_type, person)
+      end
+    end
+    v_type_status_list
   end
 
   def show_send_button_for_consumer?
@@ -133,12 +175,18 @@ module VerificationHelper
     ["verified", "rejected"].include?(status)
   end
 
-  def show_v_type(v_type, person)
-    case verification_type_status(v_type, person)
+  def show_v_type(v_type, person, admin = false)
+    case verification_type_status(v_type, person, admin)
       when "in review"
         "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
       when "verified"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "valid"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "attested"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      when "curam"
+        admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
         person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
     end
@@ -159,13 +207,13 @@ module VerificationHelper
 
   def build_admin_actions_list(v_type, f_member)
     if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Return for Deficiency"}
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
   end
 
   def type_unverified?(v_type, person)
-    verification_type_status(v_type, person) != "verified"
+    !["verified", "valid", "attested"].include?(verification_type_status(v_type, person))
   end
 end
