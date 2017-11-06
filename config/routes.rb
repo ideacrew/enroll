@@ -138,7 +138,6 @@ Rails.application.routes.draw do
         post :update_fein
         get :identity_verification
         post :identity_verification_datatable
-        get :identity_verification_pending_admin_approval
       end
 
       member do

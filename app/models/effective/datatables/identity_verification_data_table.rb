@@ -3,7 +3,7 @@ module Effective
   module Datatables
     class IdentityVerificationDataTable < Effective::MongoidDatatable
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, identity_verification_pending_admin_approval_exchanges_hbx_profiles_path(:person_id => row.id) }, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
         table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false

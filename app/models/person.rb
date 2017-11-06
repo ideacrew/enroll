@@ -558,7 +558,7 @@ class Person
 
   class << self
     def for_admin_approval
-      all_consumer_roles.outstanding_identity_validation && all_consumer_roles.outstanding_application_validation
+      all_consumer_roles.outstanding_identity_validation || all_consumer_roles.outstanding_application_validation
     end
 
     def default_search_order
