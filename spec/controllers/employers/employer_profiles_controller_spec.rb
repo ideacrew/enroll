@@ -189,9 +189,10 @@ RSpec.describe Employers::EmployerProfilesController do
 
     it "should return census_employee when searching with ssn" do
       employer_profile.census_employees.delete_all
-      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "123456789")
-      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile, ssn: "987654321")
-      params ={commit: "search", status: "active", employee_search: "123456789", search: true,id: employer_profile.id.to_s}
+      census_employee = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+      census_employee1 = FactoryGirl.create(:census_employee, employer_profile: employer_profile)
+
+      params ={commit: "search", status: "active", employee_search: census_employee.ssn, search: true,id: employer_profile.id.to_s}
       xhr :get,:show, params
       expect(assigns(:census_employees).count).to eq 1
       expect(assigns(:census_employees)).to eq [census_employee]
