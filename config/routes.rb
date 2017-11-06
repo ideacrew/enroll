@@ -86,6 +86,8 @@ Rails.application.routes.draw do
         post :cancel_initial_plan_year_form
         get :view_terminated_hbx_enrollments
         get :get_user_info
+        get :identity_verification
+        post :identity_verification_datatable
       end
 
       member do

@@ -31,6 +31,13 @@
               active_tab: active_tab,
               remote: false
             } %>
+            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
+              tab_name: 'identity_verification',
+              link_path: identity_verification_exchanges_hbx_profiles_path,
+              display_name: 'Identity Verification',
+              active_tab: active_tab,
+              remote: true
+            } %>
           </ul>
         </li>
 
