@@ -251,7 +251,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
           let(:open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
           let(:open_enrollment_start_on) { open_enrollment_end_on - minimum_open_enrollment_length.days + 1.days }
           before do
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 7, 1))
+            TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 7, 1 + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month))
             plan_year.open_enrollment_start_on = open_enrollment_start_on
             plan_year.open_enrollment_end_on = open_enrollment_end_on
             plan_year.valid?
@@ -286,7 +286,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
         end
 
         context "and the effective date is too far in the future" do
-          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 1.month }
+          let(:invalid_initial_application_date)  { TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + 2.month }
           let(:schedule)  { PlanYear.shop_enrollment_timetable(invalid_initial_application_date) }
           let(:start_on)  { schedule[:plan_year_start_on] }
           let(:end_on)    { schedule[:plan_year_end_on] }
@@ -1441,7 +1441,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     end
 
     it "should fail when current date is later than open_enrollment_latest_start_on" do
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + 14.days)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + (Settings.aca.shop_market.open_enrollment.monthly_end_on + 1).days)
       start_on = (TimeKeeper.date_of_record + 1.month).beginning_of_month
       rsp = PlanYear.check_start_on(start_on)
       expect(rsp[:result]).to eq "failure"
@@ -1456,7 +1456,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the first of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 1) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 1) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1479,7 +1479,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the second of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 2) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 2) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
@@ -1501,7 +1501,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the third of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 3) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 3) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1524,7 +1524,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the fourth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 4) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 4) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1547,7 +1547,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the fifth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 5) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 5) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, 10) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
       let(:expected_start_on) { Date.new(2015, 8, 1) }
 
       before do
@@ -1570,8 +1570,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the eleventh of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 11) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 11) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
-      let(:expected_start_on) { Date.new(2015, 9, 1) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1592,8 +1592,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
     context "on the twelfth of the month" do
       let(:date_of_record_to_use) { Date.new(2015, 7, 12) }
       let(:expected_open_enrollment_start_on) { Date.new(2015, 7, 12) }
-      let(:expected_open_enrollment_end_on) { Date.new(2015, 8, 10) }
-      let(:expected_start_on) { Date.new(2015, 9, 1) }
+      let(:expected_open_enrollment_end_on) { Date.new(2015, 7, Settings.aca.shop_market.open_enrollment.monthly_end_on) }
+      let(:expected_start_on) { Date.new(2015, 8, 1) }
       before do
         TimeKeeper.set_date_of_record_unprotected!(date_of_record_to_use)
       end
@@ -1631,7 +1631,15 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
   end
 
   context "calculate_start_on_options" do
-    it "should return two options" do
+
+    it "should return one option if start date is before settings day of month offset" do
+      next_start = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
+      dates = [next_start].map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
+
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days - 1.days)
+      expect(PlanYear.calculate_start_on_options).to eq dates
+    end
+    it "should return one option but for the next month if after offset and enrollment monthly deadline" do
       date1 = TimeKeeper.date_of_record.beginning_of_month.next_month.next_month
       dates = [date1]
       (Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.abs - 1).times do
@@ -1639,7 +1647,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
       dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
 
@@ -1651,7 +1659,7 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
       end
       dates = dates.map{|d| [d.strftime("%B %Y"), d.strftime("%Y-%m-%d")]}
 
-      TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, 1))
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
       expect(PlanYear.calculate_start_on_options).to eq dates
     end
   end

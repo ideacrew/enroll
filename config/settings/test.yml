@@ -16,10 +16,3 @@ aca:
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
       force_publish_day_of_month: 11
-      open_enrollment:
-        minimum_length:
-          days: 3
-
-    open_enrollment:
-      monthly_start_on: 1
-      monthly_end_on: 10
