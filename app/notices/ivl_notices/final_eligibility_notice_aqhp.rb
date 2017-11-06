@@ -1,6 +1,6 @@
-class IvlNotices::FinalEligibilityNotice < IvlNotice
+class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person, :open_enrollment_start_on, :open_enrollment_end_on
+  attr_accessor :family, :data, :person
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -9,8 +9,6 @@ class IvlNotices::FinalEligibilityNotice < IvlNotice
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.person = args[:person]
-    self.open_enrollment_start_on = args[:open_enrollment_start_on]
-    self.open_enrollment_end_on = args[:open_enrollment_end_on]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -40,8 +38,8 @@ class IvlNotices::FinalEligibilityNotice < IvlNotice
     notice.primary_identifier = recipient.hbx_id
     notice.coverage_year = TimeKeeper.date_of_record.next_year.year
     notice.current_year = TimeKeeper.date_of_record.year
-    notice.ivl_open_enrollment_start_on = open_enrollment_start_on
-    notice.ivl_open_enrollment_end_on = open_enrollment_end_on
+    notice.ivl_open_enrollment_start_on = Settings.aca.individual_market.open_enrollment.start_on
+    notice.ivl_open_enrollment_end_on = Settings.aca.individual_market.open_enrollment.end_on
     append_data
     append_hbe
     notice.primary_fullname = person.full_name.titleize || ""

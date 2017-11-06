@@ -10,10 +10,10 @@
     <tr>
       <td><h3>
         <% if notice.documents_needed %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018 <br>
+          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %> <br>
           ACTION REQUIRED - SEND BY DOCUMENTS BY <%= notice.due_date.strftime("%B %d, %Y") %>
         <% else %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018
+          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %>
         <% end %>
       </h3></td>
     </tr>
@@ -35,11 +35,11 @@
       listings: ["What’s new this year", "Your final eligibility results for #{notice.coverage_year}", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["While there’s been a lot of news about the repeal and replace of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents.  We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
+ contents: ["While there’s been a lot of news about the repeal and replacement of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents. We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in #{notice.coverage_year}. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
    heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for 2018. Free expert enrollment assistance, and online support tools are available to help you and your family to make informed decisions. You may also be eligible for reduced monthly premiums."} %>
+   content: "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for #{notice.coverage_year}. Free expert enrollment assistance, and online support tools are available to help you and your family make informed decisions. You may also be eligible for reduced monthly premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
@@ -68,7 +68,7 @@
       content: "<strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by the deadline. Your final eligibility results may also change based on the documents you submit</strong>.", bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
-  listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","• We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+  listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
@@ -90,7 +90,7 @@
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+                                 rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
         col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end %>
 
@@ -104,14 +104,14 @@
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
-                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.premium}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
+                                   rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "$#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
           col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
   <% end%>
 
 <% end%>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You must continue to pay your premium for your #{notice.current_year} plan to automatically be enrolled in the plan shown for #{notice.coverage_year}. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed</strong>. If your #{notice.current_year} plan is no longer active, and you want to enroll in plan for #{notice.coverage_year}, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}.", "Your monthly premium amount will be different in #{notice.coverage_year}. <strong>If you have auto-pay set up through your health and/or dental insurance plan(s), you must contact your insurance company to update your autopay. The same is true if you set-up auto-pay through another method, such as through your bank</strong>. If you do not make an update, your plan may be terminated."],
+ contents: ["You must continue to pay your premium for your #{notice.current_year} plan to automatically be enrolled in the plan shown for #{notice.coverage_year}. <strong>If you miss a payment or do not pay the full amount each month, your coverage will not be renewed</strong>. If your #{notice.current_year} plan is no longer active, and you want to enroll in plan for #{notice.coverage_year}, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}.", "Your monthly premium amount will be different in #{notice.coverage_year}. <strong>If you have autopay set up through your health and/or dental insurance plan(s), you must contact your insurance company to update your autopay. The same is true if you set-up autopay through another method, such as through your bank</strong>. If you do not make an update, your plan may be terminated."],
    heading: 'Pay Your Premiums', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
@@ -119,7 +119,38 @@
    heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
 
 <% notice.individuals.each do |ivl|%>
-  <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
+  <div style="display:block; page-break-inside: avoid;">
+    <table align="center" cellpadding="5" class="total_table thick_broder" style="margin-top: 10px; margin-bottom: 10px; width: 100% %>;" border="1">
+      <tbody>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Household Member:</b>
+          </td>
+          <td style="width: 75%;">
+            <p><%= ivl.full_name %> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= ivl.age %> </p>
+          </td>
+        </tr>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Private Health Insurance</b>
+          </td>
+          <td style="width: 75%;">
+            <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>.</p>
+          </td>
+        </tr>
+        <% if ivl.is_totally_ineligible %>
+          <tr valign="top">
+            <td style="width: 25%;">
+              <b>Ineligible for Medicaid and Private Health Insurance</b>
+            </td>
+            <td style="width: 75%;">
+              <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {

@@ -29,10 +29,6 @@ field_names = %w(
       )
 report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
-#open enrollment information
-hbx = HbxProfile.current_hbx
-bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year.to_s == TimeKeeper.date_of_record.next_year.year.to_s }
-
 event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
@@ -55,8 +51,6 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
-            open_enrollment_start_on: bc_period.open_enrollment_start_on,
-            open_enrollment_end_on: bc_period.open_enrollment_end_on,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )

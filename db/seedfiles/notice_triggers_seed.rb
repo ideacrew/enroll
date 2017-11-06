@@ -831,7 +831,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FEL_AQHP',
-    title: 'YOUR FINAL ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS',
+    title: 'Your Final Eligibility Results, Plan, And Option TO Change Plans',
     description: 'Final Eligibility Notice will be sent to all AQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_aqhp',
@@ -839,7 +839,7 @@ ivl_notice_triggers = [
       {
         name: 'Final Eligibility Notice for AQHP individuals',
         notice_template: 'notices/ivl/final_eligibility_notice_aqhp',
-        notice_builder: 'IvlNotices::FinalEligibilityNotice',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeAqhp',
         mpi_indicator: 'IVL_FEL',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -853,7 +853,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FEL_UQHP',
-    title: 'YOUR FINAL ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS',
+    title: 'Your Final Eligibility Results, Plan, And Option TO Change Plans',
     description: 'Final Eligibility Notice will be sent to all UQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_uqhp',
@@ -861,7 +861,7 @@ ivl_notice_triggers = [
       {
         name: 'Final Eligibility Notice for UQHP individuals',
         notice_template: 'notices/ivl/final_eligibility_notice_uqhp',
-        notice_builder: 'IvlNotices::FinalEligibilityNotice',
+        notice_builder: 'IvlNotices::FinalEligibilityNoticeUqhp',
         mpi_indicator: 'IVL_FEL',
         notice_trigger_element_group: {
           market_places: ['individual'],

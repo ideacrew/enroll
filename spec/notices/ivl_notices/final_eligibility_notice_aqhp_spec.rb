@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'csv'
 
-RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
+RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each do
 
   file = "#{Rails.root}/spec/test_data/notices/final_eligibility_notice_aqhp_test_data.csv"
   csv = CSV.open(file,"r",:headers =>true)
@@ -13,24 +13,19 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Final Eligibility Notice for AQHP individuals',
                             :notice_template => 'notices/ivl/final_eligibility_notice_aqhp',
-                            :notice_builder => 'IvlNotices::FinalEligibilityNotice',
+                            :notice_builder => 'IvlNotices::FinalEligibilityNoticeAqhp',
                             :event_name => 'final_eligibility_notice_aqhp',
                             :mpi_indicator => 'IVL_FEL',
                             :data => data,
                             :person =>  person,
-                            :title => "YOUR FINAL ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS"})
+                            :title => "Your Final Eligibility Results, Plan, And Option TO Change Plans"})
                           }
-  let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let!(:open_enrollment_start_on)    { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_start_on}
-  let!(:open_enrollment_end_on)      { hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }.open_enrollment_end_on }
   let(:valid_parmas) {{
       :subject => application_event.title,
       :mpi_indicator => application_event.mpi_indicator,
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :data => data,
-      :open_enrollment_start_on => open_enrollment_start_on,
-      :open_enrollment_end_on => open_enrollment_end_on,
       :person => person
   }}
 
@@ -40,7 +35,7 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
     end
     context "valid params" do
       it "should initialze" do
-        expect{IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)}.not_to raise_error
+        expect{IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -48,7 +43,7 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -58,13 +53,12 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
       @final_eligibility_notice.build
     end
 
     it "returns coverage_year" do
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }
-      expect(@final_eligibility_notice.notice.coverage_year).to eq bc_period.start_on.year.to_s
+      expect(@final_eligibility_notice.notice.coverage_year).to eq hbx_enrollment.effective_on.year.to_s
     end
 
     it "returns event_name" do
@@ -80,7 +74,7 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
     end
 
     it "returns all auto_renewing enrollments" do
@@ -100,16 +94,14 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
       @final_eligibility_notice.build
     end
     it "return ivl open enrollment start on" do
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }
-      expect(@final_eligibility_notice.notice.ivl_open_enrollment_start_on).to eq bc_period.open_enrollment_start_on
+      expect(@final_eligibility_notice.notice.ivl_open_enrollment_start_on).to eq Settings.aca.individual_market.open_enrollment.start_on
     end
     it "return ivl open enrollment end on" do
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }
-      expect(@final_eligibility_notice.notice.ivl_open_enrollment_end_on).to eq bc_period.open_enrollment_end_on
+      expect(@final_eligibility_notice.notice.ivl_open_enrollment_end_on).to eq Settings.aca.individual_market.open_enrollment.end_on
     end
   end
 
@@ -117,7 +109,7 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
     before do
       allow(person).to receive("primary_family").and_return(family)
       allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNotice.new(person.consumer_role, valid_parmas)
+      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeAqhp.new(person.consumer_role, valid_parmas)
     end
 
     it "should render the final eligibility notice template" do
@@ -126,7 +118,6 @@ RSpec.describe IvlNotices::FinalEligibilityNotice, :dbclean => :after_each do
 
     it "should generate pdf" do
       @final_eligibility_notice.append_hbe
-      bc_period = hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if bcp.start_on.year == TimeKeeper.date_of_record.next_year.year }
       @final_eligibility_notice.build
       file = @final_eligibility_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
