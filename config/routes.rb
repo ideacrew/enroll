@@ -83,6 +83,7 @@ Rails.application.routes.draw do
         get :get_user_info
         get :identity_verification
         post :identity_verification_datatable
+        get :identity_verification_pending_admin_approval
       end
 
       member do
