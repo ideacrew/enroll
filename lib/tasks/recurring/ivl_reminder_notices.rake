@@ -12,7 +12,7 @@ namespace :recurring do
     date = TimeKeeper.date_of_record
     families.each do |family|
       health_enrollment = family.enrollments.detect{ |e| e.enrolled_contingent? && e.effective_on.year == date.year && e.coverage_kind == "health"} #skipping assisted individuals
-      next if family.e_case_id.present? || (health_enrollment.applied_aptc_amount > 0) || health_enrollment.plan.is_csr?
+      next if family.e_case_id.present? || (health_enrollment.present? && (health_enrollment.applied_aptc_amount > 0) || health_enrollment.plan.is_csr?)
       consumer_role = family.primary_applicant.person.consumer_role
       person = family.primary_applicant.person
       if consumer_role.present? && (family.best_verification_due_date > date)
