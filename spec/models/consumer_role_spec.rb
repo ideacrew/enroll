@@ -212,15 +212,15 @@ context "Verification process and notices" do
   describe "Native American verification" do
     shared_examples_for "ensures native american field value" do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
-        person.update_attributes!(:citizen_status=>"indian_tribe_member") if tribe
+        person.update_attributes!(:tribal_id=>"444444444") if tribe
         person.consumer_role.update_attributes!(:native_validation => tribe_state) if tribe_state
         expect(person.consumer_role.native_validation).to eq(state)
       end
     end
     context "native validation doesn't exist" do
-      it_behaves_like "ensures native american field value", "assigns", "na", "NON native american consumer"
+      it_behaves_like "ensures native american field value", "assigns", "na", "NON native american consumer", nil, nil
 
-      it_behaves_like "ensures native american field value", "assigns", "outstanding", "native american consumer", "tribe"
+      it_behaves_like "ensures native american field value", "assigns", "outstanding", "native american consumer", "444444444", nil
     end
     context "existing native validation" do
       it_behaves_like "ensures native american field value", "assigns", "pending", "pending native american consumer", "tribe", "pending"
@@ -371,71 +371,134 @@ context "Verification process and notices" do
       end
     end
 
-    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
-    it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
-    it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
+    context "verify" do
+      it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "local_residency_validation", "valid"
+      it_behaves_like "admin verification actions", "verify", "DC Residency", "Document in EnrollApp", "residency_update_reason", "Document in EnrollApp"
 
+    end
+
+    context "return for deficiency" do
+      it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_validation", "outstanding", "ssn_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "Social Security Number", "Document in EnrollApp", "ssn_update_reason", "Document in EnrollApp", "ssn_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "American Indian Status", "Document in EnrollApp", "native_update_reason", "Document in EnrollApp", "native_rejected"
+      it_behaves_like "admin verification actions", "return_for_deficiency", "DC Residency", "Illegible Document", "local_residency_validation", "outstanding", "residency_rejected"
+    end
   end
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
-    context "import" do
+    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
+    all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
+    shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
       before do
-        person.consumer_role.update_attributes(:ssn_validation => "invalid")
+        person.ssn = ssn
+        consumer.citizen_status = citizen
+        consumer.is_state_resident = residency
       end
+      it "moves from #{from_state} to #{to_state} on #{event}" do
+        expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+      end
+    end
+
+    context "import" do
       all_states.each do |state|
-        it "changes #{state} to fully_verified" do
-          expect(consumer).to transition_from(state).to(:fully_verified).on_event(:import)
+        it_behaves_like "IVL state machine transitions and workflow", nil, nil, nil, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "any", true, state, :fully_verified, "import!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "any", false, state, :fully_verified, "import!"
+        it "updates all verification types with callback" do
+          consumer.import!
           expect(consumer.all_types_verified?).to eq true
         end
       end
     end
 
     context "coverage_purchased" do
-      it "changes state to dhs_pending on coverage_purchased! for non_native without ssn" do
-        person.ssn=nil
-        consumer.citizen_status = "non_native_citizen"
-        expect(consumer).to transition_from(:unverified).to(:dhs_pending).on_event(:coverage_purchased)
+      describe "citizen with ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :unverified, :ssa_pending, "coverage_purchased!"
       end
-
-      it "changes state to ssa_pending on coverage_purchased! for non_native with SSN" do
-        consumer.citizen_status = "non_native_citizen"
-        expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
+      describe "citizen with NO ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", true, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", false, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", false, :unverified, :verification_outstanding, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "us_citizen", true, :unverified, :verification_outstanding, "coverage_purchased!"
+        it "update ssn with callback fail_ssa_for_no_ssn" do
+          allow(person).to receive(:ssn).and_return nil
+          allow(consumer).to receive(:citizen_status).and_return "us_citizen"
+          consumer.coverage_purchased!
+          expect(consumer.ssn_validation).to eq("na")
+          expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
+        end
       end
-
-      it "changes state to ssa_pending on coverage_purchased! for native" do
-        expect(consumer).to transition_from(:unverified).to(:ssa_pending).on_event(:coverage_purchased)
+      describe "immigrant with ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", false, :unverified, :ssa_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :unverified, :ssa_pending, "coverage_purchased!"
       end
-
-      it "changes state to outstanding for native consumer with NO ssn without calling hub" do
-        person.ssn=nil
-        expect(consumer).to transition_from(:unverified).to(:verification_outstanding).on_event(:coverage_purchased)
-        expect(consumer.ssn_validation).to eq("na")
-        expect(consumer.ssn_update_reason).to eq("no_ssn_for_native")
+      describe "immigrant with NO ssn" do
+        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", true, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "alien_lawfully_present", false, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", false, :unverified, :dhs_pending, "coverage_purchased!"
+        it_behaves_like "IVL state machine transitions and workflow", nil, "lawful_permanent_resident", true, :unverified, :dhs_pending, "coverage_purchased!"
       end
     end
 
     context "ssn_invalid" do
-      it "changes state to verification_outstanding" do
-        expect(consumer).to transition_from(:ssa_pending).to(:verification_outstanding).on_event(:ssn_invalid, verification_attr)
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :ssa_pending, :verification_outstanding, "ssn_invalid!"
+      it "fails ssn with callback" do
+        consumer.aasm_state = "ssa_pending"
+        consumer.ssn_invalid! verification_attr
         expect(consumer.ssn_validation).to eq("outstanding")
+      end
+      it "fails lawful presence with callback" do
+        consumer.aasm_state = "ssa_pending"
+        consumer.ssn_invalid! verification_attr
+        expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
       end
     end
 
     context "ssn_valid_citizenship_invalid" do
-      it "changes state to verification_outstanding for native citizen" do
-        expect(consumer).to transition_from(:ssa_pending).to(:verification_outstanding).on_event(:ssn_valid_citizenship_invalid, verification_attr)
+      describe "citizen" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", false, :ssa_pending, :verification_outstanding, "ssn_valid_citizenship_invalid!"
+      end
+      describe "immigrant" do
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", false, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :ssa_pending, :dhs_pending, "ssn_valid_citizenship_invalid!"
+      end
+
+      it "updates ssn validation with callback" do
+        consumer.aasm_state = "ssa_pending"
+        consumer.ssn_valid_citizenship_invalid! verification_attr
         expect(consumer.ssn_validation).to eq("valid")
       end
-      it "changes state to dhs_pending for non native citizen" do
+
+      it "fails lawful presence with callback" do
+        consumer.aasm_state = "ssa_pending"
+        consumer.ssn_valid_citizenship_invalid! verification_attr
+        expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
+      end
+
+      it "doesn't change user's citizen input" do
+        consumer.aasm_state = "ssa_pending"
         consumer.citizen_status = "alien_lawfully_present"
-        expect(consumer).to transition_from(:ssa_pending).to(:dhs_pending).on_event(:ssn_valid_citizenship_invalid, verification_attr)
-        expect(consumer.ssn_validation).to eq("valid")
-        #check that user's input was not overwritten
+        consumer.ssn_valid_citizenship_invalid! verification_attr
         expect(consumer.lawful_presence_determination.citizen_status).to eq("alien_lawfully_present")
         expect(consumer.lawful_presence_determination.citizenship_result).to eq("not_lawfully_present_in_us")
       end
@@ -446,105 +509,144 @@ context "Verification process and notices" do
         consumer.lawful_presence_determination.deny! verification_attr
         consumer.citizen_status = "alien_lawfully_present"
       end
-      it "changes state to fully_verified from unverified for native citizen or non native with ssn" do
-        expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
-        expect(consumer.ssn_validation).to eq("valid")
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-        #check that user's input was not overwritten
-        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
-      end
-      it "changes state to fully_verified from ssa_pending" do
-        expect(consumer).to transition_from(:ssa_pending).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
-        expect(consumer.ssn_validation).to eq("valid")
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-        #check that user's input was not overwritten
-        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
-      end
-      it "changes state to fully_verified from verification_outstanding" do
-        expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
-        expect(consumer.ssn_validation).to eq("valid")
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-        #check that user's input was not overwritten
-        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
-      end
-      it "changes state to fully_verified from fully_verified" do
-        expect(consumer).to transition_from(:fully_verified).to(:fully_verified).on_event(:ssn_valid_citizenship_valid, verification_attr)
-        expect(consumer.ssn_validation).to eq("valid")
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-        #check that user's input was not overwritten
-        expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
+      [false, nil, true].each do |residency|
+        if residency
+          to_state = :fully_verified
+        elsif residency.nil?
+          to_state = :sci_verified
+        else
+          to_state = :verification_outstanding
+        end
+        describe "residency #{residency} #{'pending' if residency.nil?}" do
+          [:unverified, :ssa_pending, :verification_outstanding].each do |from_state|
+            it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", residency, from_state, to_state, "ssn_valid_citizenship_valid!"
+            it "updates ssn citizenship with callback and doesn't change consumer citizen input" do
+              consumer.ssn_valid_citizenship_valid! verification_attr
+              expect(consumer.ssn_validation).to eq("valid")
+              expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+              expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
+            end
+          end
+        end
       end
     end
 
     context "fail_dhs" do
-      it "changes state from dhs_pending to verification_outstanding" do
-        expect(consumer).to transition_from(:dhs_pending).to(:verification_outstanding).on_event(:fail_dhs, verification_attr)
-        expect(consumer.lawful_presence_determination.verification_outstanding?).to eq true
-      end
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, :dhs_pending, :verification_outstanding, "fail_dhs!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", false, :dhs_pending, :verification_outstanding, "fail_dhs!"
+      it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, :dhs_pending, :verification_outstanding, "fail_dhs!"
 
+      it "fails lawful presence with callback" do
+        consumer.aasm_state = "dhs_pending"
+        consumer.fail_dhs! verification_attr
+        expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
+      end
     end
 
     context "pass_dhs" do
       before :each do
         consumer.lawful_presence_determination.deny! verification_attr
+        consumer.citizen_status = "alien_lawfully_present"
       end
-      it "changes state from dhs_pending to fully_verified" do
-        person.ssn=nil
-        consumer.citizen_status = "non_native_citizen"
-        expect(consumer).to transition_from(:unverified).to(:fully_verified).on_event(:pass_dhs, verification_attr)
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+      [false, nil, true].each do |residency|
+        if residency
+          to_state = :fully_verified
+        elsif residency.nil?
+          to_state = :sci_verified
+        else
+          to_state = :verification_outstanding
+        end
+        describe "residency #{residency} #{'pending' if residency.nil?}" do
+          [:unverified, :dhs_pending, :verification_outstanding].each do |from_state|
+            it_behaves_like "IVL state machine transitions and workflow", nil, "naturalized_citizen", residency, from_state, to_state, "pass_dhs!"
+            it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", residency, from_state, to_state, "pass_dhs!"
+            it "updates citizenship with callback and doesn't change consumer citizen input" do
+              consumer.pass_dhs! verification_attr
+              expect(consumer.lawful_presence_determination.verification_successful?).to eq true
+              expect(consumer.lawful_presence_determination.citizen_status).to eq "alien_lawfully_present"
+            end
+          end
+        end
       end
-      it "changes state from dhs_pending to fully_verified" do
-        expect(consumer).to transition_from(:dhs_pending).to(:fully_verified).on_event(:pass_dhs, verification_attr)
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-      end
-      it "changes state from dhs_pending to fully_verified" do
-        expect(consumer).to transition_from(:verification_outstanding).to(:fully_verified).on_event(:pass_dhs, verification_attr)
-        expect(consumer.lawful_presence_determination.verification_successful?).to eq true
-      end
-
     end
 
-    context "reject" do
-      before :each do
-        consumer.lawful_presence_determination.authorize! verification_attr
+    context "pass_residency" do
+      [nil, "111111111"].each do |ssn|
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "fail_residency!"
+        it "updates residency status with callback" do
+          consumer.is_state_resident = true
+          consumer.fail_residency!
+          expect(consumer.is_state_resident).to be false
+        end
       end
-      all_states.each do |state|
-        it "change #{state} to verification_outstanding" do
-          expect(consumer).to transition_from(state).to(:verification_outstanding).on_event(:reject, verification_attr)
+    end
+
+    context "fail_residency" do
+      [nil, "111111111"].each do |ssn|
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "us_citizen", true, :unverified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "fail_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :verification_outstanding, "fail_residency!"
+        it "updates residency status with callback" do
+          consumer.is_state_resident = true
+          consumer.fail_residency! verification_attr
+          expect(consumer.is_state_resident).to be false
+        end
+      end
+    end
+
+    context "trigger_residency" do
+      [nil, "111111111"].each do |ssn|
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "lawful_permanent_resident", true, :ssa_pending, :ssa_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", true, :dhs_pending, :dhs_pending, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "naturalized_citizen", false, :sci_verified, :sci_verified, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :verification_outstanding, :verification_outstanding, "trigger_residency!"
+        it_behaves_like "IVL state machine transitions and workflow", ssn, "alien_lawfully_present", false, :fully_verified, :sci_verified, "trigger_residency!"
+        it "updates residency status with callback" do
+          if consumer.may_trigger_residency?
+            consumer.is_state_resident = true
+            consumer.trigger_residency!
+            expect(consumer.is_state_resident).to be nil
+          end
         end
       end
     end
 
     context "revert" do
       before :each do
-        consumer.lawful_presence_determination.authorize! verification_attr
+        consumer.import! verification_attr
       end
+
       all_states.each do |state|
-        it "change #{state} to unverified" do
-          expect(consumer).to transition_from(state).to(:unverified).on_event(:revert, verification_attr)
+        it_behaves_like "IVL state machine transitions and workflow", "111111111", "us_citizen", true, state, :unverified, "revert!"
+        it "updates ssn" do
+          consumer.revert!
+          expect(consumer.ssn_validation).to eq "pending"
+        end
+
+        it "updates lawful presence status" do
+          consumer.revert!
           expect(consumer.lawful_presence_determination.verification_pending?).to eq true
+        end
+        it "updates residency status" do
+          consumer.revert!
+          expect(consumer.is_state_resident?).to eq nil
         end
       end
     end
 
-    context "redetermine" do
-      before :each do
-        consumer.lawful_presence_determination.authorize! verification_attr
-      end
-      all_states.each do |state|
-        it "change #{state} to ssa_pending if SSA applied" do
-          expect(consumer).to transition_from(state).to(:ssa_pending).on_event(:redetermine, verification_attr)
-          expect(consumer.lawful_presence_determination.verification_pending?).to eq true
-        end
-
-        it "change #{state} to dhs_pending if DHS applied" do
-          person.ssn=nil
-          consumer.citizen_status = "non_native_citizen"
-          expect(consumer).to transition_from(state).to(:dhs_pending).on_event(:redetermine, verification_attr)
-          expect(consumer.lawful_presence_determination.verification_pending?).to eq true
-        end
-      end
+    context 'coverage_purchased_no_residency' do
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', false, :unverified, :ssa_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', true, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
+      it_behaves_like 'IVL state machine transitions and workflow', nil, 'alien_lawfully_present', false, :unverified, :dhs_pending, 'coverage_purchased_no_residency!'
     end
   end
 
@@ -553,15 +655,16 @@ context "Verification process and notices" do
     all_fields = FactoryGirl.build(:person, :encrypted_ssn => "111111111", :gender => "male", "updated_by_id": "any").attributes.keys
     mask_hash = all_fields.map{|v| [v, (sensitive_fields.include?(v) ? "call" : "don't call")]}.to_h
     subject { ConsumerRole.new(:person => person) }
+    let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
     shared_examples_for "reping the hub fo critical changes" do |field, call, params|
       it "#{call} the hub if #{field} record was changed" do
         allow(Person).to receive(:person_has_an_active_enrollment?).and_return true
         if call == "call"
-          expect(subject).to receive(:redetermine!)
+          expect(subject).to receive(:redetermine_verification!)
         else
-          expect(subject).to_not receive(:redetermine!)
+          expect(subject).to_not receive(:redetermine_verification!)
         end
-        subject.check_for_critical_changes(params)
+        subject.check_for_critical_changes(params, family)
       end
     end
     mask_hash.each do |field, action|
@@ -643,6 +746,79 @@ describe "#build_nested_models_for_person" do
   it "should get emails" do
     Email::KINDS.each do |kind|
       expect(person.emails.map(&:kind)).to include kind
+    end
+  end
+end
+
+describe "can_trigger_residency?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when person has age > 19 & has an active coverage" do
+
+    before :each do
+      allow(family).to receive(:person_has_an_active_enrollment?).and_return true
+    end
+
+    it "should return true if there is a change in address from non-dc to dc" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if there is a change in address from dc to non-dc" do
+      person.update_attributes(no_dc_address: false)
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+    end
+
+    it "should return false if there is a change in address from dc to dc" do
+      person.update_attributes(no_dc_address: false)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+
+    it "should return false if there is a change in address from non-dc to non-dc" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.can_trigger_residency?("true", family)).to eq false
+    end
+  end
+
+  context "when has an active coverage & address change from non-dc to dc", dbclean: :after_each do
+
+    before do
+      person.update_attributes(no_dc_address: true)
+      allow(family).to receive(:person_has_an_active_enrollment?).and_return true
+    end
+
+    it "should return true if age > 18" do
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if age = 18" do
+      person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+
+    it "should return false if age < 18" do
+      consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
+    end
+  end
+
+  context "when age > 18 & address change from non-dc to dc" do
+    before do
+      person.update_attributes(no_dc_address: true)
+      allow(family).to receive_message_chain(:active_household, :hbx_enrollments, :where).and_return [enrollment]
+    end
+
+    it "should return true if has an active coverage" do
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq true
+    end
+
+    it "should return false if no active coverage" do
+      allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
+      expect(consumer_role.can_trigger_residency?("false", family)).to eq false
     end
   end
 end
