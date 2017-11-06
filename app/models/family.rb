@@ -1026,7 +1026,8 @@ class Family
   end
 
   def is_document_not_verified(type, person)
-    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified"
+    verification_type_status(type, person) != "valid" && verification_type_status(type, person) != "attested" && verification_type_status(type, person) != "verified" &&
+    verification_type_status(type, person, person.hbx_staff_role?) != "curam"
   end
 
 private

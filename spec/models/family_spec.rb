@@ -1458,3 +1458,43 @@ describe "#document_due_date", dbclean: :after_each do
   end  
 end
 
+describe Family, '#is_document_not_verified' do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  
+  it "return true when document is not verified" do
+    expect(family.is_document_not_verified("Citizenship", family.primary_family_member.person)).to eq true
+  end
+
+  it 'returns false when document is verified' do
+    person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "Social Security Number")
+    person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, verification_type: "DC Residency")
+    person.consumer_role.update_attributes(ssn_validation: "valid")
+    expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
+
+  end
+
+  context 'when the consumer vlp authority is curam' do
+    before do
+      person.consumer_role.update_attributes(vlp_authority: "curam", aasm_state: "fully_verified")
+    end
+
+    context "when user is admin" do
+      let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_hbx_staff_role)}
+      it 'returns true when consumer is fully verified and admin' do
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq false
+      end
+
+      it 'returns false when consumer is not verified and admin' do
+        person.consumer_role.update_attributes(aasm_state: "unverified")
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
+      end
+    end
+
+    context 'when user is not admin' do
+      it 'returns false when consumer is fully verified and not an admin' do
+        expect(family.is_document_not_verified("Social Security Number", family.primary_family_member.person)).to eq true
+      end
+    end
+  end
+end
