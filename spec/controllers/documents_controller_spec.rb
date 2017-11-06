@@ -100,7 +100,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
     context "American Indian Status verification type" do
       before do
-        person.consumer_role.update_attributes!(citizen_status: "indian_tribe_member")
+        person.update_attributes(:tribal_id => "444444444")
       end
       it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_validation", "valid"
       it_behaves_like "update verification type", "American Indian Status", "Document in EnrollApp", "verify", "native_update_reason", "Document in EnrollApp"

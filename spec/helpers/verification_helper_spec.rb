@@ -25,17 +25,20 @@ RSpec.describe VerificationHelper, :type => :helper do
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
+        person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
         if curam
           person.consumer_role.import!(verification_attr) if current_state == "valid"
           person.consumer_role.vlp_authority = "curam"
         else
           if current_state == "valid"
-            person.consumer_role.ssn_validation = "valid"
-            person.consumer_role.native_validation = "valid"
+            person.consumer_role.update_attributes(:ssn_validation => "valid",
+                                                   :native_validation => "valid")
+            person.consumer_role.mark_residency_authorized
             person.consumer_role.lawful_presence_determination.authorize!(verification_attr)
           else
             person.consumer_role.ssn_validation = "outstanding"
             person.consumer_role.native_validation = "outstanding"
+            person.consumer_role.mark_residency_denied
             person.consumer_role.lawful_presence_determination.deny!(verification_attr)
           end
         end
@@ -59,6 +62,7 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
       it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", "curam", false
+      it_behaves_like "verification type status", "outstanding", "Residency", true, "in review", false, false
     end
 
     context "admin role" do
@@ -66,6 +70,36 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
       it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
+    end
+
+    context 'verification type status attested' do
+      before :each do
+        person.dob = Date.new(2010,11,10)
+      end
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'returns attested if age <= 18 and type is residency' do
+        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
+      end
+
+      it 'does not return attested if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
+        expect(helper.verification_type_status('DC Residency', person)).not_to eq('attested')
+      end
+
+      it 'does not return attested if age <= 18 and type is social security number ' do
+        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
+      end
+
+      it 'returns outstanding if age > 18 and type is residency' do
+        person.dob = Date.new(1988,11,10)
+        person.consumer_role.native_validation = "outstanding"
+        person.consumer_role.mark_residency_denied
+        expect(helper.verification_type_status('DC Residency', person)).to eq('outstanding')
+      end
     end
   end
 
