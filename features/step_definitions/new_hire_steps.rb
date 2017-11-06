@@ -188,7 +188,7 @@ When(/(.*) enters termination reason/) do |named_person|
 
   waiver_modal = find('.terminate_confirm')
   waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select terminate reason')]]").click
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
+  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I have coverage through Medicaid')]").click
   waiver_modal.find('.terminate_reason_submit').click
 end
 
