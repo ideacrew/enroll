@@ -1322,7 +1322,7 @@ class PlanYear
 
     if (start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days) > TimeKeeper.date_of_record
       errors.add(:start_on, "may not start application before " \
-                 "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
+                 "#{(open_enrollment_start_period_with_offset(start_on)).to_date} with #{start_on} effective date")
     end
 
     if !['canceled', 'suspended', 'terminated','termination_pending'].include?(aasm_state)
