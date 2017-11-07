@@ -423,6 +423,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
   describe "POST set_default_ga" do
     include ActiveJob::TestHelper
     let(:general_agency_profile) { FactoryGirl.create(:general_agency_profile) }
+    let!(:general_agency_account) { FactoryGirl.create(:general_agency_account, general_agency_profile_id: general_agency_profile.id, employer_profile: employer_profile, aasm_state: "inactive")}
     let(:broker_agency_profile) { FactoryGirl.create(:broker_agency_profile) }
     let(:broker_role) { FactoryGirl.create(:broker_role, :aasm_state => 'active', broker_agency_profile: broker_agency_profile) }
     let(:person) { broker_role.person }
@@ -469,7 +470,7 @@ RSpec.describe BrokerAgencies::ProfilesController do
       sign_in user
       xhr :post, :set_default_ga, id: broker_agency_profile.id, type: 'clear', format: :js
       
-      expect(enqueued_jobs.size).to eq(0)
+      expect(enqueued_jobs.size).to eq(1)
       queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
         job_info[:job] == ShopNoticesNotifierJob
       end
