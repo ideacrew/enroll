@@ -37,8 +37,8 @@ class IvlEnrollmentDataUpdate < MongoidMigrationTask
           end
         end
       end
-    end                                                                                                                                                                                                                                                                           require 'csv'
-
+    end
   end
+
 end
 
