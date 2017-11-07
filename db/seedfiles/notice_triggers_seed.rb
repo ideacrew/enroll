@@ -689,7 +689,7 @@ ivl_notice_triggers = [
       {
         name: 'Outstanding Verification Notification',
         notice_template: 'notices/ivl/verifications_backlog_notice',
-        notice_builder: 'IvlNotices::ConsumerNotice',
+        notice_builder: 'IvlNotices::ReminderNotice',
         mpi_indicator: 'MPI_IVLV5B',
         notice_trigger_element_group: {
           market_places: ['individual'],
@@ -701,7 +701,7 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVLNotice20A',
+    hbx_id: 'IVL_DR1',
     title: 'REMINDER - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 10 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
@@ -710,8 +710,8 @@ ivl_notice_triggers = [
       {
         name: 'First Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLNotice20A',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR1',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -722,7 +722,7 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVLNotice20B',
+    hbx_id: 'IVL_DR2',
     title: 'DON’T FORGET - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 25 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
@@ -731,8 +731,8 @@ ivl_notice_triggers = [
       {
         name: 'Second Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLNotice20B',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR2',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -743,7 +743,7 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVLNotice21',
+    hbx_id: 'IVL_DR3',
     title: 'TIME SENSITIVE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 50 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
@@ -752,8 +752,8 @@ ivl_notice_triggers = [
       {
         name: 'Third Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLNotice21',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR3',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
@@ -764,7 +764,7 @@ ivl_notice_triggers = [
     ]
   },
   {
-    hbx_id: 'IVLNotice22',
+    hbx_id: 'IVL_DR4',
     title: 'FINAL NOTICE - YOU MUST SUBMIT DOCUMENTS BY THE DEADLINE TO KEEP YOUR INSURANCE',
     description: 'After 65 days passed, notice to be sent to Consumers informing them of the outstanding verifications',
     resource_name: 'consumer_role',
@@ -773,8 +773,8 @@ ivl_notice_triggers = [
       {
         name: 'Fourth Outstanding Verification Notification',
         notice_template: 'notices/ivl/documents_verification_reminder',
-        notice_builder: 'IvlNotices::ConsumerNotice',
-        mpi_indicator: 'MPI_IVLNotice22',
+        notice_builder: 'IvlNotices::ReminderNotice',
+        mpi_indicator: 'IVL_DR4',
         notice_trigger_element_group: {
           market_places: ['individual'],
           primary_recipients: ["consumer"],
