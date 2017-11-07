@@ -96,55 +96,8 @@ module Notifier
       merge_model.new_hire_oe_end_date = format_date(census_employee.new_hire_enrollment_period.max)
     end
 
-    def current_plan_year
-      return @current_plan_year if defined? @current_plan_year
-      if payload['event_object_kind'].constantize == PlanYear
-        plan_year = employer_profile.plan_years.find(payload['event_object_id'])
-      end
-
-      if plan_year.blank? && enrollment.present?
-        if enrollment.benefit_group
-          plan_year = enrollment.benefit_group.plan_year
-        end
-      end
-
-      if plan_year.present?
-        if plan_year.is_renewing?
-          @current_plan_year = employer_profile.plan_years.published_plan_years_by_date(plan_year.start_on.prev_year).first
-        else
-          @current_plan_year = plan_year
-        end
-      end
-    end
-
-    def renewal_plan_year
-      return @renewal_plan_year if defined? @renewal_plan_year
-      if payload['event_object_kind'].constantize == PlanYear
-        plan_year = employer_profile.plan_years.find(payload['event_object_id'])
-      end
-
-      if plan_year.blank? && enrollment.present?
-        if enrollment.benefit_group
-          plan_year = enrollment.benefit_group.plan_year
-        end
-      end
-
-      if plan_year.present?
-        if plan_year.is_renewing?
-          @renewal_plan_year = plan_year
-        else
-          @renewal_plan_year = employer_profile.plan_years.renewing.where(:start_on => plan_year.start_on.next_year).last
-        end
-      end
-    end
-
     def employer_profile
       employee_role.employer_profile
-    end
-
-    def format_date(date)
-      return if date.blank?
-      date.strftime("%m/%d/%Y")
     end
   end
 end
