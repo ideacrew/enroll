@@ -214,8 +214,10 @@ module VerificationHelper
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
+    if f_member.consumer_role.aasm_state == 'unverified'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
+    elsif verification_type_status(v_type, f_member) == 'outstanding'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end
