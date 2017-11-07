@@ -83,6 +83,7 @@ module VerificationHelper
 
   def applicant_unverified?
     applicant = @f_member.applicant_for_verification
+    return false unless applicant
     applicant.aasm_state != "fully_verified" if applicant.present?
   end
 
