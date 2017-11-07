@@ -147,6 +147,7 @@ class FamilyMember
   end
 
   def applicant_of_application(application)
+    return nil unless application
     application.active_applicants.where(family_member_id: self.id).first
   end
 

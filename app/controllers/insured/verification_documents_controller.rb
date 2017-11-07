@@ -7,11 +7,11 @@ class Insured::VerificationDocumentsController < ApplicationController
   def upload
     @doc_errors = []
     @docs_owner = find_docs_owner(params[:family_member])
-    @applicant = @family.latest_applicable_submitted_application.applicants.where(family_member_id: params[:family_member]).first
+    application_in_context = @family.latest_applicable_submitted_application
+    @applicant = application_in_context.applicants.where(family_member_id: params[:family_member]).first if application_in_context
     if params[:file]
       params[:file].each do |file|
-        doc_uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:id-verification##{file_name(file)}"
-        # doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
+        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
           if update_verification_documents(file_name(file), doc_uri)
             flash[:notice] = "File Saved"

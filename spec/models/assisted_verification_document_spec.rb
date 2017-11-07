@@ -24,5 +24,10 @@ RSpec.describe AssistedVerificationDocument, :type => :model do
       assisted_verification_document.identifier = "url"
       expect(assisted_verification.assisted_verification_documents.uploaded.count).to eq(1)
     end
+
+    it "returns number of uploaded documents as Zero as we don't have any identifier" do
+      assisted_verification_document.identifier = nil
+      expect(assisted_verification.assisted_verification_documents.uploaded.count).to eq(0)
+    end
   end
 end
