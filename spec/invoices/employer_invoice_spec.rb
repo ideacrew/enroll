@@ -34,7 +34,7 @@ RSpec.describe EmployerInvoice, :type => :model, dbclean: :after_each do
       let!(:employer_invoice) {EmployerInvoice.new(organization2)}
 
       it "should trigger notice for the first invoice" do
-        expect(employer_profile2).to receive(:trigger_notices).with("initial_employer_invoice_available")
+        expect(employer_profile2).to receive(:trigger_notices).with("initial_employer_first_invoice_available")
         employer_invoice.save_and_notify_with_clean_up
       end
 
