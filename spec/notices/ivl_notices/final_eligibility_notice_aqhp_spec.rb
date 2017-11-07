@@ -78,13 +78,13 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeAqhp, :dbclean => :after_each d
     end
 
     it "returns all auto_renewing enrollments" do
-      @final_eligibility_notice.pick_enrollments
+      @final_eligibility_notice.build
       expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
     end
 
     it "returns nil when there are no auto_renewing enrollments" do
       hbx_enrollment.update_attributes!(:aasm_state => "coverage_expired")
-      @final_eligibility_notice.pick_enrollments
+      @final_eligibility_notice.build
       expect(@final_eligibility_notice.notice.enrollments.size).to eq 0
     end
   end
