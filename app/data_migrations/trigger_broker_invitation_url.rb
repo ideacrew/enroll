@@ -5,10 +5,10 @@ class TriggerBrokerInvitationUrl< MongoidMigrationTask
     npn = ENV['broker_npn']
     broker_role = BrokerRole.by_npn(npn).first if npn.present?
     if broker_role.nil?
-      puts "No broker role found with npn: #{npn} " unless Rails.env.test?
+      puts "No broker role found with npn: #{npn}" unless Rails.env.test?
     else
       broker_role.send_invitation
-      puts "Invitation sent" unless Rails.env.test?
+      puts "Invitation sent"
     end
   end
 end

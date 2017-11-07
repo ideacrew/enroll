@@ -13,13 +13,13 @@ describe TriggerBrokerInvitationUrl, dbclean: :after_each do
 
   describe "changing person ssn" do
     let(:person) {FactoryGirl.build(:person)}
-    let(:registered_broker_role) {BrokerRole.new(person: person, npn: "2323334", provider_kind: "broker")}
+    let!(:registered_broker_role) {FactoryGirl.create(:broker_role, npn: "2323334")}
 
     before do
       $stdout = StringIO.new
+      allow(ENV).to receive(:[]).with("broker_npn").and_return(registered_broker_role.npn)
       allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
       registered_broker_role.approve
-      allow(ENV).to receive(:[]).with("broker_npn").and_return(registered_broker_role.npn)
     end
 
     after(:all) do
