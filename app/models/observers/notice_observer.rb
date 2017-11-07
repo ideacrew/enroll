@@ -59,8 +59,8 @@ module Observers
         end
       end
 
-      if PlanYear::DATA_CHANGE_EVENTS.include?(new_model_event.event_key)
-      end
+      # Trigger notice for date_change event
+      date_change_events(new_model_event)
     end
 
     def employer_profile_update; end
@@ -82,5 +82,22 @@ module Observers
     end
 
     def census_employee_update; end
+
+
+    def date_change_events(model_event)
+      plan_year = model_event.klass_instance
+      if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
+        if model_event.event_key == :renewal_plan_year_publish_dead_line
+          organizations_for_force_publish(TimeKeeper.date_of_record).each do |organization|
+            begin
+             trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:"renewal_employer_reminder_to_publish_plan_year" )
+            rescue Exception => e
+              puts "Unable to deliver reminder notice to publish plan year for renewing employer #{organization.legal_name} due to #{e}"
+            end
+          end
+        end
+      end
+    end
+
   end
 end
