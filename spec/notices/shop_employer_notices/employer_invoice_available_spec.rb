@@ -1,25 +1,25 @@
 require 'rails_helper'
 
-RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
+RSpec.describe ShopEmployerNotices::EmployerInvoiceAvailable do
   let(:employer_profile){ create :employer_profile}
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month - 1.year}
   let(:person){ create :person}
   let!(:plan_year) { FactoryGirl.create(:plan_year, employer_profile: employer_profile, start_on: start_on, :aasm_state => 'active' ) }
   let!(:active_benefit_group) { FactoryGirl.create(:benefit_group, plan_year: plan_year, title: "Benefits #{plan_year.start_on.year}") }
   let(:application_event){ double("ApplicationEventKind",{
-                            :name =>'Initial Employer first invoice available in the account',
-                            :notice_template => 'notices/shop_employer_notices/initial_employer_invoice_available_notice',
-                            :notice_builder => 'ShopEmployerNotices::InitialEmployerInvoiceAvailable',
-                            :event_name => 'initial_employer_invoice_available',
-                            :mpi_indicator => 'MPI_SHOP20',
-                            :title => "Your Invoice for Employer Sponsored Coverage is Now Available"})
-                          }
-    let(:valid_parmas) {{
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template
-    }}
+      :name =>'Employer monthly invoice available in the account',
+      :notice_template => 'notices/shop_employer_notices/employer_invoice_available_notice',
+      :notice_builder => 'ShopEmployerNotices::EmployerInvoiceAvailable',
+      :event_name => 'employer_invoice_available',
+      :mpi_indicator => 'SHOP_D021',
+      :title => "Monthly Invoice Available"})
+  }
+  let(:valid_parmas) {{
+      :subject => application_event.title,
+      :mpi_indicator => application_event.mpi_indicator,
+      :event_name => application_event.event_name,
+      :template => application_event.notice_template
+  }}
 
   describe "New" do
     before do
@@ -27,7 +27,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
     end
     context "valid params" do
       it "should initialze" do
-        expect{ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
+        expect{ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.not_to raise_error
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
       [:mpi_indicator,:subject,:template].each do  |key|
         it "should NOT initialze with out #{key}" do
           valid_parmas.delete(key)
-          expect{ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
+          expect{ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)}.to raise_error(RuntimeError,"Required params #{key} not present")
         end
       end
     end
@@ -44,7 +44,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
   describe "Build" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should build notice with all necessary info" do
       @employer_notice.build
@@ -57,7 +57,7 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
   describe "append_data" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
     it "should append necessary information" do
       plan_year = employer_profile.plan_years.where(:aasm_state => "active").first
@@ -68,16 +68,14 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
     end
   end
 
-  describe "#generate_pdf_notice" do
+  describe "Render template & Generate PDF" do
     before do
       allow(employer_profile).to receive_message_chain("staff_roles.first").and_return(person)
-      @employer_notice = ShopEmployerNotices::InitialEmployerInvoiceAvailable.new(employer_profile, valid_parmas)
+      @employer_notice = ShopEmployerNotices::EmployerInvoiceAvailable.new(employer_profile, valid_parmas)
     end
-
-    it "should render the template" do
-      expect(@employer_notice.template).to eq "notices/shop_employer_notices/initial_employer_invoice_available_notice"
+    it "should render renewal_employer_available_notice" do
+      expect(@employer_notice.template).to eq "notices/shop_employer_notices/employer_invoice_available_notice"
     end
-
     it "should generate pdf" do
       @employer_notice.build
       @employer_notice.append_data
@@ -85,5 +83,4 @@ RSpec.describe ShopEmployerNotices::InitialEmployerInvoiceAvailable do
       expect(File.exist?(file.path)).to be true
     end
   end
-
 end

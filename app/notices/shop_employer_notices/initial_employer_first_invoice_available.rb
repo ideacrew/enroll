@@ -1,4 +1,4 @@
-class ShopEmployerNotices::InitialEmployerInvoiceAvailable < ShopEmployerNotice
+class ShopEmployerNotices::InitialEmployerFirstInvoiceAvailable < ShopEmployerNotice
 
   def deliver
     build
