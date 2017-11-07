@@ -42,6 +42,7 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
 
     it "allow dependent ssn's to be updated to nil" do
       census_employee.census_dependents = [census_dependent]
+      allow(ENV).to receive(:[]).with("dep_ssn").and_return nil
       subject.migrate
       census_employee.reload
       expect(census_employee.census_dependents.first.ssn).to match(nil)
@@ -49,10 +50,10 @@ describe UpdateEeDependentSSN, dbclean: :after_each do
 
     it "allow dependent ssn's to be updated" do
       census_employee.census_dependents = [census_dependent]
-      census_employee.census_dependents.first.update_attributes!(ssn: "123456789")
+      allow(ENV).to receive(:[]).with("dep_ssn").and_return("123156189")
       subject.migrate
       census_employee.reload
-      expect(census_employee.census_dependents.first.ssn).to match("123456789")
+      expect(census_employee.census_dependents.first.ssn).to match("123156189")
     end
   end
 end
