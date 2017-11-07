@@ -12,3 +12,6 @@ Feature: Phone and Paper Enrollment options exist
   Scenario: Phone and Phone Enrollment
     Then I see the Paper link
     Then I see the Phone link
+
+  Scenario: Disabling Paper link
+    Then the Paper action should not be actionable
