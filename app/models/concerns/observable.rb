@@ -30,7 +30,7 @@ module Concerns::Observable
         end
       end
     end
-  end
+  end  
 
   class_methods do
 
