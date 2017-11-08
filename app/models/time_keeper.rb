@@ -81,7 +81,7 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    ModelEvents::PlanYear.date_change_event(self.date_of_record)
+    PlanYear.date_change_event(self.date_of_record)
   end
 
   def self.with_cache
