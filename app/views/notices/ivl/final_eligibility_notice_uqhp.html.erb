@@ -8,14 +8,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>
-        <% if notice.documents_needed %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %> <br>
-          ACTION REQUIRED - SEND BY DOCUMENTS BY <%= notice.due_date.strftime("%B %d, %Y") %>
-        <% else %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %>
-        <% end %>
-      </h3></td>
+      <td><h3>YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -61,14 +54,8 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You need to send us documents to verify that you still qualify to get coverage through #{Settings.site.short_name}."],
-   heading: 'Send Us Documents', sub_heading: ''} %>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "<strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance if you don’t submit them by the deadline. Your final eligibility results may also change based on the documents you submit</strong>.", bottom_margin: '5px'} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance."]} %>
+ contents: ["We are in the process of checking the information on your application with our electronic data sources, as federal law requires. If your information does not match the data sources, we will ask you to provide documents proving your information. <strong>You could lose your insurance if you don’t respond to our request for documents by the deadline included in our request. Your final eligibility results contained in this letter may also change.</strong>"],
+   heading: 'Verifying Your Information', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
@@ -164,17 +151,24 @@ listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_rec
  contents: ["Please call #{Settings.site.short_name} at #{notice.hbe.phone} if you have any questions about this letter."],
    heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
-<%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page. "} %>
-
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+  contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:",
+  "<i>Exchange Regulations</i>",
   "General eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
   "Premium tax credit calculations:  26 CFR § 1.36B-3",
   "Annual Eligibility Redetermination and Renewal Standards: 45 CFR §155.335",
   "Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
   "Annual open enrollment period: 45 CFR § 155.155.410(e)",
-  "Special enrollment periods: 45 CFR § 155.420"]} %>
+  "Special enrollment periods: 45 CFR § 155.420",
+  "Requirement to report changes: 45 CFR § 155.330(b)",
+  "<i>Medicaid Regulations</i>",
+  "State residence: 42 CFR § 435.403",
+  "Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+  "Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
+  "Medicaid determination of eligibility: 42 CFR § 435.911",
+  "Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
+  "Verification of other non-financial information: 42 CFR § 435.956",
+  "Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>

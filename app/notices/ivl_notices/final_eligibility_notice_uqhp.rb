@@ -18,7 +18,6 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents if notice.documents_needed
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
@@ -36,7 +35,6 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     append_data
     pick_enrollments
     append_hbe
-    append_unverified_individuals
     if recipient.mailing_address
       append_address(recipient.mailing_address)
     else
@@ -117,57 +115,6 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     notice.ivl_open_enrollment_end_on = Settings.aca.individual_market.open_enrollment.end_on
     notice.primary_fullname = recipient.full_name.titleize || ""
     notice.primary_firstname = recipient.first_name.titleize
-  end
-
-  def append_unverified_individuals
-    family = recipient.primary_family
-    enrolled_contingent_enrollment = family.enrollments.where(:aasm_state => "enrolled_contingent").sort_by(&:created_at).last
-
-    if enrolled_contingent_enrollment.present?# && enrolled_contingent_enrollment.special_verification_period.present?
-      family_members = enrolled_contingent_enrollment.hbx_enrollment_members.map(&:family_member)
-      people = family_members.map(&:person).uniq
-      people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-      people.reject!{|person| !ssn_outstanding?(person) && !lawful_presence_outstanding?(person) }
-      if people.empty?
-        raise 'no family member found with outstanding verification'
-      end
-
-      outstanding_people = []
-      people.each do |person|
-        if person.consumer_role.outstanding_verification_types.present?
-          outstanding_people << person
-        end
-      end
-
-      outstanding_people.uniq!
-      if outstanding_people.empty?
-        notice.documents_needed = false
-        raise 'no family member found without uploaded documents'
-      else
-        notice.documents_needed = true
-        notice.due_date = enrolled_contingent_enrollment.special_verification_period || TimeKeeper.date_of_record+95.days
-        append_outstanding_people(people)
-      end
-    else
-      notice.documents_needed = false
-      notice.due_date = nil
-    end
-  end
-
-  def append_outstanding_people(people)
-    people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record)})
-      end
-
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record)})
-      end
-    end
-  end
-
-  def ssn_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
 
   def is_totally_ineligible(person)

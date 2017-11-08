@@ -18,7 +18,6 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents if notice.documents_needed
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
@@ -58,14 +57,12 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
     end
-    notice.documents_needed = check(primary_member["documents_needed"])
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
     notice.irs_consent_needed = check(primary_member["irs_consent"])
     notice.primary_firstname = primary_member["first_name"]
   end
 
   def append_member_information_for_aqhp(primary_member)
-    due_dates = []
     data.collect do |datum|
       notice.individuals << PdfTemplates::Individual.new({
         :first_name => datum["first_name"].titleize,
@@ -80,28 +77,17 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :tax_status => filer_type(datum["filer_type"]),
         :mec => datum["mec"].try(:upcase) == "YES" ? "Yes" : "No",
         :is_ia_eligible => check(datum["aqhp_eligible"]),
+        :indian_conflict => check(datum["indian"]),
         :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
         :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
         :is_without_assistance => check(datum["uqhp_eligible"]),
         :is_totally_ineligible => check(datum["totally_inelig"]),
         :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
+        :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
         :has_access_to_affordable_coverage => check(datum ["mec"]),
         :tax_household => append_tax_household_information(primary_member)
       })
-
-      due_dates << Date.strptime(datum["document_deadline"], '%m/%d/%Y')
-
-      if datum["outstanding_verification_types"].include?("Social Security Number")
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
-      end
-      if datum["outstanding_verification_types"].include?("Immigration status")
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
-      end
-      if datum["outstanding_verification_types"].include?("Citizenship")
-        notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: datum["first_name"].titleize, documents_due_date: Date.strptime(datum["document_deadline"], '%m/%d/%Y'), age: calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')) })
-      end
     end
-    notice.due_date = due_dates.min
   end
 
   def pick_enrollments
@@ -170,8 +156,10 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
       :csr_percent_as_integer => (primary_member["csr"].upcase == "YES") ? primary_member["csr_percent"] : "100",
       :max_aptc => primary_member["aptc"],
       :aptc_csr_annual_household_income => primary_member["actual_income"],
+      :aptc_csr_monthly_household_income => primary_member["monthly_hh_income"],
       :aptc_annual_income_limit => primary_member["aptc_annual_limit"],
-      :csr_annual_income_limit => primary_member["csr_annual_income_limit"]
+      :csr_annual_income_limit => primary_member["csr_annual_income_limit"],
+      :applied_aptc => primary_member["applied_aptc"]
     })
   end
 

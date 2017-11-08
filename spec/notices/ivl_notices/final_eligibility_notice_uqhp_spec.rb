@@ -52,26 +52,6 @@ RSpec.describe IvlNotices::FinalEligibilityNoticeUqhp, :dbclean => :after_each d
     end
   end
 
-  describe "#document_due_date" do
-    before do
-      allow(person).to receive("primary_family").and_return(family)
-      allow(person.consumer_role).to receive_message_chain("person.families.first.primary_applicant.person").and_return(person)
-      @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_parmas)
-    end
-
-    it "returns all auto_renewing enrollments" do
-      person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-      @final_eligibility_notice.build
-      expect(@final_eligibility_notice.notice.due_date).to eq hbx_enrollment_1.special_verification_period
-    end
-
-    it "returns nil when there are no auto_renewing enrollments" do
-      hbx_enrollment_1.update_attributes!(:aasm_state => "coverage_selected")
-      @final_eligibility_notice.build
-      expect(@final_eligibility_notice.notice.due_date).to eq nil
-    end
-  end
-
   describe "#pick_enrollments" do
     before do
       allow(person).to receive("primary_family").and_return(family)

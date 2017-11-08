@@ -831,7 +831,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FEL_AQHP',
-    title: 'Your Final Eligibility Results, Plan, And Option TO Change Plans',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
     description: 'Final Eligibility Notice will be sent to all AQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_aqhp',
@@ -853,7 +853,7 @@ ivl_notice_triggers = [
 
   {
     hbx_id: 'IVL_FEL_UQHP',
-    title: 'Your Final Eligibility Results, Plan, And Option TO Change Plans',
+    title: 'Your Final Eligibility Results, Plan, And Option To Change Plans',
     description: 'Final Eligibility Notice will be sent to all UQHP individuals',
     resource_name: 'consumer_role',
     event_name: 'final_eligibility_notice_uqhp',

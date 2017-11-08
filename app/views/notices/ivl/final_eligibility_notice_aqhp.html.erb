@@ -8,14 +8,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>
-        <% if notice.documents_needed %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018 <br>
-          ACTION REQUIRED - SEND BY DOCUMENTS BY <%= notice.due_date.strftime("%B %d, %Y") %>
-        <% else %>
-          YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR 2018
-        <% end %>
-      </h3></td>
+      <td><h3>YOUR ELIGIBILITY RESULTS, PLAN, AND OPTION TO CHANGE PLANS FOR <%= notice.coverage_year %></h3></td>
     </tr>
   </tbody>
 </table>
@@ -35,7 +28,7 @@
       listings: ["What’s new this year", "Your final eligibility results for #{notice.coverage_year}", "What you need to do next", "How we made our decision", "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["While there’s been a lot of news about the repeal and replacement of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents. We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in 2018. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
+ contents: ["While there’s been a lot of news about the repeal and replacement of the Affordable Care Act (ACA), please know that the ACA remains the law of the land. Established under District law, #{Settings.site.short_name} continues to be the health insurance marketplace for District residents. We are locally managed and controlled. We are financially sound and going strong.", "There are many new plans to choose from in #{notice.coverage_year}. For example, CareFirst BlueCross BlueShield and Kaiser Permanente are both offering health plans that allow you to open a tax-free Health Savings Account (HSA) to pay for qualified medical expenses."],
    heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
@@ -84,13 +77,13 @@
       content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $6,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $15 instead of $35. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs.  <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 94 %>
       <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong>The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $6,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $5 instead of $35. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs.  <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. For example, an annual deductible that would normally be $6,000 for an individual might be reduced to $0, and the cost to see an in-network doctor might be $5 instead of $35. The deductible is how much you must pay for some covered services you use before your insurance company begins to help with costs.  <strong>To get these savings, you must select a silver plan.</strong>", bottom_margin: '5px'} %>
     <% when 100 %>
       <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong>The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you get from providers who are in your plan’s network. You also won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% else %>
       <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "<strong>Cost-sharing reductions:</strong>The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
+      content: "<strong>Cost-sharing reductions:</strong> The people listed above are also projected to be eligible to pay less when getting medical services. You won’t pay anything for services you receive from an Indian Health Service provider.", bottom_margin: '5px'} %>
     <% end %>
   <% end %>
   <%= render partial: 'notices/shared/custom_listing', locals: {
@@ -101,17 +94,14 @@
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Does Not Qualify for Coverage:</strong>",
     listings: notice.ineligible_applicants} %>
+
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+  listing: "<strong>What you need to do next:</strong> Review the section, ‘How We Made Our Decision’, to find out why, and learn about options for those listed."} %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You need to send us documents to verify that you still qualify to get coverage through #{Settings.site.short_name}."],
-   heading: 'Send Us Documents', sub_heading: ''} %>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-      content: "<strong>The deadline to return them is #{notice.due_date.strftime("%B %d, %Y")}. You could lose your insurance or cost savings if you don’t submit them by this deadline. Your final eligibility results may also change based on the documents you submit</strong>.", bottom_margin: '5px'} %>
-
-<%= render partial: 'notices/shared/unordered_list', locals: {
-  listings: ["The list of documents we need from you is at the end of this letter.","We also tell you how to send them to us.","We need your documents, by the deadline, to make a final decision on your eligibility for insurance and cost savings."]} %>
+ contents: ["We are in the process of checking the information on your application with our electronic data sources, as federal law requires. If your information does not match the data sources, we will ask you to provide documents proving your information. <strong>You could lose your insurance if you don’t respond to our request for documents by the deadline included in our request. Your final eligibility results contained in this letter may also change.</strong>"],
+   heading: 'Verifying Your Information', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["If you want to change plans for #{notice.coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After #{notice.ivl_open_enrollment_end_on.strftime("%B %d, %Y")}, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
@@ -129,7 +119,7 @@
        heading: 'Your Plan', sub_heading: '', bottom_margin: '5px'} %>
 
   <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
+      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctors and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
@@ -143,7 +133,7 @@
      heading: 'Your Plan', sub_heading: '', bottom_margin: '3px'} %>
 
   <%= render partial: 'notices/shared/custom_listing', locals: {
-      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctor and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
+      listing: "Don’t forget to call your insurance company or visit their website to make sure your doctors and other health care providers will be in the plan network next year. Also check to make sure any prescription medicines you take are still covered."} %>
 
   <% notice.enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
@@ -220,17 +210,24 @@ listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_rec
  contents: ["Please call #{Settings.site.short_name} at #{notice.hbe.phone} if you have any questions about this letter."],
    heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
-<%= render partial: 'notices/shared/custom_listing', :locals => {
-listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not return them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page. "} %>
-
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
-contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:<br>",
+  contents: ["Legal Reference: The following laws, regulations and rules apply to this letter:",
+  "<i>Exchange Regulations</i>",
   "General eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
   "Premium tax credit calculations:  26 CFR § 1.36B-3",
   "Annual Eligibility Redetermination and Renewal Standards: 45 CFR §155.335",
   "Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
   "Annual open enrollment period: 45 CFR § 155.155.410(e)",
-  "Special enrollment periods: 45 CFR § 155.420"]} %>
+  "Special enrollment periods: 45 CFR § 155.420",
+  "Requirement to report changes: 45 CFR § 155.330(b)",
+  "<i>Medicaid Regulations</i>",
+  "State residence: 42 CFR § 435.403",
+  "Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+  "Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
+  "Medicaid determination of eligibility: 42 CFR § 435.911",
+  "Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
+  "Verification of other non-financial information: 42 CFR § 435.956",
+  "Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
