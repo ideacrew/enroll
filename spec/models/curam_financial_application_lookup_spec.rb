@@ -17,7 +17,7 @@ describe CuramFinancialApplicationLookup do
     }
 
     it "returns a valid response code" do
-      allow(Acapi::Requestor).to receive(:request).with("curam_financial_application.search", person_demographics, 2).and_return(amqp_response)
+      allow(Acapi::Requestor).to receive(:request).with("account_management.check_existing_account", person_demographics, 2).and_return(amqp_response)
       expect(generator.search_curam_financial_app(person_demographics)).to eq valid_response_code
     end
   end
