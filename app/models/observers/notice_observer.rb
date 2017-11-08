@@ -83,6 +83,10 @@ module Observers
 
     def census_employee_update; end
 
+    def plan_year_date_change; end
+    def employer_profile_date_change; end
+    def hbx_enrollment_date_change; end
+    def census_employee_date_change; end
 
     def date_change_events(model_event)
       plan_year = model_event.klass_instance
