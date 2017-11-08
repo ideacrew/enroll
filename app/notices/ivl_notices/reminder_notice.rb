@@ -1,4 +1,4 @@
-class IvlNotices::ConsumerNotice < IvlNotice
+class IvlNotices::ReminderNotice < IvlNotice
   attr_accessor :family
 
   def initialize(consumer_role, args = {})
@@ -45,15 +45,16 @@ class IvlNotices::ConsumerNotice < IvlNotice
     notice.primary_identifier = recipient.hbx_id
     append_hbe
     append_unverified_family_members
+    append_notice_subject
 
     if recipient.mailing_address
       append_address(recipient.mailing_address)
-    else  
+    else
       raise 'mailing address not present'
     end
   end
 
-  def notice_subject
+  def append_notice_subject
     notice.notice_subject =  case notice.notification_type
     when "first_verifications_reminder"
       "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")}"
@@ -88,7 +89,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
     if people.empty?
       raise 'no family member found with outstanding verification'
     end
-    
+
     outstanding_people = []
     people.each do |person|
       if person.consumer_role.outstanding_verification_types.present?
@@ -135,20 +136,38 @@ class IvlNotices::ConsumerNotice < IvlNotice
     person.consumer_role.outstanding_verification_types.include?("Social Security Number")
   end
 
-  def lawful_presence_outstanding?(person)
-    person.consumer_role.outstanding_verification_types.include?('Citizenship') || person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  def citizenship_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Citizenship')
+  end
+
+  def immigration_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('Immigration status')
+  end
+
+  def residency_outstanding?(person)
+    person.consumer_role.outstanding_verification_types.include?('DC Residency')
   end
 
   def append_unverified_individuals(people)
     people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
-
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+      person.consumer_role.outstanding_verification_types.each do |verification_type|
+        case verification_type
+        when "Social Security Number"
+          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "Immigration status"
+          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "Citizenship"
+          notice.citizenstatus_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        when "DC Residency"
+          notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: document_due_date(person, verification_type), age: person.age_on(TimeKeeper.date_of_record) })
+        end
       end
     end
+  end
+
+  def document_due_date(person, verification_type)
+    special_verification = person.consumer_role.special_verifications.where(verification_type: verification_type).sort_by(&:created_at).last
+    special_verification.present? ? special_verification.due_date : nil
   end
 
   def append_address(primary_address)
@@ -171,7 +190,7 @@ class IvlNotices::ConsumerNotice < IvlNotice
   end
 
   def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
+    address_line.split(/\s/).map do |x|
       x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
   end
@@ -192,4 +211,4 @@ class IvlNotices::ConsumerNotice < IvlNotice
       notice.enrollments.first.aasm_state.to_s
     ]
   end
-end 
+end
