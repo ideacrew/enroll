@@ -51,14 +51,14 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
       allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
-      @consumer_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
-      @consumer_notice.build
+      @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
+      @reminder_notice.build
     end
     it "should retun priamry full name" do
-      expect(@consumer_notice.notice.primary_fullname).to eq person.full_name.titleize
+      expect(@reminder_notice.notice.primary_fullname).to eq person.full_name.titleize
     end
     it "should retun notification type" do
-      expect(@consumer_notice.notice.notification_type).to eq application_event.event_name
+      expect(@reminder_notice.notice.notification_type).to eq application_event.event_name
     end
   end
 
@@ -108,11 +108,11 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
       allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
-      @consumer_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
-      @consumer_notice.build
+      @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
+      @reminder_notice.build
     end
     it "should retun priamry full name" do
-      expect(@consumer_notice.notice.notice_subject).to eq "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY FEBRUARY 10, 2018"
+      expect(@reminder_notice.notice.notice_subject).to eq "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{@reminder_notice.notice.due_date.strftime("%^B %d, %Y")}"
     end
   end
 
@@ -121,16 +121,16 @@ RSpec.describe IvlNotices::ReminderNotice, :dbclean => :after_each do
       person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
       allow(hbx_enrollment).to receive("plan").and_return(plan)
       allow(person).to receive("primary_family").and_return(family)
-      @consumer_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
+      @reminder_notice = IvlNotices::ReminderNotice.new(person.consumer_role, valid_parmas)
     end
 
     it "should render the projected eligibility notice template" do
-      expect(@consumer_notice.template).to eq "notices/ivl/documents_verification_reminder"
+      expect(@reminder_notice.template).to eq "notices/ivl/documents_verification_reminder"
     end
 
     it "should generate pdf" do
-      @consumer_notice.build
-      file = @consumer_notice.generate_pdf_notice
+      @reminder_notice.build
+      file = @reminder_notice.generate_pdf_notice
       expect(File.exist?(file.path)).to be true
     end
   end
