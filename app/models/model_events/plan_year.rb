@@ -74,16 +74,21 @@ module ModelEvents
       end
     end
 
-    def self.date_change_event(new_date)
-      # renewal plan year publish due date 2 days prior i.e 13th of the month
-      if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
-        is_renewal_plan_year_publish_dead_line = true
-      end
+    def self.included(base)
+      base.extend ClassMethods
+    end
 
-      DATA_CHANGE_EVENTS.each do |event|
-        if event_fired = instance_eval("is_" + event.to_s)
-          event_options = {}
-          notify_observers(ModelEvent.new(event, self, event_options))
+    module ClassMethods
+      def date_change_event(new_date)
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
+          is_renewal_plan_year_publish_dead_line = true
+        end
+
+        DATA_CHANGE_EVENTS.each do |event|
+          if event_fired = instance_eval("is_" + event.to_s)
+            event_options = {}
+            notify_observers(ModelEvent.new(event, self, event_options))
+          end
         end
       end
     end
