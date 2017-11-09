@@ -6,10 +6,10 @@
           <%= link_to(employers_employer_profile_show_profile_path(:employer_profile_id=>@employer_profile.id, tab: 'inbox', folder: 'Deleted'), remote: true, class: 'pull-right') do%>
           <% if @folder == 'Deleted' %>
           <strong>
-            Deleted
+            Archived
           </strong>
           <% else %>
-          Deleted
+          Archived
           <% end %>
           <% end %>
           <span class="pull-right">
@@ -53,9 +53,6 @@
               Date
             </th>
             <th>Subject</th>
-            <%- if @folder != 'Deleted' %>
-            <th></th>
-            <%- end %>
           </tr>
         </thead>
         <tbody>

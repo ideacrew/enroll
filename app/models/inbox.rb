@@ -20,7 +20,7 @@ class Inbox
   end
 
   def deleted_messages
-    messages.where(message_read: true, folder: Message::FOLDER_TYPES[:deleted])
+    messages.where(folder: Message::FOLDER_TYPES[:deleted])
   end
 
   def post_message(new_message)
