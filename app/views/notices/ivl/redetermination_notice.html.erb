@@ -1,0 +1,140 @@
+<%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<br>
+<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>IMPORTANT NOTICE – CHANGE IN HEALTH COVERAGE ELIGIBILITY</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 10px;">Dear <%= notice.primary_firstname %>:  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+    content: "Your household’s eligibility for health coverage through #{Settings.site.short_name} has changed based on information we recently received. This letter will tell you:"} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["Your new eligibility results",
+     "What you need to do next",
+     "How we made our decision",
+     "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
+  
+
+  <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: [ ],
+    heading: 'Your New Eligibility Results', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
+
+ 
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Qualify for Private Health Insurance:</strong>",
+    listings: notice.uqhp_individuals} %>
+
+ <% if notice.uqhp_individuals.present? %>
+ <% end %>
+ 
+  <%= render partial: 'notices/shared/custom_listing', locals: {
+  listing: "<strong>What you need to do next:</strong> [If OE=YES]Login to your account at dchealthlink.com to shop for a plan. [If OE=NO] This change may qualify you to sign up for a plan, change plans, or add someone to your plan even though it isn’t open enrollment. To see if you can enroll now, login to your account at dchealthlink.com. We may need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment. "} %>
+
+  <% if notice.ineligible_applicants.present? %>
+  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+    previous: "<strong>Does Not Qualify for Coverage:</strong>",
+    listings: notice.ineligible_applicants} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["If you want to change plans for <coverage year>, or add someone to a plan, shop for a new plan during open enrollment. After <OE End Date>, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
+   heading: 'Open Enrollment', sub_heading: '', bottom_margin: '5px'} %>
+
+  
+  <% if notice.aqhp_enrollments.present? || notice.uqhp_individuals.present? %>
+    <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+        contents: ["There are many reasons eligibility for you, or someone in your household can change. For example:"],
+        heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
+ 
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+        listing: "DC Health Link registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: dchealthlink.com/find-expert."} %>
+
+    <%= render partial: 'notices/shared/custom_listing', :locals => {
+        listing: "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at dchealthlink.com"} %>
+  <%end%>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+    contents: ["There are many reasons eligibility for you, or someone in your household can change. For example:"],
+    heading: 'Why Your Eligibility changed', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["You may have added or removed someone from your household, your residency may have changed, or something else changed.",
+     "We may have requested documents from you to verify your eligibility, and you didn’t submit them by the deadline. 
+      Federal law requires that if we don’t hear from you, we must update your status based on what our electronic data
+      sources told us.",
+     "You may have submitted documents we needed to verify your eligibility, but the information you gave us was different
+      than what you told us on your application.",
+     "Information from one of our electronic data sources was different from information you gave us on your application."]} %>   
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["The results below tell you how we made our decision."],
+   heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
+  
+   <% notice.individuals.each do |ivl|%>
+  <div style="display:block; page-break-inside: avoid;">
+    <table align="center" cellpadding="5" class="total_table thick_broder" style="margin-top: 10px; margin-bottom: 10px; width: 100% %>;" border="1">
+      <tbody>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Household Member:</b>
+          </td>
+          <td style="width: 75%;">
+            <p><%= ivl.full_name %> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= ivl.age %> </p>
+          </td>
+        </tr>
+        <tr valign="top">
+          <td style="width: 25%;">
+            <b>Private Health Insurance</b>
+          </td>
+          <td style="width: 75%;">
+            <p><%= ivl.first_name %> qualifies to purchase private health insurance through <%= Settings.site.short_name %>.</p>
+          </td>
+        </tr>
+        <% if ivl.is_totally_ineligible %>
+          <tr valign="top">
+            <td style="width: 25%;">
+              <b>Ineligible for Medicaid and Private Health Insurance</b>
+            </td>
+            <td style="width: 75%;">
+              <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
+   heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
+
+<%= render partial: 'notices/shared/custom_listing', :locals => {
+listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record+95.days).strftime("%B %d, %Y")}.</strong>Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> ________________________________________________________________________________"} %>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:<br>",
+"General eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
+"Mid-year eligibility redetermination standards: 45 CFR § 155.330",
+"Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
+"Annual open enrollment period: 45 CFR § 155.155.410(e)",
+"Special enrollment periods: 45 CFR § 155.420",
+"Requirement to report changes: 45 CFR § 155.330(b)"]} %>

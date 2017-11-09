@@ -125,6 +125,7 @@ class Person
 
   #after_save :generate_family_search
   after_create :create_inbox
+  after_save :send_redetermination_notice
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
@@ -869,8 +870,19 @@ class Person
       user.ridp_by_paper_application
     end
   end
-
+  
   private
+
+  def send_redetermination_notice
+    if is_incarcerated || is_dc_resident? || citizen_status == ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
+      begin
+        IvlNoticesNotifierJob.perform_later(self.consumer_role.id.to_s,"redetermination_notice") unless Rails.env.test?
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver redetermination_notice for person #{self.id} with Exception #{e}" } unless Rails.env.test?
+      end
+    end
+  end
+
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);

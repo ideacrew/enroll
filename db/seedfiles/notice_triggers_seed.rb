@@ -1021,6 +1021,27 @@ ivl_notice_triggers = [
     ]
   },
   {
+    hbx_id: 'IVL_REU',
+    title: 'IMPORTANT NOTICE – CHANGE IN HEALTH COVERAGE ELIGIBILITY',
+    description: 'Notice will be sent to the household if household\'s eligibility changes',
+    resource_name: 'consumer_role',
+    event_name: 'redetermination_notice',
+    notice_triggers: [
+      {
+        name: 'Redetermination Notice',
+        notice_template: 'notices/ivl/redetermination_notice',
+        notice_builder: 'IvlNotices::RedeterminationNoticeBuilder',
+        mpi_indicator: 'IVL_REU',
+        notice_trigger_element_group: {
+          market_places: ['individual'],
+          primary_recipients: ["consumer"],
+          primary_recipient_delivery_method: ["secure_message", "paper"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+  {
     hbx_id: 'IVL_ENR',
     title: 'Enrollment notice',
     description: 'Notice will be sent to families after their enrollment is done.',
