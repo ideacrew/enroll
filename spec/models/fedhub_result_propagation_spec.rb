@@ -4,7 +4,7 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
   let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:individual_market_family, primary_person: person) }
   let(:hbx_profile) { FactoryGirl.create(:hbx_profile, :open_enrollment_coverage_period) }
-  let(:enrollment) do
+  let(:enrollment11) do
     benefit_sponsorship = hbx_profile.benefit_sponsorship
     benefit_package = benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     plan = Plan.find(benefit_package.benefit_ids.first)
@@ -29,24 +29,24 @@ describe "A new consumer role with an individual market enrollment", :dbclean =>
 
     describe "when the enrollment is active" do
       before :each do
-        enrollment
+        enrollment11
         person.consumer_role.ssn_invalid!(denial_information)
       end
 
       it "puts the enrollment in enrolled_contingent state" do
-          enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+          enroll = HbxEnrollment.by_hbx_id(enrollment11.hbx_id).first
           expect(enroll.aasm_state).to eql "enrolled_contingent"
       end
     end
 
     describe "when the enrollment is terminated" do
       before :each do
-        enrollment.terminate_coverage!
+        enrollment11.terminate_coverage!
         person.consumer_role.ssn_invalid!(denial_information)
       end
 
       it "does not change the state of the enrollment" do
-          enroll = HbxEnrollment.by_hbx_id(enrollment.hbx_id).first
+          enroll = HbxEnrollment.by_hbx_id(enrollment11.hbx_id).first
           expect(enroll.aasm_state).to eql "coverage_terminated"
       end
     end
