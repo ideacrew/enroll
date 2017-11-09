@@ -482,11 +482,11 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_view_application_types to true" do
-        expect(Person.all.count).to eq(3)
+        expect(Person.all.count).to eq(4)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_application_types).to be false
         #verifying that the rake task updated only the correct subroles
         expect(Permission.developer.can_view_application_types).to be false
       end
