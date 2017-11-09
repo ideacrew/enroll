@@ -167,15 +167,6 @@ class Insured::PlanShoppingsController < ApplicationController
     end
   end
 
-  def employee_waiver_notice(hbx_enrollment)
-    begin
-      census_employee = CensusEmployee.find(hbx_enrollment.employee_role.census_employee_id.to_s)
-      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_waiver_notice")
-    rescue Exception => e
-      puts "Unable to send Employee Waiver notice to #{census_employee.full_name}" unless Rails.env.test?
-    end
-  end
-
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
 
