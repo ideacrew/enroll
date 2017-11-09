@@ -73,11 +73,11 @@ describe DefinePermissions, dbclean: :after_each do
       before do
         User.all.delete
         Person.all.delete
-        # @hbx_staff_person = FactoryGirl.create(:person)
+        @hbx_staff_person = FactoryGirl.create(:person)
         @hbx_csr_supervisor_person = FactoryGirl.create(:person)
         @hbx_csr_tier1_person = FactoryGirl.create(:person)
         @hbx_csr_tier2_person = FactoryGirl.create(:person)
-        # hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
+        hbx_staff_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)
         hbx_csr_supervisor_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_supervisor_person, subrole: "hbx_csr_supervisor", permission_id: Permission.hbx_csr_supervisor.id)
         hbx_csr_tier1_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier1_person, subrole: "hbx_csr_tier1", permission_id: Permission.hbx_csr_tier1.id)
         hbx_csr_tier2_role = FactoryGirl.create(:hbx_staff_role, person: @hbx_csr_tier2_person, subrole: "hbx_csr_tier2", permission_id: Permission.hbx_csr_tier2.id)
@@ -85,11 +85,11 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_view_application_types to true" do
-        expect(Person.all.count).to eq(3)
-        # expect(@hbx_staff_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be true
-        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(Person.all.count).to eq(4)
+        expect(@hbx_staff_person.hbx_staff_role.permission.can_view_application_types).to be true
+        expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be false
+        expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be false
+        expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_view_application_types).to be false
         #verifying that the rake task updated only the correct subroles
         expect(Permission.developer.can_view_application_types).to be false
       end
