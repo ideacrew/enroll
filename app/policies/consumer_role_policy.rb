@@ -46,6 +46,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   def can_view_application_types?
+    binding.pry
     return @user.person.hbx_staff_role.permission.can_view_application_types if (@user.person && @user.person.hbx_staff_role)
     return false
   end

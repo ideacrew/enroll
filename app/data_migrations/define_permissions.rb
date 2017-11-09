@@ -164,8 +164,6 @@ class DefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_view_application_types
-    Permission.hbx_csr_supervisor.update_attributes!(can_view_application_types: true)
-    Permission.hbx_csr_tier2.update_attributes!(can_view_application_types: true)
-    Permission.hbx_csr_tier1.update_attributes!(can_view_application_types: true)
+    Permission.hbx_staff.update_attributes!(can_view_application_types: true)
   end
 end
