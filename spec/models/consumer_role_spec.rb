@@ -83,28 +83,6 @@ describe ConsumerRole, dbclean: :after_each do
         end
       end
     end
-
-    describe "Check for mec and income attributes" do
-      let(:valid_params) do
-        {
-            is_applicant: is_applicant,
-            person: saved_person,
-        }
-      end
-      let(:consumer_role) {saved_person.build_consumer_role(valid_params)}
-      context "valid attribute" do
-        it "it is expected to have attributes mec & income" do
-          consumer_role.update_attributes({assisted_mec_validation: "valid",
-                                           assisted_income_validation: "valid",
-                                           assisted_mec_reason: "Document in EnrollApp",
-                                           assisted_income_reason: "Document in EnrollApp"})
-          expect(consumer_role).to have_attributes(:assisted_income_validation => "valid")
-          expect(consumer_role).not_to have_attributes(:assisted_income_validation => nil)
-          expect(consumer_role).to have_attributes(:assisted_mec_validation => "valid")
-          expect(consumer_role).not_to have_attributes(:assisted_mec_validation => nil)
-        end
-      end
-    end
   end
 end
 
@@ -330,7 +308,6 @@ context "Verification process and notices" do
     let(:consumer) { person.consumer_role }
     shared_examples_for "update verification type for consumer" do |verification_type, old_authority, new_authority|
       before do
-        consumer.update_attributes(:ssn_validation => "invalid")
         consumer.lawful_presence_determination.deny!(verification_attr)
         consumer.lawful_presence_determination.update_attributes(:vlp_authority => old_authority)
         consumer.update_verification_type(verification_type, "documents in Enroll")
@@ -346,16 +323,6 @@ context "Verification process and notices" do
     it_behaves_like "update verification type for consumer", "Social Security Number", "hbx", "hbx"
     it_behaves_like "update verification type for consumer", "Citizenship", "hbx", "hbx"
     it_behaves_like "update verification type for consumer", "Citizenship", "curam", "hbx"
-
-    it "updates income for assisted consumer" do
-      consumer.update_verification_type("Income", "Document in DIMS", nil)
-      expect(consumer.assisted_income_verified?).to eq true
-    end
-
-    it "updates mec for assisted consumer" do
-      consumer.update_verification_type("Minimal Essential Coverage", "Document in EnrollApp", "hbx")
-      expect(consumer.assisted_mec_verified?).to eq true
-    end
   end
 
   describe "#update_all_verification_types private" do

@@ -762,18 +762,12 @@ private
     applicants.each do |applicant|
       income_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "Income")
       mec_assisted_verification = applicant.assisted_verifications.create!(status: "submitted", verification_type: "MEC")
-
-      applicant.person.consumer_role.assisted_verification_documents.create!(application_id: self.id, applicant_id: applicant.id,
-        assisted_verification_id: income_assisted_verification.id, kind: income_assisted_verification.verification_type)
-      applicant.person.consumer_role.assisted_verification_documents.create!(application_id: self.id, applicant_id: applicant.id,
-        assisted_verification_id: mec_assisted_verification.id, kind: mec_assisted_verification.verification_type)
     end
   end
 
   def delete_verification_documents
     applicants.each do |applicant|
       applicant.assisted_verifications.destroy_all
-      applicant.person.consumer_role.assisted_verification_documents.destroy_all
     end
   end
 end

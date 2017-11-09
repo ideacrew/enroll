@@ -18,6 +18,7 @@ describe Subscribers::FinancialAssistanceApplicationEligibilityResponse do
 
   before do
     allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile_organization)
+    allow(hbx_profile_organization).to receive(:under_open_enrollment?).and_return(false)
   end
 
   after(:all) do

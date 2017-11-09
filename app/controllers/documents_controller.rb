@@ -1,7 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type]
+  before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification]
+  before_action :set_current_person, only: [:update_verification_type]
   respond_to :html, :js
 
   def download
@@ -31,11 +32,21 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
+    primary_person = @person
+    family = primary_person.primary_family
+    person_in_context = Person.find(params["person_id"]) #Can be a dependent or a primary
+    family_member = family.family_members.where(:person_id => params["person_id"]).first
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
     respond_to do |format|
-      if (VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS).uniq.include? (update_reason)
-        verification_result = @person.consumer_role.update_verification_type(v_type, update_reason)
+      if ( VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS ).uniq.include?(update_reason)
+        if FinancialAssistance::AssistedVerification::VERIFICATION_TYPES.include?(params["verification_type"])
+          applicant = family.latest_applicable_submitted_application.applicants.where(family_member_id: family_member.id).first
+          verification_result = applicant.update_verification_type(v_type, update_reason)
+        else
+          verification_result = person_in_context.consumer_role.update_verification_type(v_type, update_reason)
+        end
+
         message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
         format.html { redirect_to :back, :flash => { :success => message} }
       else
@@ -45,26 +56,26 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-     family = @person.primary_family
-     if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
-       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-         enrollment.evaluate_individual_market_eligiblity
-       end
-       family.save!
-       respond_to do |format|
-         format.html {
-           flash[:success] = "Enrollment group was completely verified."
-           redirect_to :back
-         }
-       end
-     else
-       respond_to do |format|
-         format.html {
-           flash[:danger] = "Family does not have any active Enrollment to verify."
-           redirect_to :back
-         }
-       end
-     end
+    family = @person.primary_family
+    if family.try(:active_household).try(:hbx_enrollments).try(:verification_needed).any?
+      family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+        enrollment.evaluate_individual_market_eligiblity
+      end
+      family.save!
+      respond_to do |format|
+        format.html {
+          flash[:success] = "Enrollment group was completely verified."
+          redirect_to :back
+        }
+      end
+    else
+      respond_to do |format|
+        format.html {
+          flash[:danger] = "Family does not have any active Enrollment to verify."
+          redirect_to :back
+        }
+      end
+    end
   end
 
   def fed_hub_request

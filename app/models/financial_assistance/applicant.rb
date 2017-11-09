@@ -1,6 +1,7 @@
 class FinancialAssistance::Applicant
   include Mongoid::Document
   include Mongoid::Timestamps
+  include AASM
 
   embedded_in :application
 
@@ -42,6 +43,18 @@ class FinancialAssistance::Applicant
     undergraduate
     vocational
   )
+  INCOME_VALIDATION_STATES = %w(na valid outstanding pending)
+  MEC_VALIDATION_STATES = %w(na valid outstanding pending)
+
+  field :assisted_income_validation, type: String, default: "pending"
+  validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
+  field :assisted_mec_validation, type: String, default: "pending"
+  validates_inclusion_of :assisted_mec_validation, :in => MEC_VALIDATION_STATES, :allow_blank => false
+  field :assisted_income_reason, type: String
+  field :assisted_mec_reason, type: String
+
+  field :aasm_state, type: String, default: :unverified
+
   field :family_member_id, type: BSON::ObjectId
   field :tax_household_id, type: BSON::ObjectId
 
@@ -138,6 +151,7 @@ class FinancialAssistance::Applicant
   embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
   embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
   embeds_many :assisted_verifications, class_name: "::FinancialAssistance::AssistedVerification"
+  embeds_many :workflow_state_transitions, as: :transitional
 
   accepts_nested_attributes_for :incomes, :deductions, :benefits
 
@@ -193,6 +207,60 @@ class FinancialAssistance::Applicant
 
   def is_not_in_a_tax_household?
     self.tax_household.blank?
+  end
+
+  aasm do
+    state :unverified, initial: true #Both Income and MEC are Pending.
+    state :verification_outstanding #Atleast one of the Verifications is Outstanding.
+    state :verification_pending #One of the Verifications is Pending and the other Verification is Verified.
+    state :fully_verified #Both Income and MEC are Verified.
+
+    event :income_outstanding do
+      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    end
+
+    event :mec_outstanding do
+      transitions from: :verification_pending, to: :verification_outstanding, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_outstanding, :after => [:record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+    end
+
+    event :income_valid do
+      transitions from: :unverified, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_mec_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+      transitions from: :fully_verified, to: :fully_verified
+    end
+
+    event :mec_valid do
+      transitions from: :unverified, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :unverified, to: :verification_pending, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_pending, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :fully_verified, :guard => :is_income_verified?, :after => [ :record_transition, :notify_of_eligibility_change]
+      transitions from: :verification_outstanding, to: :verification_outstanding, :after => [:record_transition]
+      transitions from: :fully_verified, to: :fully_verified
+    end
+  end
+
+  #Income/MEC
+  def valid_mec_response
+    update_attributes!(assisted_mec_validation: "valid")
+  end
+
+  def invalid_mec_response
+    update_attributes!(assisted_mec_validation: "outstanding")
+  end
+
+  def valid_income_response
+    update_attributes!(assisted_income_validation: "valid")
+  end
+
+  def invalid_income_response
+    update_attributes!(assisted_income_validation: "outstanding")
   end
 
   def has_spouse
@@ -421,7 +489,88 @@ class FinancialAssistance::Applicant
     end
   end
 
-private
+  def assisted_income_verified?
+    assisted_income_validation == "valid"
+  end
+
+  def assisted_mec_verified?
+    assisted_mec_validation == "valid"
+  end
+
+  def has_faa_docs_for_type?(type)
+    self.assisted_verifications.where(verification_type: type).first.assisted_verification_documents.any?{ |doc| doc.identifier }
+  end
+
+  def update_verification_type(v_type, update_reason)
+    if v_type == "MEC"
+      update_attributes!(:assisted_mec_validation => "valid", :assisted_mec_reason => update_reason)
+      assisted_verifications.mec.first.update_attributes!(status: "verified")
+      self.mec_valid!
+    else v_type == "Income"
+      update_attributes(:assisted_income_validation => "valid", :assisted_income_reason => update_reason)
+      assisted_verifications.income.first.update_attributes!(status: "verified")
+      self.income_valid!
+    end
+  end
+
+  def is_assistance_verified?
+    ((!eligible_for_faa?) || is_assistance_required_and_verified?) ? true : false
+  end
+
+  def is_assistance_required_and_verified?
+    eligible_for_faa? && income_valid? && mec_valid?
+  end
+
+  def income_valid?
+    assisted_income_validation == "valid"
+  end
+
+  def mec_valid?
+    assisted_mec_validation == "valid"
+  end
+
+  def eligible_for_faa?
+    family.active_approved_application.present?
+  end
+
+  def income_pending?
+    assisted_doument_pending?("Income")
+  end
+
+  def mec_pending?
+    assisted_doument_pending?("MEC")
+  end
+
+  def assisted_doument_pending?(kind)
+    if eligible_for_faa? && assisted_verifications.where(verification_type: kind).present? && assisted_verifications.select{|assisted_verification| assisted_verification.verification_type == kind }.first.status == "pending"
+      return true
+    elsif !eligible_for_faa?
+      return false
+    else
+      return false
+    end
+  end
+
+  def is_income_verified?
+    assisted_income_verification = assisted_verifications.select{|verification| verification.verification_type == "Income" }.first
+    if assisted_income_verification.present? && assisted_income_verification.status == "verified"
+      return true
+    end
+
+    return false
+  end
+
+  def is_mec_verified?
+    assisted_mec_verification = assisted_verifications.select{|verification| verification.verification_type == "MEC" }.first
+    if assisted_mec_verification.present? && assisted_mec_verification.status == "verified"
+      return true
+    end
+
+    return false
+  end
+
+  private
+
   def validate_applicant_information
     validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temp_out_of_state, :family_member_id#, :tax_household_id
   end
@@ -516,5 +665,17 @@ private
       model_params[:student_status_end_on] = nil
       model_params[:student_kind] = nil
     end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(
+      from_state: aasm.from_state,
+      to_state: aasm.to_state
+    )
+  end
+
+  #Income/MEC Verifications
+  def notify_of_eligibility_change
+    CoverageHousehold.update_eligibility_for_family(family)
   end
 end

@@ -3,6 +3,7 @@ class FinancialAssistance::AssistedVerification
   include Mongoid::Timestamps
 
   embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
+  embeds_many :assisted_verification_documents, as: :documentable
 
   VERIFICATION_TYPES = %W(Income MEC)
   VERIFICATION_STATUSES = %W(submitted external_source not_required pending unverified outstanding verified)
@@ -19,7 +20,10 @@ class FinancialAssistance::AssistedVerification
   validates :verification_type,
       inclusion: { in: VERIFICATION_TYPES, message: "%{value} is not a defined verification type" }
 
-  def assisted_verification_doument
-    applicant.person.consumer_role.assisted_verification_documents.where(assisted_verification_id: self.id).first
+  scope :income, ->{ where(:"verification_type" => "Income") }
+  scope :mec, ->{ where(:"verification_type" => "MEC") }
+
+  def family
+    applicant.family
   end
 end
