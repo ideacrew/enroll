@@ -11,7 +11,7 @@ class ReportForBadEligibileFamilies < MongoidMigrationTask
           Assistance_applicable_year
           Family_e_case_id
           PrimaryPerson_FN
-          PrimaryPerson_FN
+          PrimaryPerson_LN
           PrimaryPerson_Hbx_ID
           Dependent_FN
           Dependent_LN
