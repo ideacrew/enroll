@@ -440,7 +440,14 @@ class Admin::Aptc < ApplicationController
     end
 
     def years_with_tax_household(family)
-      family.active_household.tax_households.map(&:effective_starting_on).map(&:year).uniq
+      year_set = family.active_household.tax_households.map(&:effective_starting_on).map(&:year)
+      current_hbx = HbxProfile.current_hbx
+
+      if current_hbx && current_hbx.under_open_enrollment?
+        year_set << (TimeKeeper.date_of_record.next_year.year)
+      end
+
+      year_set.uniq
     end
 
   end #  end of class << self
