@@ -223,7 +223,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
 
 
     it "should redirect back if termination date is in the past" do
-      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
       post :terminate, term_date: TimeKeeper.date_of_record - 3.days, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
