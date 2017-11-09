@@ -34,7 +34,7 @@ class DocumentsController < ApplicationController
   def update_verification_type
     primary_person = @person
     family = primary_person.primary_family
-    @person_in_context = Person.find(params["person_id"]) #Can be a dependent or a primary
+    person_in_context = Person.find(params["person_id"]) #Can be a dependent or a primary
     family_member = family.family_members.where(:person_id => params["person_id"]).first
     v_type = params[:verification_type]
     update_reason = params[:verification_reason]
@@ -44,7 +44,7 @@ class DocumentsController < ApplicationController
           applicant = family.latest_applicable_submitted_application.applicants.where(family_member_id: family_member.id).first
           verification_result = applicant.update_verification_type(v_type, update_reason)
         else
-          verification_result = @person_in_context.consumer_role.update_verification_type(v_type, update_reason)
+          verification_result = person_in_context.consumer_role.update_verification_type(v_type, update_reason)
         end
 
         message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
