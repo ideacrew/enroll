@@ -15,6 +15,7 @@ module ModelEvents
     ]
 
     DATA_CHANGE_EVENTS = [
+      :renewal_employer_publish_plan_year_reminder_after_soft_dead_line
 
     ]
 
@@ -80,8 +81,9 @@ module ModelEvents
 
     module ClassMethods
       def date_change_event(new_date)
-        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
-          is_renewal_plan_year_publish_dead_line = true
+        # renewal employer publish plan_year reminder a day after advertised soft deadline i.e 11th of the month
+        if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline + 1
+          is_renewal_employer_publish_plan_year_reminder_after_soft_dead_line = true
         end
 
         DATA_CHANGE_EVENTS.each do |event|
