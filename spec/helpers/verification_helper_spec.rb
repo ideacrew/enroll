@@ -279,14 +279,14 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe '#get_person_v_types' do
+  describe '#get_person_v_type_status' do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    it 'returns verification types of the person' do
+    it 'returns verification types states of the person' do
       status = 'verified'
       allow(helper).to receive(:verification_type_status).and_return(status)
       persons = family.family_members.map(&:person)
 
-      expect(helper.get_person_v_type_status(persons)).to eq([status])
+      expect(helper.get_person_v_type_status(persons)).to eq([status, status])
     end
   end
 

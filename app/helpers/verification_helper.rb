@@ -183,7 +183,7 @@ module VerificationHelper
       when "valid"
         "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       when "attested"
-        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+        "&nbsp;&nbsp;&nbsp;&nbsp;Attested&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       when "curam"
         admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
