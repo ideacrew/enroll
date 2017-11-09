@@ -113,7 +113,8 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       @person.consumer_role.build_nested_models_for_person
       mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
-      allow(view).to receive(:policy_helper).and_return(double("ConsumerRole", can_view_application_types?: true), double("FamilyPolicy", updateable?: true))
+      #returning false for everyone except hbx_staff
+      allow(view).to receive(:policy_helper).and_return(double("ConsumerRole", can_view_application_types?: false), double("FamilyPolicy", updateable?: true))
 
       assign(:consumer_role, @person.consumer_role)
       assign(:person, @person)
@@ -124,7 +125,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     it "should display all application types options when e_case_id not present" do
       expect(rendered).to have_select("application_type_id")
       #expect(rendered).to have_select("application_type_id", :options => ["choose  *" , "Curam", "In Person","Phone", "Mobile", "Paper"])
-      expect(rendered).to have_select("application_type_id", :options => ["choose *", "Phone", "In Person", "Paper", "Curam", "Mobile"])
+      expect(rendered).to have_select("application_type_id", :options => ["choose *", "Phone", "Paper"])
 
     end
   end
