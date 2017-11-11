@@ -7,6 +7,14 @@ CensusEmployee.where(:aasm_state.in => %w(newly_designated_linked newly_designat
    end
 end
 
+%w(2685748 2288952 19750474 180970).each do |hbx_id|
+  person = Person.by_hbx_id(hbx_id).first
+  role = person.active_employee_roles.detect{|role| role.employer_profile.fein == '536002523'}
+  person.primary_family.active_household.hbx_enrollments.where(:effective_on => Date.new(2017,1,1), :aasm_state => 'auto_renewing').each do |enrollment|
+    enrollment.update(:employee_role_id => role.id) if enrollment.employee_role.employer_profile.fein == '536002523'
+  end
+end
+
 Organization.where(:fein.in => feins).each do |organization|
   puts "Processing for #{organization.dba}"
 
