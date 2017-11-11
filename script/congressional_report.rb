@@ -1,5 +1,5 @@
 renewal_begin_date = Date.new(2018, 1, 1)
-feins = ["536002523", "536002522", "536002558"]
+feins = ARGV[0].split(" ")
 
 Organization.where(:fein.in => feins).each do |organization|
 
