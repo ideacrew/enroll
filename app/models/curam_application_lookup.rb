@@ -1,6 +1,6 @@
 require 'singleton'
 
-class CuramFinancialApplicationLookup
+class CuramApplicationLookup
   include Singleton
 
   attr_accessor :provider
@@ -31,11 +31,11 @@ class CuramFinancialApplicationLookup
 
   class SlugSource
     def self.search_curam_financial_app(person_demographics)
-      "NO_DATA_FOUND"
+      "NO_CURAM_DATA_FOUND"
     end
   end
 end
 
 unless Rails.env.production?
-  CuramFinancialApplicationLookup.slug!
+  CuramApplicationLookup.slug!
 end
