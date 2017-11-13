@@ -67,7 +67,7 @@ Then(/^Employer should see a form to enter information about employee, address a
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT STATE')]").click
+  find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/b').click
   find(:xpath, "//li[contains(., 'GA')]").click
 
   fill_in 'census_employee[address_attributes][zip]', :with => "30228"
@@ -163,7 +163,7 @@ Then(/employer should see the message Your employee was successfully added to yo
   expect(page).to have_content('Your employee was successfully added to your roster')
   person = people_for_cobra['Jack Employee']
   expect(page).to have_content(person[:first_name])
-  expect(page).to have_content(person[:last_name])  
+  expect(page).to have_content(person[:last_name])
   expect(page).to have_content((TimeKeeper.date_of_record + 1.days).to_s)
 end
 
@@ -176,7 +176,7 @@ And(/^.+ should see the status of Cobra Linked$/) do
 end
 
 And(/^.+ should see the status of Employee Role Linked$/) do
-  expect(page).to have_content('Employee Role Linked')
+  expect(page).to have_content('Account Linked')
 end
 
 And(/^.+ should see the status of eligible$/) do
@@ -235,7 +235,7 @@ Then(/Set Date back to two months ago/) do
 end
 
 When(/^.+ terminate one employee$/) do
-  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}  
+  element = all('.census-employees-table tr.top').detect{|ele| ele.all('a', :text => 'Employee Jr.').present?}
   element.find('i.fa-trash-o').click
   find('input.date-picker').set((TimeKeeper.date_of_record - 1.days).to_s)
   find('.employees-section').click
@@ -275,11 +275,12 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  expect(page).to have_content('Coverage Termination Pending')
   unless TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Selected')
+    expect(page).to have_content('Coverage Termination Pending')
   else
     expect(page).to have_content('Coverage Enrolled')
+    expect(page).to have_content('Terminated')
   end
 end
 
@@ -292,8 +293,9 @@ Then(/^.+ should not see individual on enrollment title/) do
 end
 
 And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click

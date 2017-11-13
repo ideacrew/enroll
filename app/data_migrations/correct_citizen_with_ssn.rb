@@ -88,7 +88,7 @@ class CorrectCitizenStatus < MongoidMigrationTask
         person.reload
         parse_ssa_response(person)
       rescue
-        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}"
+        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}" unless Rails.env.test?
       end
     end
   end

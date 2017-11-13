@@ -504,6 +504,10 @@ module ApplicationHelper
     end.uniq
   end
 
+  def show_oop_pdf_link(aasm_state)
+    (PlanYear::PUBLISHED + PlanYear::RENEWING_PUBLISHED_STATE).include?(aasm_state)
+  end
+
   def calculate_age_by_dob(dob)
     now = TimeKeeper.date_of_record
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
@@ -527,22 +531,6 @@ module ApplicationHelper
     pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
     name=family_member.try(:first_name) || ''
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
-  end
-
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
-
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << ["#{kind.humanize}(#{qle_date.to_s})", kind]
-      when 'fixed_first_of_next_month'
-        options << ["#{kind.humanize}(#{(qle_date.end_of_month + 1.day).to_s})", kind]
-      end
-    end
-
-    options
   end
 
   def purchase_or_confirm
@@ -623,7 +611,8 @@ module ApplicationHelper
       if text == "Yes"
         "Eligible"
       else
-        "<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='popover' title='Eligibility' data-content='#{eligibility_text}'></i>".html_safe
+        "Ineligible"
+        #{}"<i class='fa fa-info-circle' data-html='true' data-placement='top' aria-hidden='true' data-toggle='tooltip' title='#{eligibility_text}'></i>".html_safe
       end
     else
       "Ineligible"
