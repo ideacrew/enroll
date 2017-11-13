@@ -62,10 +62,10 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           person.last_name
         ]
       else
-        puts "No consumer role for #{person.hbx_id} -- #{e}" unless Rails.env.test?
+        puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver #{event} notice to #{person.hbx_id} - ic number due to the following error #{e.backtrace}" unless Rails.env.test?
+      puts "Unable to deliver #{event} notice to #{person.hbx_id} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
 
   end
