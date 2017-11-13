@@ -626,7 +626,10 @@ class ConsumerRole
   end
 
   def invoke_residency_verification!
-    start_residency_verification_process if can_start_residency_verification?
+    if can_start_residency_verification?
+      mark_residency_pending
+      start_residency_verification_process
+    end
   end
 
   #class methods
@@ -643,18 +646,19 @@ class ConsumerRole
   end
 
   def mark_residency_denied(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false,
                       :local_residency_validation => "outstanding")
   end
 
   def mark_residency_pending(*args)
-    update_attributes(:residency_determined_at => Time.now,
-                      :is_state_resident => nil)
+    update_attributes(:residency_determined_at => DateTime.now,
+                      :is_state_resident => nil,
+                      :local_residency_validation => nil)
   end
 
   def mark_residency_authorized(*args)
-    update_attributes(:residency_determined_at => Time.now,
+    update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => true,
                       :local_residency_validation => "valid")
   end
@@ -852,7 +856,7 @@ class ConsumerRole
   end
 
   def processing_residency_24h?
-    residency_pending? &&  no_changes_24_h?
+    residency_pending? && ((self.residency_determined_at + 24.hours) > DateTime.now)
   end
 
   def no_changes_24_h?
