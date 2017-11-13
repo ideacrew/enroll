@@ -15,9 +15,9 @@
               <% if @person.primary_family.e_case_id.present? %>
                 <%= f.select(:application_type, options_for_select(["Curam"], selected: "Curam"), required: true, id:'application_type_id' ) %>
               <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
-                  <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+                  <%= f.select(:application_type, options_for_select(["Phone", "Paper"] ), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
               <% else %>
-                <%= f.select(:application_type, options_for_select(["Phone", "Paper"]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+                <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
               <% end %>
             <% end %>
           </div>
