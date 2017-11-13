@@ -15,6 +15,7 @@ module ModelEvents
     ]
 
     DATA_CHANGE_EVENTS = [
+      :renewal_employer_open_enrollment_completed
 
     ]
 
@@ -82,6 +83,10 @@ module ModelEvents
       def date_change_event(new_date)
         if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2
           is_renewal_plan_year_publish_dead_line = true
+        end
+
+        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
+          is_renewal_employer_open_enrollment_completed = true
         end
 
         DATA_CHANGE_EVENTS.each do |event|

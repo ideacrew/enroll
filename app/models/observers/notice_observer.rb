@@ -83,7 +83,17 @@ module Observers
 
     def census_employee_update; end
 
-    def plan_year_date_change; end
+    def plan_year_date_change(model_event)
+      if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
+        if model_event.event_key == :renewal_employer_open_enrollment_completed
+          organizations_force_publish(TimeKeeper.date_of_record).each do |organization|
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_enrolling').first
+            trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:"renewal_employer_open_enrollment_completed" )
+          end
+        end
+      end
+    end
+
     def employer_profile_date_change; end
     def hbx_enrollment_date_change; end
     def census_employee_date_change; end
