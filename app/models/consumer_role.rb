@@ -816,7 +816,7 @@ class ConsumerRole
 
   def is_type_verified?(type)
     case type
-      when "Residency", "DC Residency"
+      when "DC Residency"
         residency_verified?
       when "Social Security Number"
         ssn_verified?
