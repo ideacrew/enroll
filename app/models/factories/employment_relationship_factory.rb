@@ -18,7 +18,8 @@ module Factories
         :gender => employee_candidate.gender,
         :census_employee_id => census_employee.id,
         :hired_on => hired_on,
-        :eligible_for_coverage_on => census_employee.coverage_effective_on
+        :eligible_for_coverage_on => census_employee.coverage_effective_on,
+        :is_cobra_dependent => census_employee.aasm_state == CensusEmployee::COBRA_DEPENDENT ? true : false
       })
     end
 

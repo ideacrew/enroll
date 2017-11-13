@@ -232,6 +232,9 @@ module Factories
       if saved
         census_employee.save
         migrate_census_employee_contact_to_person(census_employee, person)
+        if census_employee.aasm_state == "cobra_dependent"
+          census_employee.build_hbx_enrollment_for_cobra
+        end
       elsif person_new
         person.delete
       end

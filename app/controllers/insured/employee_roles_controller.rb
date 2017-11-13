@@ -53,7 +53,9 @@ class Insured::EmployeeRolesController < ApplicationController
     @employment_relationship = Forms::EmploymentRelationship.new(params.require(:employment_relationship))
     @employee_role, @family = Factories::EnrollmentFactory.construct_employee_role(actual_user, @employment_relationship.census_employee, @employment_relationship)
     census_employees = CensusEmployee.matchable(actual_user.person.ssn, actual_user.person.dob).to_a
-    census_employees.each { |ce| ce.construct_employee_role_for_match_person }
+    census_employees.each do |ce| 
+      ce.construct_employee_role_for_match_person 
+    end
     if @employee_role.present? && (@employee_role.census_employee.present? && @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
@@ -65,7 +67,7 @@ class Insured::EmployeeRolesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to :back, alert: "You can not enroll as another employee"}
+        format.html { redirect_to :back }
       end
     end
   end
