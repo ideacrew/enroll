@@ -816,11 +816,11 @@ class ConsumerRole
 
   def is_type_verified?(type)
     case type
-      when "Residency"
+      when "Residency", "DC Residency"
         residency_verified?
-      when 'Social Security Number'
+      when "Social Security Number"
         ssn_verified?
-      when 'American Indian Status'
+      when "American Indian Status"
         native_verified?
       else
         lawful_presence_verified?
