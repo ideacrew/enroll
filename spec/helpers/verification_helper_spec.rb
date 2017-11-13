@@ -20,12 +20,13 @@ RSpec.describe VerificationHelper, :type => :helper do
 
   describe "#verification_type_status" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    let(:types) { ["Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
-    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin|
+    let(:types) { ["DC Residency", "Social Security Number", "Citizenship", "Immigration status", "American Indian Status"] }
+    shared_examples_for "verification type status" do |current_state, verification_type, uploaded_doc, status, curam, admin, dob|
       before do
         uploaded_doc ? person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :verification_type => verification_type) : person.consumer_role.vlp_documents = []
         person.consumer_role.revert!(verification_attr) unless current_state
         person.consumer_role.tribal_id = "444444444" if verification_type == "American Indian Status"
+        person.dob = dob || Date.new(1991,11,10)
         if curam
           person.consumer_role.import!(verification_attr) if current_state == "valid"
           person.consumer_role.vlp_authority = "curam"
@@ -62,7 +63,10 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Immigration status", false, "verified", false, false
       it_behaves_like "verification type status", "outstanding", "Immigration status", true, "in review", false, false
       it_behaves_like "verification type status", "valid", "Immigration status", true, "verified", "curam", false
-      it_behaves_like "verification type status", "outstanding", "Residency", true, "in review", false, false
+      it_behaves_like "verification type status", "outstanding", "DC Residency", true, "in review", false, false
+      it_behaves_like "verification type status", "valid", "DC Residency", true, "attested", false, false, Date.new(2005,11,10)
+      it_behaves_like "verification type status", "valid", "DC Residency", true, "valid", false, false
+      it_behaves_like "verification type status", "valid", "Citizenship", true, "verified", false, false, Date.new(2005,11,10)
     end
 
     context "admin role" do
@@ -70,36 +74,6 @@ RSpec.describe VerificationHelper, :type => :helper do
       it_behaves_like "verification type status", "valid", "Social Security Number", false, "verified", false, "admin"
       it_behaves_like "verification type status", "valid", "Citizenbship", true, "curam", "curam", "admin"
       it_behaves_like "verification type status", "outstanding", "American Indian Status", false, "outstanding", "curam", "admin"
-    end
-
-    context 'verification type status attested' do
-      before :each do
-        person.dob = Date.new(2010,11,10)
-      end
-      it 'returns attested if age <= 18 and type is residency' do
-        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
-      end
-
-      it 'returns attested if age <= 18 and type is residency' do
-        expect(helper.verification_type_status('DC Residency', person)).to eq('attested')
-      end
-
-      it 'does not return attested if age > 18 and type is residency' do
-        person.dob = Date.new(1988,11,10)
-        person.consumer_role.update_attributes!(local_residency_validation: 'valid')
-        expect(helper.verification_type_status('DC Residency', person)).not_to eq('attested')
-      end
-
-      it 'does not return attested if age <= 18 and type is social security number ' do
-        expect(helper.verification_type_status('Social Security Number', person)).not_to eq('attested')
-      end
-
-      it 'returns outstanding if age > 18 and type is residency' do
-        person.dob = Date.new(1988,11,10)
-        person.consumer_role.native_validation = "outstanding"
-        person.consumer_role.mark_residency_denied
-        expect(helper.verification_type_status('DC Residency', person)).to eq('outstanding')
-      end
     end
   end
 
@@ -373,14 +347,14 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
   end
 
-  describe '#get_person_v_types' do
+  describe '#get_person_v_type_status' do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
-    it 'returns verification types of the person' do
+    it 'returns verification types states of the person' do
       status = 'verified'
       allow(helper).to receive(:verification_type_status).and_return(status)
       persons = family.family_members.map(&:person)
 
-      expect(helper.get_person_v_type_status(persons)).to eq([status])
+      expect(helper.get_person_v_type_status(persons)).to eq([status, status])
     end
   end
 

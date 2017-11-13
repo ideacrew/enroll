@@ -1077,49 +1077,28 @@ describe Person do
       end
     end
 
-    describe "19 plus y.o." do
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
-      end
-
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
-      end
-
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
-      end
-
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
-      end
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
     end
 
-    describe "less then 19y.o." do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true, nil, 18
-      end
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+    end
 
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false, nil, 16
-      end
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+    end
 
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native", 5
-      end
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+    end
 
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true, nil, 13
-      end
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+    end
 
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false, nil, 14
-      end
-
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native", 15
-      end
-
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
     end
   end
 
