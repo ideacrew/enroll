@@ -66,7 +66,7 @@
             <% if ivl.is_medicaid_chip_eligible %>
               <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for private health insurance because this person is likely eligible for Medicaid.</p>
             <% end %>
-            <% if notice.irs_consent_needed %>
+            <% unless notice.irs_consent_needed %>
               <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for the insurance for one of the following reasons:</p>
               <ul>
                 <li>
@@ -114,7 +114,24 @@
           <% if ivl.is_medicaid_chip_eligible %>
             <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person is likely eligible for Medicaid.</p>
           <% end %>
-          <% if ivl.tax_household.csr_percent_as_integer.nil? && ivl.has_access_to_affordable_coverage %>
+          <% unless notice.irs_consent_needed %>
+            <p><%= ivl.first_name %> does not qualify for cost-sharing reductions for one of the following reasons:</p>
+            <ul>
+              <li>
+                Not filing taxes for <%= notice.coverage_year %>
+              </li>
+              <li>
+                Filed taxes separately from spouse for <%= notice.coverage_year %>
+              </li>
+              <li>
+                You did not give us permission to verify your income with the IRS
+              </li>
+            </ul>
+            <p>
+              Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= Settings.site.short_name %> can check again to see if <%= ivl.first_name%> would be eligible.
+            </p>
+          <% end %>
+          <% if (ivl.tax_household.csr_percent_as_integer == 100) && ivl.has_access_to_affordable_coverage %>
             <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person has access to what the federal government considers affordable coverage.</p>
           <% end %>
           </td>
