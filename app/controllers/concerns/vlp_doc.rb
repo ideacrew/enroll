@@ -16,7 +16,7 @@ module VlpDoc
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
-        return true if params[:dependent][:is_applying_coverage] == "false"
+        return true if params[:person][:is_applying_coverage] == "false"
         add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
       elsif source == 'dependent' && dependent.present?
         return true if params[:dependent][:is_applying_coverage] == "false"
@@ -26,11 +26,8 @@ module VlpDoc
     end
 
     if params[source][:consumer_role] && params[source][:consumer_role][:vlp_documents_attributes]
-      if params[:dependent].present? 
-        return true if params[:dependent][:is_applying_coverage] == "false"
         if params[:dependent][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
           params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:dependent][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], '%m/%d/%Y')
-        end
       elsif params[:person].present? && params[:person][:consumer_role].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"].present? && params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date].present?
         params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date] = DateTime.strptime(params[:person][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date], "%m/%d/%Y")
       end
