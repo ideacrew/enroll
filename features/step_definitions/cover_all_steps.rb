@@ -11,7 +11,7 @@ Then(/^Hbx Admin should not see an DC Resident Application link$/) do
 end
 
 When(/^Hbx Admin clicks on DC Resident Application link$/) do
-  find(:xpath, "//*[@id='myTab']/li[2]/ul/li[3]/a/span[1]").trigger('click')
+  find(:xpath, "/html/body/div[2]/div/ul/li[2]/ul/li[4]/a/span[1]").trigger('click')
 end
 
 Then(/^Hbx Admin should see DC Resident Personal Information page$/) do
