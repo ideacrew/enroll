@@ -13,13 +13,12 @@ module VlpDoc
 
   def update_vlp_documents(consumer_role, source='person', dependent=nil)
     return true if consumer_role.blank?
+    return true if params[source][:is_applying_coverage] == "false"
 
     if (params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true") && (params[source][:consumer_role].blank? || params[source][:consumer_role][:vlp_documents_attributes].blank?)
       if source == 'person'
-        return true if params[:person][:is_applying_coverage] == "false"
         add_document_errors_to_consumer_role(consumer_role, ["document type", "cannot be blank"])
       elsif source == 'dependent' && dependent.present?
-        return true if params[:dependent][:is_applying_coverage] == "false"
         add_document_errors_to_dependent(dependent, ["document type", "cannot be blank"])
       end
       return false

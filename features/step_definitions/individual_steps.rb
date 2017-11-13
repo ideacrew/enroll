@@ -54,10 +54,10 @@ end
 
 When(/^\w+ clicks? on continue button$/) do
   wait_for_ajax
-  click_link "Continue"
+  find('.btn', text: 'CONTINUE').click
 end
 
-Then(/^user should see heading labeled personal information/) do
+Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
 end
 
@@ -82,6 +82,41 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   fill_in "person[phones_attributes][0][full_phone_number]", :with => "9999999999"
   screenshot("personal_form")
+end
+
+And(/^.+ selects (.*) for coverage$/) do |coverage|
+  if coverage == "applying"
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+  else
+    find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  end
+end
+
+Then(/^.+ should see error message (.*)$/) do |text|
+  page.should have_content(text)
+end
+
+Then(/^.+ should not see error message (.*)$/) do |text|
+  page.should have_no_content(text)
+end
+
+And(/(.*) selects eligible immigration status$/) do |text|
+  if text == "Dependent"
+    find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
+    find(:xpath, '//label[@for="dependent_eligible_immigration_status_true"]').click
+  else
+    find(:xpath, '//label[@for="person_us_citizen_false"]').click
+    find(:xpath, '//label[@for="person_eligible_immigration_status_true"]').click
+  end
+end
+
+And(/Individual edits dependent/) do
+  find('.fa-pencil').click
+  wait_for_ajax
+end
+
+And(/Individual clicks on confirm member/) do
+  all(:css, ".mz").last.click
 end
 
 When(/Individual clicks on Save and Exit/) do
@@ -205,7 +240,7 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
-And(/I click on sign in existing account$/) do
+And(/^.+ click on sign in existing account$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
   find('.interaction-click-control-sign-in-existing-account').click
 end
