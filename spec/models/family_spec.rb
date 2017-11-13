@@ -454,6 +454,8 @@ describe Family do
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record]
     end
     it "should return sorted due dates" do 
+      allow(family).to receive(:document_due_date).with(family.primary_family_member,"DC Residency").and_return(TimeKeeper.date_of_record)
+      allow(family).to receive(:document_due_date).with(family_member,"DC Residency").and_return(TimeKeeper.date_of_record+30)
       allow(family).to receive(:document_due_date).with(family.primary_family_member,"Immigration status").and_return(TimeKeeper.date_of_record)
       allow(family).to receive(:document_due_date).with(family_member,"Immigration status").and_return(TimeKeeper.date_of_record+30)
       expect(family.contingent_enrolled_family_members_due_dates).to eq [TimeKeeper.date_of_record,TimeKeeper.date_of_record+30]
