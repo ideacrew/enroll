@@ -609,7 +609,7 @@ shop_notice_triggers = [
   },
     {
         hbx_id: 'SHOP32',
-        title: 'MAE032 EE SEP Requested Enrollment Period Approval Notice',
+        title: 'EE SEP Requested Enrollment Period Approval Notice',
         description: 'Notification to Employee Regarding SEP Request Enrollment Approval',
         resource_name: 'employee_role',
         event_name: 'notify_employee_of_special_enrollment_period',
