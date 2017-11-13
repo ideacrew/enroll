@@ -114,7 +114,7 @@ class Employers::BrokerAgencyController < ApplicationController
     begin
          ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired_confirmation")
     rescue Exception => e
-       puts "Unable to deliver Broker Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
+       puts "Unable to deliver Broker Agency Notice to #{@employer_profile.broker_agency_profile.legal_name} due to #{e}" unless Rails.env.test?
     end
   end
 
