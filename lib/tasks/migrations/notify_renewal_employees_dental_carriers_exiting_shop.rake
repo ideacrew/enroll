@@ -16,7 +16,7 @@ namespace :migrations do
           end 
         end
       rescue Exception => e
-        Rails.logger.error {"Unable to deliver dental carriers exiting shop notice to employees #{hbx_id} due to #{e}"}) unless Rails.env.test?
+        Rails.logger.error {"Unable to deliver Dental Carriers Exiting SHOP Notice to Employee hbx_id: #{hbx_id} due to #{e}"} unless Rails.env.test?
       end
     end
   end
