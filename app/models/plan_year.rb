@@ -905,7 +905,7 @@ class PlanYear
     end
 
     event :renew_plan_year, :after => :record_transition do
-      transitions from: :draft, to: :renewing_draft
+      transitions from: :draft, to: :renewing_draft, :after => [:notify_renewal_employer_dental_carriers]
     end
 
     event :renew_publish, :after => :record_transition do
@@ -1007,6 +1007,21 @@ class PlanYear
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  def notify_renewal_employer_dental_carriers
+    if is_offering_dental?
+       dental_carriers_offered.each do |cpid|
+        carrier_profile = CarrierProfile.find cpid
+        if carrier_profile && (carrier_profile.legal_name.downcase == "metlife" || carrier_profile.legal_name.downcase == "delta dental")
+          begin
+            ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_dental_carriers_exiting_notice")
+          rescue Exception => e
+            (Rails.logger.error { "Unable to deliver renewal dental carrier exiting notice to #{self.employer_profile.legal_name} due to #{e}" })
+          end
+        end
+      end
+    end
   end
 
   alias_method :external_plan_year?, :can_be_migrated?
