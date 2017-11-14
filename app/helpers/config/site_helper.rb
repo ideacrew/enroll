@@ -51,10 +51,6 @@ module Config::SiteHelper
   def site_nondiscrimination_notice_url
     Settings.site.nondiscrimination_notice_url
   end
-
-  def link_to_site_business_resource_center
-    link_to "Business Resource Center", site_business_resource_center_url
-  end
     
   def site_policies_url
     Settings.site.policies_url
