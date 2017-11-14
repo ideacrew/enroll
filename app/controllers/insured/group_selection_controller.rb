@@ -1,5 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
+  include Acapi::Notifiers
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :set_vars_for_market, only: [:new]
@@ -84,6 +85,11 @@ class Insured::GroupSelectionController < ApplicationController
     end
   rescue Exception => error
     flash[:error] = error.message
+
+    if error.message.downcase.include? "execution error"
+      log("#19441 person_id: #{@person.id}, message: #{error.message}, params: #{params}", {:severity => "error"})
+    end
+
     logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
