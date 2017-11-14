@@ -22,9 +22,9 @@ RSpec.describe 'Generate notices to employee by taking hbx_ids, census_ids and e
     ActiveJob::Base.queue_adapter = :test
   end
 
-  # after(:all) do
-  #   $stdout = STDOUT
-  # end
+  after(:all) do
+    $stdout = STDOUT
+  end
 
   after(:each) do
     Rake::Task['notice:shop_employee_notice_event'].reenable

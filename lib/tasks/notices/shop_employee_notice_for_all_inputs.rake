@@ -17,9 +17,11 @@ namespace :notice do
         when @hbx_ids
           @hbx_ids.each do |hbx_id|
             record = Person.where(hbx_id: hbx_id).first
-            census_employee_id = record.employee_roles.first.census_employee_id.to_s if record.has_active_employee_role?
-            ShopNoticesNotifierJob.perform_later(census_employee_id, @event_name) if census_employee_id
-            puts "Notice Triggered Successfully"
+            census_employee_id = record.employee_roles.first.census_employee_id.to_s
+            if record.has_active_employee_role?
+              ShopNoticesNotifierJob.perform_later(census_employee_id, @event_name) if census_employee_id
+              puts "Notice Triggered Successfully"
+            end
           end
         else
           puts "Please provide either hbx_id or census_employee _id as arguments"
