@@ -28,7 +28,7 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :options => {
-        :hbx_enrollment => hbx_enrollment
+        :hbx_enrollment => hbx_enrollment.hbx_id.to_s
       }
   }}
 

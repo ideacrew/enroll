@@ -35,7 +35,7 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop do
       expect(queued_job[:args]).not_to be_empty
       expect(queued_job[:args].include?('notify_renewal_employees_dental_carriers_exiting_shop')).to be_truthy
       expect(queued_job[:args].include?("#{hbx_enrollment.census_employee.id.to_s}")).to be_truthy
-      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.id.to_s
+      expect(queued_job[:args].third["hbx_enrollment"]).to eq hbx_enrollment.hbx_id.to_s
     end
   end
 end
