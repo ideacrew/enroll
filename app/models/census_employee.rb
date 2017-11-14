@@ -818,11 +818,12 @@ class CensusEmployee < CensusMember
     return false unless self.employment_terminated?
 
     Family.where(:"households.hbx_enrollments" => {
-      :benefit_group_assignment_id.in => benefit_group_assignments.pluck(:id),
-      :coverage_kind => 'health',
-      :kind => 'employer_sponsored',
-      :terminated_on => coverage_terminated_on || employment_terminated_on.end_of_month,
-      :aasm_state.in => ['coverage_terminated', 'coverage_termination_pending']
+      :$elemMatch => {
+        :benefit_group_assignment_id.in => benefit_group_assignments.pluck(:id),
+        :coverage_kind => 'health',
+        :kind => 'employer_sponsored',
+        :terminated_on => coverage_terminated_on || employment_terminated_on.end_of_month,
+        :aasm_state.in => ['coverage_terminated', 'coverage_termination_pending']}
     }).present?
   end
 
