@@ -8,6 +8,7 @@ class ConsumerRole
   include AASM
   include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
+  include Mongoid::History::Trackable
 
   embedded_in :person
 
@@ -103,7 +104,11 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
-  embeds_many :vlp_documents, as: :documentable
+  embeds_many :vlp_documents, as: :documentable do
+    def uploaded
+      @target.select{|document| document.identifier }
+    end
+  end
   embeds_many :workflow_state_transitions, as: :transitional
   embeds_many :special_verifications, cascade_callbacks: true, validate: true
 
@@ -141,6 +146,29 @@ class ConsumerRole
   after_initialize :setup_lawful_determination_instance
 
   before_validation :ensure_validation_states, on: [:create, :update]
+
+  track_history   :on => [:five_year_bar,
+                          :aasm_state,
+                          :marital_status,
+                          :ssn_validation,
+                          :native_validation,
+                          :is_state_resident,
+                          :local_residency_validation,
+                          :ssn_update_reason,
+                          :lawful_presence_update_reason,
+                          :native_update_reason,
+                          :residency_update_reason,
+                          :is_applying_coverage,
+                          :ssn_rejected,
+                          :native_rejected,
+                          :lawful_presence_rejected,
+                          :residency_rejected],
+                  :scope => :person,
+                  :modifier_field => :modifier,
+                  :version_field => :tracking_version,
+                  :track_create  => true,    # track document creation, default is false
+                  :track_update  => true,    # track document updates, default is true
+                  :track_destroy => true
 
   def ivl_coverage_selected
     if unverified?
