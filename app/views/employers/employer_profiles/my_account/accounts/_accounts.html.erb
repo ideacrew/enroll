@@ -12,8 +12,8 @@
     </thead>
     <tbody>
       <tr>
-        <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:total_due)) || "Data not available" %></td>
-        <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due)) || "Data not available" %></td>
+        <td><%= number_to_currency(@employer_profile_account.try(:total_due)) || "Data not available" %></td>
+        <td <%= amount_color_style(@employer_profile_account.try(:past_due)) %>><%= number_to_currency(@employer_profile_account.try(:past_due)) || "Data not available" %></td>
       </tr>
     </tbody>
   </table>
