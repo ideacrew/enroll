@@ -54,18 +54,33 @@ RSpec.describe ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingS
   end
 
   describe "Build" do
-    it "should build notice with all necessory info" do
+    before do 
       @employee_notice.build
+    end
+
+    it "should build notice with primary full name" do
       expect(@employee_notice.notice.primary_fullname).to eq person.full_name.titleize
+    end
+    
+    it "should build notice with organization name" do
       expect(@employee_notice.notice.employer_name).to eq employer_profile.organization.legal_name
     end
   end
 
   describe "append data" do
-    it "should append data" do
+    before do
       @employee_notice.append_data
+    end
+
+    it "should append plan name" do
       expect(@employee_notice.notice.plan.plan_name).to eq plan.name
+    end
+
+    it "should append plan year end_on date" do
       expect(@employee_notice.notice.plan.coverage_end_on).to eq hbx_enrollment.benefit_group.plan_year.end_on
+    end
+
+    it "should append carrier name" do
       expect(@employee_notice.notice.plan.plan_carrier).to eq plan.carrier_profile.organization.legal_name
     end
   end

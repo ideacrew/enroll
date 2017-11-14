@@ -2,7 +2,7 @@ class ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop < Sho
   attr_accessor :census_employee, :hbx_enrollment
 
   def initialize(census_employee, args = {})
-    self.hbx_enrollment = args[:options][:hbx_enrollment]
+    self.hbx_enrollment = HbxEnrollment.find(args[:options][:hbx_enrollment])
     super(census_employee, args)
   end
 
