@@ -40,11 +40,11 @@ module Forms
 
     def consumer_fields_validation
       if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
-        if @us_citizen.nil?
+        if us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
-        elsif @us_citizen == false && @eligible_immigration_status.nil?
+        elsif us_citizen == false && eligible_immigration_status.nil?
           self.errors.add(:base, "Eligible immigration status is required")
-        elsif @us_citizen == true && @naturalized_citizen.nil?
+        elsif us_citizen == true && naturalized_citizen.nil?
           self.errors.add(:base, "Naturalized citizen is required")
         end
 
@@ -58,6 +58,10 @@ module Forms
 
         if @is_incarcerated.nil?
           self.errors.add(:base, "Incarceration status is required")
+        end
+
+        if @is_physically_disabled.nil?
+          self.errors.add(:base, "Physically disabled status is required")
         end
       end
     end
@@ -178,6 +182,7 @@ module Forms
         :ethnicity => ethnicity,
         :language_code => language_code,
         :is_incarcerated => is_incarcerated,
+        :is_physically_disabled => is_physically_disabled,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
@@ -224,6 +229,7 @@ module Forms
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
         :is_incarcerated => found_family_member.is_incarcerated,
+        :is_physically_disabled => found_family_member.is_physically_disabled,
         :citizen_status => found_family_member.citizen_status,
         :naturalized_citizen => found_family_member.naturalized_citizen,
         :eligible_immigration_status => found_family_member.eligible_immigration_status,

@@ -99,11 +99,11 @@
         </td>
       </tr>
     </table>
+
+    <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+      content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
   <% end %>
 <% end %>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
- content: "Remember, tax credit savings are based on your household’s estimated annual income. You must file a federal income tax return for #{notice.coverage_year} to report your actual income. When you file, you must report the tax credits you received. If your income is higher than what you told us on your application, you may have to repay some or all of the tax credit. If your income is lower than what you told us, you may get an additional credit on your tax return."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Your premium is how much you must pay each month to your insurance company to keep your plan. Your insurance company will send plan ID cards, and details about your benefits once you make your first payment."],
@@ -168,8 +168,11 @@ content: "Call your insurance company if you have questions about services the p
 content: "To report life changes, login to your account at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call #{Settings.site.short_name}.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["You can end your insurance for any reason, but you must tell us at least 2 weeks before you want your plan to end. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
+ contents: ["You can end your insurance for any reason. For example, if you get a new job that offers insurance, you may want to end your plan. If you want to end your plan because you’re having trouble paying for it, call #{Settings.site.short_name} first. We can help you find out if there are other options to make your coverage more affordable."],
    heading: 'Ending Your Insurance', sub_heading: '', top_margin: '8px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+content: "If you want to end your insurance, you must tell us no later than the day you want your plan to end.", top_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
 content: "If you end your health plan, and don’t replace it, you may have to pay a penalty to the IRS for the months you don’t have health insurance.", top_margin: '5px'} %>
@@ -184,7 +187,7 @@ content: "If you end your plan, you also won’t be able to sign up again until 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
 listing: "<strong>Remember, you must pay your monthly premium by #{notice.current_health_enrollments.first.effective_on.strftime("%B %d, %Y")} to start and keep your insurance.</strong>", top_margin: '10px'} %>
 
-<% if notice.documents_needed == true %>
+<% if (notice.documents_needed == true && !notice.cover_all?) %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
   listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>

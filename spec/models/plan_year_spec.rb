@@ -657,10 +657,30 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
         it "and should provide relevent warning message" do
           expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/fewer full time equivalent employees/)
-          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/fewer full time equivalent employees/)
-          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/fewer full time equivalent employees/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:invalid_fte_count]).not_to match(/Number of full time equivalents/)
+          expect(plan_year1.application_eligibility_warnings[:valid_fte_count]).not_to match(/Number of full time equivalents/)
+        end
+
+        it "and plan year should be in publish pending state" do
+          expect(workflow_plan_year_with_benefit_group.aasm_state).to eq "publish_pending"
+        end
+      end
+
+      context "and the number of employees count is zero" do
+        before do
+          workflow_plan_year_with_benefit_group.fte_count = 0
+          workflow_plan_year_with_benefit_group.publish
+        end
+
+        it "application should not be valid" do
+          expect(workflow_plan_year_with_benefit_group.is_application_eligible?).to be_falsey
+        end
+
+        it "and should provide relevent warning message" do
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count].present?).to be_truthy
+          expect(workflow_plan_year_with_benefit_group.application_eligibility_warnings[:fte_count]).to match(/Number of full time equivalents/)
         end
 
         it "and plan year should be in publish pending state" do
@@ -1792,8 +1812,8 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 
   context '.hbx_enrollments_by_month' do
     let!(:employer_profile)          { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789', hired_on: TimeKeeper.date_of_record) }
-    let!(:person) { FactoryGirl.create(:person, first_name: 'John', last_name: 'Smith', dob: '1966-10-10'.to_date, ssn: '123456789') }
+    let!(:census_employee) { FactoryGirl.create(:census_employee, hired_on: TimeKeeper.date_of_record) }
+    let!(:person) { FactoryGirl.create(:person, first_name: census_employee.first_name, last_name: census_employee.last_name, dob: census_employee.dob, ssn: census_employee.ssn) }
 
     let!(:employee_role) {
       person.employee_roles.create(
@@ -2146,11 +2166,16 @@ describe PlanYear, :type => :model, :dbclean => :after_each do
 end
 
 describe PlanYear, "which has the concept of export eligibility" do
+
+  let(:employer_profile){ FactoryGirl.create(:employer_profile)}
+  let(:current_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "active") }
+  let(:future_plan_year){ FactoryGirl.build(:plan_year, aasm_state: "renewing_enrolled") }
+
   ALL_STATES = PlanYear.aasm.states.map(&:name).map(&:to_s)
   INVALID_EXPORT_STATES = PlanYear::INELIGIBLE_FOR_EXPORT_STATES
   EXPORTABLE_STATES = ALL_STATES - INVALID_EXPORT_STATES
 
-  subject { PlanYear.new(:aasm_state => export_state) }
+  subject { PlanYear.new(start_on:TimeKeeper.date_of_record.next_month.beginning_of_month, :aasm_state => export_state) }
 
   INVALID_EXPORT_STATES.each do |astate|
     describe "in #{astate} state" do
@@ -2165,11 +2190,105 @@ describe PlanYear, "which has the concept of export eligibility" do
     describe "in #{astate} state" do
       let(:export_state) { astate}
       it "is not eligible for export" do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.beginning_of_month + 15)
         expect(subject.eligible_for_export?).to eq true
       end
     end
   end
 
+
+  describe PlanYear, "exporting eligibile plan year for initial employer"  do
+
+    context "On/before 15th of month" do
+
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 14 }
+
+      before :each do
+        allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+        allow(employer_profile).to receive(:plan_years).and_return [current_plan_year]
+      end
+
+      it "should return false for current plan year" do
+        expect(current_plan_year.eligible_for_export?).to be_falsey
+      end
+
+      it "should not return plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq []
+      end
+    end
+
+    context "On/After 16th of the month" do
+
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 15 }
+
+      before :each do
+        allow(employer_profile).to receive(:plan_years).and_return [current_plan_year]
+        allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for current plan year" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return current plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year]
+      end
+    end
+
+  end
+
+  describe PlanYear, "exporting eligibile plan year for renewal employer"  do
+
+    before :each do
+      allow(employer_profile).to receive(:plan_years).and_return [current_plan_year,future_plan_year]
+      allow(current_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month - 1.year)
+      allow(future_plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.next_month.beginning_of_month)
+    end
+
+    context "On/Before 15th of month" do
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 14 }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for past plan year(active plan year)" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return only past plan year" do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year]
+      end
+
+      it "should return false for future plan year(renewing plan year)" do
+        expect(future_plan_year.eligible_for_export?).to be_falsey
+      end
+
+    end
+
+    context "On/After 16th of the month" do
+      let(:current_date) { TimeKeeper.date_of_record.beginning_of_month + 15 }
+
+      before :each do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(current_date)
+      end
+
+      it "should return true for past plan year(active plan year)" do
+        expect(current_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return true for future plan year(renewing plan year)" do
+        expect(future_plan_year.eligible_for_export?).to be_truthy
+      end
+
+      it "should return past and future plan years." do
+        expect(employer_profile.plan_years.select(&:eligible_for_export?)).to eq [current_plan_year,future_plan_year]
+      end
+    end
+
+  end
 
   describe PlanYear, "state machine transitions -- unhappy path" do
 
@@ -2188,6 +2307,7 @@ describe PlanYear, "which has the concept of export eligibility" do
           employer_profile: employer_profile,
           start_on: valid_plan_year_start_on,
           end_on: valid_plan_year_end_on,
+          fte_count: 3,
           open_enrollment_start_on: valid_open_enrollment_start_on,
           open_enrollment_end_on: valid_open_enrollment_end_on
           })
@@ -2483,5 +2603,31 @@ describe PlanYear, '.update_employee_benefit_packages', type: :model, dbclean: :
 
       expect(census_employee.active_benefit_group_assignment.start_on).to eq modified_start_on
     end
+  end
+end
+
+describe "#trigger renewal_employee_enrollment_confirmation", type: :model, dbclean: :after_all do
+  let!(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
+  let!(:employer_profile) { create(:employer_with_planyear, plan_year_state: 'renewing_enrolled', start_on: start_on)}
+  let!(:benefit_group) { employer_profile.plan_years.first.benefit_groups.first}
+  let!(:census_employee){
+    employee = FactoryGirl.create :census_employee, employer_profile: employer_profile
+    employee.add_benefit_group_assignment benefit_group, benefit_group.start_on
+    employee
+  }
+  let!(:plan_year1) { employer_profile.plan_years.first }
+  let!(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let!(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment, household: family.active_household, benefit_group_assignment_id: benefit_group.benefit_group_assignments.first.id, benefit_group_id: benefit_group.id, effective_on: start_on, aasm_state: "renewing_coverage_enrolled")}
+
+  it "should trigger renewal_employee_enrollment_confirmation job in queue" do
+    census_employee.active_benefit_group_assignment.update_attributes(hbx_enrollment_id: hbx_enrollment.id)
+    hbx_enrollment.save!
+    ActiveJob::Base.queue_adapter = :test
+    ActiveJob::Base.queue_adapter.enqueued_jobs = []
+    plan_year1.renewal_employee_enrollment_confirmation
+    queued_job = ActiveJob::Base.queue_adapter.enqueued_jobs.find do |job_info|
+      job_info[:job] == ShopNoticesNotifierJob
+    end
+    expect(queued_job[:args]).to eq [census_employee.id.to_s, 'renewal_employee_enrollment_confirmation']
   end
 end

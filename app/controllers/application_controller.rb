@@ -244,6 +244,7 @@ class ApplicationController < ActionController::Base
     end
 
     def save_bookmark (role, bookmark_url)
+      return if hbx_staff_and_consumer_role(role)
       if role && bookmark_url && (role.try(:bookmark_url) != family_account_path)
         role.bookmark_url = bookmark_url
         role.try(:save!)
@@ -252,6 +253,16 @@ class ApplicationController < ActionController::Base
         @person.employee_roles.last.update_attribute(:bookmark_url, family_account_path) if (@person.employee_roles.present? && @person.employee_roles.last.bookmark_url != family_account_path)
       end
     end
+
+    def hbx_staff_and_consumer_role(role)
+      hbx_staff = current_user.has_hbx_staff_role?
+      if role.present?
+        hbx_staff && role.class.name == 'ConsumerRole'
+      else
+        hbx_staff && @person.has_consumer_role? && !@person.has_active_employee_role?
+      end
+    end
+
     def set_bookmark_url(url=nil)
       set_current_person
       bookmark_url = url || request.original_url

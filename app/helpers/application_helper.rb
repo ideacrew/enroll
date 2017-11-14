@@ -546,6 +546,19 @@ module ApplicationHelper
     end
   end
 
+  def ee_plan_selection_confirmation_sep_new_hire(enrollment)
+    if enrollment.is_shop? && (enrollment.enrollment_kind == "special_enrollment" || enrollment.census_employee.new_hire_enrollment_period.present?)
+      if enrollment.census_employee.new_hire_enrollment_period.last >= TimeKeeper.date_of_record || enrollment.special_enrollment_period.present?
+        begin
+          ShopNoticesNotifierJob.perform_later(enrollment.census_employee.id.to_s, "ee_plan_selection_confirmation_sep_new_hire")
+        rescue Exception => e
+          (Rails.logger.error { "Unable to deliver Notices to #{enrollment.census_employee.id.to_s} due to #{e}" }) unless Rails.env.test?
+        end
+      end
+    end
+  end
+
+
   def disable_purchase?(disabled, hbx_enrollment, options = {})
     disabled || !hbx_enrollment.can_select_coverage?(qle: options[:qle])
   end
@@ -648,4 +661,6 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
 end
+

@@ -46,17 +46,19 @@ class EmployerInvoice
   end
 
   def send_email_notice
-    subject = "Invoice Now Available"
-    body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
-    message_params = {
-      sender_id: "admins",
-      parent_message_id: @organization.employer_profile.id,
-      from: "DC Health Link",
-      to: "Employer Mailbox",
-      subject: subject,
-      body: body
-    }
-    create_secure_message message_params, @organization.employer_profile, :inbox
+    unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
+      subject = "Invoice Now Available"
+      body = "Your invoice is now available in your employer profile under Billing tab. Thank You"
+      message_params = {
+        sender_id: "admins",
+        parent_message_id: @organization.employer_profile.id,
+        from: "DC Health Link",
+        to: "Employer Mailbox",
+        subject: subject,
+        body: body
+      }
+      create_secure_message message_params, @organization.employer_profile, :inbox
+    end
   end
 
   def clear_tmp(file)
@@ -64,8 +66,15 @@ class EmployerInvoice
   end
 
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting? && (@organization.invoices.size < 1)
-      @organization.employer_profile.trigger_notices("initial_employer_invoice_available")
+    begin
+      if @employer_profile.is_new_employer? && !@employer_profile.is_converting?
+        plan_year = @employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
+        if (@organization.invoices.size < 1) || (@organization.invoices.sort_by(&:date).last.date.next_month.beginning_of_month < plan_year.start_on)
+          @employer_profile.trigger_notices("initial_employer_first_invoice_available")
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error {"Error delivering first invoice available notice to #{@employer_profile.legal_name} due to #{e}"}
     end
   end
 

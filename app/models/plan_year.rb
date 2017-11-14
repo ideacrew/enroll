@@ -11,7 +11,7 @@ class PlanYear
   RENEWING  = %w(renewing_draft renewing_published renewing_enrolling renewing_enrolled renewing_publish_pending)
   RENEWING_PUBLISHED_STATE = %w(renewing_published renewing_enrolling renewing_enrolled)
 
-  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended terminated application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
+  INELIGIBLE_FOR_EXPORT_STATES = %w(draft publish_pending eligibility_review published_invalid canceled renewing_draft suspended application_ineligible renewing_application_ineligible renewing_canceled conversion_expired renewing_enrolling enrolling)
 
   OPEN_ENROLLMENT_STATE   = %w(enrolling renewing_enrolling)
   INITIAL_ENROLLING_STATE = %w(publish_pending eligibility_review published published_invalid enrolling enrolled)
@@ -32,13 +32,13 @@ class PlanYear
   field :is_conversion, type: Boolean, default: false
 
   # Number of full-time employees
-  field :fte_count, type: Integer, default: 0
+  field :fte_count, type: Integer
 
   # Number of part-time employess
-  field :pte_count, type: Integer, default: 0
+  field :pte_count, type: Integer
 
   # Number of Medicare Second Payers
-  field :msp_count, type: Integer, default: 0
+  field :msp_count, type: Integer
 
   # Calculated Fields for DataTable
   field :enrolled_summary, type: Integer, default: 0
@@ -195,7 +195,7 @@ class PlanYear
   def eligible_for_export?
     return false if self.aasm_state.blank?
     return false if self.is_conversion
-    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s)
+    !INELIGIBLE_FOR_EXPORT_STATES.include?(self.aasm_state.to_s) && TimeKeeper.date_of_record >= (self.start_on.prev_month.beginning_of_month + Settings.aca.shop_market.employer_transmission_day_of_month.days - 1.day)
   end
 
   def overlapping_published_plan_years
@@ -289,14 +289,14 @@ class PlanYear
   end
 
   def carriers_offered
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.carriers_offered
     end.uniq
   end
 
   def dental_carriers_offered
     return [] unless is_offering_dental?
-    benefit_groups.inject([]) do |carriers, bg| 
+    benefit_groups.inject([]) do |carriers, bg|
       carriers += bg.dental_carriers_offered
     end.uniq
   end
@@ -426,8 +426,8 @@ class PlanYear
     end
 
     # Maximum company size at time of initial registration on the HBX
-    if !(is_renewing?) && (fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
-      warnings.merge!({ fte_count: "Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees" })
+    if !(is_renewing?) && (fte_count < 1 || fte_count > Settings.aca.shop_market.small_market_employee_count_maximum)
+      warnings.merge!({ fte_count: "Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})" })
     end
 
     # Exclude Jan 1 effective date from certain checks
@@ -786,7 +786,7 @@ class PlanYear
     state :published,         :after_enter => :accept_application     # Plan is finalized. Employees may view benefits, but not enroll
     state :published_invalid, :after_enter => :decline_application    # Non-compliant plan application was forced-published
 
-    state :enrolling, :after_enter => [:send_employee_invites, :initial_employer_open_enrollment_begins] # Published plan has entered open enrollment
+    state :enrolling, :after_enter => :send_employee_invites          # Published plan has entered open enrollment
     state :enrolled,  :after_enter => [:ratify_enrollment, :initial_employer_open_enrollment_completed] # Published plan open enrollment has ended and is eligible for coverage,
                                                                       #   but effective date is in future
     state :application_ineligible, :after_enter => :deny_enrollment   # Application is non-compliant for enrollment
@@ -827,7 +827,7 @@ class PlanYear
 
       transitions from: :renewing_enrolled,   to: :active,              :guard  => :is_event_date_valid?
       transitions from: :renewing_published,  to: :renewing_enrolling,  :guard  => :is_event_date_valid?
-      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?]
+      transitions from: :renewing_enrolling,  to: :renewing_enrolled,   :guards => [:is_open_enrollment_closed?, :is_enrollment_valid?], :after => :renewal_employee_enrollment_confirmation
       transitions from: :renewing_enrolling,  to: :renewing_application_ineligible, :guard => :is_open_enrollment_closed?, :after => :renewal_employer_ineligibility_notice
 
       transitions from: :enrolling, to: :enrolling  # prevents error when plan year is already enrolling
@@ -1007,6 +1007,19 @@ class PlanYear
   # Checks for external plan year
   def can_be_migrated?
     self.employer_profile.is_conversion? && self.is_conversion
+  end
+
+  def renewal_employee_enrollment_confirmation
+    begin
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        enrollment = ce.active_benefit_group_assignment.hbx_enrollment
+        if enrollment.present? && HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on == self.start_on
+          ShopNoticesNotifierJob.perform_later(ce.id.to_s, "renewal_employee_enrollment_confirmation")
+        end
+      end
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver notice due to '#{e}' " }
+    end
   end
 
   alias_method :external_plan_year?, :can_be_migrated?

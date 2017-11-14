@@ -34,4 +34,18 @@ module Insured::FamilyMembersHelper
     end
     return first_checked, second_checked
   end
+
+  def all_dependent_valid(dependents)
+    !any_dependent_invalid?(dependents)
+  end
+
+  def any_dependent_invalid?(dependents)
+    dependents.any?{|dep| !dependent_valid?(dep)}
+  end
+
+  def dependent_valid?(dependent)
+    @dep = Forms::FamilyMember.find(dependent.id )
+    @dep.is_consumer_role = true
+    @dep.valid?
+  end
 end

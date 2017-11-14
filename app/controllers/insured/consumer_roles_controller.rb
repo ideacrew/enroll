@@ -113,7 +113,6 @@ class Insured::ConsumerRolesController < ApplicationController
             end
             return
           end
-
           found_person = @consumer_candidate.match_person
           if found_person.present?
             format.html { render 'match' }
@@ -203,12 +202,13 @@ class Insured::ConsumerRolesController < ApplicationController
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
+      @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if is_new_paper_application?(current_user, session[:original_application_type])
+        if is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           redirect_to insured_family_members_path(consumer_role_id: @consumer_role.id)
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -237,6 +237,11 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       set_consumer_bookmark_url
     end
+  end
+
+  def upload_ridp_document
+    set_consumer_bookmark_url
+    set_current_person
   end
 
   private
@@ -274,6 +279,7 @@ class Insured::ConsumerRolesController < ApplicationController
       :gender,
       :language_code,
       :is_incarcerated,
+      :is_physically_disabled,
       :is_disabled,
       :race,
       :is_consumer_role,

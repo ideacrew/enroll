@@ -126,16 +126,31 @@ RSpec.describe TaxHousehold, type: :model do
     #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
     let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
     let(:benefit_coverage_period) {double(contains?:true, second_lowest_cost_silver_plan: plan)}
-    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
-    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
+    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1', is_medicaid_chip_eligible: false)}
+    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2', is_medicaid_chip_eligible: false)}
+    let(:tax_household) { TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record) }
 
-    it "can return ratio hash" do
+    before do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
       allow(plan).to receive(:premium_for).and_return(110)
-      tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
       allow(tax_household).to receive(:aptc_members).and_return([tax_household_member1, tax_household_member2])
+    end
+
+    it "can return ratio hash" do
       expect(tax_household.aptc_ratio_by_member.class).to eq Hash
       result = {"tax_member1"=>0.5, "tax_member2"=>0.5}
+      expect(tax_household.aptc_ratio_by_member).to eq result
+    end
+
+    it 'should return 1 for tax_member1' do
+      allow(tax_household_member2).to receive(:is_medicaid_chip_eligible).and_return true
+      result = {"tax_member1"=>1.0}
+      expect(tax_household.aptc_ratio_by_member).to eq result
+    end
+
+    it 'should return 1 for tax_member2' do
+      allow(tax_household_member1).to receive(:is_medicaid_chip_eligible).and_return true
+      result = {"tax_member2"=>1.0}
       expect(tax_household.aptc_ratio_by_member).to eq result
     end
   end
@@ -235,5 +250,30 @@ RSpec.describe TaxHousehold, type: :model do
       tax_household.eligibility_determinations = [eligibility_determination]
       expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
     end
+  end
+end
+
+describe TaxHousehold, "generate_tax_household_id if hbx_assigned_id blank", dbclean: :after_each do
+  let(:person) { FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:tax_household) { TaxHousehold.new(household: family.households.first) }
+  let(:tax_household1) { TaxHousehold.new(household: family.households.first) }
+  let(:tax_household2) { TaxHousehold.new(household: family.households.first) }
+
+  it "generate_tax_household_id" do
+    expect(tax_household.hbx_assigned_id).to eq nil
+    tax_household.save
+    expect(tax_household.hbx_assigned_id).not_to eq nil
+  end
+
+  it "should generate hbx_id" do
+    expect(tax_household1.generate_tax_household_id).not_to be nil
+  end
+
+  it "should not generate a new hbx_id if one exists" do
+    tax_household2.save
+    family.save
+    expect(tax_household2.hbx_assigned_id).not_to be eq nil
+    expect(tax_household2.generate_tax_household_id).to be nil
   end
 end

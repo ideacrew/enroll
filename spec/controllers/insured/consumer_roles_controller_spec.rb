@@ -170,10 +170,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       post :create, person: person_params
       expect(response).to have_http_status(:redirect)
     end
-
-
   end
-
 
   context "POST create with failed construct_employee_role" do
     let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"000000111","user_id"=>"xyz"}}
@@ -205,9 +202,23 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
+  context "GET upload_ridp_document" do
+    before(:each) do
+      allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:consumer_role?).and_return(true)
+      allow(person).to receive(:consumer_role).and_return(consumer_role)
+    end
+    it "should render new template" do
+      sign_in user
+      get :upload_ridp_document
+      expect(response).to have_http_status(:success)
+      expect(response).to render_template(:upload_ridp_document)
+    end
+  end
+
   context "PUT update" do
-    let(:person_params){{"dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
-    let(:person){ FactoryGirl.build(:person) }
+    let(:person_params){{"family"=>{"application_type"=>"Phone"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryGirl.create(:person, :with_family) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -265,6 +276,39 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
+    end
+  end
+
+  context "PUT update as HBX Admin" do
+    let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
+    let(:person){ FactoryGirl.create(:person, :with_family, :with_hbx_staff_role) }
+
+    before(:each) do
+      allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+      allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(user).to receive(:person).and_return person
+      allow(person).to receive(:consumer_role).and_return consumer_role
+      sign_in user
+    end
+
+    it "should redirect to family members path when current user has application type as Curam" do
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
+    it "should redirect to family members path when current user has application type as Mobile" do
+      person_params["family"]["application_type"] = "Mobile"
+      allow(consumer_role).to receive(:update_by_person).and_return(true)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, person: person_params, id: "test"
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
   end
 

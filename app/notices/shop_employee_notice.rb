@@ -29,6 +29,7 @@ class ShopEmployeeNotice < Notice
     notice.notification_type = self.event_name
     notice.primary_fullname = census_employee.employee_role.person.full_name
     notice.employer_name = census_employee.employer_profile.legal_name
+    notice.primary_email = census_employee.employee_role.person.work_email_or_best
     append_hbe
     append_address(census_employee.employee_role.person.mailing_address)
     append_broker(census_employee.employer_profile.broker_agency_profile)
@@ -38,8 +39,25 @@ class ShopEmployeeNotice < Notice
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'envelope_without_address.pdf')]
   end
 
+  def employee_appeal_rights_attachment
+    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'employee_appeal_rights.pdf')]
+  end
+
   def non_discrimination_attachment
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
+  end
+
+  def send_generic_notice_alert_to_broker_and_ga
+    if census_employee.employer_profile.broker_agency_profile.present?
+      broker_name = census_employee.employer_profile.broker_agency_profile.primary_broker_role.person.full_name
+      broker_email = census_employee.employer_profile.broker_agency_profile.primary_broker_role.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(broker_name, broker_email, census_employee.employer_profile.legal_name.titleize).deliver_now
+    end
+    if census_employee.employer_profile.general_agency_profile.present?
+      ga_staff_name = census_employee.employer_profile.general_agency_profile.general_agency_staff_roles.first.person.full_name
+      ga_staff_email = census_employee.employer_profile.general_agency_profile.general_agency_staff_roles.first.email_address
+      UserMailer.generic_notice_alert_to_ba_and_ga(ga_staff_name, ga_staff_email, census_employee.employer_profile.legal_name.titleize).deliver_now
+    end
   end
 
   def append_hbe

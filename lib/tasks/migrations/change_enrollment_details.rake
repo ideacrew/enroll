@@ -7,6 +7,7 @@ require File.join(Rails.root, "app", "data_migrations", "change_enrollment_detai
 # RAILS_ENV=production bundle exec rake migrations:change_enrollment_details hbx_id=640826 action="cancel_enrollment"
 # RAILS_ENV=production bundle exec rake migrations:change_enrollment_details hbx_id=609082 action="cancel"
 # RAILS_ENV=production bundle exec rake migrations:change_enrollment_details hbx_id=609082 action="generate_hbx_signature"
+# RAILS_ENV=production bundle exec rake migrations:change_enrollment_details hbx_id=609082 action="expire_coverage"
 
 #For mutliple feins
 # RAILS_ENV=production bundle exec rake migrations:change_enrollment_details hbx_id=640826,640826,640826 action="revert_termination"
@@ -14,4 +15,4 @@ require File.join(Rails.root, "app", "data_migrations", "change_enrollment_detai
 namespace :migrations do
   desc "changing attributes on enrollment"
   ChangeEnrollmentDetails.define_task :change_enrollment_details => :environment
-end 
+end

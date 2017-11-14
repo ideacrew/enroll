@@ -52,7 +52,7 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @dependents = @family.active_family_members.reject(&:is_primary_applicant) if @family
   end
 
   def new
@@ -128,6 +128,7 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
+
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     consumer_role.check_for_critical_changes(params[:dependent], @family) if consumer_role
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)

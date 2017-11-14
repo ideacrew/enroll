@@ -27,6 +27,10 @@ class Employers::BrokerAgencyController < ApplicationController
         @broker_agency_profiles = results.map(&:broker_agency_profile).uniq
       end
     end
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def show
@@ -40,7 +44,6 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
@@ -48,10 +51,12 @@ class Employers::BrokerAgencyController < ApplicationController
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
       end
-      send_broker_assigned_msg(@employer_profile, broker_agency_profile)
+      # send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
+      broker_hired_confirmation_notice
+      broker_hired 
+      broker_agency_hired
     end
-
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
@@ -62,6 +67,13 @@ class Employers::BrokerAgencyController < ApplicationController
     log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
   end
 
+  def broker_hired
+     ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired")
+  end
+
+  def broker_agency_hired
+     ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_agency_hired")
+  end
 
   def terminate
     authorize EmployerProfile, :updateable?
@@ -90,6 +102,10 @@ class Employers::BrokerAgencyController < ApplicationController
         end
       }
     end
+  end
+
+  def broker_hired_confirmation_notice
+    ShopNoticesNotifierJob.perform_later(@employer_profile.id.to_s, "broker_hired_confirmation_notice")
   end
 
   private

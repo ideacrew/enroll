@@ -364,6 +364,7 @@ private
       :gender,
       :us_citizen,
       :is_incarcerated,
+      :is_physically_disabled,
       :language_code,
       :is_disabled,
       :race,
@@ -375,7 +376,7 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason, 
+      :no_dc_address_reason,
       :id,
       :consumer_role,
       :is_applying_coverage

@@ -460,9 +460,10 @@ describe Person do
   describe '.match_by_id_info' do
     before(:all) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
-      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
-      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888127654")
+      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "661332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
+      @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
 
     after(:all) do
@@ -515,6 +516,16 @@ describe Person do
 
     it 'ssn present, dob not present then should return empty array' do
       expect(Person.match_by_id_info(ssn: '999884321').size).to eq 0
+    end
+
+    it 'returns person records only where is_active == true' do
+      expect(@p2.is_active).to eq true
+      expect(Person.match_by_id_info(last_name: @p2.last_name, dob: @p2.dob, first_name: @p2.first_name)).to eq [@p2]
+    end
+
+    it 'should not match person record if is_active == false' do
+      expect(@p5.is_active).to eq false
+      expect(Person.match_by_id_info(last_name: @p5.last_name, dob: @p5.dob, first_name: @p5.first_name)).to be_empty
     end
   end
 
@@ -728,9 +739,9 @@ describe Person do
     end
   end
 
-  describe "need_to_notify?" do
+  describe "need_to_notify?", dbclean: :after_each do
     let(:person1) { FactoryGirl.create(:person, :with_consumer_role) }
-    let(:person2) { FactoryGirl.create(:person, :with_employee_role) }
+    let(:person2) { FactoryGirl.create(:person, :with_employee_role, ssn: "887766551", dob: "1965-01-01") }
     let(:person3) { FactoryGirl.create(:person, :with_employer_staff_role) }
 
     it "should return true when update consumer_role" do
@@ -1066,58 +1077,58 @@ describe Person do
       end
     end
 
-    describe "19 plus y.o." do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
-      end
-
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
-      end
-
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
-      end
-
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
-      end
-
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
-      end
-
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
-      end
+    context "SSN + Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Citizenship"], 3, "2222222222", true, nil, 25
     end
-    describe "less then 19y.o." do
-      context "SSN + Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Citizenship"], 2, "2222222222", true, nil, 18
-      end
 
-      context "SSN + Immigrant" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "Immigration status"], 2, "2222222222", false, nil, 16
-      end
+    context "SSN + Immigrant" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "Immigration status"], 3, "2222222222", false, nil, 20
+    end
 
-      context "SSN + Native Citizen" do
-        it_behaves_like "collecting verification types for person", ["Social Security Number", "American Indian Status", "Citizenship"], 3, "2222222222", true, "native", 5
-      end
+    context "SSN + Native Citizen" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Social Security Number", "American Indian Status", "Citizenship"], 4, "2222222222", true, "native", 20
+    end
 
-      context "Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Citizenship"], 1, nil, true, nil, 13
-      end
+    context "Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Citizenship"], 2, nil, true, nil, 20
+    end
 
-      context "Immigrant with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["Immigration status"], 1, nil, false, nil, 14
-      end
+    context "Immigrant with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "Immigration status"], 2, nil, false, nil, 20
+    end
 
-      context "Native Citizen with NO SSN" do
-        it_behaves_like "collecting verification types for person", ["American Indian Status", "Citizenship"], 2, nil, true, "native", 15
-      end
-
+    context "Native Citizen with NO SSN" do
+      it_behaves_like "collecting verification types for person", ["DC Residency", "American Indian Status", "Citizenship"], 3, nil, true, "native", 20
     end
   end
+
+  describe 'ridp_verification_types' do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:person) {FactoryGirl.create(:person, :with_consumer_role, user: user) }
+
+    shared_examples_for 'collecting ridp verification types for person' do |ridp_types, types_count, is_applicant|
+      before do
+        allow(person).to receive(:completed_identity_verification?).and_return(false)
+        person.consumer_role.update_attributes!(is_applicant: is_applicant)
+      end
+      it 'returns array of verification types' do
+        expect(person.ridp_verification_types).to be_a Array
+      end
+
+      it "returns #{types_count} verification types" do
+        expect(person.ridp_verification_types.count).to eq types_count
+      end
+
+      it "contains #{ridp_types} verification types" do
+        expect(person.ridp_verification_types).to eq ridp_types
+      end
+    end
+    context 'ridp verification types for person' do
+      it_behaves_like 'collecting ridp verification types for person', ['Identity', 'Application'], 2, true
+      it_behaves_like 'collecting ridp verification types for person', [], 0, false
+    end
+  end
+
 
   describe ".add_employer_staff_role(first_name, last_name, dob, email, employer_profile)" do
     let(:employer_profile){FactoryGirl.create(:employer_profile)}
@@ -1393,6 +1404,31 @@ describe Person do
     end
   end
 
+  describe "#is_ssn_composition_correct?" do
+    let(:person) { FactoryGirl.create(:person)}
+
+    shared_examples_for "invalid SSN" do |input, result|
+      display_text = result ? "valid" : "invalid"
+      it "should return #{result} when received #{display_text} SSN" do
+        person.ssn = input
+        expect(person.save).to eq result
+      end
+    end
+
+    it_behaves_like "invalid SSN", "999786567", true
+    it_behaves_like "invalid SSN", "000786567", false
+    it_behaves_like "invalid SSN", "666786567", false
+    it_behaves_like "invalid SSN", "945786567", true
+    it_behaves_like "invalid SSN", "123006567", false
+    it_behaves_like "invalid SSN", "123000000", false
+    it_behaves_like "invalid SSN", "123456000", false
+    it_behaves_like "invalid SSN", "812345600", false
+    it_behaves_like "invalid SSN", "811111197", false
+    it_behaves_like "invalid SSN", "111111997", false
+    it_behaves_like "invalid SSN", "811111897", true
+    it_behaves_like "invalid SSN", "812345800", true
+
+  end
 
   describe "staff_for_employer" do
     let(:employer_profile) { FactoryGirl.build(:employer_profile) }

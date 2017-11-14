@@ -12,17 +12,18 @@ describe "insured/family_members/_dependent.html.erb" do
   before :each do
     sign_in user
     allow(view).to receive(:edit_insured_family_member_path).and_return "#"
+    allow(view).to receive(:dependent_valid?).and_return true
   end
 
   it "should have name" do
-    render "insured/family_members/dependent", dependent: dependent, person: person
+    render "insured/family_members/dependent", dependent: dependent, person: person, consumer: person.consumer_role
     expect(rendered).to have_selector("label", text: 'FIRST NAME')
     expect(rendered).to have_selector("label", text: 'LAST NAME')
   end
 
   it "should have address" do
     allow(view).to receive(:get_address_from_dependent).with(dependent).and_return [address]
-    render "insured/family_members/dependent", dependent: dependent, person: person
+    render "insured/family_members/dependent", dependent: dependent, person: person, consumer: person.consumer_role
     expect(rendered).to have_selector("label", text: 'ADDRESS LINE 1')
     expect(rendered).to have_selector("label", text: 'ADDRESS LINE 2')
     expect(rendered).to have_selector("label", text: 'CITY')

@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  require 'resque/server' 
+  require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
@@ -44,9 +44,12 @@ Rails.application.routes.draw do
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
+
       collection do
+        post :reinstate_enrollment
         get :family_index
         get :family_index_dt
+        get :outstanding_verification_dt
         post :families_index_datatable
         get :employer_index
         get :employer_poc
@@ -68,8 +71,6 @@ Rails.application.routes.draw do
         get :binder_index
         get :binder_index_datatable
         post :binder_paid
-        get :verification_index
-        get :verifications_index_datatable
         get :cancel_enrollment
         post :update_cancel_enrollment
         get :terminate_enrollment
@@ -80,7 +81,13 @@ Rails.application.routes.draw do
         get :add_sep_form
         get :hide_form
         get :show_sep_history
+        get :enable_or_disable_link
+        post :cancel_initial_plan_year
+        post :cancel_initial_plan_year_form
+        get :view_terminated_hbx_enrollments
         get :get_user_info
+        get :identity_verification
+        post :identity_verification_datatable
       end
 
       member do
@@ -127,6 +134,11 @@ Rails.application.routes.draw do
     get 'paper_applications/upload', to: 'paper_applications#upload'
     post 'paper_applications/upload', to: 'paper_applications#upload'
     get 'paper_applications/download/:key', to: 'paper_applications#download'
+    get 'ridp_documents/upload', to: 'ridp_documents#upload'
+    post 'ridp_documents/upload', to: 'ridp_documents#upload'
+    get 'ridp_documents/download/:key', to: 'ridp_documents#download'
+    resources :ridp_documents, only: [:destroy]
+
 
     resources :plan_shoppings, :only => [:show] do
       member do
@@ -141,7 +153,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update]
+    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+      collection do
+        get 'failed_validation'
+        get 'service_unavailable'
+      end
+    end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :families, only: [:show] do
@@ -170,6 +187,8 @@ Rails.application.routes.draw do
         get 'family'
         get 'upload_notice_form'
         post 'upload_notice'
+        get 'download_tax_documents_form'
+        get 'download_tax_documents'
       end
 
       resources :people do
@@ -186,6 +205,7 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
@@ -209,7 +229,7 @@ Rails.application.routes.draw do
       get :edit_resident_dependent, on: :member
       get :show_resident_dependent, on: :member
     end
-    
+
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :terminate
@@ -229,6 +249,7 @@ Rails.application.routes.draw do
     resources :employer_staff_roles, :only => [:create, :destroy] do
       member do
         get :approve
+        put :make_primary_poc
       end
     end
 
@@ -252,6 +273,9 @@ Rails.application.routes.draw do
       member do
         get "download_invoice"
         post 'generate_checkbook_urls'
+        get "show_invoice"
+        get "wells_fargo_sso"
+
       end
       collection do
         get 'welcome'
@@ -495,6 +519,7 @@ Rails.application.routes.draw do
       put :change_person_aasm_state
       get :show_docs
       put :update_verification_type
+      put :update_ridp_verification_type
       get :enrollment_verification
       put :extend_due_date
       post :fed_hub_request

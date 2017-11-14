@@ -287,6 +287,26 @@ And(/^.+ should see a button to create new plan year$/) do
   wait_for_ajax(2,3)
 end
 
+When(/^Employer enters plan year start date$/) do
+  start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{start}')]").click
+end
+
+Then(/^Employer should see disabled button with text continue$/) do
+  expect(page).to have_css('a.btn-primary[disabled]', visible: false)
+end
+
+When(/^Employer enters total number of employees$/) do
+  fill_in "plan_year[pte_count]", :with => "15"
+  fill_in "plan_year[msp_count]", :with => "3"
+  fill_in "plan_year[fte_count]", :with => "3"
+end
+
+Then(/^Employer should see benefits page$/) do
+  expect(page).to have_content('Benefit Package - Set Up')
+end
+
 And(/^.+ should be able to enter plan year, benefits, relationship benefits with (high|low) FTE$/) do |amount_of_fte|
   start = (TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month.year
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
@@ -381,7 +401,7 @@ Then(/^.+ should see Publish Plan Year Modal with address warnings$/) do
 end
 
 Then(/^.+ should see Publish Plan Year Modal with FTE warnings$/) do
-  expect(find('.modal-body')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
+  expect(find('.modal-body')).to have_content("Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})")
 end
 
 Then(/^.+ clicks? on the Cancel button$/) do
@@ -395,7 +415,7 @@ end
 
 Then(/^.+ should be on the Plan Year Edit page with warnings$/) do
   expect(page).to have_css('#plan_year')
-  expect(find('.alert-plan-year')).to have_content("Has #{Settings.aca.shop_market.small_market_employee_count_maximum} or fewer full time equivalent employees")
+  expect(find('.alert-plan-year')).to have_content("Number of full time equivalents (FTEs) exceeds maximum allowed (#{Settings.aca.shop_market.small_market_employee_count_maximum})")
 end
 
 Then(/^.+ updates the address location with correct address$/) do
@@ -446,6 +466,19 @@ Given /^an employer exists$/ do
   owner :with_family, :employer, organization: employer
 end
 
+Given /^the employer has draft plan year$/ do
+  create(:custom_plan_year, employer_profile: employer.employer_profile, start_on: TimeKeeper.date_of_record.beginning_of_month, aasm_state: 'draft', with_dental: false)
+end
+
+Given /^the employer has broker agency profile$/ do
+  employer.employer_profile.hire_broker_agency(FactoryGirl.create :broker_agency_profile)
+  employer.employer_profile.save!
+end
+
+When /^they visit the Employer Home page$/ do
+  visit employers_employer_profile_path(employer.employer_profile) + "?tab=home"
+end
+
 When /^they visit the Employee Roster$/ do
   visit employers_employer_profile_path(employer.employer_profile) + "?tab=employees"
 end
@@ -485,6 +518,10 @@ Then /^employer clicks on terminated filter$/ do
   wait_for_ajax
   page.execute_script("$('.filter-options').show();")
   find("#terminated_yes").trigger('click')
+end
+
+Then /^employer should not see the Get Help from Broker$/ do
+  expect(page).not_to have_xpath("//h3", :text => "Get Help From a Broker")
 end
 
 Then /^employer sees termination date column$/ do

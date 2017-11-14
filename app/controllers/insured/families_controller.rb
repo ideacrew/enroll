@@ -79,6 +79,17 @@ class Insured::FamiliesController < FamiliesController
     render :layout => 'application'
   end
 
+  # def generate_out_of_pocket_url
+  #   @person = Person.find(params[:id])
+  #   if @person && @person.has_active_employee_role?
+  #     census_employee=@person.active_employee_roles.first.census_employee
+  #     cs= ::CheckbookServices::PlanComparision.new(census_employee)
+  #     url = cs.generate_url
+  #     redirect_to url
+  #   else
+  #   end
+  # end
+
   def record_sep
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
@@ -93,6 +104,7 @@ class Insured::FamiliesController < FamiliesController
     if @family.enrolled_hbx_enrollments.any?
       action_params.merge!({change_plan: "change_plan"})
     end
+    ee_sep_request_accepted_notice
     redirect_to new_insured_group_selection_path(action_params)
   end
 
@@ -228,6 +240,24 @@ class Insured::FamiliesController < FamiliesController
     @notices = @person.documents.where(subject: 'notice')
   end
 
+  def download_tax_documents_form
+
+  end
+
+  def download_tax_documents
+   if params[:identifier].split("tax_documents#")[1].present?
+     uri = params[:identifier].split("tax_documents#")[1]
+     send_data Aws::S3Storage.find(uri), filename: params[:title]
+
+   elsif params[:identifier].present?
+     uri = params[:identifier]
+     send_data Aws::S3Storage.find(uri)
+   else
+     flash[:error] = "File does not exist or you are not authorized to access it."
+     redirect_to download_tax_documents_form_insured_families_path
+   end
+ end
+
   def delete_consumer_broker
     @family = Family.find(params[:id])
     if @family.current_broker_agency.destroy
@@ -316,10 +346,15 @@ class Insured::FamiliesController < FamiliesController
     elsif @person.has_active_consumer_role?
       if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
-      elsif @person.user && !@person.user.identity_verified?
+      elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
       end
     end
+  end
+
+  def ridp_redirection
+    consumer = @person.consumer_role
+    @person.user && (!@person.user.identity_verified? && !consumer.identity_verified? && !consumer.application_verified?)  && !current_user.has_hbx_staff_role?
   end
 
   def update_changing_hbxs(hbxs)
@@ -359,6 +394,14 @@ class Insured::FamiliesController < FamiliesController
 
     @person.inbox.messages << Message.new(subject: subject, body: body, from: 'DC Health Link')
     @person.save!
+  end
+
+  def ee_sep_request_accepted_notice
+    begin
+      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "ee_sep_request_accepted_notice")
+    rescue Exception => e
+      log("#{e.message}; person_id: #{@person.id}")
+    end
   end
 
   def calculate_dates

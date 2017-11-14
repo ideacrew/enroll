@@ -1,5 +1,4 @@
 class TimeKeeper
-  include Mongoid::Document
   include Singleton
   include Acapi::Notifiers
   extend Acapi::Notifiers

@@ -49,11 +49,15 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
     let(:plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month+ 2.month - 1.year, benefit_groups: [benefit_group], aasm_state:'active',created_at:TimeKeeper.date_of_record)}
     let(:future_plan_year)         { FactoryGirl.build(:plan_year, start_on:TimeKeeper.date_of_record.beginning_of_month + 2.months, benefit_groups: [benefit_group2], aasm_state:'renewing_enrolled')}
     let!(:employer)  { EmployerProfile.new(**valid_params, plan_years: [plan_year]) }
-
-    let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone)}
+    let(:user){FactoryGirl.create(:user)}
+    let(:staff) { FactoryGirl.create(:person, :with_work_email, :with_work_phone, :user_id => user.id)}
+    let(:email) { FactoryGirl.build(:email, kind: 'work') }
+    let(:phone) {FactoryGirl.build(:phone, kind: "work")}
+    let(:staff2) { FactoryGirl.create(:person, first_name: "Jack", last_name: "Bruce", user_id: "", emails:[email], phones:[phone])}
     let(:broker_agency_profile) { BrokerAgencyProfile.create(market_kind: "both") }
     let(:person_broker) {FactoryGirl.build(:person,:with_work_email, :with_work_phone)}
     let(:broker) {FactoryGirl.build(:broker_role,aasm_state:'active',person:person_broker)}
+
     include AcapiVocabularySpecHelpers
 
     before(:all) do
@@ -105,6 +109,10 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
       it "should not have shop_transfer" do
         expect(@doc.xpath("//x:shop_transfer/x:hbx_active_on", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq ""
+      end
+
+      it "should have benefit group id" do
+        expect(@doc.xpath("//x:benefit_groups/x:benefit_group/x:id/x:id", "x"=>"http://openhbx.org/api/terms/1.0").text).to eq benefit_group.id.to_s
       end
 
       it "should be schema valid" do
@@ -174,17 +182,33 @@ RSpec.describe "events/v2/employer/updated.haml.erb" do
 
     context "when manual gen of cv = true" do
 
-      before :each do
-        employer.plan_years = [plan_year,future_plan_year]
-        employer.save
-        render :template => "events/v2/employers/updated", :locals => { :employer => employer, manual_gen: true }
-        @doc = Nokogiri::XML(rendered)
+      context "non termination case" do
+        before :each do
+          employer.plan_years = [plan_year, future_plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 2
+        end
       end
 
-      it "should return all eligible for export plan years" do
-        expect(@doc.xpath("//x:plan_years/x:plan_year", "x"=>"http://openhbx.org/api/terms/1.0").count).to eq 2
+      context "terminated plan year with future termination date" do
+        before :each do
+          plan_year.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
+                                       :aasm_state => "terminated"})
+          employer.plan_years = [plan_year]
+          employer.save
+          render :template => "events/v2/employers/updated", :locals => {:employer => employer, manual_gen: true}
+          @doc = Nokogiri::XML(rendered)
+        end
+
+        it "should return all eligible for export plan years" do
+          expect(@doc.xpath("//x:plan_years/x:plan_year", "x" => "http://openhbx.org/api/terms/1.0").count).to eq 1
+        end
       end
     end
-
   end
 end

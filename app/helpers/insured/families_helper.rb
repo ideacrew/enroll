@@ -166,7 +166,7 @@ module Insured::FamiliesHelper
     if enrollment.is_shop?
       true
     else
-      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired'].include?(enrollment.aasm_state.to_s)
+      ['coverage_selected', 'coverage_canceled', 'coverage_terminated', 'auto_renewing', 'coverage_expired', 'renewing_coverage_selected'].include?(enrollment.aasm_state.to_s)
     end
   end
 
@@ -178,7 +178,7 @@ module Insured::FamiliesHelper
   end
 
   def enrollment_coverage_end(hbx_enrollment)
-    if hbx_enrollment.coverage_terminated?
+    if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending?
       hbx_enrollment.terminated_on
     elsif hbx_enrollment.coverage_expired?
       if hbx_enrollment.is_shop? && hbx_enrollment.benefit_group_assignment.present?
@@ -232,10 +232,23 @@ module Insured::FamiliesHelper
       false
     elsif @person.consumer_role.blank?
       false
-    elsif @person.consumer_role.present? 
+    elsif @person.consumer_role.present?
       true
     end
   end
+
+  def show_download_tax_documents_button_on_documents_page?
+    if @person.ssn.present?
+      false
+    elsif !current_user.has_hbx_staff_role?
+      false
+    elsif @person.consumer_role.blank?
+      false
+    elsif @person.consumer_role.present?
+      true
+    end
+  end
+
   def is_applying_coverage_value_personal(person)
     first_checked = true
     second_checked = false

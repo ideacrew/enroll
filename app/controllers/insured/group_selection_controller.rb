@@ -25,12 +25,11 @@ class Insured::GroupSelectionController < ApplicationController
     insure_hbx_enrollment_for_shop_qle_flow
     @waivable = @hbx_enrollment.can_complete_shopping? if @hbx_enrollment.present?
 
-    qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
-    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: select_benefit_group(qle))
+    @qle = (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    @benefit_group = select_benefit_group(@qle, @employee_role)
+    @new_effective_on = calculate_effective_on(market_kind: @market_kind, employee_role: @employee_role, benefit_group: @benefit_group)
 
     generate_coverage_family_members_for_cobra
-    # Set @new_effective_on to the date choice selected by user if this is a QLE with date options available.
-    @new_effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
   def create
@@ -101,8 +100,7 @@ class Insured::GroupSelectionController < ApplicationController
   def terminate
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-
-    if hbx_enrollment.may_terminate_coverage?
+    if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
       hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
       hbx_enrollment.terminate_benefit(term_date)
       hbx_enrollment.propogate_terminate(term_date)

@@ -1,11 +1,12 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Group Ineligible to Obtain Coverage</h3></td>
+      <td><h3>GROUP INELIGIBLE TO OBTAIN COVERAGE</h3></td>
     </tr>
   </tbody>
 </table>
@@ -49,7 +50,7 @@
           TTY: 711
         </li>
         <li style="margin-top: 5px;">
-          Online at <a href="#{Settings.site.home_url}">www.DCHealthLink.com</a>
+          Online at <a href=<%="#{Settings.site.home_url}"%>><%="#{Settings.site.website_name}"%></a>
         </li>
         </ul>
       </td>

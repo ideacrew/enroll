@@ -1,6 +1,7 @@
-<%= render partial: 'notices/shared/logo' %>
-<%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
-<%= render partial: "notices/shared/address", :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/cover_page', :locals => {notice: notice} %>
+<%= render partial: 'notices/shared/logo_and_address_shop' %>
+<%= render partial: "notices/shared/shop_address", :locals => {notice: notice} %>
+<%= render partial: "notices/shared/date", :locals => {notice: notice} %>
 
 <table class="total_table" border="0">
   <tbody>
@@ -121,7 +122,7 @@
  previous: "Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
  listings: ["By calling #{notice.hbe.phone}.",
             "TTY: 711",
-            "Online at www.DCHealthLink.com"] } %>
+            "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"] } %>
 
 <% if notice.broker.present? %>
   <%= render partial: 'notices/shared/broker_contact_info', :locals => {broker: notice.broker} %>

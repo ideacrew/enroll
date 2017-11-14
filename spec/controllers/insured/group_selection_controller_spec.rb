@@ -37,6 +37,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     allow(person).to receive(:consumer_role).and_return(nil)
     allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
+    allow(user).to receive(:has_hbx_staff_role?).and_return false
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
     allow(person).to receive(:has_active_employee_role?).and_return true
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
@@ -208,15 +209,23 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     it "should redirect to family home if termination is possible" do
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(hbx_enrollment).to receive(:terminate_benefit)
-      expect(hbx_enrollment).to receive(:propogate_terminate).with(Date.today)
+      expect(hbx_enrollment).to receive(:propogate_terminate).with(TimeKeeper.date_of_record)
       expect(hbx_enrollment.termination_submitted_on).to eq nil
-      post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.termination_submitted_on).to eq TimeKeeper.datetime_of_record
       expect(response).to redirect_to(family_account_path)
     end
 
     it "should redirect back if hbx enrollment can't be terminated" do
-      post :terminate, term_date: Date.today, hbx_enrollment_id: hbx_enrollment.id
+      post :terminate, term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id
+      expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
+      expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
+    end
+
+
+    it "should redirect back if termination date is in the past" do
+      allow(hbx_enrollment).to receive(:terminate_benefit)
+      post :terminate, term_date: TimeKeeper.date_of_record - 3.days, hbx_enrollment_id: hbx_enrollment.id
       expect(hbx_enrollment.may_terminate_coverage?).to be_falsey
       expect(response).to redirect_to(terminate_confirm_insured_group_selections_path(person_id: person.id, hbx_enrollment_id: hbx_enrollment.id))
     end
@@ -228,7 +237,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
     let(:benefit_group) {FactoryGirl.create(:benefit_group)}
     let(:benefit_group_assignment) {double(update: true)}
     let(:employee_roles){ [double("EmployeeRole")] }
-    let(:census_employee) {FactoryGirl.create(:census_employee)}
+    let(:census_employee) { FactoryGirl.create(:census_employee) }
 
     before do
       allow(coverage_household).to receive(:household).and_return(household)
@@ -320,7 +329,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller do
       expect(flash[:error]).to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
     end
-    
+
     it "for cobra with invalid date" do
       user = FactoryGirl.create(:user, id: 196, person: FactoryGirl.create(:person))
       sign_in user

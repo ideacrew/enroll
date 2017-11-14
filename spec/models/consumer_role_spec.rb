@@ -18,7 +18,7 @@ describe ConsumerRole, dbclean: :after_each do
   it { should validate_presence_of :dob }
 
   let(:address)       {FactoryGirl.build(:address)}
-  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789")}
+  let(:saved_person)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "887776665")}
   let(:saved_person_no_ssn)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '1')}
   let(:saved_person_no_ssn_invalid)  {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "", no_ssn: '0')}
   let(:is_applicant)          { true }
@@ -136,6 +136,35 @@ describe "#find_vlp_document_by_key" do
   end
 end
 
+describe "#find_ridp_document_by_key" do
+  let(:person) {Person.new}
+  let(:consumer_role) {ConsumerRole.new({person:person})}
+  let(:key) {"sample-key"}
+  let(:ridp_document) {RidpDocument.new({subject: "Driver License", identifier:"urn:openhbx:terms:v1:file_storage:s3:bucket:bucket_name##{key}"})}
+
+  context "has a ridp_document without a file uploaded" do
+    before do
+      consumer_role.ridp_documents.build({subject: "Driver License"})
+    end
+
+    it "return no document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to be_nil
+    end
+  end
+
+  context "has a ridp_document with a file uploaded" do
+    before do
+      consumer_role.ridp_documents << ridp_document
+    end
+
+    it "returns ridp_document document" do
+      found_document = consumer_role.find_ridp_document_by_key(key)
+      expect(found_document).to eql(ridp_document)
+    end
+  end
+end
+
 describe "#build_nested_models_for_person" do
   let(:person) {FactoryGirl.create(:person)}
   let(:consumer_role) {ConsumerRole.new}
@@ -205,6 +234,32 @@ context "Verification process and notices" do
       it "returns false if person has NO documents for this type" do
         person.consumer_role.vlp_documents << FactoryGirl.build(:vlp_document, :identifier => "identifier", :verification_type  => "Immigration type")
         expect(person.consumer_role.has_docs_for_type?("Immigration type")).to be_truthy
+      end
+    end
+  end
+
+  describe "#has_ridp_docs_for_type?" do
+    before do
+      person.consumer_role.ridp_documents=[]
+    end
+    context "ridp exist but document is NOT uploaded" do
+      it "returns false for ridp doc without uploaded copy" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil )
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+      it "returns false for Identity type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => nil, :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_falsey
+      end
+    end
+    context "ridp with uploaded copy" do
+      it "returns true if person has uploaded documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
+      end
+      it "returns false if person has NO documents for this type" do
+        person.consumer_role.ridp_documents << FactoryGirl.build(:ridp_document, :identifier => "identifier", :ridp_verification_type  => "Identity")
+        expect(person.consumer_role.has_ridp_docs_for_type?("Identity")).to be_truthy
       end
     end
   end
@@ -329,6 +384,20 @@ context "Verification process and notices" do
     it_behaves_like "update verification type for consumer", "Citizenship", "curam", "hbx"
   end
 
+  describe "update_ridp_verification_type private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "update ridp verification type for consumer" do |verification_type, reason|
+      before do
+        consumer.update_ridp_verification_type(verification_type, reason)
+      end
+      it "updates #{verification_type}" do
+        expect(consumer.identity_verified?).to eq true
+      end
+    end
+
+    it_behaves_like "update ridp verification type for consumer", "Identity", "documents in Enroll"
+  end
+
   describe "#update_all_verification_types private" do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "curam" })}
     let(:consumer) { person.consumer_role }
@@ -351,6 +420,28 @@ context "Verification process and notices" do
     it_behaves_like "update update all verification types for consumer", "admin", "hbx"
     it_behaves_like "update update all verification types for consumer", "curam", "curam"
     it_behaves_like "update update all verification types for consumer", "any", "hbx"
+  end
+
+  describe "#admin_ridp_verification_action private" do
+    let(:consumer) { person.consumer_role }
+    shared_examples_for "admin ridp verification actions" do |admin_action, v_type, update_reason, upd_attr, result, rejected_field|
+      before do
+        consumer.admin_ridp_verification_action(admin_action, v_type, update_reason)
+      end
+      it "updates #{v_type} as #{result} if admin clicks #{admin_action}" do
+        expect(consumer.send(upd_attr)).to eq result
+      end
+
+      if admin_action == "return_for_deficiency"
+        it "marks #{v_type} type as rejected" do
+          expect(consumer.send(rejected_field)).to be_truthy
+        end
+      end
+    end
+
+    it_behaves_like "admin ridp verification actions", "verify", "Identity", "Document in EnrollApp", "identity_validation", "valid"
+    it_behaves_like "admin ridp verification actions", "return_for_deficiency", "Identity", "Document in EnrollApp", "identity_validation", "outstanding", "identity_rejected"
+
   end
 
   describe "#admin_verification_action private" do
@@ -389,17 +480,19 @@ context "Verification process and notices" do
 
   describe "state machine" do
     let(:consumer) { person.consumer_role }
-    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx" })}
-    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.now, :vlp_authority => "hbx", :five_year_bar => true, :is_barred => true, :bar_met => true })}
+    all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :verification_period_ended]
     all_citizen_states = %w(any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident)
     shared_examples_for "IVL state machine transitions and workflow" do |ssn, citizen, residency, from_state, to_state, event|
-      before do
-        person.ssn = ssn
-        consumer.citizen_status = citizen
-        consumer.is_state_resident = residency
-      end
-      it "moves from #{from_state} to #{to_state} on #{event}" do
-        expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+      context "import" do
+        before do
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+          consumer.is_state_resident = residency
+        end
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+        end
       end
     end
 
@@ -540,6 +633,14 @@ context "Verification process and notices" do
         consumer.aasm_state = "dhs_pending"
         consumer.fail_dhs! verification_attr
         expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
+      end
+
+      it "stores 5 year bar response" do
+        consumer.aasm_state="dhs_pending"
+        consumer.fail_dhs!(verification_attr)
+        expect(consumer.is_barred).to be true
+        expect(consumer.five_year_bar).to be true
+        expect(consumer.bar_met).to be true
       end
     end
 

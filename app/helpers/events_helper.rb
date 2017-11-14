@@ -61,11 +61,11 @@ module EventsHelper
 
   def transaction_id
     @transaction_id ||= begin
-                          ran = Random.new
-                          current_time = Time.now.utc
-                          reference_number_base = current_time.strftime("%Y%m%d%H%M%S") + current_time.usec.to_s[0..2]
-                          reference_number_base + sprintf("%05i",ran.rand(65535))
-                        end
+      ran = Random.new
+      current_time = Time.now.utc
+      reference_number_base = current_time.strftime("%Y%m%d%H%M%S") + current_time.usec.to_s[0..2]
+      reference_number_base + sprintf("%05i",ran.rand(65535))
+    end
   end
 
   def employer_plan_years(employer)
@@ -90,5 +90,10 @@ module EventsHelper
 
   def is_renewal_or_conversion_employer?(employer)
     is_new_conversion_employer?(employer) || is_renewal_employer?(employer) || is_renewing_conversion_employer?(employer)
+  end
+
+  def plan_years_for_manual_export(employer)
+    plan_year_states = PlanYear::INELIGIBLE_FOR_EXPORT_STATES.delete_if{|py_state| ["renewing_enrolling","enrolling"].include?(py_state)}
+    employer.plan_years.select {|plan_year| !plan_year_states.include?(plan_year.aasm_state)}
   end
 end

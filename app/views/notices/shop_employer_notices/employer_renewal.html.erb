@@ -43,8 +43,8 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:",
- listings: ["Online at #{notice.hbe.url};",
-            "By email at #{notice.hbe.email}; or",
+ listings: ["Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>;",
+            "By email at <a href='mailto:#{notice.hbe.email}'>#{notice.hbe.email}</a>; or",
             "By calling #{notice.hbe.phone}."] } %>
 
 <% if notice.broker.present? %>

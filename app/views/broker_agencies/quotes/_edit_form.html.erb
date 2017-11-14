@@ -1,4 +1,5 @@
 <div class="wrapper">
+
 	<div>&nbsp;</div>
 	<!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">-->
 		<div class="panel panel-default">
@@ -27,7 +28,7 @@
 					<div class="row form-inline">
           <!-- Disabling client for now as per business request -->
 						<div class="form-group col-sm-6">Type:
-							<%= f.select(:employer_type, options_for_select([["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
+							<%= f.select(:employer_type, options_for_select([["Client","client"],["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
 						</div>
 						<div class="form-group col-sm-6">Employer Name:
 							<div class="type">
@@ -36,7 +37,6 @@
 						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 
@@ -141,7 +141,6 @@ else {
 
   $('button#remove_household_button').click(remove_household_handler);
 
-
   var remove_benefit_group_handler = function(){
     var $quote_benefit_group_id = $(this);
     if(this.getAttribute("data-benefit-group-id") != undefined){
@@ -161,6 +160,7 @@ else {
       });
 //$(this).parent().parent().remove();
 }
+
 };
 
 $('button#remove_benefit_group_button').click(remove_benefit_group_handler);
@@ -264,6 +264,5 @@ $(document).on('change','.employer_profile' ,function() {
     });
   // }
 });
-
 
 </script>

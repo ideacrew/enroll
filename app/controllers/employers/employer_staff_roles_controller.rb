@@ -1,6 +1,7 @@
 class Employers::EmployerStaffRolesController < Employers::EmployersController
 
-  before_action :check_access_to_employer_profile,:updateable?
+  before_action :check_access_to_employer_profile # :except => [:make_primary_poc]
+  before_action :updateable?
 
   def create
 
@@ -19,7 +20,7 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
     person = Person.find(params[:staff_id])
     role = person.employer_staff_roles.detect{|role| role.is_applicant? &&
       role.employer_profile_id.to_s == params[:id]}
-    if role && role.approve && role.save!
+    if role && role.approve!
       flash[:notice] = 'Role is approved'
     else
       flash[:error] = 'Please contact HBX Admin to report this error'
@@ -42,19 +43,33 @@ class Employers::EmployerStaffRolesController < Employers::EmployersController
 
     redirect_to edit_employers_employer_profile_path(employer_profile.organization)
   end
-
+  
+  def make_primary_poc
+    employer_profile_id = params[:emp_id]
+    employer_profile = EmployerProfile.find(employer_profile_id)
+    @poc_count = employer_profile.staff_roles.map(&:active_employer_staff_roles).count
+    poc = Person.find(params[:id])
+    poc.make_primary(params[:primary_poc])
+    flash[:notice] = 'Primary POC Role updated.'
+    
+    respond_to do |format|
+      format.js {render inline: "location.reload();" }
+    end
+  end
+  
   private
 
   def updateable?
     authorize EmployerProfile, :updateable?
   end
+  
   # Check to see if current_user is authorized to access the submitted employer profile
   def check_access_to_employer_profile
-    employer_profile = EmployerProfile.find(params[:id])
+    employer_profile = EmployerProfile.find(params[:id]) || EmployerProfile.find(params[:emp_id])
     policy = ::AccessPolicies::EmployerProfile.new(current_user)
     policy.authorize_edit(employer_profile, self)
   end
-
+  
 end
 
 

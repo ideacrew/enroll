@@ -5,10 +5,13 @@ module PdfTemplates
     attribute :notification_type, String
     attribute :mpi_indicator, String
     attribute :primary_fullname, String
+    attribute :employee_fullname, String
     attribute :primary_identifier, String
     attribute :notice_date, Date
     attribute :application_date, Date
     attribute :employer_name, String
+    attribute :enrollment, PdfTemplates::Enrollment
+    attribute :employer_email, String
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :broker, PdfTemplates::Broker
     attribute :hbe, PdfTemplates::Hbe
@@ -22,7 +25,6 @@ module PdfTemplates
     attribute :reference_plan, Object
     attribute :family_contribution, String
     attribute :data, Hash
-    attribute :plan_year, String
     attribute :coverage_end_on, Date
     attribute :coverage_start_on, Date
     attribute :to, String
@@ -34,9 +36,12 @@ module PdfTemplates
       return true
     end
 
+    def broker?
+      return false
+    end
+
     def employee_notice?
       false
     end
-
   end
 end

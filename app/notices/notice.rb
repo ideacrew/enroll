@@ -72,11 +72,11 @@ class Notice
           template: header,
           layout: false,
           locals: { recipient: recipient, notice: notice}
-          }),
-        }
+        }),
+      }
     }
-
     footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/shop_footer.html.erb"
+
     options.merge!({footer: {
       content: ApplicationController.new.render_to_string({
         template: footer,
@@ -155,9 +155,9 @@ class Notice
       creator: "hbx_staff",
       subject: "notice",
       identifier: doc_uri,
-      format: "application/pdf"
+      format: "application/pdf",
+      description: mpi_indicator
     })
-
     if notice.save
       notice
     else

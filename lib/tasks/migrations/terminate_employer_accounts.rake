@@ -1,14 +1,13 @@
 # This rake task used to terminate employer active plan year && active enrollments.
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date']
-# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['fein','end_on','termination_date', 'generate_termination_notice']
+# RAILS_ENV=production bundle exec rake migrations:terminate_employer_account['522326356','02/28/2017','02/01/2017',true/false]
 
 namespace :migrations do
   desc "Terminating active plan year and enrollments"
-  task :terminate_employer_account, [:fein, :end_on, :termination_date] => :environment do |task, args|
-
+  task :terminate_employer_account, [:fein, :end_on, :termination_date, :generate_termination_notice] => :environment do |task, args|
     fein = args[:fein]
+    generate_termination_notice = args[:generate_termination_notice] == "true"
     organizations = Organization.where(fein: fein)
-
     if organizations.size > 1
       puts "found more than 1 for #{legal_name}"
       raise 'more than 1 employer found with given fein'
@@ -53,7 +52,9 @@ namespace :migrations do
         if plan_year.may_terminate?
           plan_year.terminate!
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
-
+          if generate_termination_notice
+            employer_terminated_from_shop(organization)
+          end
           bg_ids = plan_year.benefit_groups.map(&:id)
           census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
           census_employees.each do |census_employee|
@@ -127,5 +128,16 @@ def enrollments_for_plan_year(plan_year)
   families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
   enrollments = families.inject([]) do |enrollments, family|
     enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+  end
+end
+
+def employer_terminated_from_shop(org)
+  org.employer_profile.census_employees.active.each do |ce|
+    begin
+      ShopNoticesNotifierJob.perform_later(ce.id.to_s, "notify_employee_when_employer_requests_advance_termination")
+      puts "Notification generated for #{ce.full_name}"
+    rescue Exception => e
+      (Rails.logger.error { "Unable to deliver employer terminated from shop notice to #{ce.full_name} " }) unless Rails.env.test?
+    end
   end
 end

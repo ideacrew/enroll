@@ -89,7 +89,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:consumer_role_id).and_return(false)
       allow(census_employee.employee_role).to receive(:is_under_open_enrollment?).and_return(true)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
+      allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(false)
       allow(hbx_enrollment).to receive(:future_enrollment_termination_date).and_return(TimeKeeper.date_of_record)
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -259,6 +259,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should not disable the Make Changes button" do
       expect(rendered).to_not have_selector('.cna')
+    end
+
+    it "should show plan contact information" do
+      expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+    end
+
+    it "should not show carrier contact information" do
+      expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
     end
   end
 

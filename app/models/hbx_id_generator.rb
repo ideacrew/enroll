@@ -20,6 +20,18 @@ class HbxIdGenerator
     provider.generate_organization_id
   end
 
+  def generate_family_id
+    provider.generate_family_id
+  end
+
+  def generate_tax_household_id
+    provider.generate_tax_household_id
+  end
+
+  def generate_case_id
+    provider.generate_case_id
+  end
+
   def self.slug!
     self.instance.provider = SlugSource
   end
@@ -34,6 +46,18 @@ class HbxIdGenerator
 
   def self.generate_organization_id
     self.instance.generate_organization_id
+  end
+
+  def self.generate_family_id
+    self.instance.generate_family_id
+  end
+
+  def self.generate_tax_household_id
+    self.instance.generate_tax_household_id
+  end
+
+  def self.generate_case_id
+    self.instance.generate_case_id
   end
 
   class AmqpSource
@@ -58,6 +82,18 @@ class HbxIdGenerator
     def self.generate_organization_id
       generate_id_from_sequence("organization_id")
     end
+
+    def self.generate_family_id
+      generate_id_from_sequence("family_id")
+    end
+
+    def self.generate_tax_household_id
+      generate_id_from_sequence("tax_household_id")
+    end
+
+    def self.generate_case_id
+      generate_id_from_sequence("case_id")
+    end
   end
 
   class SlugSource
@@ -70,6 +106,18 @@ class HbxIdGenerator
     end
 
     def self.generate_member_id
+      random_uuid
+    end
+
+    def self.generate_family_id
+      random_uuid
+    end
+
+    def self.generate_tax_household_id
+      random_uuid
+    end
+
+    def self.generate_case_id
       random_uuid
     end
 

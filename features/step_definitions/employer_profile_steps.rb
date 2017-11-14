@@ -77,6 +77,7 @@ Then(/(\w+) is the staff person for an employer$/) do |name|
   person = Person.where(first_name: name).first
   employer_profile = FactoryGirl.create(:employer_profile)
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: employer_profile.id)
+  person.active_employer_staff_roles.update(primary_poc: true)
 end
 
 Given(/^Sarh is the staff person for an organization with employer profile and broker agency profile$/) do
@@ -90,11 +91,13 @@ end
 Then(/(\w+) is the staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id)
+  person.active_employer_staff_roles.update(primary_poc: true)
 end
 
 Then(/(\w+) is applicant staff person for an existing employer$/) do |name|
   person = Person.where(first_name: name).first
   employer_staff_role = FactoryGirl.create(:employer_staff_role, person: person, employer_profile_id: @employer_profile.id, aasm_state: 'is_applicant')
+  person.employer_staff_roles.update(primary_poc: false)
 end
 
 When(/(\w+) accesses the Employer Portal/) do |name|

@@ -26,9 +26,6 @@ gem 'turbolinks','2.5.3'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
-# Background Jobs with Resque
-gem 'resque'
-
 # JS graph API
 # gem 'highcharts-rails', '~> 4.1', '>= 4.1.9'
 
@@ -45,7 +42,6 @@ gem 'mongoid-history', git: "https://github.com/aq1018/mongoid-history.git", bra
 # gem 'mongoid-history', '~> 5.1.0'
 gem 'mongoid_userstamp'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
-gem "mongoid-autoinc"
 gem 'mongoid-versioning'
 gem 'money-rails', '~> 1.3.0'
 gem "mongoid-enum"
@@ -64,6 +60,9 @@ gem 'symmetric-encryption', '~> 3.6.0'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'development'
 # gem 'acapi', path: "../acapi"
 gem 'openhbx_cv2', git: "https://github.com/dchbx/openhbx_cv2.git", branch: 'master'
+
+#For Background jobs
+gem 'resque'
 
 gem 'aasm', '~> 4.8.0'
 gem 'haml'
@@ -121,8 +120,8 @@ end
 
 group :development, :test do
   # YARD documentation generation tool: http://yardoc.org/
-  gem 'yard', '~> 0.9.5'
-  gem 'yard-mongoid', '~> 0.1.0'
+  gem 'yard', '~> 0.9.5', require: false
+  gem 'yard-mongoid', '~> 0.1.0', require: false
   gem 'railroady', '~> 1.5.2'
 
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

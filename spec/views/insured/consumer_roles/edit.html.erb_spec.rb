@@ -58,12 +58,12 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to have_selector('#naturalized_citizen_container')
   end
 
-  it "should display the immigration_status_container" do
-    expect(rendered).to have_selector("#immigration_status_container")
+  it "should display the eligible_immigration_status_container" do
+    expect(rendered).to have_selector("#eligible_immigration_status_container")
   end
 
-  it "should display the indian_tribe_area" do
-    expect(rendered).to have_selector("#indian_tribe_area")
+  it "should display the indian_tribe_member_container" do
+    expect(rendered).to have_selector("#indian_tribe_member_container")
   end
 
   it "should display the vlp document area" do
@@ -99,12 +99,12 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to have_selector('#naturalized_citizen_container')
   end
 
-  it "should display the immigration_status_container" do
-    expect(rendered).to have_selector("#immigration_status_container")
+  it "should display the eligible_immigration_status_container" do
+    expect(rendered).to have_selector("#eligible_immigration_status_container")
   end
 
-  it "should display the indian_tribe_area" do
-    expect(rendered).to have_selector("#indian_tribe_area")
+  it "should display the indian_tribe_member_container" do
+    expect(rendered).to have_selector("#indian_tribe_member_container")
   end
 
   it "should display the vlp document area" do

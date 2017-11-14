@@ -5,14 +5,20 @@ module PdfTemplates
     attribute :enrollees, Array[Individual]
     attribute :premium, String
     attribute :employee_cost, String
+    attribute :employer_cost, String
+    attribute :employer_contribution, String
     attribute :phone, String
     attribute :effective_on, Date
+    attribute :terminated_on, Date
     attribute :selected_on, Date
     attribute :aptc_amount, String
     attribute :responsible_amount, String
     attribute :plan, PdfTemplates::Plan
+    attribute :enrolled_count, String
+    attribute :kind, String
+    attribute :dependents_count, String
     attribute :coverage_kind, String
-    attribute :is_receiving_assistance, Boolean
+    attribute :is_receiving_assistance, Boolean, :default => false
     attribute :plan_year, Date
     attribute :ivl_open_enrollment_start_on, Date
     attribute :ivl_open_enrollment_end_on, Date
