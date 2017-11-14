@@ -13,11 +13,7 @@
     <tbody>
       <tr>
         <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:total_due)) || "Data not available" %></td>
-        <% if @employer_profile.try(:employer_profile_account).try(:past_due) > 0 %>
-          <td style="color:Red"><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due))%></td>
-        <% else %>
-          <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due)) || "Data not available" %></td>
-        <% end %>
+        <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due)) || "Data not available" %></td>
       </tr>
     </tbody>
   </table>

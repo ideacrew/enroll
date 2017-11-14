@@ -260,6 +260,14 @@ class EmployerProfile
     notify("acapi.info.events.employer.general_agent_terminated", {employer_id: self.hbx_id, event_name: "general_agent_terminated"})
   end
 
+  def has_premium_payments?
+    try(:employer_profile_account).try(:premium_payments) ? true : false
+  end
+
+  def premium_payments
+    try(:employer_profile_account).try(:premium_payments) || nil
+  end
+
   # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
   def roster_size
     return @roster_size if defined? @roster_size

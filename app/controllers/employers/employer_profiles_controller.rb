@@ -118,6 +118,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       when 'documents'
       when 'accounts'
         collect_and_sort_invoices(params[:sort_order])
+        @employer_profile_account = @employer_profile.employer_profile_account
         @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
         #only exists if coming from redirect from sso failing
         @page_num = params[:page_num] if params[:page_num].present?
@@ -347,7 +348,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def retrieve_payments_for_page(page_no)
-    @payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
+    if @payments = @employer_profile.premium_payments
+      @payments = @payments.order_by(:paid_on => 'desc').skip((page_no.to_i - 1)*10).limit(10)
+    end
   end
 
   def updateable?
