@@ -1,15 +1,4 @@
 GIT
-  remote: https://github.com/aq1018/mongoid-history.git
-  revision: 1c69841f823d7ebf69fb2145d307d60b1500b89c
-  branch: master
-  specs:
-    mongoid-history (0.5.1)
-      activesupport
-      easy_diff
-      mongoid (>= 3.0)
-      mongoid-compatibility
-
-GIT
   remote: https://github.com/dchbx/acapi.git
   revision: abe34027bcd7f9de675dc40f76035518a028d694
   branch: development
@@ -339,7 +328,7 @@ GEM
       tzinfo (>= 0.3.37)
     mongoid-autoinc (5.0.2)
       mongoid (~> 5.0)
-    mongoid-compatibility (0.4.0)
+    mongoid-compatibility (0.5.0)
       activesupport
       mongoid (>= 2.0)
     mongoid-enum (0.4.0)
@@ -347,6 +336,11 @@ GEM
     mongoid-grid_fs (2.2.1)
       mime-types (>= 1.0, < 3.0)
       mongoid (>= 3.0, < 6.0)
+    mongoid-history (0.6.1)
+      activesupport
+      easy_diff
+      mongoid (>= 3.0)
+      mongoid-compatibility
     mongoid-rspec (3.0.0)
       mongoid (~> 5.0)
       rake
@@ -646,7 +640,7 @@ DEPENDENCIES
   mongoid (= 5.0.1)
   mongoid-autoinc
   mongoid-enum
-  mongoid-history!
+  mongoid-history
   mongoid-rspec (= 3.0.0)
   mongoid-versioning
   mongoid_userstamp
@@ -694,4 +688,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.14.6
+   1.15.3
