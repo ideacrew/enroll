@@ -62,8 +62,8 @@ class CensusEmployee < CensusMember
   validate :check_cobra_begin_date
   validate :check_hired_on_before_dob
   after_update :update_hbx_enrollment_effective_on_by_hired_on
+  after_save :assign_default_benefit_package
 
-  before_save :assign_default_benefit_package
   before_save :allow_nil_ssn_updates_dependents
 
   before_create :update_cobra_end_date

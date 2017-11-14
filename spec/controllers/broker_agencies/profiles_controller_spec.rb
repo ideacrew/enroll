@@ -91,7 +91,16 @@ RSpec.describe BrokerAgencies::ProfilesController do
       #expect(flash[:error]).to eq "Failed to Update Broker Agency Profile"
     end
 
-    it "should update record" do
+    it "should update person main phone" do
+      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "phone main")
+      post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
+      {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
+       "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
+       broker_agency_profile.primary_broker_role.person.reload
+       expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
+    end
+
+    it "should update person record" do
       post :update, id: broker_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
       {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
        "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}
