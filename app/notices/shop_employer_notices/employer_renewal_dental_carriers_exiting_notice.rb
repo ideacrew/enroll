@@ -2,7 +2,6 @@ class ShopEmployerNotices::EmployerRenewalDentalCarriersExitingNotice < ShopEmpl
 
   def deliver
     build
-    append_data
     generate_pdf_notice
     shop_dchl_rights_attachment
     non_discrimination_attachment
@@ -11,8 +10,4 @@ class ShopEmployerNotices::EmployerRenewalDentalCarriersExitingNotice < ShopEmpl
     send_generic_notice_alert
   end
 
-  def append_data
-    
-  end
-  
 end
