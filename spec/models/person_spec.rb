@@ -40,11 +40,11 @@ describe Person do
 
           context "the second person" do
             it "should not be valid" do
-              expect(person2.valid?).to be true
+              expect(person2.valid?).to be false
             end
 
             it "should have an error on ssn" do
-              expect(person2.errors[:ssn].any?).to be false
+              expect(person2.errors[:ssn].any?).to be true
             end
 
             it "should not have the same id as the first person" do
