@@ -21,6 +21,11 @@ end
 Given(/^I should see page for documents verification$/) do
   expect(page).to have_content "Documents FAQ"
   expect(page).to have_content('Social Security Number')
+  find('.btn', text: 'Documents FAQ').click
+  expect(page).to have_content('DC Residency')
+  find_link('https://dmv.dc.gov/page/proof-dc-residency-certifications').visible?
+  new_window = window_opened_by { click_link 'https://dmv.dc.gov/page/proof-dc-residency-certifications' }
+  switch_to_window new_window
 end
 
 Given(/^a consumer exists$/) do
