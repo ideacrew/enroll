@@ -104,6 +104,17 @@ RSpec.describe FinancialAssistance::BenefitsController, type: :controller do
     end
   end
 
+  context "create" do
+    it "should create a benefit instance" do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: {start_on: "09/04/2017", end_on: "09/20/2017"}, format: :js
+      expect(applicant.benefits.count).to eq 1
+    end
+    it "should able to save an benefit instance with the 'to' field blank " do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: {start_on: "09/04/2017", end_on: " "}, format: :js
+      expect(applicant.benefits.count).to eq 1
+    end
+  end
+
   context "destroy" do
     it "should delete a benefit instance" do
       expect(applicant.benefits.count).to eq 1

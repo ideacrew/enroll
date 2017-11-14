@@ -8,6 +8,9 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
   let!(:application) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryGirl.create(:applicant, application: application,family_member_id: family.primary_applicant.id) }
   let!(:deduction) {FactoryGirl.create(:financial_assistance_deduction, applicant: applicant)}
+  let!(:valid_deductions_params) {
+    {"kind"=>"alimony_paid", "amount"=>"23.5", "frequency_kind"=>"biweekly", "start_on"=>"09/09/2017", "end_on"=>"09/29/2017"}
+  }
   let!(:deduction_valid_params) {
     {"kind"=>"alimony_paid", "amount"=>"23.5", "frequency_kind"=>"biweekly", "start_on"=>"09/09/2017", "end_on"=>"09/29/2017"}
   }
@@ -82,6 +85,18 @@ RSpec.describe FinancialAssistance::DeductionsController, type: :controller do
       post :step, application_id: application.id , applicant_id: applicant.id, id: deduction.id, deduction: deduction_invalid_params
       expect(flash[:error]).to match("Pppppp Is Not A Valid Deduction Type")
       expect(response).to render_template 'workflow/step'
+    end
+  end
+
+  context "create deductions (income adjustments)" do
+    it "should create a deductions (income adjustments)  instance" do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_deductions_params, format: :js
+      expect(applicant.deductions.count).to eq 1
+    end
+    it "should be able to create a deductions (income adjustments)  instance with the 'to' field blank " do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_deductions_params, format: :js
+      valid_deductions_params["end_on"] = nil
+      expect(applicant.deductions.count).to eq 1
     end
   end
 
