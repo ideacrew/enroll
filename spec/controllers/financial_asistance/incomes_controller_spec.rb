@@ -8,12 +8,11 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
   let!(:application) { FactoryGirl.create(:application,family: family, aasm_state: "draft",effective_date:TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryGirl.create(:applicant, application: application,family_member_id: family.primary_applicant.id) }
   let!(:income) {FactoryGirl.create(:financial_assistance_income, applicant: applicant)}
-  let!(:valid_income_params){ 
-    {"kind"=>"capital_gains", "amount"=>"34.8", "frequency_kind"=>"monthly", "start_on"=>"09/04/2017", "end_on"=>"09/24/2017", "employer_name"=>""}
-  }
-  let!(:invalid_income_params){ 
-    {"kind"=>"ppp", "amount"=>"45.3", "frequency_kind"=>"monthly", "start_on"=>"09/04/2017", "end_on"=>"09/24/2017", "employer_name"=>""}
-  }
+  let!(:valid_job_income_params){ {"kind"=>"wages_and_salaries", "employer_name"=>"sfd", "amount"=>"50001", "frequency_kind"=>"quarterly", "start_on"=>"11/08/2017", "end_on"=>"11/08/2018", "employer_address"=>{"kind"=>"work", "address_1"=>"2nd Main St", "address_2"=>"sfdsf", "city"=>"Washington", "state"=>"DC", "zip"=>"35467"}, "employer_phone"=>{"kind"=>"work", "full_phone_number"=>"(301)-848-8053"}} }
+  let!(:valid_self_employed_income_params){ {"kind"=>"net_self_employment", "amount"=>"23", "frequency_kind"=>"monthly", "start_on"=>"11/01/2017", "end_on"=>"11/23/2017"} }
+  let!(:valid_other_income_params){ {"kind"=>"alimony_and_maintenance", "amount"=>"45", "frequency_kind"=>"biweekly", "start_on"=>"11/01/2017", "end_on"=>"11/30/2017"}}
+  let!(:valid_income_params){ {"kind"=>"capital_gains", "amount"=>"34.8", "frequency_kind"=>"monthly", "start_on"=>"09/04/2017", "end_on"=>"09/24/2017", "employer_name"=>""} }
+  let!(:invalid_income_params){  {"kind"=>"ppp", "amount"=>"45.3", "frequency_kind"=>"monthly", "start_on"=>"09/04/2017", "end_on"=>"09/24/2017", "employer_name"=>""} }
   let(:income_employer_address_params){ {"address_1"=>"23 main st", "address_2"=>"", "city"=>"washington", "state"=>"dc", "zip"=>"12343"}}
   let(:income_employer_phone_params) {{"full_phone_number"=>""}}
 
@@ -75,6 +74,42 @@ RSpec.describe FinancialAssistance::IncomesController, type: :controller do
     it "should render step if model is not saved" do
       post :step, application_id: application.id , applicant_id: applicant.id, id: income.id, income: invalid_income_params, employer_address: income_employer_address_params, employer_phone: income_employer_phone_params
       expect(response).to render_template 'workflow/step'
+    end
+  end
+
+  context "create job income" do
+    it "should create a job income  instance" do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_job_income_params, format: :js
+      expect(applicant.incomes.count).to eq 1
+    end
+    it "should able to save an job income instance with the 'to' field blank " do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_job_income_params, format: :js
+      valid_job_income_params["end_on"] = nil
+      expect(applicant.incomes.count).to eq 1
+    end
+  end
+
+  context "create self employed income" do
+    it "should create a self employed income  instance" do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_self_employed_income_params, format: :js
+      expect(applicant.incomes.count).to eq 1
+    end
+    it "should able to save an self employed income instance with the 'to' field blank " do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_self_employed_income_params, format: :js
+      valid_self_employed_income_params["end_on"] = nil
+      expect(applicant.incomes.count).to eq 1
+    end
+  end
+
+  context "create other income" do
+    it "should create a other income  instance" do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_other_income_params, format: :js
+      expect(applicant.incomes.count).to eq 1
+    end
+    it "should able to save an other income instance with the 'to' field blank " do
+      post :create, application_id: application.id , applicant_id: applicant.id, financial_assistance_benefit: valid_other_income_params, format: :js
+      valid_other_income_params["end_on"] = nil
+      expect(applicant.incomes.count).to eq 1
     end
   end
 
