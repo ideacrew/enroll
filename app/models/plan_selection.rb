@@ -39,7 +39,12 @@ class PlanSelection
 
       hbx_enrollment.special_enrollment_period_id = sep_id
     end
-    hbx_enrollment.select_coverage!(qle: qle)
+    members = hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role)
+    if members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)
+      hbx_enrollment.move_to_contingent!
+    else
+      hbx_enrollment.select_coverage!(qle: qle)
+    end
   end
 
   def self.for_enrollment_id_and_plan_id(enrollment_id, plan_id)
