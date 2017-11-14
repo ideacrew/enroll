@@ -44,9 +44,10 @@
   </table>
 
   <!-- pagination UI -->
+  
   <div class="container-flid text-center">
     <div class="btn-group" role="group" aria-label="...">
-      <% num_of_payments = @employer_profile.try(:employer_profile_account).try(:premium_payments).size %>
+      <% num_of_payments = @employer_profile_account.try(:premium_payments).size %>
       <% if num_of_payments > 10 %>
         <% num_of_pages = (1..paginate_upper_bound(num_of_payments)).to_a %>
         <% num_of_pages.each do |page_num|%>
@@ -63,7 +64,10 @@
       <% end %>
     </div>
   </div>
+  <!-- end pagination UI -->
+
 </div>
+
 <script>
   $('#sso_disabled').click(function(e){
     e.preventDefault();
