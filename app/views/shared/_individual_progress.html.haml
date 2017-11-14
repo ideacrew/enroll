@@ -44,6 +44,8 @@
 - elsif ridp == true && step == 2
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !application_verified
+  - elsif next_link.present?  && current_user.has_hbx_staff_role? && @person.primary_family.application_type == "In Person"
+    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
   - elsif next_link.present?
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => (current_user.has_hbx_staff_role? ? false : !(identity_verified  && application_verified))
   - else
@@ -51,6 +53,8 @@
 - elsif step == 2
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !application_verified
+  - elsif next_link.present?  && current_user.has_hbx_staff_role? && @person.primary_family.application_type == "In Person"
+    = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
   - else next_link.present?
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => (current_user.has_hbx_staff_role? ? false : !(identity_verified  && application_verified))
 - elsif defined? url
