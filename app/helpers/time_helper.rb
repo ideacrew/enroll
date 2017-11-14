@@ -38,8 +38,8 @@ module TimeHelper
       active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
       min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
     elsif has_dual_roles && market_kind == nil
-        active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
-        min_or_max == 'min' ? [beginning_of_year, active_plan_years.map(&:start_on).min].min : [end_of_year, active_plan_years.map(&:end_on).max].max
+      active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:plan_years).map(&:published_or_renewing_published).flatten
+      min_or_max == 'min' ? [beginning_of_year, active_plan_years.map(&:start_on).min].compact.min : [end_of_year, active_plan_years.map(&:end_on).max].compact.max
     end
   end
 
