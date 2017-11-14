@@ -12,6 +12,9 @@
       <%= link_to 'Pay My Bill', @wf_url, id: :sso_disabled, target: :_blank %> to make an online payment now.
     </p>
   <% end %>
+
+<% if @employer_profile.has_premium_payments? %>
+
   <table class="table" id="payments-table">
     <thead>
       <tr>
@@ -44,7 +47,7 @@
   </table>
 
   <!-- pagination UI -->
-  
+
   <div class="container-flid text-center">
     <div class="btn-group" role="group" aria-label="...">
       <% num_of_payments = @employer_profile_account.try(:premium_payments).size %>
@@ -65,6 +68,8 @@
     </div>
   </div>
   <!-- end pagination UI -->
+
+  <% end %>
 
 </div>
 
