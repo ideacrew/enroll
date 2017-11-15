@@ -11,10 +11,7 @@ Background: Hbx Admin navigates into the new consumer application with In Person
   When Admin clicks CONTINUE button
   Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
-
 Scenario: Hbx Admin clicks continue without uploading and verifying an application
   Given the Admin will be navigated to the DOCUMENT UPLOAD page
   When the Admin clicks CONTINUE without uploading and verifying an Identity
   Then the Admin can navigate to the next page and finish the application
-
-
