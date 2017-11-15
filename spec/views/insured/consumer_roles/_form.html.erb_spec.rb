@@ -124,7 +124,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
 
     it "should display all application types options when e_case_id not present" do
       expect(rendered).to have_select("application_type_id")
-      expect(rendered).to have_select("application_type_id", :options => ["choose *","Phone", "In Person", "Paper", "Curam", "Mobile"])
+      expect(rendered).to have_select("application_type_id", :options => ["choose *","Phone", "Paper"])
     end
   end
 end
