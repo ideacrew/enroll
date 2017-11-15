@@ -206,6 +206,24 @@ RSpec.describe Insured::FamilyMembersController do
       end
     end
 
+    describe "with a valid dependent but not applying for coverage" do
+      let(:save_result) { true }
+      let(:dependent_properties) { { "is_applying_coverage" => "false" } }
+
+      it "should assign the dependent" do
+        expect(assigns(:dependent)).to eq dependent
+      end
+
+      it "should assign the created" do
+        expect(assigns(:created)).to eq true
+      end
+
+      it "should render the show template" do
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("show")
+      end
+    end
+
     describe "when update_vlp_documents failed" do
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return false
