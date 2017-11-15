@@ -57,7 +57,14 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     return nil if hbx_enrollments.flatten.compact.empty?
     hbx_enrollments.flatten.compact.each do |enrollment|
       notice.enrollments << append_enrollment_information(enrollment)
-      append_member_information(enrollment)
+    end
+
+    family_members = hbx_enrollments.flatten.compact.inject([]) do |family_members, enrollment|
+      family_members += enrollment.hbx_enrollment_members.map(&:family_member)
+    end.uniq
+
+    family_members.map(&:person).each do |prson|
+      append_member_information(prson)
     end
   end
 
@@ -90,20 +97,18 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     })
   end
 
-  def append_member_information(enrollment)
-    enrollment.hbx_enrollment_members.map(&:person).each do |person|
-      notice.individuals << PdfTemplates::Individual.new({
-        :first_name => person.first_name.titleize,
-        :last_name => person.last_name.titleize,
-        :full_name => person.full_name.titleize,
-        :age => calculate_age_by_dob(person.dob),
-        :incarcerated => person.is_incarcerated? ? "Yes" : "No",
-        :citizen_status => citizen_status(person.citizen_status),
-        :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
-        :is_without_assistance => true,
-        :is_totally_ineligible => is_totally_ineligible(person)
-        })
-    end
+  def append_member_information(member)
+    notice.individuals << PdfTemplates::Individual.new({
+      :first_name => member.first_name.titleize,
+      :last_name => member.last_name.titleize,
+      :full_name => member.full_name.titleize,
+      :age => calculate_age_by_dob(member.dob),
+      :incarcerated => member.is_incarcerated? ? "Yes" : "No",
+      :citizen_status => citizen_status(member.citizen_status),
+      :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
+      :is_without_assistance => true,
+      :is_totally_ineligible => is_totally_ineligible(member)
+      })
   end
 
   def append_data

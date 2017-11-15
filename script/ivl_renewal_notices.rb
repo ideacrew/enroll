@@ -65,7 +65,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         puts "Error for ic_number - #{ic_number} -- #{e}" unless Rails.env.test?
       end
     rescue Exception => e
-      puts "Unable to deliver #{event} notice to #{person.hbx_id} due to the following error #{e.backtrace}" unless Rails.env.test?
+      puts "Unable to deliver #{event} notice to family - #{ic_number} due to the following error #{e.backtrace}" unless Rails.env.test?
     end
 
   end

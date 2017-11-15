@@ -32,7 +32,7 @@
    heading: 'What’s New This Year', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-   content: "For the best prices and plans that meet your medical needs and budget, we encourage to shop, compare and enroll in coverage for #{notice.coverage_year}. Free expert enrollment assistance, and online support tools are available to help you and your family make informed decisions. You may also be eligible for reduced monthly premiums."} %>
+   content: "For the best prices and plans that meet your medical needs and budget, we encourage you to shop, compare and enroll in coverage for #{notice.coverage_year}. Free expert enrollment assistance, and online support tools are available to help you and your family make informed decisions. You may also be eligible for reduced monthly premiums."} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["Each year, the federal government requires us to confirm that you still qualify to get coverage through #{Settings.site.short_name}. Based on our records, and any updates you gave us, your results are as follows:"],
@@ -54,7 +54,7 @@
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["We are in the process of checking the information on your application with our electronic data sources, as federal law requires. If your information does not match the data sources, we will ask you to provide documents proving your information. <strong>You could lose your insurance if you don’t respond to our request for documents by the deadline included in our request. Your final eligibility results contained in this letter may also change.</strong>"],
+ contents: ["We are in the process of checking the information on your application with our electronic data sources, as federal law requires. If your information does not match the data sources, we will ask you to provide documents proving your information.  If we ask you for documents, and you don’t respond by the deadline, you could lose your insurance.  Your final eligibility results contained in this letter may also change."],
    heading: 'Verifying Your Information', sub_heading: '', bottom_margin: '5px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -163,12 +163,4 @@ content: "If you have questions or concerns, we’re here to help.<br></br>The #
   "Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
   "Annual open enrollment period: 45 CFR § 155.155.410(e)",
   "Special enrollment periods: 45 CFR § 155.420",
-  "Requirement to report changes: 45 CFR § 155.330(b)",
-  "<i>Medicaid Regulations</i>",
-  "State residence: 42 CFR § 435.403",
-  "Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
-  "Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
-  "Medicaid determination of eligibility: 42 CFR § 435.911",
-  "Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
-  "Verification of other non-financial information: 42 CFR § 435.956",
-  "Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
+  "Requirement to report changes: 45 CFR § 155.330(b)"]} %>
