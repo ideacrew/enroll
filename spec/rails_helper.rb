@@ -62,6 +62,7 @@ RSpec.configure do |config|
   config.include ControllerHelpers, :type => :controller #stubbed logins for unit testing
   config.include Devise::TestHelpers, :type => :helper
   config.include FactoryGirl::Syntax::Methods
+  config.example_status_persistence_file_path = "tmp/rspec_failures.txt"
 
   config.infer_spec_type_from_file_location!
 
