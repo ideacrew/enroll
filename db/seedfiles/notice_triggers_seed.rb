@@ -901,6 +901,7 @@ shop_notice_triggers = [
                 name: 'Notice to employer when employee terminates coverage',
                 notice_template: 'notices/shop_employee_notices/employee_terminating_coverage',
                 notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
+                # used unique MPI indicator with two event names
                 mpi_indicator: 'SHOP_M040',
                 notice_trigger_element_group: {
                     market_places: ['shop'],
