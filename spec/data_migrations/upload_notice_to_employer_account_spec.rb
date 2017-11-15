@@ -10,9 +10,10 @@ describe UploadNoticeToEmployerAccount, dbclean: :after_each do
   let(:bucket_name) { 'notices' }
   let(:file_path) { File.dirname(__FILE__) }
   let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key" }
-  let!(:employer_profile)  { FactoryGirl.create(:employer_profile, organization: organization, plan_years: [plan_year]) }
+  let!(:employer_profile)  { EmployerProfile.new(organization: organization, plan_years: [plan_year]) }
 
   before(:each) do
+    employer_profile.save(:validate => false)
     allow(ENV).to receive(:[]).with('fein').and_return(organization.fein)
     allow(ENV).to receive(:[]).with('notice_name').and_return('Special Enrollment Denial Notice')
     allow(ENV).to receive(:[]).with('file_path').and_return(file_path)
