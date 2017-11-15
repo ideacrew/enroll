@@ -16,7 +16,7 @@ class ShopEnrollmentsPublisher
   end
 end
 
-enrollment_kinds = ["employer_sponsored"]
+enrollment_kinds = ["employer_sponsored", "employer_sponsored_cobra"]
 
 purchase_ids = Family.collection.aggregate([
   {"$match" => {
