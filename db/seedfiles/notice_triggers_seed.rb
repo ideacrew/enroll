@@ -765,6 +765,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP10023',
     title: 'Employee Terminating coverage',
@@ -786,6 +787,7 @@ shop_notice_triggers = [
       }
     ]
   },
+
   {
     hbx_id: 'SHOP42',
     title: 'Employee Plan Selection Confirmation',
@@ -809,7 +811,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOP43',
+    hbx_id: 'SHOP_D001',
     title: 'Welcome to DC Health Link',
     description: 'ER creates an account in DC Health',
     resource_name: 'employer',
@@ -819,7 +821,7 @@ shop_notice_triggers = [
         name: 'Welcome Notice sent to Employer',
         notice_template: 'notices/shop_employer_notices/employer_account_creation_notice',
         notice_builder: 'ShopEmployerNotices::EmployerAccountCreationNotice',
-        mpi_indicator: 'MPI_SHOP43',
+        mpi_indicator: 'SHOP_D001',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

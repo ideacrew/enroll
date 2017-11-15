@@ -9,7 +9,7 @@ RSpec.describe ShopEmployerNotices::EmployerAccountCreationNotice, :dbclean => :
                             :notice_template => 'notices/shop_employer_notices/employer_account_creation_notice',
                             :notice_builder => 'ShopEmployerNotices::EmployerAccountCreationNotice',
                             :event_name => 'employer_account_creation_notice',
-                            :mpi_indicator => 'MPI_SHOP43',
+                            :mpi_indicator => 'SHOP_D001',
                             :title => "Welcome Notice to Employer"})
                           }
 
