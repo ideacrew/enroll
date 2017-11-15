@@ -16,6 +16,7 @@ module PdfTemplates
     attribute :primary_address, PdfTemplates::NoticeAddress
     attribute :hbe, PdfTemplates::Hbe
     attribute :broker, PdfTemplates::Broker
+    attribute :general_agency_account_start_on, Date
 
     def shop?
       return true

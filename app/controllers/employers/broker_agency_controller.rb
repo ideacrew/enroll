@@ -40,14 +40,13 @@ class Employers::BrokerAgencyController < ApplicationController
     authorize EmployerProfile, :updateable?
     broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
     broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-
     if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
       @employer_profile.broker_role_id = broker_role_id
       @employer_profile.hire_broker_agency(broker_agency_profile)
       if broker_agency_profile.default_general_agency_profile.present?
         @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
         send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
-        general_agency_hired_notice(default_general_agency_profile, @employer_profile) # broker hired and broker has default GA assigned
+        broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
       end
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)

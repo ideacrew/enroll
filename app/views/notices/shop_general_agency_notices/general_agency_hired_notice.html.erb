@@ -29,7 +29,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', locals: {
- content: "Congratulations! You have been selected as the General Agency for <strong>#{notice.general_agency.employer}</strong> as of <strong>#{TimeKeeper.date_of_record}</strong>. The broker for this <strong>#{notice.general_agency.employer}</strong> is <strong>#{notice.general_agency.broker_fullname}</strong> and the primary contact for the group is <strong>#{notice.general_agency.employer_fullname}</strong>."} %>
+ content: "Congratulations! You have been selected as the General Agency for <strong>#{notice.general_agency.employer}</strong> as of <strong>#{notice.general_agency.general_agency_account_start_on}</strong>. The broker for this <strong>#{notice.general_agency.employer}</strong> is <strong>#{notice.general_agency.broker_fullname}</strong> and the primary contact for the group is <strong>#{notice.general_agency.employer_fullname}</strong>."} %>
 
  <%= render partial: 'notices/shared/paragraph', locals: {
  content: "If you need resources in assisting your new client, please look to <a href=https://dchealthlink.com/forms>DCHealthLink.com/forms</a>."} %>

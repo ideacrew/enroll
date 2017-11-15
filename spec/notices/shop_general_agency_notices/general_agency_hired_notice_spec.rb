@@ -13,7 +13,7 @@ RSpec.describe ShopGeneralAgencyNotices::GeneralAgencyHiredNotice, :dbclean => :
                             :name =>'General Agency hired notification',
                             :notice_template => 'notices/shop_general_agency_notices/general_agency_hired_notice',
                             :notice_builder => 'ShopGeneralAgencyNotices::GeneralAgencyHiredNotice',
-                            :mpi_indicator => 'MPI_SHOPDX0085',
+                            :mpi_indicator => 'SHOP_D085',
                             :event_name => 'general_agency_hired_notice',
                             :title => "Employer has hired you as a General agency"})
                           }
@@ -23,7 +23,7 @@ RSpec.describe ShopGeneralAgencyNotices::GeneralAgencyHiredNotice, :dbclean => :
       :event_name => application_event.event_name,
       :template => application_event.notice_template,
       :options => {
-        :employer_profile => employer_profile
+        :employer_profile_id => employer_profile.id.to_s
       }
   }}
 

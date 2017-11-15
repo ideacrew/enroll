@@ -198,7 +198,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
         @broker_agency_profile.employer_clients.each do |employer_profile|
-          general_agency_hired_notice(@general_agency_profile, employer_profile) # GA notice when broker selects a default GA 
+          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
         end
       end
       @broker_agency_profile.save
@@ -305,7 +305,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
             employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
             employer_profile.save
             send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
-            general_agency_hired_notice(general_agency_profile, employer_profile) #GA notice when broker Assign a GA to employers
+            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
           end
         end
         flash.now[:notice] ="Assign successful."
@@ -328,14 +328,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       notice = "Unassign successful."
     end
     redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
-  end
-
-  def general_agency_hired_notice(general_agency_profile, employer_profile)
-    begin
-      ShopNoticesNotifierJob.perform_later(general_agency_profile.id.to_s, "general_agency_hired_notice", employer_profile: employer_profile)
-    rescue Exception => e
-      (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{general_agency_profile.legal_name} due to #{e}"}) unless Rails.env.test?
-    end
   end
 
   def clear_assign_for_employer
