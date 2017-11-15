@@ -2,6 +2,7 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include Acapi::Notifiers
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
@@ -321,6 +322,10 @@ class Insured::ConsumerRolesController < ApplicationController
   def set_error_message(message)
     if message.include? "year too big to marshal"
       return "Date of birth cannot be more than 110 years ago"
+    elsif message.downcase.include? "execution error"
+      id = @person.present? ? @person.id : nil
+      log("#19441 person_id: #{id}, message: #{message}, params: #{params}", {:severity => "error"})
+      return message
     else
       return message
     end
