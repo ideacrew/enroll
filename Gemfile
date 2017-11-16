@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.7.1'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -70,7 +70,7 @@ gem 'haml'
 # gem 'bh'
 
 # spreadsheet support
-gem 'roo', '~> 2.7.0'
+gem 'roo', '~> 2.1.0'
 
 # configuration support
 gem "config", '~> 1.0.0'
