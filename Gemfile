@@ -71,7 +71,7 @@ gem 'haml'
 # gem 'bh'
 
 # spreadsheet support
-gem 'roo', '~> 2.7.0'
+gem 'roo', '~> 2.1.0'
 
 # configuration support
 gem "config", '~> 1.0.0'
