@@ -843,8 +843,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_unpublishable?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :dental_carriers_exiting_shop_notice_to_ee]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible? , :after => [:trigger_renewal_notice, :zero_employees_on_roster, :dental_carriers_exiting_shop_notice_to_ee]
       transitions from: :renewing_draft, to: :renewing_publish_pending
     end
 
@@ -864,8 +864,8 @@ class PlanYear
       transitions from: :draft, to: :publish_pending, :after => :initial_employer_denial_notice
 
       transitions from: :renewing_draft, to: :renewing_draft,     :guard => :is_application_invalid?
-      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster]
-      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster]
+      transitions from: :renewing_draft, to: :renewing_enrolling, :guard => [:is_application_eligible?, :is_event_date_valid?], :after => [:accept_application, :trigger_renewal_notice, :zero_employees_on_roster, :dental_carriers_exiting_shop_notice_to_ee]
+      transitions from: :renewing_draft, to: :renewing_published, :guard => :is_application_eligible?, :after => [:trigger_renewal_notice, :zero_employees_on_roster, :dental_carriers_exiting_shop_notice_to_ee]
       transitions from: :renewing_draft, to: :renewing_publish_pending, :after => [:employer_renewal_eligibility_denial_notice, :notify_employee_of_renewing_employer_ineligibility]
     end
 
@@ -1196,6 +1196,22 @@ class PlanYear
         ShopNoticesNotifierJob.perform_later(self.employer_profile.id.to_s, "employer_renewal_eligibility_denial_notice")
       rescue Exception => e
         Rails.logger.error { "Unable to deliver employer renewal eligiblity denial notice for #{self.employer_profile.organization.legal_name} due to #{e}" }
+      end
+    end
+  end
+
+  def dental_carriers_exiting_shop_notice_to_ee
+    if !self.start_on.beginning_of_year
+      self.employer_profile.census_employees.non_terminated.each do |ce|
+        begin
+          hbx_enrollment = ce.active_benefit_group_assignment.hbx_enrollment
+          carrier_name = hbx_enrollment.plan.carrier_profile.organization.legal_name
+          if ["Delta Dental", "MetLife"].include?(carrier_name)
+            ShopNoticesNotifierJob.perform_later(ce.id.to_s, "dental_carriers_exiting_shop_notice_to_ee", { :hbx_enrollment => hbx_enrollment.hbx_id.to_s})
+          end
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver dental_carriers_exiting_shop_notice_to_ee to Employee with id: #{ce.id.to_s} due to #{e}" }
+        end
       end
     end
   end
