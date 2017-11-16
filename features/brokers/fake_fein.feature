@@ -6,7 +6,7 @@ Feature: Fake FEINs
 
 Scenario: Primary Broker should not see FAKE Fein in his account
   When Primary Broker visits the HBX Broker Registration form
-
+  Given a valid ach record exists
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information
@@ -46,6 +46,7 @@ Scenario: Hbx Admin should see broker's actual FEIN
 
 Scenario: Hbx Admin should see fake fein in broker's account
   When Primary Broker visits the HBX Broker Registration form
+  Given a valid ach record exists
   Given Primary Broker has not signed up as an HBX user
   Then Primary Broker should see the New Broker Agency form
   When Primary Broker enters personal information

@@ -1,4 +1,9 @@
 module Config::SiteHelper
+
+  def site_redirect_on_timeout_route
+    Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
+  end
+  
   def site_byline
     Settings.site.byline
   end
@@ -23,6 +28,10 @@ module Config::SiteHelper
     Settings.site.home_url
   end
 
+  def site_curam_enabled?
+    Settings.site.curam_enabled
+  end
+  
   def site_home_link
     link_to site_home_url, site_home_url
   end
@@ -41,10 +50,6 @@ module Config::SiteHelper
 
   def site_nondiscrimination_notice_url
     Settings.site.nondiscrimination_notice_url
-  end
-
-  def link_to_site_business_resource_center
-    link_to "Business Resource Center", site_business_resource_center_url
   end
     
   def site_policies_url
@@ -75,10 +80,6 @@ module Config::SiteHelper
     Settings.site.main_web_address
   end
 
-  def site_main_web_address_url
-    Settings.site.main_web_address_url
-  end
-
   def site_main_web_link
     link_to site_website_name, site_main_web_address_url
   end
@@ -97,6 +98,10 @@ module Config::SiteHelper
 
   def ivl_login_url
     Settings.site.ivl_login_url
+  end
+
+  def site_main_web_address_url
+     Settings.site.main_web_address_url
   end
 
   def site_uses_default_devise_path?

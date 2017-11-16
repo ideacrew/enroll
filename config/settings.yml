@@ -24,6 +24,7 @@ site:
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   use_default_devise_path: true
+  plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
@@ -74,6 +75,11 @@ contact_center:
     phone_3: "800-537-7697"
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
+plan_option_titles:
+  sole_source: 'One Plan'
+  metal_level: 'One Level'
+  single_carrier: 'One Carrier'
+
 notices:
   mailing_address:
     address_1:
@@ -89,15 +95,22 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   dental_market_enabled: false
+  dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
-  plan_options_available: ["sole_source"]
+  plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-#
+  reference_carriers_for_metal_level: ["silver", "gold", "dental"]
+    ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+
+  plan_option_years:
+    single_carriers_available: ['2018']
+    sole_source_carriers_available: ['2017','2018']
+    metal_level_carriers_available: ['2018']
+
   qle:
     with_in_sixty_days: 60
 #
-
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
