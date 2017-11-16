@@ -5,7 +5,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
   let(:model_event)  { "ineligible_renewal_application_submitted" }
   let(:notice_event) { "ineligible_renewal_application_submitted" }
 
-  let(:start_on) { (TimeKeeper.date_of_record + 1.months).beginning_of_month }
+  let(:start_on) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
 
   let!(:employer) {
     FactoryGirl.create(:employer_with_renewing_planyear, start_on: start_on, renewal_plan_year_state: 'renewing_draft')
