@@ -89,6 +89,13 @@ module Observers
             trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event: "renewal_plan_year_first_reminder_before_soft_dead_line")
           end
         end
+
+        if model_event.event_key == :renewal_plan_year_publish_dead_line
+          organizations_for_force_publish(TimeKeeper.date_of_record).each do |organization|
+              plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+              trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:"renewal_plan_year_publish_dead_line" )
+          end
+        end
       end
     end
 

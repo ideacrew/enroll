@@ -13,11 +13,10 @@ module Observers
     end
 
     def organizations_for_force_publish(new_date)
-      Organization.where({:'employer_profile.plan_years' =>
-                                 {:$elemMatch => {
-                                     :start_on => new_date.next_month.beginning_of_month,
-                                     :aasm_state => 'renewing_draft'
-                                 }}
+      Organization.where({:'employer_profile.plan_years' => {:$elemMatch => {
+          :start_on => new_date.next_month.beginning_of_month,
+          :aasm_state => 'renewing_draft'
+      }}
                          })
     end
   end
