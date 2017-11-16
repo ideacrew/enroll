@@ -26,6 +26,8 @@ class CensusMember
   embeds_one :email
   accepts_nested_attributes_for :email, allow_destroy: true
 
+  validates_with Validations::SocialSecurityValidator
+
   validates_presence_of :first_name, :last_name, :dob, :employee_relationship
 
   validates :gender,
@@ -33,7 +35,7 @@ class CensusMember
     inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
   validates :ssn,
-    length: { minimum: 9, maximum: 9, message: "SSN must be 9 digits" },
+    length: { minimum: 9, maximum: 9, message: "must be 9 digits" },
     allow_blank: true,
     numericality: true
 

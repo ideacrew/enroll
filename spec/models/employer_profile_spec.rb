@@ -454,7 +454,7 @@ end
 
 describe EmployerProfile, "given an unlinked, linkable census employee with a family" do
   let(:census_dob) { Date.new(1983,2,15) }
-  let(:census_ssn) { "123456789" }
+  let(:census_ssn) { "123416789" }
 
   let(:benefit_group) { FactoryGirl.create(:benefit_group) }
   let(:plan_year) { benefit_group.plan_year }

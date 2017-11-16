@@ -18,7 +18,7 @@ describe ActivateBenefitGroupAssignment do
     # let!(:benefit_group2)     { FactoryGirl.create(:benefit_group, plan_year: plan_year)}
     # let!(:plan_year)         { FactoryGirl.create(:plan_year, aasm_state: "draft", employer_profile: employer_profile) }
     # let(:employer_profile)  { FactoryGirl.create(:employer_profile) }
-    let!(:census_employee) { FactoryGirl.create(:census_employee,ssn:"123456789")}
+    let!(:census_employee) { FactoryGirl.create(:census_employee)}
 
     let!(:benefit_group_assignment1)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
     let!(:benefit_group_assignment2)  { FactoryGirl.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
