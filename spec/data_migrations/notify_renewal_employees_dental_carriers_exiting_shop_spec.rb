@@ -23,6 +23,10 @@ describe NotifyRenewalEmployeesDentalCarriersExitingShop do
     let!(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee_id: census_employee.id) }
     let!(:census_employee) { FactoryGirl.create(:census_employee) }
 
+    before(:each) do
+      allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
+    end
+
     it "should trigger notify_renewal_employees_dental_carriers_exiting_shop job in queue" do
       ActiveJob::Base.queue_adapter = :test
       ActiveJob::Base.queue_adapter.enqueued_jobs = []
