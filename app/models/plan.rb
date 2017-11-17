@@ -63,6 +63,11 @@ class Plan
   field :dental_level, type: String
   field :carrier_special_plan_identifier, type: String
 
+  # offerings
+  field :is_horizontal, type: Boolean, default: true
+  field :is_vertical, type: Boolean, default: true
+  field :is_sole_source, type: Boolean, default: true
+
   # In MongoDB, the order of fields in an index should be:
   #   First: fields queried for exact values, in an order that most quickly reduces set
   #   Second: fields used to sort
@@ -143,13 +148,17 @@ class Plan
   ## Scopes
   default_scope -> {order("name ASC")}
 
+  #filter based on plan offerings
+  scope :check_plan_offerings_for_metal_level,  ->{ where(is_horizontal: "true") }
+  scope :check_plan_offerings_for_single_carrier,  ->{ where(is_vertical: "true") }
+  scope :check_plan_offerings_for_sole_source,  ->{ where(is_sole_source: "true") }
+
   # Metal level
   scope :platinum_level,      ->{ where(metal_level: "platinum") }
   scope :gold_level,          ->{ where(metal_level: "gold") }
   scope :silver_level,        ->{ where(metal_level: "silver") }
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
-
 
   scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
 
@@ -297,12 +306,12 @@ class Plan
 
   def self.for_service_areas_and_carriers(service_area_carrier_pairs, active_year, metal_level = nil, coverage_kind = 'health')
     plan_criteria_set = service_area_carrier_pairs.map do |sap|
-    	criteria = {
-    		:carrier_profile_id => sap.first,
-    		:service_area_id => sap.last,
-    		:active_year => active_year,
+      criteria = {
+        :carrier_profile_id => sap.first,
+        :service_area_id => sap.last,
+        :active_year => active_year,
         :coverage_kind => coverage_kind
-    	}
+      }
       if metal_level.present?
         criteria.merge(metal_level: metal_level)
       end
@@ -457,13 +466,17 @@ class Plan
       result
     end
 
-    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+    def open_enrollment_year
+      Organization.open_enrollment_year
+    end
+
+    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
       Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
         Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
       end
     end
 
-    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year, carrier_service_area_pairs=[])
+    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year, carrier_service_area_pairs=[])
       Plan.for_service_areas_and_carriers(carrier_service_area_pairs, year_of_plans)
     end
 
@@ -473,7 +486,7 @@ class Plan
       Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile).uniq
     end
 
-    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=TimeKeeper.date_of_record.year)
+    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
       Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
         Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
       end

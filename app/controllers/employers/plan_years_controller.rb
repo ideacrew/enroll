@@ -1,6 +1,6 @@
 class Employers::PlanYearsController < ApplicationController
-  before_action :find_employer, except: [:recommend_dates]
-  before_action :generate_carriers_and_plans, except: [:recommend_dates, :generate_dental_carriers_and_plans]
+  before_action :find_employer
+  before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
   layout "two_column"
 
@@ -37,18 +37,24 @@ class Employers::PlanYearsController < ApplicationController
     @dental_plans = Plan.by_active_year(params[:start_on]).shop_market.dental_coverage.all
 
     offering_query = Queries::EmployerPlanOfferings.new(@employer_profile)
-    @plans = if params[:plan_option_kind] == "single_carrier"
+    @plans = case params[:plan_option_kind]
+    when "single_carrier"
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       offering_query.single_carrier_offered_health_plans(params[:carrier_id], params[:start_on])
-    elsif params[:plan_option_kind] == "metal_level"
+    when "metal_level"
       @metal_level = params[:metal_level]
       offering_query.metal_level_offered_health_plans(params[:metal_level], params[:start_on])
-    elsif ["single_plan", "sole_source"].include?(params[:plan_option_kind])
+    when "single_plan"
       @single_plan = params[:single_plan]
       @carrier_id = params[:carrier_id]
       @carrier_profile = CarrierProfile.find(params[:carrier_id])
       offering_query.single_option_offered_health_plans(params[:carrier_id], params[:start_on])
+    when "sole_source"
+      @single_plan = params[:single_plan]
+      @carrier_id = params[:carrier_id]
+      @carrier_profile = CarrierProfile.find(params[:carrier_id])
+      offering_query.sole_source_offered_health_plans(params[:carrier_id], params[:start_on])
     end
     @carriers_cache = CarrierProfile.all.inject({}){|carrier_hash, carrier_profile| carrier_hash[carrier_profile.id] = carrier_profile.legal_name; carrier_hash;}
     respond_to do |format|
@@ -301,6 +307,23 @@ class Employers::PlanYearsController < ApplicationController
       start_on = params[:start_on].to_date
       @result = PlanYear.check_start_on(start_on)
       if @result[:result] == "ok"
+        @plan_year = build_plan_year
+        @benefit_group = params[:benefit_group]
+        @location_id = params[:location_id]
+        @start_on = params[:start_on].to_date.year
+
+        ## TODO: different if we dont have service areas enabled
+        ## TODO: awfully slow
+        @single_carriers = Organization.load_carriers(
+                            primary_office_location: @employer_profile.organization.primary_office_location,
+                            selected_carrier_level: 'single_carrier',
+                            active_year: @start_on
+                            )
+        @sole_source_carriers = Organization.load_carriers(
+                            primary_office_location: @employer_profile.organization.primary_office_location,
+                            selected_carrier_level: 'sole_source',
+                            active_year: @start_on
+                            )
         @open_enrollment_dates = PlanYear.calculate_open_enrollment_date(start_on)
         @schedule= PlanYear.shop_enrollment_timetable(start_on)
       end
@@ -358,7 +381,7 @@ class Employers::PlanYearsController < ApplicationController
         errors = @plan_year.application_errors.values + @plan_year.open_enrollment_date_errors.values
         flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
       end
-      
+
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
     end
   end
@@ -414,6 +437,22 @@ class Employers::PlanYearsController < ApplicationController
     respond_to do |format|
       format.js
     end
+  end
+
+  def generate_health_carriers_and_plans
+    @plan_year = build_plan_year
+    @benefit_group = params[:benefit_group]
+    @location_id = params[:location_id]
+    @start_on = params[:start_on]
+    @carrier_search_level = params[:selected_carrier_level]
+
+    ## TODO: different if we dont have service areas enabled
+    ## TODO: awfully slow
+    @carrier_names = Organization.load_carriers(
+                        primary_office_location: @employer_profile.organization.primary_office_location,
+                        selected_carrier_level: params[:selected_carrier_level],
+                        active_year: @start_on
+                        )
   end
 
   private

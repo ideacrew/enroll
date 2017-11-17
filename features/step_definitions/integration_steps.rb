@@ -213,9 +213,10 @@ Given(/^User has existing security questions/) do
 end
 
 Given(/^Hbx Admin exists$/) do
-  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true)
+  p_staff=Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true,
+                            list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                            modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_lock_unlock: true,
+                            can_reset_password: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryGirl.create :hbx_profile
   user = FactoryGirl.create :user, :with_family, :hbx_staff, with_security_questions: false, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -334,7 +335,8 @@ Given(/(.*) Employer for (.*) exists with active and renewing plan year/) do |ki
     first_name: person[:first_name],
     last_name: person[:last_name],
     ssn: person[:ssn],
-    dob: person[:dob_date]
+    dob: person[:dob_date],
+    email: FactoryGirl.build(:email, address: person[:email])
 
   earliest_enrollment_available = TimeKeeper.date_of_record.next_month.beginning_of_month
 
@@ -388,7 +390,6 @@ Given(/(.*) Employer for (.*) exists with active and expired plan year/) do |kin
 end
 
 Given(/(.*) Employer for (.*) exists with active and renewing enrolling plan year/) do |kind, named_person|
-  TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
   person = people[named_person]
   FactoryGirl.create(:rating_area, zip_code: "01002", county_name: "Franklin", rating_area: Settings.aca.rating_areas.first)
   organization = FactoryGirl.create :organization, :with_active_and_renewal_plan_years, legal_name: person[:legal_name], dba: person[:dba], fein: person[:fein]
@@ -641,6 +642,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   # TODO: fix this bombing issue
   wait_for_ajax
   page.evaluate_script("window.location.reload()")
+  wait_for_ajax
   person = people[named_person]
   screenshot("before modal")
   # find('.interaction-click-control-click-here').click
@@ -781,7 +783,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 When(/^.+ selects? a plan on the plan shopping page$/) do
-  click_link 'Select Plan'
+  first(:link, 'Select Plan').click
 end
 
 Then(/^.+ should see the coverage summary page$/) do

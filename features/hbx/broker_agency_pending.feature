@@ -1,7 +1,18 @@
 Feature: HBX Admin should be able to send the broker application to pending state
 
+  Scenario: Broker can enter ACH information
+    When Primary Broker visits the HBX Broker Registration form
+    Given a valid ach record exists
+    Given Primary Broker has not signed up as an HBX user
+    Then Primary Broker should see the New Broker Agency form
+    When Primary Broker enters personal information
+    And Primary Broker enters broker agency information for SHOP markets
+    And Primary Broker enters office location for default_office_location
+    Then Primary Broker should see bank information
+
   Scenario: HBX Admin sends a Broker Applicant to a pending state
     When Primary Broker visits the HBX Broker Registration form
+    Given a valid ach record exists
     Given Primary Broker has not signed up as an HBX user
     Then Primary Broker should see the New Broker Agency form
     When Primary Broker enters personal information

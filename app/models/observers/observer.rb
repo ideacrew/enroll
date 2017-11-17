@@ -19,6 +19,5 @@ module Observers
       }}
                          })
     end
-
   end
 end

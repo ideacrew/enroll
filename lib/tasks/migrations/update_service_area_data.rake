@@ -7,7 +7,7 @@ namespace :update_service_reference do
     ACTIVE_YEAR = 2017
     count = 0
     begin
-      file_path = File.join(Rails.root, 'lib', 'xls_templates', args[:file_name])
+      file_path = File.join(Rails.root, 'db/seedfiles/plan_xmls', Settings.aca.state_abbreviation.downcase, 'xls_templates', args[:file_name])
 
       raise "active_year not present" if args[:active_year].blank?
       raise "issuer_hios_id not present" if args[:issuer_hios_id].blank?
