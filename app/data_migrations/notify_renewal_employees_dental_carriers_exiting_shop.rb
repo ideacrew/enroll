@@ -6,7 +6,7 @@ class NotifyRenewalEmployeesDentalCarriersExitingShop < MongoidMigrationTask
       hbx_ids = ENV['hbx_id'].split(',').map(&:lstrip)
       hbx_ids.each do |hbx_id|
         person = Person.where(hbx_id: hbx_id).first
-        enrollments = person.primary_family.active_household.hbx_enrollments.by_coverage_kind("dental").shop_market.select{ |enr| enr.plan.present?} if (person.present? && person.primary_family.present?)
+        enrollments = person.primary_family.active_household.hbx_enrollments.enrolled.by_coverage_kind("dental").shop_market.select{ |enr| enr.plan.present?} if (person.present? && person.primary_family.present?)
         next if !enrollments.present?
         enrollments.each do |hbx_enrollment|
           if ["Delta Dental", "MetLife"].include?(hbx_enrollment.plan.carrier_profile.organization.legal_name)
