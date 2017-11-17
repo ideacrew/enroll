@@ -41,6 +41,10 @@ def document_due_date(family)
   end
 end
 
+def is_family_renewing(family)
+  family.active_household.hbx_enrollments.where(:aasm_state.in => ["coverage_selected", "enrolled_contingent"], kind: "individual", effective_on: Date.new(2017,1,1)).present?
+end
+
 def check_for_outstanding_verification_types(person)
   outstanding_verification_types = []
 
@@ -61,6 +65,7 @@ end
 while offset <= family_count
   Family.offset(offset).limit(batch_size).flat_map(&:households).flat_map(&:hbx_enrollments).each do |policy|
     begin
+      next if !is_family_renewing(policy.family)
       next if policy.plan.nil?
       next if !plan_ids.include?(policy.plan_id)
       next if policy.effective_on < Date.new(2018, 01, 01)
