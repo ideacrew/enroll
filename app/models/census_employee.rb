@@ -514,16 +514,6 @@ class CensusEmployee < CensusMember
     self.census_dependents.detect{|cd| cd.id.to_s == id}
   end
 
-  #  def cobra_dependent_find(id)
-  #   self.employee_role.person.families.each do |fam|
-  #     fam.households.each do |households|
-  #       households.hbx_enrollments.each do |hbx|
-  #          hbx.family_members.detect{|cd| cd.id.to_s == id}
-  #        end
-  #      end
-  #    end
-  # end
-
   class << self
 
     def enrolled_count(benefit_group)

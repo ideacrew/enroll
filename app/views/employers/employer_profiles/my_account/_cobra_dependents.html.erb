@@ -1,13 +1,4 @@
 <% if census_employee.can_elect_cobra? %>
-  <!-- <tr class="">
-    <td class="confirm-terminate-wrapper" colspan="3">
-      <span>Employment Termination Date: </span>
-      <span><%= format_date census_employee.employment_terminated_on %></span>
-    </td>
-    <td class="confirm-cobra-wrapper" colspan="6" id="enter-date">
-      <%=cobra_effective_date(census_employee) %>
-    </td>
-  </tr> -->
   <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <td class="confirm-terminate-wrapper" colspan="9">
       <span>Please Choose how the COBRA/Continuation enrollment(s) will be grouped</span>
@@ -45,7 +36,6 @@
   <tr class="collapse" id="childrensMessage">
     <td colspan="9" style="color:red">
     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Please contact Customer Service  phone/email for assistance </br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;processing your request to create a child(ren) only household.</span>
-  <!-- </td> -->
   </td>
   </tr>
 </tr>
@@ -81,10 +71,6 @@
     <td class="confirm-cobra-wrapper" colspan="4" id="enter-date">
       <%=cobra_effective_date(census_employee) %>
     </td>
-    <!-- <td class="col-md-6" colspan="4">
-    <input name='name' value="" type="text" class="form-control date-picker col-md-2"
-       data-date-format="yyyy-mm-dd"/>
-    </td> -->
   </tr>
   <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <td class="confirm-terminate-wrapper" colspan="9">
