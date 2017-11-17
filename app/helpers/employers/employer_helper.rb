@@ -211,4 +211,8 @@ module Employers::EmployerHelper
     (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
   end
 
+  def get_census_dependent_id(hbx_enrollment_member,census_employee)
+    census_employee.census_dependents.detect{|d| hbx_enrollment_member.person.full_name == d.full_name }.try(:id)
+  end
+
 end

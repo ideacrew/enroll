@@ -55,36 +55,20 @@
     <th>Enroll as Cobra/Continuation?</th>
     <th>Relationship:</th>
   </tr>
+  <% hbx_enrollment_members= census_employee.active_benefit_group_assignment.try(:hbx_enrollment).try(:hbx_enrollment_members);
+  hbx_enrollment_members.try(:each) do |hbx_enrollment_member| %>
   <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
     <td>
-      <%= census_employee.full_name %>
+       <%= hbx_enrollment_member.person.full_name %>
     </td>
     <td>
       <input name="cobra_options_is_cobra" type="checkbox">
-      <input type="hidden" name="cobra_options_id" data-dependent="false" value="<%= census_employee.id %>">
-    </td>
-    <td colspan="1">
-        <div class="dropdown">
-          <select name="cobra_options_type" >
-            <option value="primary">Primary</option>
-            <option value="Dependent">Dependent</option>
-          </select>
-        </div>
-    </td>
-  </tr>
-  <%census_employee.census_dependents.each do |dependent| %>
-  <tr class="unbrd cobra_confirm cobra_confirm_<%= census_employee.id %> dn">
-    <td>
-       <%= dependent.full_name %>
-    </td>
-    <td>
-      <input name="cobra_options_is_cobra" type="checkbox">
-      <input type="hidden" name="cobra_options_id" data-dependent="true" value="<%= dependent.id %>">
+      <input type="hidden" name="cobra_options_id" data-dependent="true" value="<%=get_census_dependent_id(hbx_enrollment_member,census_employee)%>">
     </td>
     <td>
         <div class="dropdown">
           <select name="cobra_options_type">
-            <% if ['spouse'].include?(dependent.employee_relationship.downcase) %>
+            <% if ['spouse','self'].include?(hbx_enrollment_member.primary_relationship.downcase) %>
               <option value="primary">Primary</option>
             <%end%>
             <option value="Dependent">Dependent</option>

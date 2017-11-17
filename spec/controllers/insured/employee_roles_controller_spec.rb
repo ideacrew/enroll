@@ -217,23 +217,23 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :after_each do
       end
     end
 
-    context "can not construct_employee_role" do
-      before :each do
-        allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
-        allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
-        request.env["HTTP_REFERER"] = "/"
-        sign_in(user)
-        post :create, :employment_relationship => employment_relationship_properties
-      end
+    # context "can not construct_employee_role" do
+    #   before :each do
+    #     allow(Forms::EmploymentRelationship).to receive(:new).with(employment_relationship_properties).and_return(employment_relationship)
+    #     allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).with(user, census_employee, employment_relationship).and_return([nil, nil])
+    #     request.env["HTTP_REFERER"] = "/"
+    #     sign_in(user)
+    #     post :create, :employment_relationship => employment_relationship_properties
+    #   end
 
-      it "should redirect" do
-        expect(response).to have_http_status(:redirect)
-      end
+      # it "should redirect" do
+      #   expect(response).to have_http_status(:redirect)
+      # end
 
-      it "should get an alert" do
-        expect(flash[:alert]).to match /You can not enroll as another employee/
-      end
-    end
+      # it "should get an alert" do
+      #   expect(flash[:alert]).to match /You can not enroll as another employee/
+      # end
+    # end
   end
 
   describe "POST match" do
