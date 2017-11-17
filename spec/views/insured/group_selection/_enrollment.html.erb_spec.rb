@@ -85,6 +85,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb" do
       it "should not have terminate confirmation modal" do
         expect(rendered).not_to have_selector('h4', text: 'Select Terminate Reason')
       end
+
+      it "should show the text carrier contact info" do
+        expect(rendered).to match /Carrier Contact Info/
+      end
     end
 
     context 'with Coverall coverage' do
