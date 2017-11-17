@@ -876,6 +876,28 @@ shop_notice_triggers = [
   },
 
   {
+    hbx_id: 'SHOP_D091',
+    title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
+    description: 'Notify Employers of their Dental Carriers are Exiting',
+    resource_name: 'employer',
+    event_name: 'employer_renewal_dental_carriers_exiting_notice',
+    notice_triggers: [
+      {
+        name: 'Notice to Renewal ERs Dental Carriers are Exiting SHOP in 2018',
+        notice_template: 'notices/shop_employer_notices/employer_renewal_dental_carriers_exiting_notice',
+        notice_builder: 'ShopEmployerNotices::EmployerRenewalDentalCarriersExitingNotice',
+        mpi_indicator: 'SHOP_D091',
+        notice_trigger_element_group: {
+          market_places: ['shop'],
+          primary_recipients: ["employer"],
+          primary_recipient_delivery_method: ["secure_message"],
+          secondary_recipients: []
+        }
+      }
+    ]
+  },
+
+  {
     hbx_id: 'SHOP_D092',
     title: 'Dental Carrier Exit from DC Health Link’s Small Business Marketplace',
     description: 'Notify Renewal Employees of dental plan carriers are exiting SHOP market',

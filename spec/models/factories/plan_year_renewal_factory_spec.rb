@@ -107,6 +107,27 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
           expect(renewing_employer.renewing_plan_year.present?).to be_falsey
         end
       end
+
+      context 'when renewal plan year have mapping for health but not for dental' do
+
+        let(:renewal_factory) {
+          Factories::PlanYearRenewalFactory.new
+        }
+        let(:dental_plan) { FactoryGirl.create(:plan, market: 'shop', metal_level: 'dental', active_year: effective_on.year - 1, hios_id: "91111111122302", renewal_plan_id: nil, coverage_kind: 'dental', dental_level: 'high')}
+
+        before :each do
+          dental_plan_id = renewing_employer.plan_years.first.benefit_groups.first.elected_dental_plan_ids.first
+          carrier_profile_id = Plan.all.where(id: dental_plan_id).first.carrier_profile_id
+          CarrierProfile.find(carrier_profile_id).organization.update_attributes!(legal_name: "delta dental")
+          renewal_factory.employer_profile = renewing_employer
+          renewal_factory.is_congress = false
+        end
+
+        it "should create renewal plan year with only health" do
+          expect(renewal_factory).to receive(:trigger_notice)
+          renewal_factory.renew
+        end
+      end
     end
   end
 end
