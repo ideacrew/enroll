@@ -27,11 +27,23 @@ class IvlNotice < Notice
     end
   end
 
+  def attach_required_documents
+    generate_custom_notice('notices/ivl/documents_section')
+    attach_blank_page(custom_notice_path)
+    join_pdfs [notice_path, custom_notice_path]
+    clear_tmp
+  end
+
+  def generate_custom_notice(custom_template)
+    File.open(custom_notice_path, 'wb') do |file|
+      file << self.pdf_custom(custom_template)
+    end
+  end
+
   def pdf_custom(custom_template)
     WickedPdf.new.pdf_from_string(self.html({kind: 'pdf', custom_template: custom_template}), pdf_options_custom)
   end
 
-  
   def pdf_options_custom
     options = {
       margin:  {
@@ -69,12 +81,6 @@ class IvlNotice < Notice
 
   def custom_notice_path
     Rails.root.join("tmp", "documents_section_#{notice_filename}.pdf")
-  end
-
-  def generate_custom_notice(custom_template)
-    File.open(custom_notice_path, 'wb') do |file|
-      file << self.pdf_custom(custom_template)
-    end
   end
 
   def append_hbe
