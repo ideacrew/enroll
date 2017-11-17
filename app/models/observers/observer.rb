@@ -19,5 +19,15 @@ module Observers
       }}
                          })
     end
+
+    def organizations_for_open_enrollment_end(new_date)
+      Organization.where(:"employer_profile.plan_years" =>
+                             {:$elemMatch => {
+                                 :"open_enrollment_end_on".lt => new_date,
+                                 :"start_on".gt => new_date,
+                                 :"aasm_state".in => ['published', 'renewing_published', 'enrolling', 'renewing_enrolling']
+                             }
+                             })
+    end
   end
 end
