@@ -20,9 +20,9 @@ RSpec.describe "insured/group_selection/terminate_confirm.html.erb"  do
     render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
   end
   it "should show plan contact information" do
-    expect(rendered).to have_selector('div',text: 'Plan Contact Info')
+    expect(rendered).not_to have_selector('div',text: 'Plan Contact Info')
   end
   it "should not show carrier contact information" do
-    expect(rendered).not_to have_selector('div',text: 'Carrier Contact Info')
+    expect(rendered).to have_selector('div',text: 'Carrier Contact Info')
   end
 end
