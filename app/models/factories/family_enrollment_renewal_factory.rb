@@ -46,6 +46,8 @@ module Factories
                 renew_enrollment(enrollment: active_enrollment)
                 trigger_notice { "employee_open_enrollment_auto_renewal" }
               else
+                carrier_name = active_enrollment.plan.carrier_profile.legal_name.downcase
+                trigger_notice_dental(enrollment_id: active_enrollment.id.to_s) { "dental_carriers_exiting_shop_notice_to_ee" } if carrier_name && ["metlife", "delta dental"].include?(carrier_name)
                 trigger_notice { "employee_open_enrollment_no_auto_renewal" }
               end
             end
@@ -106,6 +108,17 @@ module Factories
         notice_name = yield
         begin
           ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield) unless Rails.env.test?
+        rescue Exception => e
+          Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
+        end
+      end
+    end
+
+    def trigger_notice_dental(enrollment_id: nil)
+      if !disable_notifications && coverage_kind == 'dental'
+        notice_name = yield
+        begin
+          ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, yield, :hbx_enrollment => enrollment_id) unless Rails.env.test?
         rescue Exception => e
           Rails.logger.error { "Unable to deliver census employee notice for #{notice_name} to census_employee #{census_employee.id} due to #{e}" }
         end
