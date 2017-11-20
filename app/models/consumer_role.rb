@@ -170,6 +170,14 @@ class ConsumerRole
                   :track_update  => true,    # track document updates, default is true
                   :track_destroy => true
 
+  # used to track history verification actions can be used on any top node model to build history of changes.
+  # in this case consumer role taken as top node model instead of family member bz all verification functionality tied to consumer role model
+  # might be encapsulated into new verification model further with verification code refactoring
+  embeds_many :history_action_trackers, as: :history_trackable
+
+  #list of the collections we want to track under consumer role model
+  COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
+
   def ivl_coverage_selected
     if unverified?
       coverage_purchased!
