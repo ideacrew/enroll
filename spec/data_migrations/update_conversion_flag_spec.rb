@@ -14,16 +14,22 @@ describe UpdateConversionFlag, dbclean: :after_each do
 
   describe "updating conversion flag of employer" do
     let(:employer_profile) { FactoryGirl.create(:employer_profile, profile_source: "conversion")}
+    let(:conversion_employer_profile) { FactoryGirl.create(:employer_profile, profile_source: "self_serve")}
 
-    before(:each) do
-      allow(ENV).to receive(:[]).with("fein").and_return(employer_profile.fein)
-      allow(ENV).to receive(:[]).with("profile_source").and_return("self_serve")
-    end
-
-    it "should update conversion flag" do
+    it "should update conversion flag to self_serve" do
+      ENV["fein"] = employer_profile.fein
+      ENV["profile_source"] = "self_serve"
       subject.migrate
       employer_profile.organization.reload
       expect(employer_profile.organization.employer_profile.profile_source).to eq ("self_serve")
+    end
+
+    it "should update the conversion flag to conversion" do
+      ENV["fein"] = conversion_employer_profile.fein
+      ENV["profile_source"] = "conversion"
+      subject.migrate
+      employer_profile.organization.reload
+      expect(employer_profile.organization.employer_profile.profile_source).to eq ("conversion")
     end
   end
 end
