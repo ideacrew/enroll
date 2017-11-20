@@ -119,34 +119,38 @@ RSpec.describe Admin::Aptc, :type => :model do
   end
   
   context "years_with_tax_household" do
-    let(:test_date) { Date.new(oe_start_year, 10, 10) }
+    let(:past_date) { Date.new(oe_start_year, 10, 10) }
+    let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
     let!(:family10) { FactoryGirl.create(:family, :with_primary_family_member) }
-    let!(:tax_household10) { FactoryGirl.create(:tax_household, household: family10.households.first, effective_starting_on: test_date) }
+    let!(:tax_household10) { FactoryGirl.create(:tax_household, household: family10.households.first, effective_starting_on: past_date) }
     let!(:hbx_profile) { FactoryGirl.create(:hbx_profile, :single_open_enrollment_coverage_period) }
     let!(:current_hbx_under_open_enrollment) {double("current hbx", under_open_enrollment?: true)}
-    let(:current_year) { TimeKeeper.date_of_record.year }
     let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
-
-    context "when open_enrollment on or before Dec 31st" do
-      it "should return array without next year added as it is not under_open_enrollment" do
-        tax_household10.update_attributes!(effective_starting_on: Date.new(current_year, 10, 10))
-        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [current_year]
-      end
-    end
 
     context "when open_enrollment after Dec 31st" do
       before :each do
-        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(test_date)
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(future_date)
+      end
+
+      it "should return array without next year added as it is not under_open_enrollment" do
+        tax_household10.update_attributes!(effective_starting_on: future_date )
+        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [future_date.year]
+      end
+    end
+
+    context "when open_enrollment on or before Dec 31st" do
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(past_date)
       end
 
       it "should return array with next year added as it is under_open_enrollment" do
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
-        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [current_year, current_year + 1 ]
+        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year, past_date.year + 1 ]
       end
 
       it "should return array without next year added as it is not under_open_enrollment" do
         allow(HbxProfile).to receive(:current_hbx).and_return(false)
-        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [current_year]
+        expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year]
       end
     end
   end
