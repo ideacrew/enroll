@@ -115,7 +115,7 @@ module ApplicationHelper
 
   def amount_color_style(amount)
     return "" if amount.blank?
-    amount > 0 ? "class='negative_amount'" : ""
+    amount > 0 ? "class=red" : ""
   end
 
 
