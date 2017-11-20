@@ -44,4 +44,9 @@ class ConsumerRolePolicy < ApplicationPolicy
   def update?
     edit?
   end
+
+  def can_view_application_types?
+    return @user.person.hbx_staff_role.permission.can_view_application_types if (@user.person && @user.person.hbx_staff_role)
+    return false
+  end
 end
