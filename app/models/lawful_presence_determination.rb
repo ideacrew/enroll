@@ -71,6 +71,10 @@ class LawfulPresenceDetermination
     notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
   end
 
+  def assign_citizen_status(new_status)
+    update_attributes(citizen_status: new_status)
+  end
+
   private
   def record_approval_information(*args)
     approval_information = args.first
