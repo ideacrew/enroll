@@ -25,7 +25,9 @@ Then (/Dual Role Person should not see any button to enroll in ivl market/) do
 end
 
 And (/Employee clicks on Enroll/) do
-  click_link "Enroll"
+  within ".shop-for-plans-widget" do
+    click_link "Enroll"
+  end
 end
 
 Then (/Employee redirects to ivl flow/) do
