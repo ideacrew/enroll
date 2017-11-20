@@ -14,7 +14,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><%= notice.primary_fullname %>:  </td>
+      <td>Dear <%= notice.primary_fullname %>:  </td>
     </tr>
   </tbody>
 </table>
@@ -25,56 +25,82 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => 
   { contents: [""], heading: 'Next Steps', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Log in to your DCHealthLink.com Account"]} %>
-
 <div style="display:block; page-break-inside: avoid;">
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li>
-          <strong>Employee Enrollments</strong> <br>
-          Share <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf"> Employees How to Enroll in a Plan through <%= Settings.site.short_name %></a> with your eligible employees to guide them through the enrollment process. If you are the point of contact for the group, you can follow this guide to enroll in a plan - <a href= "https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf">Employers Enrolling as Employees.</a><br>
-
-          <br><strong><i>Employers should review their roster to ensure that it includes all eligible employees and ensure that any employees who are also owners (owner’s spouses) are identified as owners on their roster.</i></strong> For your group to receive coverage through the Small Business Marketplace, you must have at least one non-owner employee enrolled in a health plan at the end of each annual employee open enrollment period.<br>
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          <ul style="list-style: circle solid;">
+            <li>
+              <strong>Log in to your DCHealthLink.com Account</strong> <br>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <div style="display:block; page-break-inside: avoid;">
-<table class="total_table" border="0">
-  <tbody>
-    <tr>
-      <td>
-        <ul style="list-style: circle solid;">
-        <li>
-          <strong>First Month’s Premium Payment</strong><br>Your first month’s premium payment must be made over the phone or online so it can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:<br><br>
-          
-          <strong>Make a Secure Online Payment</strong><br>
-          <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf"> Employers Paying Your Premiums Online guide</a> to make your premium payment online here: <a href="https://www.e-BillExpress.com/ebpp/DCHealthPay"> https://www.e-BillExpress.com/ebpp/DCHealthPay.</a>.
-          <br> <br>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          <ul style="list-style: circle solid;">
+            <li>
+              <strong>Employee Enrollments</strong> <br>
+              Share <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employees-How-to-Enroll-in-a-Plan-through-DC-Health-Link.pdf"> Employees How to Enroll in a Plan through <%= Settings.site.short_name %></a> with your eligible employees to guide them through the enrollment process. If you are the point of contact for the group, you can follow this guide to enroll in a plan - <a href= "https://dchealthlink.com/sites/default/files/v2/forms/Employers-Enrolling-as-Employees.pdf">Employers Enrolling as Employees.</a><br>
 
-          <strong>To make a secure electronic check payment by phone</strong>
-          <br>Call <%= notice.hbe.phone %>
-          <br>Select your language (1 for English, 2 for Spanish, additional language options available)
-          <br>Select option for Small Business Employer
-          <br>Select option for Need to Make a Payment<br>
-        </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
+              <br><strong><i>Employers should review their roster to ensure that it includes all eligible employees and ensure that any employees who are also owners (owner’s spouses) are identified as owners on their roster.</i></strong> For your group to receive coverage through the Small Business Marketplace, you must have at least one non-owner employee enrolled in a health plan at the end of each annual employee open enrollment period.<br>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          <ul style="list-style: circle solid;">
+            <li>
+              <strong>First Month’s Premium Payment</strong><br>Your first month’s premium payment must be made over the phone or online so it can be processed immediately and will ensure your coverage will not be delayed. Checks are not accepted for the first month of coverage as they cannot be processed in time for your group’s enrollments to be transmitted to your health insurance company. You can make this payment by following the steps below:<br><br>
+              
+              <strong>Make a Secure Online Payment</strong><br>
+              <%= Settings.site.short_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in <a href="https://dchealthlink.com/sites/default/files/v2/forms/Employers-Paying-Your-Premiums-Online.pdf"> Employers Paying Your Premiums Online guide</a> to make your premium payment online here: <a href="https://www.e-BillExpress.com/ebpp/DCHealthPay"> https://www.e-BillExpress.com/ebpp/DCHealthPay.</a>.
+              <br> <br>
+
+              <strong>To make a secure electronic check payment by phone</strong>
+              <br>Call <%= notice.hbe.phone %> (LINK)
+              <br>Select your language (1 for English, 2 for Spanish, additional language options available)
+              <br>Select option for Small Business Employer
+              <br>Select option for Need to Make a Payment<br>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>  
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Dental Coverage through the #{Settings.site.short_name}</strong><br>It is optional to offer dental coverage to your employees."]} %>
+<div style="display:block; page-break-inside: avoid;">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td>
+          <ul style="list-style: circle solid;">
+            <li>
+              <strong>Dental Coverage through the #{Settings.site.short_name}</strong><br>It is optional to offer dental coverage to your employees.</strong> <br>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { 
   contents: [""], heading: 'For Questions or Assistance:', sub_heading: ''} %>
