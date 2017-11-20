@@ -15,7 +15,7 @@ namespace "migrations" do
         end
         person = people.first
 
-        person.phones << hash_val["phone"]
+        person.phones << Phone.new(hash_val["phone"])
         person.save!
       rescue Exception => e
         puts "Exception #{hash_val["hbx_id"]} : #{e}"
