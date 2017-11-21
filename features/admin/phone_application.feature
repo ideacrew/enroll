@@ -4,6 +4,7 @@ Background: Hbx Admin navigates into the new consumer application with phone app
 	Given Hbx Admin exists
   When Hbx Admin logs on to the Hbx Portal
 	And admin has navigated into the NEW CONSUMER APPLICATION
+	And the applicant with no e_case_id and visit personal information edit page
 	And the Admin is on the Personal Info page for the family
 	And the Admin clicks the Application Type drop down
 	And the Admin selects the Phone application option
