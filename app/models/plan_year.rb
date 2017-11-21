@@ -111,6 +111,35 @@ class PlanYear
     end
   end
 
+  def terminate_employee_benefit_packages
+    bg_ids = self.benefit_groups.map(&:id)
+    census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
+    census_employees.each do |census_employee|
+      census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+        assignment.update(end_on: self.end_on) if assignment.end_on.present? && assignment.end_on > self.end_on
+      end
+    end
+  end
+
+  def enrollments_for_plan_year
+    id_list = self.benefit_groups.map(&:id)
+    families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
+    enrollments = families.inject([]) do |enrollments, family|
+      enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+    end
+  end
+
+  def terminate_employee_enrollments
+    enrollments_for_plan_year.each do |hbx_enrollment|
+      if plan_year.end_on > TimeKeeper.date_of_record
+        hbx_enrollment.terminate_coverage!  if hbx_enrollment.may_terminate_coverage?
+      else
+        hbx_enrollment.schedule_coverage_termination! if hbx_enrollment.may_schedule_coverage_termination?
+      end
+      hbx_enrollment.update_attributes!(terminated_on: plan_year.end_on, termination_submitted_on: plan_year.termination_date)
+    end
+  end
+
   def filter_active_enrollments_by_date(date)
     id_list = benefit_groups.collect(&:_id).uniq
     enrollment_proxies = Family.collection.aggregate([
@@ -653,6 +682,14 @@ class PlanYear
       calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
+    def terminate_scheduled_plan_years
+      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
+      organizations.each do |org|
+        py = org.employer_profile.plan_years.where(:aasm_state => "termination_pending")
+        py.terminate!
+      end
+    end
+
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
 
@@ -776,6 +813,7 @@ class PlanYear
     state :canceled             # Published plan open enrollment has ended and is ineligible for coverage
     state :active               # Published plan year is in-force
 
+    state :termination_pending
     state :renewing_draft, :after_enter => :renewal_group_notice # renewal_group_notice - Sends a notice three months prior to plan year renewing
     state :renewing_published
     state :renewing_publish_pending
@@ -876,9 +914,14 @@ class PlanYear
       transitions from: :active, to: :suspended
     end
 
+    event :schedule_termination, :after => :record_transition do
+      transitions from: :active,
+                    to: :termination_pending
+    end
+
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended, :expired], to: :terminated
+      transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated
     end
 
     event :renew_plan_year, :after => :record_transition do

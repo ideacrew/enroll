@@ -28,9 +28,9 @@
        <th>Open Enrollment Start</th>
        <th>Open Enrollment end</th>
        <th>Created On</th>
-       <th>Termianted On</th>
+       <th>Terminated On</th>
        <th>Status</th>
-       <th></th>
+       <th>Action Button</th>
       </tr>
     </thead>
     <tbody>
@@ -44,9 +44,7 @@
           <td><%= TimeKeeper.format_date_time(application.terminated_on) if application.terminated_on.present? %></td>
           <td><%= application.aasm_state.humanize %></td>
           <td>
-            <% if can_terminate_application?(application)  %>
-              <%= link_to 'Update', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
-            <% end %>
+            <%= link_to 'Update', edit_exchanges_employer_application_path(application.id, employer_id: @employer_profile.id), :remote => true, :role => 'button', :class => "btn btn-primary btn-sm" %>
           </td>
         </tr>
         <tr id="collapse_<%= application.id %>">
