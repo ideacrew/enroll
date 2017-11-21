@@ -19,7 +19,7 @@ When(/HBX Admin goes to register an user as individual$/) do
   fill_in 'person[first_name]', :with => "Carlos"
   fill_in 'person[last_name]', :with => "Devina"
   fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
-  find(:xpath, '//label[@for="radio_male"]').click
+  find(:xpath, '//label[@for="radio_male"]').trigger('click')
   find('.btn', text: 'CONTINUE').click
 end
 
@@ -61,6 +61,7 @@ When(/Hbx Admin select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (TimeKeeper.date_of_record - 5.days).strftime("%m/%d/%Y")
+  find('h1').click
   within '#qle-date-chose' do
     click_link "CONTINUE"
   end
