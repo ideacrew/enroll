@@ -833,9 +833,6 @@ describe "is_type_verified?" do
 
   context "when entered type is DC Residency" do
 
-    # before :each do
-    #   allow(family).to receive(:person_has_an_active_enrollment?).and_return true
-    # end
 
     it "should return true for dc residency verified type" do
       person.update_attributes(no_dc_address: true)
