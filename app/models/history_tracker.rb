@@ -63,7 +63,6 @@ class HistoryTracker
       if tracking_node("Person").exists?
         person = tracking_node("Person").first
         person.consumer_role.history_action_trackers << create_history_element
-        person.save
       end
     end
   end
@@ -77,7 +76,6 @@ class HistoryTracker
           enrollment.hbx_enrollment_members.each do |enrollment_member|
             person = enrollment_member.family_member.person
             person.consumer_role.history_action_trackers << create_history_element
-            person.save
           end
         end
       end
