@@ -39,3 +39,5 @@ end
 #rake permissions:migrate_hbx
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_complete_resident_application
+
+#rake permissions:hbx_admin_can_view_application_types
