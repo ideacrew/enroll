@@ -823,6 +823,28 @@ describe "can_trigger_residency?" do
   end
 end
 
+
+
+describe "is_type_verified?" do
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role)}
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+  let(:enrollment) { double("HbxEnrollment", aasm_state: "coverage_selected")}
+
+  context "when entered type is DC Residency" do
+
+    # before :each do
+    #   allow(family).to receive(:person_has_an_active_enrollment?).and_return true
+    # end
+
+    it "should return true for dc residency verified type" do
+      person.update_attributes(no_dc_address: true)
+      expect(consumer_role.is_type_verified?("DC Residency")).to eq true
+    end
+  end
+
+end
+
 RSpec.shared_examples "a consumer role unchanged by ivl_coverage_selected" do |c_state|
   let(:current_state) { c_state }
 
