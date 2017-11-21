@@ -5,7 +5,10 @@ module PdfTemplates
     attribute :mpi_indicator, String
     attribute :notification_type, String
     attribute :primary_firstname, String
+    attribute :primary_lastname, String
     attribute :primary_fullname, String
+    attribute :primary_person_age, String
+    attribute :primary_hbx_id, String
     attribute :primary_identifier, String
     attribute :request_full_determination, Boolean, :default => false
     attribute :is_family_totally_ineligibile, Boolean, :default => false

@@ -28,38 +28,81 @@
     ["Your new eligibility results",
      "What you need to do next",
      "How we made our decision",
-     "What to do if you don’t agree with our decision, or think we made a mistake"]} %>
-  
+     "What to do if you don’t agree with our decision, or think we made a mistake"]} %> 
 
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: [ ],
     heading: 'Your New Eligibility Results', sub_heading: '', top_margin: '10px', bottom_margin: '5px'} %>
 
- 
-  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance:</strong>",
     listings: notice.uqhp_individuals} %>
 
- <% if notice.uqhp_individuals.present? %>
- <% end %>
- 
-  <%= render partial: 'notices/shared/custom_listing', locals: {
-  listing: "<strong>What you need to do next:</strong> [If OE=YES]Login to your account at dchealthlink.com to shop for a plan. [If OE=NO] This change may qualify you to sign up for a plan, change plans, or add someone to your plan even though it isn’t open enrollment. To see if you can enroll now, login to your account at dchealthlink.com. We may need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment. "} %>
+     <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+       ["#{notice.primary_fullname }  " "&nbsp" " Age:#{notice.primary_person_age}"]} %> 
+
+    <% if notice.uqhp_individuals.count > 1 %>
+      <% notice.uqhp_individuals.each do |member| %>
+        <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+         ["#{ivl.full_name }  " "&nbsp" " Age:#{ivl.age_on(TimeKeeper.date_of_record)}"]} %> 
+      <% end %>
+    <% end %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "This eligibility is effective as of <effective date>. If this person is already eligible, nothing has changed." } %>
+
+     <%= render partial: 'notices/shared/custom_listing', locals: {
+       listing: "<strong>What you need to do next:</strong> "} %>
+        <% if is_under_open_enrollment? %>
+          <%= render partial: 'notices/shared/paragraph', :locals => {
+           content:  "Login to your account at <a href=#{Settings.site.home_url}>dchealthlink.com</a> to shop for a plan" } %>
+        <% else %>
+          <%= render partial: 'notices/shared/paragraph', :locals => {
+           content: "This change may qualify you to sign up for a plan, change plans, or add someone to your plan even though it isn’t open enrollment. To see if you can enroll now, login to your account at <a href=#{Settings.site.home_url}>dchealthlink.com</a>. We may need to ask you a few questions to see if you qualify to enroll now, or if you must wait until the next open enrollment."  }%>
+        <% end %>
 
   <% if notice.ineligible_applicants.present? %>
-  <%= render partial: 'notices/shared/unordered_family_listing', locals: {
-    previous: "<strong>Does Not Qualify for Coverage:</strong>",
-    listings: notice.ineligible_applicants} %>
-<% end %>
+    <%= render partial: 'notices/shared/unordered_family_listing', locals: {
+      previous: "<strong>Does Not Qualify for Coverage:</strong>",
+      listings: notice.ineligible_applicants} %>
 
+      <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+       ["#{ivl.full_name }  " "&nbsp" " Age:#{ivl.age}"]} %>
+       <% if notice.ineligible_applicants.count > 1 %> 
+       <% dependents = notice.ineligible_applicants.reject{|ivl| ivl.is_subscriber? }%>
+         <% dependents.each do |ivl|%>
+            <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+            ["#{ivl.full_name }  " "&nbsp" " Age:#{ivl.age}"]} %>
+          <% end %>
+  <% end %>
+
+    <%= render partial: 'notices/shared/paragraph', :locals => {
+     content: "This eligibility is effective as of <effective date>. If this person has always been ineligible, nothing has changed." } %>  
+
+    <%= render partial: 'notices/shared/custom_listing', locals: {
+       listing: "<strong>What you need to do next:</strong> Review the section, ‘How We Made Our Decision’, to find out why, and learn about options for those listed."} %>  
+  <% end %>
+
+<% if is_under_open_enrollment? %>
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["If you want to change plans for <coverage year>, or add someone to a plan, shop for a new plan during open enrollment. After <OE End Date>, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
+ contents: ["If you want to change plans for #{coverage_year}, or add someone to a plan, shop for a new plan during open enrollment. After <OE End Date>, you won’t be able to sign up for a new plan or change to a different plan until the next open enrollment period unless you experience a major life change like getting married or having a baby. If you want to pick a new plan, make sure to keep in mind these deadlines:"],
    heading: 'Open Enrollment', sub_heading: '', bottom_margin: '5px'} %>
 
-  
+  <%= render partial: 'notices/shared/oe_dates' %>
+
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+        content: "Open enrollment for <coverage year> ended on <coverage year OE end date>."}%>
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
+    ["Those who qualify can only enroll in a plan now if someone in your household had a recent life change.",
+     "Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period."]} %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+content: "To find out if those who qualify can enroll now, login to your account at dchealthlink.com, or call us at #{Settings.contact_center.phone_number}. If you qualify, there’s limited time to sign up." } %>            
+<% end %>
+
   <% if notice.aqhp_enrollments.present? || notice.uqhp_individuals.present? %>
     <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
-        contents: ["There are many reasons eligibility for you, or someone in your household can change. For example:"],
+        contents: [ ],
         heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>
  
     <%= render partial: 'notices/shared/custom_listing', :locals => {
@@ -82,11 +125,14 @@
       than what you told us on your application.",
      "Information from one of our electronic data sources was different from information you gave us on your application."]} %>   
 
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+content: "If you’d like more information on why your eligibility changed, and what options are available to you, give us a call at #{Settings.contact_center.phone_number}" } %>   
+
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
  contents: ["The results below tell you how we made our decision."],
    heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
   
-   <% notice.individuals.each do |ivl|%>
+<% notice.individuals.each do |ivl|%>
   <div style="display:block; page-break-inside: avoid;">
     <table align="center" cellpadding="5" class="total_table thick_broder" style="margin-top: 10px; margin-bottom: 10px; width: 100% %>;" border="1">
       <tbody>
@@ -109,10 +155,10 @@
         <% if ivl.is_totally_ineligible %>
           <tr valign="top">
             <td style="width: 25%;">
-              <b>Ineligible for Medicaid and Private Health Insurance</b>
+              <b>Ineligible for Private Health Insurance</b>
             </td>
             <td style="width: 75%;">
-              <p><%= ivl.first_name %> does not qualify for Medicaid or private health insurance (with or without help paying for coverage). The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
+              <p><%= ivl.first_name %> does not qualify for private health insurance. The reason is because <%= ivl.reason_for_ineligibility.join(' In addition, ') %> If <%= ivl.first_name %>’s status changes, we encourage you to update your application, or call <%= Settings.site.short_name %> at <%= notice.hbe.phone %>."</p>
             </td>
           </tr>
         <% end %>
@@ -120,6 +166,7 @@
     </table>
   </div>
 <% end %>
+
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: ["If you do not agree with the results, or think we made a mistake, you have the right to request an appeal. You can learn more about your rights, and how to request an appeal in the insert included with this letter."],
    heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '8px', bottom_margin: '5px'} %>

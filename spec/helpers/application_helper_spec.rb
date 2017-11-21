@@ -316,27 +316,28 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
-   describe "#show_oop_pdf_link" , dbclean: :after_each do
-       context 'valid aasm_state' do
-         it "should return true" do
-           PlanYear::PUBLISHED.each do |state|
-             expect(helper.show_oop_pdf_link(state)).to be true
-           end
 
-          PlanYear::RENEWING_PUBLISHED_STATE.each do |state|
-             expect(helper.show_oop_pdf_link(state)).to be true
-           end
-         end
-       end
-
-        context 'invalid aasm_state' do
-          it "should return false" do
-            ["draft", "renewing_draft"].each do |state|
-              expect(helper.show_oop_pdf_link(state)).to be false
-            end
-          end
+  describe "#show_oop_pdf_link" , dbclean: :after_each do
+    context 'valid aasm_state' do
+      it "should return true" do
+        PlanYear::PUBLISHED.each do |state|
+          expect(helper.show_oop_pdf_link(state)).to be true
         end
-     end
+
+        PlanYear::RENEWING_PUBLISHED_STATE.each do |state|
+          expect(helper.show_oop_pdf_link(state)).to be true
+        end
+      end
+    end
+
+    context 'invalid aasm_state' do
+      it "should return false" do
+        ["draft", "renewing_draft"].each do |state|
+          expect(helper.show_oop_pdf_link(state)).to be false
+        end
+      end
+    end
+  end
 
 
   describe "find_plan_name", dbclean: :after_each do
@@ -391,6 +392,56 @@ RSpec.describe ApplicationHelper, :type => :helper do
 
     it "should return false when the current user is an admin & not working on new paper application" do
       expect(helper.is_new_paper_application?(admin_user, "")).to eq false
+    end
+  end
+
+  describe "current_year" do
+    let!(:current_date) { TimeKeeper.date_of_record }
+
+    it "should return current year" do
+      expect(helper.current_year).to eq current_date.year
+    end
+
+    it "should not return any other year" do
+      expect(helper.current_year).not_to eq current_date.next_year.year
+    end
+  end
+
+  context "years_with_tax_household" do
+    let(:past_date) { Date.new(oe_start_year, 10, 10) }
+    let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
+    let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
+
+    context "when open_enrollment after Dec 31st" do
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(future_date)
+      end
+
+      it "should return array with next year added as it is under_open_enrollment" do
+        allow(helper).to receive(:is_under_open_enrollment?).and_return(true)
+        expect(helper.coverage_year).to eq future_date.year
+      end
+
+      it "should return array without next year added as it is not under_open_enrollment" do
+        allow(helper).to receive(:is_under_open_enrollment?).and_return(false)
+        expect(helper.coverage_year).to eq future_date.year
+      end
+    end
+
+    context "when open_enrollment on or before Dec 31st" do
+      before :each do
+        allow_any_instance_of(TimeKeeper).to receive(:date_of_record).and_return(past_date)
+      end
+
+      it "should return array with next year added as it is under_open_enrollment" do
+        allow(helper).to receive(:is_under_open_enrollment?).and_return(true)
+        expect(helper.coverage_year).to eq future_date.year
+      end
+
+      it "should return array without next year added as it is not under_open_enrollment" do
+        allow(helper).to receive(:is_under_open_enrollment?).and_return(false)
+        expect(helper.coverage_year).to eq past_date.year
+      end
     end
   end
 end

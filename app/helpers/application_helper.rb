@@ -648,4 +648,18 @@ module ApplicationHelper
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
+
+  def current_year
+    TimeKeeper.date_of_record.year
+  end
+
+  def coverage_year
+    oe_start_year = Settings.aca.individual_market.open_enrollment.start_on.year
+
+    if is_under_open_enrollment? && current_year == oe_start_year
+      return current_year + 1
+    else
+      return current_year
+    end
+  end
 end
