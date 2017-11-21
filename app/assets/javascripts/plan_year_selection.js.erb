@@ -706,7 +706,7 @@ function attachEmployerHealthContributionShowHide() {
 
 function loadCarrierNames() {
   var start_on = $("#plan_year_start_on").val().substr(0,4);
-  var selected_carrier_level = $('.health .nav li:visible input').val()
+  var selected_carrier_level = $(this).siblings('input').val();
   var employer_profile_id = $('#employerProfileId').data('value');
   var benefit_group_id = $('#benefitGroupId').data('value');
   var location_id = $('.health .nav li:visible').closest('fieldset').attr('id');
