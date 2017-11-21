@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   require 'resque/server' 
-  mount Resque::Server, at: '/jobs'
+#  mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions' }
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -154,6 +154,7 @@ Rails.application.routes.draw do
       get 'new'
       member do
         delete 'delete_consumer_broker'
+        get 'generate_out_of_pocket_url'
       end
 
       collection do
@@ -256,6 +257,7 @@ Rails.application.routes.draw do
       post 'bulk_employee_upload'
       member do
         get "download_invoice"
+        post 'generate_checkbook_urls'
       end
       collection do
         get 'welcome'
@@ -500,9 +502,8 @@ Rails.application.routes.draw do
       get :show_docs
       put :update_verification_type
       get :enrollment_verification
-      put :enrollment_docs_state
       put :extend_due_date
-      get :fed_hub_request
+      post :fed_hub_request
     end
   end
 

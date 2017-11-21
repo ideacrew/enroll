@@ -23,9 +23,8 @@ module Factories
           @employer_profile.force_enroll!
         end
 
-        validate_employer_profile
-
         @active_plan_year = @employer_profile.active_plan_year
+        validate_employer_profile
         validate_plan_year
 
         @plan_year_start_on = @active_plan_year.end_on + 1.day
@@ -73,11 +72,11 @@ module Factories
         raise PlanYearRenewalFactoryError, "Employer #{@employer_profile.legal_name} already renewed"
       end
 
-      unless PlanYear::PUBLISHED.include? @employer_profile.active_plan_year.aasm_state
+      unless PlanYear::PUBLISHED.include? @active_plan_year.aasm_state
         raise PlanYearRenewalFactoryError, "Renewals require an existing, published Plan Year"
       end
 
-      unless TimeKeeper.date_of_record <= @employer_profile.active_plan_year.end_on
+      unless TimeKeeper.date_of_record <= @active_plan_year.end_on
         raise PlanYearRenewalFactoryError, "Renewal time period has expired.  You must submit a new application"
       end
     end
@@ -96,18 +95,6 @@ module Factories
         elected_plan_ids = benefit_group.renewal_elected_plan_ids
         if elected_plan_ids.blank?
           raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_plan_ids}"
-        end
-
-        if benefit_group.is_offering_dental?
-          reference_plan_id = benefit_group.dental_reference_plan.renewal_plan_id
-          if reference_plan_id.blank?
-            raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{benefit_group.dental_reference_plan.id} Year #{benefit_group.dental_reference_plan.active_year} Hios #{benefit_group.dental_reference_plan.hios_id}"
-          end
-
-          elected_plan_ids = benefit_group.renewal_elected_dental_plan_ids
-          if elected_plan_ids.blank?
-            raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{benefit_group.elected_dental_plan_ids}"
-          end
         end
       end
     end
@@ -135,6 +122,10 @@ module Factories
       renewal_benefit_group
     end
 
+    def is_renewal_dental_offered?(active_group)
+      active_group.is_offering_dental? && active_group.dental_reference_plan.renewal_plan_id.present? && active_group.renewal_elected_dental_plan_ids.any?
+    end
+
     def assign_dental_plan_offerings(renewal_benefit_group, active_group)
       renewal_benefit_group.assign_attributes({
         dental_plan_option_kind: active_group.dental_plan_option_kind,
@@ -158,7 +149,7 @@ module Factories
       })
      
       renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
-      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if active_group.is_offering_dental?
+      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if is_renewal_dental_offered?(active_group)
       renewal_benefit_group
     end
 
