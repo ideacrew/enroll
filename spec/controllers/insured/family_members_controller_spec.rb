@@ -7,9 +7,9 @@ RSpec.describe Insured::FamilyMembersController do
   let(:person) { test_family.primary_family_member.person }
   let(:published_plan_year)  { FactoryGirl.build(:plan_year, aasm_state: :published)}
   let(:employer_profile) { FactoryGirl.create(:employer_profile) }
-  let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee ) }
+  let(:employee_role) { FactoryGirl.create(:employee_role, employer_profile: employer_profile, person: person, census_employee: census_employee1 ) }
   let(:employee_role_id) { employee_role.id }
-  let(:census_employee) { FactoryGirl.create(:census_employee) }
+  let(:census_employee1) { FactoryGirl.create(:census_employee) }
 
   before do
     employer_profile.plan_years << published_plan_year
@@ -50,7 +50,8 @@ RSpec.describe Insured::FamilyMembersController do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(person).to receive(:primary_family).and_return(test_family)
         allow(user).to receive(:person).and_return(person)
-        allow(census_employee).to receive(:earliest_eligible_date).and_return(date.next_month.beginning_of_month)
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(census_employee1).to receive(:earliest_eligible_date).and_return(date.next_month.beginning_of_month)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
       end
