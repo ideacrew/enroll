@@ -158,18 +158,8 @@ module Factories
       })
      
       renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
-
-      if is_renewal_dental_offered?(active_group)
-        renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group)
-      elsif active_group.is_offering_dental?
-        carrier_profiles = @active_plan_year.dental_carriers_offered.inject([]) do |acc, cpid|
-          acc << CarrierProfile.find(cpid)
-        end
-        legal_names = carrier_profiles.map(&:legal_name).map(&:downcase).uniq if carrier_profiles
-        if legal_names && (legal_names.include?("metlife") || legal_names.include?("delta dental"))
-          trigger_notice {"employer_renewal_dental_carriers_exiting_notice"}
-        end
-      end
+      renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if is_renewal_dental_offered?(active_group)
+      trigger_notice {"employer_renewal_dental_carriers_exiting_notice"}
 
       renewal_benefit_group
     end
