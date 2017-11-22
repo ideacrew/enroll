@@ -111,7 +111,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     waiver_reason = params[:waiver_reason] || (hbx_enrollment.terminate_reason if hbx_enrollment.terminate_reason)
-    if hbx_enrollment.may_waive_coverage? and waiver_reason.present? and hbx_enrollment.valid?
+    if (hbx_enrollment.may_waive_coverage? || hbx_enrollment.may_terminate_coverage?) and waiver_reason.present? and hbx_enrollment.valid?
       hbx_enrollment.waive_coverage_by_benefit_group_assignment(waiver_reason)
 
       if hbx_enrollment.terminate_reason.present?
