@@ -19,7 +19,7 @@ class RemoveDuplicatePerson < MongoidMigrationTask
         invalid_person = people.select { |p| p.ssn.nil?}
         invalid_person.each do |person|
           puts "Removing Person with details #{person.inspect}"
-          person.update_attribute("is_active",false)
+          person.destroy
         end
       else
         puts "No invalid person to remove"

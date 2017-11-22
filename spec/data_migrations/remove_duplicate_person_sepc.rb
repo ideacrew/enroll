@@ -25,7 +25,7 @@ describe RemoveDuplicatePerson, dbclean: :after_each do
 
     it "should set person hbx id to nil" do
       subject.migrate
-      expect(Person.active.count).to eq 1
+      expect(Person.all.count).to eq 1
     end
   end
 end
