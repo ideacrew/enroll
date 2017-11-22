@@ -45,6 +45,9 @@ class Plan
   embeds_many :premium_tables
   accepts_nested_attributes_for :premium_tables, :sbc_document
 
+  # To filter plan renewal mapping for carrier
+  embeds_many :renewal_plan_mappings
+
   # More Attributes from qhp
   field :plan_type, type: String  # "POS", "HMO", "EPO", "PPO"
   field :deductible, type: String # Deductible
@@ -359,9 +362,15 @@ class Plan
     end
   end
 
-  def renewal_plan
+  def renewal_plan(date = nil)
     return @renewal_plan if defined? @renewal_plan
-    @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
+
+    if date.present? && renewal_plan_mappings.by_date(date).present?
+      renewal_mapping = renewal_plan_mappings.by_date(date).first
+      @renewal_plan = renewal_mapping.renewal_plan
+    else
+      @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
+    end
   end
 
   def minimum_age
