@@ -25,7 +25,7 @@
               <p>The DC Department of Human Services (DHS) will make a final decision on <%= ivl.first_name %>’s Medicaid eligibility. We have forwarded your application to them.</p>
               <p>IF DHS determines that <%= ivl.first_name %>  qualifies for Medicaid, DHS will provide information on how to enroll.</p>
             <% end %>
-            <% if !(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.is_ia_eligible || ivl.is_without_assistance) %>
+            <% if !(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.is_ia_eligible || ivl.is_without_assistance) && ivl.no_medicaid_because_of_income %>
               <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Your monthly household income of <%= number_to_currency(ivl.tax_household.aptc_csr_monthly_household_income, precision: 2) %> is over the monthly income limit of <%= number_to_currency(ivl.magi_medicaid_monthly_income_limit, precision: 2) %> for this person.</p>
             <% end %>
             <% if ivl.no_medicaid_because_of_immigration %>
