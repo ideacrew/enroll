@@ -36,23 +36,12 @@ unless event_kind.present?
   puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
 
-#need to exlude this list from UQHP_FEL data set.
-@excluded_list = []
-CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
-  @excluded_list << d["Subscriber"]
-end
-
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
-      next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] == "FALSE")
-      next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
-      next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
-
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       consumer_role = person.consumer_role
       if person.present? && consumer_role.present?

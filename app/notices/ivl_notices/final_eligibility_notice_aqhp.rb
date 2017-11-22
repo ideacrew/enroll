@@ -155,12 +155,12 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_tax_household_information(primary_member)
     PdfTemplates::TaxHousehold.new({
       :csr_percent_as_integer => (primary_member["csr"].upcase == "YES") ? primary_member["csr_percent"] : "100",
-      :max_aptc => primary_member["aptc"],
+      :max_aptc => primary_member["aptc"].present? ? primary_member["aptc"] : 0.0,
       :aptc_csr_annual_household_income => primary_member["actual_income"],
       :aptc_csr_monthly_household_income => primary_member["monthly_hh_income"],
       :aptc_annual_income_limit => primary_member["aptc_annual_limit"],
       :csr_annual_income_limit => primary_member["csr_annual_income_limit"],
-      :applied_aptc => primary_member["applied_aptc"]
+      :applied_aptc => primary_member["applied_aptc"].present? ? primary_member["applied_aptc"] : 0.0
     })
   end
 
