@@ -46,6 +46,12 @@ module CheckbookServices
     }
     end
 
+      # uri = URI('https://myapp.com/api/v1/resource')
+      # req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+      # req.body = {param1: 'some value', param2: 'some other value'}.to_json
+      # res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      #  http.request(req)
+
     def employer_contributions
       premium_benefit_contributions = {}
       census_employee.employer_profile.plan_years.first.benefit_groups.first.relationship_benefits.each do |relationship_benefit|
