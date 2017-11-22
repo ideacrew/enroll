@@ -9,7 +9,7 @@ class RenewalPlanMapping
 
   validates_presence_of :start_on, :end_on, :renewal_plan_id
 
-  scope :by_date, ->(new_date) { where({:"start_on".lte => new_date, :"end_on".gte => new_date}) }
+  scope :by_date, ->(new_year) { where({:"start_on".gte => Date.new(new_year, 1, 1), :"end_on".lte => Date.new(new_year, 7, 1)}) }
 
 
   def renewal_plan

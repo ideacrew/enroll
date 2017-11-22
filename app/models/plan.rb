@@ -365,8 +365,8 @@ class Plan
   def renewal_plan(date = nil)
     return @renewal_plan if defined? @renewal_plan
 
-    if date.present? && renewal_plan_mappings.by_date(date).present?
-      renewal_mapping = renewal_plan_mappings.by_date(date).first
+    if date.present? && renewal_plan_mappings.by_date(date.year).present?
+      renewal_mapping = renewal_plan_mappings.by_date(date.year).first
       @renewal_plan = renewal_mapping.renewal_plan
     else
       @renewal_plan = Plan.find(renewal_plan_id) unless renewal_plan_id.blank?
