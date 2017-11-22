@@ -6,18 +6,14 @@
       <tr>
         <th>Account Balance <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Account Balance includes payments and enrollment changes made since the latest invoice but have not yet been billed.  This may not be the total amount that is currently due."></i>
         </th>
-        <th>Past Due Balance <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Past Due Amount includes premiums that were previously billed but were not paid by the due date. If premiums are not paid within 2 months of the due date, your group’s health coverage may be terminated."></i>
+        <th>Past Due Amount <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Past Due Amount includes premiums that were previously billed but were not paid by the due date. If premiums are not paid within 2 months of the due date, your group’s health coverage may be terminated."></i>
         </th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:total_due)) || "Data not available" %></td>
-        <% if @employer_profile.try(:employer_profile_account).try(:past_due) > 0 %>
-          <td style="color:Red"><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due))%></td>
-        <% else %>
-          <td><%= number_to_currency(@employer_profile.try(:employer_profile_account).try(:past_due)) || "Data not available" %></td>
-        <% end %>
+        <td><%= number_to_currency(@employer_profile_account.try(:total_due)) || "Data not available" %></td>
+        <td <%= amount_color_style(@employer_profile_account.try(:past_due)) %>><%= number_to_currency(@employer_profile_account.try(:past_due)) || "Data not available" %></td>
       </tr>
     </tbody>
   </table>
