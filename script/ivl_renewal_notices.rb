@@ -32,6 +32,21 @@ report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%
 event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
+def valid_enrollments(person)
+  hbx_enrollments = []
+  family = person.primary_family
+  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
+  return [] if enrollments.blank?
+  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
+  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+
+  hbx_enrollments << health_enrollments
+  hbx_enrollments << dental_enrollments
+
+  hbx_enrollments.flatten!.compact!
+  hbx_enrollments
+end
+
 unless event_kind.present?
   puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
@@ -43,6 +58,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      enrollments = valid_enrollments(person)
+      next if enrollments.empty?
       consumer_role = person.consumer_role
       if person.present? && consumer_role.present?
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
@@ -51,6 +68,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
+            enrollments: enrollments,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )

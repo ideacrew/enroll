@@ -1,6 +1,6 @@
 class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   include ApplicationHelper
-  attr_accessor :family, :data, :person
+  attr_accessor :family, :data, :person, :enrollments
 
   def initialize(consumer_role, args = {})
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
@@ -9,6 +9,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.person = args[:person]
+    self.enrollments = args[:enrollments]
     self.data = args[:data]
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -54,7 +55,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_data
     primary_member = data.detect{|m| m["subscriber"].upcase == "YES"}
     append_member_information_for_aqhp(primary_member)
-    pick_enrollments
+    append_enrollment_information
     if primary_member["aqhp_eligible"].upcase == "YES"
       notice.tax_households = append_tax_household_information(primary_member)
     end
@@ -97,50 +98,35 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     end
   end
 
-  def pick_enrollments
-    hbx_enrollments = []
-    family = recipient.primary_family
-    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
-    return nil if enrollments.blank?
-    health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
-    dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
-
-    hbx_enrollments << health_enrollments
-    hbx_enrollments << dental_enrollments
-
-    return nil if hbx_enrollments.flatten.compact.empty?
-    hbx_enrollments.flatten.compact.each do |enrollment|
-      notice.enrollments << append_enrollment_information(enrollment)
-    end
-  end
-
-  def append_enrollment_information(enrollment)
-    plan = PdfTemplates::Plan.new({
-      plan_name: enrollment.plan.name,
-      is_csr: enrollment.plan.is_csr?,
-      coverage_kind: enrollment.plan.coverage_kind,
-      plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
-      family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
-      deductible: enrollment.plan.deductible
-      })
-    PdfTemplates::Enrollment.new({
-      premium: enrollment.total_premium.round(2),
-      aptc_amount: enrollment.applied_aptc_amount.round(2),
-      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-      phone: phone_number(enrollment.plan.carrier_profile.legal_name),
-      is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
-      coverage_kind: enrollment.coverage_kind,
-      kind: enrollment.kind,
-      effective_on: enrollment.effective_on,
-      plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name.titleize,
-          age: member.person.age_on(TimeKeeper.date_of_record)
+  def append_enrollment_information
+    enrollments.each do |enrollment|
+      plan = PdfTemplates::Plan.new({
+        plan_name: enrollment.plan.name,
+        is_csr: enrollment.plan.is_csr?,
+        coverage_kind: enrollment.plan.coverage_kind,
+        plan_carrier: enrollment.plan.carrier_profile.organization.legal_name,
+        family_deductible: enrollment.plan.family_deductible.split("|").last.squish,
+        deductible: enrollment.plan.deductible
         })
-        enrollees << enrollee
-      end
-    })
+      notice.enrollments << PdfTemplates::Enrollment.new({
+        premium: enrollment.total_premium.round(2),
+        aptc_amount: enrollment.applied_aptc_amount.round(2),
+        responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+        phone: phone_number(enrollment.plan.carrier_profile.legal_name),
+        is_receiving_assistance: (enrollment.applied_aptc_amount > 0 || enrollment.plan.is_csr?) ? true : false,
+        coverage_kind: enrollment.coverage_kind,
+        kind: enrollment.kind,
+        effective_on: enrollment.effective_on,
+        plan: plan,
+        enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+          enrollee = PdfTemplates::Individual.new({
+            full_name: member.person.full_name.titleize,
+            age: member.person.age_on(TimeKeeper.date_of_record)
+          })
+          enrollees << enrollee
+        end
+      })
+    end
   end
 
   def phone_number(legal_name)
