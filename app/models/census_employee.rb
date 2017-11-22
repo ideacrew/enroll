@@ -484,6 +484,14 @@ class CensusEmployee < CensusMember
     end
   end
 
+  def trigger_notice(event)
+    begin
+      ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver #{event.humanize} - notice to census employee - #{self.full_name} due to #{e}" }
+    end
+  end
+
   def update_for_cobra(cobra_date,current_user=nil)
     self.cobra_begin_date = cobra_date
     self.elect_cobra(current_user)

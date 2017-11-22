@@ -43,6 +43,7 @@ class Insured::FamilyMembersController < ApplicationController
       special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
       special_enrollment_period.save
       @market_kind = qle.market_kind
+      @employee_role.census_employee.trigger_notice("ee_sep_request_accepted_notice") if (qle.present? && qle.shop? && @employee_role.present? && @employee_role.census_employee.present?)
     end
 
     if request.referer.present?
