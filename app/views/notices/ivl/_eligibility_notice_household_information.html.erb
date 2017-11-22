@@ -26,11 +26,10 @@
               <p>IF DHS determines that <%= ivl.first_name %>  qualifies for Medicaid, DHS will provide information on how to enroll.</p>
             <% end %>
             <% if !(ivl.is_medicaid_chip_eligible || ivl.is_non_magi_medicaid_eligible) && (ivl.is_ia_eligible || ivl.is_without_assistance) %>
-              <% if ivl.immigration_unverified == true %>
-                <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Either the person’s immigration status doesn’t meet requirements, or the person has not held the status long enough to qualify for Medicaid.</p>
-              <% else %>
-                <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Your monthly household income of <%= number_to_currency(ivl.tax_household.aptc_csr_monthly_household_income, precision: 2) %> is over the monthly income limit of <%= number_to_currency(ivl.magi_medicaid_monthly_income_limit, precision: 2) %> for this person.</p>
-              <% end %>
+              <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Your monthly household income of <%= number_to_currency(ivl.tax_household.aptc_csr_monthly_household_income, precision: 2) %> is over the monthly income limit of <%= number_to_currency(ivl.magi_medicaid_monthly_income_limit, precision: 2) %> for this person.</p>
+            <% end %>
+            <% if ivl.no_medicaid_because_of_immigration %>
+              <p><%= ivl.first_name %> likely doesn’t qualify for Medicaid. Either the person’s immigration status doesn’t meet requirements, or the person has not held the status long enough to qualify for Medicaid.</p>
             <% end %>
           </td>
         </tr>
@@ -66,7 +65,7 @@
             <% if ivl.is_medicaid_chip_eligible %>
               <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for private health insurance because this person is likely eligible for Medicaid.</p>
             <% end %>
-            <% unless notice.irs_consent_needed %>
+            <% if ivl.no_aptc_because_of_tax %>
               <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for the insurance for one of the following reasons:</p>
               <ul>
                 <li>
@@ -83,7 +82,7 @@
                 Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= Settings.site.short_name %> can check again to see if <%= ivl.first_name%> would be eligible.
               </p>
             <% end %>
-            <% if ivl.has_access_to_affordable_coverage %>
+            <% if ivl.no_aptc_because_of_mec %>
               <p><%= ivl.first_name %> does not qualify for an advance premium tax credit to help pay for the insurance because this person has access to what the federal government considers affordable coverage.</p>
             <% end %>
           </td>
@@ -114,7 +113,7 @@
           <% if ivl.is_medicaid_chip_eligible %>
             <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person is likely eligible for Medicaid.</p>
           <% end %>
-          <% unless notice.irs_consent_needed %>
+          <% if ivl.no_csr_because_of_tax %>
             <p><%= ivl.first_name %> does not qualify for cost-sharing reductions for one of the following reasons:</p>
             <ul>
               <li>
@@ -131,7 +130,7 @@
               Call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find out if this issue can be resolved. If it can, <%= Settings.site.short_name %> can check again to see if <%= ivl.first_name%> would be eligible.
             </p>
           <% end %>
-          <% if (ivl.tax_household.csr_percent_as_integer == 100) && ivl.has_access_to_affordable_coverage %>
+          <% if ivl.no_csr_because_of_mec %>
             <p><%= ivl.first_name %> does not qualify for cost-sharing reductions because this person has access to what the federal government considers affordable coverage.</p>
           <% end %>
           </td>

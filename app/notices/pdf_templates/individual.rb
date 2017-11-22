@@ -35,8 +35,11 @@ module PdfTemplates
     attribute :is_totally_ineligible, Boolean, :default => false
     attribute :no_aptc_because_of_income, Boolean, :default => false
     attribute :no_aptc_because_of_tax, Boolean, :default => false
+    attribute :no_aptc_because_of_mec, Boolean, :default => false
+    attribute :no_medicaid_because_of_immigration, Boolean, :default => false
     attribute :no_csr_because_of_income, Boolean, :default => false
     attribute :no_csr_because_of_tax, Boolean, :default => false
+    attribute :no_csr_because_of_mec, Boolean, :default => false
     attribute :has_access_to_affordable_coverage, Boolean, :default => false
 
     # attribute :ineligible_members, Array[String]

@@ -59,7 +59,6 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
       notice.tax_households = append_tax_household_information(primary_member)
     end
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
-    notice.irs_consent_needed = check(primary_member["irs_consent"])
     notice.primary_firstname = primary_member["first_name"]
   end
 
@@ -86,6 +85,13 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
         :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
         :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
         :has_access_to_affordable_coverage => check(datum ["mec"]),
+        :no_medicaid_because_of_immigration => (datum["nonmedi_reason"].downcase == "immigration") ? true : false,
+        :no_aptc_because_of_income => (datum["nonaptc_reason"].downcase == "over income") ? true : false,
+        :no_aptc_because_of_tax => datum["nonaptc_reason"].downcase == "tax" ? true : false,
+        :no_aptc_because_of_mec => datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
+        :no_csr_because_of_income => datum["noncsr_reason"].downcase == "over income" ? true : false,
+        :no_csr_because_of_tax => datum["noncsr_reason"].downcase == "tax" ? true : false,
+        :no_csr_because_of_mec => datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
         :tax_household => append_tax_household_information(primary_member)
       })
     end
@@ -94,10 +100,10 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def pick_enrollments
     hbx_enrollments = []
     family = recipient.primary_family
-    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected"], :kind => "individual")
+    enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
     return nil if enrollments.blank?
-    health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
-    dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
+    health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
+    dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
 
     hbx_enrollments << health_enrollments
     hbx_enrollments << dental_enrollments
