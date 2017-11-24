@@ -84,8 +84,8 @@ module Observers
       if PlanYear::DATA_CHANGE_EVENTS.include?(model_event.event_key)
         if model_event.event_key == :renewal_plan_year_publish_dead_line
           organizations_for_force_publish(TimeKeeper.date_of_record).each do |organization|
-              plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
-              trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event:"renewal_plan_year_publish_dead_line" )
+            plan_year = organization.employer_profile.plan_years.where(:aasm_state => 'renewing_draft').first
+            trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event: "renewal_plan_year_publish_dead_line")
           end
         end
       end
