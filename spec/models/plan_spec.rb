@@ -138,11 +138,11 @@ RSpec.describe Plan, dbclean: :after_each do
     end
 
     context "renewal_plan_mapping filter by date" do
-      let!(:renewal_plan_mapping2) { RenewalPlanMapping.new(start_on: Date.new(TimeKeeper.date_of_record.year, 2, 1), end_on: Date.new(TimeKeeper.date_of_record.year, 5, 4), renewal_plan_id: neighbour_plan.id)}
+      let!(:renewal_plan_mapping2) { RenewalPlanMapping.new(start_on: TimeKeeper.date_of_record, end_on: TimeKeeper.date_of_record + 5.months, renewal_plan_id: neighbour_plan.id)}
       let!(:renewal_plan_mappings1) {
-         {start_on: Date.new(TimeKeeper.date_of_record.year,2,1),
-          end_on: Date.new(TimeKeeper.date_of_record.year,5,4),
-          renewal_plan_id: neighbour_plan.id
+         { start_on: TimeKeeper.date_of_record,
+           end_on: TimeKeeper.date_of_record + 5.months,
+           renewal_plan_id: neighbour_plan.id
          }
       }
       let!(:sole_source_plan) { create(:plan, is_sole_source: true, is_horizontal: false, is_vertical: false, renewal_plan_id: renewal_health_plan.id, renewal_plan_mappings: [renewal_plan_mappings1]) }
@@ -155,9 +155,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should filter by date and return renewal plan by date" do
-        year = TimeKeeper.date_of_record.year
-        # we are creating using "Date" because we are filtering based on date ine between Jan and July
-        expect(sole_source_plan.renewal_plan(Date.new(year, 2, 11))).to eq(neighbour_plan)
+        expect(sole_source_plan.renewal_plan(TimeKeeper.date_of_record)).to eq(neighbour_plan)
       end
     end
 
