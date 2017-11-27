@@ -50,7 +50,7 @@ namespace :reports do
     family_member.person.verification_types.each do |v_type|
       doc_due_date = family.document_due_date(family_member, v_type)
       due_date = doc_due_date.present? ? doc_due_date.to_date : nil
-      if v_type == 'Citizenship'
+      if v_type == 'DC Residency'
         @residency_due_date = due_date
       elsif v_type == 'Citizenship'
         @citizenship_due_date = due_date
