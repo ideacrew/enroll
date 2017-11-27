@@ -11,11 +11,11 @@ module ModelEvents
       :open_enrollment_began,
       :open_enrollment_ended,
       :application_denied,
-      :renewal_application_denied
+      :renewal_application_denied,
+      :renewal_employer_open_enrollment_completed
     ]
 
     DATA_CHANGE_EVENTS = [
-        :renewal_employer_open_enrollment_completed,
         :renewal_plan_year_first_reminder_before_soft_dead_line,
         :renewal_plan_year_publish_dead_line
     ]
@@ -46,6 +46,10 @@ module ModelEvents
 
         if is_transition_matching?(to: [:renewing_published, :renewing_enrolling], from: :renewing_draft, event: :force_publish)
           is_renewal_application_autosubmitted = true
+        end
+
+        if is_transition_matching?(to: :renewing_enrolled, from: :renewing_enrolling, event: :advance_date)
+          is_renewal_employer_open_enrollment_completed = true
         end
 
         if enrolling? || renewing_enrolling?
@@ -81,11 +85,6 @@ module ModelEvents
 
     module ClassMethods
       def date_change_event(new_date)
-
-        # renewal_application with enrolling state, reached open-enrollment end date with minimum participation and non-owner-enrolle i.e 15th of month
-        if new_date.day == Settings.aca.shop_market.renewal_application.publish_due_day_of_month
-          is_renewal_employer_open_enrollment_completed = true
-        end
 
         # renewal_application with un-published plan year, send notice 2 days before soft dead line i.e 8th of the month
         if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2
