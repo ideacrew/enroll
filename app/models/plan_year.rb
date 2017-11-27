@@ -131,12 +131,12 @@ class PlanYear
 
   def terminate_employee_enrollments
     enrollments_for_plan_year.each do |hbx_enrollment|
-      if plan_year.end_on > TimeKeeper.date_of_record
+      if self.end_on > TimeKeeper.date_of_record
         hbx_enrollment.terminate_coverage!  if hbx_enrollment.may_terminate_coverage?
       else
         hbx_enrollment.schedule_coverage_termination! if hbx_enrollment.may_schedule_coverage_termination?
       end
-      hbx_enrollment.update_attributes!(terminated_on: plan_year.end_on, termination_submitted_on: plan_year.termination_date)
+      hbx_enrollment.update_attributes!(terminated_on: self.end_on, termination_submitted_on: TimeKeeper.date_of_record)
     end
   end
 
@@ -932,6 +932,7 @@ class PlanYear
       transitions from: :active, to: :suspended
     end
 
+    # Scheduling terminations for plan years with a future end on date
     event :schedule_termination, :after => :record_transition do
       transitions from: :active,
                     to: :termination_pending
@@ -1316,7 +1317,7 @@ class PlanYear
                  "#{(start_on + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).to_date} with #{start_on} effective date")
     end
 
-    if !['canceled', 'suspended', 'terminated'].include?(aasm_state)
+    if !['canceled', 'suspended', 'terminated', 'termination_pending'].include?(aasm_state)
 
       #groups terminated for non-payment get 31 more days of coverage from their paid through date
       if end_on != end_on.end_of_month

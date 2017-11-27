@@ -18,7 +18,7 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       if end_on > TimeKeeper.date_of_record
         @application.schedule_termination! if @application.may_schedule_termination?
       else
-        @application.terminate! @application.may_terminate?
+        @application.terminate! if @application.may_terminate?
       end
       @application.update_attributes!(end_on: end_on, :terminated_on => TimeKeeper.date_of_record)
       @application.terminate_employee_benefit_packages

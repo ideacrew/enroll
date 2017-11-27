@@ -5,9 +5,10 @@
 
       <% if can_terminate_application?(@application) %>
       <%= render 'exchanges/employer_applications/terminate', application: @application, employer_profile: @employer_profile %>
-      <% end %>
-      <% if can_cancel_application?(@application) %>
+      <% elsif can_cancel_application?(@application) %>
       <%= render 'exchanges/employer_applications/cancel', application: @application, employer_profile: @employer_profile %>
+      <% else %>
+      <%= render 'exchanges/employer_applications/no_action', :object => @application %>
       <% end %>
     </div>
   </div>
