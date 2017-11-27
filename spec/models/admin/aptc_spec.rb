@@ -117,7 +117,7 @@ RSpec.describe Admin::Aptc, :type => :model do
       expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
     end
   end
-  
+
   context "years_with_tax_household" do
     let(:past_date) { Date.new(oe_start_year, 10, 10) }
     let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
