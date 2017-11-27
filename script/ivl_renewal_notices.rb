@@ -59,6 +59,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       next if primary_member.nil?
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
       next if !person.present?
+      next if !person.primary_family.present?
       enrollments = valid_enrollments(person)
       next if enrollments.empty?
       consumer_role = person.consumer_role
