@@ -18,11 +18,8 @@ class Exchanges::EmployerApplicationsController < ApplicationController
       if end_on > TimeKeeper.date_of_record
         @application.schedule_termination! if @application.may_schedule_termination?
       else
-        @application.terminate! if @application.may_terminate?
+        @application.terminate!(end_on: end_on) if @application.may_terminate?
       end
-      @application.update_attributes!(end_on: end_on, :terminated_on => TimeKeeper.date_of_record)
-      @application.terminate_employee_benefit_packages
-      @application.terminate_employee_enrollments
       flash[:notice] = "Employer Application terminated successfully."
       redirect_to exchanges_hbx_profiles_root_path
     end

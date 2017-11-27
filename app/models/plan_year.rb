@@ -935,12 +935,12 @@ class PlanYear
     # Scheduling terminations for plan years with a future end on date
     event :schedule_termination, :after => :record_transition do
       transitions from: :active,
-                    to: :termination_pending
+                    to: :termination_pending, :after => [:set_plan_year_termination_date, :terminate_employee_benefit_packages, :terminate_employee_enrollments]
     end
 
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated
+      transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated, :after => [:set_plan_year_termination_date, :terminate_employee_benefit_packages, :terminate_employee_enrollments]
     end
 
     # Coverage reinstated
@@ -989,6 +989,11 @@ class PlanYear
     self.hbx_enrollments.each do |enrollment|
       enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
     end
+  end
+
+  def set_plan_year_termination_date(end_on, terminated_on = TimeKeeper.date_of_record)
+    self.end_on = end_on
+    self.terminated_on = TimeKeeper.date_of_record
   end
 
   def trigger_passive_renewals
