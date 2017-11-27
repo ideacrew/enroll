@@ -56,7 +56,7 @@
             <b>Advance Premium Tax Credit (APTC)</b>
           </td>
           <td style="width: 75%;">
-            <% if ivl.tax_household.max_aptc > 0 %>
+            <% if ivl.is_ia_eligible %>
               <p><%= ivl.first_name %> qualifies for an advance premium tax credit to help pay for the insurance. Your annual household income of <%= number_to_currency(ivl.tax_household.aptc_csr_annual_household_income, precision: 2) %> is within the income limit of <%= number_to_currency(ivl.tax_household.aptc_annual_income_limit, precision: 2) %> for this person. The value of the tax credit is based on your household size, income, and the cost of health plans available to those who qualify.</p>
             <% end %>
             <% if ivl.no_aptc_because_of_income %>
@@ -95,7 +95,7 @@
             <b>Cost-Sharing Reductions (CSR)</b>
           </td>
           <td style="width: 75%;">
-          <% if (!ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) %>
+          <% if (!ivl.indian_conflict && ivl.is_csr_eligible ) %>
             <p><%= ivl.first_name %> qualifies for cost-sharing reductions, but must select a silver plan to receive them. Your annual household income of <%= number_to_currency(ivl.tax_household.aptc_csr_annual_household_income, precision: 2) %> is within the income limit of <%= number_to_currency(ivl.tax_household.csr_annual_income_limit, precision: 2) %>. With a silver plan, <%= ivl.first_name %> will get a discount on out-of-pocket costs for medical services.</p>
           <% end %>
 

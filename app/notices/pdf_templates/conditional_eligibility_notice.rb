@@ -158,7 +158,7 @@ module PdfTemplates
     end
 
     def eligibility_notice_display_aptc(ivl)
-      (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax
+      (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
     end
 
     def eligibiltiy_notice_display_csr(ivl)

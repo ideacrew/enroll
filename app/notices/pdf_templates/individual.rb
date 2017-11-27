@@ -30,6 +30,7 @@ module PdfTemplates
 
     attribute :is_medicaid_chip_eligible, Boolean, :default => false
     attribute :is_ia_eligible, Boolean, :default => false
+    attribute :is_csr_eligible, Boolean, :default => false
     attribute :is_non_magi_medicaid_eligible, Boolean, :default => false
     attribute :is_without_assistance, Boolean, :default => false
     attribute :is_totally_ineligible, Boolean, :default => false
