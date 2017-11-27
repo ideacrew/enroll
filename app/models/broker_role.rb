@@ -227,10 +227,15 @@ class BrokerRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
+    event :approve do
       transitions from: :applicant, to: :active, :guard => :is_primary_broker?
       transitions from: :broker_agency_pending, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
+      after(ensure: true) do
+        record_transition
+        send_invitation
+        notify_updated
+      end
     end
 
     event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
