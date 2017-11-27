@@ -58,10 +58,11 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      next if !person.present?
       enrollments = valid_enrollments(person)
       next if enrollments.empty?
       consumer_role = person.consumer_role
-      if person.present? && consumer_role.present?
+      if consumer_role.present?
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
