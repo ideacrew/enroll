@@ -19,11 +19,13 @@ class ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop < Sho
   def append_data
     plan = self.hbx_enrollment.plan
     plan_name = plan.name
+    plan_year_start_on = self.hbx_enrollment.benefit_group.plan_year.start_on
     plan_year_end_on = self.hbx_enrollment.benefit_group.plan_year.end_on
     carrier_name = plan.carrier_profile.organization.legal_name
 
     notice.plan = PdfTemplates::Plan.new({
       :plan_name => hbx_enrollment.plan.name,
+      :coverage_start_on => plan_year_start_on,
       :coverage_end_on => plan_year_end_on,
       :plan_carrier => carrier_name
       })
