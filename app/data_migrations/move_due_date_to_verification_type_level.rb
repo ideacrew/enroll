@@ -3,7 +3,14 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MoveDueDateToVerificationTypeLevel < MongoidMigrationTask
   def migrate
-    Family.having_unverified_enrollment.where(:"households.hbx_enrollments.special_verification_period".ne => nil).each do |family|
+
+    Family.having_unverified_enrollment.where(
+      :"households.hbx_enrollments" => {
+        :"$elemMatch" => {
+          :"special_verification_period".ne => nil,
+          :"aasm_state" => "enrolled_contingent"
+        }
+    }).each do |family|
       family.family_members.each do |f_member|
         begin
           enrollment = enrolled_policy(family, f_member)
