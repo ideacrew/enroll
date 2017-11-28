@@ -6,20 +6,29 @@ class RevertTerminationForEmployee < MongoidMigrationTask
       census_employee = CensusEmployee.where(_id: ENV["census_employee_id"].to_s).first
       if census_employee.may_reinstate_eligibility?
         census_employee.reinstate_eligibility!
-        census_employee.unset(:employment_terminated_on, :coverage_terminated_on)
-        puts "Reverted Employee Termination" unless Rails.env.test?
-        puts "Removed Employment termination on & coverage Termination On dates" unless Rails.env.test?
       else
-        puts "Employee Not eligible for re-instatement" unless Rails.env.test?
+        from_state = census_employee.aasm_state
+        census_employee.update_attributes(aasm_state:"employee_role_linked")
+        census_employee.workflow_state_transitions << WorkflowStateTransition.new(from_state: from_state, to_state: census_employee.aasm_state)
+      end
+      census_employee.unset(:employment_terminated_on, :coverage_terminated_on)
+      puts "Reverted Employee Termination" unless Rails.env.test?
+
+
+      hbx_ids = "#{ENV['enrollment_hbx_id']}".split(',').uniq
+      hbx_ids.inject([]) do |enrollments, hbx_id|
+        if HbxEnrollment.by_hbx_id(hbx_id.to_s).size != 1
+          raise "Found no (OR) more than 1 enrollments with the #{hbx_id}" unless Rails.env.test?
+        end
+        enrollments << HbxEnrollment.by_hbx_id(hbx_id.to_s).first
+      end
+      enrollments.each do |enrollment|
+        enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
+        enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
+        puts "Reverted Enrollment termination" unless Rails.env.test?
       end
 
-      if ENV['enrollment_hbx_id'].present?
-        enrollment = HbxEnrollment.by_hbx_id(ENV['enrollment_hbx_id'].to_s)[0]
-        if enrollment.termination_attributes_cleared?
-          enrollment.update_attributes!(aasm_state: "coverage_enrolled") # No Event Available
-          puts "Moved Enrollment to Enrolled status" unless Rails.env.test?
-        end
-      end
+
     rescue => e
       puts "#{e}"
     end
