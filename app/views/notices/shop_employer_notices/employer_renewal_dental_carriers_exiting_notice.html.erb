@@ -15,7 +15,7 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td><h3>Dental Carrier Exit from DC Health Link’s Small Business Marketplace</h3></td>
+      <td><h3>Dental Carrier Exit from <%= Settings.site.short_name.upcase %>’s Small Business Marketplace</h3></td>
     </tr>
   </tbody>
 </table>
@@ -29,7 +29,7 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "MetLife and Delta Dental have notified the DC Health Benefit Exchange Authority of their decision to cease new sales in the Small Business market as of January 1, 2018. If your organization offers dental coverage from either of these carriers through DC Health Link, your benefits administrator will have to update your group’s plan offerings.", top_margin: '10px'} %>
+  content: "MetLife and Delta Dental have notified the #{Settings.aca.hbx_abbreviation} Authority of their decision to cease new sales in the Small Business market as of January 1, 2018. If your organization offers dental coverage from either of these carriers through #{Settings.site.short_name}, your benefits administrator will have to update your group’s plan offerings.", top_margin: '10px'} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "Groups that are have interest in offering dental coverage in the upcoming plan year through #{Settings.site.short_name} will continue to have the following products as options in Plan Year 2018: CareFirst’s BlueDental Traditional (PPO) and BlueDental Preferred High (PPO), as well as Dominion’s Select Plan Premium (HMO), Choice PPO Basic (PPO), and Choice PPO Premium (PPO). Should you have any questions, feel free to reach out to the #{Settings.site.short_name} Contact Center #{notice.hbe.phone} 8:00am-6:00pm Monday through Friday.", top_margin: '10px'} %>
@@ -40,7 +40,7 @@
   contents: ["Please contact your broker for further assistance.  You can also contact #{Settings.site.short_name} with any questions:"],
     heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["By calling #{notice.hbe.phone}.",
+  ["By calling #{notice.hbe.phone}",
     "TTY: #{Settings.contact_center.tty}",
     "Online at <a href=#{Settings.site.home_url}>#{Settings.site.website_name}</a>"]} %>
 

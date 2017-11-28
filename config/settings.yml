@@ -25,7 +25,7 @@ contact_center:
 aca:
   state_name: "District of Columbia"
   state_abbreviation: "DC"
-
+  hbx_abbreviation: "DC Health Benefit Exchange"
 #
   qle:
     with_in_sixty_days: 60

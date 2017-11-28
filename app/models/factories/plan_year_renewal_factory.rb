@@ -53,6 +53,7 @@ module Factories
 
         if @renewal_plan_year.save
           renew_benefit_groups
+          trigger_notice {"employer_renewal_dental_carriers_exiting_notice"}
           @renewal_plan_year
         else
           raise PlanYearRenewalFactoryError,
@@ -159,8 +160,6 @@ module Factories
      
       renewal_benefit_group = assign_health_plan_offerings(renewal_benefit_group, active_group)
       renewal_benefit_group = assign_dental_plan_offerings(renewal_benefit_group, active_group) if is_renewal_dental_offered?(active_group)
-      trigger_notice {"employer_renewal_dental_carriers_exiting_notice"}
-
       renewal_benefit_group
     end
 
