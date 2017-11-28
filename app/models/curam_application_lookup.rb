@@ -25,7 +25,7 @@ class CuramApplicationLookup
         request_result = Acapi::Requestor.request("account_management.check_existing_account", person_demographics, 2)
         retry_attempt = retry_attempt + 1
       end
-      request_result.stringify_keys["body"]
+      request_result.stringify_keys["return_status"]
     end
   end
 
