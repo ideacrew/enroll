@@ -4,8 +4,8 @@ class ShopEmployerNotices::LowEnrollmentNotice < ShopEmployerNotice
     build
     append_data
     generate_pdf_notice
-    attach_envelope
     non_discrimination_attachment
+    attach_envelope
     upload_and_send_secure_message
     send_generic_notice_alert
   end
@@ -20,10 +20,6 @@ class ShopEmployerNotices::LowEnrollmentNotice < ShopEmployerNotice
 
     #binder payment deadline
     notice.plan_year.binder_payment_due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
-  end
-
-  def non_discrimination_attachment
-    join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'shop_non_discrimination_attachment.pdf')]
   end
 
 end

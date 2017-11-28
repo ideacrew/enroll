@@ -26,6 +26,7 @@ RSpec.describe "app/views/insured/group_selection/terminate_confirm.html.erb" do
       dollar_amount = number_to_currency(current_premium(hbx_enrollment), precision: 2)
       expect(rendered).to match /Premium/
       expect(rendered).to include dollar_amount
+      expect(rendered).to match /Carrier Contact Info/
     end
   end
 end
