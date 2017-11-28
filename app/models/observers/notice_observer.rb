@@ -20,6 +20,8 @@ module Observers
     ]
     
     def plan_year_update(new_model_event)
+
+
       raise ArgumentError.new("expected ModelEvents::ModelEvent") unless new_model_event.is_a?(ModelEvents::ModelEvent)
 
       if PLANYEAR_NOTICE_EVENTS.include?(new_model_event.event_key)
@@ -38,9 +40,8 @@ module Observers
             end
           end
         end
-
         if new_model_event.event_key == :renewal_employer_open_enrollment_completed
-          trigger_notice(recipient: organization.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
+          trigger_notice(recipient: plan_year.employer_profile, event_object: plan_year, notice_event: "renewal_employer_open_enrollment_completed")
         end
 
         if new_model_event.event_key == :renewal_application_submitted

@@ -9,30 +9,52 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:employer) { create(:employer_with_planyear, start_on: (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year, plan_year_state: 'active') }
   let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_enrolling', benefit_groups: [benefit_group]) }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
+  let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer) }
+  let(:household) { FactoryGirl.create(:household, family: family)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:valid_params) do
+      {
+        census_employee: census_employee,
+        benefit_group: benefit_group,
+        start_on: start_on,
+        is_active: true
+      }
+    end
+  let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
+  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: household,
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, 
+                          aasm_state: "renewing_coverage_selected"
+                          )}
 
-  let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer) }
+  #let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer) }
 
   let!(:date_mock_object) { double("Date", day: 15)}
+  after(:each) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
   describe "ModelEvent" do
-    after(:each) do
-      DatabaseCleaner.clean_with(:truncation)
-    end
+    
     context "when renewal employer 2 days prior to publish due date" do
       it "should trigger model event" do
-        expect_any_instance_of(Observers::Observer).to receive(:trigger_notice).with(recipient: organization.employer_profile, event_object: model_instance, notice_event: model_event).and_return(true)
-        PlanYear.date_change_event(date_mock_object)
+        allow(model_instance).to receive(:is_open_enrollment_closed?).and_return(true)
+        allow(model_instance).to receive(:is_enrollment_valid?).and_return(true)
+        model_instance.observer_peers.keys.each do |observer|
+          expect(observer).to receive(:plan_year_update) do |model_event|
+            expect(model_event).to be_an_instance_of(ModelEvents::ModelEvent)
+            expect(model_event).to have_attributes(:event_key => :renewal_employer_open_enrollment_completed, :klass_instance => model_instance, :options => {})
+          end
+        end
+        model_instance.advance_date!
       end
     end
   end
 
   describe "NoticeTrigger" do
-    after(:each) do
-      DatabaseCleaner.clean_with(:truncation)
-    end
     context "when renewal application created" do
       subject { Observers::NoticeObserver.new }
 
-      let(:model_event) { ModelEvents::ModelEvent.new(:renewal_employer_open_enrollment_completed, PlanYear, {}) }
+      let(:model_event) { ModelEvents::ModelEvent.new(:renewal_employer_open_enrollment_completed, model_instance, {}) }
 
       it "should trigger notice event" do
         expect(subject).to receive(:notify) do |event_name, payload|
@@ -42,7 +64,7 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
         end
 
-        subject.plan_year_date_change(model_event)
+        subject.plan_year_update(model_event)
       end
     end
   end
