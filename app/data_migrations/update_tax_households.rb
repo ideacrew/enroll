@@ -38,13 +38,13 @@ class UpdateTaxHouseholds < MongoidMigrationTask
             count+=1
 
           rescue => e
-            puts "Bad Family Record with id: #{family.id}"
+            puts "Bad Family Record with id: #{family.id}" unless Rails.env.test?
           end
         end
       end
-      puts "updated #{count} families"
+      puts "updated #{count} families" unless Rails.env.test?
     else
-      puts "cannot activate THH, which is not the current year"
+      puts "cannot activate THH, which is not the current year" unless Rails.env.test?
     end
   end
 end
