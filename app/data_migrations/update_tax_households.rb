@@ -2,7 +2,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateTaxHouseholds < MongoidMigrationTask
   def migrate
-    thh_year = 2017 # This is the Year for which you are 're-activating' the THH.
+    thh_year = ENV['tax_household_year'].to_i # This is the Year for which you are 're-activating' the THH.
     if thh_year == TimeKeeper.date_of_record.year
       field_names = %w(
             family_id
@@ -44,7 +44,7 @@ class UpdateTaxHouseholds < MongoidMigrationTask
       end
       puts "updated #{count} families"
     else
-      puts "cannot activate THH for a previous year"
+      puts "cannot activate THH, which is not the current year"
     end
   end
 end

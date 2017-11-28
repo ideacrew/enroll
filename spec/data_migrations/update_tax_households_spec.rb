@@ -44,6 +44,7 @@ describe UpdateTaxHouseholds, dbclean: :after_each do
                                                           max_aptc: {"cents" => 100.00, "currency_iso" => "USD"})}
 
     it "should be nil if the effective_ending_on is nil" do
+      allow(ENV).to receive(:[]).with("tax_household_year").and_return TimeKeeper.date_of_record.year
       th=tax_household
       expect(th.effective_ending_on).to eq nil
       subject.migrate
@@ -53,6 +54,7 @@ describe UpdateTaxHouseholds, dbclean: :after_each do
     end
 
     it "should be updated if the effective_starting_on is same as current year" do
+      allow(ENV).to receive(:[]).with("tax_household_year").and_return TimeKeeper.date_of_record.year
       th=tax_household2
       expect(th.effective_starting_on.year).to eq TimeKeeper.date_of_record.year
       expect(th.effective_ending_on).not_to eq nil
@@ -63,6 +65,7 @@ describe UpdateTaxHouseholds, dbclean: :after_each do
     end
 
     it "should not be updated if the effective_starting_on is not same as current year" do
+      allow(ENV).to receive(:[]).with("tax_household_year").and_return TimeKeeper.date_of_record.year-1
       th=tax_household3
       expect(th.effective_starting_on.year).to eq TimeKeeper.date_of_record.year-1
       subject.migrate
