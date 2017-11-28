@@ -95,8 +95,10 @@
   def format_date params
     return if params[:financial_assistance_income].blank?
     params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
-    params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
- end
+    if params[:financial_assistance_income][:end_on].present?
+      params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y")
+    end
+  end
 
   def job_income_type
     FinancialAssistance::Income::JOB_INCOME_TYPE_KIND

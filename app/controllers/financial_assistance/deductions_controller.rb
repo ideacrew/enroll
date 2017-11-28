@@ -83,7 +83,9 @@ class FinancialAssistance::DeductionsController < ApplicationController
   def format_date params
     return if params[:financial_assistance_deduction].blank?
     params[:financial_assistance_deduction][:start_on] = Date.strptime(params[:financial_assistance_deduction][:start_on].to_s, "%m/%d/%Y")
-    params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y")
+    if params[:financial_assistance_deduction][:end_on].present?
+      params[:financial_assistance_deduction][:end_on] = Date.strptime(params[:financial_assistance_deduction][:end_on].to_s, "%m/%d/%Y")
+    end
   end
 
   # this might not be needed anymore as forms (with dates) have come out of the YAML. Refactor and Replace with the method above.
