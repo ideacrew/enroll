@@ -1,5 +1,6 @@
 module Notifier
   module Builders::PlanYear
+
     def plan_year_current_py_start_date
       if current_plan_year.present?
         merge_model.plan_year.current_py_start_date = format_date(current_plan_year.start_on)
@@ -98,6 +99,51 @@ module Notifier
       elsif current_plan_year.present?
         merge_model.plan_year.enrollment_errors = current_plan_year.enrollment_errors
       end
+    end
+
+    def load_plan_year
+      plan_year = nil
+
+      if payload['event_object_kind'].constantize == PlanYear
+        plan_year = employer_profile.plan_years.find(payload['event_object_id'])
+      end
+
+      if plan_year.blank? && enrollment.present?
+        if enrollment.benefit_group
+          plan_year = enrollment.benefit_group.plan_year
+        end
+      end
+
+      plan_year
+    end
+
+    def current_plan_year
+      return @current_plan_year if defined? @current_plan_year
+      plan_year = load_plan_year
+      if plan_year.present?
+        if plan_year.is_renewing? || plan_year.renewing_application_ineligible? || plan_year.renewing_canceled?
+          @current_plan_year = employer_profile.plan_years.detect{|py| py.is_published? && py.start_on == plan_year.start_on.prev_year}
+        else
+          @current_plan_year = plan_year
+        end
+      end
+    end
+
+    def renewal_plan_year
+      return @renewal_plan_year if defined? @renewal_plan_year
+      plan_year = load_plan_year
+      if plan_year.present?
+        if plan_year.is_renewing? || plan_year.renewing_application_ineligible? || plan_year.renewing_canceled?
+          @renewal_plan_year = plan_year
+        else
+          @renewal_plan_year = employer_profile.plan_years.detect{|py| py.is_published? && py.start_on == plan_year.start_on.prev_year}
+        end
+      end
+    end
+
+    def format_date(date)
+      return if date.blank?
+      date.strftime("%m/%d/%Y")
     end
   end
 end
