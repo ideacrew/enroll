@@ -16,19 +16,31 @@ class RevertTerminationForEmployee < MongoidMigrationTask
 
 
       hbx_ids = "#{ENV['enrollment_hbx_id']}".split(',').uniq
-      hbx_ids.inject([]) do |enrollments, hbx_id|
+      @enrollments= []
+      hbx_ids.each do |hbx_id|
         if HbxEnrollment.by_hbx_id(hbx_id.to_s).size != 1
           raise "Found no (OR) more than 1 enrollments with the #{hbx_id}" unless Rails.env.test?
         end
-        enrollments << HbxEnrollment.by_hbx_id(hbx_id.to_s).first
+        @enrollments << HbxEnrollment.by_hbx_id(hbx_id.to_s).first
       end
-      enrollments.each do |enrollment|
-        enrollment.update_attributes!(terminated_on: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
-        enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
-        puts "Reverted Enrollment termination" unless Rails.env.test?
+      @enrollments.each do |enrollment|
+          state = enrollment.aasm_state
+          if enrollment.is_shop?
+            enrollment.update_attributes!(terminated_on: nil, terminate_reason: nil, termination_submitted_on: nil, aasm_state: "coverage_enrolled")
+            enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+                from_state: state,
+                to_state: "coverage_enrolled"
+            )
+          else
+            enrollment.update_attributes!(terminated_on: nil, terminate_reason: nil,termination_submitted_on: nil, aasm_state: "coverage_selected")
+            enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+                from_state: state,
+                to_state: "coverage_selected"
+            )
+          end
+          enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
+          puts "Reverted Enrollment termination" unless Rails.env.test?
       end
-
-
     rescue => e
       puts "#{e}"
     end
