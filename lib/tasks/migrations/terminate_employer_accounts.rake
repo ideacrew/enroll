@@ -51,7 +51,7 @@ namespace :migrations do
         end
 
         if plan_year.may_terminate?
-          plan_year.terminate!
+          plan_year.terminate!(end_on)
           plan_year.update_attributes!(end_on: end_on, :terminated_on => termination_date)
 
           bg_ids = plan_year.benefit_groups.map(&:id)

@@ -111,12 +111,13 @@ class PlanYear
     end
   end
 
-  def terminate_employee_benefit_packages
+  def terminate_employee_benefit_packages(py_end_on)
     bg_ids = self.benefit_groups.map(&:id)
     census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
     census_employees.each do |census_employee|
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
-        assignment.update(end_on: self.end_on) if assignment.end_on.present? && assignment.end_on > self.end_on
+        assignment.update(end_on: py_end_on) if assignment.end_on.present? && assignment.end_on > py_end_on
+        assignment.update_attributes!(:is_active => false)
       end
     end
   end
@@ -129,14 +130,14 @@ class PlanYear
     end
   end
 
-  def terminate_employee_enrollments
+  def terminate_employee_enrollments(py_end_on)
     enrollments_for_plan_year.each do |hbx_enrollment|
-      if self.end_on > TimeKeeper.date_of_record
-        hbx_enrollment.terminate_coverage!  if hbx_enrollment.may_terminate_coverage?
+      if py_end_on < TimeKeeper.date_of_record
+        hbx_enrollment.terminate_coverage!(py_end_on) if hbx_enrollment.may_terminate_coverage?
       else
-        hbx_enrollment.schedule_coverage_termination! if hbx_enrollment.may_schedule_coverage_termination?
+        hbx_enrollment.schedule_coverage_termination!(py_end_on) if hbx_enrollment.may_schedule_coverage_termination?
       end
-      hbx_enrollment.update_attributes!(terminated_on: self.end_on, termination_submitted_on: TimeKeeper.date_of_record)
+      hbx_enrollment.update_attributes!(termination_submitted_on: TimeKeeper.date_of_record)
     end
   end
 
@@ -700,14 +701,6 @@ class PlanYear
       calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
     end
 
-    def terminate_scheduled_plan_years
-      organizations = Organization.where(:"employer_profile.plan_years" => {:$elemMatch => {:end_on.lt => TimeKeeper.date_of_record, :aasm_state => "termination_pending"}})
-      organizations.each do |org|
-        py = org.employer_profile.plan_years.where(:aasm_state => "termination_pending")
-        py.terminate!
-      end
-    end
-
     def calculate_open_enrollment_date(start_on)
       start_on = start_on.to_date
 
@@ -935,12 +928,12 @@ class PlanYear
     # Scheduling terminations for plan years with a future end on date
     event :schedule_termination, :after => :record_transition do
       transitions from: :active,
-                    to: :termination_pending, :after => [:set_plan_year_termination_date, :terminate_employee_benefit_packages, :terminate_employee_enrollments]
+                    to: :termination_pending, :after => [:set_plan_year_termination_date, :terminate_employee_enrollments]
     end
 
     # Coverage terminated due to non-payment
     event :terminate, :after => :record_transition do
-      transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated, :after => [:set_plan_year_termination_date, :terminate_employee_benefit_packages, :terminate_employee_enrollments]
+      transitions from: [:active, :suspended, :expired, :termination_pending], to: :terminated, :after => :terminate_employee_benefit_packages
     end
 
     # Coverage reinstated
@@ -993,7 +986,7 @@ class PlanYear
 
   def set_plan_year_termination_date(end_on, terminated_on = TimeKeeper.date_of_record)
     self.end_on = end_on
-    self.terminated_on = TimeKeeper.date_of_record
+    self.terminated_on = terminated_on
   end
 
   def trigger_passive_renewals
