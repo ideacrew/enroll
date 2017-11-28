@@ -32,36 +32,45 @@ report_name = "#{Rails.root}/#{event}_#{TimeKeeper.date_of_record.strftime('%m_%
 event_kind = ApplicationEventKind.where(:event_name => event).first
 notice_trigger = event_kind.notice_triggers.first
 
-unless event_kind.present?
-  puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
+def valid_enrollments(person)
+  hbx_enrollments = []
+  family = person.primary_family
+  enrollments = family.enrollments.where(:aasm_state.in => ["auto_renewing", "coverage_selected", "enrolled_contingent"], :kind => "individual")
+  return [] if enrollments.blank?
+  health_enrollments = enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year == 2018}
+  dental_enrollments = enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year == 2018}
+
+  hbx_enrollments << health_enrollments
+  hbx_enrollments << dental_enrollments
+
+  hbx_enrollments.flatten!.compact!
+  hbx_enrollments
 end
 
-#need to exlude this list from UQHP_FEL data set.
-@excluded_list = []
-CSV.foreach("UQHP_FEL_EXLUDE_LIST_nov_14.csv",:headers =>true).each do |d|
-  @excluded_list << d["Subscriber"]
+unless event_kind.present?
+  puts "Not a valid event kind. Please check the event name" unless Rails.env.test?
 end
 
 CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      next if (members.any?{ |m| @excluded_list.include?(m["member_id"]) })
       primary_member = members.detect{ |m| m["dependent"].upcase == "NO"}
       next if primary_member.nil?
-      next if (primary_member.present? && primary_member["policy.subscriber.person.is_dc_resident?"] == "FALSE")
-      next if members.select{ |m| m["policy.subscriber.person.is_incarcerated"] == "TRUE"}.present?
-      next if (members.any?{ |m| (m["policy.subscriber.person.citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["policy.subscriber.person.citizen_status"] == "not_lawfully_present_in_us")})
-
       person = Person.where(:hbx_id => primary_member["subscriber_id"]).first
+      next if !person.present?
+      next if !person.primary_family.present?
+      enrollments = valid_enrollments(person)
+      next if enrollments.empty?
       consumer_role = person.consumer_role
-      if person.present? && consumer_role.present?
+      if consumer_role.present?
         builder = notice_trigger.notice_builder.camelize.constantize.new(consumer_role, {
             template: notice_trigger.notice_template,
             subject: event_kind.title,
             event_name: event_kind.event_name,
             mpi_indicator: notice_trigger.mpi_indicator,
             person: person,
+            enrollments: enrollments,
             data: members
             }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)
             )
