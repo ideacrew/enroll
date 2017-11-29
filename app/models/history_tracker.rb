@@ -75,7 +75,7 @@ class HistoryTracker
           enrollment = family.active_household.hbx_enrollments.find(association_chain.last["id"])
           enrollment.hbx_enrollment_members.each do |enrollment_member|
             person = enrollment_member.family_member.person
-            person.consumer_role.history_action_trackers << create_history_element
+            person.consumer_role.history_action_trackers << create_history_element if person.consumer_role
           end
         end
       end
