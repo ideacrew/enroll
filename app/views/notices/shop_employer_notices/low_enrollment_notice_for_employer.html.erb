@@ -22,7 +22,7 @@
   content: "<strong>*** Currently, #{notice.plan_year.total_enrolled_count} out of your #{notice.plan_year.eligible_to_enroll_count} eligible employees on your census have completed their enrollment.***</strong>"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "You can monitor your employee enrollments during your open enrollment period through your employer account – see the Employer guide to managing your employee roster in our online Business Resource Center for instructions. If you are the creator of the group’s employer account and also eligible to enroll as an employee, see the Employer guide to enrolling as an employee, also available in the Business Resource Center."} %>
+  content: "You can monitor your employee enrollments during your open enrollment period through your employer account – see the Employer guide to managing your employee roster in our online #{link_to_site_business_resource_center} for instructions. If you are the creator of the group’s employer account and also eligible to enroll as an employee, see the Employer guide to enrolling as an employee, also available in the #{link_to_site_business_resource_center}."} %>
 <br>
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "Please note that your group will only obtain coverage if:",
@@ -51,7 +51,7 @@
           <strong>Log in to your MAhealthconnector.org Account</strong><br>
         </li>
         <li style="margin-top: 5px;">
-          <strong>Employee Enrollments</strong><br><br>Share our <strong>Employee guide to enrolling</strong> with your eligible employees to guide them through the enrollment process. You can find this guide in our Business Resource Center. If you are the point of contact for the group, you may want to review our <strong> Employer guide to enrolling as an employee</strong>, also available in the Business Resource Center.<br></br>
+          <strong>Employee Enrollments</strong><br><br>Share our <strong>Employee guide to enrolling</strong> with your eligible employees to guide them through the enrollment process. You can find this guide in our <%= link_to_site_business_resource_center %>. If you are the point of contact for the group, you may want to review our <strong> Employer guide to enrolling as an employee</strong>, also available in the <%= link_to_site_business_resource_center %>.<br></br>
           <strong><i>Employers should review their roster to ensure that any employees who are also owners (or spouses of owners) are identified as owners on their roster.</i></strong> For your group to receive coverage through the Small Group Marketplace, you must have at least one non-owner enrolled in a health plan at the end of each annual employee open enrollment period. 
 
         </li>
@@ -63,7 +63,7 @@
         </li>
         <li style="margin-top: 5px;">
           <strong>Make a Secure Online Payment</strong><br>
-          The <%= contact_center_mailing_address_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in our <strong>Employer guide to paying premiums</strong> in the Business Resource Center. You can <a href = '#{site_make_their_premium_payments_online}' > make your premium payments online </a> through our website.<br><br>
+          The <%= contact_center_mailing_address_name %> now offers small businesses the option to make their premium payments online through secure electronic check payment. Use the link below and follow the instructions in our <strong>Employer guide to paying premiums</strong> in the <%= link_to_site_business_resource_center %>. You can <a href = '#{site_make_their_premium_payments_online}' > make your premium payments online </a> through our website.<br><br>
           <strong>To make a secure electronic check payment by phone</strong><br>Call 1-888-813-9220
           <br>Select your language (1 for English, 2 for Spanish, additional language options available)
         </li>
