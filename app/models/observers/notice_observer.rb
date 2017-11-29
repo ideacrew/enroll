@@ -91,9 +91,9 @@ module Observers
       end
     end
 
-    def employer_profile_date_change; end
-    def hbx_enrollment_date_change; end
-    def census_employee_date_change; end
+    def employer_profile_date_change(model_event); end
+    def hbx_enrollment_date_change(model_event); end
+    def census_employee_date_change(model_event); end
 
     # def date_change_events(model_event)
     #   plan_year = model_event.klass_instance
