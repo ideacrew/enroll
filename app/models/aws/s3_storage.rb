@@ -42,7 +42,7 @@ module Aws
         read_object(object)
       rescue Exception => e
        puts "Error caused due to %s" %[$!.class]
-       raise e.backtrace
+       raise
       end
     end
 

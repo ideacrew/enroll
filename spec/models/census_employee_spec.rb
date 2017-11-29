@@ -241,7 +241,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :after_each do
             end
 
             context "and the benefit group plan year is published" do
-              before { plan_year.publish! }
+              before {
+                plan_year.publish!
+              }
 
               it "the employee census record should be ready for linking" do
                 expect(initial_census_employee.may_link_employee_role?).to be_truthy

@@ -338,9 +338,9 @@ Then(/^.+ should not see individual on enrollment title/) do
   expect(page).not_to have_content("Individual & Family")
 end
 
-def enter_plan_year_info
-  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 2.months).year}')]", :wait => 3).click
+And(/^.+ should be able to enter plan year, benefits, relationship benefits for cobra$/) do
+  find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]").click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{(Date.today + 1.months).year}')]").click
 
   screenshot("employer_add_plan_year")
   find('.interaction-field-control-plan-year-fte-count').click

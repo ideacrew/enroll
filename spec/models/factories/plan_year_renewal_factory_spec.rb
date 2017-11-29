@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_each do
-
   context '.renew' do
 
     let(:effective_on) { TimeKeeper.date_of_record.end_of_month.next_day }
