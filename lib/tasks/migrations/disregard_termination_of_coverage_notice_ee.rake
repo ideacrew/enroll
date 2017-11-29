@@ -1,7 +1,7 @@
 # This rake task used to send employer secure message it expects FEIN as arguments.
-#This rake task used to send employee secure message it expects HBX-ID as arguments.
+# This rake task used to send employee secure message it expects HBX-ID as arguments.
 
-#RAILS_ENV=production bundle exec rake bundle exec rake secure_message1:disregard_termination_of_coverage_notice_ee["3382429 3504641"]
+# RAILS_ENV=production bundle exec rake secure_message1:disregard_termination_of_coverage_notice_ee["3382429 3504641"]
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require File.join(Rails.root, "app/helpers/config/aca_helper")
 require File.join(Rails.root, "app/helpers/config/site_helper")
