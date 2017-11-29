@@ -79,7 +79,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
                                               area_code: office_location.phone.area_code,
                                               number: office_location.phone.number,
                                               extension: office_location.phone.extension)
-        full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
+         full_phone = office_location.phone.country_code + office_location.phone.area_code + office_location.phone.number + office_location.phone.extension
         person.phones.first.update_attributes(full_phone_number: full_phone)
       end
     end
@@ -87,7 +87,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     person.update_attributes(person_profile_params)
     person.save!
 
-    @broker_agency_profile.update_attributes(languages_spoken_params)
+    @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
 
 
     if @organization.update_attributes(broker_profile_params)

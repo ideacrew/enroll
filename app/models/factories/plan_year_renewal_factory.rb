@@ -51,8 +51,10 @@ module Factories
           "PlanYear state: #{@renewal_plan_year.aasm_state} cannot transition to renewing_draft"
         end
 
+        @renewal_plan_year.benefit_groups = @active_plan_year.benefit_groups.collect{|active_group| clone_benefit_group(active_group) }
+
         if @renewal_plan_year.save
-          renew_benefit_groups
+          populate_census_employee_benefit_packages
           @renewal_plan_year
         else
           raise PlanYearRenewalFactoryError,
@@ -66,6 +68,13 @@ module Factories
     end
 
     private
+
+    def populate_census_employee_benefit_packages
+      @active_plan_year.benefit_groups.each do |active_group|
+        renewal_group = @renewal_plan_year.benefit_groups.detect{|r_group| r_group.title.scan(/#{active_group.title.strip}/i).present? }
+        renew_census_employees(active_group, renewal_group)
+      end
+    end
 
     def validate_employer_profile
       if @employer_profile.plan_years.renewing.any?
@@ -81,44 +90,50 @@ module Factories
       end
     end
 
-    def renew_benefit_groups
-      @active_plan_year.benefit_groups.each do |active_group|
-        new_group = clone_benefit_group(active_group)
-        if new_group.save
-          renew_census_employees(active_group, new_group)
-        else
-          message = "Error saving benefit_group: #{new_group.id}, for employer: #{@employer_profile.id}"
-          raise PlanYearRenewalFactoryError, message
-        end
-      end
-    end
-
-    def reference_plan_ids(active_group)
+    def renewal_elected_plan_ids(active_group)
       start_on_year = (active_group.start_on + 1.year).year
       if active_group.plan_option_kind == "single_carrier"
         Plan.by_active_year(start_on_year).shop_market.health_coverage.by_carrier_profile(active_group.reference_plan.carrier_profile).and(hios_id: /-01/).map(&:id)
       elsif active_group.plan_option_kind == "metal_level"
         Plan.by_active_year(start_on_year).shop_market.health_coverage.by_metal_level(active_group.reference_plan.metal_level).and(hios_id: /-01/).map(&:id)
+      elsif active_group.plan_option_kind == "sole_source"        
+        reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
+        plans = [reference_plan_id]
       else
         Plan.where(:id.in => active_group.elected_plan_ids).map(&:renewal_plan_id)
       end
     end
 
+    def service_area_plan_hios_ids(carrier_id)
+      profile_and_service_area_pairs = CarrierProfile.carrier_profile_service_area_pairs_for(@employer_profile, @renewal_plan_year.start_on.year)
+      Plan.valid_shop_health_plans_for_service_area("carrier", carrier_id, @renewal_plan_year.start_on.year, profile_and_service_area_pairs).pluck(:hios_id)
+    end
+
     def clone_benefit_group(active_group)
       index = @active_plan_year.benefit_groups.index(active_group) + 1
       new_year = @active_plan_year.start_on.year + 1
+      renewal_plan = Plan.find(active_group.reference_plan_id).renewal_plan
 
-      reference_plan_id = Plan.find(active_group.reference_plan_id).renewal_plan_id
-      if reference_plan_id.blank?
+      if renewal_plan.blank?
         raise PlanYearRenewalFactoryError, "Unable to find renewal for referenence plan: Id #{active_group.reference_plan.id} Year #{active_group.reference_plan.active_year} Hios #{active_group.reference_plan.hios_id}"
       end
 
-      elected_plan_ids = reference_plan_ids(active_group)
+      reference_plan_id = renewal_plan.id
+ 
+      if active_group.sole_source?
+        service_area_hios = service_area_plan_hios_ids(active_group.reference_plan.carrier_profile_id)
+
+        if !service_area_hios.include?(renewal_plan.hios_id)
+          raise PlanYearRenewalFactoryError, "Unable to renew. renewal plan for referenence plan: #{active_group.reference_plan.id} not offered in employer service areas"
+        end
+      end
+
+      elected_plan_ids = renewal_elected_plan_ids(active_group)
       if elected_plan_ids.blank?
         raise PlanYearRenewalFactoryError, "Unable to find renewal for elected plans: #{active_group.elected_plan_ids}"
       end
 
-      @renewal_plan_year.benefit_groups.build({
+      benefit_group_attrs = {
         title: "#{active_group.title} (#{new_year})",
         effective_on_kind: "first_of_month",
         terminate_on_kind: active_group.terminate_on_kind,
@@ -130,7 +145,19 @@ module Factories
         reference_plan_id: reference_plan_id,
         elected_plan_ids: elected_plan_ids,
         is_congress: active_group.is_congress
-      })
+      }
+
+      benefit_group = @renewal_plan_year.benefit_groups.build(benefit_group_attrs)
+      if active_group.sole_source?
+
+        active_group.composite_tier_contributions.each do |composite_tier|
+          tier_attrs = composite_tier.attributes.symbolize_keys.except(:_id, :final_tier_premium)
+          benefit_group.composite_tier_contributions.build(tier_attrs)
+        end
+
+        benefit_group.build_estimated_composite_rates
+      end
+      benefit_group
     end
 
     def renew_census_employees(active_group, new_group)

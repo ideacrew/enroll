@@ -46,6 +46,7 @@ class EmployerProfile
   field :xml_transmitted_timestamp, type: DateTime
 
   delegate :hbx_id, to: :organization, allow_nil: true
+  delegate :issuer_assigned_id, to: :organization, allow_nil: true
   delegate :legal_name, :legal_name=, to: :organization, allow_nil: true
   delegate :dba, :dba=, to: :organization, allow_nil: true
   delegate :fein, :fein=, to: :organization, allow_nil: true
@@ -151,7 +152,34 @@ class EmployerProfile
     active_broker_agency_account.end_on = terminate_on
     active_broker_agency_account.is_active = false
     active_broker_agency_account.save!
+    employer_broker_fired
     notify_broker_terminated
+    broker_fired_confirmation_to_broker
+    broker_agency_fired_confirmation
+  end
+
+  def employer_broker_fired
+    begin
+      trigger_notices('employer_broker_fired')
+    rescue Exception => e
+      Rails.logger.error { "Unable to deliver broker fired confirmation notice to #{self.legal_name} due to #{e}" } unless Rails.env.test?
+    end
+  end
+
+  def broker_agency_fired_confirmation
+    begin
+      trigger_notices("broker_agency_fired_confirmation")
+    rescue Exception => e
+      puts "Unable to deliver broker agency fired confirmation notice to #{active_broker_agency_account.legal_name} due to #{e}" unless Rails.env.test?
+    end
+  end
+
+  def broker_fired_confirmation_to_broker
+    begin
+      trigger_notices('broker_fired_confirmation_to_broker')
+    rescue Exception => e
+      puts "Unable to send broker fired confirmation to broker. Broker's old employer - #{self.legal_name}"
+    end
   end
 
   alias_method :broker_agency_profile=, :hire_broker_agency
@@ -349,7 +377,11 @@ class EmployerProfile
   end
 
   def is_transmit_xml_button_disabled?
-    (!self.renewing_plan_year.present? && !self.binder_paid?) || binder_criteria_satisfied?
+    if self.renewing_plan_year.present?
+       binder_criteria_satisfied?
+    else
+       !self.renewing_plan_year.present? && !self.binder_paid?
+    end
   end
 
   def binder_criteria_satisfied?
@@ -562,11 +594,17 @@ class EmployerProfile
       }
     })
     end
-  
+
+    def initial_employers_enrolled_plan_year_state
+      Organization.where(:"employer_profile.plan_years" =>
+        { :$elemMatch => {
+          :aasm_state => "enrolled"
+          }
+        })
+    end
 
     def organizations_eligible_for_renewal(new_date)
-      months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months * -1
-
+      months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
       Organization.where(:"employer_profile.plan_years" =>
         { :$elemMatch => {
           :"start_on" => (new_date + months_prior_to_effective.months) - 1.year,
@@ -658,17 +696,16 @@ class EmployerProfile
         end
 
         #initial employers reminder notices to publish plan year.
-        start_on = (new_date+2.months).beginning_of_month
         start_on_1 = (new_date+1.month).beginning_of_month
-        if new_date.next_day == start_on.last_month
-          initial_employers_reminder_to_publish(start_on).each do|organization|
+        if (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
+          initial_employers_reminder_to_publish(start_on_1).each do|organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_first_reminder_to_publish_plan_year")
             rescue Exception => e
               puts "Unable to send first reminder notice to publish plan year to #{organization.legal_name} due to following error {e}"
             end
           end
-        elsif (new_date + 2.days).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
+        elsif (new_date.next_day).day == Settings.aca.shop_market.initial_application.advertised_deadline_of_month
           initial_employers_reminder_to_publish(start_on_1).each do |organization|
             begin
               organization.employer_profile.trigger_notices("initial_employer_second_reminder_to_publish_plan_year")
@@ -676,19 +713,32 @@ class EmployerProfile
               puts "Unable to send second reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
             end
           end
-        else 
+        else
           plan_year_due_date = Date.new(start_on_1.prev_month.year, start_on_1.prev_month.month, Settings.aca.shop_market.initial_application.publish_due_day_of_month)
           if (new_date + 2.days == plan_year_due_date)
             initial_employers_reminder_to_publish(start_on_1).each do |organization|
               begin
-                organization.employer_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
+                organization.employee_profile.trigger_notices("initial_employer_final_reminder_to_publish_plan_year")
               rescue Exception => e
                 puts "Unable to send final reminder notice to publish plan year to #{organization.legal_name} due to following errors {e}"
               end
             end
           end
-        end     
+        end
 
+        #initial employers misses binder payment due date deadline on next day notice
+        binder_next_day = PlanYear.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].next_day
+        if new_date == binder_next_day
+          initial_employers_enrolled_plan_year_state.each do |org|
+            if !org.employer_profile.binder_paid?
+                begin
+                  ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
+                rescue Exception => e
+                  (Rails.logger.error {"Unable to deliver Notice to  when missing binder payment due to #{e}"}) unless Rails.env.test?
+                end
+            end
+          end
+        end
       end
 
       # Employer activities that take place monthly - on first of month
@@ -929,11 +979,11 @@ class EmployerProfile
   end
 
   def transmit_initial_eligible_event
-    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(INITIAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: INITIAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def transmit_renewal_eligible_event
-    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) 
+    notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: self.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
   end
 
   def notify_broker_added
@@ -964,6 +1014,7 @@ class EmployerProfile
     org.first.employer_profile
   end
 
+
   def trigger_notices(event)
     ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
   end
@@ -986,7 +1037,7 @@ class EmployerProfile
 
   def service_areas_available_on(date)
     if use_simple_employer_calculation_model?
-      return nil
+      return []
     end
     primary_office_location = organization.primary_office_location
     CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
@@ -1066,9 +1117,9 @@ class EmployerProfile
       end
     end
   end
-  
+
   private
-  
+
   def has_ineligible_period_expired?
     ineligible? and (latest_workflow_state_transition.transition_at.to_date + 90.days <= TimeKeeper.date_of_record)
   end
@@ -1090,6 +1141,24 @@ class EmployerProfile
       from_state: aasm.from_state,
       to_state: aasm.to_state
     )
+  end
+
+  def self.notice_to_employer_for_missing_binder_payment(org)
+    begin
+      ShopNoticesNotifierJob.perform_later(org.employer_profile.id.to_s, "initial_employer_no_binder_payment_received")
+    rescue Exception => e
+      (Rails.logger.error {"Unable to deliver Notice on next day to #{org.legal_name} when employer misses binder payment due date deadline due to #{e}"}) unless Rails.env.test?
+    end
+  end
+
+  def self.notice_to_employee_for_missing_binder_payment(org)
+    org.employer_profile.census_employees.active.each do |ce|
+      begin
+        ShopNoticesNotifierJob.perform_later(ce.id.to_s, "ee_ers_plan_year_will_not_be_written_notice")
+      rescue Exception => e
+        (Rails.logger.error {"Unable to deliver Notices to #{ce.full_name} that initial Employer’s plan year will not be written due to #{e}"}) unless Rails.env.test?
+      end
+    end
   end
 
   # TODO - fix premium amount

@@ -1,7 +1,7 @@
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
-  def perform(id, event)
+  def perform(id, event, options = {})
     Resque.logger.level = Logger::DEBUG
     profile = EmployerProfile.find(id) || CensusEmployee.where(id: id).first
     event_kind = ApplicationEventKind.where(:event_name => event).first
@@ -12,6 +12,7 @@ class ShopNoticesNotifierJob < ActiveJob::Base
           subject: event_kind.title,
           event_name: event,
           mpi_indicator: notice_trigger.mpi_indicator,
+          options: options
       }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
     end
   end

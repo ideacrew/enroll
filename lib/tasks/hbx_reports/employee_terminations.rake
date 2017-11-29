@@ -13,7 +13,9 @@ namespace :reports do
         )
 
       processed_count = 0
-      file_name = "#{Rails.root}/public/employee_terminations.csv"
+
+      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+      file_name = File.expand_path("#{Rails.root}/public/employee_terminations_#{time_stamp}.csv")
 
       CSV.open(file_name, "w", force_quotes: true) do |csv|
         csv << field_names
@@ -45,6 +47,9 @@ namespace :reports do
           end
         end
       end
+
+      pubber = Publishers::Legacy::EmployeeTerminationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
 
       puts "For period #{date_start} - #{Date.today}, #{processed_count} employee terminations output to file: #{file_name}"
     end

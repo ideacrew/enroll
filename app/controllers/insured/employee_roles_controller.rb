@@ -74,6 +74,7 @@ class Insured::EmployeeRolesController < ApplicationController
       @family = @person.primary_family
       build_nested_models
     end
+    employee_eligible_notice(@employee_role.census_employee)
   end
 
   def update
@@ -205,4 +206,13 @@ class Insured::EmployeeRolesController < ApplicationController
       current_user.save!
     end
   end
+
+  def employee_eligible_notice(census_employee)
+    begin
+      ShopNoticesNotifierJob.perform_later(census_employee.id.to_s, "employee_matches_employer_rooster")
+    rescue Exception => e
+      puts "Unable to send Employee Open Enrollment begin notice to #{census_employee.first.full_name}" unless Rails.env.test?
+    end
+  end
+
 end

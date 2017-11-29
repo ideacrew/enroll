@@ -7,9 +7,12 @@ site:
   faqs_url: "https://www.mahealthconnector.org/business/help-center/faqs"
   business_resource_center_url: "https://www.mahealthconnector.org/business/business-resource-center"
   nondiscrimination_notice_url: "https://www.MAhealthconnector.org/site-policies/nondiscrimination-notice"
-  main_web_address: "www.MAhealthconnector.org"
-  website_name: "MAhealthconnector.org"
   main_web_address_url: "https://www.MAhealthconnector.org"
+  policies_url: "https://www.mahealthconnector.org/about/policy-center/policies"
+  website_name: "MAhealthconnector.org"
+  main_web_address: "www.MAhealthconnector.org"
+  health_care_website: "www.healthcare.gov"
+  health_care_website_url: "https://www.healthcare.gov"
   short_name: "Health Connector"
   byline: "The Right Place for the Right Plan"
   long_name: "Massachusetts Health Connector"
@@ -17,16 +20,18 @@ site:
   header_message: "The Right Place for the Right Plan"
   logo_file_name: "mhc_logo.svg"
   make_their_premium_payments_online: "https://www.mahealthconnector.org/business/employers/payment-information"
+  employer_application_deadline_link: "https://www.mahealthconnector.org/business/employers/employer-resources-and-information/employer-coverage-deadlines"
   s3_prefix: "mhc"
   broker_quoting_enabled: false
   use_default_devise_path: true
+  plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://ma.checkbookhealth.org/mashop"
   main_web_address_text: "MAhealthconnector.org"
   curam_enabled: false
   document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
-  registration_path: "https://www.mahealthconnector.org/business/create-a-business-account"
+
   social_media:
     facebook_url: ""
 
@@ -40,8 +45,9 @@ contact_center:
   alt_fax: "617-722-4033"
   tty_number: "711"
   alt_phone_number: "1-888-813-9220"
+  ivl_number: "1-877-623-6765"
   email_address: "smallbusiness@mahealthconnector.org"
-  small_business_email: "smallbusiness@mahealthconnector.org"
+  small_business_email: "smallbusiness@MAhealthconnector.org"
   non_discrimination_email: "Nondiscrimination@state.ma.us"
 
   appeals: "connector-appeals@state.ma.us"
@@ -69,6 +75,11 @@ contact_center:
     phone_3: "800-537-7697"
     complaint_url: "https://www.hhs.gov/civil-rights/filing-a-complaint"
 
+plan_option_titles:
+  sole_source: 'One Plan'
+  metal_level: 'One Level'
+  single_carrier: 'One Carrier'
+
 notices:
   mailing_address:
     address_1:
@@ -84,15 +95,22 @@ aca:
   nationwide_markets: false
   general_agency_enabled: false
   dental_market_enabled: false
+  dental_plan_years_available: [""]
   minimum_primary_contribution_percentage: 50
   minimum_family_contribution_percentage: 30
-  plan_options_available: ["sole_source"]
+  plan_options_available: ["sole_source", "single_carrier", "metal_level"]
   ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
-#
+  reference_carriers_for_metal_level: ["silver", "gold", "dental"]
+    ## acceptable options are ["sole_source", "single_carrier", "metal_level", "single_plan"]
+
+  plan_option_years:
+    single_carriers_available: ['2018']
+    sole_source_carriers_available: ['2017','2018']
+    metal_level_carriers_available: ['2018']
+
   qle:
     with_in_sixty_days: 60
 #
-
   individual_market:
     monthly_enrollment_due_on: 15
     verification_outstanding_window:
@@ -131,6 +149,7 @@ aca:
       advertised_deadline_of_month: 10
       earliest_start_prior_to_effective_on:
         months: -2
+        day_of_month: 5
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
@@ -140,8 +159,10 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -2
+        day_of_month: 5
       monthly_open_enrollment_end_on: 20
       publish_due_day_of_month: 15
+      application_submission_soft_deadline: 10
       force_publish_day_of_month: 16
       open_enrollment:
         minimum_length:

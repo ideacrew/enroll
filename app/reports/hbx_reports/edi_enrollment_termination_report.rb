@@ -27,8 +27,9 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                    Coverage_state_occured)
 
         processed_count = 0
-        Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-        file_name = "#{Rails.root}/hbx_report/edi_enrollment_termination_report.csv"
+
+        time_stamp = Time.now.utc.strftime("%Y%m%d_%H%M%S")
+        file_name = File.expand_path("#{Rails.root}/public/edi_enrollment_termination_report_#{time_stamp}.csv")
 
         CSV.open(file_name, "w", force_quotes: true) do |csv|
           csv << field_names
@@ -70,6 +71,8 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
               end
             end
           end
+          pubber = Publishers::Legacy::EdiEnrollmentTerminationReportPublisher.new
+          pubber.publish URI.join("file://", file_name)
           puts "For date #{date_of_termination}, total terminated hbx_enrollments count #{processed_count} and output file is: #{file_name}" unless Rails.env.test?
         end
   end

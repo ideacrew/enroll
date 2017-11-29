@@ -14,7 +14,11 @@ module Config::ContactCenterHelper
   def contact_center_alt_fax_number
     Settings.contact_center.alt_fax
   end
-  
+
+  def contact_center_ivl_number
+    Settings.contact_center.ivl_number
+  end
+
   def contact_center_city
     Settings.contact_center.mailing_address.city
   end
@@ -60,7 +64,7 @@ module Config::ContactCenterHelper
   end
 
   def small_business_email_link
-    link_to small_businesss_email,small_businesss_email
+    mail_to small_businesss_email,small_businesss_email
   end
 
   def contact_center_appeals

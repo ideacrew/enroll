@@ -7,16 +7,19 @@ namespace :reports do
     task :employer_roster_report => :environment do
 
       organizations = Organization.exists(:employer_profile => true).where(:"hbx_id".nin => [100101, 100102, 118510])
-      build_csv_report('er_roster_report.csv', organizations)
+      build_csv_report('er_roster_report', organizations)
 
       organizations = Organization.where(:"hbx_id".in => [100101, 100102, 118510])
-      build_csv_report('congressional_er_roster_report.csv', organizations)
+      build_csv_report('congressional_er_roster_report', organizations)
     end
   end
 end
 
 def build_csv_report(file_name, organizations)
-  CSV.open("#{Rails.root}/public/#{file_name}", "w", force_quotes: true) do |csv|
+  time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+  file_path = File.expand_path("#{Rails.root}/public/#{file_name}_#{time_stamp}.csv")
+
+  CSV.open(file_path, "w", force_quotes: true) do |csv|
     csv << ["EE first name","EE last name","ER legal name","ER DBA name","ER FEIN","SSN","Date of Birth","Date of Hire","Date added to roster","Employment status", "Date of Termination", "Date Terminated on Roster", "Email","Address","Roster Status","EE's HIX ID"]
     organizations.each do |organization|
       employer_profile = organization.employer_profile
@@ -34,6 +37,8 @@ def build_csv_report(file_name, organizations)
       end
     end
   end
+  pubber = Publishers::Legacy::EmployerRosterReportPublisher.new
+  pubber.publish URI.join("file://", file_path)
 end
 
 def build_employee_row(employee, employer_data)

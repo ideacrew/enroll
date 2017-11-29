@@ -1,11 +1,12 @@
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.7.1'
 
 # Mount Enroll App component engines
 gem "transport_gateway",  path: "components/transport_gateway"
-
+gem "notifier",           path: "components/notifier"
+gem "transport_profiles", path: "components/transport_profiles"
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
@@ -104,12 +105,23 @@ gem 'wicked_pdf', '1.0.6'
 # provide recaptcha services
 gem "recaptcha", '4.3.1', require: 'recaptcha/rails'
 
-gem 'jquery-datatables-rails', '3.4.0'
+# gem 'jquery-datatables-rails', '3.4.0'
+gem 'jquery-datatables-rails', '3.3.0'
 gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 
 gem 'interactor', '3.1.0'
 gem 'interactor-rails', '2.0.2'
 gem 'chosen-rails'
+
+# gem 'rocketjob_mission_control', '~> 3.0'
+# gem 'rails_semantic_logger'
+# gem 'rocketjob', '~> 3.0'
+
+gem 'ckeditor'
+gem 'redcarpet', '3.4.0'
+gem 'slim', '3.0.8'
+gem 'curl'
+gem 'non-stupid-digest-assets', '~> 1.0', '>= 1.0.9'
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views

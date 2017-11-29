@@ -109,6 +109,26 @@ RSpec.describe Plan, dbclean: :after_each do
       end
     end
 
+    context "check plan offerings scope" do
+      let!(:sole_source_plan) { create(:plan, is_sole_source: true, is_horizontal: false, is_vertical: false) }
+      let!(:horizontal_plan) { create(:plan, is_horizontal: true, is_sole_source: false, is_vertical: false) }
+      let!(:vertical_plan) { create(:plan, is_vertical: true, is_sole_source: false, is_horizontal: false) }
+      let!(:regular_plan) { create(:plan) } # we are creating this because when it is creating it will assign :is_sole_source, :is_horizontal, :is_vertical with default true boolean value
+
+
+      it "should return only sole source plans" do
+        expect(Plan.check_plan_offerings_for_sole_source).to contain_exactly(sole_source_plan, regular_plan)
+      end
+
+      it "should return only horizantal plans" do
+        expect(Plan.check_plan_offerings_for_metal_level).to contain_exactly(horizontal_plan, regular_plan)
+      end
+
+      it "should return only vertical plans" do
+        expect(Plan.check_plan_offerings_for_single_carrier).to contain_exactly(vertical_plan, regular_plan)
+      end
+    end
+
     context "with no metal_level" do
       def params;
         valid_params.except(:metal_level);

@@ -20,6 +20,7 @@ class ShopBrokerNotice < Notice
 
    def build
     notice.first_name = broker.first_name.titleize
+    notice.primary_fullname = broker.full_name.titleize
     notice.last_name = broker.last_name.titleize
     notice.hbx_id = broker.hbx_id
     notice.assignment_date = employer_profile.broker_agency_accounts.detect{|br| br.is_active == true}.start_on

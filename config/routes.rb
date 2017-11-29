@@ -1,18 +1,25 @@
 Rails.application.routes.draw do
 
   mount TransportGateway::Engine, at: "/transport_gateway"
+  mount Notifier::Engine, at: "/notifier"
+  # mount RocketJobMissionControl::Engine => 'rocketjob'
+  mount TransportProfiles::Engine, at: "/transport_profiles"
 
   require 'resque/server'
   mount Resque::Server, at: '/jobs'
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
+
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
 
+  match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
   match "hbx_admin/edit_aptc_csr" => "hbx_admin#edit_aptc_csr", as: :edit_aptc_csr, via: [:get, :post], defaults: { format: 'js' }
   match "hbx_admin/calculate_aptc_csr" => "hbx_admin#calculate_aptc_csr", as: :calculate_aptc_csr, via: :get
   post 'show_hints' => 'welcome#show_hints', :constraints => { :only_ajax => true }
+
+  post 'submit_notice' => "hbx_admin#submit_notice", as: :submit_notice
 
   namespace :users do
     resources :orphans, only: [:index, :show, :destroy]
@@ -22,10 +29,12 @@ Rails.application.routes.draw do
 
   resources :users do
     resources :security_question_responses, controller: "users/security_question_responses"
+    post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
+
     member do
-      post :unlock
-      get :lockable
-      get :confirm_lock
+      get :reset_password, :lockable, :confirm_lock, :login_history, :edit
+      put :confirm_reset_password, :update
+      post :unlock, :change_password
     end
   end
 
@@ -263,10 +272,10 @@ Rails.application.routes.draw do
     end
 
     resources :employer_attestations do
-       get 'authorized_download'
-       get 'verify_attestation'
-       delete 'delete_attestation_documents'
-       #get 'revert_attestation'
+      get 'authorized_download'
+      get 'verify_attestation'
+      delete 'delete_attestation_documents'
+      #get 'revert_attestation'
     end
     resources :inboxes, only: [:new, :create, :show, :destroy]
     resources :employer_profiles do
@@ -299,6 +308,7 @@ Rails.application.routes.draw do
         get 'reference_plans'
         get 'dental_reference_plans'
         get 'generate_dental_carriers_and_plans'
+        get 'generate_health_carriers_and_plans', on: :collection
         get 'plan_details' => 'plan_years#plan_details', on: :collection
         get 'recommend_dates', on: :collection
         get 'reference_plan_options', on: :collection
@@ -340,6 +350,7 @@ Rails.application.routes.draw do
   # match 'thank_you', to: 'broker_roles#thank_you', via: [:get]
 
   match 'broker_registration', to: 'broker_agencies/broker_roles#new_broker_agency', via: [:get]
+  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -534,8 +545,8 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
 
   resources :documents, only: [ :new, :create, :destroy, :update] do
-      get :document_reader,on: :member
-      get :autocomplete_organization_legal_name, :on => :collection
+    get :document_reader,on: :member
+    get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
       get :show_docs
@@ -552,6 +563,7 @@ Rails.application.routes.draw do
       get :download_employer_document
     end
   end
+
 
   # Temporary for Generic Form Template
   match 'templates/form-template', to: 'welcome#form_template', via: [:get, :post]

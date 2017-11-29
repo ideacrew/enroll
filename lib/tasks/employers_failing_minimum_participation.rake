@@ -11,7 +11,8 @@ namespace :reports do
         :open_enrollment_end_on => {"$gte" => window_date},
         :aasm_state.in => valid_states}})
 
-      file_name = "#{Rails.root}/public/employers_failing_minimum_participation.csv"
+      time_stamp = Time.now.strftime("%Y%m%d_%H%M%S")
+      file_name = File.expand_path("#{Rails.root}/public/employers_failing_minimum_participation_#{time_stamp}.csv")
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
       CSV.open(file_name, "w") do |csv|
@@ -43,6 +44,9 @@ namespace :reports do
         end
 
       end
+
+      pubber = Publishers::Legacy::EmployersFailingParticipationReportPublisher.new
+      pubber.publish URI.join("file://", file_name)
     end
 
     def clean_JSON_dump(json_errors)

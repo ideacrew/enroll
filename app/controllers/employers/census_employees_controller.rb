@@ -127,6 +127,7 @@ class Employers::CensusEmployeesController < ApplicationController
     respond_to do |format|
       format.js {
         if termination_date.present? && @fa
+          notice_terminated_employee
           flash[:notice] = "Successfully terminated Census Employee."
         else
           flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
@@ -163,7 +164,7 @@ class Employers::CensusEmployeesController < ApplicationController
           new_census_employee.build_address if new_census_employee.address.blank?
           new_census_employee.add_default_benefit_group_assignment
           new_census_employee.construct_employee_role_for_match_person
-
+          # there is an implicit save because of mongoid
           @census_employee = new_census_employee
           flash[:notice] = "Successfully rehired Census Employee."
         else
@@ -328,6 +329,14 @@ class Employers::CensusEmployeesController < ApplicationController
     @census_employee.build_email
     @census_employee.benefit_group_assignments.build
     @census_employee
+  end
+
+  def notice_terminated_employee
+    begin
+      ShopNoticesNotifierJob.perform_later(@census_employee.id.to_s, "employee_termination_notice")
+      rescue Exception => e
+      puts "Unable to deliver Termination notice to #{@census_employee.full_name}" unless Rails.env.test?
+    end
   end
   private
 

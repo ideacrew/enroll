@@ -15,14 +15,21 @@ module Effective
         table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
         table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| row.roles.join(', ') }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
-          dropdown = [
-           # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
-           ['Reset Password', show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax'],
-           ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
-           ['View Login History',show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id.to_s}"), 'ajax']
-          ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
-        }, :filter => false, :sortable => false
+                               dropdown = [
+                                   # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
+                                   if row.email.present?
+                                     ['Reset Password', user_password_path(user: { email: row.email }), 'post_ajax']
+                                   else
+                                     ['Reset Password', edit_user_path(row.id), 'ajax']
+                                   end,
+                                   ['Unlock / Lock Account', confirm_lock_user_path(row.id, user_action_id: "user_action_#{row.id.to_s}"), 'ajax'],
+                                   ['View Login History',login_history_user_path(id: row.id), 'ajax']
+                               ]
+                               render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "user_action_#{row.id.to_s}"}, formats: :html
+                             }, :filter => false, :sortable => false
+      end
+
+      def reset_password_link(row)
       end
 
       def collection
@@ -47,19 +54,19 @@ module Effective
 
       def nested_filter_definition
         filters = {
-          lock_unlock:
-          [
-            {scope:'locked', label: 'Locked'},
-            {scope:'unlocked', label: 'Unlocked'},
-          ],
-          users:
-          [
-            {scope:'all', label: 'All', subfilter: :lock_unlock},
-            {scope:'all_employee_roles', label: 'Employee', subfilter: :lock_unlock},
-            {scope:'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock},
-            {scope:'all_broker_roles', label: 'Broker', subfilter: :lock_unlock},
-          ],
-        top_scope: :users
+            lock_unlock:
+                [
+                    {scope:'locked', label: 'Locked'},
+                    {scope:'unlocked', label: 'Unlocked'},
+                ],
+            users:
+                [
+                    {scope:'all', label: 'All', subfilter: :lock_unlock},
+                    {scope:'all_employee_roles', label: 'Employee', subfilter: :lock_unlock},
+                    {scope:'all_employer_staff_roles', label: 'Employer', subfilter: :lock_unlock},
+                    {scope:'all_broker_roles', label: 'Broker', subfilter: :lock_unlock},
+                ],
+            top_scope: :users
         }
 
       end
