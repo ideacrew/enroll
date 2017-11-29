@@ -319,7 +319,7 @@ shop_notice_triggers = [
   },
 
   {
-    hbx_id: 'SHOPDAG015',
+    hbx_id: 'SHOPD015',
     title: 'Notice of Low Enrollment - Action Needed',
     description: 'Notifies all the employers who doesnt meet minimum participation requirement',
     resource_name: 'employer',
@@ -329,7 +329,7 @@ shop_notice_triggers = [
         name: 'Low Enrollment Notice',
         notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
         notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-        mpi_indicator: 'MPI_SHOPDAG015',
+        mpi_indicator: 'MPI_D015',
         notice_trigger_element_group: {
           market_places: ['shop'],
           primary_recipients: ["employer"],

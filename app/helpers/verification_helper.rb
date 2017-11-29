@@ -82,7 +82,11 @@ def ridp_type_status(type, person)
       when "in review"
         "warning"
       when "outstanding"
-        member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        if type == 'DC Residency'
+          member.consumer_role.processing_residency_24h? ? "info" : "danger"
+        else
+          member.consumer_role.processing_hub_24h? ? "info" : "danger"
+        end
       when "curam"
         "default"
       when "attested"
@@ -221,7 +225,11 @@ def ridp_type_status(type, person)
       when "curam"
         admin ? "External source" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
       else
-        person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        if v_type == 'DC Residency'
+          person.consumer_role.processing_residency_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        else
+          person.consumer_role.processing_hub_24h? ? "&nbsp;&nbsp;Processing&nbsp;&nbsp;".html_safe : "Outstanding"
+        end
     end
   end
 
@@ -259,8 +267,10 @@ def ridp_type_status(type, person)
   end
 
   def build_admin_actions_list(v_type, f_member)
-    if verification_type_status(v_type, f_member) == "outstanding"
-      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject"}
+    if f_member.consumer_role.aasm_state == 'unverified'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{ |el| el == 'Call HUB' }
+    elsif verification_type_status(v_type, f_member) == 'outstanding'
+      ::VlpDocument::ADMIN_VERIFICATION_ACTIONS.reject{|el| el == "Reject" }
     else
       ::VlpDocument::ADMIN_VERIFICATION_ACTIONS
     end

@@ -46,7 +46,11 @@
 <div class="row">
   <div class="fedhub-request col-md-12" id=<%="#{person.id}-#{v_type.split.join('-')}-hub"%>>
     <div class="col-md-9">
-      <p>New request to the Federal Hub will be sent.</p>
+      <% if v_type == 'DC Residency' %>
+          <p>New request to the Local Residency will be sent.</p>
+      <% else %>
+          <p>New request to the Federal Hub will be sent.</p>
+      <% end %>
     </div>
     <%= form_tag fed_hub_request_documents_path, method: :post do %>
         <%= hidden_field_tag 'person_id', person.id  %>
