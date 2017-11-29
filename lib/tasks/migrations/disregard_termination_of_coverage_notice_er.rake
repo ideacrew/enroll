@@ -12,7 +12,7 @@ include Config::ContactCenterHelper
 
 namespace :secure_message do
   desc "The employees of MA 12-1-2017 new groups received a notice in their accounts that their coverage was terminated because no payment was received from their employer."
-  task :disregard_termination_of_coverage_notice, [:fein] => :environment do |t, args|
+  task :disregard_termination_of_coverage_notice_er, [:fein] => :environment do |t, args|
   	feins = args[:fein].split(' ').uniq
 
     feins.each do |fein|
