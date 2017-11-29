@@ -6,7 +6,7 @@ module Exchanges
     end
 
     def can_cancel_application?(plan_year)
-      if plan_year.enrolling? && TimeKeeper.date_of_record < plan_year.start_on
+      if (PlanYear::PUBLISHED + PlanYear::RENEWING + ["renewing_application_inelgible"]).include?(plan_year.aasm_state)
         true
       else
         false

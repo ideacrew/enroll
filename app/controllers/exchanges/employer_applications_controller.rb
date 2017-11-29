@@ -30,7 +30,12 @@ class Exchanges::EmployerApplicationsController < ApplicationController
   def cancel
     @application = @employer_profile.plan_years.find(params[:employer_application_id])
     if @application.present?
-      @application.cancel!
+      if @application.may_cancel?
+        @application.cancel!
+      elsif @application.may_cancel_renewal?
+        @application.cancel_renewal!
+      end
+      @employer_profile.revert_application! if @employer_profile.may_revert_application?
       flash[:notice] = "Employer Application canceled successfully."
       redirect_to exchanges_hbx_profiles_root_path
     end

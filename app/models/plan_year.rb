@@ -100,10 +100,8 @@ class PlanYear
 
   def update_employee_benefit_packages
     if self.start_on_changed?
-      bg_ids = self.benefit_groups.pluck(:_id)
-      employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
-      employees.each do |census_employee|
-        census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
+      census_employees_within_play_year.each do |census_employee|
+        census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
           assignment.update(start_on: self.start_on)
           assignment.update(end_on: self.end_on) if assignment.end_on.present?
         end
@@ -111,13 +109,33 @@ class PlanYear
     end
   end
 
+  def benefit_group_ids
+    self.benefit_groups.map(&:id).uniq
+  end
+
+  def census_employees_within_play_year
+    CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => benefit_group_ids })
+  end
+
   def terminate_employee_benefit_packages(py_end_on)
-    bg_ids = self.benefit_groups.map(&:id)
-    census_employees = CensusEmployee.where({ :"benefit_group_assignments.benefit_group_id".in => bg_ids })
-    census_employees.each do |census_employee|
-      census_employee.benefit_group_assignments.where(:benefit_group_id.in => bg_ids).each do |assignment|
-        assignment.update(end_on: py_end_on) if assignment.end_on.present? && assignment.end_on > py_end_on
-        assignment.update_attributes!(:is_active => false)
+    census_employees_within_play_year.each do |census_employee|
+      census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
+        if assignment.end_on.present? && (assignment.end_on > py_end_on) && assignment.may_terminate_coverage?
+          assignment.update(end_on: py_end_on)
+          aasignment.terminate_coverage!
+          assignment.update_attributes!(:is_active => false)
+        end
+      end
+    end
+  end
+
+  def cancel_employee_benefit_packages
+    census_employees_within_play_year.each do |census_employee|
+      census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
+        if assignment.may_delink_coverage?
+          assignment.delink_coverage!
+          assignment.update_attribute(:is_active, false)
+        end
       end
     end
   end
@@ -127,6 +145,12 @@ class PlanYear
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     enrollments = families.inject([]) do |enrollments, family|
       enrollments += family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).any_of([HbxEnrollment::enrolled.selector, HbxEnrollment::renewing.selector]).to_a
+    end
+  end
+
+  def cancel_employee_enrollments
+    enrollments_for_plan_year.each do |hbx_enrollment|
+      hbx_enrollment.cancel_coverage! if hbx_enrollment.may_cancel_coverage?
     end
   end
 
@@ -917,7 +941,7 @@ class PlanYear
 
     # Enrollment processed stopped due to missing binder payment
     event :cancel, :after => :record_transition do
-      transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled
+      transitions from: [:draft, :published, :enrolling, :enrolled, :active], to: :canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     # Coverage disabled due to non-payment
@@ -970,7 +994,7 @@ class PlanYear
     end
 
     event :cancel_renewal, :after => :record_transition do
-      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled
+      transitions from: [:renewing_draft, :renewing_published, :renewing_enrolling, :renewing_application_ineligible, :renewing_enrolled, :renewing_publish_pending], to: :renewing_canceled, :after => [:cancel_employee_enrollments, :cancel_employee_benefit_packages]
     end
 
     event :conversion_expire, :after => :record_transition do
