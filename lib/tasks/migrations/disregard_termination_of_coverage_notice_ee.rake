@@ -27,7 +27,7 @@ namespace :secure_message1 do
 end
 
 def create_secure_inbox_message_for_employee(person)
-  body = "Please disregard the notice that you received on 9/26/2017 stating that your employer was not offering health coverage through the #{aca_state_name} #{site_short_name}. This notice was sent in error. We apologize for any inconvenience this may have caused." +
+  body = "Please disregard the notice that you received on 11/25/2017 stating that your employer was not offering health coverage through the #{aca_state_name} #{site_short_name}. This notice was sent in error. We apologize for any inconvenience this may have caused." +
    "<br><br>Your employer has completed its open enrollment period and has successfully met all eligibility requirements." + 
    "<br><br>Your plan selection, if any, will go into effect on the coverage effective date shown in your account." +
    "<br><br>Thank you for enrolling into employer-sponsored coverage through the #{site_short_name}."+ 
