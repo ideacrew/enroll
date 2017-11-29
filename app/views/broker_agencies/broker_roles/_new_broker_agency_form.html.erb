@@ -13,6 +13,12 @@
         <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
           <%= render "shared/broker_agency_profile_fields", f: f%>
         </div><br>
+
+        <div class="action-group">
+          <%= render "broker_agencies/applicants/bank_information", f: f %>
+          <p class="bank-name-container"></p>
+        </div>
+
         <div class="row no-buffer row-form-wrapper no-border">
           <!-- recaptcha_tags -->
         </div>
