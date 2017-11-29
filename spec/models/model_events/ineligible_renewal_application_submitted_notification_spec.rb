@@ -4,7 +4,6 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
 
   let(:model_event)  { "ineligible_renewal_application_submitted" }
   let(:notice_event) { "ineligible_renewal_application_submitted" }
-
   let(:effective_on) { Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months }
   let(:start_on) { (TimeKeeper.date_of_record - effective_on.months).beginning_of_month }
 
@@ -24,7 +23,7 @@ describe 'ModelEvents::InEligibleRenewalApplicationSubmittedNotification' do
       person = FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name)
       employee_role = FactoryGirl.create(:employee_role, person: person, census_employee: ce, employer_profile: employer)
       ce.update_attributes({employee_role: employee_role})
-    end
+    end    
   }
 
   describe "ModelEvent" do

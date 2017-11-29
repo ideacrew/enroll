@@ -10,8 +10,8 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
                             :name =>'Initial Employer SHOP Approval Notice',
                             :notice_template => 'notices/shop_employer_notices/2_initial_employer_approval_notice',
                             :notice_builder => 'ShopEmployerNotices::InitialEmployerEligibilityNotice',
+                            :mpi_indicator => 'SHOP_M002',
                             :event_name => 'initial_employer_approval',
-                            :mpi_indicator => 'MPI_SHOP2A',
                             :title => "Employer Approval Notice"})
                           }
     let(:valid_parmas) {{
@@ -64,8 +64,6 @@ RSpec.describe ShopEmployerNotices::InitialEmployerEligibilityNotice do
       due_date = PlanYear.calculate_open_enrollment_date(plan_year.start_on)[:binder_payment_due_date]
       @employer_notice.append_data
       expect(@employer_notice.notice.plan_year.start_on).to eq plan_year.start_on
-      expect(@employer_notice.notice.plan_year.open_enrollment_start_on).to eq plan_year.open_enrollment_start_on
-      expect(@employer_notice.notice.plan_year.open_enrollment_end_on).to eq plan_year.open_enrollment_end_on
       expect(@employer_notice.notice.plan_year.binder_payment_due_date).to eq due_date
     end
   end

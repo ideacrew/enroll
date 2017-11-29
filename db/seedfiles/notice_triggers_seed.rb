@@ -407,6 +407,29 @@ shop_notice_triggers = [
     #     }
     #   ]
     # },
+
+     {
+        hbx_id: 'SHOP_M015',
+        title: 'Notice of Low Enrollment - Action Needed',
+        description: 'Notifies all the employers who doesnt meet minimum participation requirement',
+        resource_name: 'employer',
+        event_name: 'low_enrollment_notice_for_employer',
+        notice_triggers: [
+          {
+            name: 'Low Enrollment Notice',
+            notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
+            notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
+            mpi_indicator: 'SHOP_M015',
+            notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employer"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+            }
+          }
+        ]
+      },
+
     # {
     #   hbx_id: 'SHOP16',
     #   title: 'Application to Offer Group Health Coverage in DC Health Link',
@@ -693,7 +716,7 @@ shop_notice_triggers = [
   },
     {
         hbx_id: 'SHOP32',
-        title: 'MAE032 EE SEP Requested Enrollment Period Approval Notice',
+        title: 'EE SEP Requested Enrollment Period Approval Notice',
         description: 'Notification to Employee Regarding SEP Request Enrollment Approval',
         resource_name: 'employee_role',
         event_name: 'notify_employee_of_special_enrollment_period',
@@ -758,92 +781,27 @@ shop_notice_triggers = [
         ]
     },
 
-   {
-   hbx_id: 'SHOP46',
-   title: 'Broker Hired Confirmation Notice',
-   description: 'Confirmation of Broker Hired Sent to Employer',
-   resource_name: 'employer',
-   event_name: 'broker_hired_confirmation',
-   notice_triggers: [
-     {
-       name: 'Boker Hired Confirmation',
-       notice_template: 'notices/shop_employer_notices/broker_hired_confirmation_notice',
-       notice_builder: 'ShopEmployerNotices::BrokerHiredConfirmationNotice',
-       mpi_indicator: 'SHOP_M046',
-       notice_trigger_element_group: {
-         market_places: ['shop'],
-         primary_recipients: ["employer"],
-         primary_recipient_delivery_method: ["secure_message"],
-         secondary_recipients: []
-       }
-      }
-     ]
-   },
-
-  # { DC
-  #   hbx_id: 'SHOP15',
-  #   title: 'Notice of Low Enrollment - Action Needed',
-  #   description: 'Notifies all the employers who doesnt meet minimum participation requirement',
-  #   resource_name: 'employer',
-  #   event_name: 'low_enrollment_notice_for_employer',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Low Enrollment Notice',
-  #       notice_template: 'notices/shop_employer_notices/low_enrollment_notice_for_employer',
-  #       notice_builder: 'ShopEmployerNotices::LowEnrollmentNotice',
-  #       mpi_indicator: 'MPI_SHOP15',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employer"],
-  #         primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #   ]
-  # },
-  # {
-  #   hbx_id: 'SHOP16',
-  #   title: 'Application to Offer Group Health Coverage in DC Health Link',
-  #   description: 'When Employer application meets minimum participation and non-owner requirements',
-  #   resource_name: 'employer',
-  #   event_name: 'initial_eligibile_employer_open_enrollment_begins',
-  #   notice_triggers: [
-  #     {
-  #       name: 'Initial Eligible Employer open enrollment begins',
-  #       notice_template: 'notices/shop_employer_notices/initial_employer_open_enrollment_begins',
-  #       notice_builder: 'ShopEmployerNotices::InitialEmployerOpenEnrollmentBegin',
-  #       mpi_indicator: 'MPI_SHOP16',
-  #       notice_trigger_element_group: {
-  #         market_places: ['shop'],
-  #         primary_recipients: ["employer"],
-  #         primary_recipient_delivery_method: ["secure_message"],
-  #         secondary_recipients: []
-  #       }
-  #     }
-  #    ]
-  #  },
-
     {
-    hbx_id: 'SHOP_M039',
-    title: 'Employee Terminating coverage',
-    description: 'Employee Terminating coverage after QLE',
-    resource_name: 'employer',
-    event_name: 'notify_employer_when_employee_terminate_coverage',
-    notice_triggers: [
-      {
-        name: 'Notice to employer when employee terminates coverage',
-        notice_template: 'notices/employee_terminating_coverage',
-        notice_builder: 'EmployeeTerminatingCoverage',
-        mpi_indicator: 'SHOP_M039',
-        notice_trigger_element_group: {
-          market_places: ['shop'],
-          primary_recipients: ["employer"],
-          primary_recipient_delivery_method: ["secure_message"],
-          secondary_recipients: []
-        }
-      }
-    ]
-  },
+        hbx_id: 'SHOP_M039',
+        title: 'Employee Terminating coverage',
+        description: 'Employee Terminating coverage after QLE',
+        resource_name: 'employer',
+        event_name: 'notify_employer_when_employee_terminate_coverage',
+        notice_triggers: [
+          {
+            name: 'Notice to employer when employee terminates coverage',
+            notice_template: 'notices/employee_terminating_coverage',
+            notice_builder: 'EmployeeTerminatingCoverage',
+            mpi_indicator: 'SHOP_M039',
+            notice_trigger_element_group: {
+              market_places: ['shop'],
+              primary_recipients: ["employer"],
+              primary_recipient_delivery_method: ["secure_message"],
+              secondary_recipients: []
+            }
+          }
+        ]
+    },
 
    {
    hbx_id: 'SHOP46',
@@ -1322,6 +1280,7 @@ shop_notice_triggers = [
                 name: 'Notice to employer when employee terminates coverage',
                 notice_template: 'notices/shop_employee_notices/employee_terminating_coverage',
                 notice_builder: 'ShopEmployeeNotices::EmployeeTerminatingCoverage',
+                # used unique MPI indicator with two event names
                 mpi_indicator: 'SHOP_M040',
                 notice_trigger_element_group: {
                     market_places: ['shop'],
