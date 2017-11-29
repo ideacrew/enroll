@@ -31,6 +31,7 @@ describe Subscribers::LawfulPresence do
     consumer_role = FactoryGirl.build(:consumer_role)
     person.consumer_role = consumer_role
     person.consumer_role.aasm_state = "dhs_pending"
+    person.consumer_role.citizen_status = "alien_lawfully_present"
     person
     }
 

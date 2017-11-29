@@ -14,7 +14,7 @@ class Insured::FamiliesController < FamiliesController
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
-    @active_sep = @family.active_seps.last
+    @active_sep = @family.latest_active_sep
 
     log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -146,7 +146,7 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if (@future_qualified_date || !@qualified_date) == true
+    if ((@qle.present? && @qle.shop?) && !@qualified_date)
       sep_request_denial_notice
     end
   end
