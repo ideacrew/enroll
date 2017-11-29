@@ -21,11 +21,16 @@ class ShopEmployeeNotices::NotifyRenewalEmployeesDentalCarriersExitingShop < Sho
     plan_name = plan.name
     plan_year_end_on = self.hbx_enrollment.benefit_group.plan_year.end_on
     carrier_name = plan.carrier_profile.organization.legal_name
+    primary_fullname = self.hbx_enrollment.employee_role.person.full_name
+    primary_email = self.hbx_enrollment.employee_role.person.work_email_or_best
 
     notice.plan = PdfTemplates::Plan.new({
       :plan_name => hbx_enrollment.plan.name,
       :coverage_end_on => plan_year_end_on,
       :plan_carrier => carrier_name
       })
+    
+    notice.primary_fullname = primary_fullname
+    notice.email = primary_email
   end
 end
