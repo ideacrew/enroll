@@ -42,12 +42,22 @@ module Concerns::Observable
       if observers.none?{|k, v| k.is_a?(observer.class)}
         observers[observer] = func
       end
+
       observers
     end
 
     def register_observers
       @@observer_peers ||= {}
-      @@observer_peers = add_observer(Observers::NoticeObserver.new, update_method_name.to_sym, @@observer_peers)
+      @@observer_peers[self.to_s] ||= []
+
+      add_observer_peer = lambda do |observer_instance|
+        matched_peer = @@observer_peers[self.to_s].detect{|peer| peer.any?{|k, v| k.is_a?(observer_instance.class)}}
+        if matched_peer.blank?
+          @@observer_peers[self.to_s] << add_observer(observer_instance, update_method_name.to_sym, {})
+        end
+      end
+
+      add_observer_peer.call(Observers::NoticeObserver.new)
     end
 
     def update_method_name
@@ -56,8 +66,10 @@ module Concerns::Observable
 
     def notify_observers(*arg)
       if defined? @@observer_peers
-        @@observer_peers.each do |k, v|
-          k.send v, *arg
+        @@observer_peers[self.to_s].each do |peer| 
+          peer.each do |k, v|
+            k.send v, *arg
+          end
         end
       end
     end
