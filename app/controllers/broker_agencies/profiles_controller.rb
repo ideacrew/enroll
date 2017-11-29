@@ -60,7 +60,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
-    #@organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -71,7 +71,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     person = @broker_agency_profile.primary_broker_role.person
 
     person.update_attributes(person_profile_params)
-
     @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
 
 
