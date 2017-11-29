@@ -12,6 +12,7 @@ class ShopEmployerNotice < Notice
     args[:to] = employer_profile.staff_roles.first.work_email_or_best
     args[:name] = employer_profile.staff_roles.first.full_name.titleize
     args[:recipient_document_store]= employer_profile
+    self.aasm_state = args[:options][:state] if args.present? && args[:options].present?
     self.key = args[:key]
     self.header = "notices/shared/header_with_page_numbers.html.erb"
     super(args)
