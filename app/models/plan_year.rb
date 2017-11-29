@@ -122,7 +122,7 @@ class PlanYear
       census_employee.benefit_group_assignments.where(:benefit_group_id.in => benefit_group_ids).each do |assignment|
         if assignment.end_on.present? && (assignment.end_on > py_end_on) && assignment.may_terminate_coverage?
           assignment.update(end_on: py_end_on)
-          aasignment.terminate_coverage!
+          assignment.terminate_coverage!
           assignment.update_attributes!(:is_active => false)
         end
       end
