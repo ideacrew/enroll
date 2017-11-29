@@ -10,23 +10,6 @@ describe 'ModelEvents::RenewalEmployerReminderToPublishPlanYearNotification' do
   let!(:model_instance) { build(:renewing_plan_year, employer_profile: employer, start_on: start_on, aasm_state: 'renewing_enrolling', benefit_groups: [benefit_group]) }
   let!(:benefit_group) { FactoryGirl.create(:benefit_group) }
   let(:census_employee)   { FactoryGirl.create(:census_employee, employer_profile: employer) }
-  let(:household) { FactoryGirl.create(:household, family: family)}
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:valid_params) do
-      {
-        census_employee: census_employee,
-        benefit_group: benefit_group,
-        start_on: start_on,
-        is_active: true
-      }
-    end
-  let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
-  let!(:enrollment) { FactoryGirl.create(:hbx_enrollment, household: household,
-                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, 
-                          aasm_state: "renewing_coverage_selected"
-                          )}
-
-  #let!(:organization) { FactoryGirl.create(:organization, employer_profile: employer) }
 
   let!(:date_mock_object) { double("Date", day: 15)}
   after(:each) do
